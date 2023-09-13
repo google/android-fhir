@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,47 +21,52 @@ import android.text.format.DateFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
-import com.google.android.fhir.demo.data.FhirPeriodicSyncWorker
+import com.google.android.fhir.demo.data.DemoFhirSyncWorker
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
-import com.google.android.fhir.sync.State
 import com.google.android.fhir.sync.Sync
+import com.google.android.fhir.sync.SyncJobStatus
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
-class MainActivityViewModel(application: Application, private val state: SavedStateHandle) :
-  AndroidViewModel(application) {
+@OptIn(InternalCoroutinesApi::class)
+class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
 
-  private val job = Sync.basicSyncJob(application.applicationContext)
-  private val _pollState = MutableSharedFlow<State>()
-  val pollState: Flow<State>
+  private val _pollState = MutableSharedFlow<SyncJobStatus>()
+  val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
   init {
-    poll()
+    viewModelScope.launch {
+      Sync.periodicSync<DemoFhirSyncWorker>(
+          application.applicationContext,
+          periodicSyncConfiguration =
+            PeriodicSyncConfiguration(
+              syncConstraints = Constraints.Builder().build(),
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+            )
+        )
+        .shareIn(this, SharingStarted.Eagerly, 10)
+        .collect { _pollState.emit(it) }
+    }
   }
 
-  /** Requests periodic sync. */
-  fun poll() {
+  fun triggerOneTimeSync() {
     viewModelScope.launch {
-      job.poll(
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-          ),
-          FhirPeriodicSyncWorker::class.java
-        )
+      Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
+        .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
     }
   }
@@ -73,7 +78,7 @@ class MainActivityViewModel(application: Application, private val state: SavedSt
         if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
       )
     _lastSyncTimestampLiveData.value =
-      job.lastSyncTimestamp()?.toLocalDateTime()?.format(formatter) ?: ""
+      Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
   }
 
   companion object {

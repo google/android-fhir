@@ -1,0 +1,750 @@
+{
+  "status": "draft",
+  "title": "Newborn hearing screening panel",
+  "resourceType": "Questionnaire",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
+    ],
+    "tag": [
+      {
+        "code": "lformsVersion: 29.2.1"
+      }
+    ]
+  },
+  "item": [
+    {
+      "type": "string",
+      "code": [
+        {
+          "code": "57700-7",
+          "display": "Hearing loss NBS comment/discussion",
+          "system": "http://loinc.org"
+        }
+      ],
+      "required": false,
+      "linkId": "/57700-7",
+      "text": "Hearing loss NBS comment/discussion"
+    },
+    {
+      "type": "choice",
+      "code": [
+        {
+          "code": "58232-0",
+          "display": "Hearing loss risk indicators",
+          "system": "http://loinc.org"
+        }
+      ],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "required": false,
+      "linkId": "/58232-0",
+      "text": "Hearing loss risk indicators",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "LA12668-2",
+            "display": "Family Hx of hearing loss"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12669-0",
+            "display": "ICU  stay > 5 days"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12673-2",
+            "display": "Hyperbilirubinemia with exchange transfusion"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12672-4",
+            "display": "Aminoglycoside administration for more than 5 days"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31563-2",
+            "display": "Asphyxia or Hypoxic Ischemic Encephalopathy"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12670-8",
+            "display": "ECMO"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12674-0",
+            "display": "In utero infection(s) such as herpes, rubella, syphilis, and toxoplasmosis"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31564-0",
+            "display": "In utero infection with cytomegalovirus (CMV)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31565-7",
+            "display": "Mother + Zika and infant with no laboratory evidence and no clinical findings"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31566-5",
+            "display": "Mother + Zika and infant with laboratory evidence of Zika"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31852-9",
+            "display": "Craniofacial malformations: Other (e.g., ear dysplasia, oral facial clefting, white forelock, microphthalmia)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31853-7",
+            "display": "Craniofacial malformations: microtia/atresia"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31567-3",
+            "display": "Congenital microcephaly, congenital or acquired hydrocephalus"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA31855-2",
+            "display": "Temporal bone ablornalities"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12676-5",
+            "display": "Syndromes associated with atypical hearing thresholds"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12678-1",
+            "display": "Culture-positive infections associated with sensorineural hearing loss"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12679-9",
+            "display": "Significant head trauma"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA6172-6",
+            "display": "Chemotherapy"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12667-4",
+            "display": "Caregiver concern about hearing"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA137-2",
+            "display": "None"
+          }
+        }
+      ],
+      "item": [
+        {
+          "text": "This question should be answered as part of the order and/or result of new born screen for hearing loss.  It is intended to capture the risk factors identified by the Joint committee on Infant Hearing (JCIH) in appendix 2 of their recommendations (Pediatrics 2007;120;898-921). The user should always provide an answer (none if no risk factors exist) and otherwise pick as many answers as apply. The observations must be included IF the hearing screening result  is delivered as part of this report.",
+          "type": "display",
+          "linkId": "/58232-0-help",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "text": "Help-Button",
+                "coding": [
+                  {
+                    "code": "help",
+                    "display": "Help-Button",
+                    "system": "http://hl7.org/fhir/questionnaire-item-control"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "choice",
+      "code": [
+        {
+          "code": "54106-0",
+          "display": "NB hearing scn meth",
+          "system": "http://loinc.org"
+        }
+      ],
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "drop-down",
+                "display": "Drop down"
+              }
+            ],
+            "text": "Drop down"
+          }
+        }
+      ],
+      "required": false,
+      "linkId": "/54106-0",
+      "text": "NB hearing scn meth",
+      "answerOption": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+              "valueString": "AABR"
+            }
+          ],
+          "valueCoding": {
+            "code": "LA10387-1",
+            "display": "Automated auditory brainstem response"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+              "valueString": "ABR"
+            }
+          ],
+          "valueCoding": {
+            "code": "LA10388-9",
+            "display": "Auditory brain stem response"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+              "valueString": "OAE"
+            }
+          ],
+          "valueCoding": {
+            "code": "LA10389-7",
+            "display": "Otoacoustic emissions"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+              "valueString": "DPOAE"
+            }
+          ],
+          "valueCoding": {
+            "code": "LA10390-5",
+            "display": "Distortion product otoacoustic emissions"
+          }
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-optionPrefix",
+              "valueString": "TOAE"
+            }
+          ],
+          "valueCoding": {
+            "code": "LA10391-3",
+            "display": "Transient otoacoustic emissions"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "LA12406-7",
+            "display": "Methodology unknown"
+          }
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "73741-1",
+          "display": "Newborn hearing screen panel - Left Ear",
+          "system": "http://loinc.org"
+        }
+      ],
+      "required": false,
+      "linkId": "/73741-1",
+      "text": "Newborn hearing screen panel - Left Ear",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "54108-6",
+              "display": "NB hearing scn Ear-L",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73741-1/54108-6",
+          "text": "NB hearing scn Ear-L",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA10392-1",
+                "display": "Pass"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA10393-9",
+                "display": "Refer"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6644-4",
+                "display": "Parental refusal"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12408-3",
+                "display": "Attempted, but unsuccessful - technical fail"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA7304-4",
+                "display": "Not performed"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12409-1",
+                "display": "Not performed, medical exclusion - not indicated"
+              }
+            }
+          ]
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "73740-3",
+              "display": "Screen dur Ear-L",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "min"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73741-1/73740-3",
+          "text": "Screen dur Ear-L",
+          "item": [
+            {
+              "text": "The duration of screening [left ear] indicates the length of time taken to perform the left ear newborn hearing screen.",
+              "type": "display",
+              "linkId": "/73741-1/73740-3-help",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "text": "Help-Button",
+                    "coding": [
+                      {
+                        "code": "help",
+                        "display": "Help-Button",
+                        "system": "http://hl7.org/fhir/questionnaire-item-control"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "73739-5",
+              "display": "NBS reason not prfmed Ear-L",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73741-1/73739-5",
+          "text": "NBS reason not prfmed Ear-L",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA12408-3",
+                "display": "Attempted, but unsuccessful - technical fail"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12409-1",
+                "display": "Not performed, medical exclusion - not indicated"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA20644-3",
+                "display": "Patient died"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6644-4",
+                "display": "Parental refusal"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA20643-5",
+                "display": "Procedure refused for religious reason"
+              }
+            }
+          ],
+          "item": [
+            {
+              "text": "Newborn hearing screening is universally mandated in the United States. Newborn hearing screen reason not performed explains why, in certain circumstances, the screening was not done for a particular infant.",
+              "type": "display",
+              "linkId": "/73741-1/73739-5-help",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "text": "Help-Button",
+                    "coding": [
+                      {
+                        "code": "help",
+                        "display": "Help-Button",
+                        "system": "http://hl7.org/fhir/questionnaire-item-control"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "text": "The newborn hearing loss panel [left ear] includes all of the terms relevant to reporting left ear newborn hearing screen results. It does not include terms that are relevant to both ears, such as the comment/discussion and hearing loss risk indicators.",
+          "type": "display",
+          "linkId": "/73741-1-help",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "text": "Help-Button",
+                "coding": [
+                  {
+                    "code": "help",
+                    "display": "Help-Button",
+                    "system": "http://hl7.org/fhir/questionnaire-item-control"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "code": [
+        {
+          "code": "73744-5",
+          "display": "Newborn hearing screen panel - Right Ear",
+          "system": "http://loinc.org"
+        }
+      ],
+      "required": false,
+      "linkId": "/73744-5",
+      "text": "Newborn hearing screen panel - Right Ear",
+      "item": [
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "54109-4",
+              "display": "NB hearing scn Ear-R",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73744-5/54109-4",
+          "text": "NB hearing scn Ear-R",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA10392-1",
+                "display": "Pass"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA10393-9",
+                "display": "Refer"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6644-4",
+                "display": "Parental refusal"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12408-3",
+                "display": "Attempted, but unsuccessful - technical fail"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA7304-4",
+                "display": "Not performed"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12409-1",
+                "display": "Not performed, medical exclusion - not indicated"
+              }
+            }
+          ]
+        },
+        {
+          "type": "decimal",
+          "code": [
+            {
+              "code": "73743-7",
+              "display": "Screen dur Ear-R",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+              "valueCoding": {
+                "display": "min"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73744-5/73743-7",
+          "text": "Screen dur Ear-R",
+          "item": [
+            {
+              "text": "The duration of screening [right ear] indicates the length of time taken to perform the right ear newborn hearing screen.",
+              "type": "display",
+              "linkId": "/73744-5/73743-7-help",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "text": "Help-Button",
+                    "coding": [
+                      {
+                        "code": "help",
+                        "display": "Help-Button",
+                        "system": "http://hl7.org/fhir/questionnaire-item-control"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "choice",
+          "code": [
+            {
+              "code": "73742-9",
+              "display": "NBS reason not prfmed Ear-R",
+              "system": "http://loinc.org"
+            }
+          ],
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "required": false,
+          "linkId": "/73744-5/73742-9",
+          "text": "NBS reason not prfmed Ear-R",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "LA12408-3",
+                "display": "Attempted, but unsuccessful - technical fail"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA12409-1",
+                "display": "Not performed, medical exclusion - not indicated"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA20644-3",
+                "display": "Patient died"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA6644-4",
+                "display": "Parental refusal"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "LA20643-5",
+                "display": "Procedure refused for religious reason"
+              }
+            }
+          ],
+          "item": [
+            {
+              "text": "Newborn hearing screening is universally mandated in the United States. Newborn hearing screen reason not performed explains why, in certain circumstances, the screening was not done for a particular infant.",
+              "type": "display",
+              "linkId": "/73744-5/73742-9-help",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "text": "Help-Button",
+                    "coding": [
+                      {
+                        "code": "help",
+                        "display": "Help-Button",
+                        "system": "http://hl7.org/fhir/questionnaire-item-control"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "text": "The newborn hearing loss panel [right ear] includes all of the terms relevant to reporting right ear newborn hearing screen results. It does not include terms that are relevant to both ears, such as the comment/discussion and hearing loss risk indicators.",
+          "type": "display",
+          "linkId": "/73744-5-help",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "text": "Help-Button",
+                "coding": [
+                  {
+                    "code": "help",
+                    "display": "Help-Button",
+                    "system": "http://hl7.org/fhir/questionnaire-item-control"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

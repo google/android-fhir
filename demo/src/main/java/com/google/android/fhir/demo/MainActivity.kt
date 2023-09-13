@@ -78,20 +78,17 @@ class MainActivity : AppCompatActivity() {
   private fun onNavigationItemSelected(item: MenuItem): Boolean {
     when (item.itemId) {
       R.id.menu_sync -> {
-        viewModel.poll()
-        true
+        viewModel.triggerOneTimeSync()
+        binding.drawer.closeDrawer(GravityCompat.START)
+        return false
       }
     }
-    binding.drawer.closeDrawer(GravityCompat.START)
     return false
   }
 
   private fun observeLastSyncTime() {
-    viewModel.lastSyncTimestampLiveData.observe(
-      this,
-      {
-        binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
-      }
-    )
+    viewModel.lastSyncTimestampLiveData.observe(this) {
+      binding.navigationView.getHeaderView(0).findViewById<TextView>(R.id.last_sync_tv).text = it
+    }
   }
 }

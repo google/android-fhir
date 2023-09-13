@@ -43,7 +43,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun shouldReturnValidResult() {
+  fun `should return valid result`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -72,104 +72,68 @@ class QuestionnaireResponseItemValidatorTest {
         }
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isTrue()
-    assertThat(validateAggregationFromChildValidators.validationMessages).isEmpty()
+    assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
-  fun exceededMaxMinValue_shouldReturnInvalidResultWithMessages() {
+  fun `should validate individual answers and combine results`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "a-question"
+        type = Questionnaire.QuestionnaireItemType.INTEGER
         addExtension(
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
-            this.setValue(IntegerType(600))
+            this.setValue(IntegerType(100))
           }
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
-            this.setValue(IntegerType(500))
+            this.setValue(IntegerType(200))
           }
         )
       }
     val answers =
       listOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType(550)
-        }
+          value = IntegerType(50)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(150)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = IntegerType(250)
+        },
       )
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("Maximum value allowed is:500")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("Minimum value allowed is:600")
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo("Minimum value allowed is:100\nMaximum value allowed is:200")
   }
 
   @Test
-  fun exceededMaxMinLength_shouldReturnInvalidResultWithMessages() {
+  fun `should validate all answers`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
-        maxLength = 10
-        addExtension(
-          Extension().apply {
-            url = MIN_LENGTH_EXTENSION_URL
-            this.setValue(IntegerType(20))
-          }
-        )
+        type = Questionnaire.QuestionnaireItemType.INTEGER
+        required = true
       }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = StringType("Length: 15chars")
-        }
-      )
+    val answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
 
-    val validateAggregationFromChildValidators =
+    val validationResult =
       QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
 
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(2)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
-    assertThat(validateAggregationFromChildValidators.validationMessages[1])
-      .isEqualTo("The minimum number of characters that are permitted in the answer is: 20")
-  }
-
-  @Test
-  fun notMatchingRegex_shouldReturnInvalidResultWithMessages() {
-    val regex = "[0-9]+\\.[0-9]+"
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            url = REGEX_EXTENSION_URL
-            this.setValue(StringType(regex))
-          }
-        )
-      }
-    val answers =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType("3141516")
-        }
-      )
-
-    val validateAggregationFromChildValidators =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
-
-    assertThat(validateAggregationFromChildValidators.isValid).isFalse()
-    assertThat(validateAggregationFromChildValidators.validationMessages.size).isEqualTo(1)
-    assertThat(validateAggregationFromChildValidators.validationMessages[0])
-      .isEqualTo("The answer doesn't match regular expression: $regex")
+    assertThat(validationResult).isInstanceOf(Invalid::class.java)
+    val invalidValidationResult = validationResult as Invalid
+    assertThat(invalidValidationResult.getSingleStringValidationMessage())
+      .isEqualTo("Missing answer for required field.")
   }
 }

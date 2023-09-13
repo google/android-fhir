@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,21 +19,18 @@ package com.google.android.fhir.impl
 import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.SyncDownloadContext
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.SyncedResourceEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.toTimeZoneString
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -58,7 +55,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.delete(type, id)
   }
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return search.execute(database)
   }
 
@@ -70,27 +67,34 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
+  override suspend fun clearDatabase() {
+    database.clearDatabase()
+  }
+
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return database.getLocalChanges(type, id)
+  }
+
+  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+    database.purge(type, id, forcePurge)
+  }
+
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend (SyncDownloadContext) -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>
   ) {
-    download(
-      object : SyncDownloadContext {
-        override suspend fun getLatestTimestampFor(type: ResourceType) = database.lastUpdate(type)
+    download().collect { resources ->
+      database.withTransaction {
+        val resolved =
+          resolveConflictingResources(
+            resources,
+            getConflictingResourceIds(resources),
+            conflictResolver
+          )
+        database.insertSyncedResources(resources)
+        saveResolvedResourcesToDatabase(resolved)
       }
-    )
-      .collect { resources ->
-        database.withTransaction {
-          val resolved =
-            resolveConflictingResources(
-              resources,
-              getConflictingResourceIds(resources),
-              conflictResolver
-            )
-          saveRemoteResourcesToDatabase(resources)
-          saveResolvedResourcesToDatabase(resolved)
-        }
-      }
+    }
   }
 
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
@@ -98,14 +102,6 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       database.deleteUpdates(it)
       database.update(*it.toTypedArray())
     }
-  }
-
-  private suspend fun saveRemoteResourcesToDatabase(resources: List<Resource>) {
-    val timeStamps =
-      resources.groupBy { it.resourceType }.entries.map {
-        SyncedResourceEntity(it.key, it.value.maxOf { it.meta.lastUpdated }.toTimeZoneString())
-      }
-    database.insertSyncedResources(timeStamps, resources)
   }
 
   private suspend fun resolveConflictingResources(
@@ -124,10 +120,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     resources
       .map { it.logicalId }
       .toSet()
-      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
+      .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    upload: suspend (List<SquashedLocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
@@ -164,7 +160,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         database.updateVersionIdAndLastUpdated(
           id,
           type,
-          response.etag,
+          getVersionFromETag(response.etag),
           response.lastModified.toInstant()
         )
       }
@@ -183,6 +179,20 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   /**
+   * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
+   * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
+   */
+  private fun getVersionFromETag(eTag: String) =
+    // The server should always return a weak etag that starts with W, but if it server returns a
+    // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
+    // always add value as a weak tag.
+    if (eTag.startsWith("W/")) {
+      eTag.split("\"")[1]
+    } else {
+      eTag
+    }
+
+  /**
    * May return a Pair of versionId and resource type extracted from the
    * [Bundle.BundleEntryResponseComponent.location].
    *
@@ -194,7 +204,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
     get() =
-      location?.split("/")?.takeIf { it.size > 3 }?.let {
-        it[it.size - 3] to ResourceType.fromCode(it[it.size - 4])
-      }
+      location
+        ?.split("/")
+        ?.takeIf { it.size > 3 }
+        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }

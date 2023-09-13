@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,10 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.add
 import androidx.fragment.app.commit
-import androidx.fragment.app.replace
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -40,12 +38,16 @@ import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
+import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
   private var isErrorState = false
+  private lateinit var infoCard: MaterialCardView
+  private lateinit var infoCardHeader: TextView
+  private lateinit var infoCardText: TextView
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -58,6 +60,24 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    infoCard = view.findViewById(R.id.infoCard)
+    when (args.questionnaireTitleKey) {
+      getString(R.string.behavior_name_skip_logic) -> {
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_skip_logic_info)
+        infoCard.visibility = View.VISIBLE
+      }
+      getString(R.string.behavior_name_calculated_expression) -> {
+        infoCardHeader = view.findViewById(R.id.infoCardHeader)
+        infoCardHeader.text = args.questionnaireTitleKey
+        infoCardText = view.findViewById(R.id.infoCardText)
+        infoCardText.text = getString(R.string.behavior_name_calculated_expression_info)
+        infoCard.visibility = View.VISIBLE
+      }
+      else -> infoCard.visibility = View.GONE
+    }
     setFragmentResultListener(REQUEST_ERROR_KEY) { _, bundle ->
       isErrorState = bundle.getBoolean(BUNDLE_ERROR_KEY)
       replaceQuestionnaireFragmentWithQuestionnaireJson()
@@ -65,10 +85,10 @@ class DemoQuestionnaireFragment : Fragment() {
     childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
       onSubmitQuestionnaireClick()
     }
-    updateArguments()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   override fun onResume() {
@@ -83,8 +103,7 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      // TODO https://github.com/google/android-fhir/issues/1088
-      R.id.submit_questionnaire -> {
+      com.google.android.fhir.datacapture.R.id.submit_questionnaire -> {
         onSubmitQuestionnaireClick()
         true
       }
@@ -98,7 +117,7 @@ class DemoQuestionnaireFragment : Fragment() {
 
   override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
     super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(getMenu(), menu)
+    getMenu()?.let { inflater.inflate(it, menu) }
   }
 
   private fun setUpActionBar() {
@@ -109,29 +128,16 @@ class DemoQuestionnaireFragment : Fragment() {
     setHasOptionsMenu(true)
   }
 
-  private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
-    requireArguments()
-      .putString(
-        QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
-        args.questionnaireFileWithValidationPathKey
-      )
-  }
-
   private fun addQuestionnaireFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add<QuestionnaireFragment>(
-            R.id.container,
-            tag = QUESTIONNAIRE_FRAGMENT_TAG,
-            args =
-              bundleOf(
-                QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
-                  viewModel.getQuestionnaireJson()
-              )
-          )
+          val questionnaireFragment =
+            QuestionnaireFragment.builder()
+              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .build()
+          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }
@@ -144,25 +150,22 @@ class DemoQuestionnaireFragment : Fragment() {
    */
   private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
     // TODO: remove check once all files are added
-    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
+    if (args.questionnaireWithValidationJsonStringKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
         if (isErrorState) {
-          viewModel.getQuestionnaireWithValidationJson()
+          args.questionnaireWithValidationJsonStringKey!!
         } else {
-          viewModel.getQuestionnaireJson()
+          args.questionnaireJsonStringKey!!
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)
-        replace<QuestionnaireFragment>(
+        replace(
           R.id.container,
-          tag = QUESTIONNAIRE_FRAGMENT_TAG,
-          args =
-            bundleOf(
-              QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
-            )
+          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString).build(),
+          QUESTIONNAIRE_FRAGMENT_TAG
         )
       }
     }
@@ -171,24 +174,22 @@ class DemoQuestionnaireFragment : Fragment() {
   private fun getThemeId(): Int {
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
-      WorkflowType.COMPONENT -> R.style.Theme_Androidfhir_Component
+      WorkflowType.COMPONENT,
+      WorkflowType.BEHAVIOR -> R.style.Theme_Androidfhir_Component
       WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
 
-  private fun getMenu(): Int {
+  private fun getMenu(): Int? {
     return when (args.workflow) {
-      WorkflowType.DEFAULT, WorkflowType.PAGINATED -> R.menu.layout_menu
       WorkflowType.COMPONENT -> R.menu.component_menu
+      else -> null
     }
   }
 
   private fun onSubmitQuestionnaireClick() {
     val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(
-        QuestionnaireContainerFragment.QUESTIONNAIRE_FRAGMENT_TAG
-      ) as
-        QuestionnaireFragment
+      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     launchQuestionnaireResponseFragment(
       viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
     )
@@ -213,14 +214,12 @@ class DemoQuestionnaireFragment : Fragment() {
 
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
-      "questionnaire-file-with-validation-path-key"
   }
 }
 
 enum class WorkflowType {
   COMPONENT,
   DEFAULT,
-  PAGINATED
+  PAGINATED,
+  BEHAVIOR
 }

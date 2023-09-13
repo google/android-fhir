@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.HttpAuthenticator
+import com.google.android.fhir.sync.remote.HttpLogger
+import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
@@ -67,6 +69,7 @@ object FhirEngineProvider {
             if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
             setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
             configuration.serverConfiguration?.let { setServerConfiguration(it) }
+            configuration.customSearchParameters?.let { setSearchParameters(it) }
             if (configuration.testMode) {
               inMemory()
             }
@@ -104,7 +107,20 @@ data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
-  val testMode: Boolean = false
+  val testMode: Boolean = false,
+  /**
+   * Additional search parameters to be used to query FHIR engine using the search API. These are in
+   * addition to the default search parameters defined in
+   * [FHIR](https://www.hl7.org/fhir/searchparameter-registry.html). The search parameters should be
+   * unique and not change the existing/default search parameters and it may lead to unexpected
+   * search behaviour.
+   *
+   * NOTE: The engine doesn't reindex resources after a new [SearchParameter] is added to the
+   * engine. It is the responsibility of the app developer to reindex the resources by updating
+   * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
+   * in the reindexing of the resource.
+   */
+  val customSearchParameters: List<SearchParameter>? = null
 )
 
 enum class DatabaseErrorStrategy {
@@ -123,14 +139,16 @@ enum class DatabaseErrorStrategy {
   RECREATE_AT_OPEN
 }
 
-/**
- * A configuration to provide the remote FHIR server url and an [Authenticator] for supplying any
- * auth token that may be necessary to communicate with the server.
- */
+/** A configuration to provide necessary params for network connection. */
 data class ServerConfiguration(
+  /** Url of the remote FHIR server. */
   val baseUrl: String,
+  /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
-  val authenticator: Authenticator? = null
+  /** An [HttpAuthenticator] for providing HTTP authorization header. */
+  val authenticator: HttpAuthenticator? = null,
+  /** Logs the communication between the engine and the remote server. */
+  val httpLogger: HttpLogger = HttpLogger.NONE
 )
 
 /** A configuration to provide the network connection parameters. */
@@ -140,5 +158,7 @@ data class NetworkConfiguration(
   /** Read timeout (in seconds) for network connection. The default is 10 seconds. */
   val readTimeOut: Long = 10,
   /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
-  val writeTimeOut: Long = 10
+  val writeTimeOut: Long = 10,
+  /** Compresses requests when uploading to a server that supports gzip. */
+  val uploadWithGzip: Boolean = false,
 )

@@ -10,11 +10,10 @@ publishArtifact(Releases.Contrib.Barcode)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -23,28 +22,26 @@ android {
   buildFeatures { viewBinding = true }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
-  compileOptions {
-    // Flag to enable support for the new language APIs
-    // See https://developer.android.com/studio/write/java8-support
-    isCoreLibraryDesugaringEnabled = false
-    // Sets Java compatibility to Java 8
-    // See https://developer.android.com/studio/write/java8-support
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+  packaging {
+    resources.excludes.addAll(
+      listOf(
+        "META-INF/INDEX.LIST",
+        "META-INF/ASL2.0",
+        "META-INF/ASL-2.0.txt",
+        "META-INF/LGPL-3.0.txt"
+      )
+    )
   }
-  kotlinOptions {
-    // See https://developer.android.com/studio/write/java8-support
-    jvmTarget = JavaVersion.VERSION_1_8.toString()
-  }
-  packagingOptions { resources.excludes.addAll(listOf("META-INF/INDEX.LIST")) }
+
   configureJacocoTestOptions()
 
   testOptions { animationsDisabled = true }
+  kotlin { jvmToolchain(11) }
 }
 
 configurations { all { exclude(module = "xpp3") } }

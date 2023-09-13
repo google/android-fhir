@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,14 @@ object Plugins {
   object BuildPlugins {
     const val androidLib = "com.android.library"
     const val application = "com.android.application"
-    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2452 is resolved.
+    const val benchmark = "androidx.benchmark"
+    const val jetbrainsKotlinAndroid = "org.jetbrains.kotlin.android"
     const val dokka = "org.jetbrains.dokka"
     const val kotlin = "kotlin"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
     const val mavenPublish = "maven-publish"
+    const val fladle = "com.osacky.fladle"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
     const val ruler = "com.spotify.ruler"
     const val spotless = "com.diffplug.spotless"
@@ -32,15 +34,18 @@ object Plugins {
 
   // classpath plugins
   const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.androidGradlePlugin}"
+  const val benchmarkGradlePlugin =
+    "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
   const val kotlinGradlePlugin =
     "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
   const val navSafeArgsGradlePlugin =
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
+  const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
 
   object Versions {
-    const val androidGradlePlugin = "7.2.1"
-    // Use Dokka 1.6.10 until https://github.com/Kotlin/dokka/issues/2472 is resolved.
-    const val dokka = "1.6.10"
+    const val androidGradlePlugin = "8.0.2"
+    const val benchmarkPlugin = "1.1.0"
+    const val dokka = "1.7.20"
   }
 }

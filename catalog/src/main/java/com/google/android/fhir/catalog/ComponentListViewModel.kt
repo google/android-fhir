@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,14 @@ import androidx.lifecycle.SavedStateHandle
 class ComponentListViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  fun getComponentList(): List<Component> {
-    return Component.values().toList()
+  sealed class ViewItem {
+    data class HeaderItem(val header: Header) : ViewItem()
+    data class ComponentItem(val component: Component) : ViewItem()
+  }
+
+  enum class Header(@StringRes val textId: Int) {
+    WIDGETS(R.string.widgets),
+    MISC_COMPONENTS(R.string.misc_components)
   }
 
   enum class Component(
@@ -38,75 +44,131 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * Path to the questionnaire json file with some or all required fields. If the user doesn't
      * answer the required questions, an error may be displayed on the particular question.
      */
-    val questionnaireFileWithValidation: String = "",
+    val questionnaireFileWithValidation: String? = null,
     val workflow: WorkflowType = WorkflowType.COMPONENT
   ) {
-    SINGLE_CHOICE(
-      R.drawable.ic_singlechoice,
-      R.string.component_name_single_choice,
-      "single_choice_questionnaire.json",
-      "single_choice_with_validation_questionnaire.json"
-    ),
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
       R.string.component_name_boolean_choice,
-      "boolean_choice_questionnaire.json",
-      "boolean_choice_with_validation_questionnaire.json"
+      "component_boolean_choice.json",
+      "component_boolean_choice_with_validation.json"
+    ),
+    SINGLE_CHOICE(
+      R.drawable.ic_singlechoice,
+      R.string.component_name_single_choice,
+      "component_single_choice.json",
+      "component_single_choice_with_validation.json"
     ),
     MULTIPLE_CHOICE(
       R.drawable.ic_multiplechoice,
       R.string.component_name_multiple_choice,
-      "multi_select_choice_questionnaire.json",
-      "multi_select_choice_with_validation_questionnaire.json"
+      "component_multi_select_choice.json",
+      "component_multi_select_choice_with_validation.json"
     ),
     DROPDOWN(
       R.drawable.ic_group_1278,
       R.string.component_name_dropdown,
-      "dropdown-questionnaire.json",
-      "dropdown_with_validation_questionnaire.json"
+      "component_dropdown.json",
+      "component_dropdown_with_validation.json"
     ),
     MODAL(
       R.drawable.ic_modal,
       R.string.component_name_modal,
-      "modal-questionnaire.json",
-      "modal_with_validation_questionnaire.json"
+      "component_modal.json",
+      "component_modal_with_validation.json"
     ),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,
-      "open-choice-questionnaire.json",
-      "open_choice_with_validation_questionnaire.json"
+      "component_open_choice.json",
+      "component_open_choice_with_validation.json"
     ),
     TEXT_FIELD(
       R.drawable.ic_textfield,
       R.string.component_name_text_field,
-      "text_fields_questionnaire.json",
-      "text_fields_with_validation_questionnaire.json"
+      "component_text_fields.json",
+      "component_text_fields_with_validation.json"
+    ),
+    AUTO_COMPLETE(
+      R.drawable.ic_autocomplete,
+      R.string.component_name_auto_complete,
+      "component_auto_complete.json",
+      "component_auto_complete_with_validation.json"
     ),
     DATE_PICKER(
       R.drawable.ic_datepicker,
       R.string.component_name_date_picker,
-      "date_picker_questionnaire.json",
-      "date_picker_with_validation_questionnaire.json"
+      "component_date_picker.json",
+      "component_date_picker_with_validation.json"
     ),
     DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
       R.string.component_name_date_time_picker,
-      "date_time_questionnaire.json",
-      "date_time_with_validation_questionnaire.json"
+      "component_date_time_picker.json",
+      "component_date_time_picker_with_validation.json"
     ),
     SLIDER(
       R.drawable.ic_slider,
       R.string.component_name_slider,
-      "slider_questionnaire.json",
-      "slider_with_validation_questionnaire.json"
+      "component_slider.json",
+      "component_slider_with_validation.json"
     ),
-    IMAGE(R.drawable.ic_image, R.string.component_name_image, "", ""),
-    AUTO_COMPLETE(
-      R.drawable.ic_textfield,
-      R.string.component_name_auto_complete,
-      "auto_complete_questionnaire.json",
-      "auto_complete_with_validation_questionnaire.json"
+    QUANTITY(
+      R.drawable.ic_unitoptions,
+      R.string.component_name_quantity,
+      "component_quantity.json",
+      "component_quantity_with_validation.json"
     ),
+    ATTACHMENT(
+      R.drawable.ic_attachment,
+      R.string.component_name_attachment,
+      "component_attachment.json",
+      "component_attachment_with_validation.json"
+    ),
+    REPEATED_GROUP(
+      R.drawable.ic_repeatgroups,
+      R.string.component_name_repeated_group,
+      "component_repeated_group.json",
+    ),
+    HELP(R.drawable.ic_help, R.string.component_name_help, "component_help.json"),
+    ITEM_MEDIA(
+      R.drawable.ic_item_media,
+      R.string.component_name_item_media,
+      "component_item_media.json"
+    ),
+    ITEM_ANSWER_MEDIA(
+      R.drawable.ic_item_answer_media,
+      R.string.component_name_item_answer_media,
+      ""
+    ),
+    INITIAL_VALUE(
+      R.drawable.ic_initial_value_component,
+      R.string.component_name_initial_value,
+      "component_initial_value.json"
+    )
   }
+
+  val viewItemList =
+    listOf(
+      ViewItem.HeaderItem(Header.WIDGETS),
+      ViewItem.ComponentItem(Component.BOOLEAN_CHOICE),
+      ViewItem.ComponentItem(Component.SINGLE_CHOICE),
+      ViewItem.ComponentItem(Component.MULTIPLE_CHOICE),
+      ViewItem.ComponentItem(Component.DROPDOWN),
+      ViewItem.ComponentItem(Component.MODAL),
+      ViewItem.ComponentItem(Component.OPEN_CHOICE),
+      ViewItem.ComponentItem(Component.TEXT_FIELD),
+      ViewItem.ComponentItem(Component.AUTO_COMPLETE),
+      ViewItem.ComponentItem(Component.DATE_PICKER),
+      ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
+      ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.QUANTITY),
+      ViewItem.ComponentItem(Component.ATTACHMENT),
+      ViewItem.ComponentItem(Component.REPEATED_GROUP),
+      ViewItem.HeaderItem(Header.MISC_COMPONENTS),
+      ViewItem.ComponentItem(Component.HELP),
+      ViewItem.ComponentItem(Component.ITEM_MEDIA),
+      ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
+      ViewItem.ComponentItem(Component.INITIAL_VALUE),
+    )
 }

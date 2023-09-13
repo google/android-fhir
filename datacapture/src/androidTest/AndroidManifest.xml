@@ -16,11 +16,12 @@
 -->
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.google.android.fhir.datacapture"
+    package="com.google.android.fhir.datacapture.test"
 >
 
   <application
         android:theme="@style/Theme.MaterialComponents.DayNight.DarkActionBar"
+        android:name=".DataCaptureTestApplication"
     >
     <activity android:name=".TestActivity" />
   </application>

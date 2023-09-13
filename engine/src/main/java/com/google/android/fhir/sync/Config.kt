@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ object SyncDataParams {
   const val SORT_KEY = "_sort"
   const val LAST_UPDATED_KEY = "_lastUpdated"
   const val ADDRESS_COUNTRY_KEY = "address-country"
+  const val SUMMARY_KEY = "_summary"
+  const val SUMMARY_COUNT_VALUE = "count"
 }
 
 /** Configuration for period synchronisation */

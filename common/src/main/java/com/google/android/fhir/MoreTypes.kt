@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,9 +65,10 @@ operator fun Type.compareTo(value: Type): Int {
       return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
     }
     this.fhirType().equals("Quantity") -> {
-      val quantity = UnitConverter.getCanonicalForm(UcumValue((this as Quantity).code, this.value))
+      val quantity =
+        UnitConverter.getCanonicalFormOrOriginal(UcumValue((this as Quantity).code, this.value))
       val anotherQuantity =
-        UnitConverter.getCanonicalForm(UcumValue((value as Quantity).code, value.value))
+        UnitConverter.getCanonicalFormOrOriginal(UcumValue((value as Quantity).code, value.value))
       if (quantity.code != anotherQuantity.code) {
         throw IllegalArgumentException(
           "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
@@ -79,7 +80,6 @@ operator fun Type.compareTo(value: Type): Int {
       throw NotImplementedError()
     }
   }
-  return 0
 }
 
 private fun clearTimeFromDateValue(dateValue: Date): Date {

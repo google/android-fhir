@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,10 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
@@ -33,7 +30,6 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private val viewModel: EditPatientViewModel by viewModels()
-  var submitMenuItem: MenuItem? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -48,26 +44,20 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     requireArguments()
       .putString(QUESTIONNAIRE_FILE_PATH_KEY, "new-patient-registration-paginated.json")
 
-    viewModel.livePatientData.observe(viewLifecycleOwner) {
-      addQuestionnaireFragment(it)
-      if (!it.toList().isNullOrEmpty()) {
-        submitMenuItem?.setEnabled(true)
-      }
-    }
+    viewModel.livePatientData.observe(viewLifecycleOwner) { addQuestionnaireFragment(it) }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
       if (!it) {
-        Toast.makeText(requireContext(), R.string.message_input_missing, Toast.LENGTH_SHORT).show()
+        Toast.makeText(requireContext(), R.string.inputs_missing, Toast.LENGTH_SHORT).show()
         return@observe
       }
       Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()
       NavHostFragment.findNavController(this).navigateUp()
     }
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.SUBMIT_REQUEST_KEY,
+      viewLifecycleOwner
+    ) { _, _ -> onSubmitAction() }
     (activity as MainActivity).setDrawerEnabled(false)
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    inflater.inflate(R.menu.edit_patient_fragment_menu, menu)
-    submitMenuItem = menu.findItem(R.id.action_edit_patient_submit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -76,23 +66,20 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      R.id.action_edit_patient_submit -> {
-        onSubmitAction()
-        true
-      }
       else -> super.onOptionsItemSelected(item)
     }
   }
 
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
-    val fragment = QuestionnaireFragment()
-    fragment.arguments =
-      bundleOf(
-        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to pair.first,
-        QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING to pair.second
-      )
     childFragmentManager.commit {
-      add(R.id.add_patient_container, fragment, QUESTIONNAIRE_FRAGMENT_TAG)
+      add(
+        R.id.add_patient_container,
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(pair.first)
+          .setQuestionnaireResponse(pair.second)
+          .build(),
+        QUESTIONNAIRE_FRAGMENT_TAG
+      )
     }
   }
 

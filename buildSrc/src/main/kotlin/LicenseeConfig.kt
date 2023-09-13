@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,10 +41,6 @@ fun Project.configureLicensee() {
     allowDependency("xpp3", "xpp3_xpath", "1.1.4c") {
       because("Custom license, essentially BSD-5. https://fedoraproject.org/wiki/Licensing/xpp")
     }
-    allowDependency("xpp3", "xpp3", "1.1.4c") {
-      because("Custom license, essentially BSD-5. https://fedoraproject.org/wiki/Licensing/xpp")
-    }
-
     // json-patch and its transitive deps
     allowDependency("com.github.java-json-tools", "btf", "1.3") {
       because("Dual-licensed under Apache. https://github.com/java-json-tools/btf")
@@ -63,10 +59,20 @@ fun Project.configureLicensee() {
     allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
+    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.4") {
+      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
+    }
 
-    // JAXB https://github.com/eclipse-ee4j/jaxb-ri
+    // Jakarta XML Binding API
     allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "2.3.3") {
       because("BSD 3-clause.")
+    }
+
+    // Jakarta Activation API 2.1 Specification
+    allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
+      because(
+        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php"
+      )
     }
 
     // Javax Annotation API
@@ -79,16 +85,23 @@ fun Project.configureLicensee() {
       because("Dual-licensed under CDDL 1.0 and GPL v3.")
     }
 
-    // ANTLR 4
-    allowDependency("org.antlr", "antlr4-runtime", "4.9.1") {
+    // xml-commons
+    allowDependency("xml-apis", "xml-apis", "1.4.01") {
+      because("Licensed under Mozilla Public License Version 2.0. http://www.mozilla.org/MPL/2.0/")
+    }
+
+    // The XSLT and XQuery Processor
+    allowDependency("net.sf.saxon", "Saxon-HE", "9.8.0-15") {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
 
-    // JSON-P https://javaee.github.io/jsonp/
-    allowDependency("org.glassfish", "javax.json", "1.1.4") {
-      because(
-        "Dual-licensed under CDDL 1.1 and GPL v2 with classpath exception. https://oss.oracle.com/licenses/CDDL+GPL-1.1"
-      )
+    // ANTLR 4
+    allowDependency("org.antlr", "antlr-runtime", "3.5.3") {
+      because("BSD 3-clause. http://www.antlr.org/license.html")
+    }
+    // ANTLR 4
+    allowDependency("org.antlr", "antlr4-runtime", "4.10.1") {
+      because("BSD 3-clause. http://www.antlr.org/license.html")
     }
 
     // Utilities
@@ -136,25 +149,24 @@ fun Project.configureLicensee() {
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
 
-    // Eclipse persistence
-    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.asm", "2.7.7") {
-      because(
-        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
-      )
+    // Glide
+    allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
 
-    // Eclipse persistence
-    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.core", "2.7.7") {
-      because(
-        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
-      )
+    // Glide Annotations
+    allowDependency("com.github.bumptech.glide", "annotations", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
 
-    // Eclipse persistence
-    allowDependency("org.eclipse.persistence", "org.eclipse.persistence.moxy", "2.7.7") {
-      because(
-        "Temporary dependency. Will be removed in https://github.com/cqframework/clinical_quality_language/pull/752"
-      )
+    // Glide Disk LRU Cache
+    allowDependency("com.github.bumptech.glide", "disklrucache", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // Glide GIF Decoder
+    allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
   }
 }
@@ -164,4 +176,5 @@ private val nonStandardLicenseUrls =
     // BSD-3
     "http://opensource.org/licenses/BSD-3-Clause",
     "http://www.opensource.org/licenses/bsd-license.php",
+    "https://asm.ow2.io/license.html",
   )

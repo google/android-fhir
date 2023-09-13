@@ -1,0 +1,11 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Schedule an appointment",
+      "type": "dateTime",
+      "required": true
+    }
+  ]
+}

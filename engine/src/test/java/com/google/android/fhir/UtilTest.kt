@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,6 +84,31 @@ class UtilTest : TestCase() {
   @Test
   fun operationOutcomeIsSuccess_patient_shouldReturnFalse() {
     assertThat(Patient().isUploadSuccess()).isFalse()
+  }
+
+  @Test
+  fun `isValidDateOnly() should return true for valid date only string`() {
+    assertThat(isValidDateOnly("2022-01-02")).isTrue()
+  }
+
+  @Test
+  fun `isValidDateOnly() should return false for valid datetime string`() {
+    assertThat(isValidDateOnly("2022-01-02 00:00:01")).isFalse()
+  }
+
+  @Test
+  fun `isValidDateOnly() should return false for invalid date string`() {
+    assertThat(isValidDateOnly("33-33-33")).isFalse()
+  }
+
+  @Test
+  fun `percentOf() should return 0 when total is zero`() {
+    assertThat(percentOf(0, 0)).isEqualTo(0)
+  }
+
+  @Test
+  fun `percentOf() should return percentage`() {
+    assertThat(percentOf(25, 50)).isEqualTo(0.5)
   }
 
   companion object {

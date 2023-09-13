@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,23 @@
 
 package com.google.android.fhir.datacapture.enablement
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.context.support.DefaultProfileValidationSupport
 import com.google.android.fhir.compareTo
-import com.google.android.fhir.datacapture.enableWhenExpression
+import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.enableWhenExpression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import com.google.android.fhir.equals
-import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.utils.FHIRPathEngine
+import org.hl7.fhir.r4.model.Resource
 
 /**
- * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent]. Uses the
- * `enableWhen` constraints and the `enableBehavior` value defined in the
- * [Questionnaire.QuestionnaireItemComponent]. Also depends on the answers (or lack thereof)
- * captured in the specified [QuestionnaireResponse.QuestionnaireResponseItemComponent] s.
+ * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent].
+ *
+ * This is done by locating the relevant [QuestionnaireResponse.QuestionnaireResponseItemComponent]s
+ * specified by the linkIds in the `enableWhen` constraints, and checking if the answers (or lack
+ * thereof) satisfy the criteria in the `enableWhen` constraints. The `enableBehavior` value is then
+ * used to combine the evaluation results of different `enableWhen` constraints.
  *
  * For example, the following `enableWhen` constraint in a
  * [Questionnaire.QuestionnaireItemComponent]
@@ -45,36 +46,86 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  *     ],
  * ```
  * specifies that the [Questionnaire.QuestionnaireItemComponent] should be enabled only if the
- * question with ID `vitaminKgiven` has been answered.
+ * question with linkId `vitaminKgiven` has been answered.
  *
  * The enablement status typically determines whether the [Questionnaire.QuestionnaireItemComponent]
  * is shown or hidden. However, it is also possible that only user interaction is enabled or
  * disabled (e.g. grayed out) with the [Questionnaire.QuestionnaireItemComponent] always shown.
+ *
+ * The evaluator works in the context of a Questionnaire and the corresponding
+ * QuestionnaireResponse. It is the caller's responsibility to make sure to call the evaluator with
+ * QuestionnaireItems and QuestionnaireResponseItems that belong to the Questionnaire and the
+ * QuestionnaireResponse.
  *
  * For more information see
  * [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
  * and
  * [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior)
  * .
+ *
+ * @param questionnaire the [Questionnaire] where the expression belong to
+ * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
+ * @param questionnaireItemParentMap the [Map] of items parent
+ * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
  */
-internal object EnablementEvaluator {
+internal class EnablementEvaluator(
+  private val questionnaire: Questionnaire,
+  private val questionnaireResponse: QuestionnaireResponse,
+  private val questionnaireItemParentMap:
+    Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+    emptyMap(),
+  private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+) {
+
+  private val expressionEvaluator =
+    ExpressionEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap
+    )
+
+  /**
+   * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
+   * represents the order in which all items are displayed in the UI.
+   */
+  private val questionnaireResponseItemPreOrderList = questionnaireResponse.allItems
+
+  /** The map from each item in the [QuestionnaireResponse] to its parent. */
+  private val questionnaireResponseItemParentMap =
+    mutableMapOf<
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponse.QuestionnaireResponseItemComponent
+    >()
+
+  init {
+    /** Adds each child-parent pair in the [QuestionnaireResponse] to the parent map. */
+    fun buildParentList(item: QuestionnaireResponse.QuestionnaireResponseItemComponent) {
+      for (child in item.item) {
+        questionnaireResponseItemParentMap[child] = item
+        buildParentList(child)
+      }
+      for (answer in item.answer) {
+        for (nestedItem in answer.item) {
+          buildParentList(nestedItem)
+        }
+      }
+    }
+
+    for (item in questionnaireResponse.item) {
+      buildParentList(item)
+    }
+  }
 
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
-   * @param questionnaireResponseItemRetriever function that returns the
-   * [QuestionnaireResponse.Item] with the `linkId`, or null if there isn't one.
-   *
-   * For example, the questionnaireItem might be
+   * @param questionnaireItem the corresponding questionnaire item.
+   * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
   fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireResponseItemRetriever:
-      (
-        item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-        linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
   ): Boolean {
     val enableWhenList = questionnaireItem.enableWhen
     val enableWhenExpression = questionnaireItem.enableWhenExpression
@@ -85,8 +136,16 @@ internal object EnablementEvaluator {
 
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
-      return fhirPathEngine.convertToBoolean(
-        fhirPathEngine.evaluate(questionnaireResponse, enableWhenExpression.expression)
+      val contextMap =
+        expressionEvaluator.extractDependentVariables(
+          questionnaireItem.enableWhenExpression!!,
+          questionnaireItem,
+        )
+      return evaluateToBoolean(
+        questionnaireResponse,
+        questionnaireResponseItem,
+        enableWhenExpression.expression,
+        contextMap,
       )
     }
 
@@ -94,8 +153,8 @@ internal object EnablementEvaluator {
     if (enableWhenList.size == 1) {
       return evaluateEnableWhen(
         enableWhenList.single(),
+        questionnaireItem,
         questionnaireResponseItem,
-        questionnaireResponseItemRetriever
       )
     }
 
@@ -105,42 +164,85 @@ internal object EnablementEvaluator {
     // enabled if ANY `enableWhen` constraint is satisfied.
     return when (val value = questionnaireItem.enableBehavior) {
       Questionnaire.EnableWhenBehavior.ALL ->
-        enableWhenList.all {
-          evaluateEnableWhen(it, questionnaireResponseItem, questionnaireResponseItemRetriever)
-        }
+        enableWhenList.all { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
       Questionnaire.EnableWhenBehavior.ANY ->
-        enableWhenList.any {
-          evaluateEnableWhen(it, questionnaireResponseItem, questionnaireResponseItemRetriever)
-        }
+        enableWhenList.any { evaluateEnableWhen(it, questionnaireItem, questionnaireResponseItem) }
       else -> throw IllegalStateException("Unrecognized enable when behavior $value")
     }
   }
-}
 
-/**
- * Returns whether the `enableWhen` constraint is satisfied.
- *
- * @param questionnaireResponseItemRetriever function that returns the [QuestionnaireResponse.Item]
- * with the `linkId`, or null if there isn't one.
- */
-private fun evaluateEnableWhen(
-  enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
-  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  questionnaireResponseItemRetriever:
-    (
-      item: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      linkId: String) -> QuestionnaireResponse.QuestionnaireResponseItemComponent?
-): Boolean {
-  val questionnaireResponseItem =
-    questionnaireResponseItemRetriever(questionnaireResponseItem, enableWhen.question)
-  return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
-    (questionnaireResponseItem == null || questionnaireResponseItem.answer.isEmpty()) !=
-      enableWhen.answerBooleanType.booleanValue()
-  } else {
-    // The `enableWhen` constraint evaluates to true if at least one answer has a value that
-    // satisfies the `enableWhen` operator and answer, with the exception of the `Exists` operator.
-    // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
-    questionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
+  /**
+   * Returns whether the `enableWhen` constraint is satisfied for the `questionnaireResponseItem`.
+   */
+  private fun evaluateEnableWhen(
+    enableWhen: Questionnaire.QuestionnaireItemEnableWhenComponent,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  ): Boolean {
+    val targetQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? =
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+          questionnaireResponseItem.linkId == enableWhen.question
+      )
+        questionnaireResponseItem
+      else findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+    return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
+      // True iff the answer value of the enable when is equal to whether an answer exists in the
+      // target questionnaire response item
+      enableWhen.answerBooleanType.booleanValue() ==
+        !(targetQuestionnaireResponseItem == null ||
+          targetQuestionnaireResponseItem.answer.isEmpty())
+    } else {
+      // The `enableWhen` constraint evaluates to true if at least one answer has a value that
+      // satisfies the `enableWhen` operator and answer, with the exception of the `Exists`
+      // operator.
+      // See https://www.hl7.org/fhir/valueset-questionnaire-enable-operator.html.
+      targetQuestionnaireResponseItem?.answer?.any { enableWhen.predicate(it) } ?: false
+    }
+  }
+
+  /**
+   * Find a questionnaire response item in [QuestionnaireResponse] with the given `linkId` starting
+   * from the `origin`.
+   *
+   * This is used by the enableWhen logic to evaluate if a question should be enabled/displayed.
+   *
+   * If multiple questionnaire response items are present for the same question (same linkId),
+   * either as a result of repeated group or nested question under repeated answers, this returns
+   * the nearest question occurrence reachable by tracing first the "ancestor" axis and then the
+   * "preceding" axis and then the "following" axis.
+   *
+   * See
+   * https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen.question.
+   */
+  private fun findEnableWhenQuestionnaireResponseItem(
+    origin: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    linkId: String,
+  ): QuestionnaireResponse.QuestionnaireResponseItemComponent? {
+    // Find the nearest ancestor with the linkId
+    var parent = questionnaireResponseItemParentMap[origin]
+    while (parent != null) {
+      if (parent.linkId == linkId) {
+        return parent
+      }
+      parent = questionnaireResponseItemParentMap[parent]
+    }
+
+    // Find the nearest item preceding the origin
+    val itemIndex = questionnaireResponseItemPreOrderList.indexOf(origin)
+    for (index in itemIndex - 1 downTo 0) {
+      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
+    }
+
+    // Find the nearest item succeeding the origin
+    for (index in itemIndex + 1 until questionnaireResponseItemPreOrderList.size) {
+      if (questionnaireResponseItemPreOrderList[index].linkId == linkId) {
+        return questionnaireResponseItemPreOrderList[index]
+      }
+    }
+
+    return null
   }
 }
 
@@ -172,10 +274,4 @@ private val Questionnaire.QuestionnaireItemEnableWhenComponent.predicate:
       }
       else -> throw NotImplementedError("Enable when operator $operator is not implemented.")
     }
-  }
-
-// Create fhirPathEngine instance
-val fhirPathEngine: FHIRPathEngine =
-  with(FhirContext.forCached(FhirVersionEnum.R4)) {
-    FHIRPathEngine(HapiWorkerContext(this, DefaultProfileValidationSupport(this)))
   }

@@ -1,0 +1,83 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "1",
+      "text": "Choose one from the options below",
+      "required": true,
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "option-1",
+            "display": "Option 1"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-2",
+            "display": "Option 2"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option-3",
+            "display": "Option 3"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "mother",
+            "display": "Option 4"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "sibling",
+            "display": "Option 5"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "other",
+            "display": "Option 6"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Select one",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ fun Project.createJacocoTestReportTask() {
     dependsOn(
       setOf(
         "testDebugUnitTest", // Generates unit test coverage report
-        "createDebugCoverageReport", // Generates instrumentation test coverage report
       )
     )
     reports {
@@ -57,7 +56,18 @@ fun Project.createJacocoTestReportTask() {
       html.required.set(true)
     }
     sourceDirectories.setFrom("$projectDir/src/main/java")
-    classDirectories.setFrom(fileTree("$buildDir/tmp/kotlin-classes/debug"))
+    classDirectories.setFrom(
+      fileTree("$buildDir/tmp/kotlin-classes/debug")
+        .exclude(
+          "**/R.class",
+          "**/R$*.class",
+          "**/BuildConfig.*",
+          "**/Manifest*.*",
+          "**/*Test*.*",
+          "android/**/*.*"
+        )
+    )
+
     executionData.setFrom(
       fileTree(buildDir) {
         include(
@@ -66,6 +76,8 @@ fun Project.createJacocoTestReportTask() {
             "outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec",
             // Instrumentation coverage report location
             "outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
+            // Instrumentation coverage report location from Firebase Test Lab
+            "fladle/results/**/*.ec",
           )
         )
       }
@@ -87,7 +99,7 @@ fun Project.createJacocoTestReportTask() {
 
 /** Configures jacoco test options in the `LibraryExtension`. */
 fun LibraryExtension.configureJacocoTestOptions() {
-  buildTypes { getByName("debug") { isTestCoverageEnabled = true } }
+  buildTypes { getByName("debug") { enableUnitTestCoverage = true } }
   testOptions {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true

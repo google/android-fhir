@@ -1,0 +1,54 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "ActivityDefinition",
+        "id": "Activity-Example",
+        "url": "http://example.com/ActivityDefinition/Activity-Example",
+        "status": "active",
+        "kind": "Task",
+        "library": [
+          "http://example.com/Library/example|1.0.0"
+        ],
+        "dynamicValue": [
+          {
+            "path": "description",
+            "expression": {
+              "language": "text/cql.identifier",
+              "expression": "Get Task Description"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "PlanDefinition",
+        "id": "Plan-Definition-Example",
+        "url" : "http://example.com/PlanDefinition/Plan-Definition-Example",
+        "status": "active",
+        "type": "workflow-definition",
+        "library": [
+          "http://example.com/Library/example|1.0.0"
+        ],
+        "action": [
+          {
+            "title": "Test for Female Patient",
+            "definitionCanonical": "http://example.com/ActivityDefinition/Activity-Example",
+            "condition": [
+              {
+                "kind": "applicability",
+                "expression": {
+                  "language": "text/cql.identifier",
+                  "expression": "Patient is Female"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+    "resourceType": "Bundle",
+    "id": "test-bundle-two-valuesets",
+    "type": "collection",
+    "entry": [
+        {
+            "resource": {
+                "resourceType": "ValueSet",
+                "id": "value-set-one",
+                "url": "http://localhost/fhir/ValueSet/value-set-one",
+                "name": "ValueSetOne",
+                "title": "ValueSetOne",
+                "status": "active",
+                "expansion": {
+                    "contains": [
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "code": "000",
+                            "display": "000 Code"
+                        },
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "code": "111",
+                            "display": "111 Code"
+                        },
+                        {
+                            "system": "http://localhost/unit-test-2",
+                            "version": "2018-03",
+                            "code": "333",
+                            "display": "333 Code"
+                        }
+                    ]
+                },
+                "compose": {
+                    "include": [
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "concept": [
+                                {
+                                    "code": "000",
+                                    "display": "000 Code"
+                                },
+                                {
+                                    "code": "111",
+                                    "display": "111 Code"
+                                }
+                            ]
+                        },
+                        {
+                            "system": "http://localhost/unit-test-2",
+                            "version": "2018-03",
+                            "concept": [
+                                {
+                                    "code": "333",
+                                    "display": "333 Code"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ValueSet",
+                "id": "value-set-two",
+                "url": "http://localhost/fhir/ValueSet/value-set-two",
+                "name": "ValueSetTwo",
+                "title": "ValueSetTwo",
+                "compose": {
+                    "include": [
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "concept": [
+                                {
+                                    "code": "444",
+                                    "display": "444 Code"
+                                },
+                                {
+                                    "code": "555",
+                                    "display": "555 Code"
+                                }
+                            ]
+                        },
+                        {
+                            "system": "http://localhost/unit-test-2",
+                            "version": "2018-03",
+                            "concept": [
+                                {
+                                    "code": "666",
+                                    "display": "666 Code"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ValueSet",
+                "id": "value-set-three",
+                "url": "http://localhost/fhir/ValueSet/value-set-three",
+                "name": "ValueSetThree",
+                "title": "ValueSetThree",
+                "expansion": {
+                    "contains": [
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "code": "777",
+                            "display": "777 Code"
+                        },
+                        {
+                            "system": "http://localhost/unit-test",
+                            "version": "2018-03",
+                            "code": "888",
+                            "display": "888 Code"
+                        },
+                        {
+                            "system": "http://localhost/unit-test-2",
+                            "version": "2018-03",
+                            "code": "999",
+                            "display": "999 Code"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "resource": {
+                "resourceType": "ValueSet",
+                "id": "value-set-four",
+                "url": "http://localhost/fhir/ValueSet/value-set-four",
+                "name": "ValueSetFour",
+                "title": "ValueSetFour"
+            }
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,15 @@ package com.google.android.fhir.datacapture.testing
 import android.app.Application
 import com.google.android.fhir.datacapture.DataCaptureConfig
 
-/** Application class when you want to test the DataCaptureConfig.Provider */
+/** Application class when you want to test the [DataCaptureConfig.Provider]. */
 internal class DataCaptureTestApplication : Application(), DataCaptureConfig.Provider {
   var dataCaptureConfiguration: DataCaptureConfig? = null
 
-  override fun getDataCaptureConfig() = dataCaptureConfiguration ?: DataCaptureConfig()
+  override fun getDataCaptureConfig(): DataCaptureConfig {
+    if (dataCaptureConfiguration == null) {
+      dataCaptureConfiguration = DataCaptureConfig()
+    }
+
+    return dataCaptureConfiguration!!
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -36,16 +37,16 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  val questionnaire: String
-    get() = getQuestionnaireJson()
+  private var _questionnaireJson: String? = null
+  val questionnaireJson: String
+    get() = fetchQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
 
-  private val questionnaireResource: Questionnaire
+  private val questionnaire: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireJson)
+        as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
-  private var questionnaireJson: String? = null
 
   /**
    * Saves patient registration questionnaire response into the application database.
@@ -55,19 +56,24 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
       if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
-            questionnaireResource,
+            questionnaire,
             questionnaireResponse,
-            getApplication()
+            getApplication(),
           )
           .values
           .flatten()
-          .any { !it.isValid }
+          .any { it is Invalid }
       ) {
         isPatientSaved.value = false
         return@launch
       }
 
-      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
+      val entry =
+        ResourceMapper.extract(
+            questionnaire,
+            questionnaireResponse,
+          )
+          .entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
       }
@@ -78,12 +84,12 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     }
   }
 
-  private fun getQuestionnaireJson(): String {
-    questionnaireJson?.let {
-      return it!!
+  private fun fetchQuestionnaireJson(): String {
+    _questionnaireJson?.let {
+      return it
     }
-    questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return questionnaireJson!!
+    _questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    return _questionnaireJson!!
   }
 
   private fun readFileFromAssets(filename: String): String {

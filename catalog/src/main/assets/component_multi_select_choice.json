@@ -1,0 +1,93 @@
+{
+  "title": "Multiple choice",
+  "status": "active",
+  "version": "0.0.1",
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1.0.0",
+      "text": "What’s the reason for today’s visit?",
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "check-box",
+                "display": "Checkbox"
+              }
+            ],
+            "text": "Checkbox"
+          }
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "code_1",
+            "display": "ANC",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_2",
+            "display": "Immunization",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_3",
+            "display": "Malaria Testing",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_4",
+            "display": "Feeling sick",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_5",
+            "display": "Family planning",
+            "system": "http://snomed.info/sct"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "code_6",
+            "display": "Lab Tests",
+            "system": "http://snomed.info/sct"
+          }
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1-select-one",
+          "text": "Select all that apply",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

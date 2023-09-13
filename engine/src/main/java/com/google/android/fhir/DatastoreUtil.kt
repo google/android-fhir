@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,10 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
-  name = "FHIR_ENGINE_PREF_DATASTORE"
-)
+private val Context.dataStore: DataStore<Preferences> by
+  preferencesDataStore(name = "FHIR_ENGINE_PREF_DATASTORE")
 
-class DatastoreUtil(private val context: Context) {
+internal class DatastoreUtil(private val context: Context) {
   private val lastSyncTimestampKey by lazy { stringPreferencesKey("LAST_SYNC_TIMESTAMP") }
 
   fun readLastSyncTimestamp(): OffsetDateTime? {

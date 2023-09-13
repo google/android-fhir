@@ -1,0 +1,89 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "type": "choice",
+      "repeats": true,
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "open-choice"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "1",
+      "text": "Do you have any pre-existing health conditions?",
+      "required": true,
+      "item": [
+        {
+          "linkId": "1.1",
+          "text": "Health conditions",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "dm",
+            "display": "Diabetes Melitus (DM)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "ht",
+            "display": "Hypertension (HT)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "ihd",
+            "display": "Ischemic Heart Disease (IHD/CHD/CCF)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "tb",
+            "display": "Tuberculosis (TB)"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "copd",
+            "display": "Asthma/COPD"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "kidney",
+            "display": "Chronic Kidney Disease"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "none",
+            "display": "None"
+          }
+        }
+      ]
+    }
+  ]
+}

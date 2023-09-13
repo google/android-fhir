@@ -1,0 +1,92 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "text": "Repeated Group",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Sample date question",
+          "type": "date",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+              "valueString": "yyyy-mm-dd"
+            }
+          ]
+        },
+        {
+          "linkId": "1-2",
+          "type": "choice",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "drop-down",
+                    "display": "Drop down"
+                  }
+                ],
+                "text": "Drop down"
+              }
+            }
+          ],
+          "text": "Sample dropdown question",
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "answer-a",
+                "display": "A"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-b",
+                "display": "B"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-c",
+                "display": "C"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "answer-other",
+                "display": "Other"
+              }
+            }
+          ],
+          "item": [
+            {
+              "linkId": "1-3-1",
+              "text": "Dropdown question helper text",
+              "type": "display",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+                  "valueCodeableConcept": {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/questionnaire-item-control",
+                        "code": "flyover",
+                        "display": "Fly-over"
+                      }
+                    ],
+                    "text": "Flyover"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

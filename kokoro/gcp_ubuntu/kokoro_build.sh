@@ -35,7 +35,7 @@ set -e
 # Code under repo is checked out to ${KOKORO_ARTIFACTS_DIR}/git.
 # The final directory name in this path is determined by the scm name specified
 # in the job configuration.
-export JAVA_HOME="/usr/lib/jvm/java-1.11.0-openjdk-amd64"
+export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
 export ANDROID_HOME=${HOME}/android_sdk
 export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
 export GCS_BUCKET="android-fhir-build-artifacts"
@@ -63,7 +63,10 @@ function zip_artifacts() {
 function setup() {
   sudo npm cache clean -f
   sudo npm install -g n
-  sudo n stable
+  sudo n 16.18.0
+  sudo apt install -y openjdk-17-jdk openjdk-17-jre
+
+  gcloud components update --quiet
 
   wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip \
     -O ${HOME}/android_sdk.zip -q
@@ -85,56 +88,27 @@ function build_only() {
 }
 
 # Runs instrumentation tests using Firebase Test Lab, and retrieves the code
-# coverage reports. First, we have to create the APKs to upload to Firebase.
-# There are four APKs that we use: one for each of the libraries we want to test,
-# and one for the demo app.
-#
-# 9 tests run in total: for each library, we run against 3 different API levels.
-# The tests for each library run in parallel and as background processes, but,
-# we wait for Firebase to finish execution of all the tests before pulling the
-# code coverage results from the GCS bucket.
-#
-# See: https://cloud.google.com/sdk/gcloud/reference/firebase/test/android/run
-# for documentation on the gcloud command used in this function
-# See: https://cloud.google.com/storage/docs/gsutil/commands/cp
-# for documentation on the gsutil command used in this function
+# coverage reports.
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
-  local lib_names=("datacapture" "engine" "workflow")
-  firebase_pids=()
-  for lib_name in "${lib_names[@]}"; do
-   gcloud firebase test android run --type instrumentation \
-      --app demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk \
-      --test $lib_name/build/outputs/apk/androidTest/debug/$lib_name-debug-androidTest.apk \
-      --timeout 30m \
-      --device model=Nexus6P,version=24 \
-      --device model=Nexus6P,version=27 \
-      --device model=Pixel2,version=30 \
-      --environment-variables coverage=true,coverageFile="/sdcard/Download/coverage.ec" \
-      --directories-to-pull /sdcard/Download  \
-      --results-bucket=$GCS_BUCKET \
-      --results-dir=$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name \
-      --project=android-fhir-instrumeted-tests \
-      --no-use-orchestrator &
+  ./gradlew packageReleaseAndroidTest --scan --stacktrace
+    local lib_names=("workflow:benchmark" "engine:benchmark" "datacapture" "engine" "knowledge" "workflow")
+    firebase_pids=()
+    for lib_name in "${lib_names[@]}"; do
+      ./gradlew :$lib_name:runFlank  --scan --stacktrace &
       firebase_pids+=("$!")
-  done
+    done
 
-  for firebase_pid in ${firebase_pids[*]}; do
-    wait $firebase_pid
-  done
-
-  mkdir -p {datacapture,engine,workflow}/build/outputs/code_coverage/debugAndroidTest/connected/firebase
-  for lib_name in "${lib_names[@]}"; do
-    gsutil -m cp -R gs://$GCS_BUCKET/$KOKORO_BUILD_ARTIFACTS_SUBDIR/firebase/$lib_name/Pixel2-30-en-portrait/**/coverage.ec \
-      $lib_name/build/outputs/code_coverage/debugAndroidTest/connected/firebase
-  done
+    for firebase_pid in ${firebase_pids[*]}; do
+        wait $firebase_pid
+    done
 }
 
 # Generates JaCoCo reports and uploads to Codecov: https://about.codecov.io/
 # Before uploading to Codecov, run an Integrity Check on the Uploader binary.
 # See: https://docs.codecov.com/docs/codecov-uploader#using-the-uploader-with-codecovio-cloud
 function code_coverage() {
-  ./gradlew jacocoTestReport --exclude-task createDebugCoverageReport --scan --stacktrace
+  ./gradlew jacocoTestReport --scan --stacktrace
 
   curl https://keybase.io/codecovsecurity/pgp_keys.asc \
     | gpg --no-default-keyring --keyring trustedkeys.gpg --import
@@ -151,6 +125,7 @@ function code_coverage() {
     -f common/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f datacapture/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f engine/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
+    -f knowledge/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -f workflow/build/reports/jacoco/jacocoTestReport/jacocoTestReport.xml \
     -t "$(cat "${KOKORO_KEYSTORE_DIR}/76773_android-fhir-codecov-token")"
 }

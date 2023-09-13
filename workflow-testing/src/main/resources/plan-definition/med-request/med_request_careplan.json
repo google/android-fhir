@@ -1,0 +1,43 @@
+{
+  "resourceType": "CarePlan",
+  "contained": [ {
+    "resourceType": "RequestGroup",
+    "id": "MedRequest-Example",
+    "instantiatesCanonical":[
+      "http://localhost/PlanDefinition/MedRequest-Example"
+    ],
+    "status": "draft",
+    "intent": "proposal",
+    "subject": {
+      "reference": "Patient/Patient-Example"
+    },
+    "action": [ {
+      "resource": {
+        "reference": "MedicationRequest/MedicationRequest-1"
+      }
+    } ]
+  }, {
+    "resourceType": "MedicationRequest",
+    "id": "MedicationRequest-1",
+    "intent": "order",
+    "medicationCodeableConcept": {
+      "text": "Medication 1"
+    },
+    "subject": {
+      "reference": "Patient/Patient-Example"
+    }
+  } ],
+  "instantiatesCanonical": [
+    "http://localhost/PlanDefinition/MedRequest-Example"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "Patient/Patient-Example"
+  },
+  "activity": [ {
+    "reference": {
+      "reference": "#MedRequest-Example"
+    }
+  } ]
+}
