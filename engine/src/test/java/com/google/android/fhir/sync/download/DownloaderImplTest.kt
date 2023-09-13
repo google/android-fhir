@@ -20,7 +20,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.DownloadRequest
-import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.UploadRequest
 import com.google.android.fhir.sync.UrlDownloadRequest

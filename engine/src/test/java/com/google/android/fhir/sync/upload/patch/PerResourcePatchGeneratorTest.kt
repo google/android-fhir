@@ -23,7 +23,6 @@ import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.jsonParser
 import com.google.android.fhir.testing.readFromFile
