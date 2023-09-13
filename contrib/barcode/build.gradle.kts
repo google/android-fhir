@@ -52,10 +52,6 @@ android {
 
   testOptions { animationsDisabled = true }
   kotlin { jvmToolchain(11) }
-  compileOptions {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-  }
 }
 
 configurations { all { exclude(module = "xpp3") } }

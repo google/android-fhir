@@ -21,6 +21,10 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -30,6 +34,7 @@ import java.time.Instant
 import java.util.Date
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.json.JSONArray
 import timber.log.Timber
 
 /**
@@ -76,11 +81,7 @@ internal abstract class LocalChangeDao {
       )
     }
     val jsonDiff =
-      LocalChangeUtils.diff(
-        iParser,
-        iParser.parseResource(oldEntity.serializedResource) as Resource,
-        resource
-      )
+      diff(iParser, iParser.parseResource(oldEntity.serializedResource) as Resource, resource)
     if (jsonDiff.length() == 0) {
       Timber.i(
         "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
@@ -189,3 +190,42 @@ internal abstract class LocalChangeDao {
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }
+
+/** Calculates the JSON patch between two [Resource] s. */
+internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
+  val objectMapper = ObjectMapper()
+  return getFilteredJSONArray(
+    JsonDiff.asJson(
+      objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
+      objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java)
+    )
+  )
+}
+
+/**
+ * This function returns the json diff as a json array of operation objects. We remove the "/meta"
+ * and "/text" paths as they cause path not found issue when we update the resource. They are
+ * usually present in the downloaded resource object but are missing in the edited object as these
+ * aren't supposed to be edited. Thus, the Json diff creates a DELETE- OP for "/meta" and "/text"
+ * and causes the issue with server update.
+ *
+ * An unfiltered JSON Array for family name update looks like
+ * ```
+ * [{"op":"remove","path":"/meta"}, {"op":"remove","path":"/text"},
+ * {"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+ * ```
+ *
+ * A filtered JSON Array for family name update looks like
+ * ```
+ * [{"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+ * ```
+ */
+private fun getFilteredJSONArray(jsonDiff: JsonNode) =
+  with(JSONArray(jsonDiff.toString())) {
+    val ignorePaths = setOf("/meta", "/text")
+    return@with JSONArray(
+      (0 until length())
+        .map { optJSONObject(it) }
+        .filterNot { jsonObject -> ignorePaths.any { jsonObject.optString("path").startsWith(it) } }
+    )
+  }

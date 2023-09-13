@@ -19,22 +19,19 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.sync.UrlUploadRequest
+import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
-/** Generates list of [UrlUploadRequest]s with for each [LocalChange] given. */
+/** Generates list of [UrlUploadRequest]s with for each [Patch] given. */
 class IndividualRequestGenerator(
-  private val getIndividualRequestForLocalChangeType:
-    (type: Type, localChange: LocalChange) -> UrlUploadRequest
+  private val getIndividualRequestForPatchType: (type: Patch.Type, patch: Patch) -> UrlUploadRequest
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(localChanges: List<LocalChange>): List<UrlUploadRequest> =
-    localChanges.map { getIndividualRequestForLocalChangeType(it.type, it) }
+  override fun generateUploadRequests(patches: List<Patch>): List<UrlUploadRequest> =
+    patches.map { getIndividualRequestForPatchType(it.type, it) }
 
   companion object Factory {
 
@@ -75,46 +72,41 @@ class IndividualRequestGenerator(
             "Update using $httpVerbToUseForUpdate is not supported."
           )
 
-      return IndividualRequestGenerator { type, localChange ->
+      return IndividualRequestGenerator { type, patch ->
         when (type) {
-          Type.INSERT -> createFunction(localChange)
-          Type.UPDATE -> updateFunction(localChange)
-          Type.DELETE -> deleteFunction(localChange)
-          Type.NO_OP -> error("Cannot create a request from a NO_OP type")
+          Patch.Type.INSERT -> createFunction(patch)
+          Patch.Type.UPDATE -> updateFunction(patch)
+          Patch.Type.DELETE -> deleteFunction(patch)
         }
       }
     }
 
-    private fun deleteFunction(localChange: LocalChange) =
+    private fun deleteFunction(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.DELETE,
-        url = "${localChange.resourceType}/${localChange.resourceId}",
-        resource = parser.parseResource(localChange.payload) as Resource,
-        localChangeToken = LocalChangeToken(localChange.token.ids),
+        url = "${patch.resourceType}/${patch.resourceId}",
+        resource = parser.parseResource(patch.payload) as Resource,
       )
 
-    private fun postForCreateResource(localChange: LocalChange) =
+    private fun postForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.POST,
-        url = localChange.resourceType,
-        resource = parser.parseResource(localChange.payload) as Resource,
-        localChangeToken = LocalChangeToken(localChange.token.ids),
+        url = patch.resourceType,
+        resource = parser.parseResource(patch.payload) as Resource,
       )
 
-    private fun putForCreateResource(localChange: LocalChange) =
+    private fun putForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.PUT,
-        url = "${localChange.resourceType}/${localChange.resourceId}",
-        resource = parser.parseResource(localChange.payload) as Resource,
-        localChangeToken = LocalChangeToken(localChange.token.ids),
+        url = "${patch.resourceType}/${patch.resourceId}",
+        resource = parser.parseResource(patch.payload) as Resource,
       )
 
-    private fun patchForUpdateResource(localChange: LocalChange) =
+    private fun patchForUpdateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.PATCH,
-        url = "${localChange.resourceType}/${localChange.resourceId}",
-        resource = Binary().apply { data = localChange.payload.toByteArray() },
-        localChangeToken = LocalChangeToken(localChange.token.ids),
+        url = "${patch.resourceType}/${patch.resourceId}",
+        resource = Binary().apply { data = patch.payload.toByteArray() },
         headers = mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH)
       )
   }

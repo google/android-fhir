@@ -80,11 +80,7 @@ android {
   }
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-  }
+  compileOptions { isCoreLibraryDesugaringEnabled = true }
 }
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
