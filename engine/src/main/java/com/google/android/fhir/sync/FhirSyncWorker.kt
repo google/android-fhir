@@ -26,6 +26,8 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
+import com.google.android.fhir.sync.upload.UploadWorkManager
 import com.google.android.fhir.sync.upload.UploaderImpl
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
@@ -36,7 +38,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.apache.commons.io.IOUtils
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -48,7 +49,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract fun getUploadWorkManager(): UploadWorkManager
+  private fun getUploadWorkManager(): UploadWorkManager {
+    return SquashedChangesUploadWorkManager()
+  }
   abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =

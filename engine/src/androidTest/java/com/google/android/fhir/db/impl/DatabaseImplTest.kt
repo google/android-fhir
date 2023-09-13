@@ -24,10 +24,10 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.Operation
