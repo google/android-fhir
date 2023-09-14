@@ -29,9 +29,9 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
+import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource

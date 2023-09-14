@@ -30,7 +30,7 @@ import kotlin.properties.Delegates
  */
 internal interface LocalChangeFetcher {
 
-  /** Represents the initial total number of local changes to upload.  */
+  /** Represents the initial total number of local changes to upload. */
   val total: Int
 
   /** Checks if there are more local changes to be fetched. */
