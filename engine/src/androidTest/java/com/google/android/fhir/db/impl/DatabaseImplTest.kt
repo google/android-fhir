@@ -2481,7 +2481,7 @@ class DatabaseImplTest {
                       Coding(
                         "http://snomed.info/sct",
                         "698360004",
-                        "Diabetes self management plan"
+                        "Diabetes self management plan",
                       ),
                     )
                 },
@@ -2560,7 +2560,7 @@ class DatabaseImplTest {
               Coding(
                 "http://id.who.int/icd11/mms",
                 "XM1NL1",
-                "COVID-19 vaccine, inactivated virus"
+                "COVID-19 vaccine, inactivated virus",
               ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
@@ -2649,7 +2649,7 @@ class DatabaseImplTest {
               Coding(
                 "http://id.who.int/icd11/mms",
                 "XM1NL1",
-                "COVID-19 vaccine, inactivated virus"
+                "COVID-19 vaccine, inactivated virus",
               ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED

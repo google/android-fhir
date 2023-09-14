@@ -819,7 +819,7 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "",
           "kg",
-          BigDecimal.valueOf(100L)
+          BigDecimal.valueOf(100L),
         ),
       )
   }
