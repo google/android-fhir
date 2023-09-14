@@ -70,17 +70,16 @@ internal class TransactionBundleGenerator(
       generatedBundleSize: Int = 500,
       useETagForUpload: Boolean = true
     ): TransactionBundleGenerator {
-
       val createFunction =
         createMapping[httpVerbToUseForCreate]
           ?: throw IllegalArgumentException(
-            "Creation using $httpVerbToUseForCreate is not supported."
+            "Creation using $httpVerbToUseForCreate is not supported.",
           )
 
       val updateFunction =
         updateMapping[httpVerbToUseForUpdate]
           ?: throw IllegalArgumentException(
-            "Update using $httpVerbToUseForUpdate is not supported."
+            "Update using $httpVerbToUseForUpdate is not supported.",
           )
 
       return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { patch, useETag ->
@@ -93,11 +92,11 @@ internal class TransactionBundleGenerator(
     }
 
     private fun putForCreateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
 
     private fun patchForUpdateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
   }
 }

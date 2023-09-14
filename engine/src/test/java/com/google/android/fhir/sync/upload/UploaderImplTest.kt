@@ -41,10 +41,7 @@ class UploaderImplTest {
 
   @Test
   fun `upload should start`() = runBlocking {
-    val result =
-      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChanges)
-        .toList()
+    val result = Uploader(BundleDataSource { Bundle() }).upload(localChanges).toList()
 
     assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
   }
@@ -52,9 +49,8 @@ class UploaderImplTest {
   @Test
   fun `upload should succeed if response is transaction response`() = runBlocking {
     val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
@@ -71,7 +67,7 @@ class UploaderImplTest {
   @Test
   fun `upload should fail if response is operation outcome with issue`() = runBlocking {
     val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource {
             OperationOutcome().apply {
               addIssue(
@@ -79,11 +75,10 @@ class UploaderImplTest {
                   severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
-                }
+                },
               )
             }
           },
-          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
@@ -95,9 +90,8 @@ class UploaderImplTest {
   @Test
   fun `upload should fail if response is empty operation outcome`() = runBlocking {
     val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource { OperationOutcome() },
-          SquashedChangesUploadWorkManager(),
         )
         .upload(localChanges)
         .toList()
@@ -110,9 +104,8 @@ class UploaderImplTest {
   fun `upload should fail if response is neither transaction response nor operation outcome`() =
     runBlocking {
       val result =
-        UploaderImpl(
+        Uploader(
             BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
-            SquashedChangesUploadWorkManager(),
           )
           .upload(localChanges)
           .toList()
@@ -124,9 +117,8 @@ class UploaderImplTest {
   @Test
   fun `upload should fail if there is connection exception`() = runBlocking {
     val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
         .toList()
@@ -153,14 +145,14 @@ class UploaderImplTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) }
+          .apply { LocalChangeToken(listOf(1)) },
       )
   }
 }

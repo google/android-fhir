@@ -17,9 +17,7 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Downloader
 import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -35,7 +33,7 @@ import timber.log.Timber
  */
 internal class DownloaderImpl(
   private val dataSource: DataSource,
-  private val downloadWorkManager: DownloadWorkManager
+  private val downloadWorkManager: DownloadWorkManager,
 ) : Downloader {
   private val resourceTypeList = ResourceType.values().map { it.name }
 
