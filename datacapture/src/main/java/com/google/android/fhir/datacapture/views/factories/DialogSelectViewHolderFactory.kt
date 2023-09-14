@@ -94,7 +94,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               OptionSelectDialogFragment(
                 title = questionnaireItem.localizedTextSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
-                selectedOptions = selectedOptions
+                selectedOptions = selectedOptions,
               )
             fragment.arguments =
               bundleOf(
@@ -117,7 +117,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           getValidationErrorMessage(
             holder.summaryHolder.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -194,7 +194,7 @@ private fun QuestionnaireViewItem.extractInitialOptions(context: Context): Selec
       OptionSelectOption(
         item = answerOption,
         selected = isAnswerOptionSelected(answerOption),
-        context = context
+        context = context,
       )
     }
   return SelectedOptions(
@@ -204,7 +204,7 @@ private fun QuestionnaireViewItem.extractInitialOptions(context: Context): Selec
         // All of the Other options will be encoded as String value types
         .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
         // We should also make sure that these values aren't present in the predefined options
-        .filter { value -> value !in options.map { it.item.value.asStringValue() } }
+        .filter { value -> value !in options.map { it.item.value.asStringValue() } },
   )
 }
 

@@ -163,11 +163,10 @@ internal class ExpressionEvaluator(
    * expression being evaluated.
    *
    * @param expression the [Expression] Variable expression
-   * Questionnaire.QuestionnaireItemComponent>] of child to parent
+   *   Questionnaire.QuestionnaireItemComponent>] of child to parent
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
-   * is defined,
+   *   is defined,
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
-   *
    * @return [Base] the result of expression
    */
   internal fun evaluateQuestionnaireItemVariableExpression(
@@ -178,8 +177,10 @@ internal class ExpressionEvaluator(
     require(
       questionnaireItem.variableExpressions.any {
         it.name == expression.name && it.expression == expression.expression
-      }
-    ) { "The expression should come from the same questionnaire item" }
+      },
+    ) {
+      "The expression should come from the same questionnaire item"
+    }
     extractDependentVariables(
       expression,
       questionnaireItem,
@@ -199,7 +200,7 @@ internal class ExpressionEvaluator(
    * @param expression the [Expression] expression to find variables applicable
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] where this expression
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
-   * defined
+   *   defined
    */
   internal fun extractDependentVariables(
     expression: Expression,
@@ -231,7 +232,6 @@ internal class ExpressionEvaluator(
    *
    * @param expression the [Expression] Variable expression
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map
-   *
    * @return [Base] the result of expression
    */
   internal fun evaluateQuestionnaireVariableExpression(
@@ -281,7 +281,8 @@ internal class ExpressionEvaluator(
 
     return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
       acc: String,
-      pair: Pair<String, String> ->
+      pair: Pair<String, String>,
+      ->
       acc.replace(pair.first, pair.second)
     }
   }
@@ -292,12 +293,12 @@ internal class ExpressionEvaluator(
    * and the second element is the evaluated string result from evaluating the resource passed in.
    *
    * @param expression x-fhir-query expression containing a FHIRpath, e.g.
-   * Practitioner?active=true&{{Practitioner.name.family}}
+   *   Practitioner?active=true&{{Practitioner.name.family}}
    * @param launchContextMap the launch context to evaluate the expression against
    */
   private fun evaluateXFhirEnhancement(
     expression: Expression,
-    launchContextMap: Map<String, Resource>
+    launchContextMap: Map<String, Resource>,
   ): Sequence<Pair<String, String>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
@@ -327,7 +328,7 @@ internal class ExpressionEvaluator(
           Timber.w(
             "$fhirPath evaluated to null. The expression is either invalid, or the " +
               "expression returned no, or more than one resource. The expression will be " +
-              "replaced with a blank string."
+              "replaced with a blank string.",
           )
         }
         fhirPathWithParentheses to evaluatedResult
@@ -346,7 +347,7 @@ internal class ExpressionEvaluator(
    *
    * @param variableName the [String] to match the variable in the ancestors
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] from where we have to
-   * track hierarchy up in the ancestors
+   *   track hierarchy up in the ancestors
    * @param variablesMap the [Map<String, Base>] of variables
    */
   private fun findAndEvaluateVariable(
@@ -387,12 +388,12 @@ internal class ExpressionEvaluator(
    *
    * @param variableName the [String] to match the variable in the ancestors
    * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] whose ancestors we
-   * visit
+   *   visit
    * @return [Pair] containing [Questionnaire.QuestionnaireItemComponent] and an [Expression]
    */
   private fun findVariableInAncestors(
     variableName: String,
-    questionnaireItem: QuestionnaireItemComponent
+    questionnaireItem: QuestionnaireItemComponent,
   ): Pair<QuestionnaireItemComponent, Expression>? {
     var parent = questionnaireItemParentMap[questionnaireItem]
     while (parent != null) {
@@ -409,7 +410,6 @@ internal class ExpressionEvaluator(
    *
    * @param expression the [Expression] the expression to evaluate
    * @param dependentVariables the [Map] of variable names to their values
-   *
    * @return [Base] the result of an expression
    */
   private fun evaluateVariable(

@@ -49,33 +49,33 @@ class HeaderViewTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val view = HeaderView(parent.context, null)
 
   private fun getQuestionnaireViewItemWithQuestionnaireItem(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent()
+      QuestionnaireResponse.QuestionnaireResponseItemComponent(),
   ): QuestionnaireViewItem {
     return QuestionnaireViewItem(
       questionnaireItem = questionnaireItem,
       questionnaireResponseItem = questionnaireResponseItem,
       validationResult = Valid,
-      answersChangedCallback = { _, _, _, _ -> }
+      answersChangedCallback = { _, _, _, _ -> },
     )
   }
 
   private fun getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent>
+    enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent>,
   ): QuestionnaireViewItem {
     return QuestionnaireViewItem(
       questionnaireItem = questionnaireItem,
       questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
       validationResult = Valid,
       answersChangedCallback = { _, _, _, _ -> },
-      enabledDisplayItems = enabledDisplayItems
+      enabledDisplayItems = enabledDisplayItems,
     )
   }
 
@@ -83,8 +83,8 @@ class HeaderViewTest {
   fun shouldShowPrefix() {
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" }
-      )
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
@@ -95,8 +95,8 @@ class HeaderViewTest {
   fun shouldHidePrefix() {
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" }
-      )
+        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
@@ -109,8 +109,8 @@ class HeaderViewTest {
         Questionnaire.QuestionnaireItemComponent().apply {
           repeats = true
           text = "Question?"
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
@@ -127,11 +127,11 @@ class HeaderViewTest {
               Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                 addExtension(Extension("lang", StringType("en")))
                 addExtension(Extension("content", StringType("Question?")))
-              }
+              },
             )
           }
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
@@ -142,8 +142,8 @@ class HeaderViewTest {
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItem(
         Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { text = "Question?" }
-      )
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { text = "Question?" },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
@@ -158,13 +158,13 @@ class HeaderViewTest {
           text = "subtitle text"
           extension = listOf(displayCategoryExtensionWithInstructionsCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
+        },
       )
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
         Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList
-      )
+        itemList,
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.hint).isVisible).isTrue()
@@ -181,10 +181,10 @@ class HeaderViewTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.GONE)
@@ -202,10 +202,10 @@ class HeaderViewTest {
                 text = "help text"
                 extension = listOf(itemControlExtensionWithHelpCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.findViewById<Button>(R.id.helpButton).isVisible).isTrue()
@@ -223,10 +223,10 @@ class HeaderViewTest {
                 text = "help text"
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.findViewById<Button>(R.id.helpButton).isVisible).isFalse()
@@ -244,10 +244,10 @@ class HeaderViewTest {
                 text = "help text"
                 extension = listOf(itemControlExtensionWithHelpCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
     view.findViewById<Button>(R.id.helpButton).performClick()
 
@@ -266,10 +266,10 @@ class HeaderViewTest {
                 text = "help text"
                 extension = listOf(itemControlExtensionWithHelpCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
     view.findViewById<Button>(R.id.helpButton).performClick()
     view.findViewById<Button>(R.id.helpButton).performClick()
@@ -286,13 +286,13 @@ class HeaderViewTest {
           text = "help text"
           extension = listOf(itemControlExtensionWithHelpCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
+        },
       )
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
         Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList
-      )
+        itemList,
+      ),
     )
 
     assertThat(view.findViewById<TextView>(R.id.helpText).text.toString()).isEqualTo("help text")
@@ -307,13 +307,13 @@ class HeaderViewTest {
           text = "subtitle text"
           extension = listOf(displayCategoryExtensionWithInstructionsCode)
           type = Questionnaire.QuestionnaireItemType.DISPLAY
-        }
+        },
       )
     view.bind(
       getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
         Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList
-      )
+        itemList,
+      ),
     )
 
     assertThat(view.visibility).isEqualTo(View.VISIBLE)
@@ -329,10 +329,10 @@ class HeaderViewTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
-      )
+        },
+      ),
     )
 
     assertThat(view.visibility).isEqualTo(View.GONE)
@@ -364,9 +364,9 @@ class HeaderViewTest {
               Coding().apply {
                 code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 
@@ -380,9 +380,9 @@ class HeaderViewTest {
               Coding().apply {
                 code = DisplayItemControlType.HELP.extensionCode
                 system = EXTENSION_ITEM_CONTROL_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 }
