@@ -55,8 +55,8 @@ internal class FhirHttpDataSourceTest {
           Bundle().apply {
             id = "transaction-response-1"
             type = Bundle.BundleType.TRANSACTIONRESPONSE
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -82,7 +82,7 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
     val request = UrlUploadRequest(HttpVerb.POST, "Patient", patient, emptyMap())
@@ -104,7 +104,7 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
     val request =
@@ -128,7 +128,8 @@ internal class FhirHttpDataSourceTest {
     val patchToApply =
       Binary().apply {
         data =
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]".toByteArray()
+          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
+            .toByteArray()
       }
 
     val request =

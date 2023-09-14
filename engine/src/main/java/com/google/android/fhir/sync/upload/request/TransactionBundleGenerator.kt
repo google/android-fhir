@@ -24,7 +24,7 @@ internal class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
   private val getBundleEntryComponentGeneratorForPatch:
-    (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
+    (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<BundleUploadRequest> {
@@ -68,7 +68,7 @@ internal class TransactionBundleGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
       generatedBundleSize: Int = 500,
-      useETagForUpload: Boolean = true
+      useETagForUpload: Boolean = true,
     ): TransactionBundleGenerator {
       val createFunction =
         createMapping[httpVerbToUseForCreate]

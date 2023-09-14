@@ -44,5 +44,5 @@ data class UrlUploadRequest(
   val httpVerb: HttpVerb,
   override val url: String,
   override val resource: Resource,
-  override val headers: Map<String, String> = emptyMap()
+  override val headers: Map<String, String> = emptyMap(),
 ) : UploadRequest(url, headers, resource)

@@ -30,9 +30,11 @@ import org.hl7.fhir.r4.model.Bundle
  *
  * The application developer may use a request like below to get an update on Patient/123 since it
  * was last downloaded.
+ *
  * ```
  *  Request.of("/Patient/123", mapOf("If-Modified-Since" to "knownLastUpdatedOfPatient123"))
  * ```
+ *
  * **BundleRequest**
  *
  * The application developer may use a request like below to download multiple resources in a single

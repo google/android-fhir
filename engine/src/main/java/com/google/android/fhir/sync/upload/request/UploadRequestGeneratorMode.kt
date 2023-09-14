@@ -23,10 +23,11 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
 sealed class UploadRequestGeneratorMode {
   data class UrlRequest(
     val httpVerbToUseForCreate: HttpVerb,
-    val httpVerbToUseForUpdate: HttpVerb
+    val httpVerbToUseForUpdate: HttpVerb,
   ) : UploadRequestGeneratorMode()
+
   data class BundleRequest(
     val httpVerbToUseForCreate: Bundle.HTTPVerb,
-    val httpVerbToUseForUpdate: Bundle.HTTPVerb
+    val httpVerbToUseForUpdate: Bundle.HTTPVerb,
   ) : UploadRequestGeneratorMode()
 }

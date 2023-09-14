@@ -31,7 +31,7 @@ internal interface UploadRequestGenerator {
         is UploadRequestGeneratorMode.BundleRequest ->
           TransactionBundleGenerator.getGenerator(
             mode.httpVerbToUseForCreate,
-            mode.httpVerbToUseForUpdate
+            mode.httpVerbToUseForUpdate,
           )
       }
     }

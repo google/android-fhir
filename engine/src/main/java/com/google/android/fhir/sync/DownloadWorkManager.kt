@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
  *
  * TODO(jingtang10): What happens after the end of a download job. Should a new download work
- * manager be created or should there be an API to restart a new download job.
+ *   manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
   /**
