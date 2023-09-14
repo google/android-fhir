@@ -249,7 +249,7 @@ class MoreQuestionnaireItemComponentsTest {
             .setValue(
               CodeableConcept()
                 .addCoding(
-                  Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
+                  Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
                 ),
             ),
         )
