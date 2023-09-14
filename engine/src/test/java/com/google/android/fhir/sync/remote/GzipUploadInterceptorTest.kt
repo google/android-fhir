@@ -84,6 +84,7 @@ class GzipUploadInterceptorTest {
     val recordedRequest = server.takeRequest()
     assertThat(recordedRequest.getHeader(CONTENT_ENCODING_HEADER_NAME)).isEqualTo("deflate, gzip")
   }
+
   @Test
   fun `no compression happens if the request body is empty`() {
     server.enqueue(MockResponse())

@@ -28,8 +28,8 @@ internal interface DataSource {
 
   /**
    * @return [Bundle] of type [BundleType.TRANSACTIONRESPONSE] for a successful operation,
-   * [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to the
-   * server.
+   *   [OperationOutcome] otherwise. Call this api with the [Bundle] that needs to be uploaded to
+   *   the server.
    */
   suspend fun upload(request: UploadRequest): Resource
 }

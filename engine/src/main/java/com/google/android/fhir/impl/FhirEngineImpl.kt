@@ -81,7 +81,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   ) {
     download().collect { resources ->
       database.withTransaction {
@@ -89,7 +89,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
           resolveConflictingResources(
             resources,
             getConflictingResourceIds(resources),
-            conflictResolver
+            conflictResolver,
           )
         database.insertSyncedResources(resources)
         saveResolvedResourcesToDatabase(resolved)
@@ -107,7 +107,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   private suspend fun resolveConflictingResources(
     resources: List<Resource>,
     conflictingResourceIds: Set<String>,
-    conflictResolver: ConflictResolver
+    conflictResolver: ConflictResolver,
   ) =
     resources
       .filter { conflictingResourceIds.contains(it.logicalId) }
@@ -123,7 +123,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
     val localChanges = database.getAllLocalChanges()
     if (localChanges.isNotEmpty()) {
@@ -161,7 +161,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
           id,
           type,
           getVersionFromETag(response.etag),
-          response.lastModified.toInstant()
+          response.lastModified.toInstant(),
         )
       }
     }
@@ -173,7 +173,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         resource.id,
         resource.resourceType,
         resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant()
+        resource.meta.lastUpdated.toInstant(),
       )
     }
   }
@@ -197,9 +197,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
    * [Bundle.BundleEntryResponseComponent.location].
    *
    * [Bundle.BundleEntryResponseComponent.location] may be:
-   *
    * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
-   *
    * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?

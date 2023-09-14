@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
+ *
  * @param fhirHttpService Http service to make requests to the server.
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {

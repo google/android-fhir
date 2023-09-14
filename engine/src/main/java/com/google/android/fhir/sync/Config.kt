@@ -60,14 +60,14 @@ class PeriodicSyncConfiguration(
   val repeat: RepeatInterval,
 
   /** Configuration for synchronization retry */
-  val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
+  val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
 )
 
 data class RepeatInterval(
   /** The interval at which the sync should be triggered in */
   val interval: Long,
   /** The time unit for the repeat interval */
-  val timeUnit: TimeUnit
+  val timeUnit: TimeUnit,
 )
 
 fun ParamMap.concatParams(): String {
@@ -85,7 +85,7 @@ data class RetryConfiguration(
   val backoffCriteria: BackoffCriteria,
 
   /** Maximum retries for a failing [FhirSyncWorker] */
-  val maxRetries: Int
+  val maxRetries: Int,
 )
 
 /**
@@ -104,5 +104,5 @@ data class BackoffCriteria(
   val backoffDelay: Long,
 
   /** The time unit for [backoffDelay] */
-  val timeUnit: TimeUnit
+  val timeUnit: TimeUnit,
 )

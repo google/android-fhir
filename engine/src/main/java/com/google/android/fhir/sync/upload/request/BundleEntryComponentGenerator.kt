@@ -54,14 +54,14 @@ abstract class BundleEntryComponentGenerator(
   private fun getEntryRequest(patch: Patch) =
     Bundle.BundleEntryRequestComponent(
         Enumeration(Bundle.HTTPVerbEnumFactory()).apply { value = httpVerb },
-        UriType("${patch.resourceType}/${patch.resourceId}")
+        UriType("${patch.resourceType}/${patch.resourceId}"),
       )
       .apply {
         if (useETagForUpload && !patch.versionId.isNullOrEmpty()) {
           // FHIR supports weak Etag, See ETag section https://hl7.org/fhir/http.html#Http-Headers
           when (patch.type) {
             Patch.Type.UPDATE,
-            Patch.Type.DELETE -> ifMatch = "W/\"${patch.versionId}\""
+            Patch.Type.DELETE, -> ifMatch = "W/\"${patch.versionId}\""
             Patch.Type.INSERT -> {}
           }
         }

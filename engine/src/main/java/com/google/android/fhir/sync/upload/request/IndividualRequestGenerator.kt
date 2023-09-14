@@ -27,7 +27,8 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /** Generates list of [UrlUploadRequest]s with for each [Patch] given. */
 class IndividualRequestGenerator(
-  private val getIndividualRequestForPatchType: (type: Patch.Type, patch: Patch) -> UrlUploadRequest
+  private val getIndividualRequestForPatchType:
+    (type: Patch.Type, patch: Patch) -> UrlUploadRequest,
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<UrlUploadRequest> =
@@ -57,19 +58,18 @@ class IndividualRequestGenerator(
      */
     fun getGenerator(
       httpVerbToUseForCreate: HttpVerb,
-      httpVerbToUseForUpdate: HttpVerb
+      httpVerbToUseForUpdate: HttpVerb,
     ): IndividualRequestGenerator {
-
       val createFunction =
         createMapping[httpVerbToUseForCreate]
           ?: throw IllegalArgumentException(
-            "Creation using $httpVerbToUseForCreate is not supported."
+            "Creation using $httpVerbToUseForCreate is not supported.",
           )
 
       val updateFunction =
         updateMapping[httpVerbToUseForUpdate]
           ?: throw IllegalArgumentException(
-            "Update using $httpVerbToUseForUpdate is not supported."
+            "Update using $httpVerbToUseForUpdate is not supported.",
           )
 
       return IndividualRequestGenerator { type, patch ->
@@ -107,7 +107,7 @@ class IndividualRequestGenerator(
         httpVerb = HttpVerb.PATCH,
         url = "${patch.resourceType}/${patch.resourceId}",
         resource = Binary().apply { data = patch.payload.toByteArray() },
-        headers = mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH)
+        headers = mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH),
       )
   }
 }

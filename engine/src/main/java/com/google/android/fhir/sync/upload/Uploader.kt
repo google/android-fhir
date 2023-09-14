@@ -35,11 +35,13 @@ internal interface Uploader {
 
 internal sealed class UploadState {
   data class Started(val total: Int) : UploadState()
+
   data class Success(
     val localChangeToken: LocalChangeToken,
     val resource: Resource,
     val total: Int,
-    val completed: Int
+    val completed: Int,
   ) : UploadState()
+
   data class Failure(val syncError: ResourceSyncException) : UploadState()
 }

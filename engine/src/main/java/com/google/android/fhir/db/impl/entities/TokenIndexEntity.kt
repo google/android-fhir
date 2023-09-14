@@ -41,8 +41,8 @@ import org.hl7.fhir.r4.model.ResourceType
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
         deferred = true,
-      )
-    ]
+      ),
+    ],
 )
 internal data class TokenIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,

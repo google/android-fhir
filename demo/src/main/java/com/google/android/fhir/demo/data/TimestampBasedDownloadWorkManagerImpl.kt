@@ -98,14 +98,15 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
   }
 
   private suspend fun extractAndSaveLastUpdateTimestampToFetchFutureUpdates(
-    resources: List<Resource>
+    resources: List<Resource>,
   ) {
     resources
       .groupBy { it.resourceType }
-      .entries.map { map ->
+      .entries
+      .map { map ->
         dataStore.saveLastUpdatedTimestamp(
           map.key,
-          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: ""
+          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: "",
         )
       }
   }

@@ -50,7 +50,7 @@ internal class UploaderImpl(
       try {
         val response = dataSource.upload(uploadRequest)
         emit(
-          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1)
+          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1),
         )
       } catch (e: Exception) {
         Timber.e(e)
@@ -64,7 +64,7 @@ internal class UploaderImpl(
     response: Resource,
     localChangeToken: LocalChangeToken,
     total: Int,
-    completed: Int
+    completed: Int,
   ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
@@ -74,16 +74,16 @@ internal class UploaderImpl(
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException(response.issueFirstRep.diagnostics)
-          )
+            FHIRException(response.issueFirstRep.diagnostics),
+          ),
         )
       }
       else -> {
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException("Unknown response for ${response.resourceType}")
-          )
+            FHIRException("Unknown response for ${response.resourceType}"),
+          ),
         )
       }
     }

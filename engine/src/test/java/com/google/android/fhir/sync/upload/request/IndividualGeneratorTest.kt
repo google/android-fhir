@@ -61,13 +61,13 @@ class IndividualGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
-        )
+        ),
       )
 
     with(requests.single()) {
@@ -94,13 +94,13 @@ class IndividualGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
-        )
+        ),
       )
 
     with(requests.single()) {
@@ -119,7 +119,7 @@ class IndividualGeneratorTest {
           type = Patch.Type.UPDATE,
           payload =
             "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()
@@ -130,7 +130,7 @@ class IndividualGeneratorTest {
       assertThat(url).isEqualTo("Patient/Patient-002")
       assertThat((resource as Binary).data.toString(Charsets.UTF_8))
         .isEqualTo(
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
+          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
         )
     }
   }
@@ -151,11 +151,11 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Doe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()
@@ -182,11 +182,11 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Doe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
         Patch(
           resourceType = ResourceType.Patient.name,
@@ -194,7 +194,7 @@ class IndividualGeneratorTest {
           type = Patch.Type.UPDATE,
           payload =
             "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
         Patch(
           resourceType = ResourceType.Patient.name,
@@ -208,11 +208,11 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Roe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
     val generator = IndividualRequestGenerator.Factory.getDefault()

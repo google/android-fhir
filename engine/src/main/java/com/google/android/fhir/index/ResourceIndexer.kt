@@ -66,7 +66,7 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html).
  */
 internal class ResourceIndexer(
-  private val searchParamDefinitionsProvider: SearchParamDefinitionsProvider
+  private val searchParamDefinitionsProvider: SearchParamDefinitionsProvider,
 ) {
   // Switched HapiWorkerContext to SimpleWorkerContext as a fix for
   // https://github.com/google/android-fhir/issues/768
@@ -125,7 +125,7 @@ internal class ResourceIndexer(
         searchParam.name,
         searchParam.path,
         date.value.epochDay,
-        date.precision.add(date.value, 1).epochDay - 1
+        date.precision.add(date.value, 1).epochDay - 1,
       )
     }
 
@@ -137,7 +137,7 @@ internal class ResourceIndexer(
             searchParam.name,
             searchParam.path,
             dateTime.value.time,
-            dateTime.precision.add(dateTime.value, 1).time - 1
+            dateTime.precision.add(dateTime.value, 1).time - 1,
           )
         }
         // No need to add precision because an instant is meant to have zero width
@@ -151,8 +151,11 @@ internal class ResourceIndexer(
             searchParam.name,
             searchParam.path,
             if (period.hasStart()) period.start.time else 0,
-            if (period.hasEnd()) period.endElement.precision.add(period.end, 1).time - 1
-            else Long.MAX_VALUE
+            if (period.hasEnd()) {
+              period.endElement.precision.add(period.end, 1).time - 1
+            } else {
+              Long.MAX_VALUE
+            },
           )
         }
         "Timing" -> {
@@ -163,9 +166,11 @@ internal class ResourceIndexer(
               searchParam.name,
               searchParam.path,
               timing.event.minOf { it.value.time },
-              timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
+              timing.event.maxOf { it.precision.add(it.value, 1).time } - 1,
             )
-          } else null
+          } else {
+            null
+          }
         }
         "string" -> {
           // e.g. CarePlan may have schedule as a string value 2011-06-27T09:30:10+01:00 (see
@@ -177,7 +182,7 @@ internal class ResourceIndexer(
               searchParam.name,
               searchParam.path,
               dateTime.value.time,
-              dateTime.precision.add(dateTime.value, 1).time - 1
+              dateTime.precision.add(dateTime.value, 1).time - 1,
             )
           } catch (e: IllegalArgumentException) {
             null
@@ -228,7 +233,7 @@ internal class ResourceIndexer(
               is HumanName -> value.asString()
               is Address -> value.asString()
               else -> value.toString()
-            }
+            },
         )
       } else {
         null
@@ -238,13 +243,13 @@ internal class ResourceIndexer(
       when (value.fhirType()) {
         "boolean" ->
           listOf(
-            TokenIndex(searchParam.name, searchParam.path, system = null, value.primitiveValue())
+            TokenIndex(searchParam.name, searchParam.path, system = null, value.primitiveValue()),
           )
         "Identifier" -> {
           val identifier = value as Identifier
           if (identifier.value != null) {
             listOf(
-              TokenIndex(searchParam.name, searchParam.path, identifier.system, identifier.value)
+              TokenIndex(searchParam.name, searchParam.path, identifier.system, identifier.value),
             )
           } else {
             listOf()
@@ -257,7 +262,7 @@ internal class ResourceIndexer(
             .map { TokenIndex(searchParam.name, searchParam.path, it.system ?: "", it.code) }
         }
         "code",
-        "Coding" -> {
+        "Coding", -> {
           val coding = value as ICoding
           if (coding.code != null) {
             listOf(TokenIndex(searchParam.name, searchParam.path, coding.system ?: "", coding.code))
@@ -291,7 +296,7 @@ internal class ResourceIndexer(
 
     private fun quantityIndex(
       searchParam: SearchParamDefinition,
-      value: Base
+      value: Base,
     ): List<QuantityIndex> =
       when (value.fhirType()) {
         "Money" -> {
@@ -302,8 +307,8 @@ internal class ResourceIndexer(
               searchParam.path,
               FHIR_CURRENCY_CODE_SYSTEM,
               money.currency,
-              money.value
-            )
+              money.value,
+            ),
           )
         }
         "Quantity" -> {
@@ -313,7 +318,7 @@ internal class ResourceIndexer(
           // Add quantity indexing record for the human readable unit
           if (quantity.unit != null) {
             quantityIndices.add(
-              QuantityIndex(searchParam.name, searchParam.path, "", quantity.unit, quantity.value)
+              QuantityIndex(searchParam.name, searchParam.path, "", quantity.unit, quantity.value),
             )
           }
 
@@ -336,8 +341,8 @@ internal class ResourceIndexer(
               searchParam.path,
               quantity.system ?: "",
               canonicalCode ?: "",
-              canonicalValue
-            )
+              canonicalValue,
+            ),
           )
           quantityIndices
         }
@@ -374,7 +379,7 @@ internal class ResourceIndexer(
         name = LAST_UPDATED,
         path = arrayOf(resourceType.name, "meta", "lastUpdated").joinToString(separator = "."),
         from = instant.value.time,
-        to = instant.value.time
+        to = instant.value.time,
       )
 
     fun createLocalLastUpdatedIndex(resourceType: ResourceType, instant: InstantType) =
@@ -382,7 +387,7 @@ internal class ResourceIndexer(
         name = LOCAL_LAST_UPDATED,
         path = arrayOf(resourceType.name, "meta", "localLastUpdated").joinToString(separator = "."),
         from = instant.value.time,
-        to = instant.value.time
+        to = instant.value.time,
       )
   }
 }

@@ -54,7 +54,7 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          SquashedChangesUploadWorkManager()
+          SquashedChangesUploadWorkManager(),
         )
         .upload(localChanges)
         .toList()
@@ -79,11 +79,11 @@ class UploaderImplTest {
                   severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
-                }
+                },
               )
             }
           },
-          SquashedChangesUploadWorkManager()
+          SquashedChangesUploadWorkManager(),
         )
         .upload(localChanges)
         .toList()
@@ -126,7 +126,7 @@ class UploaderImplTest {
     val result =
       UploaderImpl(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          SquashedChangesUploadWorkManager()
+          SquashedChangesUploadWorkManager(),
         )
         .upload(localChanges)
         .toList()
@@ -153,14 +153,14 @@ class UploaderImplTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) }
+          .apply { LocalChangeToken(listOf(1)) },
       )
   }
 }

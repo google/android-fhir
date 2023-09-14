@@ -147,11 +147,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -161,10 +161,10 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) }
+          .apply { LocalChangeToken(listOf(2)) },
       )
     val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
@@ -190,11 +190,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -212,7 +212,7 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("Jane")
                         family = "Doe"
-                      }
+                      },
                     )
                   },
                   Patient().apply {
@@ -221,12 +221,12 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("Janet")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 )
                 .toString(),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -236,7 +236,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
@@ -293,7 +293,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       PerResourcePatchGenerator.generate(
-        listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange)
+        listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
       )
 
     with(patches.single()) {
@@ -315,7 +315,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
@@ -325,7 +325,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
@@ -350,7 +350,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -369,11 +369,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
@@ -391,7 +391,7 @@ class PerResourcePatchGeneratorTest {
   private fun createUpdateLocalChange(
     oldEntity: Resource,
     updatedResource: Resource,
-    currentChangeId: Long
+    currentChangeId: Long,
   ): LocalChange {
     val jsonDiff = diff(jsonParser, oldEntity, updatedResource)
     return LocalChange(
@@ -401,7 +401,7 @@ class PerResourcePatchGeneratorTest {
       payload = jsonDiff.toString(),
       versionId = oldEntity.versionId,
       token = LocalChangeToken(listOf(currentChangeId + 1)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 
@@ -413,7 +413,7 @@ class PerResourcePatchGeneratorTest {
       payload = jsonParser.encodeResourceToString(entity),
       versionId = entity.versionId,
       token = LocalChangeToken(listOf(1L)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 
@@ -425,7 +425,7 @@ class PerResourcePatchGeneratorTest {
       payload = "",
       versionId = entity.versionId,
       token = LocalChangeToken(listOf(currentChangeId + 1)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 }
