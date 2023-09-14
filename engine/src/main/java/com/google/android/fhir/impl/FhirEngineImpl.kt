@@ -30,6 +30,8 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
+import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -122,12 +124,15 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
+    localChangesFetchMode: LocalChangesFetchMode,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
     val resourceConsolidator = DefaultResourceConsolidator(database)
-    val localChanges = database.getAllLocalChanges()
-    if (localChanges.isNotEmpty()) {
-      upload(localChanges).collect { resourceConsolidator.consolidate(it.first, it.second) }
+    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
+    while (localChangeFetcher.hasNext()) {
+      upload(localChangeFetcher.next()).collect {
+        resourceConsolidator.consolidate(it.first, it.second)
+      }
     }
   }
 }

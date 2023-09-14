@@ -21,6 +21,7 @@ import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
@@ -129,7 +130,8 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncUpload { list ->
+    val localChangesFetchMode = LocalChangesFetchMode.AllChanges
+    fhirEngine.syncUpload(localChangesFetchMode) { list ->
       flow {
         uploader.upload(list).collect { result ->
           when (result) {
