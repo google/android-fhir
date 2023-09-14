@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,11 +53,12 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
       }
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
@@ -158,7 +159,7 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      } 
+      }
       """.trimIndent()
 
     val questionnaire =
@@ -173,7 +174,7 @@ class EnablementEvaluatorTest {
         as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(
             questionnaireItem,
             questionnaireResponse.item[1],
@@ -238,7 +239,7 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      } 
+      }
       """.trimIndent()
 
     val questionnaire =
@@ -252,7 +253,7 @@ class EnablementEvaluatorTest {
         as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator(questionnaireResponse)
+        EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(
             questionnaireItemComponent,
             questionnaireResponse.item[1],
@@ -317,7 +318,7 @@ class EnablementEvaluatorTest {
           "linkId": "female"
         }
       ]
-    } 
+    }
         """.trimIndent()
 
       val questionnaire =
@@ -331,7 +332,7 @@ class EnablementEvaluatorTest {
           as QuestionnaireResponse
 
       assertThat(
-          EnablementEvaluator(questionnaireResponse)
+          EnablementEvaluator(questionnaire, questionnaireResponse)
             .evaluate(
               questionnaireItem,
               questionnaireResponse.item[1],
@@ -759,6 +760,7 @@ class EnablementEvaluatorTest {
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         enableWhen.forEachIndexed { index, enableWhen ->
@@ -775,8 +777,9 @@ class EnablementEvaluatorTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" }
         )
       }
+
     return assertThat(
-      EnablementEvaluator(questionnaireResponse)
+      EnablementEvaluator(questionnaire, questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }

@@ -31,6 +31,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 typealias ResourceSearchParams = Map<ResourceType, ParamMap>
+
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
  * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
@@ -39,14 +40,15 @@ typealias ResourceSearchParams = Map<ResourceType, ParamMap>
  */
 class ResourceParamsBasedDownloadWorkManager(
   syncParams: ResourceSearchParams,
-  val context: TimestampContext
+  val context: TimestampContext,
 ) : DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
   override suspend fun getNextRequest(): DownloadRequest? {
-    if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
+    if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty()) {
       return urlOfTheNextPagesToDownloadForAResource.poll()?.let { DownloadRequest.of(it) }
+    }
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
       val newParams =
@@ -74,7 +76,7 @@ class ResourceParamsBasedDownloadWorkManager(
   private suspend fun getLastUpdatedParam(
     resourceType: ResourceType,
     params: ParamMap,
-    context: TimestampContext
+    context: TimestampContext,
   ): MutableMap<String, String> {
     val newParams = mutableMapOf<String, String>()
     if (!params.containsKey(SyncDataParams.SORT_KEY)) {
@@ -102,34 +104,37 @@ class ResourceParamsBasedDownloadWorkManager(
       throw FHIRException(response.issueFirstRep.diagnostics)
     }
 
-    return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-      response.link
-        .firstOrNull { component -> component.relation == "next" }
-        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
-
-      response.entry
-        .map { it.resource }
-        .also { resources ->
-          resources
-            .groupBy { it.resourceType }
-            .entries.map { map ->
-              map.value
-                .filter { it.meta.lastUpdated != null }
-                .let {
-                  context.saveLastUpdatedTimestamp(
-                    map.key,
-                    it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString()
-                  )
-                }
-            }
-        }
-    } else {
-      emptyList()
+    if ((response !is Bundle || response.type != Bundle.BundleType.SEARCHSET)) {
+      return emptyList()
     }
+
+    response.link
+      .firstOrNull { component -> component.relation == "next" }
+      ?.url
+      ?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
+
+    return response.entry
+      .map { it.resource }
+      .also { resources ->
+        resources
+          .groupBy { it.resourceType }
+          .entries
+          .map { map ->
+            map.value
+              .filter { it.meta.lastUpdated != null }
+              .let {
+                context.saveLastUpdatedTimestamp(
+                  map.key,
+                  it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString(),
+                )
+              }
+          }
+      }
   }
 
   interface TimestampContext {
     suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?)
+
     suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String?
   }
 }
