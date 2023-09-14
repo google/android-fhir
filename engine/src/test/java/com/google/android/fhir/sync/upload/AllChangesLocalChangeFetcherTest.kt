@@ -77,6 +77,7 @@ class AllChangesLocalChangeFetcherTest {
   fun `getProgress when none of the local changes are removed`() = runTest {
     assertThat(fetcher.getProgress()).isEqualTo(ProgressState(2, 2))
   }
+
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
     private var TEST_PATIENT_1 =

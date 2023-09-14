@@ -43,7 +43,7 @@ internal interface LocalChangeFetcher {
   companion object {
     internal suspend fun byMode(
       mode: LocalChangesFetchMode,
-      database: Database
+      database: Database,
     ): LocalChangeFetcher {
       val totalLocalChangeCount = database.getAllLocalChanges().size
       return when (mode) {
@@ -62,7 +62,7 @@ data class ProgressState(
 
 internal class AllChangesLocalChangeFetcher(
   private val database: Database,
-  private val total: Int
+  private val total: Int,
 ) : LocalChangeFetcher {
 
   override suspend fun hasNext(): Boolean = database.getAllLocalChanges().isNotEmpty()
@@ -77,6 +77,8 @@ internal class AllChangesLocalChangeFetcher(
 sealed class LocalChangesFetchMode {
 
   object AllChanges : LocalChangesFetchMode()
+
   object PerResource : LocalChangesFetchMode()
+
   object EarliestChange : LocalChangesFetchMode()
 }
