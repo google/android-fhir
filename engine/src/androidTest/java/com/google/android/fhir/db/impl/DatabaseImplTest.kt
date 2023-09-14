@@ -511,6 +511,8 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
+    // Delete the patient created in setup as we only want to upload the patient in this test
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
       it
         .first { it.resourceId == "remote-patient-3" }
@@ -691,6 +693,23 @@ class DatabaseImplTest {
       assertThat(versionId).isEqualTo(TEST_PATIENT_2.versionId)
       assertThat(payload).isEmpty()
     }
+  }
+
+  @Test
+  fun one_localChange_should_return_one_for_count() = runBlocking {
+    assertThat(database.getLocalChangesCount()).isEqualTo(1)
+  }
+
+  @Test
+  fun add_resource_should_count_two_for_localChanges() = runBlocking {
+    database.insert(TEST_PATIENT_2)
+    assertThat(database.getLocalChangesCount()).isEqualTo(2)
+  }
+
+  @Test
+  fun no_localChanges_should_return_zero_for_count() = runBlocking {
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
+    assertThat(database.getLocalChangesCount()).isEqualTo(0)
   }
 
   @Test

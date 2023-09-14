@@ -129,11 +129,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
     val localChangeFetcher = LocalChangeFetcher.byMode(localChangesFetchMode, database)
-    upload(localChangeFetcher.next()).collect {
-      database.deleteUpdates(it.first)
-      when (it.second) {
-        is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-        else -> updateVersionIdAndLastUpdated(it.second)
+    while (localChangeFetcher.hasNext()) {
+      upload(localChangeFetcher.next()).collect {
+        database.deleteUpdates(it.first)
+        when (it.second) {
+          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
+          else -> updateVersionIdAndLastUpdated(it.second)
+        }
       }
     }
   }

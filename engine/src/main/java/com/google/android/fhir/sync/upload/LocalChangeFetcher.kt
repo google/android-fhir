@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
+import kotlin.properties.Delegates
 
 /**
  * Fetches local changes.
@@ -35,42 +36,45 @@ internal interface LocalChangeFetcher {
   suspend fun next(): List<LocalChange>
 
   /**
-   * Returns [ProgressState], which contains the remaining changes left to upload and the initial
+   * Returns [FetchProgress], which contains the remaining changes left to upload and the initial
    * total to upload
    */
-  suspend fun getProgress(): ProgressState
+  suspend fun getProgress(): FetchProgress
 
   companion object {
     internal suspend fun byMode(
       mode: LocalChangesFetchMode,
       database: Database,
-    ): LocalChangeFetcher {
-      val totalLocalChangeCount = database.getAllLocalChanges().size
-      return when (mode) {
+    ): LocalChangeFetcher =
+      when (mode) {
         is LocalChangesFetchMode.AllChanges ->
-          AllChangesLocalChangeFetcher(database, totalLocalChangeCount)
+          AllChangesLocalChangeFetcher(database).apply { initTotalCount() }
         else -> error("$mode does not have an implementation yet.")
       }
-    }
   }
 }
 
-data class ProgressState(
+data class FetchProgress(
   val remaining: Int,
   val initialTotal: Int,
 )
 
 internal class AllChangesLocalChangeFetcher(
   private val database: Database,
-  private val total: Int,
 ) : LocalChangeFetcher {
 
-  override suspend fun hasNext(): Boolean = database.getAllLocalChanges().isNotEmpty()
+  private var total by Delegates.notNull<Int>()
+
+  suspend fun initTotalCount() {
+    total = database.getLocalChangesCount()
+  }
+
+  override suspend fun hasNext(): Boolean = database.getLocalChangesCount().isNotZero()
 
   override suspend fun next(): List<LocalChange> = database.getAllLocalChanges()
 
-  override suspend fun getProgress(): ProgressState =
-    ProgressState(database.getAllLocalChanges().size, total)
+  override suspend fun getProgress(): FetchProgress =
+    FetchProgress(database.getLocalChangesCount(), total)
 }
 
 /** Represents the mode in which local changes should be fetched. */
@@ -82,3 +86,5 @@ sealed class LocalChangesFetchMode {
 
   object EarliestChange : LocalChangesFetchMode()
 }
+
+private fun Int.isNotZero() = this != 0

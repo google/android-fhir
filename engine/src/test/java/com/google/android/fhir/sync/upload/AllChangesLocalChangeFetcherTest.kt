@@ -39,7 +39,7 @@ class AllChangesLocalChangeFetcherTest {
   @Before
   fun setup() = runTest {
     database.insert(TEST_PATIENT_1, TEST_PATIENT_2)
-    fetcher = AllChangesLocalChangeFetcher(database, 2)
+    fetcher = AllChangesLocalChangeFetcher(database).apply { initTotalCount() }
   }
 
   @Test
@@ -64,18 +64,18 @@ class AllChangesLocalChangeFetcherTest {
   @Test
   fun `getProgress when all local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1, TEST_PATIENT_2))
-    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(0, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(0, 2))
   }
 
   @Test
   fun `getProgress when half the local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
-    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(1, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(1, 2))
   }
 
   @Test
   fun `getProgress when none of the local changes are removed`() = runTest {
-    assertThat(fetcher.getProgress()).isEqualTo(ProgressState(2, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(2, 2))
   }
 
   companion object {
