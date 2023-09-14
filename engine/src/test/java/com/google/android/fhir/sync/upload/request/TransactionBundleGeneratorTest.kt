@@ -61,11 +61,11 @@ class TransactionBundleGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
           Patch(
             resourceType = ResourceType.Patient.name,
@@ -80,7 +80,7 @@ class TransactionBundleGeneratorTest {
                       HumanName().apply {
                         addGiven("Jane")
                         family = "Doe"
-                      }
+                      },
                     )
                   },
                   Patient().apply {
@@ -89,12 +89,12 @@ class TransactionBundleGeneratorTest {
                       HumanName().apply {
                         addGiven("Janet")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 )
                 .toString(),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
           Patch(
             resourceType = ResourceType.Patient.name,
@@ -108,11 +108,11 @@ class TransactionBundleGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Roe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault()
@@ -145,11 +145,11 @@ class TransactionBundleGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
           Patch(
             resourceType = ResourceType.Patient.name,
@@ -164,7 +164,7 @@ class TransactionBundleGeneratorTest {
                       HumanName().apply {
                         addGiven("Jane")
                         family = "Doe"
-                      }
+                      },
                     )
                   },
                   Patient().apply {
@@ -173,13 +173,13 @@ class TransactionBundleGeneratorTest {
                       HumanName().apply {
                         addGiven("Janet")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 )
                 .toString(),
             versionId = "v-p002-01",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
           Patch(
             resourceType = ResourceType.Patient.name,
@@ -193,12 +193,12 @@ class TransactionBundleGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Roe"
-                    }
+                    },
                   )
-                }
+                },
               ),
             versionId = "v-p003-01",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
         )
       val generator =
@@ -206,7 +206,7 @@ class TransactionBundleGeneratorTest {
           Bundle.HTTPVerb.PUT,
           Bundle.HTTPVerb.PATCH,
           1,
-          true
+          true,
         )
       val result = generator.generateUploadRequests(patches)
 
@@ -235,8 +235,8 @@ class TransactionBundleGeneratorTest {
             type = Patch.Type.UPDATE,
             payload = "[]",
             versionId = "patient-002-version-1",
-            timestamp = Instant.now()
-          )
+            timestamp = Instant.now(),
+          ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
@@ -255,8 +255,8 @@ class TransactionBundleGeneratorTest {
             type = Patch.Type.UPDATE,
             payload = "[]",
             versionId = "patient-002-version-1",
-            timestamp = Instant.now()
-          )
+            timestamp = Instant.now(),
+          ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
@@ -276,7 +276,7 @@ class TransactionBundleGeneratorTest {
             type = Patch.Type.UPDATE,
             payload = "[]",
             versionId = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
           Patch(
             resourceType = ResourceType.Patient.name,
@@ -284,7 +284,7 @@ class TransactionBundleGeneratorTest {
             type = Patch.Type.UPDATE,
             payload = "[]",
             versionId = null,
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
