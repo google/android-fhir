@@ -41,7 +41,7 @@ internal interface LocalChangeFetcher {
 
   /**
    * Returns [FetchProgress], which contains the remaining changes left to upload and the initial
-   * total to upload
+   * total to upload.
    */
   suspend fun getProgress(): FetchProgress
 }
