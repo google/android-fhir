@@ -20,6 +20,8 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.download.DownloadState
+import com.google.android.fhir.sync.download.Downloader
 import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
@@ -29,13 +31,14 @@ import org.hl7.fhir.r4.model.ResourceType
 
 enum class SyncOperation {
   DOWNLOAD,
-  UPLOAD
+  UPLOAD,
 }
 
 private sealed class SyncResult {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
   class Success : SyncResult()
+
   data class Error(val exceptions: List<ResourceSyncException>) : SyncResult()
 }
 
@@ -47,7 +50,7 @@ internal class FhirSynchronizer(
   private val fhirEngine: FhirEngine,
   private val uploader: Uploader,
   private val downloader: Downloader,
-  private val conflictResolver: ConflictResolver
+  private val conflictResolver: ConflictResolver,
 ) {
   private var syncState: MutableSharedFlow<SyncJobStatus>? = null
   private val datastoreUtil = DatastoreUtil(context)
@@ -137,7 +140,7 @@ internal class FhirSynchronizer(
             is UploadState.Success ->
               emit(result.localChangeToken to result.resource).also {
                 setSyncState(
-                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed)
+                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed),
                 )
               }
             is UploadState.Failure -> exceptions.add(result.syncError)
