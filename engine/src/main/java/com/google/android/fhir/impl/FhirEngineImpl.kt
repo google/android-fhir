@@ -79,8 +79,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     return database.getLocalChanges(type, id)
   }
   // FhirEngineImpl.kt
-  override suspend fun getUnsyncedLocalChanges(): List<SquashedLocalChange> =
-    database.getAllLocalChanges()
+  override suspend fun getUnsyncedLocalChanges(): List<LocalChange> = database.getAllLocalChanges()
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
     database.purge(type, id, forcePurge)
