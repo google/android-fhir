@@ -61,7 +61,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
           id,
           type,
           getVersionFromETag(response.etag),
-          response.lastModified.toInstant()
+          response.lastModified.toInstant(),
         )
       }
     }
@@ -73,7 +73,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         resource.id,
         resource.resourceType,
         resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant()
+        resource.meta.lastUpdated.toInstant(),
       )
     }
   }
@@ -97,9 +97,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
    * [Bundle.BundleEntryResponseComponent.location].
    *
    * [Bundle.BundleEntryResponseComponent.location] may be:
-   *
    * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
-   *
    * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
    */
   private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?

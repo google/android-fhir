@@ -80,7 +80,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   ) {
     download().collect { resources ->
       database.withTransaction {
@@ -88,7 +88,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
           resolveConflictingResources(
             resources,
             getConflictingResourceIds(resources),
-            conflictResolver
+            conflictResolver,
           )
         database.insertSyncedResources(resources)
         saveResolvedResourcesToDatabase(resolved)
@@ -106,7 +106,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   private suspend fun resolveConflictingResources(
     resources: List<Resource>,
     conflictingResourceIds: Set<String>,
-    conflictResolver: ConflictResolver
+    conflictResolver: ConflictResolver,
   ) =
     resources
       .filter { conflictingResourceIds.contains(it.logicalId) }
