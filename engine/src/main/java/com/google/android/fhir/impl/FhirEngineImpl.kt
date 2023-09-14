@@ -29,7 +29,7 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.LocalChangeFetcher
+import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -128,7 +128,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     localChangesFetchMode: LocalChangesFetchMode,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
-    val localChangeFetcher = LocalChangeFetcher.byMode(localChangesFetchMode, database)
+    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
     while (localChangeFetcher.hasNext()) {
       upload(localChangeFetcher.next()).collect {
         database.deleteUpdates(it.first)

@@ -29,6 +29,10 @@ import kotlin.properties.Delegates
  * It is marked as internal to keep [Database] unexposed to clients
  */
 internal interface LocalChangeFetcher {
+
+  /** Represents the initial total number of local changes to upload.  */
+  val total: Int
+
   /** Checks if there are more local changes to be fetched. */
   suspend fun hasNext(): Boolean
 
@@ -40,18 +44,6 @@ internal interface LocalChangeFetcher {
    * total to upload
    */
   suspend fun getProgress(): FetchProgress
-
-  companion object {
-    internal suspend fun byMode(
-      mode: LocalChangesFetchMode,
-      database: Database,
-    ): LocalChangeFetcher =
-      when (mode) {
-        is LocalChangesFetchMode.AllChanges ->
-          AllChangesLocalChangeFetcher(database).apply { initTotalCount() }
-        else -> error("$mode does not have an implementation yet.")
-      }
-  }
 }
 
 data class FetchProgress(
@@ -63,7 +55,7 @@ internal class AllChangesLocalChangeFetcher(
   private val database: Database,
 ) : LocalChangeFetcher {
 
-  private var total by Delegates.notNull<Int>()
+  override var total by Delegates.notNull<Int>()
 
   suspend fun initTotalCount() {
     total = database.getLocalChangesCount()
@@ -79,12 +71,23 @@ internal class AllChangesLocalChangeFetcher(
 
 /** Represents the mode in which local changes should be fetched. */
 sealed class LocalChangesFetchMode {
-
   object AllChanges : LocalChangesFetchMode()
 
   object PerResource : LocalChangesFetchMode()
 
   object EarliestChange : LocalChangesFetchMode()
+}
+
+internal object LocalChangeFetcherFactory {
+  suspend fun byMode(
+    mode: LocalChangesFetchMode,
+    database: Database,
+  ): LocalChangeFetcher =
+    when (mode) {
+      is LocalChangesFetchMode.AllChanges ->
+        AllChangesLocalChangeFetcher(database).apply { initTotalCount() }
+      else -> throw NotImplementedError("$mode is not implemented yet.")
+    }
 }
 
 private fun Int.isNotZero() = this != 0

@@ -696,20 +696,20 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun one_localChange_should_return_one_for_count() = runBlocking {
+  fun getLocalChangesCount_noLocalChange_returnsZero() = runBlocking {
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
+    assertThat(database.getLocalChangesCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun getLocalChangesCount_oneLocalChange_returnsOne() = runBlocking {
     assertThat(database.getLocalChangesCount()).isEqualTo(1)
   }
 
   @Test
-  fun add_resource_should_count_two_for_localChanges() = runBlocking {
+  fun getLocalChangesCount_twoLocalChange_returnsTwo() = runBlocking {
     database.insert(TEST_PATIENT_2)
     assertThat(database.getLocalChangesCount()).isEqualTo(2)
-  }
-
-  @Test
-  fun no_localChanges_should_return_zero_for_count() = runBlocking {
-    database.deleteUpdates(listOf(TEST_PATIENT_1))
-    assertThat(database.getLocalChangesCount()).isEqualTo(0)
   }
 
   @Test
