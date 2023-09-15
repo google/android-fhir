@@ -17,11 +17,26 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.sync.upload.patch.Patch
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /** Generator that generates [UploadRequest]s from the [Patch]es */
 internal interface UploadRequestGenerator {
   /** Generates a list of [UploadRequest] from the [Patch]es */
   fun generateUploadRequests(patches: List<Patch>): List<UploadRequest>
+}
+
+/** Mode to decide the type of [UploadRequest] that needs to be generated */
+internal sealed class UploadRequestGeneratorMode {
+  data class UrlRequest(
+    val httpVerbToUseForCreate: HttpVerb,
+    val httpVerbToUseForUpdate: HttpVerb,
+  ) : UploadRequestGeneratorMode()
+
+  data class BundleRequest(
+    val httpVerbToUseForCreate: Bundle.HTTPVerb,
+    val httpVerbToUseForUpdate: Bundle.HTTPVerb,
+  ) : UploadRequestGeneratorMode()
 }
 
 internal object UploadRequestGeneratorFactory {
