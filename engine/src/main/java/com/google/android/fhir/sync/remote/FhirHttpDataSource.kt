@@ -18,19 +18,20 @@ package com.google.android.fhir.sync.remote
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
-import com.google.android.fhir.sync.BundleDownloadRequest
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadRequest
-import com.google.android.fhir.sync.UploadRequest
-import com.google.android.fhir.sync.UrlDownloadRequest
-import com.google.android.fhir.sync.UrlUploadRequest
+import com.google.android.fhir.sync.download.BundleDownloadRequest
+import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.download.UrlDownloadRequest
+import com.google.android.fhir.sync.upload.request.BundleUploadRequest
+import com.google.android.fhir.sync.upload.request.UploadRequest
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
+ *
  * @param fhirHttpService Http service to make requests to the server.
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {

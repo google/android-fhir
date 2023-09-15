@@ -16,20 +16,15 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.r4.model.Bundle
 
-/**
- * Generates list of [BundleUploadRequest] with Transaction [Bundle] and [LocalChangeToken]s
- * associated with the resources present in the transaction bundle.
- */
-class TransactionBundleGenerator(
+/** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
+internal class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
-  private val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Patch.Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
+  private val getBundleEntryComponentGeneratorForPatch:
+    (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(patches: List<Patch>): List<BundleUploadRequest> {
@@ -41,10 +36,7 @@ class TransactionBundleGenerator(
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
         patches.forEach {
-          this.addEntry(
-            getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
-              .getEntry(it),
-          )
+          this.addEntry(getBundleEntryComponentGeneratorForPatch(it, useETagForUpload).getEntry(it))
         }
       }
     return BundleUploadRequest(
@@ -75,8 +67,8 @@ class TransactionBundleGenerator(
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
-      generatedBundleSize: Int,
-      useETagForUpload: Boolean,
+      generatedBundleSize: Int = 500,
+      useETagForUpload: Boolean = true,
     ): TransactionBundleGenerator {
       val createFunction =
         createMapping[httpVerbToUseForCreate]
@@ -90,8 +82,8 @@ class TransactionBundleGenerator(
             "Update using $httpVerbToUseForUpdate is not supported.",
           )
 
-      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { type, useETag ->
-        when (type) {
+      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { patch, useETag ->
+        when (patch.type) {
           Patch.Type.INSERT -> createFunction(useETag)
           Patch.Type.UPDATE -> updateFunction(useETag)
           Patch.Type.DELETE -> HttpDeleteEntryComponentGenerator(useETag)
