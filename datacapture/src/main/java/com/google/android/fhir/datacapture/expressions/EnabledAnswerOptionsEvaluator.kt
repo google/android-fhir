@@ -205,7 +205,7 @@ internal class EnabledAnswerOptionsEvaluator(
           val xFhirExpressionString =
             expressionEvaluator.createXFhirQueryFromExpression(
               answerExpression,
-              variablesMap
+              variablesMap,
             )
           if (answerExpressionMap.containsKey(xFhirExpressionString)) {
             answerExpressionMap[xFhirExpressionString]

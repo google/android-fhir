@@ -62,8 +62,10 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onSubmitAction() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
     (activity as MainActivity).setDrawerEnabled(false)
   }
 
@@ -90,7 +92,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
             .setQuestionnaireResponse(pair.second)
             .setQuestionnaireLaunchContexts(listOf(patientStr))
             .build(),
-          QUESTIONNAIRE_FRAGMENT_TAG
+          QUESTIONNAIRE_FRAGMENT_TAG,
         )
       }
     }
