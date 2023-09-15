@@ -34,4 +34,13 @@ internal interface PatchGenerator {
    * certain numbers of [Patch]es.
    */
   fun generate(localChanges: List<LocalChange>): List<Patch>
+
+  companion object {
+    internal fun byMode(mode: PatchGeneratorMode): PatchGenerator {
+      return when (mode) {
+        is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
+        is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
+      }
+    }
+  }
 }
