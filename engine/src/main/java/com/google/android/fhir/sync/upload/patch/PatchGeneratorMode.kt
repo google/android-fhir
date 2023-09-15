@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.sync.upload.patch
 
+/**
+ * Mode to decide the type of [PatchGenerator] that needs to be used to upload the [LocalChange]s
+ */
 internal sealed class PatchGeneratorMode {
   object PerResource : PatchGeneratorMode()
 
