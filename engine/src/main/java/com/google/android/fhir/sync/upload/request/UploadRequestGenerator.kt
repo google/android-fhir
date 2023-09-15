@@ -22,20 +22,6 @@ import com.google.android.fhir.sync.upload.patch.Patch
 internal interface UploadRequestGenerator {
   /** Generates a list of [UploadRequest] from the [Patch]es */
   fun generateUploadRequests(patches: List<Patch>): List<UploadRequest>
-
-  companion object {
-    internal fun byMode(mode: UploadRequestGeneratorMode): UploadRequestGenerator {
-      return when (mode) {
-        is UploadRequestGeneratorMode.UrlRequest ->
-          UrlRequestGenerator.getGenerator(mode.httpVerbToUseForCreate, mode.httpVerbToUseForUpdate)
-        is UploadRequestGeneratorMode.BundleRequest ->
-          TransactionBundleGenerator.getGenerator(
-            mode.httpVerbToUseForCreate,
-            mode.httpVerbToUseForUpdate,
-          )
-      }
-    }
-  }
 }
 
 internal object UploadRequestGeneratorFactory {
