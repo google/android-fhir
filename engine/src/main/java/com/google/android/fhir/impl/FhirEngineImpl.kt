@@ -20,7 +20,6 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.logicalId
@@ -30,10 +29,13 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
+import com.google.android.fhir.sync.upload.FetchProgress
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -125,14 +127,16 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
-  ) {
+    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+  ): Flow<FetchProgress> = flow {
     val resourceConsolidator = DefaultResourceConsolidator(database)
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
+
+    emit(FetchProgress(localChangeFetcher.total, localChangeFetcher.total))
     while (localChangeFetcher.hasNext()) {
-      upload(localChangeFetcher.next()).collect {
-        resourceConsolidator.consolidate(it.first, it.second)
-      }
+      val uploadSyncResult = upload(localChangeFetcher.next())
+      resourceConsolidator.consolidate(uploadSyncResult)
+      emit(localChangeFetcher.getProgress())
     }
   }
 }

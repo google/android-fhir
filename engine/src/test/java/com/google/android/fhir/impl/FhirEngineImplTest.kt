@@ -30,13 +30,14 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
@@ -314,12 +315,15 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
-      flow {
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+        UploadSyncResult.Success(
+          LocalChangeToken(it.flatMap { it.token.ids }),
+          listOf(),
+        )
       }
-    }
+      .collect()
 
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {
