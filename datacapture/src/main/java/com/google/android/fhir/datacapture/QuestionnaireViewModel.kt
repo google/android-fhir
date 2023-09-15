@@ -66,6 +66,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
@@ -817,10 +818,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .filter { responseItemKeys.contains(it.linkId) }
       .zip(questionnaireResponseItemList.asSequence())
       .filter { (questionnaireItem, questionnaireResponseItem) ->
-        enablementEvaluator.evaluate(
-          questionnaireItem,
-          questionnaireResponseItem,
-        )
+        runBlocking {
+          enablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+          )
+        }
       }
       .map { (questionnaireItem, questionnaireResponseItem) ->
         questionnaireResponseItem.apply {
@@ -840,7 +843,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Gets a list of [QuestionnairePage]s for a paginated questionnaire, or `null` if the
    * questionnaire is not paginated.
    */
-  private fun getQuestionnairePages(): List<QuestionnairePage>? =
+  private suspend fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,

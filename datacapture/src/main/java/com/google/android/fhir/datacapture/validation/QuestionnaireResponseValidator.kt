@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -108,11 +109,12 @@ object QuestionnaireResponseValidator {
         questionnaireItem = questionnaireItemListIterator.next()
       } while (questionnaireItem!!.linkId != questionnaireResponseItem.linkId)
 
-      val enabled =
-        enablementEvaluator.evaluate(
-          questionnaireItem,
-          questionnaireResponseItem,
-        )
+      val enabled = runBlocking {
+          enablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+          )
+        }
 
       if (enabled) {
         validateQuestionnaireResponseItem(

@@ -123,7 +123,7 @@ internal class EnablementEvaluator(
    * @param questionnaireItem the corresponding questionnaire item.
    * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
-  fun evaluate(
+   suspend fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {

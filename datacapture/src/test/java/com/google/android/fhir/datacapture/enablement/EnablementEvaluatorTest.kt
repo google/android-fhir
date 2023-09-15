@@ -22,6 +22,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IntegerType
@@ -57,11 +58,12 @@ class EnablementEvaluatorTest {
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
-    assertThat(
+    runTest {
+      val result =
         EnablementEvaluator(questionnaire, questionnaireResponse)
           .evaluate(questionnaireItem, questionnaireResponseItem)
-      )
-      .isFalse()
+      assertThat(result).isFalse()
+    }
   }
 
   @Test
@@ -778,10 +780,11 @@ class EnablementEvaluatorTest {
         )
       }
 
-    return assertThat(
+    val result = runBlocking {
       EnablementEvaluator(questionnaire, questionnaireResponse)
         .evaluate(questionnaireItem, questionnaireResponse.item.last())
-    )
+    }
+    return assertThat(result)
   }
 
   /**
