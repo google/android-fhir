@@ -25,7 +25,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
-import com.google.android.fhir.sync.upload.UploaderImpl
+import com.google.android.fhir.sync.upload.Uploader
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -42,8 +41,9 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
   abstract fun getFhirEngine(): FhirEngine
+
   abstract fun getDownloadWorkManager(): DownloadWorkManager
-  abstract fun getUploadWorkManager(): UploadWorkManager
+
   abstract fun getConflictResolver(): ConflictResolver
 
   private val gson =
@@ -61,9 +61,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         ?: return Result.failure(
           buildWorkData(
             IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration."
-            )
-          )
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
+            ),
+          ),
         )
 
     val flow = MutableSharedFlow<SyncJobStatus>()
@@ -85,9 +85,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       FhirSynchronizer(
           applicationContext,
           getFhirEngine(),
-          UploaderImpl(dataSource, getUploadWorkManager()),
+          Uploader(dataSource),
           DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver()
+          getConflictResolver(),
         )
         .apply { subscribe(flow) }
         .synchronize()
@@ -122,7 +122,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     return workDataOf(
       // send serialized state and type so that consumer can convert it back
       "StateType" to state::class.java.name,
-      "State" to gson.toJson(state)
+      "State" to gson.toJson(state),
     )
   }
 
@@ -134,8 +134,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
    * Exclusion strategy for [Gson] that handles field exclusions for [SyncJobStatus] returned by
    * FhirSynchronizer. It should skip serializing the exceptions to avoid exceeding WorkManager
    * WorkData limit
+   *
    * @see <a
-   * href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>
+   *   href="https://github.com/google/android-fhir/issues/707">https://github.com/google/android-fhir/issues/707</a>
    */
   internal class StateExclusionStrategy : ExclusionStrategy {
     override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")

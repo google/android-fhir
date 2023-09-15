@@ -26,9 +26,13 @@ suspend fun getQuestionnaireJsonStringFromAssets(
   context: Context,
   backgroundContext: CoroutineContext,
   fileName: String
-): String {
+): String? {
   return withContext(backgroundContext) {
-    context.assets.open(fileName).bufferedReader().use { it.readText() }
+    if (fileName.isNotEmpty()) {
+      context.assets.open(fileName).bufferedReader().use { it.readText() }
+    } else {
+      null
+    }
   }
 }
 
