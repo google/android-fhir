@@ -20,7 +20,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /** Mode to decide the type of [UploadRequest] that needs to be generated */
-sealed class UploadRequestGeneratorMode {
+internal sealed class UploadRequestGeneratorMode {
   data class UrlRequest(
     val httpVerbToUseForCreate: HttpVerb,
     val httpVerbToUseForUpdate: HttpVerb,

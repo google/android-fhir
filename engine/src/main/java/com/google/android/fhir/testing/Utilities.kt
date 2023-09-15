@@ -31,6 +31,7 @@ import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.download.BundleDownloadRequest
 import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.android.fhir.sync.download.UrlDownloadRequest
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.request.BundleUploadRequest
 import com.google.android.fhir.sync.upload.request.UploadRequest
 import com.google.common.truth.Truth.assertThat
@@ -147,10 +148,9 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun syncUpload(
+    localChangesFetchMode: LocalChangesFetchMode,
     upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
-  ) {
-    upload(getLocalChanges(ResourceType.Patient, "123")).collect()
-  }
+  ) = upload(getLocalChanges(ResourceType.Patient, "123")).collect()
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
