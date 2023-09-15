@@ -37,3 +37,18 @@ internal interface UploadRequestGenerator {
     }
   }
 }
+
+internal object UploadRequestGeneratorFactory {
+  fun byMode(
+    mode: UploadRequestGeneratorMode,
+  ): UploadRequestGenerator =
+    when (mode) {
+      is UploadRequestGeneratorMode.UrlRequest ->
+        UrlRequestGenerator.getGenerator(mode.httpVerbToUseForCreate, mode.httpVerbToUseForUpdate)
+      is UploadRequestGeneratorMode.BundleRequest ->
+        TransactionBundleGenerator.getGenerator(
+          mode.httpVerbToUseForCreate,
+          mode.httpVerbToUseForUpdate,
+        )
+    }
+}
