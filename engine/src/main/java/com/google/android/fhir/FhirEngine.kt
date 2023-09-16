@@ -33,6 +33,10 @@ interface FhirEngine {
    */
   suspend fun create(vararg resource: Resource): List<String>
 
+  /**
+   * Creates one or more remote FHIR [resource]s in the local storage without flagging as local
+   * changes.
+   */
   suspend fun createRemote(vararg resource: Resource)
 
   /** Loads a FHIR resource given the class and the logical ID. */
@@ -55,7 +59,7 @@ interface FhirEngine {
    * api caller should [Flow.collect] it.
    */
   suspend fun syncUpload(
-    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>)
+    upload: (suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>),
   )
 
   /**
@@ -64,7 +68,7 @@ interface FhirEngine {
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   )
 
   /**
@@ -89,29 +93,32 @@ interface FhirEngine {
    * Retrieves a list of [LocalChange]s for [Resource] with given type and id, which can be used to
    * purge resource from database. If there is no local change for given [resourceType] and
    * [Resource.id], return an empty list.
+   *
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
    * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
-   * [Resource.id] . If there is no local change for given [resourceType] and [Resource.id], return
-   * an empty list.
+   *   [Resource.id] . If there is no local change for given [resourceType] and [Resource.id],
+   *   return an empty list.
    */
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
    * Purges a resource from the database based on resource type and id without any deletion of data
    * from the server.
+   *
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
    * @param isLocalPurge default value is false here resource will not be deleted from
-   * LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
-   * delete resource entry from LocalChangeEntity table.
+   *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
+   *   either sync with server or FORCE_PURGE required") if local change exists. If true this API
+   *   will delete resource entry from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }
 
 /**
  * Returns a FHIR resource of type [R] with [id] from the local storage.
+ *
  * @param <R> The resource type which should be a subtype of [Resource].
  * @throws ResourceNotFoundException if the resource is not found
  */
@@ -122,6 +129,7 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
 
 /**
  * Deletes a FHIR resource of type [R] with [id] from the local storage.
+ *
  * @param <R> The resource type which should be a subtype of [Resource].
  */
 suspend inline fun <reified R : Resource> FhirEngine.delete(id: String) {
@@ -140,7 +148,7 @@ data class SearchResult<R : Resource>(
   /** Matching referenced resources as per the [Search.include] criteria in the query. */
   val included: Map<SearchParamName, List<Resource>>?,
   /** Matching referenced resources as per the [Search.revInclude] criteria in the query. */
-  val revIncluded: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
+  val revIncluded: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
 ) {
   override fun equals(other: Any?) =
     other is SearchResult<*> &&
@@ -157,7 +165,7 @@ data class SearchResult<R : Resource>(
 
   private fun equalsShallow(
     first: Map<SearchParamName, List<Resource>>?,
-    second: Map<SearchParamName, List<Resource>>?
+    second: Map<SearchParamName, List<Resource>>?,
   ) =
     if (first != null && second != null && first.size == second.size) {
       first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
@@ -170,7 +178,7 @@ data class SearchResult<R : Resource>(
   @JvmName("equalsShallowRevInclude")
   private fun equalsShallow(
     first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
-    second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?
+    second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
   ) =
     if (first != null && second != null && first.size == second.size) {
       first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->

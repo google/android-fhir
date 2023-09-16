@@ -111,7 +111,7 @@ object TestDataSourceImpl : DataSource {
 }
 
 open class TestDownloadManagerImpl(
-  private val queries: List<String> = listOf("Patient?address-city=NAIROBI")
+  private val queries: List<String> = listOf("Patient?address-city=NAIROBI"),
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
 
@@ -133,6 +133,7 @@ open class TestDownloadManagerImpl(
 
 object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()
+
   override suspend fun createRemote(vararg resource: Resource) {
     TODO("Not yet implemented")
   }
@@ -150,17 +151,18 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
     upload(getLocalChanges(ResourceType.Patient, "123")).collect()
   }
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   ) {
     download().collect()
   }
+
   override suspend fun count(search: Search): Long {
     return 0
   }
@@ -179,8 +181,8 @@ object TestFhirEngineImpl : FhirEngine {
         payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
-        timestamp = Instant.now()
-      )
+        timestamp = Instant.now(),
+      ),
     )
   }
 
