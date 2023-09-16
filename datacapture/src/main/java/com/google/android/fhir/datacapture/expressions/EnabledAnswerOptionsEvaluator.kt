@@ -55,12 +55,12 @@ import org.hl7.fhir.r4.model.ValueSet
 internal class EnabledAnswerOptionsEvaluator(
   private val questionnaire: Questionnaire,
   private val questionnaireResponse: QuestionnaireResponse,
-  private val xFhirQueryResolver: XFhirQueryResolver?,
-  private val externalValueSetResolver: ExternalAnswerValueSetResolver?,
   private val questionnaireItemParentMap:
     Map<QuestionnaireItemComponent, QuestionnaireItemComponent> =
     emptyMap(),
   private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+  private val xFhirQueryResolver: XFhirQueryResolver? = null,
+  private val externalValueSetResolver: ExternalAnswerValueSetResolver? = null,
 ) {
 
   private val expressionEvaluator =
@@ -69,6 +69,7 @@ internal class EnabledAnswerOptionsEvaluator(
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   private val answerValueSetMap =

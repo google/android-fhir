@@ -344,6 +344,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   private val enablementEvaluator: EnablementEvaluator =
@@ -352,16 +353,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
     EnabledAnswerOptionsEvaluator(
       questionnaire,
       questionnaireResponse,
-      xFhirQueryResolver,
-      externalValueSetResolver,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
+      externalValueSetResolver,
     )
 
   /**
@@ -429,6 +431,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         getApplication(),
         questionnaireItemParentMap,
         questionnaireLaunchContextMap,
+        xFhirQueryResolver,
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {

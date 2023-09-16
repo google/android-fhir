@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import kotlinx.coroutines.runBlocking
@@ -61,6 +62,7 @@ object QuestionnaireResponseValidator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
       mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
+    xFhirQueryResolver: XFhirQueryResolver? = null,
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -80,6 +82,7 @@ object QuestionnaireResponseValidator {
         questionnaireResponse,
         questionnaireItemParentMap,
         launchContextMap,
+        xFhirQueryResolver,
       ),
       linkIdToValidationResultMap,
     )

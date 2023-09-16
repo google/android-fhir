@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.enableWhenExpression
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
@@ -77,6 +78,7 @@ internal class EnablementEvaluator(
     Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
     emptyMap(),
   private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+  private val xFhirQueryResolver: XFhirQueryResolver? = null,
 ) {
 
   private val expressionEvaluator =
@@ -85,6 +87,7 @@ internal class EnablementEvaluator(
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   /**
