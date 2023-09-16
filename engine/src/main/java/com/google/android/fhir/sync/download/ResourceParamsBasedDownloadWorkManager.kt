@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
