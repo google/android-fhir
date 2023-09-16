@@ -17,9 +17,9 @@
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.sync.UrlUploadRequest
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
 import com.google.android.fhir.sync.remote.RetrofitHttpService
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.common.truth.Truth.assertThat
 import java.net.HttpURLConnection
@@ -55,8 +55,8 @@ internal class FhirHttpDataSourceTest {
           Bundle().apply {
             id = "transaction-response-1"
             type = Bundle.BundleType.TRANSACTIONRESPONSE
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -82,7 +82,7 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
     val request = UrlUploadRequest(HttpVerb.POST, "Patient", patient, emptyMap())
@@ -104,7 +104,7 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
     val request =
@@ -128,7 +128,8 @@ internal class FhirHttpDataSourceTest {
     val patchToApply =
       Binary().apply {
         data =
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]".toByteArray()
+          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
+            .toByteArray()
       }
 
     val request =
