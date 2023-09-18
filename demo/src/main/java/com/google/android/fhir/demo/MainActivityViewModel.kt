@@ -31,6 +31,7 @@ import com.google.android.fhir.sync.SyncJobStatus
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -48,6 +49,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
+  private var syncJob: Job? = null
+
   init {
     viewModelScope.launch {
       Sync.periodicSync<DemoFhirSyncWorker>(
@@ -55,8 +58,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
               syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-            )
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+            ),
         )
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
@@ -64,18 +67,21 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   }
 
   fun triggerOneTimeSync() {
-    viewModelScope.launch {
-      Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
+    syncJob?.cancel()
+
+    syncJob =
+      viewModelScope.launch {
+        Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
+          .shareIn(this, SharingStarted.Eagerly, 10)
+          .collect { _pollState.emit(it) }
+      }
   }
 
   /** Emits last sync time. */
   fun updateLastSyncTimestamp() {
     val formatter =
       DateTimeFormatter.ofPattern(
-        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
+        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12,
       )
     _lastSyncTimestampLiveData.value =
       Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
