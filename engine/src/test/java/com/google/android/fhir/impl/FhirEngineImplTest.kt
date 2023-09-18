@@ -29,6 +29,7 @@ import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.upload.FetchProgress
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
@@ -37,7 +38,6 @@ import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
@@ -315,6 +315,8 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange() = runBlocking {
     val localChanges = mutableListOf<LocalChange>()
+    val emittedProgress = mutableListOf<FetchProgress>()
+
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
@@ -323,15 +325,19 @@ class FhirEngineImplTest {
           listOf(),
         )
       }
-      .collect()
+      .collect { emittedProgress.add(it) }
 
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {
-      assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
-      assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
-      assertThat(this.type).isEqualTo(Type.INSERT)
-      assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(resourceType).isEqualTo(ResourceType.Patient.toString())
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_1.id)
+      assertThat(type).isEqualTo(Type.INSERT)
+      assertThat(payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
     }
+
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(FetchProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(FetchProgress(0, 1))
   }
 
   @Test
