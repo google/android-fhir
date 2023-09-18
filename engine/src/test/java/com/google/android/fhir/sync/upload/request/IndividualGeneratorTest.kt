@@ -38,14 +38,14 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should return empty list if there are no local changes`() = runTest {
-    val generator = IndividualRequestGenerator.getDefault()
+    val generator = UrlRequestGenerator.getDefault()
     val requests = generator.generateUploadRequests(listOf())
     assertThat(requests).isEmpty()
   }
 
   @Test
   fun `should create a POST request for insert`() = runTest {
-    val generator = IndividualRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
+    val generator = UrlRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
     val requests =
       generator.generateUploadRequests(
         listOf(
@@ -61,13 +61,13 @@ class IndividualGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
-        )
+        ),
       )
 
     with(requests.single()) {
@@ -78,7 +78,7 @@ class IndividualGeneratorTest {
 
   @Test
   fun `should create a PUT request for insert`() = runTest {
-    val generator = IndividualRequestGenerator.getDefault()
+    val generator = UrlRequestGenerator.getDefault()
     val requests =
       generator.generateUploadRequests(
         listOf(
@@ -94,13 +94,13 @@ class IndividualGeneratorTest {
                     HumanName().apply {
                       addGiven("John")
                       family = "Doe"
-                    }
+                    },
                   )
-                }
+                },
               ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           ),
-        )
+        ),
       )
 
     with(requests.single()) {
@@ -119,10 +119,10 @@ class IndividualGeneratorTest {
           type = Patch.Type.UPDATE,
           payload =
             "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val requests = generator.generateUploadRequests(patches)
     with(requests.single()) {
       assertThat(requests.size).isEqualTo(1)
@@ -130,7 +130,7 @@ class IndividualGeneratorTest {
       assertThat(url).isEqualTo("Patient/Patient-002")
       assertThat((resource as Binary).data.toString(Charsets.UTF_8))
         .isEqualTo(
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
+          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
         )
     }
   }
@@ -151,14 +151,14 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Doe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val requests = generator.generateUploadRequests(patches)
     with(requests.single()) {
       assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
@@ -182,11 +182,11 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Doe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
         Patch(
           resourceType = ResourceType.Patient.name,
@@ -194,7 +194,7 @@ class IndividualGeneratorTest {
           type = Patch.Type.UPDATE,
           payload =
             "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
         Patch(
           resourceType = ResourceType.Patient.name,
@@ -208,14 +208,14 @@ class IndividualGeneratorTest {
                   HumanName().apply {
                     addGiven("John")
                     family = "Roe"
-                  }
+                  },
                 )
-              }
+              },
             ),
-          timestamp = Instant.now()
+          timestamp = Instant.now(),
         ),
       )
-    val generator = IndividualRequestGenerator.Factory.getDefault()
+    val generator = UrlRequestGenerator.Factory.getDefault()
     val result = generator.generateUploadRequests(patches)
     assertThat(result).hasSize(3)
     assertThat(result.map { it.httpVerb })

@@ -17,9 +17,9 @@
 package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
-import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.sync.download.DownloadRequest
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -98,14 +98,15 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
   }
 
   private suspend fun extractAndSaveLastUpdateTimestampToFetchFutureUpdates(
-    resources: List<Resource>
+    resources: List<Resource>,
   ) {
     resources
       .groupBy { it.resourceType }
-      .entries.map { map ->
+      .entries
+      .map { map ->
         dataStore.saveLastUpdatedTimestamp(
           map.key,
-          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: ""
+          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: "",
         )
       }
   }
