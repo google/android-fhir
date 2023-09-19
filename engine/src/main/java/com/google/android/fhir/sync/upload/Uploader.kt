@@ -17,12 +17,11 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.UploadState
-import com.google.android.fhir.sync.UploadWorkManager
-import com.google.android.fhir.sync.Uploader
+import com.google.android.fhir.sync.upload.patch.PerResourcePatchGenerator
+import com.google.android.fhir.sync.upload.request.TransactionBundleGenerator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
@@ -33,37 +32,30 @@ import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /**
- * Implementation of the [Uploader]. It orchestrates the pre processing of [LocalChange] and
- * constructing appropriate upload requests via [UploadWorkManager] and uploading of requests via
- * [DataSource]. [Uploader] clients should call upload and listen to the various states emitted by
- * [UploadWorkManager] as [UploadState].
+ * Uploads changes made locally to FHIR resources to server in the following steps:
+ * 1. fetching local changes from the on-device SQLite database,
+ * 2. creating patches to be sent to the server using the local changes,
+ * 3. generating HTTP requests to be sent to the server,
+ * 4. processing the responses from the server and consolidate any changes (i.e. updates resource
+ *    IDs).
  */
-internal class UploaderImpl(
+internal class Uploader(
   private val dataSource: DataSource,
-  private val uploadWorkManager: UploadWorkManager,
-) : Uploader {
+) {
+  private val patchGenerator = PerResourcePatchGenerator
+  private val requestGenerator = TransactionBundleGenerator.getDefault()
 
-  override suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
-    val transformedChanges = uploadWorkManager.prepareChangesForUpload(localChanges)
-    val uploadRequests = uploadWorkManager.createUploadRequestsFromLocalChanges(transformedChanges)
-    val total = uploadWorkManager.getPendingUploadsIndicator(uploadRequests)
-    var completed = 0
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
+    val patches = patchGenerator.generate(localChanges)
+    val requests = requestGenerator.generateUploadRequests(patches)
+    val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
+    val total = requests.size
     emit(UploadState.Started(total))
-    val pendingRequests = uploadRequests.toMutableList()
-    while (pendingRequests.isNotEmpty()) {
-      val uploadRequest = pendingRequests.first()
-      pendingRequests.remove(uploadRequest)
+    requests.forEachIndexed { index, uploadRequest ->
       try {
         val response = dataSource.upload(uploadRequest)
-        completed = total - uploadWorkManager.getPendingUploadsIndicator(pendingRequests)
         emit(
-          getUploadResult(
-            uploadRequest.resource.resourceType,
-            response,
-            uploadRequest.localChangeToken,
-            total,
-            completed
-          )
+          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1),
         )
       } catch (e: Exception) {
         Timber.e(e)
@@ -77,7 +69,7 @@ internal class UploaderImpl(
     response: Resource,
     localChangeToken: LocalChangeToken,
     total: Int,
-    completed: Int
+    completed: Int,
   ) =
     when {
       response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
@@ -87,17 +79,30 @@ internal class UploaderImpl(
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException(response.issueFirstRep.diagnostics)
-          )
+            FHIRException(response.issueFirstRep.diagnostics),
+          ),
         )
       }
       else -> {
         UploadState.Failure(
           ResourceSyncException(
             requestResourceType,
-            FHIRException("Unknown response for ${response.resourceType}")
-          )
+            FHIRException("Unknown response for ${response.resourceType}"),
+          ),
         )
       }
     }
+}
+
+internal sealed class UploadState {
+  data class Started(val total: Int) : UploadState()
+
+  data class Success(
+    val localChangeToken: LocalChangeToken,
+    val resource: Resource,
+    val total: Int,
+    val completed: Int,
+  ) : UploadState()
+
+  data class Failure(val syncError: ResourceSyncException) : UploadState()
 }

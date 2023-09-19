@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
+import com.google.android.fhir.datacapture.extensions.getLocalizedDatePattern
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
@@ -114,7 +115,9 @@ internal object DateTimePickerViewHolderFactory :
         timeInputEditText.setOnClickListener {
           buildMaterialTimePicker(itemView.context, INPUT_MODE_KEYBOARD)
         }
-        val localeDatePattern = getLocalizedDateTimePattern()
+
+        // This widget does not currently support custom entry format.
+        val localeDatePattern = getLocalizedDatePattern()
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(localeDatePattern)
         textWatcher = DatePatternTextWatcher(datePatternSeparator)
@@ -276,7 +279,7 @@ internal object DateTimePickerViewHolderFactory :
         }
 
       /** Automatically appends date separator (e.g. "/") during date input. */
-      inner class DatePatternTextWatcher(private val datePatternSeparator: Char) : TextWatcher {
+      inner class DatePatternTextWatcher(private val datePatternSeparator: Char?) : TextWatcher {
         private var isDeleting = false
 
         override fun beforeTextChanged(

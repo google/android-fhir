@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.UploadRequest
 
-/** Generator that generates [UploadRequest]s from the [LocalChange]s */
-interface UploadRequestGenerator {
-  /** Generates a list of [UploadRequest] from the [localChanges] */
-  fun generateUploadRequests(localChanges: List<LocalChange>): List<UploadRequest>
+/**
+ * Generates a [Patch] for each [LocalChange].
+ *
+ * Used when all client-side changes to FHIR resources need to be uploaded to the server in order to
+ * maintain an audit trail.
+ */
+internal object PerChangePatchGenerator : PatchGenerator {
+  override fun generate(localChanges: List<LocalChange>): List<Patch> =
+    localChanges.map {
+      Patch(
+        resourceType = it.resourceType,
+        resourceId = it.resourceId,
+        versionId = it.versionId,
+        timestamp = it.timestamp,
+        type = it.type.toPatchType(),
+        payload = it.payload,
+      )
+    }
 }

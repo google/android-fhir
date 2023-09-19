@@ -24,10 +24,10 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.Operation
@@ -39,6 +39,7 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -90,9 +91,9 @@ import org.junit.runners.Parameterized.Parameters
  * Integration tests for [DatabaseImpl]. There are written as integration tests as officially
  * recommend because:
  * * Different versions of android are shipped with different versions of SQLite. Integration tests
- * allow for better coverage on them.
+ *   allow for better coverage on them.
  * * Robolectric's SQLite implementation does not match Android, e.g.:
- * https://github.com/robolectric/robolectric/blob/master/shadows/framework/src/main/java/org/robolectric/shadows/ShadowSQLiteConnection.java#L97
+ *   https://github.com/robolectric/robolectric/blob/master/shadows/framework/src/main/java/org/robolectric/shadows/ShadowSQLiteConnection.java#L97
  */
 @MediumTest
 @RunWith(Parameterized::class)
@@ -267,7 +268,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!"
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!",
       )
     assertThat(database.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
   }
@@ -280,7 +281,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceIllegalStateException.message)
       .isEqualTo(
-        "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required"
+        "Resource with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID has local changes, either sync with server or FORCE_PURGE required",
       )
   }
 
@@ -326,7 +327,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_2_ID!"
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_2_ID!",
       )
   }
 
@@ -336,12 +337,10 @@ class DatabaseImplTest {
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { database.update(TEST_PATIENT_2) }
       }
-    /* ktlint-disable max-line-length */
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!"
-        /* ktlint-enable max-line-length */
-        )
+        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!",
+      )
   }
 
   @Test
@@ -383,7 +382,7 @@ class DatabaseImplTest {
           HumanName().apply {
             family = "FamilyName"
             addGiven("FirstName")
-          }
+          },
         )
         meta =
           Meta().apply {
@@ -401,7 +400,7 @@ class DatabaseImplTest {
           HumanName().apply {
             family = "UpdatedFamilyName"
             addGiven("UpdatedFirstName")
-          }
+          },
         )
       }
     database.update(updatedPatient)
@@ -438,7 +437,7 @@ class DatabaseImplTest {
         database
           .getAllLocalChanges()
           .map { it }
-          .none { it.type == LocalChange.Type.DELETE && it.resourceId == "nonexistent_patient" }
+          .none { it.type == LocalChange.Type.DELETE && it.resourceId == "nonexistent_patient" },
       )
       .isTrue()
   }
@@ -512,7 +511,9 @@ class DatabaseImplTest {
         lastUpdated = Date()
       }
     database.insert(patient)
-    services.fhirEngine.syncUpload { it ->
+    // Delete the patient created in setup as we only want to upload the patient in this test
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
+    services.fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
       it
         .first { it.resourceId == "remote-patient-3" }
         .let {
@@ -521,7 +522,7 @@ class DatabaseImplTest {
               Patient().apply {
                 id = it.resourceId
                 meta = remoteMeta
-              }
+              },
           )
         }
     }
@@ -538,7 +539,7 @@ class DatabaseImplTest {
         database
           .getAllLocalChanges()
           .map { it }
-          .none { it.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID) }
+          .none { it.resourceId in listOf(patient.logicalId, TEST_PATIENT_2_ID) },
       )
       .isTrue()
   }
@@ -552,14 +553,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("Jane")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(result.size).isEqualTo(1)
 
@@ -570,14 +571,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.insert(updatedPatient)
     val updatedResult =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(updatedResult.size).isEqualTo(0)
   }
@@ -591,14 +592,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("Jane")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.insertRemote(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(result.size).isEqualTo(1)
 
@@ -609,14 +610,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.insertRemote(updatedPatient)
     val updatedResult =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(updatedResult.size).isEqualTo(0)
   }
@@ -648,14 +649,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("Jane")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.insertRemote(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(result.size).isEqualTo(1)
 
@@ -666,14 +667,14 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
 
     database.update(updatedPatient)
     val updatedResult =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "Jane" }) }.getQuery(),
       )
     assertThat(updatedResult.size).isEqualTo(0)
   }
@@ -695,19 +696,36 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun getLocalChangesCount_noLocalChange_returnsZero() = runBlocking {
+    database.deleteUpdates(listOf(TEST_PATIENT_1))
+    assertThat(database.getLocalChangesCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun getLocalChangesCount_oneLocalChange_returnsOne() = runBlocking {
+    assertThat(database.getLocalChangesCount()).isEqualTo(1)
+  }
+
+  @Test
+  fun getLocalChangesCount_twoLocalChange_returnsTwo() = runBlocking {
+    database.insert(TEST_PATIENT_2)
+    assertThat(database.getLocalChangesCount()).isEqualTo(2)
+  }
+
+  @Test
   fun search_sortDescending_twoVeryCloseFloatingPointNumbers_orderedCorrectly() = runBlocking {
     val smallerId = "risk_assessment_1"
     val largerId = "risk_assessment_2"
     database.insert(
       riskAssessment(id = smallerId, probability = BigDecimal("0.3")),
-      riskAssessment(id = largerId, probability = BigDecimal("0.30000000001"))
+      riskAssessment(id = largerId, probability = BigDecimal("0.30000000001")),
     )
 
     val results =
       database.search<RiskAssessment>(
         Search(ResourceType.RiskAssessment)
           .apply { sort(RiskAssessment.PROBABILITY, Order.DESCENDING) }
-          .getQuery()
+          .getQuery(),
       )
 
     val ids = results.map { it.id }
@@ -723,7 +741,7 @@ class DatabaseImplTest {
         listOf(
           RiskAssessment.RiskAssessmentPredictionComponent().apply {
             setProbability(DecimalType(probability))
-          }
+          },
         )
     }
 
@@ -737,7 +755,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -753,7 +771,7 @@ class DatabaseImplTest {
     database.insert(patient)
     val result =
       database.search<Patient>(
-        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery()
+        Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -776,10 +794,10 @@ class DatabaseImplTest {
               {
                 value = "Eve"
                 modifier = StringFilterModifier.MATCHES_EXACTLY
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -802,10 +820,10 @@ class DatabaseImplTest {
               {
                 value = "Eve"
                 modifier = StringFilterModifier.MATCHES_EXACTLY
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -829,10 +847,10 @@ class DatabaseImplTest {
               {
                 value = "Eve"
                 modifier = StringFilterModifier.CONTAINS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
@@ -855,10 +873,10 @@ class DatabaseImplTest {
               {
                 value = "eve"
                 modifier = StringFilterModifier.CONTAINS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -870,7 +888,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -884,10 +902,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.EQUAL
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -899,7 +917,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100.5)),
         )
       }
 
@@ -913,10 +931,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.EQUAL
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -928,7 +946,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0)),
         )
       }
 
@@ -942,10 +960,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.NOT_EQUAL
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
@@ -956,7 +974,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -970,10 +988,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.NOT_EQUAL
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -985,7 +1003,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100)),
         )
       }
 
@@ -999,10 +1017,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.GREATERTHAN
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1014,7 +1032,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1028,10 +1046,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.GREATERTHAN
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1043,7 +1061,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1057,10 +1075,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1072,7 +1090,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0)),
         )
       }
 
@@ -1086,10 +1104,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1101,7 +1119,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0)),
         )
       }
 
@@ -1115,10 +1133,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.LESSTHAN
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1130,7 +1148,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1144,10 +1162,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.LESSTHAN
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1159,7 +1177,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1173,10 +1191,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
@@ -1187,7 +1205,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100)),
         )
       }
 
@@ -1201,10 +1219,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1216,7 +1234,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.0)),
         )
       }
 
@@ -1230,10 +1248,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.ENDS_BEFORE
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1245,7 +1263,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1259,10 +1277,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.ENDS_BEFORE
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1274,7 +1292,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(100)),
         )
       }
 
@@ -1288,10 +1306,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.STARTS_AFTER
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1303,7 +1321,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(99.5)),
         )
       }
 
@@ -1317,10 +1335,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.STARTS_AFTER
                 value = BigDecimal("99.5")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1332,7 +1350,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(93))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(93)),
         )
       }
 
@@ -1346,10 +1364,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.APPROXIMATE
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
@@ -1361,7 +1379,7 @@ class DatabaseImplTest {
       RiskAssessment().apply {
         id = "1"
         addPrediction(
-          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(120))
+          RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(120)),
         )
       }
 
@@ -1375,10 +1393,10 @@ class DatabaseImplTest {
               {
                 prefix = ParamPrefixEnum.APPROXIMATE
                 value = BigDecimal("100")
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result).isEmpty()
@@ -1402,10 +1420,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1428,10 +1446,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2020-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1454,10 +1472,10 @@ class DatabaseImplTest {
               {
                 value = of(DateType("2013-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1480,10 +1498,10 @@ class DatabaseImplTest {
               {
                 value = of(DateType("2020-03-14"))
                 prefix = ParamPrefixEnum.APPROXIMATE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1505,10 +1523,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.STARTS_AFTER
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1530,10 +1548,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.STARTS_AFTER
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1555,10 +1573,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1580,10 +1598,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.ENDS_BEFORE
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1605,10 +1623,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.NOT_EQUAL
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1630,10 +1648,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.NOT_EQUAL
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1655,10 +1673,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.EQUAL
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1680,10 +1698,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.EQUAL
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1705,10 +1723,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.GREATERTHAN
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1730,10 +1748,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.GREATERTHAN
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1755,10 +1773,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1780,10 +1798,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1805,10 +1823,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.LESSTHAN
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1830,10 +1848,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.LESSTHAN
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1855,10 +1873,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14"))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Patient/1")
   }
@@ -1880,10 +1898,10 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2013-03-14T00:00:00-00:00"))
                 prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1912,10 +1930,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -1944,10 +1962,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -1976,10 +1994,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2008,10 +2026,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2040,10 +2058,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2072,10 +2090,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2104,10 +2122,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2136,10 +2154,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2168,10 +2186,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2200,10 +2218,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2232,10 +2250,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2264,10 +2282,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2296,10 +2314,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
@@ -2328,10 +2346,10 @@ class DatabaseImplTest {
                 value = BigDecimal("5.403")
                 system = "http://unitsofmeasure.org"
                 unit = "g"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result).isEmpty()
   }
@@ -2360,17 +2378,17 @@ class DatabaseImplTest {
                 value = BigDecimal("5403")
                 system = "http://unitsofmeasure.org"
                 unit = "mg"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.single().id).isEqualTo("Observation/1")
   }
 
   @Test
   fun search_nameGivenDuplicate_deduplicatePatient() = runBlocking {
-    var patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
+    val patient: Patient = readFromFile(Patient::class.java, "/patient_name_given_duplicate.json")
     database.insertRemote(patient)
     val result =
       database.search<Patient>(
@@ -2380,7 +2398,7 @@ class DatabaseImplTest {
             count = 100
             from = 0
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.filter { it.id == patient.id }).hasSize(1)
   }
@@ -2401,8 +2419,8 @@ class DatabaseImplTest {
             Coding(
               "http://hl7.org/fhir/sid/cvx",
               "140",
-              "Influenza, seasonal, injectable, preservative free"
-            )
+              "Influenza, seasonal, injectable, preservative free",
+            ),
           )
         status = Immunization.ImmunizationStatus.COMPLETED
       }
@@ -2420,10 +2438,10 @@ class DatabaseImplTest {
                       Coding(
                         "http://hl7.org/fhir/sid/cvx",
                         "140",
-                        "Influenza, seasonal, injectable, preservative free"
-                      )
+                        "Influenza, seasonal, injectable, preservative free",
+                      ),
                     )
-                }
+                },
               )
 
               // Follow Immunization.ImmunizationStatus
@@ -2431,7 +2449,7 @@ class DatabaseImplTest {
                 Immunization.STATUS,
                 {
                   value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight"))
-                }
+                },
               )
             }
 
@@ -2440,10 +2458,10 @@ class DatabaseImplTest {
               {
                 modifier = StringFilterModifier.MATCHES_EXACTLY
                 value = "IN"
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
   }
@@ -2464,8 +2482,8 @@ class DatabaseImplTest {
         category =
           listOf(
             CodeableConcept(
-              Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
-            )
+              Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan"),
+            ),
           )
       }
     database.insert(patient, TEST_PATIENT_1, carePlan)
@@ -2479,13 +2497,17 @@ class DatabaseImplTest {
                 {
                   value =
                     of(
-                      Coding("http://snomed.info/sct", "698360004", "Diabetes self management plan")
+                      Coding(
+                        "http://snomed.info/sct",
+                        "698360004",
+                        "Diabetes self management plan",
+                      ),
                     )
-                }
+                },
               )
             }
           }
-          .getQuery()
+          .getQuery(),
       )
     assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
   }
@@ -2496,14 +2518,14 @@ class DatabaseImplTest {
       Patient().apply {
         id = "older-patient"
         birthDateElement = DateType("2020-12-12")
-      }
+      },
     )
 
     database.insert(
       Patient().apply {
         id = "younger-patient"
         birthDateElement = DateType("2020-12-13")
-      }
+      },
     )
 
     assertThat(
@@ -2511,9 +2533,9 @@ class DatabaseImplTest {
           .search<Patient>(
             Search(ResourceType.Patient)
               .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
-              .getQuery()
+              .getQuery(),
           )
-          .map { it.id }
+          .map { it.id },
       )
       .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
   }
@@ -2524,14 +2546,14 @@ class DatabaseImplTest {
       Patient().apply {
         id = "older-patient"
         birthDateElement = DateType("2020-12-12")
-      }
+      },
     )
 
     database.insert(
       Patient().apply {
         id = "younger-patient"
         birthDateElement = DateType("2020-12-13")
-      }
+      },
     )
 
     assertThat(
@@ -2539,9 +2561,9 @@ class DatabaseImplTest {
           .search<Patient>(
             Search(ResourceType.Patient)
               .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
-              .getQuery()
+              .getQuery(),
           )
-          .map { it.id }
+          .map { it.id },
       )
       .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
   }
@@ -2554,7 +2576,11 @@ class DatabaseImplTest {
           id = "immunization-1"
           vaccineCode =
             CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM1NL1",
+                "COVID-19 vaccine, inactivated virus",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2565,8 +2591,8 @@ class DatabaseImplTest {
               Coding(
                 "http://id.who.int/icd11/mms",
                 "XM5DF6",
-                "COVID-19 vaccine, live attenuated virus"
-              )
+                "COVID-19 vaccine, live attenuated virus",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2574,7 +2600,7 @@ class DatabaseImplTest {
           id = "immunization-3"
           vaccineCode =
             CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2585,11 +2611,11 @@ class DatabaseImplTest {
               Coding(
                 "http://hl7.org/fhir/sid/cvx",
                 "140",
-                "Influenza, seasonal, injectable, preservative free"
-              )
+                "Influenza, seasonal, injectable, preservative free",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
-        }
+        },
       )
 
     database.insert(*resources.toTypedArray())
@@ -2606,8 +2632,8 @@ class DatabaseImplTest {
                     Coding(
                       "http://id.who.int/icd11/mms",
                       "XM1NL1",
-                      "COVID-19 vaccine, inactivated virus"
-                    )
+                      "COVID-19 vaccine, inactivated virus",
+                    ),
                   )
               },
               {
@@ -2616,14 +2642,14 @@ class DatabaseImplTest {
                     Coding(
                       "http://id.who.int/icd11/mms",
                       "XM5DF6",
-                      "COVID-19 vaccine, inactivated virus"
-                    )
+                      "COVID-19 vaccine, inactivated virus",
+                    ),
                   )
               },
-              operation = Operation.OR
+              operation = Operation.OR,
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.vaccineCode.codingFirstRep.code })
@@ -2639,7 +2665,11 @@ class DatabaseImplTest {
           id = "immunization-1"
           vaccineCode =
             CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM1NL1", "COVID-19 vaccine, inactivated virus")
+              Coding(
+                "http://id.who.int/icd11/mms",
+                "XM1NL1",
+                "COVID-19 vaccine, inactivated virus",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2650,8 +2680,8 @@ class DatabaseImplTest {
               Coding(
                 "http://id.who.int/icd11/mms",
                 "XM5DF6",
-                "COVID-19 vaccine, live attenuated virus"
-              )
+                "COVID-19 vaccine, live attenuated virus",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2659,7 +2689,7 @@ class DatabaseImplTest {
           id = "immunization-3"
           vaccineCode =
             CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based")
+              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
         },
@@ -2670,11 +2700,11 @@ class DatabaseImplTest {
               Coding(
                 "http://hl7.org/fhir/sid/cvx",
                 "140",
-                "Influenza, seasonal, injectable, preservative free"
-              )
+                "Influenza, seasonal, injectable, preservative free",
+              ),
             )
           status = Immunization.ImmunizationStatus.COMPLETED
-        }
+        },
       )
 
     database.insert(*resources.toTypedArray())
@@ -2685,16 +2715,16 @@ class DatabaseImplTest {
           .apply {
             filter(
               Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) }
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) },
             )
 
             filter(
               Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) }
+              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) },
             )
             operation = Operation.OR
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.vaccineCode.codingFirstRep.code })
@@ -2712,7 +2742,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("John")
               family = "Doe"
-            }
+            },
           )
         },
         Patient().apply {
@@ -2721,7 +2751,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("Jane")
               family = "Doe"
-            }
+            },
           )
         },
         Patient().apply {
@@ -2730,7 +2760,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("John")
               family = "Roe"
-            }
+            },
           )
         },
         Patient().apply {
@@ -2739,7 +2769,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("Jane")
               family = "Roe"
-            }
+            },
           )
         },
         Patient().apply {
@@ -2748,9 +2778,9 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("Rocky")
               family = "Balboa"
-            }
+            },
           )
-        }
+        },
       )
     database.insert(*resources.toTypedArray())
 
@@ -2768,7 +2798,7 @@ class DatabaseImplTest {
                 value = "Jane"
                 modifier = StringFilterModifier.MATCHES_EXACTLY
               },
-              operation = Operation.OR
+              operation = Operation.OR,
             )
 
             filter(
@@ -2781,12 +2811,12 @@ class DatabaseImplTest {
                 value = "Roe"
                 modifier = StringFilterModifier.MATCHES_EXACTLY
               },
-              operation = Operation.OR
+              operation = Operation.OR,
             )
 
             operation = Operation.AND
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString })
@@ -2813,7 +2843,7 @@ class DatabaseImplTest {
           Identifier().apply {
             system = "https://custom-identifier-namespace"
             value = "OfficialIdentifier_DarcySmith_0001"
-          }
+          },
         )
 
         addName(
@@ -2823,14 +2853,14 @@ class DatabaseImplTest {
             addGiven("Darcy")
             gender = Enumerations.AdministrativeGender.FEMALE
             birthDateElement = DateType("1970-01-01")
-          }
+          },
         )
 
         addExtension(
           Extension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
             setValue(StringType("Marca"))
-          }
+          },
         )
       }
     // Get rid of the default service and create one with search params
@@ -2847,10 +2877,10 @@ class DatabaseImplTest {
               {
                 value = "Marca"
                 modifier = StringFilterModifier.MATCHES_EXACTLY
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
@@ -2864,7 +2894,7 @@ class DatabaseImplTest {
           Identifier().apply {
             system = "https://custom-identifier-namespace"
             value = "OfficialIdentifier_DarcySmith_0001"
-          }
+          },
         )
 
         addName(
@@ -2874,14 +2904,14 @@ class DatabaseImplTest {
             addGiven("Darcy")
             gender = Enumerations.AdministrativeGender.FEMALE
             birthDateElement = DateType("1970-01-01")
-          }
+          },
         )
 
         addExtension(
           Extension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
             setValue(StringType("Marca"))
-          }
+          },
         )
       }
     val identifierPartialSearchParameter =
@@ -2908,10 +2938,10 @@ class DatabaseImplTest {
               {
                 value = "OfficialIdentifier_"
                 modifier = StringFilterModifier.STARTS_WITH
-              }
+              },
             )
           }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
@@ -2922,21 +2952,21 @@ class DatabaseImplTest {
     database.insert(
       Patient().apply { id = "patient-test-001" },
       Patient().apply { id = "patient-test-002" },
-      Patient().apply { id = "patient-test-003" }
+      Patient().apply { id = "patient-test-003" },
     )
 
     database.update(
       Patient().apply {
         id = "patient-test-002"
         gender = Enumerations.AdministrativeGender.FEMALE
-      }
+      },
     )
 
     val result =
       database.search<Patient>(
         Search(ResourceType.Patient)
           .apply { sort(LOCAL_LAST_UPDATED_PARAM, Order.DESCENDING) }
-          .getQuery()
+          .getQuery(),
       )
 
     assertThat(result.map { it.logicalId })
@@ -2953,7 +2983,7 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("James")
             family = "Gorden"
-          }
+          },
         )
         addGeneralPractitioner(Reference("Practitioner/gp-01"))
         addGeneralPractitioner(Reference("Practitioner/gp-02"))
@@ -2966,7 +2996,7 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("James")
             family = "Bond"
-          }
+          },
         )
         addGeneralPractitioner(Reference("Practitioner/gp-02"))
         addGeneralPractitioner(Reference("Practitioner/gp-03"))
@@ -2980,7 +3010,7 @@ class DatabaseImplTest {
           HumanName().apply {
             family = "Practitioner-01"
             addGiven("General-01")
-          }
+          },
         )
         active = true
       }
@@ -2991,7 +3021,7 @@ class DatabaseImplTest {
           HumanName().apply {
             family = "Practitioner-02"
             addGiven("General-02")
-          }
+          },
         )
         active = false
       }
@@ -3002,7 +3032,7 @@ class DatabaseImplTest {
           HumanName().apply {
             family = "Practitioner-03"
             addGiven("General-03")
-          }
+          },
         )
         active = true
       }
@@ -3019,7 +3049,7 @@ class DatabaseImplTest {
             {
               value = "James"
               modifier = StringFilterModifier.MATCHES_EXACTLY
-            }
+            },
           )
 
           include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
@@ -3034,14 +3064,14 @@ class DatabaseImplTest {
           SearchResult(
             patient01,
             included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
-            revIncluded = null
+            revIncluded = null,
           ),
           SearchResult(
             patient02,
             included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
-            revIncluded = null
-          )
-        )
+            revIncluded = null,
+          ),
+        ),
       )
   }
 
@@ -3054,7 +3084,7 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("James")
             family = "Gorden"
-          }
+          },
         )
         addGeneralPractitioner(Reference("Practitioner/gp-01"))
       }
@@ -3066,7 +3096,7 @@ class DatabaseImplTest {
           HumanName().apply {
             addGiven("James")
             family = "Bond"
-          }
+          },
         )
         addGeneralPractitioner(Reference("Practitioner/gp-02"))
       }
@@ -3108,7 +3138,7 @@ class DatabaseImplTest {
             {
               value = "James"
               modifier = StringFilterModifier.MATCHES_EXACTLY
-            }
+            },
           )
           revInclude<Condition>(Condition.SUBJECT) {
             filter(Condition.CODE, { value = of(diabetesCodeableConcept) })
@@ -3125,15 +3155,15 @@ class DatabaseImplTest {
             patient01,
             included = null,
             revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1))
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1)),
           ),
           SearchResult(
             patient02,
             included = null,
             revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3))
-          )
-        )
+              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
+          ),
+        ),
       )
   }
 
@@ -3154,7 +3184,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("James")
               family = "Gorden"
-            }
+            },
           )
           addGeneralPractitioner(Reference("Practitioner/gp-01"))
           addGeneralPractitioner(Reference("Practitioner/gp-02"))
@@ -3167,7 +3197,7 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("James")
               family = "Bond"
-            }
+            },
           )
           addGeneralPractitioner(Reference("Practitioner/gp-01"))
           addGeneralPractitioner(Reference("Practitioner/gp-02"))
@@ -3180,13 +3210,13 @@ class DatabaseImplTest {
             HumanName().apply {
               addGiven("James")
               family = "Doe"
-            }
+            },
           )
           addGeneralPractitioner(Reference("Practitioner/gp-01"))
           addGeneralPractitioner(Reference("Practitioner/gp-02"))
           addGeneralPractitioner(Reference("Practitioner/gp-03"))
           managingOrganization = Reference("Organization/org-03")
-        }
+        },
       )
 
     val practitioners =
@@ -3197,7 +3227,7 @@ class DatabaseImplTest {
             HumanName().apply {
               family = "Practitioner-01"
               addGiven("General-01")
-            }
+            },
           )
           active = true
         },
@@ -3207,7 +3237,7 @@ class DatabaseImplTest {
             HumanName().apply {
               family = "Practitioner-02"
               addGiven("General-02")
-            }
+            },
           )
           active = true
         },
@@ -3217,10 +3247,10 @@ class DatabaseImplTest {
             HumanName().apply {
               family = "Practitioner-03"
               addGiven("General-03")
-            }
+            },
           )
           active = false
-        }
+        },
       )
 
     val organizations =
@@ -3239,7 +3269,7 @@ class DatabaseImplTest {
           id = "org-03"
           name = "Organization-03"
           active = false
-        }
+        },
       )
 
     val conditions =
@@ -3373,7 +3403,7 @@ class DatabaseImplTest {
               start = DateType(2022, 2, 1).value
               end = DateType(2022, 11, 1).value
             }
-        }
+        },
       )
     // 3 Patients.
     // Each has 3 conditions, only 2 should match
@@ -3394,7 +3424,7 @@ class DatabaseImplTest {
             {
               value = "James"
               modifier = StringFilterModifier.MATCHES_EXACTLY
-            }
+            },
           )
 
           include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
@@ -3404,7 +3434,7 @@ class DatabaseImplTest {
               {
                 value = "Practitioner"
                 modifier = StringFilterModifier.STARTS_WITH
-              }
+              },
             )
             operation = Operation.AND
           }
@@ -3414,7 +3444,7 @@ class DatabaseImplTest {
               {
                 value = "Organization"
                 modifier = StringFilterModifier.STARTS_WITH
-              }
+              },
             )
             filter(Practitioner.ACTIVE, { value = of(true) })
             operation = Operation.AND
@@ -3431,7 +3461,7 @@ class DatabaseImplTest {
               {
                 value = of(DateTimeType("2023-01-01"))
                 prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-              }
+              },
             )
           }
         }
@@ -3450,21 +3480,21 @@ class DatabaseImplTest {
               Pair(ResourceType.Condition, "subject") to
                 listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
               Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!)
-            )
+                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!),
+            ),
           ),
           SearchResult(
             resources["pa-02"]!!,
             mapOf(
               "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-              "organization" to listOf(resources["org-02"]!!)
+              "organization" to listOf(resources["org-02"]!!),
             ),
             mapOf(
               Pair(ResourceType.Condition, "subject") to
                 listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
               Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!)
-            )
+                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!),
+            ),
           ),
           SearchResult(
             resources["pa-03"]!!,
@@ -3475,10 +3505,10 @@ class DatabaseImplTest {
               Pair(ResourceType.Condition, "subject") to
                 listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
               Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!)
-            )
-          )
-        )
+                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
+            ),
+          ),
+        ),
       )
   }
 

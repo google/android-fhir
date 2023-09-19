@@ -22,17 +22,18 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.SearchResult
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.sync.BundleDownloadRequest
-import com.google.android.fhir.sync.BundleUploadRequest
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.UploadRequest
-import com.google.android.fhir.sync.UrlDownloadRequest
+import com.google.android.fhir.sync.download.BundleDownloadRequest
+import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.download.UrlDownloadRequest
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.request.BundleUploadRequest
+import com.google.android.fhir.sync.upload.request.UploadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.Instant
@@ -111,7 +112,7 @@ object TestDataSourceImpl : DataSource {
 }
 
 open class TestDownloadManagerImpl(
-  private val queries: List<String> = listOf("Patient?address-city=NAIROBI")
+  private val queries: List<String> = listOf("Patient?address-city=NAIROBI"),
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
 
@@ -147,17 +148,17 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
-  ) {
-    upload(getLocalChanges(ResourceType.Patient, "123")).collect()
-  }
+    localChangesFetchMode: LocalChangesFetchMode,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
+  ) = upload(getLocalChanges(ResourceType.Patient, "123")).collect()
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   ) {
     download().collect()
   }
+
   override suspend fun count(search: Search): Long {
     return 0
   }
@@ -176,8 +177,8 @@ object TestFhirEngineImpl : FhirEngine {
         payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
-        timestamp = Instant.now()
-      )
+        timestamp = Instant.now(),
+      ),
     )
   }
 

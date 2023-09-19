@@ -1144,16 +1144,7 @@
         {
           "text": "Add instructions for capturing temperature",
           "type": "display",
-          "linkId": "5.1.0",
-          "extension": [
-            {
-              "url" : "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemMedia",
-              "valueAttachment" : {
-                "contentType": "image/png",
-                "url": "https://hapi.fhir.org/baseR4/Binary/android-fhir-thermometer-image"
-              }
-            }
-          ]
+          "linkId": "5.1.0"
         },
         {
           "linkId": "5.2.0",
