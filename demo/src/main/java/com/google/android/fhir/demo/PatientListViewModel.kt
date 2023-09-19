@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -82,7 +81,6 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           }
         )
       }
-      filterCity(this)
     }
   }
 
@@ -99,12 +97,11 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             }
           )
         }
-        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
+      .mapIndexed { index, fhirPatient -> fhirPatient.resource.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
 
     val risks = getRiskAssessments()
@@ -116,19 +113,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return patients
   }
 
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
-  }
-
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
     return fhirEngine
       .search<RiskAssessment> {}
-      .groupBy { it.subject.reference }
+      .groupBy { it.resource.subject.reference }
       .mapValues { entry ->
         entry.value
-          .filter { it.hasOccurrence() }
-          .sortedByDescending { it.occurrenceDateTimeType.value }
-          .firstOrNull()
+          .filter { it.resource.hasOccurrence() }
+          .maxByOrNull { it.resource.occurrenceDateTimeType.value }
+          ?.resource
       }
   }
 

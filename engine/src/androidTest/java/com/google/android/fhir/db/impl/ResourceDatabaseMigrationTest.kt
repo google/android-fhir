@@ -25,6 +25,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
@@ -197,6 +198,10 @@ class ResourceDatabaseMigrationTest {
       execSQL(
         "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
       )
+
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'id-corrupted-timestamp', 'date-not-good', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+      )
       close()
     }
 
@@ -205,6 +210,8 @@ class ResourceDatabaseMigrationTest {
     val retrievedTask: String?
     val localChangeEntityTimeStamp: Long
     val resourceEntityLastUpdatedLocal: Long
+    val localChangeEntityCorruptedTimeStamp: Long
+
     getMigratedRoomDatabase().apply {
       retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
       resourceEntityLastUpdatedLocal =
@@ -212,17 +219,20 @@ class ResourceDatabaseMigrationTest {
           it.moveToFirst()
           it.getLong(0)
         }
-      localChangeEntityTimeStamp =
-        query("Select timestamp from LocalChangeEntity", null).let {
-          it.moveToFirst()
-          it.getLong(0)
-        }
+
+      query("SELECT timestamp FROM LocalChangeEntity", null).let {
+        it.moveToFirst()
+        localChangeEntityTimeStamp = it.getLong(0)
+        it.moveToNext()
+        localChangeEntityCorruptedTimeStamp = it.getLong(0)
+      }
 
       openHelper.writableDatabase.close()
     }
 
     assertThat(retrievedTask).isEqualTo(bedNetTask)
     assertThat(localChangeEntityTimeStamp).isEqualTo(resourceEntityLastUpdatedLocal)
+    assertThat(Instant.ofEpochMilli(localChangeEntityCorruptedTimeStamp)).isEqualTo(Instant.EPOCH)
   }
 
   private fun getMigratedRoomDatabase(): ResourceDatabase =

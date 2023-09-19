@@ -25,11 +25,11 @@ import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -530,7 +530,7 @@ class ReviewViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
               }
             )

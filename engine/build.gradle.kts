@@ -66,8 +66,6 @@ android {
     // Flag to enable support for the new language APIs
     // See https = //developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
   }
 
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
@@ -147,14 +145,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

@@ -33,9 +33,9 @@ import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.EditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
@@ -86,7 +86,7 @@ internal class QuestionnaireEditAdapter(
         QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewHolderFactory
         QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewHolderFactory
         QuestionnaireViewHolderType.DISPLAY -> DisplayViewHolderFactory
-        QuestionnaireViewHolderType.QUANTITY -> EditTextQuantityViewHolderFactory
+        QuestionnaireViewHolderType.QUANTITY -> QuantityViewHolderFactory
         QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewHolderFactory
         QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewHolderFactory
         QuestionnaireViewHolderType.DIALOG_SELECT -> QuestionnaireItemDialogSelectViewHolderFactory

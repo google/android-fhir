@@ -35,20 +35,38 @@
         android:layout_height="wrap_content"
     />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/text_input_layout"
-        style="?attr/questionnaireTextInputLayoutStyle"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
     >
 
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/text_input_edit_text"
-            style="?attr/questionnaireTextInputEditTextStyle"
-            android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout"
+            style="?attr/questionnaireTextInputLayoutStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:layout_weight="1"
+        >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/text_input_edit_text"
+                style="?attr/questionnaireTextInputEditTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:maxLines="1"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <TextView
+            android:id="@+id/unit_text_view"
+            style="?attr/questionnaireHelpTextStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:visibility="gone"
         />
 
-    </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
 </LinearLayout>

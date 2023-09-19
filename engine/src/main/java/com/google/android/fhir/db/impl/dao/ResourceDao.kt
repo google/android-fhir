@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl.dao
 
 import androidx.annotation.VisibleForTesting
+import androidx.room.ColumnInfo
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -169,6 +170,11 @@ internal abstract class ResourceDao {
   ): ResourceEntity?
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
+
+  @RawQuery
+  abstract suspend fun getReferencedResources(
+    query: SupportSQLiteQuery
+  ): List<IndexedIdAndSerializedResource>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
@@ -343,3 +349,24 @@ internal abstract class ResourceDao {
     }
   }
 }
+
+/**
+ * Data class representing the value returned by [getReferencedResources]. The optional fields may
+ * or may-not contain values based on the search query.
+ */
+internal data class IndexedIdAndSerializedResource(
+  @ColumnInfo(name = "index_name") val matchingIndex: String,
+  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
+  @ColumnInfo(name = "resourceId") val idOfBaseResourceOnWhichThisMatchedInc: String?,
+  val serializedResource: String
+)
+
+/**
+ * Data class representing an included or revIncluded [Resource], index on which the match was done
+ * and the id of the base [Resource] for which this [Resource] has been included.
+ */
+internal data class IndexedIdAndResource(
+  val matchingIndex: String,
+  val idOfBaseResourceOnWhichThisMatched: String,
+  val resource: Resource
+)

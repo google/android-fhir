@@ -16,7 +16,7 @@
 
 package com.google.android.fhir
 
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 
@@ -50,3 +50,17 @@ data class LocalChange(
     }
   }
 }
+
+/** Method to convert LocalChangeEntity to LocalChange instance. */
+internal fun LocalChangeEntity.toLocalChange(): LocalChange =
+  LocalChange(
+    resourceType,
+    resourceId,
+    versionId,
+    timestamp,
+    LocalChange.Type.from(type.value),
+    payload,
+    LocalChangeToken(listOf(id))
+  )
+
+data class LocalChangeToken(val ids: List<Long>)

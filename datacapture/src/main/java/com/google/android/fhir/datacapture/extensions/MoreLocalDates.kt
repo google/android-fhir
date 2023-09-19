@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,19 @@ import java.lang.Character.isLetter
 import java.text.ParseException
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Date
+import java.util.Locale
 
 /**
  * Returns the first character that is not a letter in the given date pattern string (e.g. "/" for
- * "dd/mm/yyyy").
+ * "dd/mm/yyyy") otherwise null.
  */
-internal fun getDateSeparator(localeDatePattern: String): Char =
-  localeDatePattern.filterNot { isLetter(it) }.first()
+internal fun getDateSeparator(localeDatePattern: String): Char? =
+  localeDatePattern.filterNot { isLetter(it) }.firstOrNull()
 
 /**
  * Converts date pattern to acceptable date pattern where 2 digits are expected for day(dd) and
@@ -111,4 +115,17 @@ internal fun LocalDate.format(pattern: String? = null): String {
   } else {
     DateTimeFormatter.ofPattern(pattern).format(this)
   }
+}
+
+/**
+ * Medium and long format styles use alphabetical month names which are difficult for the user to
+ * input. Use short format style which is always numerical.
+ */
+internal fun getLocalizedDatePattern(): String {
+  return DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+    FormatStyle.SHORT,
+    null,
+    IsoChronology.INSTANCE,
+    Locale.getDefault()
+  )
 }
