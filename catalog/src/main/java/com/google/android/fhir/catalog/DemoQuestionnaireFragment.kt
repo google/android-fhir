@@ -54,7 +54,7 @@ class DemoQuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     requireContext().setTheme(getThemeId())
     return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
@@ -172,10 +172,10 @@ class DemoQuestionnaireFragment : Fragment() {
               FhirContext.forR4Cached()
                 .newJsonParser()
                 .encodeResourceToString(Patient().apply { id = "P1" })
-                .let { listOf(it) }
+                .let { listOf(it) },
             )
             .build(),
-          QUESTIONNAIRE_FRAGMENT_TAG
+          QUESTIONNAIRE_FRAGMENT_TAG,
         )
       }
     }
@@ -185,7 +185,7 @@ class DemoQuestionnaireFragment : Fragment() {
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
       WorkflowType.COMPONENT,
-      WorkflowType.BEHAVIOR -> R.style.Theme_Androidfhir_Component
+      WorkflowType.BEHAVIOR, -> R.style.Theme_Androidfhir_Component
       WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
@@ -201,7 +201,7 @@ class DemoQuestionnaireFragment : Fragment() {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     launchQuestionnaireResponseFragment(
-      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
+      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
     )
   }
 
@@ -209,7 +209,7 @@ class DemoQuestionnaireFragment : Fragment() {
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections
-          .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response)
+          .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response),
       )
   }
 
@@ -217,8 +217,8 @@ class DemoQuestionnaireFragment : Fragment() {
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections.actionGalleryQuestionnaireFragmentToModalBottomSheet(
-          isErrorState
-        )
+          isErrorState,
+        ),
       )
   }
 
@@ -231,5 +231,5 @@ enum class WorkflowType {
   COMPONENT,
   DEFAULT,
   PAGINATED,
-  BEHAVIOR
+  BEHAVIOR,
 }

@@ -39,7 +39,8 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
     FhirEngineProvider.init(FhirEngineConfiguration())
 
-    dataCaptureConfig = DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it) })
+    dataCaptureConfig =
+      DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } })
 
     CoroutineScope(Dispatchers.IO).launch {
       assets
