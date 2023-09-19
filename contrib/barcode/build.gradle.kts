@@ -33,8 +33,8 @@ android {
         "META-INF/INDEX.LIST",
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
-        "META-INF/LGPL-3.0.txt"
-      )
+        "META-INF/LGPL-3.0.txt",
+      ),
     )
   }
 

@@ -33,7 +33,7 @@ data class QuantityParamFilterCriterion(
   var prefix: ParamPrefixEnum? = null,
   var value: BigDecimal? = null,
   var system: String? = null,
-  var unit: String? = null
+  var unit: String? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() = listOf(getConditionParamPair(prefix, value!!, system, unit))

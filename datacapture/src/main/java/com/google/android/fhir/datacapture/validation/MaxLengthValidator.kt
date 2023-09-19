@@ -31,16 +31,17 @@ internal object MaxLengthValidator : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
-    context: Context
+    context: Context,
   ): AnswerConstraintValidator.Result {
-    if (questionnaireItem.hasMaxLength() &&
+    if (
+      questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
       return AnswerConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
-          questionnaireItem.maxLength
+          questionnaireItem.maxLength,
       )
     }
     return AnswerConstraintValidator.Result(true, null)

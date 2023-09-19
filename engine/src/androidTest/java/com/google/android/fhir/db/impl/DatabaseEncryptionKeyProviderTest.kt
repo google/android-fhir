@@ -63,7 +63,7 @@ class DatabaseEncryptionKeyProviderTest {
 
   private fun deleteTestKeys() {
     val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
-    keyStore.load(/* param = */ null)
+    keyStore.load(null)
     keyStore.deleteEntry(ALIAS_NAME)
     keyStore.deleteEntry(OTHER_ALIAS_NAME)
     DatabaseEncryptionKeyProvider.clearKeyCache()

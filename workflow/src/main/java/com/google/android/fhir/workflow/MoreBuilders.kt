@@ -24,12 +24,13 @@ private const val CLASS = "com.google.android.fhir.workflow.FhirOperator"
 
 /**
  * Blocks the current thread and runs the code in a [CoroutineScope].
+ *
  * @throws BlockingMainThreadException if the calling thread is the main thread.
  */
 internal fun <T> runBlockingOrThrowMainThreadException(block: suspend (CoroutineScope) -> T): T {
   if (Looper.myLooper() == Looper.getMainLooper()) {
     throw BlockingMainThreadException(
-      "The $CLASS API has been called from the main thread resulting in a blocking call. Make sure that the $CLASS API is called from a worker thread instead. See https://developer.android.com/kotlin/coroutines for more details."
+      "The $CLASS API has been called from the main thread resulting in a blocking call. Make sure that the $CLASS API is called from a worker thread instead. See https://developer.android.com/kotlin/coroutines for more details.",
     )
   }
   return runBlocking { block(this) }

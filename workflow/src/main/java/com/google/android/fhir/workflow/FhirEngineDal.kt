@@ -40,7 +40,7 @@ internal class FhirEngineDal(
       knowledgeManager
         .loadResources(
           resourceType = id.resourceType,
-          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
+          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}",
         )
         .single()
     } else {

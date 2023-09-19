@@ -22,7 +22,7 @@ import org.gradle.process.CommandLineArgumentProvider
 
 // https://developer.android.com/training/data-storage/room/migrating-db-versions#test
 class RoomSchemaArgProvider(
-  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File
+  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File,
 ) : CommandLineArgumentProvider {
 
   override fun asArguments() = listOf("-Aroom.schemaLocation=${schemaDir.path}")

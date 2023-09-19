@@ -55,8 +55,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
               syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
-            )
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+            ),
         )
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect { _pollState.emit(it) }
@@ -75,7 +75,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   fun updateLastSyncTimestamp() {
     val formatter =
       DateTimeFormatter.ofPattern(
-        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12
+        if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12,
       )
     _lastSyncTimestampLiveData.value =
       Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""

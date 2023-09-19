@@ -103,8 +103,8 @@ class ResourceIndexerTest {
           "_lastUpdated",
           "Patient.meta.lastUpdated",
           InstantType("2001-09-01T23:09:09.000+05:30").value.time,
-          InstantType("2001-09-01T23:09:09.000+05:30").value.time
-        )
+          InstantType("2001-09-01T23:09:09.000+05:30").value.time,
+        ),
       )
   }
 
@@ -174,8 +174,8 @@ class ResourceIndexerTest {
         NumberIndex(
           "window-start",
           "MolecularSequence.referenceSeq.windowStart",
-          BigDecimal.valueOf(value.toLong())
-        )
+          BigDecimal.valueOf(value.toLong()),
+        ),
       )
   }
 
@@ -187,7 +187,7 @@ class ResourceIndexerTest {
         id = "someID"
         prediction =
           mutableListOf(
-            RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(value))
+            RiskAssessment.RiskAssessmentPredictionComponent().setProbability(DecimalType(value)),
           )
       }
 
@@ -212,10 +212,11 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.numberIndices.any {
           it.path == "MolecularSequence.referenceSeq.windowStart"
-        }
+        },
       )
       .isFalse()
   }
+
   @Test
   fun index_date() {
     val date = DateType("2001-09-01")
@@ -233,8 +234,8 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           date.value.epochDay,
-          date.precision.add(date.value, 1).epochDay - 1
-        )
+          date.precision.add(date.value, 1).epochDay - 1,
+        ),
       )
   }
 
@@ -269,8 +270,8 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time - 1
-        )
+          dateTime.precision.add(dateTime.value, 1).time - 1,
+        ),
       )
   }
 
@@ -287,7 +288,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.dateTimeIndices)
       .contains(
-        DateTimeIndex("date", "Observation.effective", instant.value.time, instant.value.time)
+        DateTimeIndex("date", "Observation.effective", instant.value.time, instant.value.time),
       )
   }
 
@@ -312,8 +313,8 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           period.start.time,
-          period.endElement.precision.add(period.end, 1).time - 1
-        )
+          period.endElement.precision.add(period.end, 1).time - 1,
+        ),
       )
   }
 
@@ -338,8 +339,8 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           0,
-          period.endElement.precision.add(period.end, 1).time - 1
-        )
+          period.endElement.precision.add(period.end, 1).time - 1,
+        ),
       )
   }
 
@@ -380,8 +381,8 @@ class ResourceIndexerTest {
           "date",
           "Observation.effective",
           timing.event.minOf { it.value.time },
-          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1
-        )
+          timing.event.maxOf { it.precision.add(it.value, 1).time } - 1,
+        ),
       )
   }
 
@@ -417,7 +418,7 @@ class ResourceIndexerTest {
               CarePlan.CarePlanActivityDetailComponent().apply {
                 scheduled = StringType("2011-06-27T09:30:10+01:00")
               }
-          }
+          },
         )
       }
 
@@ -429,8 +430,8 @@ class ResourceIndexerTest {
           "activity-date",
           "CarePlan.activity.detail.scheduled",
           dateTime.value.time,
-          dateTime.precision.add(dateTime.value, 1).time - 1
-        )
+          dateTime.precision.add(dateTime.value, 1).time - 1,
+        ),
       )
   }
 
@@ -475,7 +476,7 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.stringIndices.any { stringIndex ->
           stringIndex.path == "Patient.name.given"
-        }
+        },
       )
       .isFalse()
 
@@ -496,7 +497,7 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.stringIndices.any { stringIndex ->
           stringIndex.path == "Patient.name.given"
-        }
+        },
       )
       .isFalse()
     assertThat(resourceIndices.stringIndices.any { stringIndex -> stringIndex.name == "given" })
@@ -519,8 +520,8 @@ class ResourceIndexerTest {
           "deceased",
           "Patient.deceased.exists() and Patient.deceased != false",
           null,
-          "true"
-        )
+          "true",
+        ),
       )
   }
 
@@ -533,7 +534,7 @@ class ResourceIndexerTest {
         id = "someid"
         identifier =
           mutableListOf(
-            Identifier().setSystemElement(UriType(system)).setValueElement(StringType(value))
+            Identifier().setSystemElement(UriType(system)).setValueElement(StringType(value)),
           )
       }
 
@@ -590,7 +591,7 @@ class ResourceIndexerTest {
     val resourceIndices = resourceIndexer.index(observation)
 
     assertThat(
-        resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" }
+        resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" },
       )
       .isFalse()
     assertThat(resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.name.equals("code") })
@@ -608,7 +609,7 @@ class ResourceIndexerTest {
     val resourceIndices = resourceIndexer.index(observation)
 
     assertThat(
-        resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" }
+        resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.path == "Observation.code" },
       )
       .isFalse()
     assertThat(resourceIndices.tokenIndices.any { tokenIndex -> tokenIndex.name == "code" })
@@ -656,7 +657,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.referenceIndices)
       .containsExactly(
         ReferenceIndex(indexName, indexPath, "Library/someLibrary"),
-        ReferenceIndex(indexName, indexPath, "Questionnaire/someQuestionnaire")
+        ReferenceIndex(indexName, indexPath, "Questionnaire/someQuestionnaire"),
       )
   }
 
@@ -694,14 +695,14 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.referenceIndices.any { referenceIndex ->
           referenceIndex.path == "Patient.managingOrganization"
-        }
+        },
       )
       .isFalse()
 
     assertThat(
         resourceIndices.referenceIndices.any { referenceIndex ->
           referenceIndex.name == "organization"
-        }
+        },
       )
       .isFalse()
   }
@@ -719,13 +720,13 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.referenceIndices.any { referenceIndex ->
           referenceIndex.path == "Patient.managingOrganization"
-        }
+        },
       )
       .isFalse()
     assertThat(
         resourceIndices.referenceIndices.any { referenceIndex ->
           referenceIndex.name == "organization"
-        }
+        },
       )
       .isFalse()
   }
@@ -746,8 +747,8 @@ class ResourceIndexerTest {
           "gender",
           "Patient.gender",
           "http://hl7.org/fhir/administrative-gender",
-          "unknown"
-        )
+          "unknown",
+        ),
       )
   }
 
@@ -777,8 +778,8 @@ class ResourceIndexerTest {
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
           "EU",
-          BigDecimal.valueOf(300)
-        )
+          BigDecimal.valueOf(300),
+        ),
       )
   }
 
@@ -794,7 +795,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(100L))
+        QuantityIndex("quantity", "Substance.instance.quantity", "", "", BigDecimal.valueOf(100L)),
       )
   }
 
@@ -804,7 +805,8 @@ class ResourceIndexerTest {
       Substance().apply {
         id = "non-null-ID"
         instance.add(
-          Substance.SubstanceInstanceComponent().setQuantity(Quantity(null, 100L, null, null, "kg"))
+          Substance.SubstanceInstanceComponent()
+            .setQuantity(Quantity(null, 100L, null, null, "kg")),
         )
       }
 
@@ -812,7 +814,13 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.quantityIndices)
       .contains(
-        QuantityIndex("quantity", "Substance.instance.quantity", "", "kg", BigDecimal.valueOf(100L))
+        QuantityIndex(
+          "quantity",
+          "Substance.instance.quantity",
+          "",
+          "kg",
+          BigDecimal.valueOf(100L),
+        ),
       )
   }
 
@@ -827,13 +835,13 @@ class ResourceIndexerTest {
     val resourceIndices = resourceIndexer.index(substance)
 
     assertThat(
-        resourceIndices.quantityIndices.any { quantityIndex -> quantityIndex.name == "quantity" }
+        resourceIndices.quantityIndices.any { quantityIndex -> quantityIndex.name == "quantity" },
       )
       .isFalse()
     assertThat(
         resourceIndices.quantityIndices.any { quantityIndex ->
           quantityIndex.path == "Substance.instance.quantity"
-        }
+        },
       )
       .isFalse()
   }
@@ -845,7 +853,7 @@ class ResourceIndexerTest {
         id = "non-null-ID"
         instance.add(
           Substance.SubstanceInstanceComponent()
-            .setQuantity(Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("mg"))
+            .setQuantity(Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("mg")),
         )
       }
 
@@ -858,8 +866,8 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
           "g",
-          BigDecimal("0.100")
-        )
+          BigDecimal("0.100"),
+        ),
       )
   }
 
@@ -871,8 +879,8 @@ class ResourceIndexerTest {
         instance.add(
           Substance.SubstanceInstanceComponent()
             .setQuantity(
-              Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("randomUnit")
-            )
+              Quantity(100L).setSystem("http://unitsofmeasure.org").setCode("randomUnit"),
+            ),
         )
       }
 
@@ -885,8 +893,8 @@ class ResourceIndexerTest {
           "Substance.instance.quantity",
           "http://unitsofmeasure.org",
           "randomUnit",
-          BigDecimal.valueOf(100L)
-        )
+          BigDecimal.valueOf(100L),
+        ),
       )
   }
 
@@ -977,15 +985,15 @@ class ResourceIndexerTest {
           "Invoice.totalGross",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalGross.currency,
-          testInvoice.totalGross.value
+          testInvoice.totalGross.value,
         ),
         QuantityIndex(
           "totalnet",
           "Invoice.totalNet",
           FHIR_CURRENCY_SYSTEM,
           testInvoice.totalNet.currency,
-          testInvoice.totalNet.value
-        )
+          testInvoice.totalNet.value,
+        ),
       )
 
     assertThat(resourceIndices.numberIndices).isEmpty()
@@ -996,16 +1004,16 @@ class ResourceIndexerTest {
           "identifier",
           "Invoice.identifier",
           testInvoice.identifierFirstRep.system,
-          testInvoice.identifierFirstRep.value
+          testInvoice.identifierFirstRep.value,
         ),
         TokenIndex(
           "participant-role",
           "Invoice.participant.role",
           testInvoice.participantFirstRep.role.codingFirstRep.system,
-          testInvoice.participantFirstRep.role.codingFirstRep.code
+          testInvoice.participantFirstRep.role.codingFirstRep.code,
         ),
         TokenIndex("status", "Invoice.status", "http://hl7.org/fhir/invoice-status", "issued"),
-        TokenIndex("_id", "Invoice.id", null, "example")
+        TokenIndex("_id", "Invoice.id", null, "example"),
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1016,8 +1024,8 @@ class ResourceIndexerTest {
           "date",
           "Invoice.date",
           testInvoice.date.time,
-          testInvoice.dateElement.precision.add(testInvoice.date, 1).time - 1
-        )
+          testInvoice.dateElement.precision.add(testInvoice.date, 1).time - 1,
+        ),
       )
 
     assertThat(resourceIndices.referenceIndices)
@@ -1026,9 +1034,9 @@ class ResourceIndexerTest {
         ReferenceIndex(
           "participant",
           "Invoice.participant.actor",
-          testInvoice.participantFirstRep.actor.reference
+          testInvoice.participantFirstRep.actor.reference,
         ),
-        ReferenceIndex("account", "Invoice.account", testInvoice.account.reference)
+        ReferenceIndex("account", "Invoice.account", testInvoice.account.reference),
       )
 
     assertThat(resourceIndices.stringIndices).isEmpty()
@@ -1048,7 +1056,7 @@ class ResourceIndexerTest {
 
     assertThat(resourceIndices.uriIndices)
       .containsExactly(
-        UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141")
+        UriIndex("url", "Questionnaire.url", "http://hl7.org/fhir/Questionnaire/3141"),
       )
 
     assertThat(resourceIndices.numberIndices).isEmpty()
@@ -1060,15 +1068,15 @@ class ResourceIndexerTest {
           "status",
           "Questionnaire.status",
           "http://hl7.org/fhir/publication-status",
-          "draft"
+          "draft",
         ),
         TokenIndex("_id", "Questionnaire.id", null, "3141"),
         TokenIndex(
           "code",
           "Questionnaire.item.code",
           "http://example.org/system/code/sections",
-          "HISTOPATHOLOGY"
-        )
+          "HISTOPATHOLOGY",
+        ),
       )
 
     assertThat(resourceIndices.dateTimeIndices)
@@ -1077,8 +1085,8 @@ class ResourceIndexerTest {
           "date",
           "Questionnaire.date",
           testQuestionnaire.date.time,
-          testQuestionnaire.dateElement.precision.add(testQuestionnaire.date, 1).time - 1
-        )
+          testQuestionnaire.dateElement.precision.add(testQuestionnaire.date, 1).time - 1,
+        ),
       )
 
     assertThat(resourceIndices.referenceIndices).isEmpty()
@@ -1107,8 +1115,8 @@ class ResourceIndexerTest {
           "birthdate",
           "Patient.birthDate",
           testPatient.birthDate.epochDay,
-          testPatient.birthDateElement.precision.add(testPatient.birthDate, 1).epochDay - 1
-        )
+          testPatient.birthDateElement.precision.add(testPatient.birthDate, 1).epochDay - 1,
+        ),
       )
 
     assertThat(resourceIndices.numberIndices).isEmpty()
@@ -1119,34 +1127,34 @@ class ResourceIndexerTest {
           "identifier",
           "Patient.identifier",
           testPatient.identifierFirstRep.system,
-          testPatient.identifierFirstRep.value
+          testPatient.identifierFirstRep.value,
         ),
         TokenIndex(
           "deceased",
           "Patient.deceased.exists() and Patient.deceased != false",
           null,
-          testPatient.deceased.primitiveValue()
+          testPatient.deceased.primitiveValue(),
         ),
         TokenIndex("active", "Patient.active", null, testPatient.active.toString()),
         TokenIndex(
           "language",
           "Patient.communication.language",
           testPatient.communicationFirstRep.language.codingFirstRep.system,
-          testPatient.communicationFirstRep.language.codingFirstRep.code
+          testPatient.communicationFirstRep.language.codingFirstRep.code,
         ),
         TokenIndex(
           "gender",
           "Patient.gender",
           testPatient.gender.system,
-          testPatient.gender.toCode()
+          testPatient.gender.toCode(),
         ),
         TokenIndex(
           "address-use",
           "Patient.address.use",
           testPatient.addressFirstRep.use.system,
-          testPatient.addressFirstRep.use.toCode()
+          testPatient.addressFirstRep.use.toCode(),
         ),
-        TokenIndex("_id", "Patient.id", null, "f001")
+        TokenIndex("_id", "Patient.id", null, "f001"),
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1158,8 +1166,8 @@ class ResourceIndexerTest {
         ReferenceIndex(
           "organization",
           "Patient.managingOrganization",
-          testPatient.managingOrganization.reference
-        )
+          testPatient.managingOrganization.reference,
+        ),
       )
 
     assertThat(resourceIndices.stringIndices)
@@ -1169,17 +1177,17 @@ class ResourceIndexerTest {
         StringIndex(
           "address-postalcode",
           "Patient.address.postalCode",
-          testPatient.addressFirstRep.postalCode
+          testPatient.addressFirstRep.postalCode,
         ),
         StringIndex(
           "address-country",
           "Patient.address.country",
-          testPatient.addressFirstRep.country
+          testPatient.addressFirstRep.country,
         ),
         StringIndex("phonetic", "Patient.name", "Pieter van de Heuvel MSc"),
         StringIndex("name", "Patient.name", "Pieter van de Heuvel MSc"),
         StringIndex("family", "Patient.name.family", testPatient.nameFirstRep.family),
-        StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city)
+        StringIndex("address-city", "Patient.address.city", testPatient.addressFirstRep.city),
       )
 
     assertThat(resourceIndices.positionIndices).isEmpty()
@@ -1205,15 +1213,15 @@ class ResourceIndexerTest {
           "type",
           "Location.type",
           testLocation.typeFirstRep.codingFirstRep.system,
-          testLocation.typeFirstRep.codingFirstRep.code
+          testLocation.typeFirstRep.codingFirstRep.code,
         ),
         TokenIndex(
           "status",
           "Location.status",
           testLocation.status.system,
-          testLocation.status.toCode()
+          testLocation.status.toCode(),
         ),
-        TokenIndex("_id", "Location.id", null, "hl7")
+        TokenIndex("_id", "Location.id", null, "hl7"),
       )
 
     assertThat(resourceIndices.uriIndices).isEmpty()
@@ -1229,17 +1237,17 @@ class ResourceIndexerTest {
         StringIndex(
           "address",
           "Location.address",
-          "3300 Washtenaw Avenue, Suite 227, Ann Arbor, MI, USA, 48104"
+          "3300 Washtenaw Avenue, Suite 227, Ann Arbor, MI, USA, 48104",
         ),
         StringIndex("address-state", "Location.address.state", testLocation.address.state),
         StringIndex(
           "address-postalcode",
           "Location.address.postalCode",
-          testLocation.address.postalCode
+          testLocation.address.postalCode,
         ),
         StringIndex("name", "Location.name | Location.alias", testLocation.name),
         StringIndex("address-country", "Location.address.country", testLocation.address.country),
-        StringIndex("address-city", "Location.address.city", testLocation.address.city)
+        StringIndex("address-city", "Location.address.city", testLocation.address.city),
       )
   }
 
@@ -1254,7 +1262,7 @@ class ResourceIndexerTest {
             given = listOf(StringType("Pieter"))
             family = "van de Heuvel"
             suffix = listOf(StringType("MSc"))
-          }
+          },
         )
       }
 
@@ -1262,7 +1270,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
         StringIndex("name", "Patient.name", "Mr. Pieter van de Heuvel MSc"),
-        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel MSc")
+        StringIndex("phonetic", "Patient.name", "Mr. Pieter van de Heuvel MSc"),
       )
   }
 
@@ -1290,7 +1298,7 @@ class ResourceIndexerTest {
             given = listOf()
             family = ""
             suffix = listOf()
-          }
+          },
         )
       }
 
@@ -1313,7 +1321,7 @@ class ResourceIndexerTest {
                 StringType(""),
                 StringType(" "),
                 StringType("Prof."),
-                StringType("Dr.")
+                StringType("Dr."),
               )
             given =
               listOf(null, StringType(null), StringType(""), StringType(" "), StringType("Pieter"))
@@ -1325,9 +1333,9 @@ class ResourceIndexerTest {
                 StringType(""),
                 StringType(" "),
                 StringType("MSc"),
-                StringType("Phd")
+                StringType("Phd"),
               )
-          }
+          },
         )
       }
 
@@ -1335,7 +1343,7 @@ class ResourceIndexerTest {
     assertThat(resourceIndices.stringIndices)
       .containsAtLeast(
         StringIndex("name", "Patient.name", "Prof. Dr. Pieter van de Heuvel MSc Phd"),
-        StringIndex("phonetic", "Patient.name", "Prof. Dr. Pieter van de Heuvel MSc Phd")
+        StringIndex("phonetic", "Patient.name", "Prof. Dr. Pieter van de Heuvel MSc Phd"),
       )
   }
 
@@ -1352,7 +1360,7 @@ class ResourceIndexerTest {
               city = "Amsterdam"
               postalCode = "1024 RJ"
               country = "NLD"
-            }
+            },
           )
       }
 
@@ -1362,8 +1370,8 @@ class ResourceIndexerTest {
         StringIndex(
           "address",
           "Patient.address",
-          "Van Egmondkade 23, Amsterdam, Amsterdam, NLD, 1024 RJ"
-        )
+          "Van Egmondkade 23, Amsterdam, Amsterdam, NLD, 1024 RJ",
+        ),
       )
   }
 
@@ -1392,7 +1400,7 @@ class ResourceIndexerTest {
               city = ""
               postalCode = ""
               country = ""
-            }
+            },
           )
       }
 
@@ -1415,7 +1423,7 @@ class ResourceIndexerTest {
     assertThat(
         resourceIndices.stringIndices.filter {
           it.name == "given" && it.path == "Patient.name.given" && it.value == givenValue
-        }
+        },
       )
       .hasSize(1)
   }
@@ -1429,10 +1437,10 @@ class ResourceIndexerTest {
         id = "2126234"
         referenceSeq.windowStart = windowValue
         addVariant(
-          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue }
+          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue },
         )
         addVariant(
-          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue }
+          MolecularSequence.MolecularSequenceVariantComponent().apply { start = startValue },
         )
       }
 
@@ -1443,7 +1451,7 @@ class ResourceIndexerTest {
           it.name == "variant-start" &&
             it.path == "MolecularSequence.variant.start" &&
             it.value == BigDecimal.valueOf(startValue.toLong())
-        }
+        },
       )
       .hasSize(1)
   }
@@ -1459,13 +1467,13 @@ class ResourceIndexerTest {
           Identifier().apply {
             system = systemIdentity
             value = indexValue
-          }
+          },
         )
         addIdentifier(
           Identifier().apply {
             system = systemIdentity
             value = indexValue
-          }
+          },
         )
       }
 
@@ -1477,7 +1485,7 @@ class ResourceIndexerTest {
             it.path == "Patient.identifier" &&
             it.system == systemIdentity &&
             it.value == indexValue
-        }
+        },
       )
       .hasSize(1)
   }
@@ -1496,8 +1504,8 @@ class ResourceIndexerTest {
               Quantity(values[0]).apply {
                 system = systemValue
                 unit = unitValue
-              }
-            )
+              },
+            ),
         )
         instance.add(
           Substance.SubstanceInstanceComponent()
@@ -1505,8 +1513,8 @@ class ResourceIndexerTest {
               Quantity(values[0]).apply {
                 system = systemValue
                 unit = unitValue
-              }
-            )
+              },
+            ),
         )
         instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(values[1])))
         instance.add(Substance.SubstanceInstanceComponent().setQuantity(Quantity(values[2])))
@@ -1520,7 +1528,7 @@ class ResourceIndexerTest {
             it.path == "Substance.instance.quantity" &&
             it.system == systemValue &&
             it.value == BigDecimal.valueOf(values[0])
-        }
+        },
       )
       .hasSize(1)
   }
@@ -1543,7 +1551,7 @@ class ResourceIndexerTest {
           it.name == "general-practitioner" &&
             it.path == "Patient.generalPractitioner" &&
             it.value == values[0]
-        }
+        },
       )
       .hasSize(1)
   }
@@ -1579,7 +1587,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(70)
+          value = BigDecimal.valueOf(70),
         ),
         QuantityIndex(
           name = Observation.SP_COMPONENT_VALUE_QUANTITY,
@@ -1588,7 +1596,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(110)
+          value = BigDecimal.valueOf(110),
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1599,7 +1607,7 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(70)
+          value = BigDecimal.valueOf(70),
         ),
         QuantityIndex(
           name = Observation.SP_COMBO_VALUE_QUANTITY,
@@ -1610,8 +1618,8 @@ class ResourceIndexerTest {
               "| (Observation.component.value as SampledData)",
           system = "http://unitsofmeasure.org",
           code = "",
-          value = BigDecimal.valueOf(110)
-        )
+          value = BigDecimal.valueOf(110),
+        ),
       )
   }
 
@@ -1623,7 +1631,7 @@ class ResourceIndexerTest {
           Identifier().apply {
             system = "https://custom-identifier-namespace"
             value = "OfficialIdentifier_DarcySmith_0001"
-          }
+          },
         )
         addName(
           HumanName().apply {
@@ -1632,13 +1640,13 @@ class ResourceIndexerTest {
             addGiven("Darcy")
             gender = Enumerations.AdministrativeGender.FEMALE
             birthDateElement = DateType("1970-01-01")
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = "http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName"
             setValue(StringType("Marca"))
-          }
+          },
         )
       }
 
@@ -1653,16 +1661,16 @@ class ResourceIndexerTest {
                       name = "mothers-maiden-name",
                       type = Enumerations.SearchParamType.STRING,
                       path =
-                        "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)"
+                        "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)",
                     ),
                     SearchParamDefinition(
                       name = "identifierPartial",
                       type = Enumerations.SearchParamType.STRING,
-                      path = "Patient.identifier.value"
-                    )
-                  )
-              )
-          )
+                      path = "Patient.identifier.value",
+                    ),
+                  ),
+              ),
+          ),
         )
         .index(patient)
 
@@ -1672,17 +1680,17 @@ class ResourceIndexerTest {
           name = "mothers-maiden-name",
           path =
             "Patient.extension('http://hl7.org/fhir/StructureDefinition/patient-mothersMaidenName').value.as(String)",
-          value = "Marca"
+          value = "Marca",
         ),
         StringIndex(
           name = "identifierPartial",
           path = "Patient.identifier.value",
-          value = "OfficialIdentifier_DarcySmith_0001"
+          value = "OfficialIdentifier_DarcySmith_0001",
         ),
         StringIndex(name = "family", path = "Patient.name.family", value = "Smith"),
         StringIndex(name = "name", path = "Patient.name", value = "Darcy Smith"),
         StringIndex(name = "phonetic", path = "Patient.name", value = "Darcy Smith"),
-        StringIndex(name = "given", path = "Patient.name.given", value = "Darcy")
+        StringIndex(name = "given", path = "Patient.name.given", value = "Darcy"),
       )
   }
 

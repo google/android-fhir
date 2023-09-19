@@ -86,6 +86,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
   }
 
   fun translateX(x: Float): Float = x * widthScaleFactor
+
   fun translateY(y: Float): Float = y * heightScaleFactor
 
   /**
@@ -97,7 +98,7 @@ class GraphicOverlay(context: Context, attrs: AttributeSet) : View(context, attr
       translateX(rect.left.toFloat()),
       translateY(rect.top.toFloat()),
       translateX(rect.right.toFloat()),
-      translateY(rect.bottom.toFloat())
+      translateY(rect.bottom.toFloat()),
     )
 
   /** Draws the overlay with its associated graphic objects. */

@@ -52,11 +52,11 @@ class LocalChangeTest : TestCase() {
                 HumanName().apply {
                   addGiven("John")
                   family = "Doe"
-                }
+                },
               )
-            }
+            },
           ),
-        timestamp = Instant.now()
+        timestamp = Instant.now(),
       )
 
     val localChange = localChangeEntity.toLocalChange()

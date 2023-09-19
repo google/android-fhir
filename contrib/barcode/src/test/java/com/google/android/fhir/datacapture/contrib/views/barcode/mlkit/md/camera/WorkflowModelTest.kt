@@ -37,7 +37,6 @@ class WorkflowModelTest {
 
   @Test
   fun shouldSet_workFlowStates() {
-
     // initial state should be null
     assertThat(workflowModel.workflowState.value).isNull()
 

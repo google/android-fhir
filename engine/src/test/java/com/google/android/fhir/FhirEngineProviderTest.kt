@@ -86,8 +86,8 @@ class FhirEngineProviderTest {
         serverConfiguration =
           ServerConfiguration(
             "",
-            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
-          )
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6),
+          ),
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(5)

@@ -67,7 +67,7 @@ data class DataCaptureConfig(
    */
   var questionnaireItemViewHolderFactoryMatchersProviderFactory:
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
-    null
+    null,
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {

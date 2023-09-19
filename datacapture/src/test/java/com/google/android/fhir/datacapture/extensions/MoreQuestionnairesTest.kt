@@ -43,8 +43,8 @@ class MoreQuestionnairesTest {
       listOf(
         Extension(
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
-          CanonicalType(structureMapUrl)
-        )
+          CanonicalType(structureMapUrl),
+        ),
       )
 
     assertThat(questionnaire.targetStructureMap).isEqualTo(structureMapUrl)
@@ -64,11 +64,11 @@ class MoreQuestionnairesTest {
                     .addCoding(
                       Coding()
                         .setCode(DisplayItemControlType.PAGE.extensionCode)
-                        .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                    )
-                )
+                        .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                    ),
+                ),
             )
-          }
+          },
         )
       }
 
@@ -120,8 +120,8 @@ class MoreQuestionnairesTest {
             Coding(
               "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
               "observation",
-              "Observation"
-            )
+              "Observation",
+            ),
           )
           addExtension("type", CodeType("Observation"))
         }
@@ -135,7 +135,7 @@ class MoreQuestionnairesTest {
     assertThat(errorMessage)
       .isEqualTo(
         "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
       )
   }
 
@@ -146,7 +146,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter"),
           )
           addExtension("type", CodeType("Patient"))
         }
@@ -160,7 +160,7 @@ class MoreQuestionnairesTest {
     assertThat(errorMessage)
       .isEqualTo(
         "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
       )
   }
 
@@ -171,7 +171,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
           )
           addExtension("type", CodeType("Observation"))
         }
@@ -185,7 +185,7 @@ class MoreQuestionnairesTest {
     assertThat(errorMessage)
       .isEqualTo(
         "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
       )
   }
 
@@ -196,7 +196,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
           )
         }
 
@@ -209,7 +209,7 @@ class MoreQuestionnairesTest {
     assertThat(errorMessage)
       .isEqualTo(
         "The extension:name or extension:type extension is missing in " +
-          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT,
       )
   }
 
@@ -220,7 +220,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
           )
         }
 
@@ -233,7 +233,7 @@ class MoreQuestionnairesTest {
     assertThat(errorMessage)
       .isEqualTo(
         "The extension:name or extension:type extension is missing in " +
-          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT,
       )
   }
 }

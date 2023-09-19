@@ -52,7 +52,7 @@ import org.hl7.fhir.r4.model.codesystems.RiskProbability
 class PatientDetailsViewModel(
   application: Application,
   private val fhirEngine: FhirEngine,
-  private val patientId: String
+  private val patientId: String,
 ) : AndroidViewModel(application) {
   val livePatientData = MutableLiveData<List<PatientDetailData>>()
 
@@ -77,8 +77,8 @@ class PatientDetailsViewModel(
         it.resource,
         getRiskItem(
           it.revIncluded?.get(ResourceType.RiskAssessment to RiskAssessment.SUBJECT.paramName)
-            as List<RiskAssessment>?
-        )
+            as List<RiskAssessment>?,
+        ),
       )
 
       it.revIncluded?.get(ResourceType.Observation to Observation.SUBJECT.paramName)?.let {
@@ -100,13 +100,13 @@ class PatientDetailsViewModel(
           getRiskAssessmentStatusColor(it),
           getRiskAssessmentStatus(it),
           getLastContactedDate(it),
-          getPatientDetailsCardColor(it)
+          getPatientDetailsCardColor(it),
         )
       }
 
   private fun MutableList<PatientDetailData>.addPatientDetailData(
     patient: Patient,
-    riskAssessment: RiskAssessmentItem
+    riskAssessment: RiskAssessmentItem,
   ) {
     patient
       .toPatientItem(0)
@@ -115,29 +115,29 @@ class PatientDetailsViewModel(
         add(PatientDetailOverview(patientItem, firstInGroup = true))
         add(
           PatientDetailProperty(
-            PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone)
-          )
+            PatientProperty(getString(R.string.patient_property_mobile), patientItem.phone),
+          ),
         )
         add(
           PatientDetailProperty(
-            PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId)
-          )
+            PatientProperty(getString(R.string.patient_property_id), patientItem.resourceId),
+          ),
         )
         add(
           PatientDetailProperty(
             PatientProperty(
               getString(R.string.patient_property_address),
-              "${patientItem.city}, ${patientItem.country} "
-            )
-          )
+              "${patientItem.city}, ${patientItem.country} ",
+            ),
+          ),
         )
         add(
           PatientDetailProperty(
             PatientProperty(
               getString(R.string.patient_property_dob),
-              patientItem.dob?.localizedString ?: ""
-            )
-          )
+              patientItem.dob?.localizedString ?: "",
+            ),
+          ),
         )
         add(
           PatientDetailProperty(
@@ -145,10 +145,10 @@ class PatientDetailsViewModel(
               getString(R.string.patient_property_gender),
               patientItem.gender.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-              }
+              },
             ),
-            lastInGroup = true
-          )
+            lastInGroup = true,
+          ),
         )
       }
   }
@@ -164,7 +164,7 @@ class PatientDetailsViewModel(
           PatientDetailObservation(
             observationItem,
             firstInGroup = index == 0,
-            lastInGroup = index == observations.size - 1
+            lastInGroup = index == observations.size - 1,
           )
         }
         .let { addAll(it) }
@@ -181,7 +181,7 @@ class PatientDetailsViewModel(
           PatientDetailCondition(
             conditionItem,
             firstInGroup = index == 0,
-            lastInGroup = index == conditions.size - 1
+            lastInGroup = index == conditions.size - 1,
           )
         }
         .let { addAll(it) }
@@ -191,9 +191,11 @@ class PatientDetailsViewModel(
   private val LocalDate.localizedString: String
     get() {
       val date = Date.from(atStartOfDay(ZoneId.systemDefault())?.toInstant())
-      return if (isAndroidIcuSupported())
+      return if (isAndroidIcuSupported()) {
         DateFormat.getDateInstance(DateFormat.DEFAULT).format(date)
-      else SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
+      } else {
+        SimpleDateFormat.getDateInstance(DateFormat.DEFAULT, Locale.getDefault()).format(date)
+      }
     }
 
   // Android ICU is supported API level 24 onwards.
@@ -241,7 +243,7 @@ class PatientDetailsViewModel(
       if (it.hasOccurrence()) {
         return LocalDate.parse(
             it.occurrenceDateTimeType.valueAsString,
-            DateTimeFormatter.ISO_DATE_TIME
+            DateTimeFormatter.ISO_DATE_TIME,
           )
           .localizedString
       }
@@ -255,7 +257,7 @@ class PatientDetailsViewModel(
      */
     private fun createObservationItem(
       observation: Observation,
-      resources: Resources
+      resources: Resources,
     ): PatientListViewModel.ObservationItem {
       val observationCode = observation.code.text ?: observation.code.codingFirstRep.display
 
@@ -286,14 +288,14 @@ class PatientDetailsViewModel(
         observation.logicalId,
         observationCode,
         dateTimeString,
-        valueString
+        valueString,
       )
     }
 
     /** Creates ConditionItem objects with displayable values from the Fhir Condition objects. */
     private fun createConditionItem(
       condition: Condition,
-      resources: Resources
+      resources: Resources,
     ): PatientListViewModel.ConditionItem {
       val observationCode = condition.code.text ?: condition.code.codingFirstRep.display ?: ""
 
@@ -314,7 +316,7 @@ class PatientDetailsViewModel(
         condition.logicalId,
         observationCode,
         dateTimeString,
-        value
+        value,
       )
     }
   }
@@ -328,31 +330,31 @@ interface PatientDetailData {
 data class PatientDetailHeader(
   val header: String,
   override val firstInGroup: Boolean = false,
-  override val lastInGroup: Boolean = false
+  override val lastInGroup: Boolean = false,
 ) : PatientDetailData
 
 data class PatientDetailProperty(
   val patientProperty: PatientProperty,
   override val firstInGroup: Boolean = false,
-  override val lastInGroup: Boolean = false
+  override val lastInGroup: Boolean = false,
 ) : PatientDetailData
 
 data class PatientDetailOverview(
   val patient: PatientListViewModel.PatientItem,
   override val firstInGroup: Boolean = false,
-  override val lastInGroup: Boolean = false
+  override val lastInGroup: Boolean = false,
 ) : PatientDetailData
 
 data class PatientDetailObservation(
   val observation: PatientListViewModel.ObservationItem,
   override val firstInGroup: Boolean = false,
-  override val lastInGroup: Boolean = false
+  override val lastInGroup: Boolean = false,
 ) : PatientDetailData
 
 data class PatientDetailCondition(
   val condition: PatientListViewModel.ConditionItem,
   override val firstInGroup: Boolean = false,
-  override val lastInGroup: Boolean = false
+  override val lastInGroup: Boolean = false,
 ) : PatientDetailData
 
 data class PatientProperty(val header: String, val value: String)
@@ -360,7 +362,7 @@ data class PatientProperty(val header: String, val value: String)
 class PatientDetailsViewModelFactory(
   private val application: Application,
   private val fhirEngine: FhirEngine,
-  private val patientId: String
+  private val patientId: String,
 ) : ViewModelProvider.Factory {
   @Suppress("UNCHECKED_CAST")
   override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -375,5 +377,5 @@ data class RiskAssessmentItem(
   var riskStatusColor: Int,
   var riskStatus: String,
   var lastContacted: String,
-  var patientCardColor: Int
+  var patientCardColor: Int,
 )

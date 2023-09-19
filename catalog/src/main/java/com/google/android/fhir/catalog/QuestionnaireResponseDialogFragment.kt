@@ -26,6 +26,7 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
   private var _binding: QuestionnaireResponseDialogContentsBinding? = null
   private val binding
     get() = _binding!!
+
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
     return activity?.let {

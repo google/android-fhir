@@ -34,5 +34,5 @@ internal data class DateTimeIndex(
   /** The epoch time of the first millisecond. */
   val from: Long,
   /** The epoch time of the last millisecond. */
-  val to: Long
+  val to: Long,
 )

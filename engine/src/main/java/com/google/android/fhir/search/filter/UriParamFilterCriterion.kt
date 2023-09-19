@@ -35,5 +35,5 @@ data class UriParamFilterCriterion(val parameter: UriClientParam, var value: Str
 internal data class UriFilterCriteria(
   val parameter: UriClientParam,
   override val filters: List<UriParamFilterCriterion>,
-  override val operation: Operation
+  override val operation: Operation,
 ) : FilterCriteria(filters, operation, parameter, "UriIndexEntity")

@@ -24,7 +24,7 @@ import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFacto
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireReviewAdapter :
   ListAdapter<QuestionnaireAdapterItem.Question, QuestionnaireItemViewHolder>(
-    DiffCallbacks.QUESTIONS
+    DiffCallbacks.QUESTIONS,
   ) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     return ReviewViewHolderFactory.create(parent)

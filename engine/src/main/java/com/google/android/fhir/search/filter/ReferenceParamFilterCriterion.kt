@@ -28,7 +28,7 @@ import com.google.android.fhir.search.SearchDslMarker
 @SearchDslMarker
 data class ReferenceParamFilterCriterion(
   val parameter: ReferenceClientParam,
-  var value: String? = null
+  var value: String? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))
