@@ -577,7 +577,7 @@ class ExpressionEvaluatorTest {
                 setValue(
                   Expression().apply {
                     this.language = "text/fhirpath"
-                    this.expression = "0x"
+                    this.expression = "%AGE-YEARS"
                   }
                 )
               }
