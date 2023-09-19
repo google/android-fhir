@@ -18,6 +18,7 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.content.Context
+import com.google.android.fhir.CacheConfiguration
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -29,7 +30,6 @@ import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.remote.HttpLogger
 import java.io.File
-import okhttp3.Cache
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -60,9 +60,9 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
           networkConfiguration =
             NetworkConfiguration(
               uploadWithGzip = false,
-              okHttpCache =
-                Cache(
-                  directory = File(this.cacheDir, "http_cache"),
+              httpCache =
+                CacheConfiguration(
+                  cacheDir = File(this.cacheDir, "http_cache"),
                   // $0.05 worth of phone storage in 2020
                   maxSize = 50L * 1024L * 1024L // 50 MiB
                 )

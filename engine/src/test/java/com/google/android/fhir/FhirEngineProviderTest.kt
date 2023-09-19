@@ -21,7 +21,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.lang.IllegalStateException
-import okhttp3.Cache
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,9 +105,9 @@ class FhirEngineProviderTest {
           ServerConfiguration(
             "",
             NetworkConfiguration(
-              okHttpCache =
-                Cache(
-                  directory = File("sample-dir", "http_cache"),
+              httpCache =
+                CacheConfiguration(
+                  cacheDir = File("sample-dir", "http_cache"),
                   // $0.05 worth of phone storage in 2020
                   maxSize = 50L * 1024L * 1024L // 50 MiB
                 )
@@ -116,9 +115,8 @@ class FhirEngineProviderTest {
           )
       )
     with(config.serverConfiguration!!.networkConfiguration) {
-      assertThat(this.okHttpCache?.maxSize()).isEqualTo(50L * 1024L * 1024L)
-      assertThat(this.okHttpCache?.directory).isEqualTo(File("sample-dir", "http_cache"))
-      assertThat(this.okHttpCache).isEqualTo(6)
+      assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
+      assertThat(this.httpCache?.cacheDir).isEqualTo("sample-dir${File.separator}httpcache")
     }
   }
 }
