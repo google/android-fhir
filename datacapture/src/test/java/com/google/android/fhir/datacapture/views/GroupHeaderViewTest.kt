@@ -23,11 +23,11 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.material.card.MaterialCardView
 import com.google.common.truth.Truth.assertThat
@@ -336,7 +336,7 @@ class GroupHeaderViewTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
               }
             )

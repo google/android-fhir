@@ -218,6 +218,50 @@ class DropDownViewHolderFactoryTest {
   }
 
   @Test
+  fun shouldAutoCompleteTextViewToDisplayIfAnswerNotNullAndDisplayMatchesMoreThanOneOption() {
+    val answerOption1 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/1234"
+            display = "John"
+          }
+      }
+
+    val answerOption2 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Reference().apply {
+            reference = "Patient/6789"
+            display = "John"
+          }
+      }
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addAnswerOption(answerOption1)
+          addAnswerOption(answerOption2)
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = answerOption2.value
+            }
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> }
+      )
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).text.toString()
+      )
+      .isEqualTo(answerOption2.value.displayString(parent.context))
+  }
+
+  @Test
   fun displayValidationResult_error_shouldShowErrorMessage() {
     viewHolder.bind(
       QuestionnaireViewItem(
