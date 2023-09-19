@@ -218,6 +218,18 @@
                     "value": "Nyingine"
                   }]
               }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "unknown",
+                "display": "Unknown",
+                "designation": [
+                  {
+                    "language": "sw",
+                    "value": "Haijulikani"
+                  }]
+              }
             }
           ]
         },
