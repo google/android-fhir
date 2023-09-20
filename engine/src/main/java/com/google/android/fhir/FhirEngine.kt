@@ -34,8 +34,6 @@ interface FhirEngine {
    */
   suspend fun create(vararg resource: Resource): List<String>
 
-  suspend fun createRemote(vararg resource: Resource)
-
   /** Loads a FHIR resource given the class and the logical ID. */
   suspend fun get(type: ResourceType, id: String): Resource
 
