@@ -70,7 +70,7 @@ internal class AllChangesLocalChangeFetcher(
 }
 
 /** Represents the mode in which local changes should be fetched. */
-internal sealed class LocalChangesFetchMode {
+sealed class LocalChangesFetchMode {
   object AllChanges : LocalChangesFetchMode()
 
   object PerResource : LocalChangesFetchMode()
