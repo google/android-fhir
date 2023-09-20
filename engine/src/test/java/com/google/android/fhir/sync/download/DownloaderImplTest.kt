@@ -17,13 +17,9 @@
 package com.google.android.fhir.sync.download
 
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.sync.BundleDownloadRequest
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.DownloadRequest
-import com.google.android.fhir.sync.DownloadState
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.UploadRequest
-import com.google.android.fhir.sync.UrlDownloadRequest
+import com.google.android.fhir.sync.upload.request.UploadRequest
 import com.google.common.truth.Truth.assertThat
 import java.util.LinkedList
 import java.util.Queue
@@ -53,7 +49,7 @@ class DownloaderImplTest {
         DownloadRequest.of("Patient"),
         DownloadRequest.of("Encounter"),
         DownloadRequest.of("Medication/med-123-that-fails"),
-        DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123"))
+        DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123")),
       )
 
     val testDataSource: DataSource =
@@ -66,7 +62,7 @@ class DownloaderImplTest {
                 addEntry(
                   Bundle.BundleEntryComponent().apply {
                     resource = Patient().apply { id = "pa-123" }
-                  }
+                  },
                 )
               }
             "Encounter" ->
@@ -79,7 +75,7 @@ class DownloaderImplTest {
                         id = "en-123"
                         subject = Reference("Patient/pa-123")
                       }
-                  }
+                  },
                 )
               }
             "Medication/med-123-that-fails" ->
@@ -88,7 +84,7 @@ class DownloaderImplTest {
                   OperationOutcome.OperationOutcomeIssueComponent().apply {
                     severity = OperationOutcome.IssueSeverity.FATAL
                     diagnostics = "Resource not found."
-                  }
+                  },
                 )
               }
             else -> OperationOutcome()
@@ -105,7 +101,7 @@ class DownloaderImplTest {
                     id = "ob-123"
                     subject = Reference("Patient/pq-123")
                   }
-              }
+              },
             )
             addEntry(
               Bundle.BundleEntryComponent().apply {
@@ -114,7 +110,7 @@ class DownloaderImplTest {
                     id = "con-123"
                     subject = Reference("Patient/pq-123")
                   }
-              }
+              },
             )
           }
         }
@@ -152,7 +148,7 @@ class DownloaderImplTest {
           DownloadRequest.of("Patient"),
           DownloadRequest.of("Encounter"),
           DownloadRequest.of("Medication/med-123-that-fails"),
-          DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123"))
+          DownloadRequest.of(bundleOf("Observation/ob-123", "Condition/con-123")),
         )
 
       val testDataSource: DataSource =
@@ -165,7 +161,7 @@ class DownloaderImplTest {
                   addEntry(
                     Bundle.BundleEntryComponent().apply {
                       resource = Patient().apply { id = "pa-123" }
-                    }
+                    },
                   )
                 }
               "Encounter" ->
@@ -178,7 +174,7 @@ class DownloaderImplTest {
                           id = "en-123"
                           subject = Reference("Patient/pa-123")
                         }
-                    }
+                    },
                   )
                 }
               "Medication/med-123-that-fails" ->
@@ -187,7 +183,7 @@ class DownloaderImplTest {
                     OperationOutcome.OperationOutcomeIssueComponent().apply {
                       severity = OperationOutcome.IssueSeverity.FATAL
                       diagnostics = "Resource not found."
-                    }
+                    },
                   )
                 }
               else -> OperationOutcome()
@@ -204,7 +200,7 @@ class DownloaderImplTest {
                       id = "ob-123"
                       subject = Reference("Patient/pq-123")
                     }
-                }
+                },
               )
               addEntry(
                 Bundle.BundleEntryComponent().apply {
@@ -213,7 +209,7 @@ class DownloaderImplTest {
                       id = "con-123"
                       subject = Reference("Patient/pq-123")
                     }
-                }
+                },
               )
             }
           }
@@ -239,7 +235,7 @@ class DownloaderImplTest {
           DownloadState.Success::class.java,
           DownloadState.Success::class.java,
           DownloadState.Failure::class.java,
-          DownloadState.Success::class.java
+          DownloadState.Success::class.java,
         )
         .inOrder()
 
@@ -261,7 +257,7 @@ class DownloaderImplTest {
                   method = Bundle.HTTPVerb.GET
                   url = it
                 }
-            }
+            },
           )
         }
       }
