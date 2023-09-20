@@ -45,3 +45,12 @@ internal object PatchGeneratorFactory {
       is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
     }
 }
+
+/**
+ * Mode to decide the type of [PatchGenerator] that needs to be used to upload the [LocalChange]s
+ */
+internal sealed class PatchGeneratorMode {
+  object PerResource : PatchGeneratorMode()
+
+  object PerChange : PatchGeneratorMode()
+}
