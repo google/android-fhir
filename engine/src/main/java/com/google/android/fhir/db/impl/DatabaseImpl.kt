@@ -123,6 +123,10 @@ internal class DatabaseImpl(
     return logicalIds
   }
 
+  override suspend fun <R : Resource> insertLocalOnly(vararg resource: R): List<String> {
+    return db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
+  }
+
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
     db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
   }

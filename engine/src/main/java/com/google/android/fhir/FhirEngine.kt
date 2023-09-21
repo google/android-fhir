@@ -30,15 +30,11 @@ interface FhirEngine {
   /**
    * Creates one or more FHIR [resource]s in the local storage.
    *
+   * @param isLocalOnly - Setting the value to [true] instructs engine that the resource and its
+   *   subsequent updates should never be synced to the server.
    * @return the logical IDs of the newly created resources.
    */
-  suspend fun create(vararg resource: Resource): List<String>
-
-  /**
-   * Creates one or more remote FHIR [resource]s in the local storage without flagging as local
-   * changes.
-   */
-  suspend fun createRemote(vararg resource: Resource)
+  suspend fun create(vararg resource: Resource, isLocalOnly: Boolean = false): List<String>
 
   /** Loads a FHIR resource given the class and the logical ID. */
   suspend fun get(type: ResourceType, id: String): Resource
