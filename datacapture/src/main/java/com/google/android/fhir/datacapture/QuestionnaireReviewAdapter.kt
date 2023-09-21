@@ -16,21 +16,62 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireReviewAdapter :
-  ListAdapter<QuestionnaireAdapterItem.Question, QuestionnaireItemViewHolder>(
-    DiffCallbacks.QUESTIONS
+  ListAdapter<QuestionnaireAdapterItem, RecyclerView.ViewHolder>(
+    DiffCallbacks.ITEMS,
   ) {
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
-    return ReviewViewHolderFactory.create(parent)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    val typedViewType = QuestionnaireEditAdapter.ViewType.parse(viewType)
+    return when (typedViewType.type) {
+      QuestionnaireEditAdapter.ViewType.Type.QUESTION -> ReviewViewHolderFactory.create(parent)
+      QuestionnaireEditAdapter.ViewType.Type.NAVIGATION ->
+        NavigationViewHolder(
+          LayoutInflater.from(parent.context)
+            .inflate(R.layout.pagination_navigation_view, parent, false),
+        )
+    }
   }
 
-  override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
-    holder.bind(getItem(position).item)
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    when (val item = getItem(position)) {
+      is QuestionnaireAdapterItem.Question -> {
+        holder as QuestionnaireItemViewHolder
+        holder.bind(item.item)
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        holder as NavigationViewHolder
+        holder.bind(item.questionnairePageNavigationState)
+      }
+    }
+  }
+
+  override fun getItemViewType(position: Int): Int {
+    // Because we have multiple Item subtypes, we will pack two ints into the item view type.
+
+    // The first 8 bits will be represented by this type, which is unique for each Item subclass.
+    val type: QuestionnaireEditAdapter.ViewType.Type
+    // The last 24 bits will be represented by this subtype, which will further divide each Item
+    // subclass into more view types.
+    val subtype: Int
+    when (getItem(position)) {
+      is QuestionnaireAdapterItem.Question -> {
+        type = QuestionnaireEditAdapter.ViewType.Type.QUESTION
+        subtype = 0xFFFFFF
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        type = QuestionnaireEditAdapter.ViewType.Type.NAVIGATION
+        subtype = 0xFFFFFF
+      }
+    }
+    return QuestionnaireEditAdapter.ViewType.from(type = type, subtype = subtype).viewType
   }
 }

@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
@@ -2700,6 +2701,23 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  @Test
+  fun `review mode with navigation long scroll appends navigation to view items`() = runTest {
+    val questionnaire = Questionnaire().apply {
+      id = "a-questionnaire"
+      addItem(Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-linkId"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      })
+    }
+    val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true, showNavigationInLongScroll = true)
+    viewModel.setReviewMode(true)
+
+    val questionnaireState = viewModel.questionnaireStateFlow.first()
+    assertThat(questionnaireState.pageNavigationState).isNull()
+    assertThat(questionnaireState.items.last()).isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //                            Read-only Mode                            //
@@ -2727,6 +2745,22 @@ class QuestionnaireViewModelTest {
         )
         .isFalse()
     }
+  }
+
+  @Test
+  fun `read-only mode with navigation long scroll appends navigation to view items`() = runTest {
+    val questionnaire = Questionnaire().apply {
+      id = "a-questionnaire"
+      addItem(Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-linkId"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      })
+    }
+    val viewModel = createQuestionnaireViewModel(questionnaire, readOnlyMode = true, showNavigationInLongScroll = true)
+
+    val questionnaireState = viewModel.questionnaireStateFlow.first()
+    assertThat(questionnaireState.pageNavigationState).isNull()
+    assertThat(questionnaireState.items.last()).isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
 
   // ==================================================================== //
@@ -2796,6 +2830,27 @@ class QuestionnaireViewModelTest {
           .showSubmitButton,
       )
       .isTrue()
+  }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                       Navigation in Long  Scroll                     //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL setting should show navigation last in long scroll`() = runTest {
+    val questionnaire = Questionnaire().apply {
+      id = "a-questionnaire"
+      addItem(Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "a-linkId"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      })
+    }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showNavigationInLongScroll = true)
+    val questionnaireState = viewModel.questionnaireStateFlow.first()
+    assertThat(questionnaireState.pageNavigationState).isNull()
+    assertThat(questionnaireState.items.last()).isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
 
   // ==================================================================== //
@@ -6089,6 +6144,7 @@ class QuestionnaireViewModelTest {
     showReviewPageFirst: Boolean = false,
     readOnlyMode: Boolean = false,
     showSubmitButton: Boolean? = null,
+    showNavigationInLongScroll: Boolean = false
   ): QuestionnaireViewModel {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
@@ -6102,6 +6158,9 @@ class QuestionnaireViewModelTest {
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
     readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
     showSubmitButton?.let { state.set(EXTRA_SHOW_SUBMIT_BUTTON, it) }
+    showNavigationInLongScroll.let {
+      state.set(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL, it)
+    }
 
     return QuestionnaireViewModel(context, state)
   }

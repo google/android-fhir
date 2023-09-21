@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
@@ -61,7 +60,8 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
     requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
       DataCapture.getConfiguration(requireContext())
-        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory
+        ?.get(it)
     }
       ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
@@ -70,7 +70,7 @@ class QuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
       val themeId =
@@ -78,7 +78,7 @@ class QuestionnaireFragment : Fragment() {
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       return inflater
         .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
@@ -92,11 +92,9 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
-    val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
-    paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
-    val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
-    paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
+    val bottomNavGroup = view.findViewById<View>(R.id.bottom_nav_group)
+
+    viewModel.setOnSubmitButtonClickListener {
       viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
         if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
           setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
@@ -106,27 +104,21 @@ class QuestionnaireFragment : Fragment() {
           QuestionnaireValidationErrorMessageDialogFragment()
             .show(
               requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG
+              QuestionnaireValidationErrorMessageDialogFragment.TAG,
             )
         }
       }
     }
+
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =
       QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
         setOnClickListener { viewModel.setReviewMode(false) }
-      }
-
-    val reviewModeButton =
-      view.findViewById<View>(R.id.review_mode_button).apply {
-        setOnClickListener { viewModel.setReviewMode(true) }
       }
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
@@ -141,26 +133,23 @@ class QuestionnaireFragment : Fragment() {
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
+        updateQuestionnairePageViewNavigation(bottomNavGroup, state.pageNavigationState)
+
         when (val displayMode = state.displayMode) {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
+              state.items,
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
-            // Set button visibility
-            submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
-            reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
               } else {
                 View.GONE
               }
-            paginationPreviousButton.visibility = View.GONE
-            paginationNextButton.visibility = View.GONE
 
             // Hide progress indicator
             questionnaireProgressIndicator.visibility = View.GONE
@@ -171,21 +160,7 @@ class QuestionnaireFragment : Fragment() {
             questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
 
-            // Set button visibility
-            submitButton.visibility =
-              if (displayMode.pagination.showSubmitButton) View.VISIBLE else View.GONE
-            reviewModeButton.visibility =
-              if (displayMode.pagination.showReviewButton) View.VISIBLE else View.GONE
             reviewModeEditButton.visibility = View.GONE
-            if (displayMode.pagination.isPaginated) {
-              paginationPreviousButton.visibility = View.VISIBLE
-              paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
-              paginationNextButton.visibility = View.VISIBLE
-              paginationNextButton.isEnabled = displayMode.pagination.hasNextPage
-            } else {
-              paginationPreviousButton.visibility = View.GONE
-              paginationNextButton.visibility = View.GONE
-            }
 
             // Set progress indicator
             questionnaireProgressIndicator.visibility = View.VISIBLE
@@ -195,8 +170,8 @@ class QuestionnaireFragment : Fragment() {
                   count =
                     (displayMode.pagination.currentPageIndex +
                       1), // incremented by 1 due to initialPageIndex starts with 0.
-                  totalCount = displayMode.pagination.pages.size
-                )
+                  totalCount = displayMode.pagination.pages.size,
+                ),
               )
             } else {
               questionnaireEditRecyclerView.addOnScrollListener(
@@ -208,22 +183,18 @@ class QuestionnaireFragment : Fragment() {
                         count =
                           (linearLayoutManager.findLastVisibleItemPosition() +
                             1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                        totalCount = linearLayoutManager.itemCount
-                      )
+                        totalCount = linearLayoutManager.itemCount,
+                      ),
                     )
                   }
-                }
+                },
               )
             }
           }
           is DisplayMode.InitMode -> {
             questionnaireReviewRecyclerView.visibility = View.GONE
             questionnaireEditRecyclerView.visibility = View.GONE
-            paginationPreviousButton.visibility = View.GONE
-            paginationNextButton.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
-            submitButton.visibility = View.GONE
-            reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
           }
         }
@@ -231,7 +202,7 @@ class QuestionnaireFragment : Fragment() {
     }
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
-      viewLifecycleOwner
+      viewLifecycleOwner,
     ) { _, bundle ->
       when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
@@ -243,9 +214,51 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
           )
       }
+    }
+  }
+
+  internal fun updateQuestionnairePageViewNavigation(
+    navigationViewGroup: View,
+    questionnairePageNavigationState: QuestionnairePageNavigationState?,
+  ) {
+    if (questionnairePageNavigationState == null) {
+      navigationViewGroup.visibility = View.GONE
+      return
+    }
+
+    fun View.updateState(navigationViewState: QuestionnaireNavigationViewState) {
+      when (navigationViewState) {
+        QuestionnaireNavigationViewState.Disabled -> {
+          visibility = View.VISIBLE
+          isEnabled = false
+        }
+        is QuestionnaireNavigationViewState.Enabled -> {
+          visibility = View.VISIBLE
+          isEnabled = true
+          setOnClickListener { navigationViewState.onClickAction() }
+        }
+        QuestionnaireNavigationViewState.Hidden -> {
+          visibility = View.GONE
+        }
+      }
+    }
+
+    navigationViewGroup.findViewById<View>(R.id.pagination_previous_button).apply {
+      updateState(questionnairePageNavigationState.previousPageNavigationActionState)
+    }
+
+    navigationViewGroup.findViewById<View>(R.id.pagination_next_button).apply {
+      updateState(questionnairePageNavigationState.nextPageNavigationActionState)
+    }
+
+    navigationViewGroup.findViewById<View>(R.id.review_mode_button).apply {
+      updateState(questionnairePageNavigationState.reviewNavigationActionState)
+    }
+    navigationViewGroup.findViewById<View>(R.id.submit_questionnaire).apply {
+      updateState(questionnairePageNavigationState.submitNavigationActionState)
     }
   }
 
@@ -364,13 +377,21 @@ class QuestionnaireFragment : Fragment() {
      * [QuestionnaireItemViewHolderFactoryMatchersProvider].
      */
     fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-      matchersProviderFactory: String
+      matchersProviderFactory: String,
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
+    /**
+     * A [Boolean] extra to show questionnaire page as a default/long scroll with the
+     * previous/next/submit buttons anchored to bottom/end of page. Default is false.
+     */
+    fun setShowNavigationInDefaultLongScroll(value: Boolean) = apply {
+      args.add(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL to value)
+    }
 
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
@@ -419,6 +440,7 @@ class QuestionnaireFragment : Fragment() {
     /** A list of JSON encoded strings extra for each questionnaire context. */
     internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
       "questionnaire-launch-contexts"
+
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -459,6 +481,9 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
 
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
+
+    internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
+      "show-navigation-in-default-long-scroll"
 
     fun builder() = Builder()
   }
@@ -501,8 +526,8 @@ class QuestionnaireFragment : Fragment() {
      * Implementation should specify when custom questionnaire components should be used.
      *
      * @return A [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
-     * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
-     * questionnaire item.
+     *   whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+     *   questionnaire item.
      */
     abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
   }

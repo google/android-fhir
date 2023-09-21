@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,17 @@
 
 package com.google.android.fhir.datacapture
 
-import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+sealed class QuestionnaireNavigationViewState {
+  object Hidden : QuestionnaireNavigationViewState()
 
-/** Various types of rows that can be used in a Questionnaire RecyclerView. */
-internal sealed interface QuestionnaireAdapterItem {
-  /** A row for a question in a Questionnaire RecyclerView. */
-  data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem
+  object Disabled : QuestionnaireNavigationViewState()
 
-  data class Navigation(val questionnairePageNavigationState: QuestionnairePageNavigationState) :
-    QuestionnaireAdapterItem
+  data class Enabled(val onClickAction: () -> Unit) : QuestionnaireNavigationViewState()
 }
+
+data class QuestionnairePageNavigationState(
+  val previousPageNavigationActionState: QuestionnaireNavigationViewState,
+  val nextPageNavigationActionState: QuestionnaireNavigationViewState,
+  val submitNavigationActionState: QuestionnaireNavigationViewState,
+  val reviewNavigationActionState: QuestionnaireNavigationViewState,
+)
