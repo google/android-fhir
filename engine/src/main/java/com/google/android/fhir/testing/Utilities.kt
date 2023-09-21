@@ -133,8 +133,7 @@ open class TestDownloadManagerImpl(
 }
 
 object TestFhirEngineImpl : FhirEngine {
-  override suspend fun create(vararg resource: Resource, isLocalOnly: Boolean): List<String> =
-    emptyList()
+  override suspend fun create(vararg resource: Resource, isLocalOnly: Boolean) = emptyList<String>()
 
   override suspend fun update(vararg resource: Resource) {}
 
