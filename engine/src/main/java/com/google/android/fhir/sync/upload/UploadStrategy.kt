@@ -20,7 +20,16 @@ import com.google.android.fhir.sync.upload.patch.PatchGeneratorMode
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
-sealed class UploadStrategy(
+/**
+ * Strategy to define how to upload the [LocalChange]s to the FHIR server.
+ *
+ * Each strategy comprises of deciding appropriate modes for [LocalChangeFetcher],
+ * [PatchGeneratorMode], [UploadRequestGeneratorMode]. The strategies mentioned here are exhaustive
+ * as the different modes for the components mentioned above can only be used together in some
+ * specific ways.
+ */
+sealed class UploadStrategy
+private constructor(
   internal val localChangesFetchMode: LocalChangesFetchMode,
   internal val patchGeneratorMode: PatchGeneratorMode,
   internal val requestGeneratorMode: UploadRequestGeneratorMode,
