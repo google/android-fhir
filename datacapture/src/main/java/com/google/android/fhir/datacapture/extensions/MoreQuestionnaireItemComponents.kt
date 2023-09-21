@@ -301,6 +301,39 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
 // ********************************************************************************************** //
 
 /** UI controls relevant to rendering questionnaire items. */
+internal enum class GroupItemControlType(val extensionCode: String) {
+  GTABLE("gtable"),
+}
+
+/** Item control to show instruction text */
+internal val Questionnaire.QuestionnaireItemComponent.groupItemControl: GroupItemControlType?
+  get() {
+    val codeableConcept =
+      this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
+    val code =
+      codeableConcept?.coding?.firstOrNull { it.system == EXTENSION_ITEM_CONTROL_SYSTEM }?.code
+    return GroupItemControlType.values().firstOrNull { it.extensionCode == code }
+  }
+
+/** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
+internal val Questionnaire.QuestionnaireItemComponent.isGTableCode: Boolean
+  get() {
+    return when (type) {
+      Questionnaire.QuestionnaireItemType.GROUP -> {
+        groupItemControl == GroupItemControlType.GTABLE
+      }
+      else -> {
+        false
+      }
+    }
+  }
+
+/** Whether item type is group. */
+internal val Questionnaire.QuestionnaireItemComponent.isGroupItem: Boolean
+  get() =
+    (type == Questionnaire.QuestionnaireItemType.GROUP && isGTableCode)
+
+/** UI controls relevant to rendering questionnaire items. */
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),

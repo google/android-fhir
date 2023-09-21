@@ -77,6 +77,7 @@ data class QuestionnaireViewItem(
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
+  val subItemsIfGroup: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
 ) {
 
   /**
