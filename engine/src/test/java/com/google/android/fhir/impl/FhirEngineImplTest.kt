@@ -79,7 +79,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun createRemote_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+  fun create_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
     val totalLocalChangesPatient2 =
       fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID).size
     fhirEngine.create(TEST_PATIENT_2, isLocalOnly = true)
@@ -89,7 +89,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun createRemoteAll_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
+  fun createAll_isLocalOnlyTrue_shouldCreateResourceWithoutFlaggingLocalChange() = runBlocking {
     val totalLocalChangesPatient1 =
       fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID).size
     val totalLocalChangesPatient2 =
