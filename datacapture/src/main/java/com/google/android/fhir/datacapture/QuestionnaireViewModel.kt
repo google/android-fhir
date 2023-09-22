@@ -37,6 +37,7 @@ import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
+import com.google.android.fhir.datacapture.extensions.isGroupItem
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -737,7 +738,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showAsterisk = showAsterisk,
                 showRequiredText = showRequiredText,
                 showOptionalText = showOptionalText
-              )
+              ),
+            subItemsIfGroup = questionnaireItem.item.takeIf { questionnaireItem.isGroupItem } as List<QuestionnaireItemComponent>
           )
         )
       )

@@ -18,15 +18,23 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.annotation.VisibleForTesting
+import androidx.fragment.app.findFragment
+import com.google.android.fhir.datacapture.DataCapture
+import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
+import com.google.android.fhir.datacapture.extensions.isGroupItem
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object GroupViewHolderFactory :
@@ -36,12 +44,18 @@ internal object GroupViewHolderFactory :
       private lateinit var header: GroupHeaderView
       private lateinit var error: TextView
       private lateinit var addItemButton: Button
+      private lateinit var gtableLayout: LinearLayout
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
+
+      @VisibleForTesting
+      val questionnaireItemViewHolderFactoryMatchersProvider = EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
+
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         error = itemView.findViewById(R.id.error)
         addItemButton = itemView.findViewById(R.id.add_item)
+        gtableLayout = itemView.findViewById(R.id.gtable_layout)
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -58,6 +72,17 @@ internal object GroupViewHolderFactory :
           )
         }
         displayValidationResult(questionnaireViewItem.validationResult)
+        if (questionnaireViewItem.questionnaireItem.isGroupItem) {
+          questionnaireViewItem.subItemsIfGroup.forEach {
+            when (it.type) {
+              Questionnaire.QuestionnaireItemType.STRING -> {
+                
+              }
+
+              else -> {}
+            }
+          }
+        }
       }
 
       private fun displayValidationResult(validationResult: ValidationResult) {
@@ -75,4 +100,9 @@ internal object GroupViewHolderFactory :
         // No user input
       }
     }
+
+  private object EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl :
+    QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider() {
+    override fun get() = emptyList<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher>()
+  }
 }
