@@ -54,7 +54,7 @@ object UnitConverter {
         ucumService.getCanonicalForm(Pair(Decimal(value.value.toPlainString()), value.code))
       return UcumValue(
         pair.code,
-        pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision()))
+        pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision())),
       )
     } catch (e: UcumException) {
       throw ConverterException("UCUM conversion failed", e)
@@ -79,7 +79,7 @@ object UnitConverter {
       val pair = Pair(Decimal(value.value.toPlainString()), value.code)
       UcumValue(
         pair.code,
-        pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision()))
+        pair.value.asDecimal().toBigDecimal(MathContext(value.value.precision())),
       )
     }
   }

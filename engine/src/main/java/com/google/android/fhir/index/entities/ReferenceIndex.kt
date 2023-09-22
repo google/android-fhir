@@ -27,5 +27,5 @@ internal data class ReferenceIndex(
   /** The path of the reference index, e.g. "Observation.subject". */
   val path: String,
   /** The value of the reference index, e.g. "Patient/123". */
-  val value: String
+  val value: String,
 )

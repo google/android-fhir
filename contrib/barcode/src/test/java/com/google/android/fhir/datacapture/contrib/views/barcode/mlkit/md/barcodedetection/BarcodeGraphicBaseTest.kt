@@ -49,7 +49,6 @@ abstract class BarcodeGraphicBaseTest {
 
   @Test
   fun verify_canvasDrawing() {
-
     mockPrefsUtils()
 
     val context = ApplicationProvider.getApplicationContext<Application>()

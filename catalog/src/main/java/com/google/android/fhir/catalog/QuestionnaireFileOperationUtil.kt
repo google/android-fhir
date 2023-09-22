@@ -25,7 +25,7 @@ import kotlinx.coroutines.withContext
 suspend fun getQuestionnaireJsonStringFromAssets(
   context: Context,
   backgroundContext: CoroutineContext,
-  fileName: String
+  fileName: String,
 ): String? {
   return withContext(backgroundContext) {
     if (fileName.isNotEmpty()) {
@@ -39,7 +39,7 @@ suspend fun getQuestionnaireJsonStringFromAssets(
 suspend fun getQuestionnaireJsonStringFromFileUri(
   context: Context,
   backgroundContext: CoroutineContext,
-  uri: Uri
+  uri: Uri,
 ): String {
   return withContext(backgroundContext) {
     val reader = BufferedReader(context.contentResolver.openInputStream(uri)?.reader())

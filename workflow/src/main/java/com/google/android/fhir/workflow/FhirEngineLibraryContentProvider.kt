@@ -33,7 +33,7 @@ internal class FhirEngineLibraryContentProvider(
         .loadResources(
           resourceType = "Library",
           name = libraryIdentifier.id,
-          version = libraryIdentifier.version
+          version = libraryIdentifier.version,
         )
         .firstOrNull()
     }

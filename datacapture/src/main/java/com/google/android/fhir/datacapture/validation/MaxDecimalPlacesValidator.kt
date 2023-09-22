@@ -34,7 +34,8 @@ internal object MaxDecimalPlacesValidator :
     url = MAX_DECIMAL_URL,
     predicate = {
       extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+      ->
       val maxDecimalPlaces = (extension.value as? IntegerType)?.value
       answer.hasValueDecimalType() &&
         maxDecimalPlaces != null &&
@@ -42,7 +43,7 @@ internal object MaxDecimalPlacesValidator :
     },
     messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
-    }
+    },
   )
 
 private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"

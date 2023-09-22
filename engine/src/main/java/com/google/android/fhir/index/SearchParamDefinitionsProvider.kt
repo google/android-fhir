@@ -30,7 +30,7 @@ internal fun interface SearchParamDefinitionsProvider {
  * [SearchParamDefinition]> from the default params and custom params(if any).
  */
 internal class SearchParamDefinitionsProviderImpl(
-  private val customParams: Map<String, List<SearchParamDefinition>> = emptyMap()
+  private val customParams: Map<String, List<SearchParamDefinition>> = emptyMap(),
 ) : SearchParamDefinitionsProvider {
 
   override fun get(resource: Resource): List<SearchParamDefinition> {

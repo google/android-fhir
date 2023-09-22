@@ -46,7 +46,7 @@ class WorkflowModel(application: Application) : AndroidViewModel(application) {
     CONFIRMING,
     CONFIRMED,
     SEARCHING,
-    SEARCHED
+    SEARCHED,
   }
 
   @MainThread

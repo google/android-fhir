@@ -29,7 +29,7 @@ object XMLAssert {
         .withTest(actual)
         .withNodeMatcher(DefaultNodeMatcher(ElementSelectors.byName))
         .withDocumentBuilderFactory(
-          DocumentBuilderFactoryImpl() // Overrides the incomplete default DocumentBuilderFactory
+          DocumentBuilderFactoryImpl(), // Overrides the incomplete default DocumentBuilderFactory
         )
         .checkForSimilar()
         .build()

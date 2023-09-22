@@ -24,8 +24,9 @@ class TestUrlResolver(private val correctUrl: String, private val decodedBase64I
   UrlResolver {
 
   override suspend fun resolveBitmapUrl(url: String): Bitmap? {
-    if (url == correctUrl)
+    if (url == correctUrl) {
       return BitmapFactory.decodeByteArray(decodedBase64Image, 0, decodedBase64Image.size)
+    }
     return null
   }
 }

@@ -27,6 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class B_FhirContextLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
@@ -39,7 +40,7 @@ class B_FhirContextLoaderBenchmark {
   fun loadDstu2() {
     benchmarkRule.measureRepeated {
       assertThat(
-          FhirContext.forDstu2().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+          FhirContext.forDstu2().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode()),
         )
         .isNotNull()
     }
@@ -49,7 +50,7 @@ class B_FhirContextLoaderBenchmark {
   fun loadDstu3() {
     benchmarkRule.measureRepeated {
       assertThat(
-          FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+          FhirContext.forDstu3().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode()),
         )
         .isNotNull()
     }
@@ -59,7 +60,7 @@ class B_FhirContextLoaderBenchmark {
   fun loadR4() {
     benchmarkRule.measureRepeated {
       assertThat(
-          FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+          FhirContext.forR4().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode()),
         )
         .isNotNull()
     }
@@ -69,7 +70,7 @@ class B_FhirContextLoaderBenchmark {
   fun loadR5() {
     benchmarkRule.measureRepeated {
       assertThat(
-          FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode())
+          FhirContext.forR5().getResourceDefinition(Enumerations.ResourceType.ACCOUNT.toCode()),
         )
         .isNotNull()
     }

@@ -46,7 +46,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
   override fun process(
     data: ByteBuffer,
     frameMetadata: FrameMetadata,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
   ) {
     latestFrame = data
     latestFrameMetaData = frameMetadata
@@ -69,7 +69,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
         frameMetaData.width,
         frameMetaData.height,
         frameMetaData.rotation,
-        InputImage.IMAGE_FORMAT_NV21
+        InputImage.IMAGE_FORMAT_NV21,
       )
     val startMs = SystemClock.elapsedRealtime()
     detectInImage(image)
@@ -78,7 +78,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
         this@FrameProcessorBase.onSuccess(
           CameraInputInfo(frame, frameMetaData),
           results,
-          graphicOverlay
+          graphicOverlay,
         )
         processLatestFrame(graphicOverlay)
       }

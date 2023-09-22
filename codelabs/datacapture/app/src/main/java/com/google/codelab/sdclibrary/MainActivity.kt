@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun submitQuestionnaire() {
-
     // 5 Replace with code from the codelab to get a questionnaire response.
 
     // 6 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.

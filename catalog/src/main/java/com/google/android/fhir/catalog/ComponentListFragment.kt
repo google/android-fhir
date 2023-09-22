@@ -50,7 +50,7 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
     }
     (activity as MainActivity).setActionBar(
       getString(R.string.toolbar_text),
-      Gravity.CENTER_HORIZONTAL
+      Gravity.CENTER_HORIZONTAL,
     )
     setHasOptionsMenu(true)
   }
@@ -66,11 +66,14 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
             spanSizeLookup =
               object : GridLayoutManager.SpanSizeLookup() {
                 override fun getSpanSize(position: Int): Int {
-                  return if (adapter.getItemViewType(position) ==
+                  return if (
+                    adapter.getItemViewType(position) ==
                       ComponentsRecyclerViewAdapter.ViewType.HEADER.ordinal
-                  )
+                  ) {
                     ComponentsRecyclerViewAdapter.ViewType.HEADER.spanCount
-                  else ComponentsRecyclerViewAdapter.ViewType.ITEM.spanCount
+                  } else {
+                    ComponentsRecyclerViewAdapter.ViewType.ITEM.spanCount
+                  }
                 }
               }
           }
@@ -103,11 +106,11 @@ class ComponentListFragment : Fragment(R.layout.component_list_fragment) {
                 getQuestionnaireJsonStringFromAssets(
                   context = requireContext(),
                   backgroundContext = coroutineContext,
-                  fileName = it
+                  fileName = it,
                 )
               },
-            workflow = component.workflow
-          )
+            workflow = component.workflow,
+          ),
         )
     }
   }

@@ -45,7 +45,7 @@ class MoreQuestionnaireResponseItemComponentsTest {
             // Nested questions under answer
             addItem(questionnaireResponseItem21)
             addItem(questionnaireResponseItem22)
-          }
+          },
         )
       }
 

@@ -78,7 +78,7 @@ object PreferenceUtils {
       val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
       CameraSizePair(
         Size.parseSize(sharedPreferences.getString(previewSizePrefKey, null)),
-        Size.parseSize(sharedPreferences.getString(pictureSizePrefKey, null))
+        Size.parseSize(sharedPreferences.getString(pictureSizePrefKey, null)),
       )
     } catch (e: Exception) {
       null
@@ -88,7 +88,7 @@ object PreferenceUtils {
   private fun getBooleanPref(
     context: Context,
     @StringRes prefKeyId: Int,
-    defaultValue: Boolean
+    defaultValue: Boolean,
   ): Boolean =
     PreferenceManager.getDefaultSharedPreferences(context)
       .getBoolean(context.getString(prefKeyId), defaultValue)

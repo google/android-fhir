@@ -44,7 +44,8 @@ class CameraLauncherFragment : DialogFragment() {
         dismiss()
       }
 
-    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+    if (
+      ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
         PackageManager.PERMISSION_DENIED
     ) {
       registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

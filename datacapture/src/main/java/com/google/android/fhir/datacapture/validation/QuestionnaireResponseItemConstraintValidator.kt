@@ -38,7 +38,7 @@ internal interface QuestionnaireResponseItemConstraintValidator {
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-    context: Context
+    context: Context,
   ): Result
 
   /**

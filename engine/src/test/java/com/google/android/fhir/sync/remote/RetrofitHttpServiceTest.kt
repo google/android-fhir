@@ -68,10 +68,10 @@ class RetrofitHttpServiceTest {
                 HumanName().apply {
                   addGiven("John")
                   family = "Doe"
-                }
+                },
               )
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
@@ -95,8 +95,8 @@ class RetrofitHttpServiceTest {
             Bundle().apply {
               id = "transaction-response-1"
               type = Bundle.BundleType.TRANSACTIONRESPONSE
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
@@ -125,8 +125,8 @@ class RetrofitHttpServiceTest {
               Bundle().apply {
                 id = "transaction-response-1"
                 type = Bundle.BundleType.TRANSACTIONRESPONSE
-              }
-            )
+              },
+            ),
           )
         }
       mockWebServer.enqueue(mockResponse)

@@ -44,7 +44,7 @@ class PreferenceUtilsTest {
     PreferenceUtils.saveStringPreference(
       context,
       R.string.pref_key_rear_camera_preview_size,
-      "result"
+      "result",
     )
     val result =
       PreferenceManager.getDefaultSharedPreferences(context)
