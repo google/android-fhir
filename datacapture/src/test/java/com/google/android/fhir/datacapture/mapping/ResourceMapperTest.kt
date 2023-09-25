@@ -1194,7 +1194,8 @@ class ResourceMapperTest {
           }
         ]
       }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -1248,7 +1249,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire

@@ -295,31 +295,29 @@ object ResourceMapper {
     extractionResult: MutableList<Resource>,
     profileLoader: ProfileLoader,
   ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (
-      questionnaireItemListIterator.hasNext() && questionnaireResponseItemListIterator.hasNext()
-    ) {
+    // Questionnaire item with type = group and repeats = true can have multiple questionnaire
+    // response item components for the same
+    // questionnaire item linkId. Therefore, it must traverse the structure based on the linkId
+    // present in the response item component to avoid missing any remaining response items with the
+    // same linkId.
+
+    val linkIdToQuestionnaireItemMap = questionnaireItemList.associateBy { it.linkId }
+
+    while (questionnaireResponseItemListIterator.hasNext()) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      var currentQuestionnaireItem = questionnaireItemListIterator.next()
-      // Find the next questionnaire item with the same link ID. This is necessary because some
-      // questionnaire items that are disabled might not have corresponding questionnaire response
-      // items.
-      while (
-        questionnaireItemListIterator.hasNext() &&
-          currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId
-      ) {
-        currentQuestionnaireItem = questionnaireItemListIterator.next()
+      val currentQuestionnaireItem =
+        linkIdToQuestionnaireItemMap[currentQuestionnaireResponseItem.linkId]
+      check(currentQuestionnaireItem != null) {
+        "Missing questionnaire item for questionnaire response item ${currentQuestionnaireResponseItem.linkId}"
       }
-      if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinition(
-          currentQuestionnaireItem,
-          currentQuestionnaireResponseItem,
-          extractionContext,
-          extractionResult,
-          profileLoader,
-        )
-      }
+      extractByDefinition(
+        currentQuestionnaireItem,
+        currentQuestionnaireResponseItem,
+        extractionContext,
+        extractionResult,
+        profileLoader,
+      )
     }
   }
 
