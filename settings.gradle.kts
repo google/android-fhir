@@ -36,6 +36,8 @@ include(":contrib:barcode")
 
 include(":datacapture")
 
+include(":document")
+
 include(":demo")
 
 include(":engine")
