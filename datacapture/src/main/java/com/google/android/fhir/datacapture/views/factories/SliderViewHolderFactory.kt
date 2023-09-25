@@ -71,7 +71,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
             // Responds to when slider's value is changed
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(IntegerType(newValue.toInt()))
+                .setValue(IntegerType(newValue.toInt())),
             )
           }
         }
@@ -83,7 +83,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         error.text =
           when (validationResult) {
             is NotValidated,
-            Valid -> null
+            Valid, -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }

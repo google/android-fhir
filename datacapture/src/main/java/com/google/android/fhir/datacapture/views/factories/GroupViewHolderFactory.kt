@@ -54,7 +54,7 @@ internal object GroupViewHolderFactory :
               // TODO(jingtang10): This can be removed since we already do this in the
               // answerChangedCallback in the QuestionnaireViewModel.
               item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
+            },
           )
         }
         displayValidationResult(questionnaireViewItem.validationResult)
@@ -63,7 +63,7 @@ internal object GroupViewHolderFactory :
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid, -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE

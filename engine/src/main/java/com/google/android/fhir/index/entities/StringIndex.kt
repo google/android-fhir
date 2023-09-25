@@ -27,5 +27,5 @@ internal data class StringIndex(
   /** The path of the string index, e.g. "Patient.name.given". */
   val path: String,
   /** The value of the string index, e.g. "Tom". */
-  val value: String
+  val value: String,
 )

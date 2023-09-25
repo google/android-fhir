@@ -27,8 +27,8 @@ object DateProvider {
   // TODO possibly provide more customization options
   /**
    * * Returns the cached [clock] instance. If an Instant is passed , subsequent calls to the
-   * function will return a clock fixed to [instant]. To reset to a normal (unfixed) clock use
-   * [resetClock].
+   *   function will return a clock fixed to [instant]. To reset to a normal (unfixed) clock use
+   *   [resetClock].
    */
   operator fun invoke(instant: Instant? = null): Clock =
     synchronized(this) {

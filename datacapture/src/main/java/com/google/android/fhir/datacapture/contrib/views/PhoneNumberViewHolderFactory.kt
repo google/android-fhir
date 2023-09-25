@@ -43,7 +43,7 @@ object PhoneNumberViewHolderFactory :
       }
 
       private fun getValue(
-        text: String
+        text: String,
       ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
         return text.let {
           if (it.isEmpty()) {

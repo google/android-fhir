@@ -39,7 +39,7 @@ class GroupViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val viewHolder = GroupViewHolderFactory.create(parent)
 
@@ -51,7 +51,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -66,7 +66,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text)
@@ -82,18 +82,18 @@ class GroupViewHolderFactoryTest {
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text).isEqualTo("")
@@ -111,27 +111,28 @@ class GroupViewHolderFactoryTest {
                 linkId = "nested-display-question"
                 text = "text"
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<GroupHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .text.isNullOrEmpty()
+          .text
+          .isNullOrEmpty(),
       )
       .isTrue()
     assertThat(
         viewHolder.itemView
           .findViewById<GroupHeaderView>(R.id.header)
           .findViewById<TextView>(R.id.hint)
-          .visibility
+          .visibility,
       )
       .isEqualTo(View.GONE)
   }
@@ -144,7 +145,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
       .isEqualTo(View.VISIBLE)
@@ -158,7 +159,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<GroupHeaderView>(R.id.header).visibility)
@@ -173,7 +174,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
@@ -188,7 +189,7 @@ class GroupViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)

@@ -114,14 +114,15 @@ class UtilTest : TestCase() {
   companion object {
     val TEST_OPERATION_OUTCOME_ERROR = OperationOutcome()
     val TEST_OPERATION_OUTCOME_INFO = OperationOutcome()
+
     init {
       TEST_OPERATION_OUTCOME_ERROR.addIssue(
         OperationOutcome.OperationOutcomeIssueComponent()
-          .setSeverity(OperationOutcome.IssueSeverity.ERROR)
+          .setSeverity(OperationOutcome.IssueSeverity.ERROR),
       )
       TEST_OPERATION_OUTCOME_INFO.addIssue(
         OperationOutcome.OperationOutcomeIssueComponent()
-          .setSeverity(OperationOutcome.IssueSeverity.INFORMATION)
+          .setSeverity(OperationOutcome.IssueSeverity.INFORMATION),
       )
     }
   }

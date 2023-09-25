@@ -50,9 +50,9 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireReviewAdapter.itemCount).isEqualTo(1)
@@ -70,7 +70,7 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
-          )
+          ),
         ),
         QuestionnaireAdapterItem.Question(
           QuestionnaireViewItem(
@@ -79,9 +79,9 @@ class QuestionnaireReviewAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
             answersChangedCallback = { _, _, _, _ -> },
-          )
+          ),
         ),
-      )
+      ),
     )
 
     assertThat(questionnaireReviewAdapter.itemCount).isEqualTo(2)

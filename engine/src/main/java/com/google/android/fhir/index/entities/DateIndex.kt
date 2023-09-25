@@ -32,5 +32,5 @@ internal data class DateIndex(
   /** The epoch day of the first date. */
   val from: Long,
   /** The epoch day of the last date. */
-  val to: Long
+  val to: Long,
 )

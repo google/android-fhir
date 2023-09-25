@@ -28,7 +28,7 @@ sealed class SyncJobStatus {
   data class InProgress(
     val syncOperation: SyncOperation,
     val total: Int = 0,
-    val completed: Int = 0
+    val completed: Int = 0,
   ) : SyncJobStatus()
 
   /** Glitched but sync job is being retried. */

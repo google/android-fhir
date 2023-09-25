@@ -54,21 +54,14 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
-              )
-            ) { Timber.tag("App-HttpLog").d(it) },
-          networkConfiguration =
-            NetworkConfiguration(
-              uploadWithGzip = false,
-              httpCache =
-                CacheConfiguration(
-                  cacheDir = File(this.cacheDir, "http_cache"),
-                  // $0.05 worth of phone storage in 2020
-                  maxSize = 50L * 1024L * 1024L // 50 MiB
-                )
-            )
-        )
-      )
+                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+              ),
+            ) {
+              Timber.tag("App-HttpLog").d(it)
+            },
+          networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
+        ),
+      ),
     )
 
     dataCaptureConfig =

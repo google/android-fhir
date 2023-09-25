@@ -25,14 +25,14 @@ internal object RequiredValidator : QuestionnaireResponseItemConstraintValidator
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-    context: Context
+    context: Context,
   ): QuestionnaireResponseItemConstraintValidator.Result {
     if (!questionnaireItem.required || answers.any { it.hasValue() }) {
       return QuestionnaireResponseItemConstraintValidator.Result(true, null)
     }
     return QuestionnaireResponseItemConstraintValidator.Result(
       false,
-      context.getString(R.string.required_constraint_validation_error_msg)
+      context.getString(R.string.required_constraint_validation_error_msg),
     )
   }
 }

@@ -29,5 +29,5 @@ internal data class NumberIndex(
   /** The path of the number index, e.g. "RiskAssessment.prediction.probability". */
   val path: String,
   /** The value of the number index, e.g. "0.1". */
-  val value: BigDecimal
+  val value: BigDecimal,
 )

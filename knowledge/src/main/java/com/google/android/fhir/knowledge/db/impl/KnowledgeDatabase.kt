@@ -39,10 +39,10 @@ import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
     [
       ImplementationGuideEntity::class,
       ResourceMetadataEntity::class,
-      ImplementationGuideResourceMetadataEntity::class
+      ImplementationGuideResourceMetadataEntity::class,
     ],
   version = 1,
-  exportSchema = false
+  exportSchema = false,
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class KnowledgeDatabase : RoomDatabase() {

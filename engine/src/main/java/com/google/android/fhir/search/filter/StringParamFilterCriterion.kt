@@ -30,7 +30,7 @@ import com.google.android.fhir.search.StringFilterModifier
 data class StringParamFilterCriterion(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
-  var value: String? = null
+  var value: String? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() =
@@ -42,8 +42,8 @@ data class StringParamFilterCriterion(
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
-        value!!
-      )
+        value!!,
+      ),
     )
 }
 

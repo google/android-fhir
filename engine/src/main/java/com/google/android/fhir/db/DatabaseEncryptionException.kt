@@ -75,10 +75,10 @@ val KeyStoreException.databaseEncryptionException: DatabaseEncryptionException
               ERROR_UNSUPPORTED_KEY_VERIFICATION_ALGORITHM,
               ERROR_UNSUPPORTED_TAG,
               ERROR_UNSUPPORTED_EC_FIELD,
-              ERROR_UNSUPPORTED_MIN_MAC_LENGTH -> DatabaseEncryptionException(this, UNSUPPORTED)
+              ERROR_UNSUPPORTED_MIN_MAC_LENGTH, -> DatabaseEncryptionException(this, UNSUPPORTED)
               // Timeout: these errors could be recoverable
               ERROR_SECURE_HW_BUSY,
-              ERROR_SECURE_HW_COMMUNICATION_FAILED -> DatabaseEncryptionException(this, TIMEOUT)
+              ERROR_SECURE_HW_COMMUNICATION_FAILED, -> DatabaseEncryptionException(this, TIMEOUT)
               else -> DatabaseEncryptionException(this, UNKNOWN)
             }
           return encryptionException

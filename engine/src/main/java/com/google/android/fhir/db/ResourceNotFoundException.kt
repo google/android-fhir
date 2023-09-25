@@ -24,7 +24,7 @@ class ResourceNotFoundException : Exception {
   constructor(
     type: String,
     id: String,
-    cause: Throwable
+    cause: Throwable,
   ) : super("Resource not found with type $type and id $id!", cause) {
     this.type = type
     this.id = id

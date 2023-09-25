@@ -51,7 +51,7 @@ class SQLCipherSupportHelper(
         configuration.name,
         /* factory= */ null,
         configuration.callback.version,
-        hook
+        hook,
       ) {
       override fun onCreate(db: SQLiteDatabase) {
         configuration.callback.onCreate(db)
@@ -127,6 +127,7 @@ class SQLCipherSupportHelper(
 
   private companion object {
     const val MAX_RETRY_ATTEMPTS = 3
+
     /** The time delay before retrying a database operation. */
     val retryDelay: Duration = Duration.ofSeconds(1)
   }

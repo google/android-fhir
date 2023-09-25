@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceMetadataId"]),
-      Index(value = ["url", "version", "resourceFile"], unique = true)
+      Index(value = ["url", "version", "resourceFile"], unique = true),
     ],
 )
 internal data class ResourceMetadataEntity(

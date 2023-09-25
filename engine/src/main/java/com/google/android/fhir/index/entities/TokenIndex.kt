@@ -29,5 +29,5 @@ internal data class TokenIndex(
   /** The system of the code index, e.g. "http://openmrs.org/concepts". */
   val system: String?,
   /** The value of the code index, e.g. "1427AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA". */
-  val value: String
+  val value: String,
 )

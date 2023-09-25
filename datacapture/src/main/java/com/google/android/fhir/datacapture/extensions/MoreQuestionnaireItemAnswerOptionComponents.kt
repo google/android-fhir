@@ -49,7 +49,7 @@ internal val List<QuestionnaireItemAnswerOptionComponent>.initialSelected: List<
   get() = this.filter { it.initialSelected }.map { it.value }
 
 fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
-  context: Context
+  context: Context,
 ): Drawable? {
   return (extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?)
     ?.let {
@@ -59,7 +59,7 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
       when (it.contentType) {
         "image/jpeg",
         "image/jpg",
-        "image/png" -> {
+        "image/png", -> {
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
           val imageSize =
             context.resources.getDimensionPixelOffset(R.dimen.item_answer_media_image_size)

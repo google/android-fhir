@@ -60,7 +60,7 @@ internal fun Enumeration<*>.toCoding(): Coding {
 internal fun Any.invokeFunction(
   functionName: String,
   parameterTypes: List<Class<*>> = listOf(),
-  vararg args: Any?
+  vararg args: Any?,
 ): Any? =
   this::class
     .java

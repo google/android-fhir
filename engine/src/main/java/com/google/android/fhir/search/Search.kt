@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 suspend inline fun <reified R : Resource> FhirEngine.search(
-  init: Search.() -> Unit
+  init: Search.() -> Unit,
 ): List<SearchResult<R>> {
   val search = Search(type = R::class.java.newInstance().resourceType)
   search.init()
@@ -42,7 +42,7 @@ suspend fun FhirEngine.search(xFhirQuery: String): List<SearchResult<Resource>> 
 
 suspend fun FhirEngine.search(
   resourceType: ResourceType,
-  init: Search.() -> Unit
+  init: Search.() -> Unit,
 ): List<SearchResult<Resource>> {
   val search = Search(type = resourceType)
   search.init()

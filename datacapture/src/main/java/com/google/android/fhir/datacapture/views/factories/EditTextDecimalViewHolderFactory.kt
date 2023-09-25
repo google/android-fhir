@@ -34,7 +34,7 @@ internal object EditTextDecimalViewHolderFactory :
         editable.toString().toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType(it.toString()))
+              .setValue(DecimalType(it.toString())),
           )
         }
           ?: questionnaireViewItem.setDraftAnswer(editable.toString())
@@ -52,7 +52,8 @@ internal object EditTextDecimalViewHolderFactory :
 
         val decimalStringToDisplay = questionnaireItemViewItemDecimalAnswer ?: draftAnswer
 
-        if (decimalStringToDisplay?.toDoubleOrNull() !=
+        if (
+          decimalStringToDisplay?.toDoubleOrNull() !=
             textInputEditText.text.toString().toDoubleOrNull()
         ) {
           textInputEditText.setText(decimalStringToDisplay)

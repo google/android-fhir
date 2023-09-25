@@ -45,9 +45,8 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
   override fun onSuccess(
     inputInfo: InputInfo,
     results: List<Barcode>,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
   ) {
-
     if (!workflowModel.isCameraLive) return
 
     Timber.d("Barcode result size: ${results.size}")
@@ -92,7 +91,7 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
 
   private fun createLoadingAnimator(
     graphicOverlay: GraphicOverlay,
-    barcode: Barcode
+    barcode: Barcode,
   ): ValueAnimator {
     val endProgress = 1.1f
     return ValueAnimator.ofFloat(0f, endProgress).apply {

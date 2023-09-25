@@ -34,8 +34,8 @@ import java.io.File
   indices =
     [
       Index(value = ["implementationGuideId"]),
-      Index(value = ["packageId", "url", "version"], unique = true)
-    ]
+      Index(value = ["packageId", "url", "version"], unique = true),
+    ],
 )
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,

@@ -26,7 +26,7 @@ interface InputInfo {
 
 class CameraInputInfo(
   private val frameByteBuffer: ByteBuffer,
-  private val frameMetadata: FrameMetadata
+  private val frameMetadata: FrameMetadata,
 ) : InputInfo {
 
   private var bitmap: Bitmap? = null
@@ -40,7 +40,7 @@ class CameraInputInfo(
             frameByteBuffer,
             frameMetadata.width,
             frameMetadata.height,
-            frameMetadata.rotation
+            frameMetadata.rotation,
           )
         bitmap!!
       }

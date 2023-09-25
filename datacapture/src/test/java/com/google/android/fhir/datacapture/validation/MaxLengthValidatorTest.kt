@@ -150,7 +150,7 @@ class MaxLengthValidatorTest {
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)
         .isEqualTo(
-          "The maximum number of characters that are permitted in the answer is: $maxLength"
+          "The maximum number of characters that are permitted in the answer is: $maxLength",
         )
     }
 
@@ -168,7 +168,7 @@ class MaxLengthValidatorTest {
     @JvmStatic
     fun createMaxLengthQuestionnaireTestItem(
       maxLength: Int,
-      value: PrimitiveType<*>
+      value: PrimitiveType<*>,
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply { this.maxLength = maxLength }

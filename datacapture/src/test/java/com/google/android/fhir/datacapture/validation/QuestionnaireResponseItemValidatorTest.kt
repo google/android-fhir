@@ -50,26 +50,26 @@ class QuestionnaireResponseItemValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(250))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(300))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = REGEX_EXTENSION_URL
             this.setValue(StringType("[0-9]+"))
-          }
+          },
         )
       }
     val answers =
       listOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           value = IntegerType(275)
-        }
+        },
       )
 
     val validationResult =
@@ -88,13 +88,13 @@ class QuestionnaireResponseItemValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(100))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200))
-          }
+          },
         )
       }
     val answers =

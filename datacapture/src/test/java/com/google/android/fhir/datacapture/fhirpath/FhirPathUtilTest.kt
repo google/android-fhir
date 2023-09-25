@@ -35,7 +35,7 @@ class FhirPathUtilTest {
           HumanName().apply {
             this.family = "Doe"
             this.addGiven("John")
-          }
+          },
         )
       }
 

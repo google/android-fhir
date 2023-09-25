@@ -26,6 +26,7 @@ import org.junit.runner.RunWith
 import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlMapper
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class A_JacksonMapperBenchmark {
   @get:Rule val benchmarkRule = BenchmarkRule()
 

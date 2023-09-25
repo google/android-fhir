@@ -36,7 +36,7 @@ class AcceptLocalConflictResolverTest {
           HumanName().apply {
             family = "Local"
             addGiven("Patient1")
-          }
+          },
         )
       }
 
@@ -47,7 +47,7 @@ class AcceptLocalConflictResolverTest {
           HumanName().apply {
             family = "Remote"
             addGiven("Patient1")
-          }
+          },
         )
       }
 

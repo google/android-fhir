@@ -38,7 +38,8 @@ internal object RegexValidator :
     predicate =
       predicate@{
         extension: Extension,
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+        ->
         if (!extension.value.isPrimitive || !answer.value.isPrimitive) {
           return@predicate false
         }
@@ -52,7 +53,7 @@ internal object RegexValidator :
       },
     messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.regex_validation_error_msg, extension.value.primitiveValue())
-    }
+    },
   )
 
 internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/regex"

@@ -19,5 +19,5 @@ package com.google.android.fhir.datacapture.views
 data class QuestionTextConfiguration(
   val showAsterisk: Boolean = false,
   val showRequiredText: Boolean = false,
-  val showOptionalText: Boolean = false
+  val showOptionalText: Boolean = false,
 )

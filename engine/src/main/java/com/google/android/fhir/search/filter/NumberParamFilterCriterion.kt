@@ -31,7 +31,7 @@ import java.math.BigDecimal
 data class NumberParamFilterCriterion(
   val parameter: NumberClientParam,
   var prefix: ParamPrefixEnum? = null,
-  var value: BigDecimal? = null
+  var value: BigDecimal? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() = listOf(getConditionParamPair(prefix, value!!))

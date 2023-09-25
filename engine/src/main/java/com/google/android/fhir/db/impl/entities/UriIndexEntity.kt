@@ -30,7 +30,8 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
       // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"])],
+      Index(value = ["resourceUuid"]),
+    ],
   foreignKeys =
     [
       ForeignKey(
@@ -39,12 +40,13 @@ import org.hl7.fhir.r4.model.ResourceType
         childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
-        deferred = true
-      )]
+        deferred = true,
+      ),
+    ],
 )
 internal data class UriIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceUuid: UUID,
   val resourceType: ResourceType,
-  @Embedded(prefix = "index_") val index: UriIndex
+  @Embedded(prefix = "index_") val index: UriIndex,
 )
