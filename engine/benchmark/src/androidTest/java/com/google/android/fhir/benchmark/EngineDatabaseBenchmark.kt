@@ -74,6 +74,7 @@ class EngineDatabaseBenchmark {
     fun oneTimeSetup() {
       FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
     }
+
     @JvmStatic
     @AfterClass
     fun oneTimeTearDown() {

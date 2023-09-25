@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ sealed class SyncJobStatus {
   data class InProgress(
     val syncOperation: SyncOperation,
     val total: Int = 0,
-    val completed: Int = 0
+    val completed: Int = 0,
   ) : SyncJobStatus()
 
   /** Glitched but sync job is being retried. */

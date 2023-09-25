@@ -109,7 +109,6 @@ class QuestionnaireFragment : Fragment() {
         }
       }
     }
-
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ class DatabaseEncryptionKeyProviderTest {
 
   private fun deleteTestKeys() {
     val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
-    keyStore.load(/* param = */ null)
+    keyStore.load(null)
     keyStore.deleteEntry(ALIAS_NAME)
     keyStore.deleteEntry(OTHER_ALIAS_NAME)
     DatabaseEncryptionKeyProvider.clearKeyCache()

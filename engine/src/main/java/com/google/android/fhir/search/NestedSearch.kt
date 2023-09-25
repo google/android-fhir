@@ -41,12 +41,12 @@ internal data class NestedContext(val parentType: ResourceType, val param: IPara
  */
 inline fun <reified R : Resource> Search.has(
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit
+  init: @BaseSearchDsl BaseSearch.() -> Unit,
 ) {
   nestedSearches.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
       search.init()
-    }
+    },
   )
 }
 
@@ -67,16 +67,17 @@ inline fun <reified R : Resource> Search.has(
  *   include<Organization>(Patient.ORGANIZATION)
  * }
  * ```
+ *
  * **NOTE**: [include] doesn't support order OR count.
  */
 inline fun <reified R : Resource> Search.include(
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {},
 ) {
   forwardIncludes.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
       search.init()
-    }
+    },
   )
 }
 
@@ -103,10 +104,10 @@ inline fun <reified R : Resource> Search.include(
 fun Search.include(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {},
 ) {
   forwardIncludes.add(
-    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
+    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() },
   )
 }
 
@@ -132,13 +133,12 @@ fun Search.include(
  */
 inline fun <reified R : Resource> Search.revInclude(
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {},
 ) {
-
   revIncludes.add(
     NestedSearch(referenceParam, Search(type = R::class.java.newInstance().resourceType)).apply {
       search.init()
-    }
+    },
   )
 }
 
@@ -165,7 +165,7 @@ inline fun <reified R : Resource> Search.revInclude(
 fun Search.revInclude(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit = {}
+  init: @BaseSearchDsl BaseSearch.() -> Unit = {},
 ) {
   revIncludes.add(NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() })
 }
@@ -175,7 +175,6 @@ fun Search.revInclude(
  * [this](https://www.hl7.org/fhir/search.html#has)).
  *
  * Example usage (Search for all Patients with Condition - Diabetes):
- *
  * ```
  *   fhirEngine.search<Patient> {
  *        has(resourceType = ResourceType.Condition, referenceParam = (Condition.SUBJECT) {
@@ -187,10 +186,10 @@ fun Search.revInclude(
 fun Search.has(
   resourceType: ResourceType,
   referenceParam: ReferenceClientParam,
-  init: @BaseSearchDsl BaseSearch.() -> Unit
+  init: @BaseSearchDsl BaseSearch.() -> Unit,
 ) {
   nestedSearches.add(
-    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() }
+    NestedSearch(referenceParam, Search(type = resourceType)).apply { search.init() },
   )
 }
 
@@ -200,7 +199,7 @@ fun Search.has(
  */
 internal fun List<NestedSearch>.nestedQuery(
   type: ResourceType,
-  operation: Operation
+  operation: Operation,
 ): SearchQuery? {
   return if (isEmpty()) {
     null
@@ -211,9 +210,11 @@ internal fun List<NestedSearch>.nestedQuery(
           query =
             searchQueries.joinToString(
               prefix = "AND a.resourceUuid IN ",
-              separator = " ${operation.logicalOperator} a.resourceUuid IN"
-            ) { searchQuery -> "(\n${searchQuery.query}\n) " },
-          args = searchQueries.flatMap { it.args }
+              separator = " ${operation.logicalOperator} a.resourceUuid IN",
+            ) { searchQuery ->
+              "(\n${searchQuery.query}\n) "
+            },
+          args = searchQueries.flatMap { it.args },
         )
       }
   }

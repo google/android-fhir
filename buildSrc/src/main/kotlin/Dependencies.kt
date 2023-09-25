@@ -275,6 +275,7 @@ object Dependencies {
     const val hapiFhirCore = "5.6.36"
 
     const val http = "4.11.0"
+
     // Maximum version that supports Android API Level 24:
     // https://github.com/FasterXML/jackson-databind/issues/3658
     const val jackson = "2.13.5"

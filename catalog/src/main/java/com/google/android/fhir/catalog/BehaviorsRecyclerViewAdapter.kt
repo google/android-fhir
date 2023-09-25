@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.catalog.databinding.LandingPageItemBinding
 
 class BehaviorsRecyclerViewAdapter(
-  private val onItemClick: (BehaviorListViewModel.Behavior) -> Unit
+  private val onItemClick: (BehaviorListViewModel.Behavior) -> Unit,
 ) : ListAdapter<BehaviorListViewModel.Behavior, BehaviorViewHolder>(BehaviorDiffUtil()) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BehaviorViewHolder {
     return BehaviorViewHolder(
       LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-      onItemClick
+      onItemClick,
     )
   }
 
@@ -40,7 +40,7 @@ class BehaviorsRecyclerViewAdapter(
 
 class BehaviorViewHolder(
   val binding: LandingPageItemBinding,
-  private val onItemClick: (BehaviorListViewModel.Behavior) -> Unit
+  private val onItemClick: (BehaviorListViewModel.Behavior) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(behavior: BehaviorListViewModel.Behavior) {
     binding.componentLayoutIconImageview.setImageResource(behavior.iconId)
@@ -53,11 +53,11 @@ class BehaviorViewHolder(
 class BehaviorDiffUtil : DiffUtil.ItemCallback<BehaviorListViewModel.Behavior>() {
   override fun areItemsTheSame(
     oldBehavior: BehaviorListViewModel.Behavior,
-    newBehavior: BehaviorListViewModel.Behavior
+    newBehavior: BehaviorListViewModel.Behavior,
   ) = oldBehavior === newBehavior
 
   override fun areContentsTheSame(
     oldBehavior: BehaviorListViewModel.Behavior,
-    newBehavior: BehaviorListViewModel.Behavior
+    newBehavior: BehaviorListViewModel.Behavior,
   ) = oldBehavior == newBehavior
 }

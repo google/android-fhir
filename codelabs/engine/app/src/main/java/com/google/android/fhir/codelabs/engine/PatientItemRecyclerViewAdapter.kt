@@ -28,13 +28,14 @@ class PatientItemRecyclerViewAdapter :
 
   class PatientItemDiffCallback : DiffUtil.ItemCallback<Patient>() {
     override fun areItemsTheSame(oldItem: Patient, newItem: Patient) = oldItem.id == newItem.id
+
     override fun areContentsTheSame(oldItem: Patient, newItem: Patient) =
       oldItem.equalsDeep(newItem)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
     return PatientItemViewHolder(
-      PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+      PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
     )
   }
 

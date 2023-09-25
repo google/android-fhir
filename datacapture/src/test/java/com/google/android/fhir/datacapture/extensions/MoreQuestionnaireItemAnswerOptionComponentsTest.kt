@@ -116,7 +116,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
                 Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                   addExtension(Extension("lang", StringType("vi-VN")))
                   addExtension(Extension("content", StringType("Thí nghiệm")))
-                }
+                },
               )
             }
           }
@@ -138,7 +138,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
               addExtension(
                 Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                   addExtension(Extension("lang", StringType("vi-VN")))
-                }
+                },
               )
             }
           }
@@ -159,7 +159,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
               Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                 addExtension(Extension("lang", StringType("vi-VN")))
                 addExtension(Extension("content", StringType("Thí nghiệm")))
-              }
+              },
             )
           }
       }
@@ -198,7 +198,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
                   extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
                 },
               )
-          }
+          },
         )
       }
 
@@ -237,7 +237,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
         answerOptionOf("test-code 1", "http://code.com", "Test Code 1", null),
         answerOptionOf("test-code 2", "http://code.com", "Test Code 2", true),
         answerOptionOf("test-code 3", "http://code.com", "Test Code 3", false),
-        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true)
+        answerOptionOf("test-code 4", "http://code.com", "Test Code 4", true),
       )
 
     assertThat(answerOptions.initialSelected.map { (it as Coding).code })
@@ -248,7 +248,7 @@ class MoreQuestionnaireItemAnswerOptionComponentsTest {
     code: String,
     url: String,
     display: String,
-    initialSelected: Boolean?
+    initialSelected: Boolean?,
   ) =
     Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
       value = Coding().setCode(code).setDisplay(display).setSystem(url)

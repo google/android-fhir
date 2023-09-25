@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,8 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
       // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"])],
+      Index(value = ["resourceUuid"]),
+    ],
   foreignKeys =
     [
       ForeignKey(
@@ -39,8 +40,9 @@ import org.hl7.fhir.r4.model.ResourceType
         childColumns = ["resourceUuid"],
         onDelete = ForeignKey.CASCADE,
         onUpdate = ForeignKey.NO_ACTION,
-        deferred = true
-      )]
+        deferred = true,
+      ),
+    ],
 )
 internal data class ReferenceIndexEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,

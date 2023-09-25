@@ -28,7 +28,7 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       Index(value = ["resourceUuid"], unique = true),
       Index(value = ["resourceType", "resourceId"], unique = true),
-    ]
+    ],
 )
 internal data class ResourceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,

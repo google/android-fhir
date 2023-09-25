@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int
   fun create(parent: ViewGroup): QuestionnaireItemViewHolder {
     return QuestionnaireItemViewHolder(
       LayoutInflater.from(parent.context).inflate(resId, parent, false),
-      getQuestionnaireItemViewHolderDelegate()
+      getQuestionnaireItemViewHolderDelegate(),
     )
   }
 
@@ -52,7 +52,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int
  */
 open class QuestionnaireItemViewHolder(
   itemView: View,
-  private val delegate: QuestionnaireItemViewHolderDelegate
+  private val delegate: QuestionnaireItemViewHolderDelegate,
 ) : RecyclerView.ViewHolder(itemView) {
 
   private var itemMediaView: MediaView

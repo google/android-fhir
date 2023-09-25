@@ -44,7 +44,7 @@ import org.hl7.fhir.r4.model.ResourceType
 class Search(
   val type: ResourceType,
   override var count: Int? = null,
-  override var from: Int? = null
+  override var from: Int? = null,
 ) : BaseSearch {
   internal val stringFilterCriteria = mutableListOf<StringParamFilterCriteria>()
   internal val dateTimeFilterCriteria = mutableListOf<DateClientParamFilterCriteria>()
@@ -55,8 +55,11 @@ class Search(
   internal val uriFilterCriteria = mutableListOf<UriFilterCriteria>()
   internal var sort: IParam? = null
   internal var order: Order? = null
+
   @PublishedApi internal var nestedSearches = mutableListOf<NestedSearch>()
+
   @PublishedApi internal var revIncludes = mutableListOf<NestedSearch>()
+
   @PublishedApi internal var forwardIncludes = mutableListOf<NestedSearch>()
 
   override var operation = Operation.AND
@@ -64,7 +67,7 @@ class Search(
   override fun filter(
     stringParameter: StringClientParam,
     vararg init: StringParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
@@ -74,19 +77,19 @@ class Search(
   override fun filter(
     referenceParameter: ReferenceClientParam,
     vararg init: ReferenceParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<ReferenceParamFilterCriterion>()
     init.forEach { ReferenceParamFilterCriterion(referenceParameter).apply(it).also(filters::add) }
     referenceFilterCriteria.add(
-      ReferenceParamFilterCriteria(referenceParameter, filters, operation)
+      ReferenceParamFilterCriteria(referenceParameter, filters, operation),
     )
   }
 
   override fun filter(
     dateParameter: DateClientParam,
     vararg init: DateParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<DateParamFilterCriterion>()
     init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
@@ -96,7 +99,7 @@ class Search(
   override fun filter(
     quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<QuantityParamFilterCriterion>()
     init.forEach { QuantityParamFilterCriterion(quantityParameter).apply(it).also(filters::add) }
@@ -106,7 +109,7 @@ class Search(
   override fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<TokenParamFilterCriterion>()
     init.forEach { TokenParamFilterCriterion(tokenParameter).apply(it).also(filters::add) }
@@ -116,7 +119,7 @@ class Search(
   override fun filter(
     numberParameter: NumberClientParam,
     vararg init: NumberParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<NumberParamFilterCriterion>()
     init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
@@ -126,7 +129,7 @@ class Search(
   override fun filter(
     uriParam: UriClientParam,
     vararg init: UriParamFilterCriterion.() -> Unit,
-    operation: Operation
+    operation: Operation,
   ) {
     val filters = mutableListOf<UriParamFilterCriterion>()
     init.forEach { UriParamFilterCriterion(uriParam).apply(it).also(filters::add) }
@@ -151,13 +154,13 @@ class Search(
 
 enum class Order {
   ASCENDING,
-  DESCENDING
+  DESCENDING,
 }
 
 enum class StringFilterModifier {
   STARTS_WITH,
   MATCHES_EXACTLY,
-  CONTAINS
+  CONTAINS,
 }
 
 /** Logical operator between the filter values or the filters themselves. */

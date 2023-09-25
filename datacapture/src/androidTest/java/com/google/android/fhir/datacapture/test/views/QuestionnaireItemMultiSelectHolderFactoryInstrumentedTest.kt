@@ -49,7 +49,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("")
@@ -63,7 +63,7 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         responseOptions("Coding 1", "Coding 3"),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(holder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString())
       .isEqualTo("Coding 1, Coding 3")
@@ -81,11 +81,11 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
       )
       .isEqualTo("Missing answer for required field.")
   }
@@ -101,23 +101,23 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
       )
       .isNull()
   }
@@ -133,17 +133,17 @@ class QuestionnaireItemMultiSelectHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        holder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).isEnabled
+        holder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).isEnabled,
       )
       .isFalse()
   }
 
   private inline fun withViewHolder(
-    crossinline block: TestActivity.(QuestionnaireItemViewHolder) -> Unit
+    crossinline block: TestActivity.(QuestionnaireItemViewHolder) -> Unit,
   ) {
     rule.scenario.onActivity {
       block(it, QuestionnaireItemDialogSelectViewHolderFactory.create(FrameLayout(it)))
@@ -159,7 +159,7 @@ private fun answerOptions(vararg options: String) =
       addAnswerOption(
         Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
           value = Coding().apply { display = option }
-        }
+        },
       )
     }
   }
@@ -170,7 +170,7 @@ private fun responseOptions(vararg responses: String) =
       addAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           value = Coding().apply { display = response }
-        }
+        },
       )
     }
   }

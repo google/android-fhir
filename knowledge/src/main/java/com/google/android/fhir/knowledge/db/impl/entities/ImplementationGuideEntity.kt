@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ import java.io.File
   indices =
     [
       Index(value = ["implementationGuideId"]),
-      Index(value = ["packageId", "url", "version"], unique = true)
-    ]
+      Index(value = ["packageId", "url", "version"], unique = true),
+    ],
 )
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,

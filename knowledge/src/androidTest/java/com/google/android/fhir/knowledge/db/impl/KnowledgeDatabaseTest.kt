@@ -62,7 +62,7 @@ internal class KnowledgeDatabaseTest {
         RES_URL,
         RES_NAME,
         RES_VERSION,
-        File("resId")
+        File("resId"),
       )
 
     knowledgeDao.insertResource(igId, resource)
@@ -85,7 +85,7 @@ internal class KnowledgeDatabaseTest {
         RES_URL,
         RES_NAME,
         RES_VERSION,
-        File("resId")
+        File("resId"),
       )
     knowledgeDao.insertResource(igId, resource)
 
@@ -107,7 +107,7 @@ internal class KnowledgeDatabaseTest {
         RES_URL,
         RES_NAME,
         RES_VERSION,
-        File("resId")
+        File("resId"),
       )
 
     knowledgeDao.insertResource(igId1, resource)
@@ -133,7 +133,7 @@ internal class KnowledgeDatabaseTest {
         packageId = IG_PACKAGE_ID,
         version = IG_VERSION,
         url = "http://url",
-        rootDirectory = File("test")
+        rootDirectory = File("test"),
       )
   }
 }
