@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,24 +39,24 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
     return when (ViewTypes.from(viewType)) {
       ViewTypes.HEADER ->
         PatientDetailsHeaderItemViewHolder(
-          PatientDetailsCardViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          PatientDetailsCardViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         )
       ViewTypes.PATIENT ->
         PatientOverviewItemViewHolder(
           PatientDetailsHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-          onScreenerClick
+          onScreenerClick,
         )
       ViewTypes.PATIENT_PROPERTY ->
         PatientPropertyItemViewHolder(
-          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         )
       ViewTypes.OBSERVATION ->
         PatientDetailsObservationItemViewHolder(
-          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         )
       ViewTypes.CONDITION ->
         PatientDetailsConditionItemViewHolder(
-          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+          PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         )
     }
   }
@@ -95,7 +95,9 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
   companion object {
     private const val STROKE_WIDTH = 2f
     private const val CORNER_RADIUS = 10f
+
     @ColorInt private const val FILL_COLOR = Color.TRANSPARENT
+
     @ColorInt private const val STROKE_COLOR = Color.GRAY
 
     fun allCornersRounded(): MaterialShapeDrawable {
@@ -103,7 +105,7 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
           ShapeAppearanceModel.builder()
             .setAllCornerSizes(CORNER_RADIUS)
             .setAllCorners(RoundedCornerTreatment())
-            .build()
+            .build(),
         )
         .applyStrokeColor()
     }
@@ -115,7 +117,7 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
             .setTopRightCornerSize(CORNER_RADIUS)
             .setTopLeftCorner(RoundedCornerTreatment())
             .setTopRightCorner(RoundedCornerTreatment())
-            .build()
+            .build(),
         )
         .applyStrokeColor()
     }
@@ -127,7 +129,7 @@ class PatientDetailsRecyclerViewAdapter(private val onScreenerClick: () -> Unit)
             .setBottomRightCornerSize(CORNER_RADIUS)
             .setBottomLeftCorner(RoundedCornerTreatment())
             .setBottomRightCorner(RoundedCornerTreatment())
-            .build()
+            .build(),
         )
         .applyStrokeColor()
     }
@@ -151,7 +153,7 @@ abstract class PatientDetailItemViewHolder(v: View) : RecyclerView.ViewHolder(v)
 
 class PatientOverviewItemViewHolder(
   private val binding: PatientDetailsHeaderBinding,
-  val onScreenerClick: () -> Unit
+  val onScreenerClick: () -> Unit,
 ) : PatientDetailItemViewHolder(binding.root) {
   override fun bind(data: PatientDetailData) {
     binding.screener.setOnClickListener { onScreenerClick() }
@@ -215,7 +217,8 @@ enum class ViewTypes {
   PATIENT,
   PATIENT_PROPERTY,
   OBSERVATION,
-  CONDITION;
+  CONDITION,
+  ;
 
   companion object {
     fun from(ordinal: Int): ViewTypes {

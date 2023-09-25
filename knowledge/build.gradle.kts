@@ -14,11 +14,10 @@ publishArtifact(Releases.Knowledge)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.knowledge"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.knowledge"
@@ -31,19 +30,15 @@ android {
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
 
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
+  compileOptions { isCoreLibraryDesugaringEnabled = true }
 
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -62,14 +57,14 @@ android {
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
         "META-INF/sun-jaxb.episode",
-      )
+      ),
     )
   }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
   configureJacocoTestOptions()
+  kotlin { jvmToolchain(11) }
 }
+
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {
@@ -95,6 +90,7 @@ dependencies {
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
 
   kapt(Dependencies.Room.compiler)
 
@@ -110,7 +106,7 @@ dependencies {
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}")
+    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
@@ -121,7 +117,7 @@ tasks.dokkaHtml.configure {
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

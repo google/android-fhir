@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ internal class FhirEngineTerminologyProvider(
     } catch (e: Exception) {
       throw TerminologyProviderException(
         "Error performing membership check of Code: $code in ValueSet: ${valueSet.id}",
-        e
+        e,
       )
     }
   }
@@ -66,7 +66,7 @@ internal class FhirEngineTerminologyProvider(
       } catch (e: Exception) {
         throw TerminologyProviderException(
           "Error performing expansion of ValueSet: ${valueSetInfo.id}",
-          e
+          e,
         )
       }
     }
@@ -92,7 +92,7 @@ internal class FhirEngineTerminologyProvider(
       } catch (e: Exception) {
         throw TerminologyProviderException(
           "Error performing lookup of Code: $code in CodeSystem: ${codeSystem.id}",
-          e
+          e,
         )
       }
     }
@@ -112,7 +112,7 @@ internal class FhirEngineTerminologyProvider(
   private suspend fun searchById(id: String): List<ValueSet> =
     listOfNotNull(
       safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
-        as? ValueSet
+        as? ValueSet,
     )
 
   private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
@@ -124,12 +124,13 @@ internal class FhirEngineTerminologyProvider(
   }
 
   private suspend fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
-    if (valueSet.version != null ||
+    if (
+      valueSet.version != null ||
         (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
     ) {
       // Cannot do both at the same time yet.
       throw UnsupportedOperationException(
-        "Could not expand value set ${valueSet.id}; version and code system bindings are not supported at this time."
+        "Could not expand value set ${valueSet.id}; version and code system bindings are not supported at this time.",
       )
     }
 

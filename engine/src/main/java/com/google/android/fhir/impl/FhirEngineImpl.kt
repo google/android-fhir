@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,22 +20,22 @@ import android.content.Context
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.toLocalChange
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
+import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
+import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import timber.log.Timber
 
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
@@ -56,7 +56,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.delete(type, id)
   }
 
-  override suspend fun <R : Resource> search(search: Search): List<R> {
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
     return search.execute(database)
   }
 
@@ -72,8 +72,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     database.clearDatabase()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): LocalChange? {
-    return database.getLocalChange(type, id)?.toLocalChange()
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
+    return database.getLocalChanges(type, id)
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
@@ -82,7 +82,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>
+    download: suspend () -> Flow<List<Resource>>,
   ) {
     download().collect { resources ->
       database.withTransaction {
@@ -90,7 +90,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
           resolveConflictingResources(
             resources,
             getConflictingResourceIds(resources),
-            conflictResolver
+            conflictResolver,
           )
         database.insertSyncedResources(resources)
         saveResolvedResourcesToDatabase(resolved)
@@ -108,7 +108,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   private suspend fun resolveConflictingResources(
     resources: List<Resource>,
     conflictingResourceIds: Set<String>,
-    conflictResolver: ConflictResolver
+    conflictResolver: ConflictResolver,
   ) =
     resources
       .filter { conflictingResourceIds.contains(it.logicalId) }
@@ -121,78 +121,18 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     resources
       .map { it.logicalId }
       .toSet()
-      .intersect(database.getAllLocalChanges().map { it.localChange.resourceId }.toSet())
+      .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>
+    localChangesFetchMode: LocalChangesFetchMode,
+    upload: suspend (List<LocalChange>) -> Flow<Pair<LocalChangeToken, Resource>>,
   ) {
-    val localChanges = database.getAllLocalChanges()
-    if (localChanges.isNotEmpty()) {
-      upload(localChanges.map { it.toLocalChange() }).collect {
-        database.deleteUpdates(it.first)
-        when (it.second) {
-          is Bundle -> updateVersionIdAndLastUpdated(it.second as Bundle)
-          else -> updateVersionIdAndLastUpdated(it.second)
-        }
+    val resourceConsolidator = DefaultResourceConsolidator(database)
+    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
+    while (localChangeFetcher.hasNext()) {
+      upload(localChangeFetcher.next()).collect {
+        resourceConsolidator.consolidate(it.first, it.second)
       }
     }
   }
-
-  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
-    when (bundle.type) {
-      Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        bundle.entry.forEach {
-          when {
-            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
-            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
-          }
-        }
-      }
-      else -> {
-        // Leave it for now.
-        Timber.i("Received request to update meta values for ${bundle.type}")
-      }
-    }
-  }
-
-  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (id, type) ->
-        database.updateVersionIdAndLastUpdated(
-          id,
-          type,
-          response.etag,
-          response.lastModified.toInstant()
-        )
-      }
-    }
-  }
-
-  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant()
-      )
-    }
-  }
-
-  /**
-   * May return a Pair of versionId and resource type extracted from the
-   * [Bundle.BundleEntryResponseComponent.location].
-   *
-   * [Bundle.BundleEntryResponseComponent.location] may be:
-   *
-   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
-   *
-   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
-   */
-  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
-    get() =
-      location
-        ?.split("/")
-        ?.takeIf { it.size > 3 }
-        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
 }

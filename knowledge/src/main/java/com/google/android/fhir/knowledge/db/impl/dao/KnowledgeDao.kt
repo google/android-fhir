@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,16 +36,16 @@ abstract class KnowledgeDao {
     implementationGuideId: Long?,
     resource: ResourceMetadataEntity,
   ) {
-
     val resourceMetadata =
-      if (resource.url != null) {
+      if (resource.url != null && resource.version != null) {
+        getResourceWithUrlAndVersion(resource.url, resource.version)
+      } else if (resource.url != null) {
         getResourceWithUrl(resource.url)
       } else {
         getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
       }
     // TODO(ktarasenko) compare the substantive part of the old and new resource and thrown an
-    // exception if they
-    // are different.
+    // exception if they are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
     insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
   }
@@ -60,7 +60,7 @@ abstract class KnowledgeDao {
   }
 
   @Query(
-    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)"
+    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)",
   )
   internal abstract suspend fun deleteOrphanedResources()
 
@@ -68,7 +68,7 @@ abstract class KnowledgeDao {
   internal abstract suspend fun getImplementationGuides(): List<ImplementationGuideEntity>
 
   @Query(
-    "SELECT * from ImplementationGuideEntity WHERE packageId = :packageId AND version = :version"
+    "SELECT * from ImplementationGuideEntity WHERE packageId = :packageId AND version = :version",
   )
   internal abstract suspend fun getImplementationGuide(
     packageId: String,
@@ -83,10 +83,17 @@ abstract class KnowledgeDao {
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
 
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  internal abstract suspend fun getResourceWithUrlAndVersion(
+    url: String,
+    version: String,
+  ): ResourceMetadataEntity?
+
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
   internal abstract suspend fun getResourceWithUrl(
     url: String,
   ): ResourceMetadataEntity?
+
   // Remove after https://github.com/google/android-fhir/issues/1920
   @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
   internal abstract suspend fun getResourceWithUrlLike(
@@ -94,7 +101,7 @@ abstract class KnowledgeDao {
   ): ResourceMetadataEntity?
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name"
+    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name",
   )
   internal abstract suspend fun getResourcesWithName(
     resourceType: ResourceType,
@@ -102,7 +109,7 @@ abstract class KnowledgeDao {
   ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND name = :name AND version = :version"
+    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND name = :name AND version = :version",
   )
   internal abstract suspend fun getResourcesWithNameAndVersion(
     resourceType: ResourceType,
@@ -124,7 +131,7 @@ abstract class KnowledgeDao {
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   internal abstract suspend fun insert(
-    igResourceXRef: ImplementationGuideResourceMetadataEntity
+    igResourceXRef: ImplementationGuideResourceMetadataEntity,
   ): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)

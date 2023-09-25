@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,8 +44,8 @@ internal constructor(
 
   /**
    * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
-   * dependencies from NPM and imports data from the package manager (populates the metadata of the
-   * FHIR Resources)
+   *   dependencies from NPM and imports data from the package manager (populates the metadata of
+   *   the FHIR Resources)
    */
   suspend fun install(vararg implementationGuides: ImplementationGuide) {
     TODO("[1937]Not implemented yet ")
@@ -88,6 +88,8 @@ internal constructor(
     val resType = ResourceType.fromCode(resourceType)
     val resourceEntities =
       when {
+        url != null && version != null ->
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
         id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
         name != null && version != null ->
@@ -133,7 +135,7 @@ internal constructor(
         metadataResource?.url,
         metadataResource?.name,
         metadataResource?.version,
-        file
+        file,
       )
     knowledgeDao.insertResource(igId, res)
   }
@@ -152,7 +154,7 @@ internal constructor(
     /** Creates an [KnowledgeManager] backed by the Room DB. */
     fun create(context: Context) =
       KnowledgeManager(
-        Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build()
+        Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build(),
       )
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */

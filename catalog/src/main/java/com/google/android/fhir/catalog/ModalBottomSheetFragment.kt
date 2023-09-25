@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R.layout.fragment_modal_bottom_sheet, container, false)
   }
@@ -48,18 +48,19 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
             R.string.hide_error_state
           } else {
             R.string.show_error_state
-          }
+          },
         )
     showHideErrorButton.setOnClickListener {
       setFragmentResult(
         REQUEST_ERROR_KEY,
         bundleOf(
           BUNDLE_ERROR_KEY to
-            (showHideErrorButton.text == requireContext().getString(R.string.show_error_state))
-        )
+            (showHideErrorButton.text == requireContext().getString(R.string.show_error_state)),
+        ),
       )
       NavHostFragment.findNavController(this).navigateUp()
     }
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   companion object {

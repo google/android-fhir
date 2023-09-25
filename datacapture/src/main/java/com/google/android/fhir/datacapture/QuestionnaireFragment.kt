@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,8 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
     requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
       DataCapture.getConfiguration(requireContext())
-        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory
+        ?.get(it)
     }
       ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
@@ -70,7 +71,7 @@ class QuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
       val themeId =
@@ -78,7 +79,7 @@ class QuestionnaireFragment : Fragment() {
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       return inflater
         .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
@@ -106,7 +107,7 @@ class QuestionnaireFragment : Fragment() {
           QuestionnaireValidationErrorMessageDialogFragment()
             .show(
               requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG
+              QuestionnaireValidationErrorMessageDialogFragment.TAG,
             )
         }
       }
@@ -146,7 +147,7 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
+              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>(),
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
@@ -195,8 +196,8 @@ class QuestionnaireFragment : Fragment() {
                   count =
                     (displayMode.pagination.currentPageIndex +
                       1), // incremented by 1 due to initialPageIndex starts with 0.
-                  totalCount = displayMode.pagination.pages.size
-                )
+                  totalCount = displayMode.pagination.pages.size,
+                ),
               )
             } else {
               questionnaireEditRecyclerView.addOnScrollListener(
@@ -208,20 +209,30 @@ class QuestionnaireFragment : Fragment() {
                         count =
                           (linearLayoutManager.findLastVisibleItemPosition() +
                             1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                        totalCount = linearLayoutManager.itemCount
-                      )
+                        totalCount = linearLayoutManager.itemCount,
+                      ),
                     )
                   }
-                }
+                },
               )
             }
+          }
+          is DisplayMode.InitMode -> {
+            questionnaireReviewRecyclerView.visibility = View.GONE
+            questionnaireEditRecyclerView.visibility = View.GONE
+            paginationPreviousButton.visibility = View.GONE
+            paginationNextButton.visibility = View.GONE
+            questionnaireProgressIndicator.visibility = View.GONE
+            submitButton.visibility = View.GONE
+            reviewModeButton.visibility = View.GONE
+            reviewModeEditButton.visibility = View.GONE
           }
         }
       }
     }
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
-      viewLifecycleOwner
+      viewLifecycleOwner,
     ) { _, bundle ->
       when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
@@ -233,7 +244,7 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
           )
       }
     }
@@ -303,8 +314,16 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI to questionnaireResponseUri)
     }
 
-    fun setQuestionnaireLaunchContext(questionnaireLaunchContext: String) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING to questionnaireLaunchContext)
+    /**
+     * The launch context allows information to be passed into questionnaire based on the context in
+     * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+     * user, etc. is "in context" at the time the questionnaire response is being completed:
+     * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+     *
+     * @param launchContexts list of serialized resources
+     */
+    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
     }
 
     /**
@@ -329,6 +348,15 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_SHOW_REVIEW_PAGE_FIRST to value)
     }
 
+    /** A [Boolean] extra to control whether the asterisk text is shown. */
+    fun showAsterisk(value: Boolean) = apply { args.add(EXTRA_SHOW_ASTERISK_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the required text is shown. */
+    fun showRequiredText(value: Boolean) = apply { args.add(EXTRA_SHOW_REQUIRED_TEXT to value) }
+
+    /** A [Boolean] extra to control whether the optional text is shown. */
+    fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
+
     /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
      * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
@@ -337,7 +365,7 @@ class QuestionnaireFragment : Fragment() {
      * [QuestionnaireItemViewHolderFactoryMatchersProvider].
      */
     fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-      matchersProviderFactory: String
+      matchersProviderFactory: String,
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
     /**
@@ -389,9 +417,10 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
-    /** A JSON encoded string extra for questionnaire context. */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRING =
-      "questionnaire-launch-context"
+    /** A list of JSON encoded strings extra for each questionnaire context. */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
+      "questionnaire-launch-contexts"
+
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -426,6 +455,12 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
+
+    internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
+
+    internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
   }
@@ -468,8 +503,8 @@ class QuestionnaireFragment : Fragment() {
      * Implementation should specify when custom questionnaire components should be used.
      *
      * @return A [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
-     * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
-     * questionnaire item.
+     *   whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+     *   questionnaire item.
      */
     abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
   }

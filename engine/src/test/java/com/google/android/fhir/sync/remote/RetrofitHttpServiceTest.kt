@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,22 +68,24 @@ class RetrofitHttpServiceTest {
                 HumanName().apply {
                   addGiven("John")
                   family = "Doe"
-                }
+                },
               )
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
 
-    val result = retrofitHttpService.get("Patient/patient-001")
-
+    val result =
+      retrofitHttpService.get("Patient/patient-001", mapOf("If-Match" to "randomResourceVersionID"))
+    val serverRequest = mockWebServer.takeRequest()
+    assertThat(serverRequest.headers).contains("If-Match" to "randomResourceVersionID")
     // No exception should occur
     assertThat(result).isInstanceOf(Patient::class.java)
   }
 
   @Test // https://github.com/google/android-fhir/issues/1892
-  fun `should assemble upload request correctly`() = runTest {
+  fun `should assemble upload bundle request correctly`() = runTest {
     // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {
@@ -93,8 +95,8 @@ class RetrofitHttpServiceTest {
             Bundle().apply {
               id = "transaction-response-1"
               type = Bundle.BundleType.TRANSACTIONRESPONSE
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
@@ -104,8 +106,10 @@ class RetrofitHttpServiceTest {
         type = Bundle.BundleType.TRANSACTION
       }
 
-    val result = retrofitHttpService.post(request)
-
+    val result =
+      retrofitHttpService.post(".", request, mapOf("If-Match" to "randomResourceVersionID"))
+    val serverRequest = mockWebServer.takeRequest()
+    assertThat(serverRequest.headers["If-Match"]).isEqualTo("randomResourceVersionID")
     // No exception has occurred
     assertThat(result).isInstanceOf(Bundle::class.java)
   }
@@ -121,8 +125,8 @@ class RetrofitHttpServiceTest {
               Bundle().apply {
                 id = "transaction-response-1"
                 type = Bundle.BundleType.TRANSACTIONRESPONSE
-              }
-            )
+              },
+            ),
           )
         }
       mockWebServer.enqueue(mockResponse)
@@ -132,7 +136,7 @@ class RetrofitHttpServiceTest {
           type = Bundle.BundleType.TRANSACTION
         }
 
-      val result = retrofitHttpService.post(request)
+      val result = retrofitHttpService.post(".", request, emptyMap())
 
       assertThat(result).isInstanceOf(Bundle::class.java)
       assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)

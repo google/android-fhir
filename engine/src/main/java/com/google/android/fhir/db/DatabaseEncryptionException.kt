@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,10 +75,10 @@ val KeyStoreException.databaseEncryptionException: DatabaseEncryptionException
               ERROR_UNSUPPORTED_KEY_VERIFICATION_ALGORITHM,
               ERROR_UNSUPPORTED_TAG,
               ERROR_UNSUPPORTED_EC_FIELD,
-              ERROR_UNSUPPORTED_MIN_MAC_LENGTH -> DatabaseEncryptionException(this, UNSUPPORTED)
+              ERROR_UNSUPPORTED_MIN_MAC_LENGTH, -> DatabaseEncryptionException(this, UNSUPPORTED)
               // Timeout: these errors could be recoverable
               ERROR_SECURE_HW_BUSY,
-              ERROR_SECURE_HW_COMMUNICATION_FAILED -> DatabaseEncryptionException(this, TIMEOUT)
+              ERROR_SECURE_HW_COMMUNICATION_FAILED, -> DatabaseEncryptionException(this, TIMEOUT)
               else -> DatabaseEncryptionException(this, UNKNOWN)
             }
           return encryptionException

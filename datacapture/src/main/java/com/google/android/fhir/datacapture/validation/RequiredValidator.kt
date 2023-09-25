@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,14 @@ internal object RequiredValidator : QuestionnaireResponseItemConstraintValidator
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-    context: Context
+    context: Context,
   ): QuestionnaireResponseItemConstraintValidator.Result {
     if (!questionnaireItem.required || answers.any { it.hasValue() }) {
       return QuestionnaireResponseItemConstraintValidator.Result(true, null)
     }
     return QuestionnaireResponseItemConstraintValidator.Result(
       false,
-      context.getString(R.string.required_constraint_validation_error_msg)
+      context.getString(R.string.required_constraint_validation_error_msg),
     )
   }
 }

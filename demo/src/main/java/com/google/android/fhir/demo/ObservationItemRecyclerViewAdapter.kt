@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,25 +25,25 @@ import com.google.android.fhir.demo.databinding.ObservationListItemBinding
 /** UI Controller helper class to display list of observations. */
 class ObservationItemRecyclerViewAdapter :
   ListAdapter<PatientListViewModel.ObservationItem, ObservationItemViewHolder>(
-    ObservationItemDiffCallback()
+    ObservationItemDiffCallback(),
   ) {
 
   class ObservationItemDiffCallback :
     DiffUtil.ItemCallback<PatientListViewModel.ObservationItem>() {
     override fun areItemsTheSame(
       oldItem: PatientListViewModel.ObservationItem,
-      newItem: PatientListViewModel.ObservationItem
+      newItem: PatientListViewModel.ObservationItem,
     ): Boolean = oldItem.id == newItem.id
 
     override fun areContentsTheSame(
       oldItem: PatientListViewModel.ObservationItem,
-      newItem: PatientListViewModel.ObservationItem
+      newItem: PatientListViewModel.ObservationItem,
     ): Boolean = oldItem.id == newItem.id
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ObservationItemViewHolder {
     return ObservationItemViewHolder(
-      ObservationListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+      ObservationListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
     )
   }
 

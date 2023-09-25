@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ data class StructureMapExtractionContext(
    * hard-coded or use the [String] parameter to fetch the appropriate structure map.
    *
    * @param String The canonical URL for the Structure Map referenced in the
-   * [Target structure map extension](http://hl7.org/fhir/uv/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
-   * of the questionnaire.
+   *   [Target structure map extension](http://hl7.org/fhir/uv/sdc/StructureDefinition-sdc-questionnaire-targetStructureMap.html)
+   *   of the questionnaire.
    * @param IWorkerContext May be used with other HAPI FHIR classes, like using
-   * [StructureMapUtilities.parse] to parse content in the FHIR Mapping Language.
+   *   [StructureMapUtilities.parse] to parse content in the FHIR Mapping Language.
    */
-  val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?)
+  val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?),
 )

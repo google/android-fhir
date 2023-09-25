@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.hl7.fhir.r4.model.ResourceType
 data class DateParamFilterCriterion(
   val parameter: DateClientParam,
   var prefix: ParamPrefixEnum = ParamPrefixEnum.EQUAL,
-  var value: DateFilterValues? = null
+  var value: DateFilterValues? = null,
 ) : FilterCriterion {
   /** Returns [DateFilterValues] from [DateType]. */
   fun of(date: DateType) = DateFilterValues().apply { this.date = date }
@@ -50,7 +50,7 @@ data class DateParamFilterCriterion(
       value!!.dateTime != null -> listOf(getConditionParamPair(prefix, value!!.dateTime!!))
       else -> {
         throw IllegalStateException(
-          "DateClientParamFilter.value should have either DateType or DateTimeType."
+          "DateClientParamFilter.value should have either DateType or DateTimeType.",
         )
       }
     }
@@ -71,41 +71,47 @@ class DateFilterValues internal constructor() {
 internal data class DateClientParamFilterCriteria(
   val parameter: DateClientParam,
   override val filters: List<DateParamFilterCriterion>,
-  override val operation: Operation
+  override val operation: Operation,
 ) : FilterCriteria(filters, operation, parameter, "") {
 
   override fun query(type: ResourceType): SearchQuery {
-
     val filterCriteria =
       listOf(
         DateFilterCriteria(parameter, filters.filter { it.value!!.date != null }, operation),
-        DateTimeFilterCriteria(parameter, filters.filter { it.value!!.dateTime != null }, operation)
+        DateTimeFilterCriteria(
+          parameter,
+          filters.filter { it.value!!.dateTime != null },
+          operation,
+        ),
       )
 
     // Join the individual Date and DateTime queries to create a unified DateClientParam query. The
     // user may have provided either a single type or both types of criterion. So filter weeds
     // FilterCriteria with no criterion.
-    return filterCriteria.filter { it.filters.isNotEmpty() }.map { it.query(type) }.let { queries ->
-      SearchQuery(
-        queries.joinToString(separator = " ${operation.logicalOperator} ") {
-          if (queries.size > 1) "(${it.query})" else it.query
-        },
-        queries.flatMap { it.args }
-      )
-    }
+    return filterCriteria
+      .filter { it.filters.isNotEmpty() }
+      .map { it.query(type) }
+      .let { queries ->
+        SearchQuery(
+          queries.joinToString(separator = " ${operation.logicalOperator} ") {
+            if (queries.size > 1) "(${it.query})" else it.query
+          },
+          queries.flatMap { it.args },
+        )
+      }
   }
 
   /** Internal class used to generate query for Date type Criterion */
   private data class DateFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
-    override val operation: Operation
+    override val operation: Operation,
   ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity")
 
   /** Internal class used to generate query for DateTime type Criterion */
   private data class DateTimeFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
-    override val operation: Operation
+    override val operation: Operation,
   ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity")
 }
