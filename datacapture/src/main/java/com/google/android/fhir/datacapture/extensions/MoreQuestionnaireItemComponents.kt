@@ -782,9 +782,15 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
     ) -> T,
 ): List<T> {
-  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
-  return mapNotNull { questionnaireItem ->
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem,
+  val linkIdToQuestionnaireItemMap = associateBy { it.linkId }
+
+  // Questionnaire item with type = group and repeats = true can have multiple questionnaire
+  // response item components for the same questionnaire item linkId. Therefore, it must traverse
+  // the structure based on the linkId
+  // present in the questionnaire response item component to avoid missing any remaining response
+  // items with the same linkId.
+  return questionnaireResponseItemList.mapNotNull { questionnaireResponseItem ->
+    linkIdToQuestionnaireItemMap[questionnaireResponseItem.linkId]?.let { questionnaireItem,
       ->
       transform(questionnaireItem, questionnaireResponseItem)
     }

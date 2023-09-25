@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
+import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -295,25 +296,13 @@ object ResourceMapper {
     extractionResult: MutableList<Resource>,
     profileLoader: ProfileLoader,
   ) {
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    // Questionnaire item with type = group and repeats = true can have multiple questionnaire
-    // response item components for the same
-    // questionnaire item linkId. Therefore, it must traverse the structure based on the linkId
-    // present in the response item component to avoid missing any remaining response items with the
-    // same linkId.
-
-    val linkIdToQuestionnaireItemMap = questionnaireItemList.associateBy { it.linkId }
-
-    while (questionnaireResponseItemListIterator.hasNext()) {
-      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      val currentQuestionnaireItem =
-        linkIdToQuestionnaireItemMap[currentQuestionnaireResponseItem.linkId]
-      check(currentQuestionnaireItem != null) {
-        "Missing questionnaire item for questionnaire response item ${currentQuestionnaireResponseItem.linkId}"
-      }
+    questionnaireItemList.zipByLinkId(questionnaireResponseItemList) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
       extractByDefinition(
-        currentQuestionnaireItem,
-        currentQuestionnaireResponseItem,
+        questionnaireItem,
+        questionnaireResponseItem,
         extractionContext,
         extractionResult,
         profileLoader,
