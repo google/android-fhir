@@ -68,7 +68,7 @@ class MoreTypesTest {
       InstantType(
         Date.from(Instant.ofEpochMilli(1609459200000)),
         TemporalPrecisionEnum.SECOND,
-        TimeZone.getTimeZone(ZoneId.of("GMT"))
+        TimeZone.getTimeZone(ZoneId.of("GMT")),
       )
     assertThat((value as Type).asStringValue()).isEqualTo(value.asStringValue())
   }
@@ -85,7 +85,7 @@ class MoreTypesTest {
       DateTimeType(
         Date.from(Instant.ofEpochMilli(1609459200000)),
         TemporalPrecisionEnum.SECOND,
-        TimeZone.getTimeZone(ZoneId.of("GMT"))
+        TimeZone.getTimeZone(ZoneId.of("GMT")),
       )
     assertThat((value as Type).asStringValue()).isEqualTo(value.asStringValue())
   }
@@ -180,6 +180,7 @@ class MoreTypesTest {
     val value = Quantity(1234567.89)
     assertThat((value as Type).asStringValue()).isEqualTo("")
   }
+
   @Test
   fun stringType_toUriType() {
     val uri = StringType("fakeUri").toUriType()
@@ -272,8 +273,8 @@ class MoreTypesTest {
               Expression().apply {
                 language = "text/fhirpath"
                 expression = "today()"
-              }
-            )
+              },
+            ),
           )
       }
     assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(today)
@@ -291,8 +292,8 @@ class MoreTypesTest {
               Expression().apply {
                 language = "text/fhirpath"
                 expression = "today()"
-              }
-            )
+              },
+            ),
           )
       }
     assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(null)

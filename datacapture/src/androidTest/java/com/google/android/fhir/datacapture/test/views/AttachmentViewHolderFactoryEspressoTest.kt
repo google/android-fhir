@@ -208,11 +208,11 @@ class AttachmentViewHolderFactoryEspressoTest {
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
+                      Base64.DEFAULT,
                     )
                   contentType = "image/*"
                 }
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -246,11 +246,11 @@ class AttachmentViewHolderFactoryEspressoTest {
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
+                      Base64.DEFAULT,
                     )
                   contentType = "audio/*"
                 }
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -285,11 +285,11 @@ class AttachmentViewHolderFactoryEspressoTest {
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
+                      Base64.DEFAULT,
                     )
                   contentType = "video/*"
                 }
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -324,11 +324,11 @@ class AttachmentViewHolderFactoryEspressoTest {
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
+                      Base64.DEFAULT,
                     )
                   contentType = "application/pdf"
                 }
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -395,11 +395,11 @@ class AttachmentViewHolderFactoryEspressoTest {
                   data =
                     Base64.decode(
                       "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
-                      Base64.DEFAULT
+                      Base64.DEFAULT,
                     )
                   contentType = "image/jpeg"
                 }
-            }
+            },
           )
         },
         validationResult = NotValidated,

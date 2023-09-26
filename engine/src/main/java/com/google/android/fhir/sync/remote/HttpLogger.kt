@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,19 +24,22 @@ class HttpLogger(val configuration: Configuration, @WorkerThread val log: (Strin
   data class Configuration(
     val level: Level,
     /** Http headers to be ignored for the logging purpose. */
-    val headersToIgnore: List<String>? = null
+    val headersToIgnore: List<String>? = null,
   )
 
   /** Different levels to specify the content to be logged. */
   enum class Level {
     /** Nothing will be logged. */
     NONE,
+
     /** Request and response lines will be logged. */
     BASIC,
+
     /** Lines along with the headers will be logged for the request and response. */
     HEADERS,
+
     /** Lines, headers and body (if present) will be logged for the request and response. */
-    BODY
+    BODY,
   }
 
   companion object {

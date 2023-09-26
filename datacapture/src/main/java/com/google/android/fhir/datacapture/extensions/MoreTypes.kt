@@ -99,7 +99,7 @@ private fun getValueString(type: Type): String? =
   when (type) {
     is DateType,
     is DateTimeType,
-    is StringType -> type.asStringValue()
+    is StringType, -> type.asStringValue()
     is Quantity -> type.value.toString()
     else -> (type as? PrimitiveType<*>)?.valueAsString
   }

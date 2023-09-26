@@ -38,12 +38,13 @@ data class LocalChange(
    * This token value must be explicitly applied when list of local changes are squashed and
    * [LocalChange] class instance is created.
    */
-  var token: LocalChangeToken
+  var token: LocalChangeToken,
 ) {
   enum class Type(val value: Int) {
     INSERT(1), // create a new resource. payload is the entire resource json.
     UPDATE(2), // patch. payload is the json patch.
-    DELETE(3); // delete. payload is empty string.
+    DELETE(3), // delete. payload is empty string.
+    ;
 
     companion object {
       fun from(input: Int): Type = values().first { it.value == input }
@@ -60,7 +61,7 @@ internal fun LocalChangeEntity.toLocalChange(): LocalChange =
     timestamp,
     LocalChange.Type.from(type.value),
     payload,
-    LocalChangeToken(listOf(id))
+    LocalChangeToken(listOf(id)),
   )
 
 data class LocalChangeToken(val ids: List<Long>)

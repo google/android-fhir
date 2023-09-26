@@ -122,7 +122,7 @@ internal object QuantityViewHolderFactory :
         textInputLayout.error =
           when (validationResult) {
             is NotValidated,
-            Valid -> null
+            Valid, -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }
@@ -168,7 +168,7 @@ internal object QuantityViewHolderFactory :
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 Quantity(null, decimal!!.toDouble(), unit!!.system, unit!!.code, unit!!.display)
-            }
+            },
           )
         }
       }
@@ -197,7 +197,7 @@ internal object QuantityViewHolderFactory :
             R.layout.drop_down_list_item,
             questionnaireViewItem.questionnaireItem.unitOption.map {
               DropDownAnswerOption(it.code, it.display)
-            }
+            },
           )
         unitAutoCompleteTextView.setAdapter(unitAdapter)
       }

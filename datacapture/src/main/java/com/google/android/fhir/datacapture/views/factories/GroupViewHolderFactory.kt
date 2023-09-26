@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ internal object GroupViewHolderFactory :
               // TODO(jingtang10): This can be removed since we already do this in the
               // answerChangedCallback in the QuestionnaireViewModel.
               item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
-            }
+            },
           )
         }
         displayValidationResult(questionnaireViewItem.validationResult)
@@ -63,7 +63,7 @@ internal object GroupViewHolderFactory :
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> error.visibility = View.GONE
+          Valid, -> error.visibility = View.GONE
           is Invalid -> {
             error.text = validationResult.getSingleStringValidationMessage()
             error.visibility = View.VISIBLE

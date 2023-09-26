@@ -37,7 +37,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   }
 
   override fun resolveFunction(
-    functionName: String?
+    functionName: String?,
   ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
     throw UnsupportedOperationException()
   }
@@ -45,7 +45,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   override fun checkFunction(
     appContext: Any?,
     functionName: String?,
-    parameters: MutableList<TypeDetails>?
+    parameters: MutableList<TypeDetails>?,
   ): TypeDetails {
     throw UnsupportedOperationException()
   }
@@ -54,7 +54,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     appContext: Any?,
     focus: MutableList<Base>?,
     functionName: String?,
-    parameters: MutableList<MutableList<Base>>?
+    parameters: MutableList<MutableList<Base>>?,
   ): MutableList<Base> {
     throw UnsupportedOperationException()
   }
