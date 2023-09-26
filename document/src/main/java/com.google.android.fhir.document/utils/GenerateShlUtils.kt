@@ -122,7 +122,7 @@ class GenerateShlUtils {
     context: Context,
     qrView: ImageView,
   ) {
-    val expirationDate = shlData.exp
+    val expirationDate = shlData.expirationTime
     val labelData = shlData.label
     val bundle = shlData.ipsDoc.document
     var qrCodeBitmap: Bitmap? = null

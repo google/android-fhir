@@ -22,19 +22,19 @@ import java.io.Serializable
 If the P flag is present, a passcode is needed to decode the data */
 data class SHLData(
   var fullLink: String,
-  var shl: String,
+  var encodedShlPayload: String,
   var manifestUrl: String,
   var key: String,
   var label: String,
-  var flag: String,
-  var exp: String,
-  var v: String,
+  var flags: String,
+  var expirationTime: String,
+  var versionNumber: Int,
   var ipsDoc: IPSDocument,
 ) : Serializable {
 
-  constructor() : this("", "", "", "", "", "", "", "", IPSDocument())
+  constructor() : this("", "", "", "", "", "", "", 1, IPSDocument())
 
-  constructor(fullLink: String) : this(fullLink, "", "", "", "", "", "", "", IPSDocument())
+  constructor(fullLink: String) : this(fullLink, "", "", "", "", "", "", 1, IPSDocument())
 
-  constructor(doc: IPSDocument) : this("", "", "", "", "", "", "", "", doc)
+  constructor(doc: IPSDocument) : this("", "", "", "", "", "", "", 1, doc)
 }
