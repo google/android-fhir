@@ -44,7 +44,7 @@ internal object MinLengthValidator :
     },
     messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.min_length_validation_error_msg, extension.value.primitiveValue())
-    }
+    },
   )
 
 internal const val MIN_LENGTH_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minLength"

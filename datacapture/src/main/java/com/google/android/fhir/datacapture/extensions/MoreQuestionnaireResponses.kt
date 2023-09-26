@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ internal fun QuestionnaireResponse.unpackRepeatedGroups(questionnaire: Questionn
 
 private fun unpackRepeatedGroups(
   questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
   return questionnaireItems
     .zipByLinkId(questionnaireResponseItems) { questionnaireItem, questionnaireResponseItem ->
@@ -98,15 +98,15 @@ private fun unpackRepeatedGroups(
 
 private fun unpackRepeatedGroups(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
   questionnaireResponseItem.item =
     unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item)
   questionnaireResponseItem.answer.forEach {
     it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
   }
-  return if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-      questionnaireItem.repeats
+  return if (
+    questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP && questionnaireItem.repeats
   ) {
     questionnaireResponseItem.answer.map {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {

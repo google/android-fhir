@@ -38,8 +38,11 @@ fun clickIcon(isEndIcon: Boolean): ViewAction {
       val item = view as TextInputLayout
       val iconView: CheckableImageButton =
         item.findViewById(
-          if (isEndIcon) com.google.android.material.R.id.text_input_end_icon
-          else com.google.android.material.R.id.text_input_start_icon
+          if (isEndIcon) {
+            com.google.android.material.R.id.text_input_end_icon
+          } else {
+            com.google.android.material.R.id.text_input_start_icon
+          },
         )
       iconView.performClick()
       uiController!!.loopMainThreadForAtLeast(1000)

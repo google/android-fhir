@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,7 +86,7 @@ class RegexValidatorTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerNotMatchingRegex(
       regex = "[0-9]{2}-[0-9]{2}-[0-9]{2}",
-      value = DateType(dateFormat.parse("2021-06-01"))
+      value = DateType(dateFormat.parse("2021-06-01")),
     )
   }
 
@@ -95,7 +95,7 @@ class RegexValidatorTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerMatchingRegex(
       regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}",
-      value = DateType(dateFormat.parse("2021-06-01"))
+      value = DateType(dateFormat.parse("2021-06-01")),
     )
   }
 
@@ -113,7 +113,7 @@ class RegexValidatorTest {
   fun string_notMatchingRegex_shouldReturnInvalidResult() {
     checkAnswerNotMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = StringType("www.hl7.org")
+      value = StringType("www.hl7.org"),
     )
   }
 
@@ -121,7 +121,7 @@ class RegexValidatorTest {
   fun string_matchingRegex_shouldReturnValidResult() {
     checkAnswerMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = StringType("https://www.hl7.org/")
+      value = StringType("https://www.hl7.org/"),
     )
   }
 
@@ -129,7 +129,7 @@ class RegexValidatorTest {
   fun uri_notMatchingRegex_shouldReturnInvalidResult() {
     checkAnswerNotMatchingRegex(
       regex = "[a-z]+",
-      value = UriType(URI.create("https://www.hl7.org/"))
+      value = UriType(URI.create("https://www.hl7.org/")),
     )
   }
 
@@ -137,7 +137,7 @@ class RegexValidatorTest {
   fun uri_matchingRegex_shouldReturnValidResult() {
     checkAnswerMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = UriType(URI.create("https://www.hl7.org/"))
+      value = UriType(URI.create("https://www.hl7.org/")),
     )
   }
 
@@ -154,7 +154,7 @@ class RegexValidatorTest {
           Extension().apply {
             url = REGEX_EXTENSION_URL
             this.setValue(StringType("[0-9]+"))
-          }
+          },
         )
       }
     val response =
@@ -196,7 +196,7 @@ class RegexValidatorTest {
     @JvmStatic
     fun createRegexQuestionnaireTestItem(
       regex: String,
-      value: PrimitiveType<*>
+      value: PrimitiveType<*>,
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -204,7 +204,7 @@ class RegexValidatorTest {
             Extension().apply {
               url = REGEX_EXTENSION_URL
               this.setValue(StringType(regex))
-            }
+            },
           )
         }
       val answer = QuestionnaireResponseItemAnswerComponent().apply { this.value = value }

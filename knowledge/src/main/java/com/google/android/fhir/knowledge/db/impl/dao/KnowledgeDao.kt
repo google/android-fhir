@@ -36,7 +36,6 @@ abstract class KnowledgeDao {
     implementationGuideId: Long?,
     resource: ResourceMetadataEntity,
   ) {
-
     val resourceMetadata =
       if (resource.url != null && resource.version != null) {
         getResourceWithUrlAndVersion(resource.url, resource.version)
@@ -61,7 +60,7 @@ abstract class KnowledgeDao {
   }
 
   @Query(
-    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)"
+    "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)",
   )
   internal abstract suspend fun deleteOrphanedResources()
 
@@ -69,7 +68,7 @@ abstract class KnowledgeDao {
   internal abstract suspend fun getImplementationGuides(): List<ImplementationGuideEntity>
 
   @Query(
-    "SELECT * from ImplementationGuideEntity WHERE packageId = :packageId AND version = :version"
+    "SELECT * from ImplementationGuideEntity WHERE packageId = :packageId AND version = :version",
   )
   internal abstract suspend fun getImplementationGuide(
     packageId: String,
@@ -87,13 +86,14 @@ abstract class KnowledgeDao {
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
   internal abstract suspend fun getResourceWithUrlAndVersion(
     url: String,
-    version: String
+    version: String,
   ): ResourceMetadataEntity?
 
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
   internal abstract suspend fun getResourceWithUrl(
     url: String,
   ): ResourceMetadataEntity?
+
   // Remove after https://github.com/google/android-fhir/issues/1920
   @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
   internal abstract suspend fun getResourceWithUrlLike(
@@ -101,7 +101,7 @@ abstract class KnowledgeDao {
   ): ResourceMetadataEntity?
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name"
+    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name",
   )
   internal abstract suspend fun getResourcesWithName(
     resourceType: ResourceType,
@@ -109,7 +109,7 @@ abstract class KnowledgeDao {
   ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND name = :name AND version = :version"
+    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND name = :name AND version = :version",
   )
   internal abstract suspend fun getResourcesWithNameAndVersion(
     resourceType: ResourceType,
@@ -131,7 +131,7 @@ abstract class KnowledgeDao {
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)
   internal abstract suspend fun insert(
-    igResourceXRef: ImplementationGuideResourceMetadataEntity
+    igResourceXRef: ImplementationGuideResourceMetadataEntity,
   ): Long
 
   @Insert(onConflict = OnConflictStrategy.IGNORE)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ internal object QuestionnaireResponseItemValidator {
   fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-    context: Context
+    context: Context,
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
@@ -57,14 +57,15 @@ internal object QuestionnaireResponseItemValidator {
         answers.map { answer -> validator.validate(questionnaireItem, answer, context) }
       }
 
-    return if (questionnaireResponseItemConstraintValidationResult.all { it.isValid } &&
+    return if (
+      questionnaireResponseItemConstraintValidationResult.all { it.isValid } &&
         questionnaireResponseItemAnswerConstraintValidationResult.all { it.isValid }
     ) {
       Valid
     } else {
       Invalid(
         questionnaireResponseItemConstraintValidationResult.mapNotNull { it.errorMessage } +
-          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.errorMessage }
+          questionnaireResponseItemAnswerConstraintValidationResult.mapNotNull { it.errorMessage },
       )
     }
   }

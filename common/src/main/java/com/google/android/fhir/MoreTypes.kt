@@ -47,7 +47,7 @@ fun equals(a: Type, b: Type): Boolean {
 operator fun Type.compareTo(value: Type): Int {
   if (!this.fhirType().equals(value.fhirType())) {
     throw IllegalArgumentException(
-      "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}"
+      "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}",
     )
   }
   when {
@@ -71,7 +71,7 @@ operator fun Type.compareTo(value: Type): Int {
         UnitConverter.getCanonicalFormOrOriginal(UcumValue((value as Quantity).code, value.value))
       if (quantity.code != anotherQuantity.code) {
         throw IllegalArgumentException(
-          "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
+          "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}",
         )
       }
       return quantity.value.compareTo(anotherQuantity.value)

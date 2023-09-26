@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ internal class FhirEngineDal(
       knowledgeManager
         .loadResources(
           resourceType = id.resourceType,
-          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}"
+          url = "${id.baseUrl}/${id.resourceType}/${id.idPart}",
         )
         .single()
     } else {

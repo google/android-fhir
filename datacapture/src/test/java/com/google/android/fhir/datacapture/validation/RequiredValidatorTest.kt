@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,14 @@ class RequiredValidatorTest {
       listOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           value = IntegerType(9)
-        }
+        },
       )
 
     val validationResult =
       RequiredValidator.validate(
         questionnaireItem,
         response,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
     assertThat(validationResult.isValid).isTrue()
   }
@@ -58,7 +58,7 @@ class RequiredValidatorTest {
       RequiredValidator.validate(
         questionnaireItem,
         listOf(),
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
@@ -72,14 +72,14 @@ class RequiredValidatorTest {
         // one answer with no value
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
         // second answer with no value
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
       )
 
     val validationResult =
       RequiredValidator.validate(
         questionnaireItem,
         response,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")

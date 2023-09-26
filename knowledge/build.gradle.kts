@@ -57,7 +57,7 @@ android {
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
         "META-INF/sun-jaxb.episode",
-      )
+      ),
     )
   }
   configureJacocoTestOptions()
@@ -106,7 +106,7 @@ dependencies {
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}")
+    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
@@ -117,7 +117,7 @@ tasks.dokkaHtml.configure {
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

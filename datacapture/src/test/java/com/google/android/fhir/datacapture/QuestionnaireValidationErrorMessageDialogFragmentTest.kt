@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
             this.required = true
             text = "First Name"
             type = Questionnaire.QuestionnaireItemType.STRING
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -61,7 +61,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     val scenario =
       launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
         initialState = Lifecycle.State.CREATED,
-        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse)
+        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse),
       )
 
     val result = scenario.withFragment { onCreateCustomView() }
@@ -74,7 +74,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
 
   private fun createTestValidationErrorViewModel(
     questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
   ) =
     QuestionnaireValidationErrorViewModel().apply {
       setQuestionnaireAndValidation(
@@ -82,14 +82,14 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
           questionnaireResponse,
-          RuntimeEnvironment.getApplication()
-        )
+          RuntimeEnvironment.getApplication(),
+        ),
       )
     }
 
   private fun createDialogFragmentFactoryForTests(
     questionnaire: Questionnaire,
-    questionnaireResponse: QuestionnaireResponse
+    questionnaireResponse: QuestionnaireResponse,
   ): FragmentFactory {
     val fragmentFactory: FragmentFactory = mock()
     val factory =

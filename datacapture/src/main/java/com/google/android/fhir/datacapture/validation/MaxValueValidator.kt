@@ -34,15 +34,16 @@ internal object MaxValueValidator :
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+      ->
       answer.value > extension.value?.valueOrCalculateValue()!!
     },
     messageGenerator = { extension: Extension, context: Context ->
       context.getString(
         R.string.max_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.getValueAsString(context)
+        extension.value?.valueOrCalculateValue()?.getValueAsString(context),
       )
-    }
+    },
   ) {
 
   fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {

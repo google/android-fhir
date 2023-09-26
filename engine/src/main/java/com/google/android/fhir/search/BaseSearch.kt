@@ -51,43 +51,43 @@ interface BaseSearch {
   fun filter(
     stringParameter: StringClientParam,
     vararg init: StringParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     referenceParameter: ReferenceClientParam,
     vararg init: ReferenceParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     dateParameter: DateClientParam,
     vararg init: DateParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     numberParameter: NumberClientParam,
     vararg init: NumberParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun filter(
     uriParam: UriClientParam,
     vararg init: UriParamFilterCriterion.() -> Unit,
-    operation: Operation = Operation.OR
+    operation: Operation = Operation.OR,
   )
 
   fun sort(parameter: StringClientParam, order: Order)

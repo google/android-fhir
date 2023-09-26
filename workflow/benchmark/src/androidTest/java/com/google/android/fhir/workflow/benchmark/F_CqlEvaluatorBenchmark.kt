@@ -41,6 +41,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class F_CqlEvaluatorBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()
@@ -70,7 +71,7 @@ class F_CqlEvaluatorBenchmark {
           knowledgeManager.install(
             File(context.filesDir, lib.name).apply {
               writeText(jsonParser.encodeResourceToString(lib))
-            }
+            },
           )
         }
 
@@ -85,7 +86,7 @@ class F_CqlEvaluatorBenchmark {
         fhirOperator.evaluateLibrary(
           "http://localhost/Library/ImmunityCheck|1.0.0",
           "d4d35004-24f8-40e4-8084-1ad75924514f",
-          setOf("CompletedImmunization")
+          setOf("CompletedImmunization"),
         ) as Parameters
 
       assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
@@ -99,6 +100,7 @@ class F_CqlEvaluatorBenchmark {
     fun oneTimeSetup() {
       FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
     }
+
     @JvmStatic
     @AfterClass
     fun oneTimeTearDown() {
