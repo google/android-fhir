@@ -20,6 +20,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
+import java.util.UUID
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -55,11 +56,17 @@ import java.time.Instant
  *
  * ] For resource that is fully synced with server this table should not have any rows.
  */
-@Entity(indices = [Index(value = ["resourceType", "resourceId"])])
+@Entity(
+  indices =
+    [
+      Index(value = ["resourceType", "resourceId"]), Index(value = ["resourceType", "resourceUuid"])
+    ],
+)
 internal data class LocalChangeEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: String,
   val resourceId: String,
+  val resourceUuid: UUID,
   val timestamp: Instant,
   val type: Type,
   val payload: String,

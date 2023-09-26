@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "619e476379cf20ce4d991173d7166b9a",
+    "identityHash": "f06ae2e84f7588be59916d32f8d5a6e4",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -789,7 +789,7 @@
       },
       {
         "tableName": "LocalChangeEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `resourceUuid` BLOB NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -807,6 +807,12 @@
             "fieldPath": "resourceId",
             "columnName": "resourceId",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceUuid",
+            "columnName": "resourceUuid",
+            "affinity": "BLOB",
             "notNull": true
           },
           {
@@ -850,6 +856,16 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `${TABLE_NAME}` (`resourceType`, `resourceId`)"
+          },
+          {
+            "name": "index_LocalChangeEntity_resourceType_resourceUuid",
+            "unique": false,
+            "columnNames": [
+              "resourceType",
+              "resourceUuid"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceUuid` ON `${TABLE_NAME}` (`resourceType`, `resourceUuid`)"
           }
         ],
         "foreignKeys": []
@@ -935,7 +951,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '619e476379cf20ce4d991173d7166b9a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f06ae2e84f7588be59916d32f8d5a6e4')"
     ]
   }
 }

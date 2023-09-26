@@ -127,3 +127,25 @@ val MIGRATION_5_6 =
       )
     }
   }
+
+/** Add column resourceUuid in [LocalChangeEntity] */
+val MIGRATION_6_7 =
+  object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `resourceId` UUID NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
+      )
+      database.execSQL(
+        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`resourceUuid`,`timestamp`,`type`,`payload`,`versionId`) " +
+          "SELECT localChange.id, localChange.resourceType, localChange.resourceId, resource.resourceUuid, localChange.timestamp, localChange.type, localChange.payload, localChange.versionId FROM `LocalChangeEntity` localChange LEFT JOIN ResourceEntity resource ON localChange.resourceId= resource.resourceId",
+      )
+      database.execSQL("DROP TABLE `LocalChangeEntity`")
+      database.execSQL("ALTER TABLE `_new_LocalChangeEntity` RENAME TO `LocalChangeEntity`")
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `LocalChangeEntity` (`resourceType`, `resourceId`)",
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceUuid` ON `LocalChangeEntity` (`resourceType`, `resourceUuid`)",
+      )
+    }
+  }
