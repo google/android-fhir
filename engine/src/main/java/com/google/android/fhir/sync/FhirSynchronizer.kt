@@ -26,6 +26,7 @@ import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -52,24 +53,13 @@ internal class FhirSynchronizer(
   private val downloader: Downloader,
   private val conflictResolver: ConflictResolver,
 ) {
-  private var syncState: MutableSharedFlow<SyncJobStatus>? = null
+
+  private val _syncState = MutableSharedFlow<SyncJobStatus>()
+  val syncState: SharedFlow<SyncJobStatus> = _syncState
+
   private val datastoreUtil = DatastoreUtil(context)
 
-  private fun isSubscribed(): Boolean {
-    return syncState != null
-  }
-
-  fun subscribe(flow: MutableSharedFlow<SyncJobStatus>) {
-    if (isSubscribed()) {
-      throw IllegalStateException("Already subscribed to a flow")
-    }
-
-    this.syncState = flow
-  }
-
-  private suspend fun setSyncState(state: SyncJobStatus) {
-    syncState?.emit(state)
-  }
+  private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 
   private suspend fun setSyncState(result: SyncResult): SyncJobStatus {
     // todo: emit this properly instead of using datastore?
