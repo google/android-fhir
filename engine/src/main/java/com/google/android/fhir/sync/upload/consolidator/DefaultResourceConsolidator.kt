@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.consolidator
 
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
@@ -22,22 +22,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
-
-/**
- * Represents a mechanism to consolidate resources after they are uploaded.
- *
- * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
- * together with other components in the upload package to fulfill a specific upload strategy. After
- * a resource is uploaded to a remote FHIR server and a response is returned, we need to consolidate
- * any changes in the database, Examples of this would be, updating the lastUpdated timestamp field,
- * or deleting the local change from the database, or updating the resource IDs and payloads to
- * correspond with the server’s feedback.
- */
-internal fun interface ResourceConsolidator {
-
-  /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
-}
 
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {

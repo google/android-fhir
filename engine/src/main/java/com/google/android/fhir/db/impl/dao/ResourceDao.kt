@@ -25,6 +25,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.db.ResourceIdentifierType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -60,38 +61,69 @@ internal abstract class ResourceDao {
 
   open suspend fun update(resource: Resource, timeOfLocalChange: Instant?) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      // In case the resource has lastUpdated meta data, use it, otherwise use the old value.
-      val lastUpdatedRemote: Date? = resource.meta.lastUpdated
-      val entity =
-        it.copy(
-          serializedResource = iParser.encodeResourceToString(resource),
-          lastUpdatedLocal = timeOfLocalChange,
-          lastUpdatedRemote = lastUpdatedRemote?.toInstant() ?: it.lastUpdatedRemote,
-        )
-      // The foreign key in Index entity tables is set with cascade delete constraint and
-      // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
-      // resource, it deletes old resource and corresponding index entities (based on foreign key
-      // constrain) before inserting the new resource.
-      insertResource(entity)
-      val index =
-        ResourceIndices.Builder(resourceIndexer.index(resource))
-          .apply {
-            timeOfLocalChange?.let {
-              addDateTimeIndex(
-                createLocalLastUpdatedIndex(
-                  resource.resourceType,
-                  InstantType(Date.from(timeOfLocalChange)),
-                ),
-              )
-            }
-            lastUpdatedRemote?.let { date ->
-              addDateTimeIndex(createLastUpdatedIndex(resource.resourceType, InstantType(date)))
-            }
-          }
-          .build()
-      updateIndicesForResource(index, resource.resourceType, it.resourceUuid)
+      updateResourceEntity(it, resource, timeOfLocalChange)
     }
-      ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
+      ?: throw ResourceNotFoundException(
+        resource.resourceType.name,
+        ResourceIdentifierType.ID,
+        resource.id,
+      )
+  }
+
+  suspend fun updateResourceWithUuid(updatedResource: Resource, resourceUuid: UUID) {
+    getResourceEntity(resourceUuid)?.let {
+      updateResourceEntity(it, updatedResource, it.lastUpdatedLocal)
+    }
+      ?: throw ResourceNotFoundException(
+        updatedResource.resourceType.name,
+        ResourceIdentifierType.UUID,
+        updatedResource.id,
+      )
+  }
+
+  private suspend fun updateResourceEntity(
+    existingResourceEntity: ResourceEntity,
+    updatedResource: Resource,
+    timeOfLocalChange: Instant?,
+  ) {
+    // In case the resource has lastUpdated meta data, use it, otherwise use the old value.
+    val lastUpdatedRemote: Date? = updatedResource.meta.lastUpdated
+    val entity =
+      existingResourceEntity.copy(
+        resourceId = updatedResource.logicalId,
+        serializedResource = iParser.encodeResourceToString(updatedResource),
+        lastUpdatedLocal = timeOfLocalChange,
+        lastUpdatedRemote = lastUpdatedRemote?.toInstant()
+            ?: existingResourceEntity.lastUpdatedRemote,
+      )
+    // The foreign key in Index entity tables is set with cascade delete constraint and
+    // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
+    // resource, it deletes old resource and corresponding index entities (based on foreign key
+    // constraints) before inserting the new resource.
+    insertResource(entity)
+    val index =
+      ResourceIndices.Builder(resourceIndexer.index(updatedResource))
+        .apply {
+          timeOfLocalChange?.let {
+            addDateTimeIndex(
+              createLocalLastUpdatedIndex(
+                updatedResource.resourceType,
+                InstantType(Date.from(timeOfLocalChange)),
+              ),
+            )
+          }
+          lastUpdatedRemote?.let { date ->
+            addDateTimeIndex(
+              createLastUpdatedIndex(updatedResource.resourceType, InstantType(date)),
+            )
+          }
+        }
+        .build()
+    updateIndicesForResource(
+      index,
+      updatedResource.resourceType,
+      existingResourceEntity.resourceUuid,
+    )
   }
 
   open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
@@ -171,12 +203,28 @@ internal abstract class ResourceDao {
     resourceType: ResourceType,
   ): ResourceEntity?
 
+  @Query(
+    """
+        SELECT *
+        FROM ResourceEntity
+        WHERE resourceUuid = :resourceUuid
+    """,
+  )
+  abstract suspend fun getResourceEntity(
+    resourceUuid: UUID,
+  ): ResourceEntity?
+
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
 
   @RawQuery
   abstract suspend fun getReferencedResources(
     query: SupportSQLiteQuery,
   ): List<IndexedIdAndSerializedResource>
+
+  @RawQuery
+  abstract suspend fun getReferringResources(
+    query: SupportSQLiteQuery,
+  ): List<ReferringSerialisedResourceWithReferringPath>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
@@ -374,4 +422,30 @@ internal data class IndexedIdAndResource(
   val matchingIndex: String,
   val idOfBaseResourceOnWhichThisMatched: String,
   val resource: Resource,
+)
+
+/**
+ * Data class representing a [ResourceEntity] which is referring to the requested resource, and the
+ * FHIR path of the referring [Resource]. The referring resource payload is serialized.
+ */
+internal data class ReferringSerialisedResourceWithReferringPath(
+  @ColumnInfo(name = "resourceUuid") val resourceUuid: UUID,
+  @ColumnInfo(name = "resourceId") val resourceId: String,
+  @ColumnInfo(name = "resourceType") val resourceType: String,
+  @ColumnInfo(name = "serializedResource") val serializedResource: String,
+  @ColumnInfo(name = "index_path") val path: String,
+)
+
+/**
+ * Data class representing a [ResourceEntity] which is referring to the requested resource, and a
+ * list of the FHIR Paths of the referring [Resource] where the requested resource is referred. The
+ * referring resource payload is deserialized into a [Resource] object.
+ */
+internal data class ReferringResource(
+  val resourceUuid: UUID,
+  val resourceId: String,
+  val resourceType: ResourceType,
+  val resource: Resource,
+  val referenceValue: String,
+  val referringPaths: List<String>,
 )

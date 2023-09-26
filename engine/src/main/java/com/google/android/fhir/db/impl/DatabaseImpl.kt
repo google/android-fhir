@@ -25,15 +25,18 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.ResourceIdentifierType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ReferringResource
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -147,6 +150,10 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun updateResourceWithUuid(resource: Resource, uuid: UUID) {
+    db.withTransaction { resourceDao.updateResourceWithUuid(resource, uuid) }
+  }
+
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
@@ -168,7 +175,7 @@ internal class DatabaseImpl(
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
         iParser.parseResource(it)
       }
-        ?: throw ResourceNotFoundException(type.name, id)
+        ?: throw ResourceNotFoundException(type.name, ResourceIdentifierType.ID, id)
     } as Resource
   }
 
@@ -215,6 +222,48 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun getAllResourcesReferringToResourceWithPath(
+    resourceType: ResourceType,
+    resourceId: String,
+  ): List<ReferringResource> {
+    val searchForReferenceValue = "$resourceType/$resourceId"
+    val referringResourceSearchQuery =
+      SearchQuery(
+        query =
+          """
+          SELECT refIndex.index_path, refIndex.resourceUuid, resource.resourceId, 
+          resource.serializedResource, resource.resourceType 
+          FROM ReferenceIndexEntity as refIndex 
+          JOIN ResourceEntity as resource on refIndex.resourceUuid = resource.resourceUuid 
+          WHERE refIndex.index_value = ?
+            """
+            .trimIndent(),
+        args = listOf(searchForReferenceValue),
+      )
+    return db.withTransaction {
+      resourceDao
+        .getReferringResources(
+          SimpleSQLiteQuery(
+            referringResourceSearchQuery.query,
+            referringResourceSearchQuery.args.toTypedArray(),
+          ),
+        )
+        .groupBy { it.resourceUuid }
+        .map { (resourceUuid, referringResourceWithPath) ->
+          val paths = referringResourceWithPath.map { it.path }
+          val referringResource = referringResourceWithPath.first()
+          ReferringResource(
+            resourceUuid = resourceUuid,
+            resourceId = referringResource.resourceId,
+            resourceType = ResourceType.fromCode(referringResource.resourceType),
+            resource = iParser.parseResource(referringResource.serializedResource) as Resource,
+            referringPaths = paths,
+            referenceValue = searchForReferenceValue,
+          )
+        }
+    }
+  }
+
   override suspend fun count(query: SearchQuery): Long {
     return db.withTransaction {
       resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
@@ -225,6 +274,12 @@ internal class DatabaseImpl(
     return db.withTransaction { localChangeDao.getAllLocalChanges().map { it.toLocalChange() } }
   }
 
+  override suspend fun getAllLocalChanges(localChangeToken: LocalChangeToken): List<LocalChange> {
+    return db
+      .withTransaction { localChangeDao.getLocalChanges(localChangeToken.ids) }
+      .map { it.toLocalChange() }
+  }
+
   override suspend fun getLocalChangesCount(): Int {
     return db.withTransaction { localChangeDao.getLocalChangesCount() }
   }
@@ -233,10 +288,36 @@ internal class DatabaseImpl(
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
+  override suspend fun updateResourceIdForResourceChanges(
+    resourceType: ResourceType,
+    resourceUuid: UUID,
+    updatedResourceId: String,
+  ) {
+    db.withTransaction {
+      val localChanges = localChangeDao.getLocalChanges(resourceType, resourceUuid)
+      localChanges
+        .map { localChangeEntity -> localChangeEntity.copy(resourceId = updatedResourceId) }
+        // Add LocalChangeEntity with replace strategy
+        .forEach { localChangeDao.addLocalChange(it) }
+    }
+  }
+
+  override suspend fun replaceResourceChanges(
+    resourceType: ResourceType,
+    resourceUuid: UUID,
+    updatedChanges: List<LocalChange>,
+  ) {
+    db.withTransaction {
+      val localChanges = localChangeDao.getLocalChanges(resourceType, resourceUuid)
+      localChangeDao.discardLocalChanges(localChanges.first().resourceId, resourceType)
+      updatedChanges.forEach { localChangeDao.createLocalChange(it, resourceUuid) }
+    }
+  }
+
   override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
     return db.withTransaction {
       resourceDao.getResourceEntity(resourceId = id, resourceType = type)
-        ?: throw ResourceNotFoundException(type.name, id)
+        ?: throw ResourceNotFoundException(type.name, ResourceIdentifierType.ID, id)
     }
   }
 
@@ -259,6 +340,14 @@ internal class DatabaseImpl(
   override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
     return db.withTransaction {
       localChangeDao.getLocalChanges(resourceType = type, resourceId = id).map {
+        it.toLocalChange()
+      }
+    }
+  }
+
+  override suspend fun getLocalChanges(type: ResourceType, resourceUuid: UUID): List<LocalChange> {
+    return db.withTransaction {
+      localChangeDao.getLocalChanges(resourceType = type, resourceUuid = resourceUuid).map {
         it.toLocalChange()
       }
     }

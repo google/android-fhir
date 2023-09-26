@@ -18,12 +18,14 @@ package com.google.android.fhir.db.impl.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
@@ -49,7 +51,8 @@ internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
 
-  @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
   open suspend fun addInsert(resource: Resource, resourceUuid: UUID, timeOfLocalChange: Instant) {
@@ -67,6 +70,21 @@ internal abstract class LocalChangeDao {
         type = Type.INSERT,
         payload = resourceString,
         versionId = resource.versionId,
+      ),
+    )
+  }
+
+  suspend fun createLocalChange(localChange: LocalChange, resourceUuid: UUID) {
+    addLocalChange(
+      LocalChangeEntity(
+        id = 0,
+        resourceType = localChange.resourceType,
+        resourceId = localChange.resourceId,
+        resourceUuid = resourceUuid,
+        timestamp = localChange.timestamp,
+        type = Type.from(localChange.type.value),
+        payload = localChange.payload,
+        versionId = localChange.versionId,
       ),
     )
   }
@@ -162,6 +180,14 @@ internal abstract class LocalChangeDao {
 
   @Query(
     """
+        SELECT *
+        FROM LocalChangeEntity
+        WHERE LocalChangeEntity.id IN (:ids)""",
+  )
+  abstract suspend fun getLocalChanges(ids: List<Long>): List<LocalChangeEntity>
+
+  @Query(
+    """
         SELECT COUNT(*)
         FROM LocalChangeEntity
         """,
@@ -204,6 +230,18 @@ internal abstract class LocalChangeDao {
   abstract suspend fun getLocalChanges(
     resourceType: ResourceType,
     resourceId: String,
+  ): List<LocalChangeEntity>
+
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeEntity
+        WHERE resourceUuid = :resourceUuid AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun getLocalChanges(
+    resourceType: ResourceType,
+    resourceUuid: UUID,
   ): List<LocalChangeEntity>
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
