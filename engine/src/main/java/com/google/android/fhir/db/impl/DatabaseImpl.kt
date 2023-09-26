@@ -25,6 +25,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.ResourceAndUUID
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
@@ -186,12 +187,14 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+  override suspend fun <R : Resource> search(
+    query: SearchQuery,
+  ): List<ResourceAndUUID<R>> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { iParser.parseResource(it) as R }
-        .distinctBy { it.id }
+        .map { ResourceAndUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
+        .distinctBy { it.uuid }
     }
   }
 
@@ -202,7 +205,8 @@ internal class DatabaseImpl(
         .map {
           IndexedIdAndResource(
             it.matchingIndex,
-            it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
+            typeAndIdOfBaseResourceOnWhichThisMatched = it.idOfBaseResourceOnWhichThisMatchedRev,
+            uuidOfBaseResourceOnWhichThisMatched = it.idOfBaseResourceOnWhichThisMatchedInc,
             iParser.parseResource(it.serializedResource) as Resource,
           )
         }

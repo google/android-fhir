@@ -23,6 +23,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -93,7 +94,7 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceAndUUID<R>>
 
   suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
 
@@ -152,3 +153,8 @@ internal interface Database {
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }
+
+data class ResourceAndUUID<R>(
+  val uuid: UUID,
+  val resource: R,
+)

@@ -169,7 +169,8 @@ internal abstract class ResourceDao {
     resourceType: ResourceType,
   ): ResourceEntity?
 
-  @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
+  @RawQuery
+  abstract suspend fun getResources(query: SupportSQLiteQuery): List<SerializedResourceAndUuid>
 
   @RawQuery
   abstract suspend fun getReferencedResources(
@@ -357,7 +358,7 @@ internal abstract class ResourceDao {
 internal data class IndexedIdAndSerializedResource(
   @ColumnInfo(name = "index_name") val matchingIndex: String,
   @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
-  @ColumnInfo(name = "resourceId") val idOfBaseResourceOnWhichThisMatchedInc: String?,
+  @ColumnInfo(name = "resourceUuid") val idOfBaseResourceOnWhichThisMatchedInc: UUID?,
   val serializedResource: String,
 )
 
@@ -367,6 +368,12 @@ internal data class IndexedIdAndSerializedResource(
  */
 internal data class IndexedIdAndResource(
   val matchingIndex: String,
-  val idOfBaseResourceOnWhichThisMatched: String,
+  val typeAndIdOfBaseResourceOnWhichThisMatched: String?,
+  val uuidOfBaseResourceOnWhichThisMatched: UUID?,
   val resource: Resource,
+)
+
+internal data class SerializedResourceAndUuid(
+  @ColumnInfo(name = "resourceUuid") val uuid: UUID,
+  val serializedResource: String,
 )

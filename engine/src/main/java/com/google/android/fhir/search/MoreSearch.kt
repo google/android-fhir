@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
@@ -31,11 +32,13 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
+import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import timber.log.Timber
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -50,7 +53,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       null
     } else {
       database.searchReferencedResources(
-        getIncludeQuery(includeIds = baseResources.map { it.logicalId }),
+        getIncludeQuery(includeIds = baseResources.map { it.uuid }),
       )
     }
   val revIncludedResources =
@@ -58,23 +61,25 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       null
     } else {
       database.searchReferencedResources(
-        getRevIncludeQuery(includeIds = baseResources.map { "${it.resourceType}/${it.logicalId}" }),
+        getRevIncludeQuery(
+          includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
+        ),
       )
     }
 
-  return baseResources.map { baseResource ->
+  return baseResources.map { (uuid, baseResource) ->
     SearchResult(
       baseResource,
       included =
         includedResources
           ?.asSequence()
-          ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
+          ?.filter { it.uuidOfBaseResourceOnWhichThisMatched == uuid }
           ?.groupBy({ it.matchingIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
           ?.asSequence()
           ?.filter {
-            it.idOfBaseResourceOnWhichThisMatched ==
+            it.typeAndIdOfBaseResourceOnWhichThisMatched ==
               "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
           ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource }),
@@ -91,61 +96,164 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
 }
 
 private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
-  var matchQuery = ""
   val args = mutableListOf<Any>()
-  args.addAll(includeIds)
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
 
-  // creating the match and filter query
-  revIncludes.forEachIndexed { index, (param, search) ->
+  fun generateFilterQuery(nestedSearch: NestedSearch): Triple<String, String, String> {
+    val (param, search) = nestedSearch
     val resourceToInclude = search.type
+    val (join, order) = search.getSortOrder(otherTable = "re")
     args.add(resourceToInclude.name)
     args.add(param.paramName)
-    matchQuery += " ( a.resourceType = ? and a.index_name IN (?) "
+    args.addAll(includeIds)
+    args.add(resourceToInclude.name)
 
-    val allFilters = search.getFilterQueries()
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
 
-    if (allFilters.isNotEmpty()) {
-      val iterator = allFilters.listIterator()
-      matchQuery += "AND b.resourceUuid IN (\n"
-      do {
-        iterator.next().let {
-          matchQuery += it.query
-          args.addAll(it.args)
-        }
-
-        if (iterator.hasNext()) {
-          matchQuery +=
-            if (search.operation == Operation.OR) {
-              "\n UNION \n"
-            } else {
-              "\n INTERSECT \n"
-            }
-        }
-      } while (iterator.hasNext())
-      matchQuery += "\n)"
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\n UNION \n"
+          } else {
+            "\n INTERSECT \n"
+          }
+      }
     }
-
-    matchQuery += " \n)"
-
-    if (index != revIncludes.lastIndex) matchQuery += " OR "
+    return Triple(join, filterQuery, order)
   }
 
-  return SearchQuery(
-    query =
+  return revIncludes
+    .map {
+      val (join, filterQuery, order) = generateFilterQuery(it)
       """
-    SELECT a.index_name, a.index_value, b.serializedResource 
-    FROM ReferenceIndexEntity a 
-    JOIN  ResourceEntity b
-    ON  a.resourceUuid = b.resourceUuid
-    AND  a.index_value IN( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
-    ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
-        """
-        .trimIndent(),
-    args = args,
-  )
+        Select  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceUuid = rie.resourceUuid
+        $join
+        WHERE
+        rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString)
+        AND re.resourceType = ? 
+        ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+        $order
+      """
+        .trimIndent()
+    }
+    .joinToString("\n UNION ALL\n") { "Select * from ($it)" }
+    .let { SearchQuery(it, args) }
 }
 
-private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
+private fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
+  val args = mutableListOf<Any>()
+  val baseResourceType = type
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
+
+  fun generateFilterQuery(nestedSearch: NestedSearch): Triple<String, String, String> {
+    val (param, search) = nestedSearch
+    val resourceToInclude = search.type
+    val (join, order) = search.getSortOrder(otherTable = "re")
+    args.add(baseResourceType.name)
+    args.add(param.paramName)
+    args.addAll(includeIds.map { convertUUIDToByte(it) })
+    args.add(resourceToInclude.name)
+
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
+
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\n UNION \n"
+          } else {
+            "\n INTERSECT \n"
+          }
+      }
+    }
+    return Triple(join, filterQuery, order)
+  }
+
+  return forwardIncludes
+    .map {
+      val (join, filterQuery, order) = generateFilterQuery(it)
+      """
+        Select  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceType||"/"||re.resourceId = rie.index_value
+        $join
+        WHERE
+        rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString)
+        AND re.resourceType = ? AND re.resourceUuid IN ($filterQuery)
+        $order
+      """
+        .trimIndent()
+    }
+    .joinToString("\n UNION ALL \n") { "Select * from ($it)" }
+    .let { SearchQuery(it, args) }
+}
+
+private fun Search.getSortOrder(otherTable: String): Pair<String, String> {
+  var sortJoinStatement = ""
+  var sortOrderStatement = ""
+  if (count != null) {
+    Timber.e("count not supported for [rev]include search.")
+  }
+  sort?.let { sort ->
+    val sortTableNames =
+      when (sort) {
+        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
+        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
+        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
+        // with timezone info). Any data field in any resource will only have index records in one
+        // of the two tables. So we simply sort by both in the SQL query.
+        is DateClientParam ->
+          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+      }
+    sortJoinStatement = ""
+
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
+
+      sortJoinStatement +=
+        //  spotless:off
+        """
+      LEFT JOIN ${sortTableName.tableName} $tableAlias
+      ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = '${sort.paramName}'
+      """
+      //  spotless:on
+    }
+
+    sortTableNames.forEachIndexed { index, sortTableName ->
+      val tableAlias = 'b' + index
+      sortOrderStatement +=
+        if (index == 0) {
+          """
+            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
+          """
+            .trimIndent()
+        } else {
+          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+        }
+    }
+  }
+  return Pair(sortJoinStatement, sortOrderStatement)
+}
+
+private fun Search._getIncludeQuery(includeIds: List<String>): SearchQuery {
   var matchQuery = ""
   val args = mutableListOf<Any>(type.name)
   args.addAll(includeIds)
@@ -329,7 +437,7 @@ internal fun Search.getQuery(
         else ->
           //  spotless:off
         """ 
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
         WHERE a.resourceType = ?

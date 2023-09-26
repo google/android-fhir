@@ -183,4 +183,12 @@ data class SearchResult<R : Resource>(
     } else {
       first?.size == second?.size
     }
+
+  override fun toString(): String {
+    return resource.logicalId +
+      " Included : " +
+      included?.map { it.key + ": " + it.value.joinToString { it.logicalId } } +
+      " RevIncluded : " +
+      revIncluded?.map { it.key.toString() + ": " + it.value.joinToString { it.logicalId } }
+  }
 }

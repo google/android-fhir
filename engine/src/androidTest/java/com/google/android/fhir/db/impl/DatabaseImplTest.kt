@@ -728,7 +728,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    val ids = results.map { it.id }
+    val ids = results.map { it.resource.id }
     assertThat(ids)
       .containsExactly("RiskAssessment/$largerId", "RiskAssessment/$smallerId")
       .inOrder()
@@ -758,7 +758,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -800,7 +800,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -853,7 +853,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -908,7 +908,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -965,7 +965,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1023,7 +1023,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1081,7 +1081,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1139,7 +1139,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1196,7 +1196,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1254,7 +1254,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1312,7 +1312,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1370,7 +1370,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1425,7 +1425,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1477,7 +1477,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1528,7 +1528,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1578,7 +1578,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1628,7 +1628,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1678,7 +1678,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1728,7 +1728,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1778,7 +1778,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1828,7 +1828,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1878,7 +1878,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1935,7 +1935,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -1999,7 +1999,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2063,7 +2063,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2127,7 +2127,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2191,7 +2191,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2255,7 +2255,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2319,7 +2319,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2383,7 +2383,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2400,7 +2400,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.filter { it.id == patient.id }).hasSize(1)
+    assertThat(result.filter { it.resource.id == patient.id }).hasSize(1)
   }
 
   @Test
@@ -2463,7 +2463,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("100").inOrder()
   }
 
   @Test
@@ -2509,7 +2509,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("100").inOrder()
   }
 
   @Test
@@ -2535,7 +2535,7 @@ class DatabaseImplTest {
               .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
               .getQuery(),
           )
-          .map { it.id },
+          .map { it.resource.id },
       )
       .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
   }
@@ -2563,7 +2563,7 @@ class DatabaseImplTest {
               .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
               .getQuery(),
           )
-          .map { it.id },
+          .map { it.resource.id },
       )
       .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
   }
@@ -2652,7 +2652,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
       .inOrder()
   }
@@ -2727,7 +2727,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
       .inOrder()
   }
@@ -2819,7 +2819,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
       .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
   }
@@ -2883,7 +2883,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
 
   @Test
@@ -2944,7 +2944,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
 
   @Test
@@ -2969,7 +2969,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.logicalId })
+    assertThat(result.map { it.resource.logicalId })
       .containsAtLeast("patient-test-002", "patient-test-003", "patient-test-001")
       .inOrder()
   }
@@ -3507,6 +3507,305 @@ class DatabaseImplTest {
               Pair(ResourceType.Encounter, "subject") to
                 listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
             ),
+          ),
+        ),
+      )
+  }
+
+  @Test
+  fun search_patient_and_include_practitioners_sorted_by_family_descending(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-04"))
+        managingOrganization = Reference("Organization/org-01")
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-03"))
+        addGeneralPractitioner(Reference("Practitioner/gp-04"))
+        managingOrganization = Reference("Organization/org-03")
+      }
+    val patients = listOf(patient01, patient02)
+
+    val gp01 =
+      Practitioner().apply {
+        id = "gp-01"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-01"
+            addGiven("General-01")
+          },
+        )
+        active = true
+      }
+    val gp02 =
+      Practitioner().apply {
+        id = "gp-02"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-02"
+            addGiven("General-02")
+          },
+        )
+        active = true
+      }
+    val gp03 =
+      Practitioner().apply {
+        id = "gp-03"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-03"
+            addGiven("General-03")
+          },
+        )
+        active = true
+      }
+
+    val gp04 =
+      Practitioner().apply {
+        id = "gp-04"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-04"
+            addGiven("General-04")
+          },
+        )
+        active = false
+      }
+
+    val practitioners = listOf(gp01, gp02, gp03, gp04)
+
+    database.insertRemote(*(patients + practitioners).shuffled().toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            sort(Practitioner.FAMILY, Order.DESCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp02, gp01)),
+            revIncluded = null,
+          ),
+          SearchResult(
+            patient02,
+            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03, gp02)),
+            revIncluded = null,
+          ),
+        ),
+      )
+  }
+
+  @Test
+  fun search_patient_and_revInclude_encounters_sorted_by_date_descending(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+    val patients = listOf(patient01, patient02)
+
+    // encounters for patient 1
+    val enc1_1 =
+      Encounter().apply {
+        id = "enc1-01"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 1, 1).value
+            end = DateType(2010, 1, 2).value
+          }
+      }
+    val enc1_2 =
+      Encounter().apply {
+        id = "enc1-02"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.CANCELLED
+        period =
+          Period().apply {
+            start = DateType(2010, 2, 1).value
+            end = DateType(2010, 2, 2).value
+          }
+      }
+
+    val enc1_3 =
+      Encounter().apply {
+        id = "enc1-03"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 3, 1).value
+            end = DateType(2010, 3, 2).value
+          }
+      }
+
+    val enc1_4 =
+      Encounter().apply {
+        id = "enc1-04"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 4, 1).value
+            end = DateType(2010, 4, 2).value
+          }
+      }
+
+    // encounters for patient 2
+    val enc2_1 =
+      Encounter().apply {
+        id = "enc2-01"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 1, 1).value
+            end = DateType(2020, 1, 2).value
+          }
+      }
+    val enc2_2 =
+      Encounter().apply {
+        id = "enc2-02"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.CANCELLED
+        period =
+          Period().apply {
+            start = DateType(2020, 2, 1).value
+            end = DateType(2020, 2, 2).value
+          }
+      }
+
+    val enc2_3 =
+      Encounter().apply {
+        id = "enc2-03"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 3, 1).value
+            end = DateType(2020, 3, 2).value
+          }
+      }
+
+    val enc2_4 =
+      Encounter().apply {
+        id = "enc2-04"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 4, 1).value
+            end = DateType(2020, 4, 2).value
+          }
+      }
+
+    val encounters = listOf(enc1_1, enc1_2, enc1_3, enc1_4, enc2_1, enc2_2, enc2_3, enc2_4)
+    database.insertRemote(*(patients + encounters).shuffled().toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.STATUS,
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://hl7.org/fhir/encounter-status",
+                      Encounter.EncounterStatus.ARRIVED.toCode(),
+                      "",
+                    ),
+                  )
+              },
+            )
+            sort(Encounter.DATE, Order.DESCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .isEqualTo(
+        listOf(
+          SearchResult(
+            patient01,
+            included = null,
+            revIncluded =
+              mapOf(
+                (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                  listOf(enc1_4, enc1_3, enc1_1),
+              ),
+          ),
+          SearchResult(
+            patient02,
+            included = null,
+            revIncluded =
+              mapOf(
+                (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                  listOf(enc2_4, enc2_3, enc2_1),
+              ),
           ),
         ),
       )
