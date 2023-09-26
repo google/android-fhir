@@ -82,46 +82,45 @@ class FhirSynchronizerTest {
   fun `synchronize should return Success on successful download and upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
-    `when`(uploader.upload(any()))
-      .thenReturn(
-        UploadSyncResult.Success(
-          LocalChangeToken(listOf()),
-          listOf(),
-        ),
-      )
+      `when`(uploader.upload(any()))
+        .thenReturn(
+          UploadSyncResult.Success(
+            LocalChangeToken(listOf()),
+            listOf(),
+          ),
+        )
 
-    val testFlow = MutableSharedFlow<SyncJobStatus>()
-    fhirSynchronizer.subscribe(testFlow)
+      val testFlow = MutableSharedFlow<SyncJobStatus>()
+      fhirSynchronizer.subscribe(testFlow)
 
-    val emittedValues = mutableListOf<SyncJobStatus>()
-    backgroundScope.launch { testFlow.collect { emittedValues.add(it) } }
+      val emittedValues = mutableListOf<SyncJobStatus>()
+      backgroundScope.launch { testFlow.collect { emittedValues.add(it) } }
 
-    val result = fhirSynchronizer.synchronize()
+      val result = fhirSynchronizer.synchronize()
 
       assertThat(emittedValues)
-      .containsExactly(
-        SyncJobStatus.Started,
-        SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
-        SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-        SyncJobStatus.Finished,
-      )
+        .containsExactly(
+          SyncJobStatus.Started,
+          SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
+          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
+          SyncJobStatus.Finished,
+        )
 
-    assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
-  }
+      assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
+    }
 
   @Test
   fun `synchronize should return Failed on failed download`() =
     runTest(UnconfinedTestDispatcher()) {
       val error = ResourceSyncException(ResourceType.Patient, Exception("Download error"))
-    `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
-    `when`(uploader.upload(any()))
-      .thenReturn(
-        UploadSyncResult.Success(
-          LocalChangeToken(listOf()),
-          listOf(),
-        ),
-      )
-
+      `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
+      `when`(uploader.upload(any()))
+        .thenReturn(
+          UploadSyncResult.Success(
+            LocalChangeToken(listOf()),
+            listOf(),
+          ),
+        )
 
       val testFlow = MutableSharedFlow<SyncJobStatus>()
       fhirSynchronizer.subscribe(testFlow)
@@ -138,9 +137,9 @@ class FhirSynchronizerTest {
           SyncJobStatus.Failed(exceptions = listOf(error)),
         )
 
-    assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
-    assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
-  }
+      assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
+      assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
+    }
 
   @Test
   fun `synchronize should return Failed on failed upload`() =
