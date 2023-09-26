@@ -5,10 +5,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.IPSDocument
 import com.google.android.fhir.document.dataClasses.SHLData
 import com.google.android.fhir.document.fileExamples.file
-import com.google.android.fhir.document.fileExamples.res1
-import com.google.android.fhir.document.fileExamples.res2
-import com.google.android.fhir.document.fileExamples.res3
-import com.google.android.fhir.document.fileExamples.res5
 import org.hl7.fhir.r4.model.AllergyIntolerance
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Bundle.BundleType
@@ -34,11 +30,20 @@ class DocGenTest {
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val fileBundle = parser.parseResource(file) as Bundle
 
+  private val res1 = this::class.java.classLoader?.getResource("observationResource.json")?.readText()
+  private val res2 = this::class.java.classLoader?.getResource("allergyResource.json")?.readText()
+  private val res3 = this::class.java.classLoader?.getResource("immunizationResource.json")?.readText()
+  private val res4 = this::class.java.classLoader?.getResource("conditionResource.json")?.readText()
+  private val res5 = this::class.java.classLoader?.getResource("medicationResource.json")?.readText()
+
+  private val immunizationBundleContent = this::class.java.classLoader?.getResource("immunizationBundle.json")?.readText()
+  private val immunizationBundle = parser.parseResource(immunizationBundleContent) as Bundle
+
   private val list = listOf(
     parser.parseResource(res1) as Resource,
     parser.parseResource(res2) as Resource,
     parser.parseResource(res3) as Resource,
-    parser.parseResource(res3) as Resource,
+    parser.parseResource(res4) as Resource,
     parser.parseResource(res5) as Resource
   )
 
@@ -64,12 +69,12 @@ class DocGenTest {
     println(data)
   }
 
-  // @Test
-  // fun mapCanBeCreatedWithDataForEachTitleInImmunization() {
-  //   val doc = IPSDocument(immunizationBundle)
-  //   val data = docGenerator.getDataFromDoc(doc)
-  //   println(data)
-  // }
+  @Test
+  fun mapCanBeCreatedWithDataForEachTitleInImmunization() {
+    val doc = IPSDocument(immunizationBundle)
+    val data = docGenerator.getDataFromDoc(doc)
+    println(data)
+  }
 
   @Test
   fun anIPSDocRequiresPAMs() {

@@ -1,0 +1,45 @@
+{
+  "resourceType": "Observation",
+  "id": "b4916505-a06b-460c-9be8-011609282457",
+  "text": {
+    "status": "generated"
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "laboratory"
+        }
+      ]
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "1018-1",
+        "display": "E Ab [Presence] in Serum or Plasma"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/2b90dd2b-2dab-4c75-9bb9-a355e07401e8"
+  },
+  "effectiveDateTime": "2015-10-10T09:35:00+01:00",
+  "performer": [
+    {
+      "reference": "Organization/45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "10828004",
+        "display": "Positive"
+      }
+    ]
+  }
+}
