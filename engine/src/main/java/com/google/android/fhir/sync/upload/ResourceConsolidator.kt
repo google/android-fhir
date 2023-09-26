@@ -52,7 +52,11 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
           }
         }
       }
-      is UploadSyncResult.Failure -> {}
+      is UploadSyncResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
+      }
     }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {

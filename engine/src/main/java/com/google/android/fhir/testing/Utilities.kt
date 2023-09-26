@@ -153,7 +153,13 @@ object TestFhirEngineImpl : FhirEngine {
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
     upload: suspend (List<LocalChange>) -> UploadSyncResult,
-  ): Flow<FetchProgress> = flow { upload(getLocalChanges(ResourceType.Patient, "123")) }
+  ): Flow<FetchProgress> = flow {
+    emit(FetchProgress(1, 1))
+    when (upload(getLocalChanges(ResourceType.Patient, "123"))) {
+      is UploadSyncResult.Success -> emit(FetchProgress(0, 1))
+      is UploadSyncResult.Failure -> emit(FetchProgress(1, 1))
+    }
+  }
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
