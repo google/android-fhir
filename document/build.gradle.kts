@@ -34,16 +34,18 @@ dependencies {
 
   // Barcode detector scanning
   implementation("com.google.zxing:core:3.4.1")
-  implementation("com.google.android.gms:play-services-vision-common:20.1.3")
+  implementation("com.google.android.gms:play-services-vision-common:19.1.3")
   implementation("com.google.android.gms:play-services-vision:20.1.3")
 
   // JWT decoding
   implementation("com.nimbusds:nimbus-jose-jwt:9.31")
 
   // TODO(hugomilosz): Remove this and use retrofit instead
-  // implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.8")
+  implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.8")
 
   testImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
+
+  testImplementation(Dependencies.robolectric)
 }
