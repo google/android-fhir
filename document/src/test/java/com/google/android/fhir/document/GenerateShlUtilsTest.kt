@@ -1,6 +1,6 @@
 package com.google.android.fhir.document
 
-import com.google.android.fhir.document.fileExamples.file
+import com.google.android.fhir.document.fileExamples.minimalBundleString
 import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.ReadShlUtils
 import com.nimbusds.jose.shaded.gson.Gson
@@ -37,7 +37,7 @@ class GenerateShlUtilsTest {
   @Test
   fun canConvertFilesIntoJweTokens() {
     val encryptionKey = generateShlUtils.generateRandomKey()
-    val contentJson = Gson().toJson(file)
+    val contentJson = Gson().toJson(minimalBundleString)
     val contentEncrypted = generateShlUtils.encrypt(contentJson, encryptionKey)
     println(contentEncrypted)
     Assert.assertEquals(contentEncrypted.split('.').size, 5)
@@ -46,7 +46,7 @@ class GenerateShlUtilsTest {
   @Test
   fun fileCanSuccessfullyBeEncryptedAndDecrypted() {
     val key = generateShlUtils.generateRandomKey()
-    val content = Gson().toJson(file)
+    val content = Gson().toJson(minimalBundleString)
 
     val encrypted = generateShlUtils.encrypt(content, key)
     val decrypted = readShlUtilsMock.decodeShc(encrypted, key)

@@ -4,7 +4,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.IPSDocument
 import com.google.android.fhir.document.dataClasses.SHLData
-import com.google.android.fhir.document.fileExamples.file
+import com.google.android.fhir.document.fileExamples.minimalBundleString
 import org.hl7.fhir.r4.model.AllergyIntolerance
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Bundle.BundleType
@@ -28,7 +28,7 @@ class DocGenTest {
 
   private val docGenerator = DocumentGenerator()
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val fileBundle = parser.parseResource(file) as Bundle
+  private val fileBundle = parser.parseResource(minimalBundleString) as Bundle
 
   private val res1 = this::class.java.classLoader?.getResource("observationResource.json")?.readText()
   private val res2 = this::class.java.classLoader?.getResource("allergyResource.json")?.readText()

@@ -1,6 +1,6 @@
 package com.google.android.fhir.document.fileExamples
 
-const val file = "{\n" +
+const val minimalBundleString = "{\n" +
   "  \"resourceType\" : \"Bundle\",\n" +
   "  \"id\" : \"bundle-minimal\",\n" +
   "  \"language\" : \"en-US\",\n" +
