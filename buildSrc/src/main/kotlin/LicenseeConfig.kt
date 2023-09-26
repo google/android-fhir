@@ -106,11 +106,13 @@ fun Project.configureLicensee() {
 
     // Utilities
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
-    allowDependency("com.google.android.gms", "play-services-base", "17.4.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-base", "18.0.1") { because("") }
+
+    allowDependency("com.google.android.odml", "image", "1.0.0-beta1") { because("") }
 
     // More utility classes
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
-    allowDependency("com.google.android.gms", "play-services-basement", "17.4.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-basement", "18.0.0") { because("") }
 
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
     allowDependency("com.google.android.gms", "play-services-clearcut", "17.0.0") { because("") }
@@ -123,20 +125,16 @@ fun Project.configureLicensee() {
     // Play Services Phenotype
     allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
 
-    allowDependency("com.google.android.gms", "play-services-flags", "17.0.0") { because("") }
-
-    allowDependency("com.google.android.gms", "play-services-vision", "20.1.3") { because("") }
-
-    allowDependency("com.google.android.gms", "play-services-vision-common", "19.1.3") { because("") }
-
     // Tasks API Android https://developers.google.com/android/guides/tasks
-    allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-tasks", "18.0.1") { because("") }
 
     // Barcode Scanning https://developers.google.com/ml-kit/vision/barcode-scanning
     allowDependency("com.google.mlkit", "barcode-scanning", "16.1.1") { because("") }
 
     // MLKit Common https://developers.google.com/ml-kit/vision/barcode-scanning
-    allowDependency("com.google.mlkit", "common", "17.1.1") { because("") }
+    allowDependency("com.google.mlkit", "common", "18.0.0") { because("") }
+
+    allowDependency("com.google.mlkit", "camera", "16.0.0-beta3") { because("") }
 
     // Object Detection https://developers.google.com/ml-kit/vision/object-detection
     allowDependency("com.google.mlkit", "object-detection", "16.2.3") { because("") }
@@ -149,11 +147,13 @@ fun Project.configureLicensee() {
 
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
-    allowDependency("com.google.mlkit", "vision-common", "16.3.0") { because("") }
+    allowDependency("com.google.mlkit", "vision-common", "17.0.0") { because("") }
 
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    allowDependency("com.google.mlkit", "vision-interfaces", "16.0.0") { because("") }
 
     // Glide
     allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {

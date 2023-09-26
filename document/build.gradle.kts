@@ -34,8 +34,8 @@ dependencies {
 
   // Barcode detector scanning
   implementation("com.google.zxing:core:3.4.1")
-  implementation("com.google.android.gms:play-services-vision-common:19.1.3")
-  implementation("com.google.android.gms:play-services-vision:20.1.3")
+  implementation("com.google.mlkit:barcode-scanning:16.1.1")
+  implementation("com.google.mlkit:camera:16.0.0-beta3")
 
   // JWT decoding
   implementation("com.nimbusds:nimbus-jose-jwt:9.31")

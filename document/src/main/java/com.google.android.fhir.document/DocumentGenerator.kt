@@ -26,7 +26,7 @@ import com.google.android.fhir.document.dataClasses.IPSDocument
 import com.google.android.fhir.document.dataClasses.Title
 import com.google.android.fhir.document.interfaces.IPSDocumentGenerator
 import com.google.android.fhir.document.utils.DocumentGeneratorUtils
-import com.google.android.fhir.library.utils.DocumentUtils
+import com.google.android.fhir.document.utils.DocumentUtils
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Resource
 

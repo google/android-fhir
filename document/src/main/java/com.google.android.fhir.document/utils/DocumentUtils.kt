@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.library.utils
+package com.google.android.fhir.document.utils
 
 import android.content.Context
 import com.google.android.fhir.document.dataClasses.IPSDocument
