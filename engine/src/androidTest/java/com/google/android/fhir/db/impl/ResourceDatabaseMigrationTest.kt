@@ -22,11 +22,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
+import java.nio.ByteBuffer
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
@@ -55,14 +58,14 @@ class ResourceDatabaseMigrationTest {
             HumanName().apply {
               addGiven("Jane")
               family = "Doe"
-            }
+            },
           )
         }
         .let { iParser.encodeResourceToString(it) }
 
     helper.createDatabase(DB_NAME, 1).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('migrate1-2-test', 'Patient', 'migrate1-2-test', '$insertedPatientJson' );"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('migrate1-2-test', 'Patient', 'migrate1-2-test', '$insertedPatientJson' );",
       )
       close()
     }
@@ -95,7 +98,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 2).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -127,7 +130,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 3).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -158,7 +161,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 4).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -192,15 +195,15 @@ class ResourceDatabaseMigrationTest {
     helper.createDatabase(DB_NAME, 5).apply {
       val date = Date()
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );",
       )
 
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
       )
 
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'id-corrupted-timestamp', 'date-not-good', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'id-corrupted-timestamp', 'date-not-good', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
       )
       close()
     }
@@ -235,13 +238,67 @@ class ResourceDatabaseMigrationTest {
     assertThat(Instant.ofEpochMilli(localChangeEntityCorruptedTimeStamp)).isEqualTo(Instant.EPOCH)
   }
 
+  @Test
+  fun migrate6To7_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val taskResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 6).apply {
+      val date = Date()
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('$taskResourceUuid', 'Task', '$taskId', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );",
+      )
+
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', '$taskId', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
+      )
+      close()
+    }
+
+    helper.runMigrationsAndValidate(DB_NAME, 6, true, MIGRATION_6_7)
+
+    val retrievedTask: ResourceEntity?
+    val localChangeUuid: UUID?
+
+    getMigratedRoomDatabase().apply {
+      retrievedTask = this.resourceDao().getResourceEntity(taskResourceUuid, ResourceType.Task)
+
+      query("SELECT resourceUuid FROM LocalChangeEntity", null).let {
+        it.moveToFirst()
+        it.moveToNext()
+        val byteBuffer = ByteBuffer.wrap(it.getBlob(0))
+        localChangeUuid = UUID(byteBuffer.getLong(), byteBuffer.getLong())
+      }
+
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTask!!.resourceUuid).isEqualTo(taskResourceUuid)
+    assertThat(localChangeUuid).isEqualTo(taskResourceUuid)
+  }
+
   private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
-        DB_NAME
+        DB_NAME,
       )
-      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+      .addMigrations(
+        MIGRATION_1_2,
+        MIGRATION_2_3,
+        MIGRATION_3_4,
+        MIGRATION_4_5,
+        MIGRATION_5_6,
+        MIGRATION_6_7,
+      )
       .build()
 
   companion object {

@@ -21,13 +21,11 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.diff
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.jsonParser
 import com.google.android.fhir.testing.readFromFile
 import com.google.android.fhir.testing.readJsonArrayFromFile
-import com.google.android.fhir.toLocalChange
 import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
@@ -131,39 +129,35 @@ class PerResourcePatchGeneratorTest {
   fun `should generate no patch if the resource is inserted and deleted`() {
     val changes =
       listOf(
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                ),
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
-        LocalChangeEntity(
-            id = 2,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.DELETE,
-            payload = "",
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) },
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    },
+                  )
+                },
+              ),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.DELETE,
+          payload = "",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(2)),
+        ),
       )
     val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
@@ -174,71 +168,65 @@ class PerResourcePatchGeneratorTest {
   fun `should generate no patch if the resource is inserted, updated, and deleted`() {
     val changes =
       listOf(
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                ),
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
-        LocalChangeEntity(
-            id = 2,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.UPDATE,
-            payload =
-              diff(
-                  jsonParser,
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Jane")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Janet")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                )
-                .toString(),
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
-        LocalChangeEntity(
-            id = 3,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.DELETE,
-            payload = "",
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(3)) },
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    },
+                  )
+                },
+              ),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.UPDATE,
+          payload =
+            diff(
+                jsonParser,
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("Jane")
+                      family = "Doe"
+                    },
+                  )
+                },
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("Janet")
+                      family = "Doe"
+                    },
+                  )
+                },
+              )
+              .toString(),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.DELETE,
+          payload = "",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(3)),
+        ),
       )
     val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
@@ -308,26 +296,22 @@ class PerResourcePatchGeneratorTest {
   fun `should throw an error if a change is done after a resource is deleted locally`() {
     val changes =
       listOf(
-        LocalChangeEntity(
-            id = 2,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.DELETE,
-            payload = "",
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) },
-        LocalChangeEntity(
-            id = 3,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.UPDATE,
-            payload = "",
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(3)) },
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.DELETE,
+          payload = "",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(2)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.UPDATE,
+          payload = "",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(3)),
+        ),
       )
 
     val errorMessage =
@@ -343,39 +327,35 @@ class PerResourcePatchGeneratorTest {
   fun `should throw an error if a change is done before a resource is created locally`() {
     val changes =
       listOf(
-        LocalChangeEntity(
-            id = 3,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.UPDATE,
-            payload = "",
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                ),
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) },
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.UPDATE,
+          payload = "",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    },
+                  )
+                },
+              ),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        ),
       )
 
     val errorMessage =

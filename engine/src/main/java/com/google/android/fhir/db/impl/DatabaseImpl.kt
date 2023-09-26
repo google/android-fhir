@@ -25,14 +25,15 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.ResourceIdentifierType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
-import com.google.android.fhir.toLocalChange
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -115,8 +116,16 @@ internal class DatabaseImpl(
       logicalIds.addAll(
         resource.map {
           val timeOfLocalChange = Instant.now()
-          localChangeDao.addInsert(it, timeOfLocalChange)
-          resourceDao.insertLocalResource(it, timeOfLocalChange)
+          val resourceId = resourceDao.insertLocalResource(it, timeOfLocalChange)
+          val resourceEntity =
+            resourceDao.getResourceEntity(resourceId, it.resourceType)
+              ?: throw ResourceNotFoundException(
+                it.resourceType.name,
+                resourceId,
+                ResourceIdentifierType.ID,
+              )
+          localChangeDao.addInsert(it, resourceEntity.resourceUuid, timeOfLocalChange)
+          resourceId
         },
       )
     }
@@ -159,7 +168,7 @@ internal class DatabaseImpl(
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
         iParser.parseResource(it)
       }
-        ?: throw ResourceNotFoundException(type.name, id)
+        ?: throw ResourceNotFoundException(type.name, id, ResourceIdentifierType.ID)
     } as Resource
   }
 
@@ -169,18 +178,13 @@ internal class DatabaseImpl(
 
   override suspend fun delete(type: ResourceType, id: String) {
     db.withTransaction {
-      val remoteVersionId: String? =
-        try {
-          selectEntity(type, id).versionId
-        } catch (e: ResourceNotFoundException) {
-          null
-        }
+      val resourceEntity: ResourceEntity = selectEntity(type, id)
       val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
       if (rowsDeleted > 0) {
         localChangeDao.addDelete(
-          resourceId = id,
+          resourceUuid = resourceEntity.resourceUuid,
           resourceType = type,
-          remoteVersionId = remoteVersionId,
+          remoteVersionId = resourceEntity.versionId,
         )
       }
     }
@@ -219,6 +223,25 @@ internal class DatabaseImpl(
     return db.withTransaction { localChangeDao.getAllLocalChanges().map { it.toLocalChange() } }
   }
 
+  private suspend fun LocalChangeEntity.toLocalChange(): LocalChange {
+    val resourceEntity =
+      resourceDao.getResourceEntity(resourceUuid, ResourceType.fromCode(resourceType))
+        ?: throw ResourceNotFoundException(
+          resourceType,
+          resourceUuid.toString(),
+          ResourceIdentifierType.UUID,
+        )
+    return LocalChange(
+      resourceType,
+      resourceEntity.resourceId,
+      versionId,
+      timestamp,
+      LocalChange.Type.from(type.value),
+      payload,
+      LocalChangeToken(listOf(id)),
+    )
+  }
+
   override suspend fun getLocalChangesCount(): Int {
     return db.withTransaction { localChangeDao.getLocalChangesCount() }
   }
@@ -230,7 +253,7 @@ internal class DatabaseImpl(
   override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
     return db.withTransaction {
       resourceDao.getResourceEntity(resourceId = id, resourceType = type)
-        ?: throw ResourceNotFoundException(type.name, id)
+        ?: throw ResourceNotFoundException(type.name, id, ResourceIdentifierType.ID)
     }
   }
 
@@ -239,7 +262,16 @@ internal class DatabaseImpl(
   }
 
   override suspend fun deleteUpdates(resources: List<Resource>) {
-    localChangeDao.discardLocalChanges(resources)
+    val resourceTypeAndUuidList =
+      resources
+        .mapNotNull { resource ->
+          resourceDao.getResourceEntity(
+            resourceId = resource.logicalId,
+            resourceType = resource.resourceType,
+          )
+        }
+        .map { resourceEntity -> resourceEntity.resourceType to resourceEntity.resourceUuid }
+    localChangeDao.discardLocalChanges(resourceTypeAndUuidList)
   }
 
   override fun close() {
@@ -252,17 +284,20 @@ internal class DatabaseImpl(
 
   override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
     return db.withTransaction {
-      localChangeDao.getLocalChanges(resourceType = type, resourceId = id).map {
-        it.toLocalChange()
+      resourceDao.getResourceEntity(id, type)?.let { resourceEntity ->
+        localChangeDao
+          .getLocalChanges(resourceType = type, resourceUuid = resourceEntity.resourceUuid)
+          .map { it.toLocalChange() }
       }
+        ?: emptyList()
     }
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
     db.withTransaction {
       // To check resource is present in DB else throw ResourceNotFoundException()
-      selectEntity(type, id)
-      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+      val resourceEntity = selectEntity(type, id)
+      val localChangeEntityList = localChangeDao.getLocalChanges(type, resourceEntity.resourceUuid)
       // If local change is not available simply delete resource
       if (localChangeEntityList.isEmpty()) {
         resourceDao.deleteResource(resourceId = id, resourceType = type)

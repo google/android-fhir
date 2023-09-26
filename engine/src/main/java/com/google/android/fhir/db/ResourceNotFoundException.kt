@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,19 +19,32 @@ package com.google.android.fhir.db
 /** Thrown to indicate that the requested resource is not found. */
 class ResourceNotFoundException : Exception {
   val type: String
-  val id: String
+  val identifier: String
+  lateinit var identifierType: ResourceIdentifierType
 
   constructor(
     type: String,
-    id: String,
-    cause: Throwable
-  ) : super("Resource not found with type $type and id $id!", cause) {
+    identifier: String,
+    identifierType: ResourceIdentifierType,
+    cause: Throwable,
+  ) : super("Resource not found with type $type and $identifierType $identifier!", cause) {
     this.type = type
-    this.id = id
+    this.identifier = identifier
+    this.identifierType = identifierType
   }
 
-  constructor(type: String, id: String) : super("Resource not found with type $type and id $id!") {
+  constructor(
+    type: String,
+    identifier: String,
+    identifierType: ResourceIdentifierType,
+  ) : super("Resource not found with type $type and $identifierType $identifier!") {
     this.type = type
-    this.id = id
+    this.identifier = identifier
+    this.identifierType = identifierType
   }
+}
+
+enum class ResourceIdentifierType {
+  ID,
+  UUID,
 }

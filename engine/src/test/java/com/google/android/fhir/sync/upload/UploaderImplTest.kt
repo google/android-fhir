@@ -18,10 +18,9 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.testing.BundleDataSource
-import com.google.android.fhir.toLocalChange
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
@@ -130,29 +129,27 @@ class UploaderImplTest {
   companion object {
     val localChanges =
       listOf(
-        LocalChangeEntity(
-            id = 1,
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = LocalChangeEntity.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                ),
-            timestamp = Instant.now(),
-          )
-          .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) },
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-001",
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(
+                Patient().apply {
+                  id = "Patient-001"
+                  addName(
+                    HumanName().apply {
+                      addGiven("John")
+                      family = "Doe"
+                    },
+                  )
+                },
+              ),
+          token = LocalChangeToken(listOf(1)),
+          timestamp = Instant.now(),
+        ),
       )
   }
 }
