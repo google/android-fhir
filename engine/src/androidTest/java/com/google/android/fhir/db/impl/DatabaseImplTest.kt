@@ -468,6 +468,21 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun insert_existingRemoteResource_shouldNotChangeResourceEntityUuidOrId() = runBlocking {
+    val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
+    database.insertRemote(patient)
+    val patientEntityAfterFirstRemoteSync =
+      database.selectEntity(ResourceType.Patient, patient.logicalId)
+    database.insertRemote(patient)
+    val patientEntityAfterSecondRemoteSync =
+      database.selectEntity(ResourceType.Patient, patient.logicalId)
+    assertThat(patientEntityAfterSecondRemoteSync.resourceUuid)
+      .isEqualTo(patientEntityAfterFirstRemoteSync.resourceUuid)
+    assertThat(patientEntityAfterSecondRemoteSync.id)
+      .isEqualTo(patientEntityAfterFirstRemoteSync.id)
+  }
+
+  @Test
   fun insert_remoteResource_shouldSaveVersionIdAndLastUpdated() = runBlocking {
     val patient =
       Patient().apply {

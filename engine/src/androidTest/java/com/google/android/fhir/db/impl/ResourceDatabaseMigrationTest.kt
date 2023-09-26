@@ -163,7 +163,7 @@ class ResourceDatabaseMigrationTest {
       close()
     }
 
-    // Re-open the database with version 4 and provide MIGRATION_3_4 as the migration process.
+    // Re-open the database with version 5 and provide MIGRATION_4_5 as the migration process.
     helper.runMigrationsAndValidate(DB_NAME, 5, true, MIGRATION_4_5)
 
     val retrievedTask: String?
@@ -213,7 +213,7 @@ class ResourceDatabaseMigrationTest {
     val localChangeEntityCorruptedTimeStamp: Long
 
     getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+       retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
       resourceEntityLastUpdatedLocal =
         query("Select lastUpdatedLocal from ResourceEntity", null).let {
           it.moveToFirst()
@@ -235,13 +235,72 @@ class ResourceDatabaseMigrationTest {
     assertThat(Instant.ofEpochMilli(localChangeEntityCorruptedTimeStamp)).isEqualTo(Instant.EPOCH)
   }
 
+  @Test
+  fun migrate6To7_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val taskResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val bedNetTask: String =
+      Task()
+        .apply {
+          id = taskId
+          description = "Issue bed net"
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 6).apply {
+      val date = Date()
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('$taskResourceUuid', 'Task', '$taskId', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );",
+      )
+
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', '$taskId', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
+      )
+      close()
+    }
+
+    helper.runMigrationsAndValidate(DB_NAME, 7, true, MIGRATION_6_7)
+
+    val retrievedTaskResourceId: String?
+    val retrievedTaskResourceUuid: String?
+    val localChangeResourceUuid: String?
+    val localChangeResourceId: String?
+
+    getMigratedRoomDatabase().apply {
+      query("SELECT resourceId, resourceUuid FROM ResourceEntity", null).let {
+        it.moveToFirst()
+        retrievedTaskResourceId = it.getString(0)
+        retrievedTaskResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
+      }
+
+      query("SELECT resourceId,resourceUuid FROM LocalChangeEntity", null).let {
+        it.moveToFirst()
+        localChangeResourceId = it.getString(0)
+        localChangeResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
+      }
+
+      openHelper.writableDatabase.close()
+    }
+
+    assertThat(retrievedTaskResourceUuid).isEqualTo(localChangeResourceUuid)
+    assertThat(localChangeResourceId).isEqualTo(retrievedTaskResourceId)
+  }
+
   private fun getMigratedRoomDatabase(): ResourceDatabase =
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
         DB_NAME,
       )
-      .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+      .addMigrations(
+        MIGRATION_1_2,
+        MIGRATION_2_3,
+        MIGRATION_3_4,
+        MIGRATION_4_5,
+        MIGRATION_5_6,
+        MIGRATION_6_7,
+      )
       .build()
 
   companion object {
