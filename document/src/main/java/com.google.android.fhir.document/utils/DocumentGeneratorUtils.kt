@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document.utils
 
 import android.content.Context
@@ -38,15 +54,17 @@ class DocumentGeneratorUtils {
     addedResourcesByType.getOrPut(resourceType) { mutableListOf() }.add(resource)
 
     section.entry.clear()
-    addedResourcesByType[resourceType]?.distinctBy { it.idElement.toVersionless() }
+    addedResourcesByType[resourceType]
+      ?.distinctBy { it.idElement.toVersionless() }
       ?.forEach { addedResource ->
         val fullId = addedResource.idElement.toVersionless()
         val baseId = addedResource.idElement.toVersionless().baseUrl
-        val id = if (baseId == null) {
-          fullId
-        } else {
-          fullId.toString().removePrefix(baseId)
-        }
+        val id =
+          if (baseId == null) {
+            fullId
+          } else {
+            fullId.toString().removePrefix(baseId)
+          }
         section.entry.add(Reference().setReference(id.toString()))
       }
     return section
@@ -59,9 +77,14 @@ class DocumentGeneratorUtils {
     return organization
   }
 
-  fun createHeadingView(context: Context, titleName: String, containerLayout: LinearLayout): RelativeLayout {
+  fun createHeadingView(
+    context: Context,
+    titleName: String,
+    containerLayout: LinearLayout,
+  ): RelativeLayout {
     val layoutInflater = LayoutInflater.from(context)
-    val headingView = layoutInflater.inflate(R.layout.heading_item, containerLayout, false) as RelativeLayout
+    val headingView =
+      layoutInflater.inflate(R.layout.heading_item, containerLayout, false) as RelativeLayout
     val headingText = headingView.findViewById<TextView>(R.id.headingText)
     headingText.text = titleName
     return headingView
@@ -69,7 +92,8 @@ class DocumentGeneratorUtils {
 
   fun createCheckBox(context: Context, text: String, containerLayout: LinearLayout): CheckBox {
     val layoutInflater = LayoutInflater.from(context)
-    val checkBoxItem = layoutInflater.inflate(R.layout.checkbox_item, containerLayout, false) as CheckBox
+    val checkBoxItem =
+      layoutInflater.inflate(R.layout.checkbox_item, containerLayout, false) as CheckBox
     checkBoxItem.text = text
     return checkBoxItem
   }
@@ -89,21 +113,23 @@ class DocumentGeneratorUtils {
   /* Create coding for a section in the IPS composition for a given resource */
   private fun getResourceCode(resource: Resource): CodeableConcept {
     val codeableConcept = CodeableConcept()
-    codeableConcept.coding = listOf(
-      when (resource.resourceType) {
-        ResourceType.AllergyIntolerance -> createCoding(
-          "48765-2", "Allergies and adverse reactions Document"
-        )
-
-        ResourceType.Condition -> createCoding("11450-4", "Problem list Reported")
-        ResourceType.Medication -> createCoding("10160-0", "History of Medication")
-        ResourceType.Immunization -> createCoding("11369-6", "History of Immunizations")
-        ResourceType.Observation -> createCoding("30954-2", "Test Results")
-        ResourceType.DiagnosticReport -> createCoding("", "Diagnostic Report")
-        ResourceType.Device -> createCoding("", "Medical Devices")
-        else -> createCoding("12345", "Display Text", "http://your-coding-system-url.com")
-      }
-    )
+    codeableConcept.coding =
+      listOf(
+        when (resource.resourceType) {
+          ResourceType.AllergyIntolerance ->
+            createCoding(
+              "48765-2",
+              "Allergies and adverse reactions Document",
+            )
+          ResourceType.Condition -> createCoding("11450-4", "Problem list Reported")
+          ResourceType.Medication -> createCoding("10160-0", "History of Medication")
+          ResourceType.Immunization -> createCoding("11369-6", "History of Immunizations")
+          ResourceType.Observation -> createCoding("30954-2", "Test Results")
+          ResourceType.DiagnosticReport -> createCoding("", "Diagnostic Report")
+          ResourceType.Device -> createCoding("", "Medical Devices")
+          else -> createCoding("12345", "Display Text", "http://your-coding-system-url.com")
+        },
+      )
     return codeableConcept
   }
 
@@ -117,7 +143,6 @@ class DocumentGeneratorUtils {
           else -> "History of Past Illness"
         }
       }
-
       ResourceType.Condition -> {
         val condition = resource as Condition
         when (condition.clinicalStatus.coding.firstOrNull()?.code) {
@@ -125,18 +150,18 @@ class DocumentGeneratorUtils {
           else -> "History of Past Illness"
         }
       }
-
       ResourceType.Medication -> "Medication"
       ResourceType.Immunization -> "Immunizations"
       ResourceType.Observation -> "Results"
       else -> null
-      // "Plan of Treatment"
-
+    // "Plan of Treatment"
     }
   }
 
   /* Check all the required sections are present in the document */
-  fun checkSections(sections: MutableList<SectionComponent>): Pair<MutableList<SectionComponent>, MutableList<Resource>> {
+  fun checkSections(
+    sections: MutableList<SectionComponent>,
+  ): Pair<MutableList<SectionComponent>, MutableList<Resource>> {
     val missingSections = mutableListOf<SectionComponent>()
     val missingResources = mutableListOf<Resource>()
 
@@ -154,50 +179,60 @@ class DocumentGeneratorUtils {
   }
 
   private fun createMissingResource(sectionTitle: String): Resource {
-    val missingResource: Resource = when (sectionTitle) {
-      "Allergies and Intolerances" -> createMissingAllergyIntolerance()
-      "Active Problems" -> createMissingCondition()
-      else -> createMissingMedication()
-    }
+    val missingResource: Resource =
+      when (sectionTitle) {
+        "Allergies and Intolerances" -> createMissingAllergyIntolerance()
+        "Active Problems" -> createMissingCondition()
+        else -> createMissingMedication()
+      }
     return missingResource
   }
 
   private fun createMissingAllergyIntolerance(): Resource {
     val allergyIntolerance = AllergyIntolerance()
     allergyIntolerance.id = UUID.randomUUID().toString()
-    allergyIntolerance.code = CodeableConcept().apply {
-      coding.add(Coding().apply {
-        system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
-        code = "no-allergy-info"
-        display = "No information about allergies"
-      })
-    }
+    allergyIntolerance.code =
+      CodeableConcept().apply {
+        coding.add(
+          Coding().apply {
+            system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
+            code = "no-allergy-info"
+            display = "No information about allergies"
+          },
+        )
+      }
     return allergyIntolerance
   }
 
   private fun createMissingCondition(): Resource {
     val condition = Condition()
     condition.id = UUID.randomUUID().toString()
-    condition.code = CodeableConcept().apply {
-      coding.add(Coding().apply {
-        system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
-        code = "no-problem-info"
-        display = "No information about problems"
-      })
-    }
+    condition.code =
+      CodeableConcept().apply {
+        coding.add(
+          Coding().apply {
+            system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
+            code = "no-problem-info"
+            display = "No information about problems"
+          },
+        )
+      }
     return condition
   }
 
   private fun createMissingMedication(): Resource {
     val medication = Medication()
     medication.id = UUID.randomUUID().toString()
-    medication.code = CodeableConcept().apply {
-      coding.add(Coding().apply {
-        system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
-        code = "no-medication-info"
-        display = "No information about medications"
-      })
-    }
+    medication.code =
+      CodeableConcept().apply {
+        coding.add(
+          Coding().apply {
+            system = "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips"
+            code = "no-medication-info"
+            display = "No information about medications"
+          },
+        )
+      }
     return medication
   }
 
@@ -205,13 +240,16 @@ class DocumentGeneratorUtils {
     // Create a Composition resource to represent the IPS document
     val composition = Composition()
     composition.id = UUID.randomUUID().toString()
-    composition.type = CodeableConcept().apply {
-      coding.add(Coding().apply {
-        system = "http://loinc.org"
-        code = "60591-5"
-        display = "Patient Summary Document"
-      })
-    }
+    composition.type =
+      CodeableConcept().apply {
+        coding.add(
+          Coding().apply {
+            system = "http://loinc.org"
+            code = "60591-5"
+            display = "Patient Summary Document"
+          },
+        )
+      }
     // Set other properties of the Composition as needed
     composition.title = "Patient Summary Document Title"
     composition.status = Composition.CompositionStatus.FINAL
@@ -225,7 +263,7 @@ class DocumentGeneratorUtils {
   }
 
   /* Check if a section with the same title already exists.
-      Replace the existing section if it does, otherwise, create a new creation */
+  Replace the existing section if it does, otherwise, create a new creation */
   fun createIPSSections(selectedResources: List<Resource>): MutableList<SectionComponent> {
     val sections = mutableListOf<SectionComponent>()
     for (res in selectedResources) {
@@ -250,15 +288,19 @@ class DocumentGeneratorUtils {
     val bundle = Bundle()
     bundle.type = Bundle.BundleType.DOCUMENT
     // Add the Composition to the bundle
-    bundle.addEntry(Bundle.BundleEntryComponent().apply {
-      resource = composition
-      fullUrl = "urn:uuid:${composition.idBase}"
-    })
+    bundle.addEntry(
+      Bundle.BundleEntryComponent().apply {
+        resource = composition
+        fullUrl = "urn:uuid:${composition.idBase}"
+      },
+    )
     for (res in (selectedResources + missingResources)) {
-      bundle.addEntry(Bundle.BundleEntryComponent().apply {
-        resource = res
-        fullUrl = "urn:uuid:${res.idElement.idPart}"
-      })
+      bundle.addEntry(
+        Bundle.BundleEntryComponent().apply {
+          resource = res
+          fullUrl = "urn:uuid:${res.idElement.idPart}"
+        },
+      )
     }
     return bundle
   }

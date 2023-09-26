@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.library.utils
 
 import android.content.Context
@@ -19,20 +35,23 @@ class DocumentUtils {
   fun getSectionsFromDoc(doc: IPSDocument) {
     val bundle = doc.document
     val composition =
-      bundle.entry?.firstOrNull { it.resource.resourceType == ResourceType.Composition }?.resource as Composition
+      bundle.entry?.firstOrNull { it.resource.resourceType == ResourceType.Composition }?.resource
+        as Composition
     doc.titles = composition.section.map { Title(it.title, ArrayList()) } as ArrayList<Title>
   }
 
   fun shouldExcludeResource(title: String, resource: Resource): Boolean {
     val code = resource.hasCode().second
-    return (title == "History of Past Illness" && code == "active") || ((title == "Active Problems" || title == "Allergies and Intolerances") && code != "active")
+    return (title == "History of Past Illness" && code == "active") ||
+      ((title == "Active Problems" || title == "Allergies and Intolerances") && code != "active")
   }
 
   fun getSearchingCondition(resource: String, resourceType: String): Boolean {
     return when (resource) {
       "Allergies and Intolerances" -> resourceType == "AllergyIntolerance"
       "Medication" -> resourceType == "Medication"
-      "Active Problems", "History of Past Illness" -> resourceType == "Condition"
+      "Active Problems",
+      "History of Past Illness", -> resourceType == "Condition"
       "Immunizations" -> resourceType == "Immunization"
       "Results" -> resourceType == "Observation"
       "Plan of Treatment" -> false // inside div
@@ -44,9 +63,7 @@ class DocumentUtils {
   }
 
   fun readFileFromAssets(context: Context, filename: String): String {
-    return context.assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
+    return context.assets.open(filename).bufferedReader().use { it.readText() }
   }
 
   fun getCodings(res: Resource): MutableList<Coding>? {

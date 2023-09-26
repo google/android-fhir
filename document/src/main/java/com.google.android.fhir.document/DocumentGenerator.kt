@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document
 
 import android.content.Context
@@ -24,11 +40,15 @@ class DocumentGenerator : IPSDocumentGenerator {
     val bundle = doc.document
 
     for (title in doc.titles) {
-      val filteredResources = bundle.entry.map { it.resource }.filter { resource ->
-        val resourceType = resource.resourceType.toString()
-        docUtils.getSearchingCondition(title.name, resourceType)
-      }
-      val resourceList = filteredResources.filterNot { docUtils.shouldExcludeResource(title.name, it) }
+      val filteredResources =
+        bundle.entry
+          .map { it.resource }
+          .filter { resource ->
+            val resourceType = resource.resourceType.toString()
+            docUtils.getSearchingCondition(title.name, resourceType)
+          }
+      val resourceList =
+        filteredResources.filterNot { docUtils.shouldExcludeResource(title.name, it) }
       val existingTitle = doc.titles.find { it.name == title.name }
       existingTitle?.dataEntries?.addAll(resourceList)
     }
@@ -71,29 +91,31 @@ class DocumentGenerator : IPSDocumentGenerator {
     context: Context,
     bundle: IPSDocument,
     checkboxes: MutableList<CheckBox>,
-    checkboxTitleMap: MutableMap<String, String>
+    checkboxTitleMap: MutableMap<String, String>,
   ): List<Title> {
     docUtils.getSectionsFromDoc(bundle)
-    val containerLayout = (context as AppCompatActivity).findViewById<LinearLayout>(R.id.containerLayout)
+    val containerLayout =
+      (context as AppCompatActivity).findViewById<LinearLayout>(R.id.containerLayout)
 
-    return getDataFromDoc(bundle).filter { title ->
-      title.dataEntries.any { docUtils.getCodings(it)?.isNotEmpty() == true }
-    }.map { title ->
-      val headingView = docGenUtils.createHeadingView(context, title.name, containerLayout)
-      containerLayout.addView(headingView)
+    return getDataFromDoc(bundle)
+      .filter { title -> title.dataEntries.any { docUtils.getCodings(it)?.isNotEmpty() == true } }
+      .map { title ->
+        val headingView = docGenUtils.createHeadingView(context, title.name, containerLayout)
+        containerLayout.addView(headingView)
 
-      title.dataEntries.forEach { obj ->
-        docUtils.getCodings(obj)?.firstOrNull { it.hasDisplay() }?.let { codingElement ->
-          val displayValue = codingElement.display
-          val checkBoxItem = docGenUtils.createCheckBox(context, displayValue, containerLayout)
-          containerLayout.addView(checkBoxItem)
-          checkboxTitleMap[displayValue] = title.name
-          checkboxes.add(checkBoxItem)
+        title.dataEntries.forEach { obj ->
+          docUtils
+            .getCodings(obj)
+            ?.firstOrNull { it.hasDisplay() }
+            ?.let { codingElement ->
+              val displayValue = codingElement.display
+              val checkBoxItem = docGenUtils.createCheckBox(context, displayValue, containerLayout)
+              containerLayout.addView(checkBoxItem)
+              checkboxTitleMap[displayValue] = title.name
+              checkboxes.add(checkBoxItem)
+            }
         }
+        title
       }
-      title
-    }
   }
-
-
 }

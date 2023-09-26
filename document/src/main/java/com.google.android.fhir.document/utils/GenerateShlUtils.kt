@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document.utils
 
 import android.content.Context
@@ -104,7 +120,7 @@ class GenerateShlUtils {
     passcode: String,
     shlData: SHLData,
     context: Context,
-    qrView: ImageView
+    qrView: ImageView,
   ) {
     val expirationDate = shlData.exp
     val labelData = shlData.label
@@ -130,15 +146,12 @@ class GenerateShlUtils {
 
       val data: String = parser.encodeResourceToString(bundle)
       postPayload(data, manifestUrl, key, managementToken)
-
     }
   }
 
   private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
     val handler = Handler(Looper.getMainLooper())
-    handler.post {
-      qrView.setImageBitmap(qrCodeBitmap)
-    }
+    handler.post { qrView.setImageBitmap(qrCodeBitmap) }
   }
 
   private fun doPostRequest(httpClient: CloseableHttpClient, passcode: String): JSONObject {
@@ -171,13 +184,16 @@ class GenerateShlUtils {
     key: String,
     exp: String?,
   ): String {
-    val payloadObject = JSONObject().apply {
-      put("url", manifestUrl)
-      put("key", key)
-      flags?.let { put("flag", it) }
-      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
-    }.toString()
+    val payloadObject =
+      JSONObject()
+        .apply {
+          put("url", manifestUrl)
+          put("key", key)
+          flags?.let { put("flag", it) }
+          label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
+        }
+        .toString()
     return base64UrlEncode(payloadObject)
   }
 }

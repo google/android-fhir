@@ -1,0 +1,27 @@
+{
+  "resourceType": "AllergyIntolerance",
+  "id": "c7781f44-6df8-4a8b-9e06-0b34263a47c5",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: AllergyIntolerance</b><a name=\"c7781f44-6df8-4a8b-9e06-0b34263a47c5\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource AllergyIntolerance &quot;c7781f44-6df8-4a8b-9e06-0b34263a47c5&quot; </p></div><p><b>clinicalStatus</b>: Active <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.0.0/CodeSystem-allergyintolerance-clinical.html\">AllergyIntolerance Clinical Status Codes</a>#active)</span></p><p><b>code</b>: No known food allergies <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-absent-unknown-uv-ips.html\">Absent and Unknown Data - IPS</a>#no-known-food-allergies)</span></p><p><b>patient</b>: <a href=\"#Patient_2b90dd2b-2dab-4c75-9bb9-a355e07401e8\">See above (Patient/2b90dd2b-2dab-4c75-9bb9-a355e07401e8)</a></p></div>"
+  },
+  "clinicalStatus": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical",
+        "code": "active"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/uv/ips/CodeSystem/absent-unknown-uv-ips",
+        "code": "no-known-food-allergies"
+      }
+    ]
+  },
+  "patient": {
+    "reference": "Patient/2b90dd2b-2dab-4c75-9bb9-a355e07401e8"
+  }
+}

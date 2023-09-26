@@ -3,7 +3,6 @@ plugins {
   id(Plugins.BuildPlugins.kotlinAndroid)
 }
 
-
 android {
   namespace = "com.google.android.fhir.document"
   compileSdk = Sdk.compileSdk
@@ -22,15 +21,16 @@ android {
   }
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
 
+  sourceSets { getByName("test").apply { resources.setSrcDirs(listOf("test-data")) } }
+
   kotlin { jvmToolchain(11) }
 }
 
 dependencies {
-
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.material)
-  implementation(Dependencies.androidFhirEngine )
+  implementation(Dependencies.androidFhirEngine)
 
   // Barcode detector scanning
   implementation("com.google.zxing:core:3.4.1")

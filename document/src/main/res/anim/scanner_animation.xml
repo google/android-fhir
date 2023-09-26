@@ -1,13 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<set xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8" ?>
+<set
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:interpolator="@android:anim/accelerate_decelerate_interpolator"
-    android:fillAfter="false">
+    android:fillAfter="false"
+>
 
   <translate
-      android:fromYDelta="0%p"
-      android:toYDelta="100%p"
-      android:duration="1000"
-      android:repeatCount="infinite"
-      android:repeatMode="reverse" />
+        android:fromYDelta="0%p"
+        android:toYDelta="100%p"
+        android:duration="1000"
+        android:repeatCount="infinite"
+        android:repeatMode="reverse"
+    />
 
 </set>

@@ -123,6 +123,12 @@ fun Project.configureLicensee() {
     // Play Services Phenotype
     allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
 
+    allowDependency("com.google.android.gms", "play-services-flags", "17.0.0") { because("") }
+
+    allowDependency("com.google.android.gms", "play-services-vision", "20.1.3") { because("") }
+
+    allowDependency("com.google.android.gms", "play-services-vision-common", "19.1.3") { because("") }
+
     // Tasks API Android https://developers.google.com/android/guides/tasks
     allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
 
