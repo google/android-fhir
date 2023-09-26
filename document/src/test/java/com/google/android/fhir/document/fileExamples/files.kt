@@ -446,4 +446,4 @@ const val file = "{\n" +
 
 
   val immunizationBundleString: String = ClassLoader.getSystemResource("immunizationBundle.json").readText()
-val generated: String = ClassLoader.getSystemResource("generated.json").readText()
+// val generated: String = ClassLoader.getSystemResource("generated.json").readText()
