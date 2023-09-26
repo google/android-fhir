@@ -49,8 +49,14 @@ jobs:
           # Fetch origin/master for spotless ratchet to work
           # https://github.com/diffplug/spotless/issues/1242
           fetch-depth: 0
+
       - name: Setup machine
         uses: ./.github/actions/commonSetup
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: java
 
       - name: Spotless check
         run: ./gradlew spotlessCheck --scan --stacktrace
@@ -61,6 +67,11 @@ jobs:
       - name: Check with Gradle
         run: ./gradlew check --scan --stacktrace
 
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:java"
+        
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
       - name: Upload maven repo
