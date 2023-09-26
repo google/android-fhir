@@ -13,7 +13,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest= Config.NONE)
-class QRGeneratorTest {
+class GenerateShlUtilsTest {
 
   private val generateShlUtils = GenerateShlUtils()
   private val readShlUtilsMock = ReadShlUtils()

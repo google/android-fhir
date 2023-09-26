@@ -9,7 +9,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest= Config.NONE)
-class QRDecoderTest {
+class ReadShlUtilsTest {
 
     private val readShlUtils = ReadShlUtils()
 
