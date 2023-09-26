@@ -133,10 +133,22 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
 
     emit(FetchProgress(localChangeFetcher.total, localChangeFetcher.total))
-    while (localChangeFetcher.hasNext()) {
-      val uploadSyncResult = upload(localChangeFetcher.next())
+
+    var continueSync = true
+    while (continueSync && localChangeFetcher.hasNext()) {
+      val localChanges = localChangeFetcher.next()
+      val uploadSyncResult = upload(localChanges)
+
       resourceConsolidator.consolidate(uploadSyncResult)
-      emit(localChangeFetcher.getProgress())
+
+      continueSync =
+        when (uploadSyncResult) {
+          is UploadSyncResult.Success -> {
+            emit(localChangeFetcher.getProgress())
+            true
+          }
+          is UploadSyncResult.Failure -> false
+        }
     }
   }
 }

@@ -29,6 +29,7 @@ import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.FetchProgress
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.UploadSyncResult
@@ -40,6 +41,7 @@ import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
@@ -313,7 +315,7 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun syncUpload_uploadLocalChange() = runBlocking {
+  fun syncUpload_uploadLocalChange_success() = runTest {
     val localChanges = mutableListOf<LocalChange>()
     val emittedProgress = mutableListOf<FetchProgress>()
 
@@ -338,6 +340,23 @@ class FhirEngineImplTest {
     assertThat(emittedProgress).hasSize(2)
     assertThat(emittedProgress.first()).isEqualTo(FetchProgress(1, 1))
     assertThat(emittedProgress.last()).isEqualTo(FetchProgress(0, 1))
+  }
+
+  @Test
+  fun syncUpload_uploadLocalChange_failure() = runBlocking {
+    val emittedProgress = mutableListOf<FetchProgress>()
+
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
+        UploadSyncResult.Failure(
+          ResourceSyncException(ResourceType.Patient, FHIRException("Did not work")),
+          LocalChangeToken(it.flatMap { it.token.ids }),
+        )
+      }
+      .collect { emittedProgress.add(it) }
+
+    assertThat(emittedProgress).hasSize(1)
+    assertThat(emittedProgress.first()).isEqualTo(FetchProgress(1, 1))
   }
 
   @Test
