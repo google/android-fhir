@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ object DateProvider {
   // TODO possibly provide more customization options
   /**
    * * Returns the cached [clock] instance. If an Instant is passed , subsequent calls to the
-   * function will return a clock fixed to [instant]. To reset to a normal (unfixed) clock use
-   * [resetClock].
+   *   function will return a clock fixed to [instant]. To reset to a normal (unfixed) clock use
+   *   [resetClock].
    */
   operator fun invoke(instant: Instant? = null): Clock =
     synchronized(this) {

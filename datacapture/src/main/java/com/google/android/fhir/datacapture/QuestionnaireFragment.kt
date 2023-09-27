@@ -61,7 +61,8 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
     requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
       DataCapture.getConfiguration(requireContext())
-        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory
+        ?.get(it)
     }
       ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
@@ -70,7 +71,7 @@ class QuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
       val themeId =
@@ -78,7 +79,7 @@ class QuestionnaireFragment : Fragment() {
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       return inflater
         .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
@@ -106,7 +107,7 @@ class QuestionnaireFragment : Fragment() {
           QuestionnaireValidationErrorMessageDialogFragment()
             .show(
               requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG
+              QuestionnaireValidationErrorMessageDialogFragment.TAG,
             )
         }
       }
@@ -146,7 +147,7 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
+              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>(),
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
@@ -195,8 +196,8 @@ class QuestionnaireFragment : Fragment() {
                   count =
                     (displayMode.pagination.currentPageIndex +
                       1), // incremented by 1 due to initialPageIndex starts with 0.
-                  totalCount = displayMode.pagination.pages.size
-                )
+                  totalCount = displayMode.pagination.pages.size,
+                ),
               )
             } else {
               questionnaireEditRecyclerView.addOnScrollListener(
@@ -208,11 +209,11 @@ class QuestionnaireFragment : Fragment() {
                         count =
                           (linearLayoutManager.findLastVisibleItemPosition() +
                             1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                        totalCount = linearLayoutManager.itemCount
-                      )
+                        totalCount = linearLayoutManager.itemCount,
+                      ),
                     )
                   }
-                }
+                },
               )
             }
           }
@@ -231,7 +232,7 @@ class QuestionnaireFragment : Fragment() {
     }
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
-      viewLifecycleOwner
+      viewLifecycleOwner,
     ) { _, bundle ->
       when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
@@ -243,7 +244,7 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
           )
       }
     }
@@ -364,7 +365,7 @@ class QuestionnaireFragment : Fragment() {
      * [QuestionnaireItemViewHolderFactoryMatchersProvider].
      */
     fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-      matchersProviderFactory: String
+      matchersProviderFactory: String,
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
     /**
@@ -419,6 +420,7 @@ class QuestionnaireFragment : Fragment() {
     /** A list of JSON encoded strings extra for each questionnaire context. */
     internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
       "questionnaire-launch-contexts"
+
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -501,8 +503,8 @@ class QuestionnaireFragment : Fragment() {
      * Implementation should specify when custom questionnaire components should be used.
      *
      * @return A [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
-     * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
-     * questionnaire item.
+     *   whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+     *   questionnaire item.
      */
     abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
   }

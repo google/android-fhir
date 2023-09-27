@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,16 +31,17 @@ internal object MaxLengthValidator : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
-    context: Context
+    context: Context,
   ): AnswerConstraintValidator.Result {
-    if (questionnaireItem.hasMaxLength() &&
+    if (
+      questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
       return AnswerConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
-          questionnaireItem.maxLength
+          questionnaireItem.maxLength,
       )
     }
     return AnswerConstraintValidator.Result(true, null)

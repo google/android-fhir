@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ object PreferenceUtils {
       val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
       CameraSizePair(
         Size.parseSize(sharedPreferences.getString(previewSizePrefKey, null)),
-        Size.parseSize(sharedPreferences.getString(pictureSizePrefKey, null))
+        Size.parseSize(sharedPreferences.getString(pictureSizePrefKey, null)),
       )
     } catch (e: Exception) {
       null
@@ -88,7 +88,7 @@ object PreferenceUtils {
   private fun getBooleanPref(
     context: Context,
     @StringRes prefKeyId: Int,
-    defaultValue: Boolean
+    defaultValue: Boolean,
   ): Boolean =
     PreferenceManager.getDefaultSharedPreferences(context)
       .getBoolean(context.getString(prefKeyId), defaultValue)

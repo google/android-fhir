@@ -21,7 +21,6 @@ import android.os.Build
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.testing.TestUrlResolver
 import com.google.common.truth.Truth.assertThat
@@ -73,9 +72,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -96,9 +95,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                     .setDisplay("Radio Group")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -118,9 +117,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR),
+                ),
+            ),
         )
       }
 
@@ -141,9 +140,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -164,9 +163,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode("null-test")
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -186,9 +185,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -208,9 +207,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -230,9 +229,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -249,8 +248,10 @@ class MoreQuestionnaireItemComponentsTest {
             .setUrl(EXTENSION_ITEM_CONTROL_URL)
             .setValue(
               CodeableConcept()
-                .addCoding(Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM))
-            )
+                .addCoding(
+                  Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -270,9 +271,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -292,9 +293,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.HELP.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -317,11 +318,11 @@ class MoreQuestionnaireItemComponentsTest {
                       .addCoding(
                         Coding()
                           .setCode(DisplayItemControlType.HELP.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                      ),
+                  ),
               )
-            }
+            },
           )
       }
 
@@ -344,11 +345,11 @@ class MoreQuestionnaireItemComponentsTest {
                       .addCoding(
                         Coding()
                           .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                      ),
+                  ),
               )
-            }
+            },
           )
       }
 
@@ -368,9 +369,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.HELP.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -390,9 +391,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -411,9 +412,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -430,8 +431,8 @@ class MoreQuestionnaireItemComponentsTest {
             .setUrl(EXTENSION_ITEM_CONTROL_URL)
             .setValue(
               CodeableConcept()
-                .addCoding(Coding().setCode(DisplayItemControlType.PAGE.extensionCode))
-            )
+                .addCoding(Coding().setCode(DisplayItemControlType.PAGE.extensionCode)),
+            ),
         )
       }
 
@@ -444,7 +445,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
-          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
+          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode),
         )
       }
     assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
@@ -456,7 +457,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
-          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
+          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode),
         )
       }
     assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
@@ -678,7 +679,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -697,7 +698,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -716,7 +717,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -751,7 +752,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -770,7 +771,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -789,7 +790,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -811,9 +812,9 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "text"
-              }
+              },
             )
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
@@ -834,9 +835,9 @@ class MoreQuestionnaireItemComponentsTest {
                 text = "subtitle text"
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -885,14 +886,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -918,14 +919,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -950,14 +951,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1000,9 +1001,9 @@ class MoreQuestionnaireItemComponentsTest {
                 Coding().apply {
                   code = "some random code"
                   system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
+                },
               )
-          }
+          },
         )
       }
     val questionnaireItem =
@@ -1023,7 +1024,7 @@ class MoreQuestionnaireItemComponentsTest {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedFlyoverSpanned).isNull()
@@ -1050,11 +1051,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
@@ -1079,7 +1080,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1090,11 +1091,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -1110,7 +1111,7 @@ class MoreQuestionnaireItemComponentsTest {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedHelpSpanned).isNull()
@@ -1137,11 +1138,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("help text")
@@ -1165,7 +1166,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1176,11 +1177,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -1205,7 +1206,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 addExtension(
@@ -1215,12 +1216,12 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1232,7 +1233,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(true)) }
-          .isHidden
+          .isHidden,
       )
       .isTrue()
   }
@@ -1242,7 +1243,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(false)) }
-          .isHidden
+          .isHidden,
       )
       .isFalse()
   }
@@ -1252,7 +1253,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, IntegerType(1)) }
-          .isHidden
+          .isHidden,
       )
       .isFalse()
   }
@@ -1273,10 +1274,10 @@ class MoreQuestionnaireItemComponentsTest {
                     language = "text/fhirpath"
                     expression =
                       "%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.enableWhenExpression!!.expression)
@@ -1298,10 +1299,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.enableWhenExpression).isNull()
@@ -1316,7 +1317,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     assertThat(item.calculatedExpression).isNotNull()
@@ -1332,7 +1333,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     assertThat(item.calculatedExpression).isNull()
@@ -1348,14 +1349,14 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
         addExtension(
           EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
           Expression().apply {
             this.expression = "%resource.status == 'draft'"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
 
@@ -1376,7 +1377,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "%resource.item.where(linkId='B')"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
@@ -1393,7 +1394,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "%resource.item.where(answer.value.empty())"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
@@ -1410,8 +1411,8 @@ class MoreQuestionnaireItemComponentsTest {
           .addItem(
             Questionnaire.QuestionnaireItemComponent()
               .apply { linkId = "C" }
-              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" })
-          )
+              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" }),
+          ),
       )
     assertThat(items.flattened().map { it.linkId }).containsExactly("A", "B", "C", "D")
   }
@@ -1434,7 +1435,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1445,11 +1446,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1474,7 +1475,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1485,11 +1486,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1521,7 +1522,7 @@ class MoreQuestionnaireItemComponentsTest {
             linkId = "gender"
             type = Questionnaire.QuestionnaireItemType.STRING
             initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-          }
+          },
         )
 
         addItem(
@@ -1529,7 +1530,7 @@ class MoreQuestionnaireItemComponentsTest {
             linkId = "isActive"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-          }
+          },
         )
       }
 
@@ -1557,9 +1558,9 @@ class MoreQuestionnaireItemComponentsTest {
                 linkId = "isActive"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -1567,7 +1568,7 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat((questionResponse.item[0].answer[0].value as StringType).value).isEqualTo("male")
     assertThat(
-        (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
+        (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue(),
       )
       .isEqualTo(true)
   }
@@ -1584,8 +1585,8 @@ class MoreQuestionnaireItemComponentsTest {
               Quantity().apply {
                 code = "months"
                 system = "http://unitofmeausre.org"
-              }
-            )
+              },
+            ),
           )
       }
 
@@ -1607,8 +1608,8 @@ class MoreQuestionnaireItemComponentsTest {
                 code = "months"
                 system = "http://unitofmeausre.org"
                 value = BigDecimal("1")
-              }
-            )
+              },
+            ),
           )
       }
 
@@ -1651,7 +1652,7 @@ class MoreQuestionnaireItemComponentsTest {
         initial =
           listOf(
             Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
-            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222")),
           )
       }
 
@@ -1659,6 +1660,54 @@ class MoreQuestionnaireItemComponentsTest {
 
     assertThat(responseItem.answer.map { it.value.primitiveValue() })
       .containsExactly("000011111", "000022222")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initialSelected option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phone"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("b")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        repeats = true
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("a", "b")
   }
 
   @Test
@@ -1670,7 +1719,7 @@ class MoreQuestionnaireItemComponentsTest {
         initial =
           listOf(
             Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
-            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222"))
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222")),
           )
       }
     assertThrows(IllegalArgumentException::class.java) {
@@ -1679,7 +1728,69 @@ class MoreQuestionnaireItemComponentsTest {
       .run {
         assertThat(this.message)
           .isEqualTo(
-            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for initial and answerOption both specified`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+          )
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
           )
       }
   }
@@ -1862,10 +1973,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "%resource.item.where(linkId='diseases').value"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.answerExpression!!.expression)
@@ -1887,10 +1998,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.answerExpression).isNull()
@@ -1911,10 +2022,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "%resource.item.where(linkId='diseases').value"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionnaire.itemFirstRep.candidateExpression!!.expression)
@@ -1936,10 +2047,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionnaire.itemFirstRep.candidateExpression).isNull()
@@ -1964,15 +2075,15 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("display")))
                   addExtension(Extension("label", StringType("DESCRIPTION")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.choiceColumn!!)
       .containsExactly(
         ChoiceColumn("code", "CODE", false),
-        ChoiceColumn("display", "DESCRIPTION", true)
+        ChoiceColumn("display", "DESCRIPTION", true),
       )
   }
 
@@ -1991,10 +2102,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.choiceColumn).isEmpty()
@@ -2019,9 +2130,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("display")))
                   addExtension(Extension("label", StringType("DESCRIPTION")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     val answers =
@@ -2052,9 +2163,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("name.family")))
                   addExtension(Extension("label", StringType("FAMILY")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     val answers =
@@ -2070,8 +2181,8 @@ class MoreQuestionnaireItemComponentsTest {
               id = "5678"
               nameFirstRep.family = "Doe"
               nameFirstRep.addGiven("Jane")
-            }
-          )
+            },
+          ),
         )
         .map { it.valueReference }
 
@@ -2096,9 +2207,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("name.given")))
                   addExtension(Extension("label", StringType("GIVEN")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     assertThrows(IllegalArgumentException::class.java) {
@@ -2107,7 +2218,7 @@ class MoreQuestionnaireItemComponentsTest {
       .run {
         assertThat(this.message)
           .isEqualTo(
-            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource.",
           )
       }
   }
@@ -2131,6 +2242,59 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
+  @Test
+  fun `should return entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("yyyymmdd")),
+        )
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyymmdd")
+  }
+
+  @Test
+  fun `should return empty entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+      }
+
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `should return valid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("y-MM-dd")))
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return default string for invalid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ENTRY_FORMAT_URL)
+            .setValue(StringType("This is not a valid date format string!")),
+        )
+      }
+
+    assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -2139,11 +2303,11 @@ class MoreQuestionnaireItemComponentsTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 

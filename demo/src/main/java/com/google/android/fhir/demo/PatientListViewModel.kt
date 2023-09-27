@@ -24,7 +24,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
-import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
@@ -59,7 +58,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
    */
   private fun updatePatientListAndPatientCount(
     search: suspend () -> List<PatientItem>,
-    count: suspend () -> Long
+    count: suspend () -> Long,
   ) {
     viewModelScope.launch {
       liveSearchedPatients.value = search()
@@ -79,10 +78,9 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
           {
             modifier = StringFilterModifier.CONTAINS
             value = nameQuery
-          }
+          },
         )
       }
-      filterCity(this)
     }
   }
 
@@ -96,15 +94,14 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             {
               modifier = StringFilterModifier.CONTAINS
               value = nameQuery
-            }
+            },
           )
         }
-        filterCity(this)
         sort(Patient.GIVEN, Order.ASCENDING)
         count = 100
         from = 0
       }
-      .mapIndexed { index, fhirPatient -> fhirPatient.toPatientItem(index + 1) }
+      .mapIndexed { index, fhirPatient -> fhirPatient.resource.toPatientItem(index + 1) }
       .let { patients.addAll(it) }
 
     val risks = getRiskAssessments()
@@ -116,19 +113,15 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return patients
   }
 
-  private fun filterCity(search: Search) {
-    search.filter(Patient.ADDRESS_CITY, { value = "NAIROBI" })
-  }
-
   private suspend fun getRiskAssessments(): Map<String, RiskAssessment?> {
     return fhirEngine
       .search<RiskAssessment> {}
-      .groupBy { it.subject.reference }
+      .groupBy { it.resource.subject.reference }
       .mapValues { entry ->
         entry.value
-          .filter { it.hasOccurrence() }
-          .sortedByDescending { it.occurrenceDateTimeType.value }
-          .firstOrNull()
+          .filter { it.resource.hasOccurrence() }
+          .maxByOrNull { it.resource.occurrenceDateTimeType.value }
+          ?.resource
       }
   }
 
@@ -145,7 +138,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val isActive: Boolean,
     val html: String,
     var risk: String? = "",
-    var riskItem: RiskAssessmentItem? = null
+    var riskItem: RiskAssessmentItem? = null,
   ) {
     override fun toString(): String = name
   }
@@ -155,7 +148,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val id: String,
     val code: String,
     val effective: String,
-    val value: String
+    val value: String,
   ) {
     override fun toString(): String = code
   }
@@ -164,14 +157,14 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     val id: String,
     val code: String,
     val effective: String,
-    val value: String
+    val value: String,
   ) {
     override fun toString(): String = code
   }
 
   class PatientListViewModelFactory(
     private val application: Application,
-    private val fhirEngine: FhirEngine
+    private val fhirEngine: FhirEngine,
   ) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -189,9 +182,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val name = if (hasName()) name[0].nameAsSingleString else ""
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob =
-    if (hasBirthDateElement())
+    if (hasBirthDateElement()) {
       LocalDate.parse(birthDateElement.valueAsString, DateTimeFormatter.ISO_DATE)
-    else null
+    } else {
+      null
+    }
   val phone = if (hasTelecom()) telecom[0].value else ""
   val city = if (hasAddress()) address[0].city else ""
   val country = if (hasAddress()) address[0].country else ""
@@ -208,6 +203,6 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     city = city ?: "",
     country = country ?: "",
     isActive = isActive,
-    html = html
+    html = html,
   )
 }

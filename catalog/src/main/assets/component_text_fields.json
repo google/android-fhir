@@ -2,13 +2,12 @@
   "resourceType": "Questionnaire",
   "item": [
     {
-      "linkId": "1.1",
-      "text": "Register new patient",
+      "linkId": "1",
       "type": "string",
       "item": [
         {
-          "linkId": "1-first-name",
-          "text": "First Name",
+          "linkId": "1.1",
+          "text": "Enter a string",
           "type": "display",
           "extension": [
             {
@@ -29,38 +28,12 @@
       ]
     },
     {
-      "linkId": "2.2",
-      "type": "string",
-      "item": [
-        {
-          "linkId": "1-family-name",
-          "text": "Family Name",
-          "type": "display",
-          "extension": [
-            {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-item-control",
-                    "code": "flyover",
-                    "display": "Fly-over"
-                  }
-                ],
-                "text": "Flyover"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "linkId": "3.3",
+      "linkId": "2",
       "type": "integer",
       "item": [
         {
-          "linkId": "1-id-number",
-          "text": "ID number",
+          "linkId": "2.1",
+          "text": "Enter an integer",
           "type": "display",
           "extension": [
             {
@@ -81,12 +54,84 @@
       ]
     },
     {
-      "linkId": "4.4",
+      "linkId": "3",
       "type": "decimal",
       "item": [
         {
-          "linkId": "1-mobile-number",
-          "text": "Mobile number",
+          "linkId": "3.1",
+          "text": "Enter a decimal",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "4",
+      "type": "integer",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "kg",
+            "display": "kilogram"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "4.1",
+          "text": "Enter an integer (with unit)",
+          "type": "display",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-item-control",
+                    "code": "flyover",
+                    "display": "Fly-over"
+                  }
+                ],
+                "text": "Flyover"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "5",
+      "type": "decimal",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unit",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "kg",
+            "display": "kilogram"
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "5.1",
+          "text": "Enter a decimal (with unit)",
           "type": "display",
           "extension": [
             {

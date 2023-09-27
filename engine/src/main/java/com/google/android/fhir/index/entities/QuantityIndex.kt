@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,5 +28,5 @@ internal data class QuantityIndex(
   val path: String,
   val system: String,
   val code: String,
-  val value: BigDecimal
+  val value: BigDecimal,
 )

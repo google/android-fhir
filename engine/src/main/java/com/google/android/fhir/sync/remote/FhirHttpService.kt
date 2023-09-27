@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.remote
 
+import com.github.fge.jsonpatch.JsonPatch
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
@@ -25,14 +26,37 @@ internal interface FhirHttpService {
 
   /**
    * Makes a HTTP-GET method request to the server.
+   *
    * @return The server may return a particular [Resource], [Bundle] or [OperationOutcome] based on
-   * the request processing.
+   *   the request processing.
    */
   suspend fun get(path: String, headers: Map<String, String>): Resource
 
   /**
    * Makes a HTTP-POST method request to the server with the [Bundle] as request-body.
+   *
    * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
    */
   suspend fun post(path: String, resource: Resource, headers: Map<String, String>): Resource
+
+  /**
+   * Makes a HTTP-PUT method request to the server with a [Resource] as request-body.
+   *
+   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   */
+  suspend fun put(path: String, resource: Resource, headers: Map<String, String>): Resource
+
+  /**
+   * Makes a HTTP-PATCH method request to the server with a [JsonPatch] as request-body.
+   *
+   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   */
+  suspend fun patch(path: String, patchDocument: JsonPatch, headers: Map<String, String>): Resource
+
+  /**
+   * Makes a HTTP-DELETE method request to the server.
+   *
+   * @return The server may return [Bundle] or [OperationOutcome] based on the request processing.
+   */
+  suspend fun delete(path: String, headers: Map<String, String>): Resource
 }

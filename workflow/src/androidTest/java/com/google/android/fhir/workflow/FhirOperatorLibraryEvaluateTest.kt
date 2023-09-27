@@ -87,7 +87,7 @@ class FhirOperatorLibraryEvaluateTest {
    * 2. load the Immunization records of that patient,
    * 3. load the CQL Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   * matches the number of required doses or if the number of required doses is null.
+   *    matches the number of required doses or if the number of required doses is null.
    *
    * ```
    * library ImmunityCheck version '1.0.0'
@@ -127,7 +127,7 @@ class FhirOperatorLibraryEvaluateTest {
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization")
+        setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()

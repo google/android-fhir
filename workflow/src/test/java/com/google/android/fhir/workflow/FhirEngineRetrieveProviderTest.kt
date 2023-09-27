@@ -62,7 +62,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           FhirEngineTerminologyProvider(
             FhirContext.forR4Cached(),
             fhirEngine,
-            KnowledgeManager.createInMemory(context)
+            KnowledgeManager.createInMemory(context),
           )
         isExpandValueSets = true
       }
@@ -95,9 +95,9 @@ class FhirEngineRetrieveProviderTest : Loadable() {
             datePath = null,
             dateLowPath = null,
             dateHighPath = null,
-            dateRange = null
+            dateRange = null,
           )
-          .toList()
+          .toList(),
       )
       .isEmpty()
   }
@@ -119,7 +119,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
 
     assertThat(results).isNotNull()
@@ -144,7 +144,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -171,7 +171,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -200,7 +200,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -228,7 +228,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -251,7 +251,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -277,7 +277,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
     assertThat(results).isNotNull()
     assertThat(results.toList()).isEmpty()
@@ -297,7 +297,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
     assertThat(results).isNotNull()
 
@@ -324,7 +324,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
       datePath = null,
       dateLowPath = null,
       dateHighPath = null,
-      dateRange = null
+      dateRange = null,
     )
   }
 
@@ -347,7 +347,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
 
     assertThat(results).isNotNull()
@@ -367,7 +367,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
     assertThat(results).isNotNull()
     assertThat(results.toList().size).isEqualTo(1)
@@ -391,7 +391,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -412,7 +412,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = null
+          dateRange = null,
         )
         .toList()
 
@@ -443,7 +443,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = "onset-date",
           dateLowPath = null,
           dateHighPath = null,
-          dateRange = interval
+          dateRange = interval,
         )
         .toList()
 
@@ -464,7 +464,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           datePath = null,
           dateLowPath = "onset-date",
           dateHighPath = "onset-date",
-          dateRange = interval
+          dateRange = interval,
         )
         .toList()
 
@@ -488,7 +488,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
         datePath = null,
         dateLowPath = null,
         dateHighPath = null,
-        dateRange = null
+        dateRange = null,
       )
     }
 }

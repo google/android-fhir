@@ -25,7 +25,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
@@ -51,9 +50,11 @@ class SyncInstrumentedTest {
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+
     override fun getDataSource(): DataSource = TestDataSourceImpl
+
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
-    override fun getUploadWorkManager() = SquashedChangesUploadWorkManager()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -85,7 +86,7 @@ class SyncInstrumentedTest {
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
               syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
             ),
         )
         .transformWhile {

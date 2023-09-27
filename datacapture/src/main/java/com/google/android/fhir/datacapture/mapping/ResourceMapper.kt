@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package com.google.android.fhir.datacapture.mapping
 
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
+import com.google.android.fhir.datacapture.extensions.initialExpression
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
@@ -28,6 +30,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.util.Locale
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
@@ -45,6 +48,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.StructureDefinition
@@ -90,22 +94,19 @@ object ResourceMapper {
    * @param questionnaire A [Questionnaire] with data extraction extensions.
    * @param questionnaireResponse A [QuestionnaireResponse] with answers for [questionnaire].
    * @param structureMapExtractionContext The [IWorkerContext] may be used along with
-   * [StructureMapUtilities] to parse the script and convert it into [StructureMap].
-   *
+   *   [StructureMapUtilities] to parse the script and convert it into [StructureMap].
    * @return [Bundle] containing the extracted [Resource]s or empty Bundle if the extraction fails.
-   * An exception might also be thrown in a few cases
-   *
+   *   An exception might also be thrown in a few cases
    * @throws IllegalArgumentException when Resource getting extracted does conform different profile
-   * than standard FHIR profile and argument loadProfile callback Implementation is not provided to
-   * load different profile
+   *   than standard FHIR profile and argument loadProfile callback Implementation is not provided
+   *   to load different profile
    */
   suspend fun extract(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext? = null,
-    profileLoader: ProfileLoader? = null
+    profileLoader: ProfileLoader? = null,
   ): Bundle {
-
     return when {
       questionnaire.targetStructureMap == null ->
         extractByDefinition(
@@ -119,7 +120,7 @@ object ResourceMapper {
             override fun loadProfile(url: CanonicalType): StructureDefinition? {
               if (profileLoader == null) {
                 Timber.w(
-                  "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to"
+                  "ProfileLoader implementation required to load StructureDefinition that this resource claims to conform to",
                 )
                 return null
               }
@@ -132,7 +133,7 @@ object ResourceMapper {
                 structureDefinitionMap[url.toString()] = it
               }
             }
-          }
+          },
         )
       structureMapExtractionContext != null -> {
         extractByStructureMap(questionnaire, questionnaireResponse, structureMapExtractionContext)
@@ -153,7 +154,7 @@ object ResourceMapper {
   private fun extractByDefinition(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ): Bundle {
     val rootResource: Resource? = questionnaire.createResource()
     val extractedResources = mutableListOf<Resource>()
@@ -163,7 +164,7 @@ object ResourceMapper {
       questionnaireResponse.item,
       rootResource,
       extractedResources,
-      profileLoader
+      profileLoader,
     )
 
     if (rootResource != null) {
@@ -181,10 +182,9 @@ object ResourceMapper {
    * StructureMap-based extraction.
    *
    * @param structureMapProvider provides the referenced [StructureMap] either from persistence or a
-   * remote service.
-   *
+   *   remote service.
    * @return a [Bundle] including the extraction results, or `null` if [structureMapProvider] is
-   * missing.
+   *   missing.
    *
    * See http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction for more on
    * StructureMap-based extraction.
@@ -192,18 +192,19 @@ object ResourceMapper {
   private suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    structureMapExtractionContext: StructureMapExtractionContext
+    structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
     val simpleWorkerContext =
       DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+        .simpleWorkerContext
+        .apply { setExpansionProfile(Parameters()) }
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
           simpleWorkerContext,
-          structureMapExtractionContext.transformSupportServices
+          structureMapExtractionContext.transformSupportServices,
         )
         .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
     }
@@ -217,7 +218,7 @@ object ResourceMapper {
    */
   suspend fun populate(
     questionnaire: Questionnaire,
-    vararg resources: Resource
+    vararg resources: Resource,
   ): QuestionnaireResponse {
     populateInitialValues(questionnaire.item, *resources)
     return QuestionnaireResponse().apply {
@@ -227,14 +228,14 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    vararg resources: Resource
+    vararg resources: Resource,
   ) {
     questionnaireItems.forEach { populateInitialValue(it, *resources) }
   }
 
   private suspend fun populateInitialValue(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    vararg resources: Resource
+    vararg resources: Resource,
   ) {
     check(questionnaireItem.initial.isEmpty() || questionnaireItem.initialExpression == null) {
       "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
@@ -245,17 +246,16 @@ object ResourceMapper {
         fhirPathEngine
           .evaluate(
             selectPopulationContext(resources.asList(), it),
-            it.expression.removePrefix("%")
+            it.expression.removePrefix("%"),
           )
           .singleOrNull()
       }
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
+        val value = it.asExpectedType(questionnaireItem.type)
         questionnaireItem.initial =
-          mutableListOf(
-            Questionnaire.QuestionnaireItemInitialComponent().setValue(it.asExpectedType())
-          )
+          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
       }
 
     populateInitialValues(questionnaireItem.item, *resources)
@@ -271,19 +271,12 @@ object ResourceMapper {
    */
   private fun selectPopulationContext(
     resources: List<Resource>,
-    initialExpression: Expression
+    initialExpression: Expression,
   ): Resource? {
     val resourceType = initialExpression.expression.substringBefore(".").removePrefix("%")
     return resources.singleOrNull { it.resourceType.name.lowercase() == resourceType.lowercase() }
       ?: resources.firstOrNull()
   }
-
-  private val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
-    get() {
-      return this.extension
-        .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
-        ?.let { it.value as Expression }
-    }
 
   /**
    * Updates corresponding fields in [extractionContext] with answers in
@@ -300,19 +293,22 @@ object ResourceMapper {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ) {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
     val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (questionnaireItemListIterator.hasNext() &&
-      questionnaireResponseItemListIterator.hasNext()) {
+    while (
+      questionnaireItemListIterator.hasNext() && questionnaireResponseItemListIterator.hasNext()
+    ) {
       val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
       var currentQuestionnaireItem = questionnaireItemListIterator.next()
       // Find the next questionnaire item with the same link ID. This is necessary because some
       // questionnaire items that are disabled might not have corresponding questionnaire response
       // items.
-      while (questionnaireItemListIterator.hasNext() &&
-        currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId) {
+      while (
+        questionnaireItemListIterator.hasNext() &&
+          currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId
+      ) {
         currentQuestionnaireItem = questionnaireItemListIterator.next()
       }
       if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
@@ -321,7 +317,7 @@ object ResourceMapper {
           currentQuestionnaireResponseItem,
           extractionContext,
           extractionResult,
-          profileLoader
+          profileLoader,
         )
       }
     }
@@ -341,7 +337,7 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionContext: Base?,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ) {
     when (questionnaireItem.type) {
       Questionnaire.QuestionnaireItemType.GROUP ->
@@ -359,7 +355,7 @@ object ResourceMapper {
               questionnaireItem,
               questionnaireResponseItem,
               extractionResult,
-              profileLoader
+              profileLoader,
             )
           questionnaireItem.definition != null -> {
             // Extract a new element (which is not a resource) e.g. HumanName, Quantity, etc
@@ -371,7 +367,7 @@ object ResourceMapper {
               questionnaireResponseItem,
               extractionContext,
               extractionResult,
-              profileLoader
+              profileLoader,
             )
           }
           else ->
@@ -381,7 +377,7 @@ object ResourceMapper {
               questionnaireResponseItem.item,
               extractionContext,
               extractionResult,
-              profileLoader
+              profileLoader,
             )
         }
       else ->
@@ -394,7 +390,7 @@ object ResourceMapper {
             questionnaireItem,
             questionnaireResponseItem,
             extractionContext,
-            profileLoader
+            profileLoader,
           )
         }
     }
@@ -409,7 +405,7 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ) {
     val resource = questionnaireItem.createResource() as Resource
     extractByDefinition(
@@ -417,7 +413,7 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       resource,
       extractionResult,
-      profileLoader
+      profileLoader,
     )
     extractionResult += resource
   }
@@ -432,7 +428,7 @@ object ResourceMapper {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
     extractionResult: MutableList<Resource>,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ) {
     val fieldName = getFieldNameByDefinition(questionnaireItem.definition)
     val value =
@@ -449,7 +445,7 @@ object ResourceMapper {
       questionnaireResponseItem.item,
       value,
       extractionResult,
-      profileLoader
+      profileLoader,
     )
   }
 
@@ -461,7 +457,7 @@ object ResourceMapper {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     base: Base,
-    profileLoader: ProfileLoader
+    profileLoader: ProfileLoader,
   ) {
     if (questionnaireResponseItem.answer.isEmpty()) return
 
@@ -501,19 +497,20 @@ object ResourceMapper {
         val extensionForType =
           questionnaireItem.definition.substring(
             questionnaireItem.definition.lastIndexOf("#") + 1,
-            questionnaireItem.definition.lastIndexOf(".")
+            questionnaireItem.definition.lastIndexOf("."),
           )
-        if (isExtensionSupportedByProfile(
+        if (
+          isExtensionSupportedByProfile(
             structureDefinition = it,
             extensionForType = extensionForType,
-            fieldName = fieldName
+            fieldName = fieldName,
           )
         ) {
           addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
           return
         } else {
           Timber.w(
-            "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored"
+            "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored",
           )
         }
       }
@@ -524,7 +521,7 @@ object ResourceMapper {
 private fun isExtensionSupportedByProfile(
   structureDefinition: StructureDefinition,
   extensionForType: String,
-  fieldName: String
+  fieldName: String,
 ): Boolean {
   // Partial ElementDefinition from StructureDefinition to check extension is
   //  "id": "Patient.address.extension:address-preferred",
@@ -541,17 +538,18 @@ private fun isExtensionSupportedByProfile(
 
 /**
  * Adds custom extension for Resource.
+ *
  * @param questionnaireItem QuestionnaireItemComponent with details for extension
  * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
  * @param base
  * - resource's Base class instance See
- * https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
- * custom extensions
+ *   https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
+ *   custom extensions
  */
 private fun addDefinitionBasedCustomExtension(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
-  base: Base
+  base: Base,
 ) {
   if (base is Type) {
     // Create an extension
@@ -621,12 +619,13 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
 
 /**
  * The api's used to updateField with answers are:
- *
  * * For Parameterized list of primitive type e.g HumanName.given of type List<StringType>
+ *
  * ```
  *     addGiven(String) - adds a new StringType to the list.
  * ```
  * * For any primitive value e.g for Patient.active which is of BooleanType
+ *
  * ```
  *     setActiveElement(BooleanType)
  * ```
@@ -638,7 +637,7 @@ private fun updateFieldWithEnum(base: Base, field: Field, value: Base) {
 private fun updateField(
   base: Base,
   field: Field,
-  answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>
+  answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
 ) {
   val answersOfFieldType =
     answers.map { wrapAnswerInFieldType(it.value, field) }.toCollection(mutableListOf())
@@ -665,7 +664,7 @@ private fun addAnswerToListField(base: Base, field: Field, answerValue: List<Bas
   base.javaClass
     .getMethod(
       "add${field.name.replaceFirstChar(Char::uppercase)}",
-      answerValue.first().fhirType().replaceFirstChar(Char::uppercase).javaClass
+      answerValue.first().fhirType().replaceFirstChar(Char::uppercase).javaClass,
     )
     .let { method -> answerValue.forEach { method.invoke(base, it.primitiveValue()) } }
 }
@@ -719,9 +718,6 @@ private fun wrapAnswerInFieldType(answer: Base, fieldType: Field): Base {
   return answer
 }
 
-internal const val ITEM_INITIAL_EXPRESSION_URL: String =
-  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression"
-
 private val Field.isList: Boolean
   get() = isParameterized && type == List::class.java
 
@@ -731,8 +727,11 @@ private val Field.isParameterized: Boolean
 /** The non-parameterized type of this field (e.g. `String` for a field of type `List<String>`). */
 private val Field.nonParameterizedType: Class<*>
   get() =
-    if (isParameterized) (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
-    else type
+    if (isParameterized) {
+      (genericType as ParameterizedType).actualTypeArguments[0] as Class<*>
+    } else {
+      type
+    }
 
 private fun Class<*>.getFieldOrNull(name: String): Field? {
   return try {
@@ -758,11 +757,33 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(): Type {
-  return when (this) {
-    is Enumeration<*> -> toCoding()
-    is IdType -> StringType(idPart)
+private fun Base.asExpectedType(
+  questionnaireItemType: Questionnaire.QuestionnaireItemType? = null,
+): Type {
+  return when {
+    questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
+      asExpectedReferenceType()
+    this is Enumeration<*> -> toCoding()
+    this is IdType -> StringType(idPart)
     else -> this as Type
+  }
+}
+
+private fun Base.asExpectedReferenceType(): Type {
+  return when {
+    this.isResource -> {
+      this@asExpectedReferenceType as Resource
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+      }
+    }
+    this is IdType ->
+      Reference().apply {
+        reference =
+          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
+      }
+    else -> throw FHIRException("Expression supplied does not evaluate to IdType.")
   }
 }
 

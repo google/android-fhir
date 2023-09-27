@@ -23,7 +23,6 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFailingDatasource
@@ -40,35 +39,42 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE)
 class FhirSyncWorkerTest {
   private lateinit var context: Context
+
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+
     override fun getDataSource(): DataSource = TestDataSourceImpl
+
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+
     override fun getDataSource(): DataSource = TestFailingDatasource
+
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
-    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
     appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
   ) : FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+
     override fun getDownloadWorkManager() = TestDownloadManagerImpl()
-    override fun getUploadWorkManager(): UploadWorkManager = SquashedChangesUploadWorkManager()
+
     override fun getDataSource(): DataSource? = null
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -85,7 +91,7 @@ class FhirSyncWorkerTest {
       TestListenableWorkerBuilder<PassingPeriodicSyncWorker>(
           context,
           inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 1).build(),
-          runAttemptCount = 0
+          runAttemptCount = 0,
         )
         .build()
     val result = runBlocking { worker.doWork() }
@@ -98,7 +104,7 @@ class FhirSyncWorkerTest {
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
           inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 0).build(),
-          runAttemptCount = 0
+          runAttemptCount = 0,
         )
         .build()
     val result = runBlocking { worker.doWork() }
@@ -111,7 +117,7 @@ class FhirSyncWorkerTest {
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
           inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-          runAttemptCount = 2
+          runAttemptCount = 2,
         )
         .build()
     val result = runBlocking { worker.doWork() }
@@ -124,7 +130,7 @@ class FhirSyncWorkerTest {
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
           inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-          runAttemptCount = 1
+          runAttemptCount = 1,
         )
         .build()
     val result = runBlocking { worker.doWork() }
@@ -137,7 +143,7 @@ class FhirSyncWorkerTest {
       TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
           context,
           inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
-          runAttemptCount = 2
+          runAttemptCount = 2,
         )
         .build()
     val result = runBlocking { worker.doWork() }

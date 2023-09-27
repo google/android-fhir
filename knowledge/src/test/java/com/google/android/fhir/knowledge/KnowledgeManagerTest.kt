@@ -53,9 +53,9 @@ internal class KnowledgeManagerTest {
           dependency.version,
           dependency.uri,
           emptyList(),
-          dataFolder
+          dataFolder,
         )
-      }
+      },
     )
 
   @After
@@ -73,7 +73,7 @@ internal class KnowledgeManagerTest {
         knowledgeDb
           .knowledgeDao()
           .getImplementationGuidesWithResources(implementationGuideId)
-          ?.resources
+          ?.resources,
       )
       .hasSize(6)
   }
@@ -103,8 +103,8 @@ internal class KnowledgeManagerTest {
     assertThat(
         knowledgeManager.loadResources(
           resourceType = "Measure",
-          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
-        )
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        ),
       )
       .isNotEmpty()
     assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
@@ -134,6 +134,7 @@ internal class KnowledgeManagerTest {
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
   }
+
   fun `installing from npmPackageManager`() = runTest {
     knowledgeManager.install(dependency)
 
@@ -145,8 +146,8 @@ internal class KnowledgeManagerTest {
     assertThat(
         knowledgeManager.loadResources(
           resourceType = "Measure",
-          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
-        )
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        ),
       )
       .isNotEmpty()
     assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))

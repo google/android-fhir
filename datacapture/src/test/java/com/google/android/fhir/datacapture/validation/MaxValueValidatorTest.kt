@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ class MaxValueValidatorTest {
           Extension().apply {
             this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
-          }
+          },
         )
       }
     val answer =
@@ -76,7 +76,7 @@ class MaxValueValidatorTest {
           Extension().apply {
             this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
-          }
+          },
         )
       }
     val answer =
@@ -100,9 +100,9 @@ class MaxValueValidatorTest {
             Extension().apply {
               url = MAX_VALUE_EXTENSION_URL
               this.setValue(dateType)
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
@@ -127,14 +127,14 @@ class MaxValueValidatorTest {
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)
@@ -159,14 +159,14 @@ class MaxValueValidatorTest {
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today() + 5 'days' "
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)

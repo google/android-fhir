@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceMetadataId"]),
-      Index(value = ["url", "version", "resourceFile"], unique = true)
+      Index(value = ["url", "version", "resourceFile"], unique = true),
     ],
 )
 internal data class ResourceMetadataEntity(

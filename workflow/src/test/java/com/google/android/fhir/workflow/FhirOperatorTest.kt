@@ -67,8 +67,12 @@ class FhirOperatorTest {
     // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
     knowledgeManager.install(
-      Dependency("com.google.android.fhir", "1.0.0", "http://github.com/google/android-fhir"),
-      rootDirectory
+      Dependency(
+        "com.google.android.fhir",
+        "1.0.0",
+        "http://github.com/google/android-fhir",
+      ),
+      rootDirectory,
     )
   }
 
@@ -86,23 +90,23 @@ class FhirOperatorTest {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
     loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
 
     assertThat(
         fhirOperator.generateCarePlan(
           planDefinitionId = "plandefinition-RuleFilters-1.0.0",
           patientId = "Reportable",
-          encounterId = "reportable-encounter"
-        )
+          encounterId = "reportable-encounter",
+        ),
       )
       .isNotNull()
   }
@@ -115,7 +119,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "MedRequest-Example",
-        patientId = "Patient/Patient-Example"
+        patientId = "Patient/Patient-Example",
       )
 
     println(jsonParser.encodeResourceToString(carePlan))
@@ -123,7 +127,7 @@ class FhirOperatorTest {
     assertEquals(
       readResourceAsString("/plan-definition/med-request/med_request_careplan.json"),
       jsonParser.encodeResourceToString(carePlan),
-      true
+      true,
     )
   }
 
@@ -132,20 +136,20 @@ class FhirOperatorTest {
     loadFile("/plan-definition/cql-applicability-condition/patient.json", ::importToFhirEngine)
     loadFile(
       "/plan-definition/cql-applicability-condition/plan_definition.json",
-      ::installToIgManager
+      ::installToIgManager,
     )
     loadFile("/plan-definition/cql-applicability-condition/example-1.0.0.cql", ::installToIgManager)
 
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "Plan-Definition-Example",
-        patientId = "Patient/Female-Patient-Example"
+        patientId = "Patient/Female-Patient-Example",
       )
 
     assertEquals(
       readResourceAsString("/plan-definition/cql-applicability-condition/care_plan.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan),
-      true
+      true,
     )
   }
 
@@ -154,15 +158,15 @@ class FhirOperatorTest {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
     loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
 
     val measureReport =
@@ -172,7 +176,7 @@ class FhirOperatorTest {
         end = "2021-12-31",
         reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
-        practitioner = null
+        practitioner = null,
       )
 
     measureReport.date = null
@@ -180,7 +184,7 @@ class FhirOperatorTest {
     assertEquals(
       readResourceAsString("/first-contact/04-results/population-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
-      true
+      true,
     )
   }
 
@@ -199,7 +203,7 @@ class FhirOperatorTest {
         end = "2022-12-31",
         reportType = MeasureEvalType.POPULATION.toCode(),
         subject = null,
-        practitioner = null
+        practitioner = null,
       )
 
     measureReport.date = null
@@ -207,7 +211,7 @@ class FhirOperatorTest {
     assertEquals(
       readResourceAsString("/group-measure/Results-Measure-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
-      true
+      true,
     )
   }
 
@@ -216,15 +220,15 @@ class FhirOperatorTest {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
     loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/02-enrollment/episodeofcare-charity-otala-1-pregnancy-episode.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     loadFile(
       "/first-contact/03-contact/encounter-anc-encounter-charity-otala-1.xml",
-      ::importToFhirEngine
+      ::importToFhirEngine,
     )
     val measureReport =
       fhirOperator.evaluateMeasure(
@@ -233,7 +237,7 @@ class FhirOperatorTest {
         end = "2020-01-31",
         reportType = MeasureEvalType.SUBJECT.toCode(),
         subject = "charity-otala-1",
-        practitioner = "jane"
+        practitioner = "jane",
       )
 
     measureReport.date = null
@@ -241,7 +245,7 @@ class FhirOperatorTest {
     assertEquals(
       readResourceAsString("/first-contact/04-results/subject-report.json"),
       jsonParser.setPrettyPrint(true).encodeResourceToString(measureReport),
-      true
+      true,
     )
   }
 
@@ -261,7 +265,7 @@ class FhirOperatorTest {
 
   private suspend fun loadResource(
     resource: Resource,
-    importFunction: KSuspendFunction1<Resource, Unit>
+    importFunction: KSuspendFunction1<Resource, Unit>,
   ) {
     when (resource.resourceType) {
       ResourceType.Bundle -> loadBundle(resource as Bundle, importFunction)
@@ -271,7 +275,7 @@ class FhirOperatorTest {
 
   private suspend fun loadBundle(
     bundle: Bundle,
-    importFunction: KSuspendFunction1<Resource, Unit>
+    importFunction: KSuspendFunction1<Resource, Unit>,
   ) {
     for (entry in bundle.entry) {
       val resource = entry.resource

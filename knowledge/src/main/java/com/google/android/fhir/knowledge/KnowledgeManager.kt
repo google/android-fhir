@@ -49,13 +49,14 @@ internal constructor(
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
-   * * Checks if the [dependencies] are present in DB. If necessary, downloads the dependencies from
-   * NPM and imports data from the package manager (populates the metadata of the FHIR Resources)
+   * Checks if the [dependencies] are present in DB. If necessary, downloads the dependencies from
+   * NPM and imports data from the package manager (populates the metadata of the FHIR Resources).
    */
   suspend fun install(vararg dependencies: Dependency) {
     for (dependency in dependencies) {
-      if (knowledgeDao.getImplementationGuide(dependency.packageId, dependency.version) != null)
+      if (knowledgeDao.getImplementationGuide(dependency.packageId, dependency.version) != null) {
         continue
+      }
       println(dependency)
       val containsPackage = npmFileManager.containsPackage(dependency.packageId, dependency.version)
       val npmPackage =
@@ -153,7 +154,7 @@ internal constructor(
         metadataResource?.url,
         metadataResource?.name,
         metadataResource?.version,
-        file
+        file,
       )
     knowledgeDao.insertResource(igId, res)
   }
@@ -174,14 +175,14 @@ internal constructor(
     fun create(context: Context) =
       KnowledgeManager(
         Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build(),
-        context.dataDir
+        context.dataDir,
       )
 
     /** Creates an [KnowledgeManager] backed by the in-memory DB. */
     fun createInMemory(context: Context) =
       KnowledgeManager(
         Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build(),
-        context.dataDir
+        context.dataDir,
       )
   }
 }

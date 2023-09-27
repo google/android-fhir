@@ -71,7 +71,7 @@ fun Project.configureLicensee() {
     // Jakarta Activation API 2.1 Specification
     allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
       because(
-        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php"
+        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php",
       )
     }
 

@@ -25,6 +25,7 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -48,6 +49,7 @@ internal object AutoCompleteViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
+
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var errorTextView: TextView
 
@@ -64,8 +66,10 @@ internal object AutoCompleteViewHolderFactory :
                 value =
                   questionnaireViewItem.enabledAnswerOptions
                     .first {
-                      it.value.displayString(header.context) ==
-                        autoCompleteTextView.adapter.getItem(position) as String
+                      it.value.identifierString(header.context) ==
+                        (autoCompleteTextView.adapter.getItem(position)
+                            as AutoCompleteViewAnswerOption)
+                          .answerId
                     }
                     .valueCoding
               }
@@ -78,9 +82,20 @@ internal object AutoCompleteViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
-        val answerOptionString =
-          questionnaireViewItem.enabledAnswerOptions.map { it.value.displayString(header.context) }
-        val adapter = ArrayAdapter(header.context, R.layout.drop_down_list_item, answerOptionString)
+        val answerOptionValues =
+          questionnaireViewItem.enabledAnswerOptions.map {
+            AutoCompleteViewAnswerOption(
+              answerId = it.value.identifierString(header.context),
+              answerDisplay = it.value.displayString(header.context),
+            )
+          }
+        val adapter =
+          ArrayAdapter(
+            header.context,
+            R.layout.drop_down_list_item,
+            R.id.answer_option_textview,
+            answerOptionValues,
+          )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
         chipContainer.removeAllViews()
@@ -105,7 +120,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun onAnswerSelected(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         if (canHaveMultipleAnswers) {
           handleSelectionWhenQuestionCanHaveMultipleAnswers(answer)
@@ -120,7 +135,7 @@ internal object AutoCompleteViewHolderFactory :
        * will happen if the user selects an already selected answer.
        */
       private fun addNewChipIfNotPresent(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
@@ -141,16 +156,17 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun chipIsAlreadyPresent(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ): Boolean {
         return chipContainer.children.any { chip ->
           (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent)
-            .value.equalsDeep(answer.value)
+            .value
+            .equalsDeep(answer.value)
         }
       }
 
       private fun handleSelectionWhenQuestionCanHaveSingleAnswer(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         if (chipContainer.isEmpty()) {
           addNewChipIfNotPresent(answer)
@@ -164,7 +180,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun handleSelectionWhenQuestionCanHaveMultipleAnswers(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         val answerNotPresent =
           questionnaireViewItem.answers.none { it.value.equalsDeep(answer.value) }
@@ -191,7 +207,7 @@ internal object AutoCompleteViewHolderFactory :
         // textInputLayout to show the error icon and the box color.
         when (validationResult) {
           is NotValidated,
-          Valid -> {
+          Valid, -> {
             errorTextView.visibility = View.GONE
             textInputLayout.error = null
           }
@@ -203,4 +219,14 @@ internal object AutoCompleteViewHolderFactory :
         }
       }
     }
+}
+
+/**
+ * An answer option that would show up as a dropdown item in an [AutoCompleteViewHolderFactory]
+ * textview
+ */
+internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
+  override fun toString(): String {
+    return this.answerDisplay
+  }
 }
