@@ -308,6 +308,61 @@ class FhirEngineRetrieveProviderTest : Loadable() {
       .isEqualTo("test-one-r4")
   }
 
+  @Test
+  fun `should return result when code path is multiword`() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+
+    val code =
+      Code()
+        .withCode("confirmed")
+        .withSystem("http://terminology.hl7.org/CodeSystem/condition-ver-status")
+    val results: Iterable<Any> =
+      retrieveProvider.retrieve(
+        context = "Patient",
+        contextPath = "subject",
+        contextValue = "test-one-r4",
+        dataType = "Condition",
+        templateId = null,
+        codePath = "verificationStatus",
+        codes = mutableSetOf(code),
+        valueSet = null,
+        datePath = null,
+        dateLowPath = null,
+        dateHighPath = null,
+        dateRange = null,
+      )
+    val resultList = results.toList()
+    assertThat(resultList.size).isEqualTo(2)
+    assertThat(resultList.first()).isInstanceOf(Condition::class.java)
+    assertThat((resultList.first() as Condition).subject.referenceElement.idPart)
+      .isEqualTo("test-one-r4")
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `should throw exception when code path is not a valid search param`(): Unit =
+    runBlockingOnWorkerThread {
+      loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+
+      val code =
+        Code()
+          .withCode("confirmed")
+          .withSystem("http://terminology.hl7.org/CodeSystem/condition-ver-status")
+      retrieveProvider.retrieve(
+        context = "Patient",
+        contextPath = "subject",
+        contextValue = "test-one-r4",
+        dataType = "Condition",
+        templateId = null,
+        codePath = "missingProperty", // code path is not valid
+        codes = mutableSetOf(code),
+        valueSet = null,
+        datePath = null,
+        dateLowPath = null,
+        dateHighPath = null,
+        dateRange = null,
+      )
+    }
+
   @Test(expected = TerminologyProviderException::class)
   fun testFilterToValueSetNoTerminologyProvider(): Unit = runBlockingOnWorkerThread {
     loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))

@@ -71,7 +71,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     } else {
       val search = Search(ResourceType.fromCode(dataType))
       filterByContext(context, contextPath, contextValue, dataType, search)
-      filterByCode(codePath, codes, search)
+      filterByCode(codePath, codes, dataType, search)
       filterByValueSet(codePath, valueSet, search)
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
       fhirEngine.search(search)
@@ -158,7 +158,12 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     }
   }
 
-  private fun filterByCode(codePath: String?, codes: Iterable<Code>?, search: Search) {
+  private fun filterByCode(
+    codePath: String?,
+    codes: Iterable<Code>?,
+    dataType: String,
+    search: Search,
+  ) {
     if (codes == null || codePath == null) return
 
     val inCodes =
@@ -169,7 +174,15 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         apply
       }
 
-    if (inCodes.isNotEmpty()) search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+    if (inCodes.isNotEmpty()) {
+      val param = findSearchParamDefinition(dataType, codePath)
+      require(param != null) {
+        throw IllegalArgumentException(
+          "FhirEngineRetrieveProvider doesn't know how to search for $dataType.$codePath",
+        )
+      }
+      search.filter(TokenClientParam(param.name), *inCodes.toTypedArray())
+    }
   }
 
   private fun filterByValueSet(codePath: String?, valueSetUrl: String?, search: Search) {
@@ -185,7 +198,9 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         apply
       }
 
-    if (inCodes.isNotEmpty()) search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+    if (inCodes.isNotEmpty()) {
+      search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+    }
   }
 
   private fun filterByContext(
