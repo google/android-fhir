@@ -25,13 +25,11 @@ import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -67,18 +65,6 @@ class FhirSynchronizerTest {
   }
 
   @Test
-  fun `subscribe should throw exception on second subscription`() {
-    val flow1 = MutableSharedFlow<SyncJobStatus>()
-    val flow2 = MutableSharedFlow<SyncJobStatus>()
-    fhirSynchronizer.subscribe(flow1)
-
-    val exception =
-      assertThrows(IllegalStateException::class.java) { fhirSynchronizer.subscribe(flow2) }
-
-    assertThat(exception.localizedMessage).isEqualTo("Already subscribed to a flow")
-  }
-
-  @Test
   fun `synchronize should return Success on successful download and upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
@@ -90,11 +76,8 @@ class FhirSynchronizerTest {
           ),
         )
 
-      val testFlow = MutableSharedFlow<SyncJobStatus>()
-      fhirSynchronizer.subscribe(testFlow)
-
       val emittedValues = mutableListOf<SyncJobStatus>()
-      backgroundScope.launch { testFlow.collect { emittedValues.add(it) } }
+      backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
 
       val result = fhirSynchronizer.synchronize()
 
@@ -123,11 +106,8 @@ class FhirSynchronizerTest {
           ),
         )
 
-      val testFlow = MutableSharedFlow<SyncJobStatus>()
-      fhirSynchronizer.subscribe(testFlow)
-
       val emittedValues = mutableListOf<SyncJobStatus>()
-      backgroundScope.launch { testFlow.collect { emittedValues.add(it) } }
+      backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
 
       val result = fhirSynchronizer.synchronize()
 
@@ -151,11 +131,8 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(UploadSyncResult.Failure(error, LocalChangeToken(listOf())))
 
-      val testFlow = MutableSharedFlow<SyncJobStatus>()
-      fhirSynchronizer.subscribe(testFlow)
-
       val emittedValues = mutableListOf<SyncJobStatus>()
-      backgroundScope.launch { testFlow.collect { emittedValues.add(it) } }
+      backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
 
       val result = fhirSynchronizer.synchronize()
 
