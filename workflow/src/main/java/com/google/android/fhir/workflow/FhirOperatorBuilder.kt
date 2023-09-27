@@ -45,13 +45,6 @@ class FhirOperatorBuilder(private val applicationContext: Context) {
     return this
   }
 
-  fun withImplementationGuides(
-    vararg dependencies: Dependency,
-  ): FhirOperatorBuilder {
-    this.dependencies = dependencies.toList()
-    return this
-  }
-
   fun build(): FhirOperator {
     return FhirOperator(
       fhirContext ?: FhirContext(FhirVersionEnum.R4),
