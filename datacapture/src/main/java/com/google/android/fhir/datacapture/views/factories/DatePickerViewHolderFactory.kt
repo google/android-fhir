@@ -136,8 +136,8 @@ internal object DatePickerViewHolderFactory :
         if (!draftAnswer.isNullOrEmpty()) {
           displayValidationResult(
             Invalid(
-              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern))
-            )
+              listOf(invalidDateErrorText(textInputEditText.context, canonicalizedDatePattern)),
+            ),
           )
         } else {
           displayValidationResult(questionnaireViewItem.validationResult)
@@ -188,7 +188,7 @@ internal object DatePickerViewHolderFactory :
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = localDate.dateType
-          }
+          },
         )
 
       /**
@@ -210,7 +210,7 @@ internal object DatePickerViewHolderFactory :
           getValidationErrorMessage(
             textInputLayout.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -222,7 +222,7 @@ internal object DatePickerViewHolderFactory :
           charSequence: CharSequence,
           start: Int,
           count: Int,
-          after: Int
+          after: Int,
         ) {
           isDeleting = count > after
         }
@@ -231,7 +231,7 @@ internal object DatePickerViewHolderFactory :
           charSequence: CharSequence,
           start: Int,
           before: Int,
-          count: Int
+          count: Int,
         ) {}
 
         override fun afterTextChanged(editable: Editable) {
@@ -239,7 +239,7 @@ internal object DatePickerViewHolderFactory :
             editable,
             canonicalizedDatePattern,
             dateFormatSeparator,
-            isDeleting
+            isDeleting,
           )
           parseDateOnTextChanged(editable.toString())
         }
@@ -258,7 +258,7 @@ internal fun handleDateFormatAfterTextChange(
   editable: Editable,
   canonicalizedDatePattern: String,
   dateFormatSeparator: Char?,
-  isDeleting: Boolean
+  isDeleting: Boolean,
 ) {
   val editableLength = editable.length
   if (editable.isEmpty()) {
@@ -276,7 +276,8 @@ internal fun handleDateFormatAfterTextChange(
       // 02 is entered with dd/MM/yyyy so appending / to editable 02/
       editable.append(dateFormatSeparator)
     }
-    if (canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
+    if (
+      canonicalizedDatePattern[editable.lastIndex] == dateFormatSeparator &&
         editable[editable.lastIndex] != dateFormatSeparator
     ) {
       // Add separator to break different date components, e.g. converting "123" to "12/3"
@@ -287,13 +288,15 @@ internal fun handleDateFormatAfterTextChange(
 
 internal val DateType.localDate
   get() =
-    if (!this.hasValue()) null
-    else
+    if (!this.hasValue()) {
+      null
+    } else {
       LocalDate.of(
         year,
         month + 1,
         day,
       )
+    }
 
 internal val LocalDate.dateType
   get() = DateType(year, monthValue - 1, dayOfMonth)
@@ -318,5 +321,5 @@ internal fun invalidDateErrorText(context: Context, formatPattern: String) =
     // Use 'mm' for month instead of 'MM' to avoid confusion.
     // See https://developer.android.com/reference/kotlin/java/text/SimpleDateFormat.
     formatPattern.lowercase(),
-    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023")
+    formatPattern.replace("dd", "31").replace("MM", "01").replace("yyyy", "2023"),
   )

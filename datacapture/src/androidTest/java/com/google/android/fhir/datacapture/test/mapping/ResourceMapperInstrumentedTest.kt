@@ -66,7 +66,8 @@ class ResourceMapperInstrumentedTest {
            }
          ]
        }
-    """.trimIndent()
+        """
+      .trimIndent()
 
   @Language("JSON")
   private val questionnaireResponseJson =
@@ -84,7 +85,8 @@ class ResourceMapperInstrumentedTest {
             }
           ]
         }
-    """.trimIndent()
+        """
+      .trimIndent()
   val iParser: IParser = FhirContext.forR4().newJsonParser()
   private val questionnaireWithBirthTimeExt: Questionnaire =
     iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -114,7 +116,7 @@ class ResourceMapperInstrumentedTest {
     val dateTimeType =
       patient
         .getExtensionByUrl(
-          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime"
+          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime",
         )
         .value as DateTimeType
     val expectedDateTimeType = DateTimeType("2022-02-07T13:28:17-05:00")
@@ -136,8 +138,8 @@ class ResourceMapperInstrumentedTest {
     assertThat(patient).isNotNull()
     assertThat(
         patient.getExtensionByUrl(
-          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime"
-        )
+          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime",
+        ),
       )
       .isEqualTo(null)
   }
@@ -157,8 +159,8 @@ class ResourceMapperInstrumentedTest {
       assertThat(patient).isNotNull()
       assertThat(
           patient.getExtensionByUrl(
-            "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthTime"
-          )
+            "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-patient#Patient.birthTime",
+          ),
         )
         .isEqualTo(null)
     }
@@ -170,7 +172,6 @@ class ResourceMapperInstrumentedTest {
       val structureDefinition =
         when (url.valueAsString) {
           "http://fhir.org/guides/who/core/StructureDefinition/who-patient" -> {
-
             // This JSON file is available at
             // https://build.fhir.org/ig/WorldHealthOrganization/smart-anc/branches/master/StructureDefinition-who-patient.profile.json.html
             // in WHO IG can be downloaded as raw JSON file
@@ -189,7 +190,7 @@ class ResourceMapperInstrumentedTest {
           "http://fhir.org/guides/who/core/StructureDefinition/who-patient" -> {
             getStructureDefinition(
               "structure_definition_who_patient_without_birthtime.json",
-              context
+              context,
             )
           }
           else -> null
@@ -201,7 +202,7 @@ class ResourceMapperInstrumentedTest {
 
 private fun getStructureDefinition(
   StructureDefinitionUri: String,
-  context: Context
+  context: Context,
 ): StructureDefinition {
   val structureDefinitionJson =
     context.assets.open(StructureDefinitionUri).bufferedReader().use { it.readText() }

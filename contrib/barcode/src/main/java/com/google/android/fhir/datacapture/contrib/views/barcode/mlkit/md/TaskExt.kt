@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import java.util.concurrent.Executor
  */
 fun <TResult> Task<TResult>.addOnSuccessListener(
   executor: Executor,
-  listener: (TResult) -> Unit
+  listener: (TResult) -> Unit,
 ): Task<TResult> {
   return addOnSuccessListener(executor, OnSuccessListener(listener))
 }
@@ -40,7 +40,7 @@ fun <TResult> Task<TResult>.addOnSuccessListener(
  */
 fun <TResult> Task<TResult>.addOnFailureListener(
   executor: Executor,
-  listener: (Exception) -> Unit
+  listener: (Exception) -> Unit,
 ): Task<TResult> {
   return addOnFailureListener(executor, OnFailureListener(listener))
 }
@@ -51,7 +51,7 @@ fun <TResult> Task<TResult>.addOnFailureListener(
  */
 fun <TResult> Task<TResult>.addOnCompleteListener(
   executor: Executor,
-  listener: (Task<TResult>) -> Unit
+  listener: (Task<TResult>) -> Unit,
 ): Task<TResult> {
   return addOnCompleteListener(executor, OnCompleteListener(listener))
 }
@@ -62,7 +62,7 @@ fun <TResult> Task<TResult>.addOnCompleteListener(
  */
 fun <TResult> Task<TResult>.addOnCanceledListener(
   executor: Executor,
-  listener: () -> Unit
+  listener: () -> Unit,
 ): Task<TResult> {
   return addOnCanceledListener(executor, OnCanceledListener(listener))
 }

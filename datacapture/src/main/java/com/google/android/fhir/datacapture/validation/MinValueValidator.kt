@@ -27,25 +27,27 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueValidator :
   AnswerExtensionConstraintValidator(
     url = MIN_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+      ->
       answer.value < extension.value?.valueOrCalculateValue()!!
     },
     messageGenerator = { extension: Extension, context: Context ->
       context.getString(
         R.string.min_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.getValueAsString(context)
+        extension.value?.valueOrCalculateValue()?.getValueAsString(context),
       )
-    }
+    },
   ) {
 
   internal fun getMinValue(
-    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
+    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent,
   ): Type? {
     return questionnaireItemComponent.extension
       .firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }

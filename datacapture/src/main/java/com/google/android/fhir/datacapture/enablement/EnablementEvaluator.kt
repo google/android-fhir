@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.Resource
  *
  * For example, the following `enableWhen` constraint in a
  * [Questionnaire.QuestionnaireItemComponent]
+ *
  * ```
  *     "enableWhen": [
  *       {
@@ -45,6 +46,7 @@ import org.hl7.fhir.r4.model.Resource
  *       }
  *     ],
  * ```
+ *
  * specifies that the [Questionnaire.QuestionnaireItemComponent] should be enabled only if the
  * question with linkId `vitaminKgiven` has been answered.
  *
@@ -82,7 +84,7 @@ internal class EnablementEvaluator(
       questionnaire,
       questionnaireResponse,
       questionnaireItemParentMap,
-      questionnaireLaunchContextMap
+      questionnaireLaunchContextMap,
     )
 
   /**
@@ -95,7 +97,7 @@ internal class EnablementEvaluator(
   private val questionnaireResponseItemParentMap =
     mutableMapOf<
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
     >()
 
   init {
@@ -180,11 +182,14 @@ internal class EnablementEvaluator(
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {
     val targetQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? =
-      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      if (
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireResponseItem.linkId == enableWhen.question
-      )
+      ) {
         questionnaireResponseItem
-      else findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+      } else {
+        findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+      }
     return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
       // True iff the answer value of the enable when is equal to whether an answer exists in the
       // target questionnaire response item

@@ -46,7 +46,7 @@ fun endIconClickInTextInputLayout(id: Int) {
 
 fun assertQuestionnaireResponseAtIndex(
   answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-  vararg expectedStrings: String
+  vararg expectedStrings: String,
 ) {
   for ((index, expectedString) in expectedStrings.withIndex()) {
     assertThat((answers[index].value as Coding).display).isEqualTo(expectedString)

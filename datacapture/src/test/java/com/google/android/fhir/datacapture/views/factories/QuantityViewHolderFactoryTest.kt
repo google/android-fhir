@@ -44,7 +44,7 @@ class QuantityViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val viewHolder = QuantityViewHolderFactory.create(parent)
 
@@ -56,7 +56,7 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -72,18 +72,19 @@ class QuantityViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity().apply { value = BigDecimal("5") }
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString(),
       )
       .isEqualTo("5")
   }
@@ -97,12 +98,12 @@ class QuantityViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity().apply { value = BigDecimal("5") }
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -110,13 +111,14 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString(),
       )
       .isEqualTo("")
   }
@@ -130,18 +132,19 @@ class QuantityViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity().apply { unit = "kg" }
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.unit_auto_complete)
-          .text.toString()
+          .text
+          .toString(),
       )
       .isEqualTo("kg")
   }
@@ -155,12 +158,12 @@ class QuantityViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity().apply { unit = "kg" }
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -168,13 +171,14 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<AutoCompleteTextView>(R.id.unit_auto_complete)
-          .text.toString()
+          .text
+          .toString(),
       )
       .isEqualTo("")
   }
@@ -187,7 +191,7 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -203,12 +207,12 @@ class QuantityViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Quantity(22.5)
-            }
+            },
           )
         },
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -223,11 +227,11 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled,
       )
       .isFalse()
   }
@@ -240,11 +244,11 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.unit_auto_complete).isEnabled
+        viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.unit_auto_complete).isEnabled,
       )
       .isFalse()
   }
@@ -257,7 +261,7 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -275,8 +279,8 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -294,8 +298,8 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -310,14 +314,15 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Required")
   }
@@ -330,8 +335,8 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
@@ -346,14 +351,15 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Optional")
   }
@@ -366,8 +372,8 @@ class QuantityViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)

@@ -57,7 +57,7 @@ internal class KnowledgeManagerTest {
         knowledgeDb
           .knowledgeDao()
           .getImplementationGuidesWithResources(implementationGuideId)
-          ?.resources
+          ?.resources,
       )
       .hasSize(6)
   }
@@ -87,8 +87,8 @@ internal class KnowledgeManagerTest {
     assertThat(
         knowledgeManager.loadResources(
           resourceType = "Measure",
-          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01"
-        )
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        ),
       )
       .isNotEmpty()
     assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
@@ -120,6 +120,7 @@ internal class KnowledgeManagerTest {
   }
 
   private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
   private fun writeToFile(library: Library): File {
     return File(context.filesDir, library.name).apply {
       writeText(jsonParser.encodeResourceToString(library))

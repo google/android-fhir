@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ class QuestionnaireResponseDialogFragment() : DialogFragment() {
   private var _binding: QuestionnaireResponseDialogContentsBinding? = null
   private val binding
     get() = _binding!!
+
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     val contents = requireArguments().getString(BUNDLE_KEY_CONTENTS)
     return activity?.let {

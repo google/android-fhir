@@ -45,7 +45,7 @@ class AutoCompleteViewHolderFactoryTest {
     FrameLayout(
       RuntimeEnvironment.getApplication().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val viewHolder = AutoCompleteViewHolderFactory.create(parent)
 
@@ -57,7 +57,7 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -71,11 +71,11 @@ class AutoCompleteViewHolderFactoryTest {
         repeats = false
         addAnswerOption(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
-            .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code"))
+            .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
         )
         addAnswerOption(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
-            .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+            .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code")),
         )
       }
     viewHolder.bind(
@@ -88,12 +88,12 @@ class AutoCompleteViewHolderFactoryTest {
                 questionnaireItem.answerOption
                   .first { it.value.displayString(parent.context) == "Test1 Code" }
                   .valueCoding
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -107,7 +107,7 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
-          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code")),
       )
 
     val fakeAnswerValueSetResolver = { uri: String ->
@@ -131,20 +131,20 @@ class AutoCompleteViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
-            }
+            },
           )
 
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 answers.first { it.value.displayString(parent.context) == "Test2 Code" }.valueCoding
-            }
+            },
           )
         },
         enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -157,7 +157,7 @@ class AutoCompleteViewHolderFactoryTest {
       listOf(
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(
-            Coding().setCode("test1-code").setDisplay("Test Code").setId("test1-code") as Coding
+            Coding().setCode("test1-code").setDisplay("Test Code").setId("test1-code") as Coding,
           ),
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(
@@ -165,8 +165,8 @@ class AutoCompleteViewHolderFactoryTest {
               .setSystem("http://answers/test-codes")
               .setVersion("1.0")
               .setCode("test2-code")
-              .setDisplay("Test Code") as Coding
-          )
+              .setDisplay("Test Code") as Coding,
+          ),
       )
 
     val fakeAnswerValueSetResolver = { uri: String ->
@@ -188,7 +188,7 @@ class AutoCompleteViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = answers.first { it.value.id == "test1-code" }.valueCoding
-            }
+            },
           )
 
           addAnswer(
@@ -200,13 +200,13 @@ class AutoCompleteViewHolderFactoryTest {
                       "http://answers/test-codes1.0|test2-code"
                   }
                   .valueCoding
-            }
+            },
           )
         },
         enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -220,7 +220,7 @@ class AutoCompleteViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
           .setValue(Coding().setCode("test1-code").setDisplay("Test1 Code")),
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
-          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code"))
+          .setValue(Coding().setCode("test2-code").setDisplay("Test2 Code")),
       )
 
     val fakeAnswerValueSetResolver = { uri: String ->
@@ -244,13 +244,13 @@ class AutoCompleteViewHolderFactoryTest {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value =
                 answers.first { it.value.displayString(parent.context) == "Test1 Code" }.valueCoding
-            }
+            },
           )
         },
         enabledAnswerOptions = fakeAnswerValueSetResolver.invoke(questionnaireItem.answerValueSet),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<ChipGroup>(R.id.chipContainer).childCount)
@@ -265,7 +265,7 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
@@ -285,19 +285,19 @@ class AutoCompleteViewHolderFactoryTest {
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Coding().apply { display = "display" }
-            }
+            },
           )
         },
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).visibility)
@@ -314,7 +314,7 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -332,8 +332,8 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -351,8 +351,8 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -367,12 +367,12 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Required")
   }
@@ -385,12 +385,12 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
@@ -405,12 +405,12 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Optional")
   }
@@ -423,12 +423,12 @@ class AutoCompleteViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)

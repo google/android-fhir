@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,7 +70,7 @@ object CqlBuilder : Loadable() {
         modelManager,
         libraryManager,
         UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml")),
-        *CqlTranslatorOptions.defaultOptions().options.toTypedArray()
+        *CqlTranslatorOptions.defaultOptions().options.toTypedArray(),
       )
 
     // Helper makes sure the test CQL compiles. Reports an error if it doesn't
@@ -92,7 +92,6 @@ object CqlBuilder : Loadable() {
    * @param jsonElmStr the JSON representation of the ELM Library
    * @param libName the Library name
    * @param libVersion the Library Version
-   *
    * @return a FHIR Library that includes the ELM Library.
    */
   fun assembleFhirLib(
@@ -100,9 +99,8 @@ object CqlBuilder : Loadable() {
     jsonElmStr: String?,
     xmlElmStr: String?,
     libName: String,
-    libVersion: String
+    libVersion: String,
   ): Library {
-
     val attachmentCql =
       cqlStr?.let {
         Attachment().apply {
@@ -155,7 +153,7 @@ object CqlBuilder : Loadable() {
       strLib,
       null,
       elmLibrary.identifier.id,
-      elmLibrary.identifier.version
+      elmLibrary.identifier.version,
     )
   }
 
@@ -174,7 +172,7 @@ object CqlBuilder : Loadable() {
         it.toJson(),
         it.toXml(),
         it.toELM().identifier.id,
-        it.toELM().identifier.version
+        it.toELM().identifier.version,
       )
     }
   }
@@ -228,7 +226,7 @@ object CqlBuilder : Loadable() {
           expectedElmJsonAsset,
           expectedElmXmlAsset,
           translator.toELM().identifier.id,
-          translator.toELM().identifier.version
+          translator.toELM().identifier.version,
         )
 
       JSONAssert.assertEquals(load(expectedFhirAssetName), library.toJson(), false)

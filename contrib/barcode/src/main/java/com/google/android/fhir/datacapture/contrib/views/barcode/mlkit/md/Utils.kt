@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,7 +165,7 @@ object Utils {
       /* outPadding= */ return maybeTransformBitmap(
         context.contentResolver,
         imageUri,
-        decodedBitmap
+        decodedBitmap,
       )
     } finally {
       inputStreamForSize?.close()
@@ -176,7 +176,8 @@ object Utils {
   private fun maybeTransformBitmap(resolver: ContentResolver, uri: Uri, bitmap: Bitmap?): Bitmap? {
     val matrix: Matrix? =
       when (getExifOrientationTag(resolver, uri)) {
-        ExifInterface.ORIENTATION_UNDEFINED, ExifInterface.ORIENTATION_NORMAL ->
+        ExifInterface.ORIENTATION_UNDEFINED,
+        ExifInterface.ORIENTATION_NORMAL, ->
           // Set the matrix to be null to skip the image transform.
           null
         ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> Matrix().apply { postScale(-1.0f, 1.0f) }
@@ -203,7 +204,8 @@ object Utils {
   }
 
   private fun getExifOrientationTag(resolver: ContentResolver, imageUri: Uri): Int {
-    if (ContentResolver.SCHEME_CONTENT != imageUri.scheme &&
+    if (
+      ContentResolver.SCHEME_CONTENT != imageUri.scheme &&
         ContentResolver.SCHEME_FILE != imageUri.scheme
     ) {
       return 0

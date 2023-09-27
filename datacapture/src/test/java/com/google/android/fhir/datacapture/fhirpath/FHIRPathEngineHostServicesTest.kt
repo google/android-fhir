@@ -89,7 +89,7 @@ class FHIRPathEngineHostServicesTest {
         mapOf<Any, Any>(),
         mutableListOf(),
         "",
-        mutableListOf()
+        mutableListOf(),
       )
     }
   }
