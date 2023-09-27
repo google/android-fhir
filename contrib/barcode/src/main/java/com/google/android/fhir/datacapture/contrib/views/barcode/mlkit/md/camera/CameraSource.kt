@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -179,7 +179,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
         ?: throw IOException("Could not find suitable preview frames per second range.")
     parameters.setPreviewFpsRange(
       previewFpsRange[Parameters.PREVIEW_FPS_MIN_INDEX],
-      previewFpsRange[Parameters.PREVIEW_FPS_MAX_INDEX]
+      previewFpsRange[Parameters.PREVIEW_FPS_MAX_INDEX],
     )
 
     parameters.previewFormat = IMAGE_FORMAT
@@ -217,7 +217,6 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
 
   @Throws(IOException::class)
   private fun setPreviewAndPictureSize(camera: Camera, parameters: Parameters) {
-
     // Gives priority to the preview size specified by the user if exists.
     val sizePair: CameraSizePair =
       PreferenceUtils.getUserSpecifiedPreviewSize(context)
@@ -241,7 +240,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
         PreferenceUtils.saveStringPreference(
           context,
           R.string.pref_key_rear_camera_preview_size,
-          it.toString()
+          it.toString(),
         )
       }
 
@@ -251,7 +250,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
       PreferenceUtils.saveStringPreference(
         context,
         R.string.pref_key_rear_camera_picture_size,
-        pictureSize.toString()
+        pictureSize.toString(),
       )
     }
   }
@@ -350,7 +349,7 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
 
         if (!bytesToByteBuffer.containsKey(data)) {
           Timber.d(
-            "Skipping frame. Could not find ByteBuffer associated with the image data from the camera."
+            "Skipping frame. Could not find ByteBuffer associated with the image data from the camera.",
           )
           return
         }
@@ -435,9 +434,9 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
      * landscape mode.
      *
      * It's firstly trying to pick the one that has closest aspect ratio to display view with its
-     * width be in the specified range [[.MIN_CAMERA_PREVIEW_WIDTH], [
-     * ][.MAX_CAMERA_PREVIEW_WIDTH]]. If there're multiple candidates, choose the one having longest
-     * width.
+     * width be in the specified range [[.MIN_CAMERA_PREVIEW_WIDTH],
+     * [ ][.MAX_CAMERA_PREVIEW_WIDTH]]. If there're multiple candidates, choose the one having
+     * longest width.
      *
      * If the above looking up failed, chooses the one that has the minimum sum of the differences
      * between the desired values and the actual values for width and height.
@@ -462,7 +461,8 @@ class CameraSource(private val graphicOverlay: GraphicOverlay) {
 
       for (sizePair in validPreviewSizes) {
         val previewSize = sizePair.preview
-        if (previewSize.width < MIN_CAMERA_PREVIEW_WIDTH ||
+        if (
+          previewSize.width < MIN_CAMERA_PREVIEW_WIDTH ||
             previewSize.width > MAX_CAMERA_PREVIEW_WIDTH
         ) {
           continue

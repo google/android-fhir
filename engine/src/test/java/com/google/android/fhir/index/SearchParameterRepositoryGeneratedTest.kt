@@ -44,10 +44,10 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
           SearchParamDefinition(
             it.name,
             Enumerations.SearchParamType.valueOf(it.type.toUpperCase()),
-            it.path
+            it.path,
           )
         }
-        .toMutableList()
+        .toMutableList(),
     )
 
     return searchParams
@@ -60,43 +60,43 @@ class SearchParameterRepositoryGeneratedTest(private val resource: Resource) {
       SearchParamDefinition(
         "_id",
         Enumerations.SearchParamType.TOKEN,
-        "${resource.resourceType.name}.id"
-      )
+        "${resource.resourceType.name}.id",
+      ),
     )
     searchParams.add(
       SearchParamDefinition(
         "_lastUpdated",
         Enumerations.SearchParamType.DATE,
-        "${resource.resourceType.name}.meta.lastUpdated"
-      )
+        "${resource.resourceType.name}.meta.lastUpdated",
+      ),
     )
     searchParams.add(
       SearchParamDefinition(
         "_profile",
         Enumerations.SearchParamType.URI,
-        "${resource.resourceType.name}.meta.profile"
-      )
+        "${resource.resourceType.name}.meta.profile",
+      ),
     )
     searchParams.add(
       SearchParamDefinition(
         "_security",
         Enumerations.SearchParamType.TOKEN,
-        "${resource.resourceType.name}.meta.security"
-      )
+        "${resource.resourceType.name}.meta.security",
+      ),
     )
     searchParams.add(
       SearchParamDefinition(
         "_source",
         Enumerations.SearchParamType.URI,
-        "${resource.resourceType.name}.meta.source"
-      )
+        "${resource.resourceType.name}.meta.source",
+      ),
     )
     searchParams.add(
       SearchParamDefinition(
         "_tag",
         Enumerations.SearchParamType.TOKEN,
-        "${resource.resourceType.name}.meta.tag"
-      )
+        "${resource.resourceType.name}.meta.tag",
+      ),
     )
 
     return searchParams

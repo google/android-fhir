@@ -68,7 +68,7 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
       Extension().apply {
         addExtension(launchExtension.extension.firstOrNull { it.url == "name" })
         addExtension(launchExtension.extension.firstOrNull { it.url == "type" })
-      }
+      },
     )
   }
 
@@ -93,23 +93,23 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
                   code = it.code
                   display = it.display
                   system = it.system
-                }
+                },
               )
-            }
+            },
           )
           addExtension(
             Extension().apply {
               url = "type"
               setValue(CodeType().setValue(it.resourceType))
-            }
+            },
           )
-        }
+        },
       )
     }
   if (!isValidExtension) {
     error(
       "The extension:name extension and/or extension:type extension do not follow the format " +
-        "specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
     )
   }
 }
@@ -171,7 +171,8 @@ val Questionnaire.entryMode: EntryMode?
 enum class EntryMode(val value: String) {
   PRIOR_EDIT("prior-edit"),
   RANDOM("random"),
-  SEQUENTIAL("sequential");
+  SEQUENTIAL("sequential"),
+  ;
 
   companion object {
     fun from(type: String?): EntryMode? = values().find { it.value == type }

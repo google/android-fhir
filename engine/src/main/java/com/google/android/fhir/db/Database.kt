@@ -17,8 +17,8 @@
 package com.google.android.fhir.db
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -58,7 +58,7 @@ internal interface Database {
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,
-    lastUpdated: Instant
+    lastUpdated: Instant,
   )
 
   /**
@@ -105,6 +105,9 @@ internal interface Database {
    */
   suspend fun getAllLocalChanges(): List<LocalChange>
 
+  /** Retrieves the count of [LocalChange]s stored in the database. */
+  suspend fun getLocalChangesCount(): Int
+
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
 
@@ -127,23 +130,25 @@ internal interface Database {
    * Retrieve a list of [LocalChange] for [Resource] with given type and id, which can be used to
    * purge resource from database. If there is no local change for given [resourceType] and
    * [Resource.id], return an empty list.
+   *
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
    * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
-   * [Resource.id] . If there is no local change for given [resourceType] and [Resource.id], return
-   * empty list.
+   *   [Resource.id] . If there is no local change for given [resourceType] and [Resource.id],
+   *   return empty list.
    */
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from
    * the server.
+   *
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
    * @param isLocalPurge default value is false here resource will not be deleted from
-   * LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
-   * delete resource entry from LocalChangeEntity table.
+   *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
+   *   either sync with server or FORCE_PURGE required") if local change exists. If true this API
+   *   will delete resource entry from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }

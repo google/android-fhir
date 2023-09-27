@@ -85,22 +85,22 @@ class QuestionnaireUiEspressoTest {
     onView(withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
-        )
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
       )
 
     clickOnText("Yes")
     onView(withId(R.id.review_mode_button))
       .check(
-        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE))
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
       )
 
     clickOnText("No")
     onView(withId(R.id.review_mode_button))
       .check(
         ViewAssertions.matches(
-          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)
-        )
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
       )
   }
 
@@ -274,7 +274,7 @@ class QuestionnaireUiEspressoTest {
               val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 4) }
               setValue(maxDate)
             }
-          }
+          },
         )
       }
 
@@ -293,7 +293,7 @@ class QuestionnaireUiEspressoTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         getQuestionnaireResponse(),
-        context
+        context,
       )
 
     assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
@@ -318,7 +318,7 @@ class QuestionnaireUiEspressoTest {
               url = "http://hl7.org/fhir/StructureDefinition/maxValue"
               setValue(maxDate)
             }
-          }
+          },
         )
       }
 
@@ -334,7 +334,7 @@ class QuestionnaireUiEspressoTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         getQuestionnaireResponse(),
-        context
+        context,
       )
 
     assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
@@ -360,7 +360,7 @@ class QuestionnaireUiEspressoTest {
               val maxDate = DateType(Date()).apply { add(Calendar.YEAR, 2) }
               setValue(maxDate)
             }
-          }
+          },
         )
       }
 
@@ -376,7 +376,7 @@ class QuestionnaireUiEspressoTest {
       QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         getQuestionnaireResponse(),
-        context
+        context,
       )
 
     assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
@@ -403,7 +403,7 @@ class QuestionnaireUiEspressoTest {
               val maxDate = DateType(Date()).apply { add(Calendar.YEAR, -1) }
               setValue(maxDate)
             }
-          }
+          },
         )
       }
 
@@ -495,7 +495,7 @@ class QuestionnaireUiEspressoTest {
 
   private fun buildFragmentFromQuestionnaire(
     questionnaire: Questionnaire,
-    isReviewMode: Boolean = false
+    isReviewMode: Boolean = false,
   ) {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
@@ -512,6 +512,7 @@ class QuestionnaireUiEspressoTest {
 
   private fun readFileFromAssets(filename: String) =
     javaClass.getResourceAsStream(filename)!!.bufferedReader().use { it.readText() }
+
   private fun getQuestionnaireResponse(): QuestionnaireResponse {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->

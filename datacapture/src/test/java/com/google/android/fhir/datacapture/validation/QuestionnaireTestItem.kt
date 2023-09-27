@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,5 +22,5 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 /** A data class which holds the questionnaire requirement and response. */
 data class QuestionnaireTestItem(
   val requirement: Questionnaire.QuestionnaireItemComponent,
-  val answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  val answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
 )

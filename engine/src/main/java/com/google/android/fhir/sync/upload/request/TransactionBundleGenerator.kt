@@ -16,46 +16,31 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.sync.BundleUploadRequest
+import com.google.android.fhir.sync.upload.patch.Patch
 import org.hl7.fhir.r4.model.Bundle
 
-/**
- * Generates list of [BundleUploadRequest] with Transaction [Bundle] and [LocalChangeToken]s
- * associated with the resources present in the transaction bundle.
- */
-class TransactionBundleGenerator(
+/** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
+internal class TransactionBundleGenerator(
   private val generatedBundleSize: Int,
   private val useETagForUpload: Boolean,
-  private val getBundleEntryComponentGeneratorForLocalChangeType:
-    (type: Type, useETagForUpload: Boolean) -> BundleEntryComponentGenerator
+  private val getBundleEntryComponentGeneratorForPatch:
+    (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(localChanges: List<LocalChange>): List<BundleUploadRequest> {
-    return localChanges
-      .chunked(generatedBundleSize)
-      .filter { it.isNotEmpty() }
-      .map { generateBundleRequest(it) }
+  override fun generateUploadRequests(patches: List<Patch>): List<BundleUploadRequest> {
+    return patches.chunked(generatedBundleSize).map { generateBundleRequest(it) }
   }
 
-  private fun generateBundleRequest(localChanges: List<LocalChange>): BundleUploadRequest {
+  private fun generateBundleRequest(patches: List<Patch>): BundleUploadRequest {
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
-        localChanges
-          .filterNot { it.type == Type.NO_OP }
-          .forEach {
-            this.addEntry(
-              getBundleEntryComponentGeneratorForLocalChangeType(it.type, useETagForUpload)
-                .getEntry(it)
-            )
-          }
+        patches.forEach {
+          this.addEntry(getBundleEntryComponentGeneratorForPatch(it, useETagForUpload).getEntry(it))
+        }
       }
     return BundleUploadRequest(
       resource = bundleRequest,
-      localChangeToken = LocalChangeToken(localChanges.flatMap { it.token.ids })
     )
   }
 
@@ -82,39 +67,36 @@ class TransactionBundleGenerator(
     fun getGenerator(
       httpVerbToUseForCreate: Bundle.HTTPVerb,
       httpVerbToUseForUpdate: Bundle.HTTPVerb,
-      generatedBundleSize: Int,
-      useETagForUpload: Boolean
+      generatedBundleSize: Int = 500,
+      useETagForUpload: Boolean = true,
     ): TransactionBundleGenerator {
-
       val createFunction =
         createMapping[httpVerbToUseForCreate]
           ?: throw IllegalArgumentException(
-            "Creation using $httpVerbToUseForCreate is not supported."
+            "Creation using $httpVerbToUseForCreate is not supported.",
           )
 
       val updateFunction =
         updateMapping[httpVerbToUseForUpdate]
           ?: throw IllegalArgumentException(
-            "Update using $httpVerbToUseForUpdate is not supported."
+            "Update using $httpVerbToUseForUpdate is not supported.",
           )
 
-      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { type, useETag ->
-        when (type) {
-          Type.INSERT -> createFunction(useETag)
-          Type.UPDATE -> updateFunction(useETag)
-          Type.DELETE -> HttpDeleteEntryComponentGenerator(useETag)
-          Type.NO_OP ->
-            error("NO_OP type represents a no-operation and is not mapped to an HTTP operation.")
+      return TransactionBundleGenerator(generatedBundleSize, useETagForUpload) { patch, useETag ->
+        when (patch.type) {
+          Patch.Type.INSERT -> createFunction(useETag)
+          Patch.Type.UPDATE -> updateFunction(useETag)
+          Patch.Type.DELETE -> HttpDeleteEntryComponentGenerator(useETag)
         }
       }
     }
 
     private fun putForCreateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
 
     private fun patchForUpdateBasedBundleComponentMapper(
-      useETagForUpload: Boolean
+      useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPatchForUpdateEntryComponentGenerator(useETagForUpload)
   }
 }

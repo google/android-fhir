@@ -69,7 +69,7 @@ internal object DropDownViewHolderFactory :
               DropDownAnswerOption(
                 it.value.identifierString(context),
                 it.value.displayString(context),
-                it.itemAnswerOptionImage(context)
+                it.itemAnswerOptionImage(context),
               )
             }
             .toMutableList()
@@ -78,8 +78,8 @@ internal object DropDownViewHolderFactory :
           DropDownAnswerOption(
             context.getString(R.string.hyphen),
             context.getString(R.string.hyphen),
-            null
-          )
+            null,
+          ),
         )
         val adapter =
           AnswerOptionDropDownArrayAdapter(context, R.layout.drop_down_list_item, answerOptionList)
@@ -94,7 +94,7 @@ internal object DropDownViewHolderFactory :
               it.answerOptionImage,
               null,
               null,
-              null
+              null,
             )
           }
         autoCompleteTextView.setAdapter(adapter)
@@ -106,7 +106,7 @@ internal object DropDownViewHolderFactory :
               adapter.getItem(position)?.answerOptionImage,
               null,
               null,
-              null
+              null,
             )
             val selectedAnswer =
               questionnaireViewItem.enabledAnswerOptions
@@ -118,7 +118,7 @@ internal object DropDownViewHolderFactory :
             } else {
               questionnaireViewItem.setAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(selectedAnswer)
+                  .setValue(selectedAnswer),
               )
             }
           }
@@ -131,7 +131,7 @@ internal object DropDownViewHolderFactory :
           getValidationErrorMessage(
             textInputLayout.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -150,7 +150,7 @@ internal object DropDownViewHolderFactory :
 internal class AnswerOptionDropDownArrayAdapter(
   context: Context,
   private val layoutResourceId: Int,
-  answerOption: List<DropDownAnswerOption>
+  answerOption: List<DropDownAnswerOption>,
 ) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
   override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
     val listItemView =
@@ -164,7 +164,7 @@ internal class AnswerOptionDropDownArrayAdapter(
         answerOption?.answerOptionImage,
         null,
         null,
-        null
+        null,
       )
     } catch (e: Exception) {
       Timber.w("Could not set data to dropdown UI", e)
@@ -176,7 +176,7 @@ internal class AnswerOptionDropDownArrayAdapter(
 internal data class DropDownAnswerOption(
   val answerId: String,
   val answerOptionString: String,
-  val answerOptionImage: Drawable? = null
+  val answerOptionImage: Drawable? = null,
 ) {
   override fun toString(): String {
     return this.answerOptionString

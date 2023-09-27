@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
     registerForActivityResult(ActivityResultContracts.GetContent()) {
       it?.let { launchQuestionnaireFragment(it) }
     }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setSupportActionBar(findViewById(R.id.toolbar))
@@ -100,10 +101,10 @@ class MainActivity : AppCompatActivity(R.layout.activity_main) {
               getQuestionnaireJsonStringFromFileUri(
                 context = applicationContext,
                 backgroundContext = coroutineContext,
-                uri = uri
+                uri = uri,
               ),
             workflow = WorkflowType.DEFAULT,
-          )
+          ),
         )
     }
   }
