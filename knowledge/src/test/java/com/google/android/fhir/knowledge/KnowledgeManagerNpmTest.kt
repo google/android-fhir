@@ -53,7 +53,7 @@ class KnowledgeManagerNpmTest {
       knowledgeDb,
       context.dataDir,
       npmFileManager = mockNpmFileManager,
-      packageDownloader = fakePackageDownloader
+      packageDownloader = fakePackageDownloader,
     )
 
   @Test

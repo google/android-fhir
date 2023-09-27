@@ -273,6 +273,7 @@ object Dependencies {
     // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
     // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
     const val hapiFhir = "6.0.1"
+
     // Newer versions don't work on Android due to Apache Commons Codec:
     // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
     const val hapiFhirCore = "5.6.36"

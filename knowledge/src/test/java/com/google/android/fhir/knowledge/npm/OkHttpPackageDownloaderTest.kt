@@ -74,7 +74,7 @@ class OkHttpPackageDownloaderTest {
       listOf(
         Dependency("hl7.fhir.r4.core", "4.0.1"),
         Dependency("hl7.terminology.r4", "5.0.0"),
-        Dependency("hl7.fhir.fr.core", "1.1.0")
+        Dependency("hl7.fhir.fr.core", "1.1.0"),
       )
   }
 }

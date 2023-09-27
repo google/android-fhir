@@ -67,7 +67,7 @@ internal class NpmFileManager(private val cacheRoot: File) {
         getString("version"),
         optString("canonical"),
         dependencies?.toList() ?: emptyList(),
-        packageFolder
+        packageFolder,
       )
     }
   }

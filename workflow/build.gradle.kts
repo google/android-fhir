@@ -84,6 +84,7 @@ configurations {
 }
 
 dependencies {
+  testImplementation(project(mapOf("path" to ":knowledge")))
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   androidTestImplementation(Dependencies.AndroidxTest.core)
