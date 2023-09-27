@@ -70,7 +70,7 @@ class FhirOperatorLibraryEvaluateTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator =
-      FhirOperatorBuilder(context)
+      FhirOperator.Builder(context)
         .withFhirContext(fhirContext)
         .withFhirEngine(fhirEngine)
         .withIgManager(knowledgeManager)
