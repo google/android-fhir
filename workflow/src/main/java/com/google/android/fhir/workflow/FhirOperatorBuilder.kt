@@ -27,7 +27,6 @@ import com.google.android.fhir.knowledge.KnowledgeManager
 class FhirOperatorBuilder(private val applicationContext: Context) {
   private var fhirContext: FhirContext? = null
   private var fhirEngine: FhirEngine? = null
-  private var dependencies: List<Dependency> = emptyList()
   private var knowledgeManager: KnowledgeManager? = null
 
   fun withFhirEngine(fhirEngine: FhirEngine): FhirOperatorBuilder {
