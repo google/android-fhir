@@ -23,7 +23,4 @@ import org.hl7.fhir.r4.model.Resource
 data class Title(
   var name: String,
   var dataEntries: ArrayList<Resource>,
-) : Serializable {
-
-  constructor(name: String) : this(name, ArrayList())
-}
+) : Serializable

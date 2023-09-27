@@ -29,6 +29,7 @@ import com.google.zxing.qrcode.QRCodeWriter
 
 class QRGeneratorUtils {
 
+  /* Creates a QR for a given string */
   fun createQRCodeBitmap(content: String): Bitmap {
     val hints = mutableMapOf<EncodeHintType, Any>()
     hints[EncodeHintType.MARGIN] = 2
@@ -46,6 +47,7 @@ class QRGeneratorUtils {
     return qrCodeBitmap
   }
 
+  /* Creates a bitmap containing the SMART logo */
   fun createLogoBitmap(context: Context, qrCodeBitmap: Bitmap): Bitmap {
     val logoScale = 0.4
     val logoDrawable = ContextCompat.getDrawable(context, R.drawable.smart_logo)
@@ -58,6 +60,7 @@ class QRGeneratorUtils {
     return convertDrawableToBitmap(logoDrawable, logoWidth, logoHeight)
   }
 
+  /* Overlays the SMART logo in the centre of a QR code */
   fun overlayLogoOnQRCode(qrCodeBitmap: Bitmap, logoBitmap: Bitmap): Bitmap {
     val centerX = (qrCodeBitmap.width - logoBitmap.width) / 2
     val centerY = (qrCodeBitmap.height - logoBitmap.height) / 2
@@ -76,7 +79,8 @@ class QRGeneratorUtils {
     return finalBitmap
   }
 
-  private fun convertDrawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
+  /* Converts the logo into a bitmap */
+  fun convertDrawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, canvas.width, canvas.height)

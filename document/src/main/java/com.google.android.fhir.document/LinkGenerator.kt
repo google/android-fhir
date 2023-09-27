@@ -32,21 +32,12 @@ class LinkGenerator : SHLGenerator {
   private val generateShlUtils = GenerateShlUtils()
 
   @RequiresApi(Build.VERSION_CODES.O)
-  override fun generateKey(): String {
-    val random = SecureRandom()
-    val keyBytes = ByteArray(32)
-    random.nextBytes(keyBytes)
-    return Base64.getUrlEncoder().encodeToString(keyBytes)
-  }
-
-  @RequiresApi(Build.VERSION_CODES.O)
   override fun generateSHL(
     context: Context,
     shlData: SHLData,
     passcode: String,
-    qrView: ImageView,
-  ): Bitmap? {
+    qrView: ImageView
+  ) {
     generateShlUtils.generateAndPostPayload(passcode, shlData, context, qrView)
-    return null
   }
 }

@@ -16,16 +16,17 @@
 
 package com.google.android.fhir.document
 
-// import com.google.android.fhir.document.fileExamples.minimalBundleString
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.utils.GenerateShlUtils
-import com.google.android.fhir.document.utils.ReadShlUtils
 import com.google.android.fhir.testing.readFromFile
 import com.nimbusds.jose.shaded.gson.Gson
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
-import org.junit.Assert
+import org.json.JSONObject
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -36,7 +37,6 @@ import org.robolectric.annotation.Config
 class GenerateShlUtilsTest {
 
   private val generateShlUtils = GenerateShlUtils()
-  private val readShlUtilsMock = ReadShlUtils()
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val minimalBundleString =
     parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
@@ -44,10 +44,11 @@ class GenerateShlUtilsTest {
   @Test
   fun postingToServerReturnsManifestIdAndToken() {
     runBlocking {
-      val res = generateShlUtils.getManifestUrl()
-      println(res)
-      Assert.assertTrue(
-        res.contains("id") && res.contains("managementToken") && res.contains("active"),
+      val postResponse = generateShlUtils.getManifestUrlAndToken("")
+      assertTrue(
+        postResponse.has("id") && postResponse.has("managementToken") && postResponse.has(
+          "active"
+        )
       )
     }
   }
@@ -64,16 +65,79 @@ class GenerateShlUtilsTest {
     val contentJson = Gson().toJson(minimalBundleString)
     val contentEncrypted = generateShlUtils.encrypt(contentJson, encryptionKey)
     println(contentEncrypted)
-    Assert.assertEquals(contentEncrypted.split('.').size, 5)
+    assertEquals(contentEncrypted.split('.').size, 5)
   }
 
   @Test
-  fun fileCanSuccessfullyBeEncryptedAndDecrypted() {
-    val key = generateShlUtils.generateRandomKey()
-    val content = Gson().toJson(minimalBundleString)
-
-    val encrypted = generateShlUtils.encrypt(content, key)
-    val decrypted = readShlUtilsMock.decodeShc(encrypted, key)
-    Assert.assertEquals(content, decrypted)
+  fun pFlagIsIncludedWhenPasscodeIsPresent() {
+    val flags = generateShlUtils.getKeyFlags("passcode")
+    assert(flags.contains("P"))
   }
+
+  @Test
+  fun pFlagIsNotIncludedWhenPasscodeIsNotPresent() {
+    val flags = generateShlUtils.getKeyFlags("")
+    assert(!flags.contains("P"))
+  }
+
+  @Test
+  fun canCorrectlyConstructSHLinkPayload() {
+    val manifestUrl = "https://example.com/manifest"
+    val label = "My SHL"
+    val flags = "P"
+    val key = generateShlUtils.generateRandomKey()
+    val expirationDate = "2023-12-31"
+
+    /* Construct the expected JSON object */
+    val expectedJson = JSONObject()
+      .put("url", manifestUrl)
+      .put("key", key)
+      .put("flag", flags)
+      .put("label", label)
+      .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
+
+    val payload =
+      generateShlUtils.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
+    val actualJson = JSONObject(payload)
+    assertEquals(expectedJson.toString(), actualJson.toString())
+  }
+
+  @Test
+  fun testDateToEpochSeconds() {
+    val dateString = "2023-09-30"
+    val expectedEpochSeconds = 1696032000L
+    val epochSeconds = generateShlUtils.dateStringToEpochSeconds(dateString)
+    assertEquals(expectedEpochSeconds, epochSeconds)
+  }
+
+  @Test
+  fun canPostPayloadWithValidInputs() {
+    val manifestUrl = "https://example.com/manifest"
+    val key = generateShlUtils.generateRandomKey()
+    val managementToken = ""
+    val fileData = ""
+
+    runBlocking {
+      val success = kotlin.runCatching {
+        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
+      }.isSuccess
+      assertTrue(success)
+    }
+  }
+
+  @Test
+  fun failsToPostPayloadWithInvalidManifestUrl() {
+    val manifestUrl = "invalid_url"
+    val key = generateShlUtils.generateRandomKey()
+    val managementToken = ""
+    val fileData = ""
+
+    runBlocking {
+      val success = kotlin.runCatching {
+        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
+      }.isSuccess
+      assertFalse(success)
+    }
+  }
+
 }

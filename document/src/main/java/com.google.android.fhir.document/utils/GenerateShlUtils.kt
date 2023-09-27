@@ -54,28 +54,7 @@ class GenerateShlUtils {
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val qrGeneratorUtils = QRGeneratorUtils()
 
-  fun getManifestUrl(): String {
-    val httpClient: CloseableHttpClient = HttpClients.createDefault()
-    val httpPost = HttpPost("https://api.vaxx.link/api/shl")
-    httpPost.addHeader("Content-Type", "application/json")
-    val jsonData = "{}"
-    val entity = StringEntity(jsonData)
-
-    httpPost.entity = entity
-
-    return httpClient.execute(httpPost).use { response ->
-      EntityUtils.toString(response.entity, StandardCharsets.UTF_8)
-    }
-  }
-
-  @RequiresApi(Build.VERSION_CODES.O)
-  fun generateRandomKey(): String {
-    val random = SecureRandom()
-    val keyBytes = ByteArray(32)
-    random.nextBytes(keyBytes)
-    return Base64.getUrlEncoder().encodeToString(keyBytes)
-  }
-
+  /* Encrypt a given string as a JWE token, using a given key */
   @RequiresApi(Build.VERSION_CODES.O)
   fun encrypt(data: String, key: String): String {
     val header = JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
@@ -86,6 +65,7 @@ class GenerateShlUtils {
     return jweObj.serialize()
   }
 
+  /* POST the IPS document to the manifest URL */
   @RequiresApi(Build.VERSION_CODES.O)
   fun postPayload(file: String, manifestUrl: String, key: String, managementToken: String) {
     val contentEncrypted = encrypt(file, key)
@@ -99,7 +79,7 @@ class GenerateShlUtils {
     httpClient.close()
   }
 
-  // converts the inputted expiry date to epoch seconds
+  /* Converts the inputted expiry date to epoch seconds */
   @RequiresApi(Build.VERSION_CODES.O)
   fun dateStringToEpochSeconds(dateString: String): Long {
     val formatter = DateTimeFormatter.ofPattern("yyyy-M-d")
@@ -108,12 +88,23 @@ class GenerateShlUtils {
     return zonedDateTime.toEpochSecond()
   }
 
+  /* Base64Url encodes a given string */
   @RequiresApi(Build.VERSION_CODES.O)
   fun base64UrlEncode(data: String): String {
     val bytes = data.toByteArray(StandardCharsets.UTF_8)
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
   }
 
+  /* Generate a random SHL-specific key */
+  @RequiresApi(Build.VERSION_CODES.O)
+  fun generateRandomKey(): String {
+    val random = SecureRandom()
+    val keyBytes = ByteArray(32)
+    random.nextBytes(keyBytes)
+    return Base64.getUrlEncoder().encodeToString(keyBytes)
+  }
+
+  /* Generate an SHL */
   @RequiresApi(Build.VERSION_CODES.O)
   @OptIn(DelicateCoroutinesApi::class)
   fun generateAndPostPayload(
@@ -125,21 +116,19 @@ class GenerateShlUtils {
     val expirationDate = shlData.expirationTime
     val labelData = shlData.label
     val bundle = shlData.ipsDoc.document
-    var qrCodeBitmap: Bitmap? = null
+    var qrCodeBitmap: Bitmap?
 
     GlobalScope.launch(Dispatchers.IO) {
-      val httpClient: CloseableHttpClient = HttpClients.createDefault()
-      val jsonPostRes = doPostRequest(httpClient, passcode)
-
-      val manifestUrl = "https://api.vaxx.link/api/shl/${jsonPostRes.getString("id")}"
-      val key = generateRandomKey()
-      val managementToken = jsonPostRes.getString("managementToken")
+      val initialPostResponse = getManifestUrlAndToken(passcode)
+      val manifestUrl = "https://api.vaxx.link/api/shl/${initialPostResponse.getString("id")}"
+      val managementToken = initialPostResponse.getString("managementToken")
       val exp =
         if (expirationDate.isNotEmpty()) dateStringToEpochSeconds(expirationDate).toString() else ""
-
+      val key = generateRandomKey()
       val shLinkPayload =
         constructSHLinkPayload(manifestUrl, labelData, getKeyFlags(passcode), key, exp)
-      val shLink = "https://demo.vaxx.link/viewer#shlink:/$shLinkPayload"
+      val encodedPayload = base64UrlEncode(shLinkPayload)
+      val shLink = "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
 
       qrCodeBitmap = generateQRCode(context, shLink)
       updateImageViewOnMainThread(qrView, qrCodeBitmap!!)
@@ -149,11 +138,20 @@ class GenerateShlUtils {
     }
   }
 
+  /* Send a POST request to the SHL server with the optional passcode */
+  fun getManifestUrlAndToken(passcode: String): JSONObject {
+    val httpClient: CloseableHttpClient = HttpClients.createDefault()
+    return doPostRequest(httpClient, passcode)
+  }
+
+  /* Set the image view to the QR code */
   private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
     val handler = Handler(Looper.getMainLooper())
     handler.post { qrView.setImageBitmap(qrCodeBitmap) }
   }
 
+  /* Send a POST request to the SHL server to get a new manifest URL.
+     Can optionally add a passcode to the SHL here */
   private fun doPostRequest(httpClient: CloseableHttpClient, passcode: String): JSONObject {
     val httpPost = HttpPost("https://api.vaxx.link/api/shl")
     httpPost.addHeader("Content-Type", "application/json")
@@ -166,18 +164,21 @@ class GenerateShlUtils {
     return JSONObject(responseBody)
   }
 
-  private fun getKeyFlags(passcode: String): String {
+  /* Sets the P flag if a passcode has been set */
+  fun getKeyFlags(passcode: String): String {
     return if (passcode.isNotEmpty()) "P" else ""
   }
 
+  /* Generates the SHL QR code for the given payload */
   private fun generateQRCode(context: Context, content: String): Bitmap {
     val qrCodeBitmap = qrGeneratorUtils.createQRCodeBitmap(content)
     val logoBitmap = qrGeneratorUtils.createLogoBitmap(context, qrCodeBitmap)
     return qrGeneratorUtils.overlayLogoOnQRCode(qrCodeBitmap, logoBitmap)
   }
 
+  /* Constructs the SHL payload */
   @RequiresApi(Build.VERSION_CODES.O)
-  private fun constructSHLinkPayload(
+  fun constructSHLinkPayload(
     manifestUrl: String,
     label: String?,
     flags: String?,
@@ -191,9 +192,9 @@ class GenerateShlUtils {
           put("key", key)
           flags?.let { put("flag", it) }
           label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
+          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
         }
         .toString()
-    return base64UrlEncode(payloadObject)
+    return payloadObject
   }
 }

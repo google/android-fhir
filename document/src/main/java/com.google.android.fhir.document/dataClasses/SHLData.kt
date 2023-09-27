@@ -30,11 +30,4 @@ data class SHLData(
   var expirationTime: String,
   var versionNumber: Int,
   var ipsDoc: IPSDocument,
-) : Serializable {
-
-  constructor() : this("", "", "", "", "", "", "", 1, IPSDocument())
-
-  constructor(fullLink: String) : this(fullLink, "", "", "", "", "", "", 1, IPSDocument())
-
-  constructor(doc: IPSDocument) : this("", "", "", "", "", "", "", 1, doc)
-}
+) : Serializable

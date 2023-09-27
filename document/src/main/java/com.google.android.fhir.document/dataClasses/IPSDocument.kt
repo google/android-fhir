@@ -26,9 +26,4 @@ data class IPSDocument(
   var document: Bundle,
   var titles: ArrayList<Title>,
   var patient: Patient,
-) : Serializable {
-
-  constructor() : this(Bundle(), ArrayList<Title>(), Patient())
-
-  constructor(bundle: Bundle) : this(bundle, ArrayList<Title>(), Patient())
-}
+) : Serializable
