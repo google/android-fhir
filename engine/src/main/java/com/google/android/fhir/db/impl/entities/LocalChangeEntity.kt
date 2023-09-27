@@ -59,7 +59,8 @@ import java.util.UUID
 @Entity(
   indices =
     [
-      Index(value = ["resourceType", "resourceId"]), Index(value = ["resourceType", "resourceUuid"])
+      Index(value = ["resourceType", "resourceId"]),
+      Index(value = ["resourceType", "resourceUuid"]),
     ],
 )
 internal data class LocalChangeEntity(

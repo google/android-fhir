@@ -133,7 +133,7 @@ val MIGRATION_6_7 =
   object : Migration(6, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `resourceId` UUID NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
+        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `resourceUuid` UUID NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
       )
       database.execSQL(
         "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`resourceUuid`,`timestamp`,`type`,`payload`,`versionId`) " +
