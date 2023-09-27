@@ -53,20 +53,18 @@ internal constructor(
    * NPM and imports data from the package manager (populates the metadata of the FHIR Resources).
    */
   suspend fun install(vararg dependencies: Dependency) {
-    for (dependency in dependencies) {
-      if (knowledgeDao.getImplementationGuide(dependency.packageId, dependency.version) != null) {
-        continue
+    dependencies
+      .filter { knowledgeDao.getImplementationGuide(it.packageId, it.version) == null }
+      .forEach {
+        val npmPackage =
+          if (npmFileManager.containsPackage(it.packageId, it.version)) {
+            npmFileManager.getPackage(it.packageId, it.version)
+          } else {
+            packageDownloader.downloadPackage(it, PACKAGE_SERVER)
+          }
+        install(it, npmPackage.rootDirectory)
+        install(*npmPackage.dependencies.toTypedArray())
       }
-      val containsPackage = npmFileManager.containsPackage(dependency.packageId, dependency.version)
-      val npmPackage =
-        if (containsPackage) {
-          npmFileManager.getPackage(dependency.packageId, dependency.version)
-        } else {
-          packageDownloader.downloadPackage(dependency, PACKAGE_SERVER)
-        }
-      install(dependency, npmPackage.rootDirectory)
-      install(*npmPackage.dependencies.toTypedArray())
-    }
   }
 
   /**
