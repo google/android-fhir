@@ -23,7 +23,11 @@ import org.hl7.fhir.r4.model.Patient
 /* A data class object which stores an IPS document, the patient it relates to, and a list of
 `  titles present in the document */
 data class IPSDocument(
-  var document: Bundle,
-  var titles: ArrayList<Title>,
-  var patient: Patient,
-) : Serializable
+  val document: Bundle,
+  val titles: ArrayList<Title>,
+  val patient: Patient
+) {
+  class Builder() {
+
+  }
+}

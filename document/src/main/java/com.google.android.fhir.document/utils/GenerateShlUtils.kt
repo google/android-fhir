@@ -16,15 +16,18 @@
 
 package com.google.android.fhir.document.utils
 
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.document.dataClasses.SHLData
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.client.methods.HttpPost
 import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.entity.StringEntity
@@ -37,6 +40,7 @@ import com.nimbusds.jose.JWEHeader
 import com.nimbusds.jose.JWEObject
 import com.nimbusds.jose.Payload
 import com.nimbusds.jose.crypto.DirectEncrypter
+import java.lang.Exception
 import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 import java.time.LocalDate
@@ -49,10 +53,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class GenerateShlUtils {
+internal class GenerateShlUtils(
+  private val qrGeneratorUtils: QRGeneratorUtils,
+) {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val qrGeneratorUtils = QRGeneratorUtils()
 
   /* Encrypt a given string as a JWE token, using a given key */
   @RequiresApi(Build.VERSION_CODES.O)
@@ -68,18 +73,25 @@ class GenerateShlUtils {
   /* POST the IPS document to the manifest URL */
   @RequiresApi(Build.VERSION_CODES.O)
   fun postPayload(file: String, manifestUrl: String, key: String, managementToken: String) {
-    val contentEncrypted = encrypt(file, key)
-    val httpClient: CloseableHttpClient = HttpClients.createDefault()
-    val httpPost = HttpPost("$manifestUrl/file")
-    httpPost.addHeader("Content-Type", "application/fhir+json")
-    httpPost.addHeader("Authorization", "Bearer $managementToken")
-    val entity = StringEntity(contentEncrypted)
-    httpPost.entity = entity
-    httpClient.execute(httpPost)
-    httpClient.close()
+    try {
+      val contentEncrypted = encrypt(file, key)
+      val httpClient: CloseableHttpClient = HttpClients.createDefault()
+      val httpPost = HttpPost("$manifestUrl/file")
+      httpPost.addHeader("Content-Type", "application/fhir+json")
+      httpPost.addHeader("Authorization", "Bearer $managementToken")
+      val entity = StringEntity(contentEncrypted)
+      httpPost.entity = entity
+      httpClient.execute(httpPost)
+      httpClient.close()
+    }
+    catch (e: Exception) {
+      Log.e(TAG, "Error while posting payload: ${e.message}", e)
+      throw e
+    }
   }
 
   /* Converts the inputted expiry date to epoch seconds */
+
   @RequiresApi(Build.VERSION_CODES.O)
   fun dateStringToEpochSeconds(dateString: String): Long {
     val formatter = DateTimeFormatter.ofPattern("yyyy-M-d")
@@ -185,16 +197,13 @@ class GenerateShlUtils {
     key: String,
     exp: String?,
   ): String {
-    val payloadObject =
-      JSONObject()
-        .apply {
-          put("url", manifestUrl)
-          put("key", key)
-          flags?.let { put("flag", it) }
-          label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
-        }
-        .toString()
+    val payloadObject = JSONObject().apply {
+        put("url", manifestUrl)
+        put("key", key)
+        flags?.let { put("flag", it) }
+        label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+        exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
+      }.toString()
     return payloadObject
   }
 }

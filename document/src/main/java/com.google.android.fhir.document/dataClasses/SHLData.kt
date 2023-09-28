@@ -21,13 +21,13 @@ import java.io.Serializable
 /* This data class holds all the information stored in a SHL.
 If the P flag is present, a passcode is needed to decode the data */
 data class SHLData(
-  var fullLink: String,
-  var encodedShlPayload: String,
-  var manifestUrl: String,
-  var key: String,
-  var label: String,
-  var flags: String,
-  var expirationTime: String,
-  var versionNumber: Int,
-  var ipsDoc: IPSDocument,
-) : Serializable
+  val fullLink: String,
+  val encodedShlPayload: String,
+  val manifestUrl: String,
+  val key: String,
+  val label: String,
+  val flags: String,
+  val expirationTime: String,
+  val versionNumber: Int,
+  val ipsDoc: IPSDocument
+)

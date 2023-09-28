@@ -27,25 +27,24 @@ android {
 }
 
 dependencies {
+  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
+  androidTestImplementation(Dependencies.Espresso.espressoCore)
+
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.material)
   implementation(Dependencies.androidFhirEngine)
-
   // Barcode detector scanning
   implementation("com.google.zxing:core:3.4.1")
-  implementation("com.google.mlkit:barcode-scanning:16.1.1")
-  implementation("com.google.mlkit:camera:16.0.0-beta3")
 
   // JWT decoding
   implementation("com.nimbusds:nimbus-jose-jwt:9.31")
-
   // TODO(hugomilosz): Remove this and use retrofit instead
-  implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.8")
+  implementation("com.google.firebase:firebase-crashlytics-buildtools:2.9.9")
 
   testImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
-
   testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockitoInline)
+  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
 }

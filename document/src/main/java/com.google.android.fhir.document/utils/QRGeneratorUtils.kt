@@ -27,7 +27,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 
-class QRGeneratorUtils {
+internal class QRGeneratorUtils {
 
   /* Creates a QR for a given string */
   fun createQRCodeBitmap(content: String): Bitmap {

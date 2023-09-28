@@ -21,15 +21,18 @@ import android.graphics.Bitmap
 import android.os.Build
 import android.widget.ImageView
 import androidx.annotation.RequiresApi
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.SHLData
 import com.google.android.fhir.document.interfaces.SHLGenerator
 import com.google.android.fhir.document.utils.GenerateShlUtils
+import com.google.android.fhir.document.utils.QRGeneratorUtils
 import java.security.SecureRandom
 import java.util.Base64
 
 class LinkGenerator : SHLGenerator {
 
-  private val generateShlUtils = GenerateShlUtils()
+  private val generateShlUtils = GenerateShlUtils(QRGeneratorUtils())
 
   @RequiresApi(Build.VERSION_CODES.O)
   override fun generateSHL(

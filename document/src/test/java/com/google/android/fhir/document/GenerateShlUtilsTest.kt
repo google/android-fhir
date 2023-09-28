@@ -19,38 +19,48 @@ package com.google.android.fhir.document
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.utils.GenerateShlUtils
+import com.google.android.fhir.document.utils.QRGeneratorUtils
 import com.google.android.fhir.testing.readFromFile
 import com.nimbusds.jose.shaded.gson.Gson
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
 class GenerateShlUtilsTest {
 
-  private val generateShlUtils = GenerateShlUtils()
+  @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
+
+  private lateinit var generateShlUtils: GenerateShlUtils
+
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    generateShlUtils = GenerateShlUtils(qrGeneratorUtils)
+  }
+
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val minimalBundleString =
     parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
 
   @Test
   fun postingToServerReturnsManifestIdAndToken() {
-    runBlocking {
-      val postResponse = generateShlUtils.getManifestUrlAndToken("")
-      assertTrue(
-        postResponse.has("id") && postResponse.has("managementToken") && postResponse.has(
-          "active"
-        )
+
+    val postResponse = generateShlUtils.getManifestUrlAndToken("")
+    assertTrue(
+      postResponse.has("id") && postResponse.has("managementToken") && postResponse.has(
+        "active"
       )
-    }
+    )
+
   }
 
   @Test
@@ -89,12 +99,9 @@ class GenerateShlUtilsTest {
     val expirationDate = "2023-12-31"
 
     /* Construct the expected JSON object */
-    val expectedJson = JSONObject()
-      .put("url", manifestUrl)
-      .put("key", key)
-      .put("flag", flags)
-      .put("label", label)
-      .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
+    val expectedJson =
+      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
+        .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
 
     val payload =
       generateShlUtils.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
@@ -116,13 +123,10 @@ class GenerateShlUtilsTest {
     val key = generateShlUtils.generateRandomKey()
     val managementToken = ""
     val fileData = ""
-
-    runBlocking {
-      val success = kotlin.runCatching {
-        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-      }.isSuccess
-      assertTrue(success)
-    }
+    val success = kotlin.runCatching {
+      generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
+    }.isSuccess
+    assertTrue(success)
   }
 
   @Test
@@ -131,13 +135,10 @@ class GenerateShlUtilsTest {
     val key = generateShlUtils.generateRandomKey()
     val managementToken = ""
     val fileData = ""
-
-    runBlocking {
-      val success = kotlin.runCatching {
-        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-      }.isSuccess
-      assertFalse(success)
+    val result = kotlin.runCatching {
+      generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
     }
+    assertTrue(result.isFailure)
   }
 
 }
