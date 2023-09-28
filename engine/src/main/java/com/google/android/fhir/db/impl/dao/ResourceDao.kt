@@ -94,7 +94,7 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
+  open suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
     return resources.map { resource -> insertRemoteResource(resource) }
   }
 
@@ -185,16 +185,16 @@ internal abstract class ResourceDao {
 
   // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
   // itself), we extract the lastUpdatedLocal if any and then set it back again.
-  private suspend fun insertRemoteResource(resource: Resource): String {
+  private suspend fun insertRemoteResource(resource: Resource): UUID {
     val existingResourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
     if (existingResourceEntity != null) {
       update(resource, existingResourceEntity.lastUpdatedLocal)
-      return resource.id
+      return existingResourceEntity.resourceUuid
     }
     return insertResource(resource, null)
   }
 
-  private suspend fun insertResource(resource: Resource, lastUpdatedLocal: Instant?): String {
+  private suspend fun insertResource(resource: Resource, lastUpdatedLocal: Instant?): UUID {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource
@@ -228,7 +228,7 @@ internal abstract class ResourceDao {
 
     updateIndicesForResource(index, resource.resourceType, resourceUuid)
 
-    return resource.id
+    return entity.resourceUuid
   }
 
   suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
