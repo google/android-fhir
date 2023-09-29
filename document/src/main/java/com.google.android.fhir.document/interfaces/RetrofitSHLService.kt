@@ -1,4 +1,4 @@
-package com.google.android.fhir.document
+package com.google.android.fhir.document.interfaces
 
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
