@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "f06ae2e84f7588be59916d32f8d5a6e4",
+    "identityHash": "112cd4c5acec0220c1a0298571087d0d",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -858,14 +858,13 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `${TABLE_NAME}` (`resourceType`, `resourceId`)"
           },
           {
-            "name": "index_LocalChangeEntity_resourceType_resourceUuid",
+            "name": "index_LocalChangeEntity_resourceUuid",
             "unique": false,
             "columnNames": [
-              "resourceType",
               "resourceUuid"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceUuid` ON `${TABLE_NAME}` (`resourceType`, `resourceUuid`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceUuid` ON `${TABLE_NAME}` (`resourceUuid`)"
           }
         ],
         "foreignKeys": []
@@ -951,7 +950,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f06ae2e84f7588be59916d32f8d5a6e4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '112cd4c5acec0220c1a0298571087d0d')"
     ]
   }
 }

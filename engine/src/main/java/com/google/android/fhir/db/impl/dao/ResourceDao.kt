@@ -183,8 +183,9 @@ internal abstract class ResourceDao {
   suspend fun insertLocalResource(resource: Resource, timeOfChange: Instant) =
     insertResource(resource, timeOfChange)
 
-  // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
-  // itself), we extract the lastUpdatedLocal if any and then set it back again.
+  // Check if the resource already exists using its logical ID, if it does, we just update the
+  // existing [ResourceEntity]
+  // Else, we insert with a new [ResourceEntity]
   private suspend fun insertRemoteResource(resource: Resource): UUID {
     val existingResourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
     if (existingResourceEntity != null) {

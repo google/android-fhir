@@ -145,7 +145,7 @@ val MIGRATION_6_7 =
         "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `LocalChangeEntity` (`resourceType`, `resourceId`)",
       )
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceUuid` ON `LocalChangeEntity` (`resourceType`, `resourceUuid`)",
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceUuid` ON `LocalChangeEntity` (`resourceUuid`)",
       )
     }
   }

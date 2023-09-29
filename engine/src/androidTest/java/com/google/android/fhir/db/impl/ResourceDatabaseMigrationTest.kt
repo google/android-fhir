@@ -70,13 +70,13 @@ class ResourceDatabaseMigrationTest {
     val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 2, true, MIGRATION_1_2)
 
     val readPatientJson: String?
-    migratedDatabase.apply {
-      query("SELECT serializedResource FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
         it.moveToFirst()
         readPatientJson = it.getString(0)
       }
     }
-
+    migratedDatabase.close()
     assertThat(readPatientJson).isEqualTo(insertedPatientJson)
   }
 
@@ -104,13 +104,13 @@ class ResourceDatabaseMigrationTest {
     val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 3, true, MIGRATION_2_3)
 
     val retrievedTask: String?
-    migratedDatabase.apply {
-      query("SELECT serializedResource FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
         it.moveToFirst()
         retrievedTask = it.getString(0)
       }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -138,13 +138,13 @@ class ResourceDatabaseMigrationTest {
     val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 4, true, MIGRATION_3_4)
 
     val retrievedTask: String?
-    migratedDatabase.apply {
-      query("SELECT serializedResource FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
         it.moveToFirst()
         retrievedTask = it.getString(0)
       }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -171,13 +171,13 @@ class ResourceDatabaseMigrationTest {
     val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 5, true, MIGRATION_4_5)
 
     val retrievedTask: String?
-    migratedDatabase.apply {
-      query("SELECT serializedResource FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
         it.moveToFirst()
         retrievedTask = it.getString(0)
       }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -218,26 +218,26 @@ class ResourceDatabaseMigrationTest {
     val resourceEntityLastUpdatedLocal: Long
     val localChangeEntityCorruptedTimeStamp: Long
 
-    migratedDatabase.apply {
-      query("SELECT serializedResource FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
         it.moveToFirst()
         retrievedTask = it.getString(0)
       }
 
       resourceEntityLastUpdatedLocal =
-        query("Select lastUpdatedLocal from ResourceEntity").let {
+        database.query("Select lastUpdatedLocal from ResourceEntity").let {
           it.moveToFirst()
           it.getLong(0)
         }
 
-      query("SELECT timestamp FROM LocalChangeEntity").let {
+      database.query("SELECT timestamp FROM LocalChangeEntity").let {
         it.moveToFirst()
         localChangeEntityTimeStamp = it.getLong(0)
         it.moveToNext()
         localChangeEntityCorruptedTimeStamp = it.getLong(0)
       }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
     assertThat(localChangeEntityTimeStamp).isEqualTo(resourceEntityLastUpdatedLocal)
     assertThat(Instant.ofEpochMilli(localChangeEntityCorruptedTimeStamp)).isEqualTo(Instant.EPOCH)
@@ -275,20 +275,20 @@ class ResourceDatabaseMigrationTest {
     val localChangeResourceUuid: String?
     val localChangeResourceId: String?
 
-    migratedDatabase.apply {
-      query("SELECT resourceId, resourceUuid FROM ResourceEntity").let {
+    migratedDatabase.let { database ->
+      database.query("SELECT resourceId, resourceUuid FROM ResourceEntity").let {
         it.moveToFirst()
         retrievedTaskResourceId = it.getString(0)
         retrievedTaskResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
       }
 
-      query("SELECT resourceId,resourceUuid FROM LocalChangeEntity").let {
+      database.query("SELECT resourceId,resourceUuid FROM LocalChangeEntity").let {
         it.moveToFirst()
         localChangeResourceId = it.getString(0)
         localChangeResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
       }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTaskResourceUuid).isEqualTo(localChangeResourceUuid)
     assertThat(localChangeResourceId).isEqualTo(retrievedTaskResourceId)
   }
