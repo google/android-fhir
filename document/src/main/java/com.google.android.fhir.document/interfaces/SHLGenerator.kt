@@ -20,9 +20,16 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.widget.ImageView
 import com.google.android.fhir.document.dataClasses.SHLData
+import kotlinx.coroutines.CoroutineScope
 
 interface SHLGenerator {
 
   /* Passcode added to generateSHL as it shouldn't be wrapped in the SHL object */
-  fun generateSHL(context: Context, shlData: SHLData, passcode: String, qrView: ImageView)
+  fun generateSHL(
+    context: Context,
+    shlData: SHLData,
+    passcode: String,
+    qrView: ImageView,
+    viewModelScope: CoroutineScope,
+  )
 }

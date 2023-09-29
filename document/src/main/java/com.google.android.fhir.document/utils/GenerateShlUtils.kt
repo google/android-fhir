@@ -42,6 +42,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Base64
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -71,7 +72,12 @@ internal class GenerateShlUtils(
 
   /* POST the IPS document to the manifest URL */
   @RequiresApi(Build.VERSION_CODES.O)
-  suspend fun postPayload(file: String, manifestUrl: String, key: String, managementToken: String): JSONObject {
+  suspend fun postPayload(
+    file: String,
+    manifestUrl: String,
+    key: String,
+    managementToken: String,
+  ): JSONObject {
     try {
       val contentEncrypted = encrypt(file, key)
 
@@ -128,36 +134,39 @@ internal class GenerateShlUtils(
 
   /* Generate an SHL */
   @RequiresApi(Build.VERSION_CODES.O)
-  @OptIn(DelicateCoroutinesApi::class)
   fun generateAndPostPayload(
     passcode: String,
     shlData: SHLData,
     context: Context,
     qrView: ImageView,
+    viewModelScope: CoroutineScope,
   ) {
-    val expirationDate = shlData.expirationTime
-    val labelData = shlData.label
-    val bundle = shlData.ipsDoc.document
-    var qrCodeBitmap: Bitmap?
-
-    GlobalScope.launch(Dispatchers.IO) {
+    viewModelScope.launch(Dispatchers.IO) {
       val initialPostResponse = getManifestUrlAndToken(passcode)
-      val manifestUrl = "https://api.vaxx.link/api/shl/${initialPostResponse.getString("id")}"
-      val managementToken = initialPostResponse.getString("managementToken")
-      val exp =
-        if (expirationDate.isNotEmpty()) dateStringToEpochSeconds(expirationDate).toString() else ""
-      val key = generateRandomKey()
-      val shLinkPayload =
-        constructSHLinkPayload(manifestUrl, labelData, getKeyFlags(passcode), key, exp)
-      val encodedPayload = base64UrlEncode(shLinkPayload)
-      val shLink = "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
-
-      qrCodeBitmap = generateQRCode(context, shLink)
-      updateImageViewOnMainThread(qrView, qrCodeBitmap!!)
-
-      val data: String = parser.encodeResourceToString(bundle)
-      postPayload(data, manifestUrl, key, managementToken)
+      val shLink = generateShLink(initialPostResponse, shlData, passcode)
+      generateAndSetQRCode(context, shLink, qrView)
     }
+  }
+
+  /* Generate and display the SHL QR code*/
+  private fun generateAndSetQRCode(context: Context, shLink: String, qrView: ImageView) {
+    val qrCodeBitmap = generateQRCode(context, shLink)
+    updateImageViewOnMainThread(qrView, qrCodeBitmap)
+  }
+
+  /* POST the data to the SHL server and return the link itself */
+  @RequiresApi(Build.VERSION_CODES.O)
+  private suspend fun generateShLink(initialPostResponse: JSONObject, shlData: SHLData, passcode: String): String {
+    val manifestUrl = "https://api.vaxx.link/api/shl/${initialPostResponse.getString("id")}"
+    val managementToken = initialPostResponse.getString("managementToken")
+    val exp =
+      if (shlData.expirationTime.isNotEmpty()) dateStringToEpochSeconds(shlData.expirationTime).toString() else ""
+    val key = generateRandomKey()
+    val shLinkPayload = constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
+    val encodedPayload = base64UrlEncode(shLinkPayload)
+    val data: String = parser.encodeResourceToString(shlData.ipsDoc.document)
+    postPayload(data, manifestUrl, key, managementToken)
+    return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
   }
 
   /* Send a POST request to the SHL server to get a new manifest URL.
@@ -212,12 +221,12 @@ internal class GenerateShlUtils(
     exp: String?,
   ): String {
     val payloadObject = JSONObject().apply {
-        put("url", manifestUrl)
-        put("key", key)
-        flags?.let { put("flag", it) }
-        label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-        exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
-      }.toString()
+      put("url", manifestUrl)
+      put("key", key)
+      flags?.let { put("flag", it) }
+      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
+    }.toString()
     return payloadObject
   }
 }

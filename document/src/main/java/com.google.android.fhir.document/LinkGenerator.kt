@@ -29,6 +29,7 @@ import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.QRGeneratorUtils
 import java.security.SecureRandom
 import java.util.Base64
+import kotlinx.coroutines.CoroutineScope
 
 class LinkGenerator : SHLGenerator {
 
@@ -39,8 +40,9 @@ class LinkGenerator : SHLGenerator {
     context: Context,
     shlData: SHLData,
     passcode: String,
-    qrView: ImageView
+    qrView: ImageView,
+    viewModelScope: CoroutineScope,
   ) {
-    generateShlUtils.generateAndPostPayload(passcode, shlData, context, qrView)
+    generateShlUtils.generateAndPostPayload(passcode, shlData, context, qrView, viewModelScope)
   }
 }
