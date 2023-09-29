@@ -22,10 +22,15 @@ import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.QRGeneratorUtils
 import com.google.android.fhir.testing.readFromFile
 import com.nimbusds.jose.shaded.gson.Gson
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertThat
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -33,8 +38,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class GenerateShlUtilsTest {
 
   @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
@@ -52,15 +59,14 @@ class GenerateShlUtilsTest {
     parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
 
   @Test
-  fun postingToServerReturnsManifestIdAndToken() {
-
+  fun postingToServerReturnsManifestIdAndToken() = runTest {
     val postResponse = generateShlUtils.getManifestUrlAndToken("")
-    assertTrue(
-      postResponse.has("id") && postResponse.has("managementToken") && postResponse.has(
-        "active"
-      )
-    )
+    println("Response: $postResponse")
 
+    assertNotNull(postResponse)
+    assertTrue(postResponse.has("id"))
+    assertTrue(postResponse.has("managementToken"))
+    assertTrue(postResponse.has("active"))
   }
 
   @Test
@@ -118,19 +124,21 @@ class GenerateShlUtilsTest {
   }
 
   @Test
-  fun canPostPayloadWithValidInputs() {
-    val manifestUrl = "https://example.com/manifest"
+  fun canPostPayloadWithValidInputs() = runTest {
+    val manifestUrl = "https://api.vaxx.link/api/shl/eT4EyhrDJ3gMJao9ovpwSX2SIKfkCBgjzOC-ft6BCk8"
     val key = generateShlUtils.generateRandomKey()
-    val managementToken = ""
+    val managementToken = "M6hY9PkPiYQ6SiaFAtmve9a7tkzP_xExwlWdRXLh3BQ"
     val fileData = ""
-    val success = kotlin.runCatching {
-      generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-    }.isSuccess
-    assertTrue(success)
+    val postResponse = generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
+
+    assertNotNull(postResponse)
+    assertTrue(postResponse.has("passcodeFailuresRemaining"))
+    assertTrue(postResponse.has("managementToken"))
+    assertTrue(postResponse.has("active"))
   }
 
   @Test
-  fun failsToPostPayloadWithInvalidManifestUrl() {
+  fun failsToPostPayloadWithInvalidManifestUrl() = runTest {
     val manifestUrl = "invalid_url"
     val key = generateShlUtils.generateRandomKey()
     val managementToken = ""

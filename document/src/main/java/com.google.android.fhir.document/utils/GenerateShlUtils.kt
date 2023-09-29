@@ -27,13 +27,8 @@ import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.document.RetrofitSHLService
 import com.google.android.fhir.document.dataClasses.SHLData
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.client.methods.HttpPost
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.entity.StringEntity
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.impl.client.CloseableHttpClient
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.impl.client.HttpClients
-import com.google.firebase.crashlytics.buildtools.reloc.org.apache.http.util.EntityUtils
 import com.nimbusds.jose.EncryptionMethod
 import com.nimbusds.jose.JWEAlgorithm
 import com.nimbusds.jose.JWEHeader
@@ -51,7 +46,11 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 
 internal class GenerateShlUtils(
   private val qrGeneratorUtils: QRGeneratorUtils,
@@ -72,26 +71,37 @@ internal class GenerateShlUtils(
 
   /* POST the IPS document to the manifest URL */
   @RequiresApi(Build.VERSION_CODES.O)
-  fun postPayload(file: String, manifestUrl: String, key: String, managementToken: String) {
+  suspend fun postPayload(file: String, manifestUrl: String, key: String, managementToken: String): JSONObject {
     try {
       val contentEncrypted = encrypt(file, key)
-      val httpClient: CloseableHttpClient = HttpClients.createDefault()
-      val httpPost = HttpPost("$manifestUrl/file")
-      httpPost.addHeader("Content-Type", "application/fhir+json")
-      httpPost.addHeader("Authorization", "Bearer $managementToken")
-      val entity = StringEntity(contentEncrypted)
-      httpPost.entity = entity
-      httpClient.execute(httpPost)
-      httpClient.close()
-    }
-    catch (e: Exception) {
+
+      val retrofit = Retrofit.Builder()
+        .baseUrl("$manifestUrl/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+
+      val apiService = retrofit.create(RetrofitSHLService::class.java)
+
+      val authorization = "Bearer $managementToken"
+
+      val response = apiService.postPayload(contentEncrypted, authorization)
+
+      return if (response.isSuccessful) {
+        println(response.message())
+        val responseBody = response.body()?.string()
+        JSONObject(responseBody)
+      } else {
+        println("HTTP Error: ${response.code()}")
+        JSONObject()
+      }
+    } catch (e: Exception) {
+      println(e)
       Log.e(TAG, "Error while posting payload: ${e.message}", e)
       throw e
     }
   }
 
   /* Converts the inputted expiry date to epoch seconds */
-
   @RequiresApi(Build.VERSION_CODES.O)
   fun dateStringToEpochSeconds(dateString: String): Long {
     val formatter = DateTimeFormatter.ofPattern("yyyy-M-d")
@@ -150,30 +160,34 @@ internal class GenerateShlUtils(
     }
   }
 
-  /* Send a POST request to the SHL server with the optional passcode */
-  fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val httpClient: CloseableHttpClient = HttpClients.createDefault()
-    return doPostRequest(httpClient, passcode)
+  /* Send a POST request to the SHL server to get a new manifest URL.
+     Can optionally add a passcode to the SHL here */
+  suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
+    val retrofit = Retrofit.Builder()
+      .baseUrl("https://api.vaxx.link/api/")
+      .addConverterFactory(GsonConverterFactory.create())
+      .build()
+
+    val apiService = retrofit.create(RetrofitSHLService::class.java)
+    val requestBody = if (passcode.isNotBlank()) {
+      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
+    } else {
+      "{}".toRequestBody("application/json".toMediaTypeOrNull())
+    }
+    val response = apiService.getManifestUrlAndToken(requestBody)
+    return if (response.isSuccessful) {
+      val responseBody = response.body()?.string()
+      JSONObject(responseBody)
+    } else {
+      println("HTTP Error: ${response.code()}")
+      JSONObject()
+    }
   }
 
   /* Set the image view to the QR code */
   private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
     val handler = Handler(Looper.getMainLooper())
     handler.post { qrView.setImageBitmap(qrCodeBitmap) }
-  }
-
-  /* Send a POST request to the SHL server to get a new manifest URL.
-     Can optionally add a passcode to the SHL here */
-  private fun doPostRequest(httpClient: CloseableHttpClient, passcode: String): JSONObject {
-    val httpPost = HttpPost("https://api.vaxx.link/api/shl")
-    httpPost.addHeader("Content-Type", "application/json")
-    val jsonData: String = if (passcode.isNotEmpty()) "{\"passcode\" : \"$passcode\"}" else "{}"
-    val entity = StringEntity(jsonData)
-    httpPost.entity = entity
-    val response = httpClient.execute(httpPost)
-    val responseBody = EntityUtils.toString(response.entity, StandardCharsets.UTF_8)
-    httpClient.close()
-    return JSONObject(responseBody)
   }
 
   /* Sets the P flag if a passcode has been set */
