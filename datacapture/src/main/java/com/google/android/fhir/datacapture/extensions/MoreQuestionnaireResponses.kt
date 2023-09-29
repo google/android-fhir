@@ -100,22 +100,27 @@ private fun unpackRepeatedGroups(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  questionnaireResponseItem.item =
-    unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item)
-  questionnaireResponseItem.answer.forEach {
-    it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
-  }
-  return if (
-    questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP && questionnaireItem.repeats
-  ) {
-    questionnaireResponseItem.answer.map {
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        linkId = questionnaireItem.linkId
-        text = questionnaireItem.localizedTextSpanned?.toString()
-        item = it.item
+  if (questionnaireResponseItem.hasAnswer()) {
+    questionnaireResponseItem.item =
+      unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item)
+    questionnaireResponseItem.answer.forEach {
+      it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
+    }
+    return if (
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        questionnaireItem.repeats
+    ) {
+      questionnaireResponseItem.answer.map {
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          linkId = questionnaireItem.linkId
+          text = questionnaireItem.localizedTextSpanned?.toString()
+          item = it.item
+        }
       }
+    } else {
+      listOf(questionnaireResponseItem)
     }
   } else {
-    listOf(questionnaireResponseItem)
+    return listOf(questionnaireResponseItem)
   }
 }
