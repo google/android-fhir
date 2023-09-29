@@ -102,7 +102,11 @@ class GenerateShlUtilsTest {
 
     /* Construct the expected JSON object */
     val expectedJson =
-      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
+      JSONObject()
+        .put("url", manifestUrl)
+        .put("key", key)
+        .put("flag", flags)
+        .put("label", label)
         .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
 
     val payload =
@@ -139,10 +143,10 @@ class GenerateShlUtilsTest {
     val key = generateShlUtils.generateRandomKey()
     val managementToken = ""
     val fileData = ""
-    val result = kotlin.runCatching {
-      generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-    }
+    val result =
+      kotlin.runCatching {
+        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
+      }
     assertTrue(result.isFailure)
   }
-
 }

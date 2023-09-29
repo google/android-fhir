@@ -27,8 +27,8 @@ import android.widget.ImageView
 import androidx.annotation.RequiresApi
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.document.interfaces.RetrofitSHLService
 import com.google.android.fhir.document.dataClasses.SHLData
+import com.google.android.fhir.document.interfaces.RetrofitSHLService
 import com.nimbusds.jose.EncryptionMethod
 import com.nimbusds.jose.JWEAlgorithm
 import com.nimbusds.jose.JWEHeader
@@ -79,10 +79,11 @@ internal class GenerateShlUtils(
     try {
       val contentEncrypted = encrypt(file, key)
 
-      val retrofit = Retrofit.Builder()
-        .baseUrl("$manifestUrl/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+      val retrofit =
+        Retrofit.Builder()
+          .baseUrl("$manifestUrl/")
+          .addConverterFactory(GsonConverterFactory.create())
+          .build()
 
       val apiService = retrofit.create(RetrofitSHLService::class.java)
 
@@ -154,13 +155,22 @@ internal class GenerateShlUtils(
 
   /* POST the data to the SHL server and return the link itself */
   @RequiresApi(Build.VERSION_CODES.O)
-  private suspend fun generateShLink(initialPostResponse: JSONObject, shlData: SHLData, passcode: String): String {
+  private suspend fun generateShLink(
+    initialPostResponse: JSONObject,
+    shlData: SHLData,
+    passcode: String,
+  ): String {
     val manifestUrl = "https://api.vaxx.link/api/shl/${initialPostResponse.getString("id")}"
     val managementToken = initialPostResponse.getString("managementToken")
     val exp =
-      if (shlData.expirationTime.isNotEmpty()) dateStringToEpochSeconds(shlData.expirationTime).toString() else ""
+      if (shlData.expirationTime.isNotEmpty()) {
+        dateStringToEpochSeconds(shlData.expirationTime).toString()
+      } else {
+        ""
+      }
     val key = generateRandomKey()
-    val shLinkPayload = constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
+    val shLinkPayload =
+      constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
     val encodedPayload = base64UrlEncode(shLinkPayload)
     val data: String = parser.encodeResourceToString(shlData.ipsDoc.document)
     postPayload(data, manifestUrl, key, managementToken)
@@ -168,19 +178,21 @@ internal class GenerateShlUtils(
   }
 
   /* Send a POST request to the SHL server to get a new manifest URL.
-     Can optionally add a passcode to the SHL here */
+  Can optionally add a passcode to the SHL here */
   suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val retrofit = Retrofit.Builder()
-      .baseUrl("https://api.vaxx.link/api/")
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
+    val retrofit =
+      Retrofit.Builder()
+        .baseUrl("https://api.vaxx.link/api/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
 
     val apiService = retrofit.create(RetrofitSHLService::class.java)
-    val requestBody = if (passcode.isNotBlank()) {
-      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
-    } else {
-      "{}".toRequestBody("application/json".toMediaTypeOrNull())
-    }
+    val requestBody =
+      if (passcode.isNotBlank()) {
+        "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
+      } else {
+        "{}".toRequestBody("application/json".toMediaTypeOrNull())
+      }
     val response = apiService.getManifestUrlAndToken(requestBody)
     return if (response.isSuccessful) {
       val responseBody = response.body()?.string()
@@ -218,13 +230,16 @@ internal class GenerateShlUtils(
     key: String,
     exp: String?,
   ): String {
-    val payloadObject = JSONObject().apply {
-      put("url", manifestUrl)
-      put("key", key)
-      flags?.let { put("flag", it) }
-      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
-    }.toString()
+    val payloadObject =
+      JSONObject()
+        .apply {
+          put("url", manifestUrl)
+          put("key", key)
+          flags?.let { put("flag", it) }
+          label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
+        }
+        .toString()
     return payloadObject
   }
 }

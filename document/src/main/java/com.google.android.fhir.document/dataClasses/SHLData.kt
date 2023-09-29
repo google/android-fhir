@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.document.dataClasses
 
-import java.io.Serializable
-
 /* This data class holds all the information stored in a SHL.
 If the P flag is present, a passcode is needed to decode the data */
 data class SHLData(
@@ -29,5 +27,5 @@ data class SHLData(
   val flags: String,
   val expirationTime: String,
   val versionNumber: Int,
-  val ipsDoc: IPSDocument
+  val ipsDoc: IPSDocument,
 )

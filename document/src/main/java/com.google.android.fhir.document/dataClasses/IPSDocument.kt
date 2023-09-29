@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.document.dataClasses
 
-import java.io.Serializable
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
 
@@ -25,9 +24,7 @@ import org.hl7.fhir.r4.model.Patient
 data class IPSDocument(
   val document: Bundle,
   val titles: ArrayList<Title>,
-  val patient: Patient
+  val patient: Patient,
 ) {
-  class Builder() {
-
-  }
+  class Builder()
 }

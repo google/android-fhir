@@ -27,8 +27,6 @@ android {
 }
 
 dependencies {
-
-  implementation(project(":engine"))
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.material)

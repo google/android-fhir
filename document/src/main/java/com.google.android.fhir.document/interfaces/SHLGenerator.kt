@@ -17,7 +17,6 @@
 package com.google.android.fhir.document.interfaces
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.widget.ImageView
 import com.google.android.fhir.document.dataClasses.SHLData
 import kotlinx.coroutines.CoroutineScope
