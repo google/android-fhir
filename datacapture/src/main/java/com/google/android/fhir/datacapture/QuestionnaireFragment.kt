@@ -124,16 +124,7 @@ class QuestionnaireFragment : Fragment() {
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-
     val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
-    // Reads submit button visibility value initially defined in
-    // [R.attr.submitButtonStyleQuestionnaire] style.
-    val submitButtonVisibilityInStyle = submitButton.visibility
-    viewModel.setShowSubmitButtonFlag(submitButtonVisibilityInStyle == View.VISIBLE)
-    // Reads submit button visibility value initially defined in
-    // [R.attr.cancelButtonStyleQuestionnaire] style.
-    val cancelButtonVisibilityInStyle = cancelButton.visibility
-    viewModel.setShowCancelButtonFlag(cancelButtonVisibilityInStyle == View.VISIBLE)
 
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
