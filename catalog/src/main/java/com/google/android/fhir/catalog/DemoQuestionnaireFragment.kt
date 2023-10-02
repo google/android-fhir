@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,12 +34,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.BUNDLE_ERROR_KEY
 import com.google.android.fhir.catalog.ModalBottomSheetFragment.Companion.REQUEST_ERROR_KEY
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.SUBMIT_REQUEST_KEY
 import com.google.android.material.card.MaterialCardView
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Patient
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
@@ -52,7 +54,7 @@ class DemoQuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     requireContext().setTheme(getThemeId())
     return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
@@ -93,6 +95,7 @@ class DemoQuestionnaireFragment : Fragment() {
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
+    (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }
 
   override fun onResume() {
@@ -107,8 +110,7 @@ class DemoQuestionnaireFragment : Fragment() {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      // TODO https://github.com/google/android-fhir/issues/1088
-      R.id.submit_questionnaire -> {
+      com.google.android.fhir.datacapture.R.id.submit_questionnaire -> {
         onSubmitQuestionnaireClick()
         true
       }
@@ -133,27 +135,16 @@ class DemoQuestionnaireFragment : Fragment() {
     setHasOptionsMenu(true)
   }
 
-  private fun updateArguments() {
-    requireArguments().putString(QUESTIONNAIRE_FILE_PATH_KEY, args.questionnaireFilePathKey)
-    requireArguments()
-      .putString(
-        QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY,
-        args.questionnaireFileWithValidationPathKey
-      )
-  }
-
   private fun addQuestionnaireFragment() {
     viewLifecycleOwner.lifecycleScope.launch {
       if (childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) == null) {
         childFragmentManager.commit {
           setReorderingAllowed(true)
-          add(
-            R.id.container,
+          val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .setQuestionnaire(viewModel.getQuestionnaireJson())
-              .build(),
-            QUESTIONNAIRE_FRAGMENT_TAG
-          )
+              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .build()
+          add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
       }
     }
@@ -166,22 +157,30 @@ class DemoQuestionnaireFragment : Fragment() {
    */
   private fun replaceQuestionnaireFragmentWithQuestionnaireJson() {
     // TODO: remove check once all files are added
-    if (args.questionnaireFileWithValidationPathKey.isNullOrEmpty()) {
+    if (args.questionnaireWithValidationJsonStringKey.isNullOrEmpty()) {
       return
     }
     viewLifecycleOwner.lifecycleScope.launch {
       val questionnaireJsonString =
         if (isErrorState) {
-          viewModel.getQuestionnaireWithValidationJson()
+          args.questionnaireWithValidationJsonStringKey!!
         } else {
-          viewModel.getQuestionnaireJson()
+          args.questionnaireJsonStringKey!!
         }
       childFragmentManager.commit {
         setReorderingAllowed(true)
         replace(
           R.id.container,
-          QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString).build(),
-          QUESTIONNAIRE_FRAGMENT_TAG
+          QuestionnaireFragment.builder()
+            .setQuestionnaire(questionnaireJsonString)
+            .setQuestionnaireLaunchContexts(
+              FhirContext.forR4Cached()
+                .newJsonParser()
+                .encodeResourceToString(Patient().apply { id = "P1" })
+                .let { listOf(it) },
+            )
+            .build(),
+          QUESTIONNAIRE_FRAGMENT_TAG,
         )
       }
     }
@@ -191,7 +190,7 @@ class DemoQuestionnaireFragment : Fragment() {
     return when (args.workflow) {
       WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
       WorkflowType.COMPONENT,
-      WorkflowType.BEHAVIOR -> R.style.Theme_Androidfhir_Component
+      WorkflowType.BEHAVIOR, -> R.style.Theme_Androidfhir_Component
       WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
     }
   }
@@ -207,7 +206,7 @@ class DemoQuestionnaireFragment : Fragment() {
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     launchQuestionnaireResponseFragment(
-      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse())
+      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
     )
   }
 
@@ -215,7 +214,7 @@ class DemoQuestionnaireFragment : Fragment() {
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections
-          .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response)
+          .actionGalleryQuestionnaireFragmentToQuestionnaireResponseFragment(response),
       )
   }
 
@@ -223,16 +222,13 @@ class DemoQuestionnaireFragment : Fragment() {
     findNavController()
       .navigate(
         DemoQuestionnaireFragmentDirections.actionGalleryQuestionnaireFragmentToModalBottomSheet(
-          isErrorState
-        )
+          isErrorState,
+        ),
       )
   }
 
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
-    const val QUESTIONNAIRE_FILE_PATH_KEY = "questionnaire-file-path-key"
-    const val QUESTIONNAIRE_FILE_WITH_VALIDATION_PATH_KEY =
-      "questionnaire-file-with-validation-path-key"
   }
 }
 
@@ -240,5 +236,5 @@ enum class WorkflowType {
   COMPONENT,
   DEFAULT,
   PAGINATED,
-  BEHAVIOR
+  BEHAVIOR,
 }

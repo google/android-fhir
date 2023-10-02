@@ -3,6 +3,9 @@
   "contained": [ {
     "resourceType": "RequestGroup",
     "id": "MedRequest-Example",
+    "instantiatesCanonical":[
+      "http://localhost/PlanDefinition/MedRequest-Example"
+    ],
     "status": "draft",
     "intent": "proposal",
     "subject": {
@@ -24,6 +27,9 @@
       "reference": "Patient/Patient-Example"
     }
   } ],
+  "instantiatesCanonical": [
+    "http://localhost/PlanDefinition/MedRequest-Example"
+  ],
   "status": "draft",
   "intent": "proposal",
   "subject": {

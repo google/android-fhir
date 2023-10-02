@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,10 +47,13 @@ class FakeFhirDal : FhirDal {
   override fun read(id: IIdType) = cacheById[toKey(id)]
 
   override fun create(resource: IBaseResource) {}
+
   override fun update(resource: IBaseResource) {}
+
   override fun delete(id: IIdType) {}
 
   override fun search(resourceType: String) = cacheByType[resourceType]
+
   override fun searchByUrl(resourceType: String, url: String) =
     cacheByURL[url]?.filter { it.idElement.resourceType == resourceType }
 }

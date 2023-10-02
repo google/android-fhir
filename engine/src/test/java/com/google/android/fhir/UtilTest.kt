@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -114,14 +114,15 @@ class UtilTest : TestCase() {
   companion object {
     val TEST_OPERATION_OUTCOME_ERROR = OperationOutcome()
     val TEST_OPERATION_OUTCOME_INFO = OperationOutcome()
+
     init {
       TEST_OPERATION_OUTCOME_ERROR.addIssue(
         OperationOutcome.OperationOutcomeIssueComponent()
-          .setSeverity(OperationOutcome.IssueSeverity.ERROR)
+          .setSeverity(OperationOutcome.IssueSeverity.ERROR),
       )
       TEST_OPERATION_OUTCOME_INFO.addIssue(
         OperationOutcome.OperationOutcomeIssueComponent()
-          .setSeverity(OperationOutcome.IssueSeverity.INFORMATION)
+          .setSeverity(OperationOutcome.IssueSeverity.INFORMATION),
       )
     }
   }

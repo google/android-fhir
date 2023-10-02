@@ -28,8 +28,8 @@
         style="?attr/questionnaireEditButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
+        android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+        android:layout_marginVertical="@dimen/action_button_margin_vertical"
         app:icon="@drawable/ic_outline_edit_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -87,7 +87,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_previous"
             android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -100,7 +101,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_next"
             android:textAllCaps="false"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -113,7 +115,8 @@
             style="?attr/questionnaireButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_review"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -125,9 +128,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-
-            android:layout_marginHorizontal="@dimen/item_margin_horizontal"
- 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
         >
@@ -137,8 +137,8 @@
                 style="?attr/questionnaireCancelButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-                android:layout_marginVertical="@dimen/item_margin_vertical"
+                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+                android:layout_marginVertical="@dimen/action_button_margin_vertical"
             />
 
             <Button
@@ -146,8 +146,8 @@
                 style="?attr/questionnaireSubmitButtonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-                android:layout_marginVertical="@dimen/item_margin_vertical"
+                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+                android:layout_marginVertical="@dimen/action_button_margin_vertical"
             />
         </LinearLayout>
 

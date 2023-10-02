@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import androidx.appcompat.view.ContextThemeWrapper
  * https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:appcompat/appcompat/src/main/java/androidx/appcompat/app/AppCompatDelegateImpl.java;l=1615
  *
  * TODO: find a more robust way to do this as it is not guaranteed that the activity is an
- * AppCompatActivity.
+ *   AppCompatActivity.
  */
 fun Context.tryUnwrapContext(): AppCompatActivity? {
   var context = this

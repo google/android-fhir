@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -57,7 +58,7 @@ class MinValueValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(10))
-          }
+          },
         )
       }
     val answer = QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(9) }
@@ -66,7 +67,7 @@ class MinValueValidatorTest {
       MinValueValidator.validate(
         questionnaireItem,
         answer,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
 
     assertThat(validationResult.isValid).isFalse()
@@ -81,7 +82,7 @@ class MinValueValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(500))
-          }
+          },
         )
       }
     val answer = QuestionnaireResponseItemAnswerComponent().apply { value = IntegerType(501) }
@@ -90,7 +91,7 @@ class MinValueValidatorTest {
       MinValueValidator.validate(
         questionnaireItem,
         answer,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
 
     assertThat(validationResult.isValid).isTrue()
@@ -109,16 +110,16 @@ class MinValueValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      CQF_CALCULATED_EXPRESSION_URL,
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
-                      }
-                    )
+                      },
+                    ),
                   )
-              }
+              },
             )
-          }
+          },
         )
       }
     val answerDate =
@@ -130,8 +131,8 @@ class MinValueValidatorTest {
                 add(Calendar.YEAR, -1)
                 add(Calendar.DAY_OF_MONTH, -1)
               }
-              .valueAsString)
-          )
+              .valueAsString),
+          ),
       )
     val answer = QuestionnaireResponseItemAnswerComponent().apply { value = answerDate }
 
@@ -139,7 +140,7 @@ class MinValueValidatorTest {
       MinValueValidator.validate(
         questionnaireItem,
         answer,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
     val expectedDateRange =
       (MinValueValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
@@ -160,16 +161,16 @@ class MinValueValidatorTest {
                 extension =
                   listOf(
                     Extension(
-                      CQF_CALCULATED_EXPRESSION_URL,
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
                         language = "text/fhirpath"
                         expression = "today() - 1 'days'"
-                      }
-                    )
+                      },
+                    ),
                   )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -179,7 +180,7 @@ class MinValueValidatorTest {
       MinValueValidator.validate(
         questionnaireItem,
         answer,
-        InstrumentationRegistry.getInstrumentation().context
+        InstrumentationRegistry.getInstrumentation().context,
       )
 
     assertThat(validationResult.isValid).isTrue()
@@ -200,18 +201,18 @@ class MinValueValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
     assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString)
       .isEqualTo(today)
@@ -227,9 +228,9 @@ class MinValueValidatorTest {
             Extension().apply {
               url = MIN_VALUE_EXTENSION_URL
               this.setValue(dateType)
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.value)

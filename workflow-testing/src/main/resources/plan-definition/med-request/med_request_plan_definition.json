@@ -17,6 +17,7 @@
       "resource": {
         "resourceType" : "PlanDefinition",
         "id" : "MedRequest-Example",
+        "url" : "http://localhost/PlanDefinition/MedRequest-Example",
         "title" : "This example illustrates a medication request",
         "status" : "active",
         "action" : [{

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.sync
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.resource.TestingUtils
+import com.google.android.fhir.testing.assertResourceEquals
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
@@ -28,7 +26,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class AcceptLocalConflictResolverTest {
-  private val testingUtils = TestingUtils(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser())
 
   @Test
   fun resolve_shouldReturnLocalChange() {
@@ -39,7 +36,7 @@ class AcceptLocalConflictResolverTest {
           HumanName().apply {
             family = "Local"
             addGiven("Patient1")
-          }
+          },
         )
       }
 
@@ -50,12 +47,12 @@ class AcceptLocalConflictResolverTest {
           HumanName().apply {
             family = "Remote"
             addGiven("Patient1")
-          }
+          },
         )
       }
 
     val result = AcceptLocalConflictResolver.resolve(localResource, remoteResource)
     assertThat(result).isInstanceOf(Resolved::class.java)
-    testingUtils.assertResourceEquals(localResource, (result as Resolved).resolved)
+    assertResourceEquals(localResource, (result as Resolved).resolved)
   }
 }

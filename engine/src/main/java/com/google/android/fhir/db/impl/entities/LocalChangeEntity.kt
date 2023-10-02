@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import java.time.Instant
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -26,6 +27,7 @@ import androidx.room.PrimaryKey
  * type of change and can be:
  * * DELETE: The empty string, "".
  * * INSERT: The full resource in JSON form, e.g. {
+ *
  * ```
  *      "resourceType": "Patient",
  *      "id": "animal",
@@ -39,8 +41,10 @@ import androidx.room.PrimaryKey
  *        ],
  *      ...
  * ```
+ *
  * }
  * * UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient: [
+ *
  * ```
  *      {
  *      "op": "replace",
@@ -48,6 +52,7 @@ import androidx.room.PrimaryKey
  *      "value": "Binny"
  *      }
  * ```
+ *
  * ] For resource that is fully synced with server this table should not have any rows.
  */
 @Entity(indices = [Index(value = ["resourceType", "resourceId"])])
@@ -55,15 +60,16 @@ internal data class LocalChangeEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: String,
   val resourceId: String,
-  val timestamp: String = "",
+  val timestamp: Instant,
   val type: Type,
   val payload: String,
-  val versionId: String? = null
+  val versionId: String? = null,
 ) {
   enum class Type(val value: Int) {
     INSERT(1), // create a new resource. payload is the entire resource json.
     UPDATE(2), // patch. payload is the json patch.
-    DELETE(3); // delete. payload is empty string.
+    DELETE(3), // delete. payload is empty string.
+    ;
 
     companion object {
       fun from(input: Int): Type = values().first { it.value == input }

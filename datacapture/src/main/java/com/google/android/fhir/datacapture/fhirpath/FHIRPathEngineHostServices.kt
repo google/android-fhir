@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,8 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * Resolves constants defined in the fhir path expressions beyond those defined in the specification
  */
 internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
-  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? {
-    return if (appContext is Map<*, *> && appContext.containsKey(name)) appContext[name] as Base
-    else null
-  }
+  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? =
+    (appContext as? Map<*, *>)?.get(name) as? Base
 
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
     throw UnsupportedOperationException()
@@ -39,7 +37,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   }
 
   override fun resolveFunction(
-    functionName: String?
+    functionName: String?,
   ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
     throw UnsupportedOperationException()
   }
@@ -47,7 +45,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   override fun checkFunction(
     appContext: Any?,
     functionName: String?,
-    parameters: MutableList<TypeDetails>?
+    parameters: MutableList<TypeDetails>?,
   ): TypeDetails {
     throw UnsupportedOperationException()
   }
@@ -56,7 +54,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     appContext: Any?,
     focus: MutableList<Base>?,
     functionName: String?,
-    parameters: MutableList<MutableList<Base>>?
+    parameters: MutableList<MutableList<Base>>?,
   ): MutableList<Base> {
     throw UnsupportedOperationException()
   }

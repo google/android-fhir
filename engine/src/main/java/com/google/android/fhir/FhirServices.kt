@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.RemoteFhirService
+import com.google.android.fhir.sync.remote.FhirHttpDataSource
+import com.google.android.fhir.sync.remote.RetrofitHttpService
 import org.hl7.fhir.r4.model.SearchParameter
 import timber.log.Timber
 
@@ -36,7 +37,7 @@ internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database,
-  val remoteDataSource: DataSource? = null
+  val remoteDataSource: DataSource? = null,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -76,15 +77,18 @@ internal data class FhirServices(
           context = context,
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
-          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap))
+          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap)),
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
-            .setAuthenticator(it.authenticator)
-            .setHttpLogger(it.httpLogger)
-            .build()
+          FhirHttpDataSource(
+            fhirHttpService =
+              RetrofitHttpService.builder(it.baseUrl, it.networkConfiguration)
+                .setAuthenticator(it.authenticator)
+                .setHttpLogger(it.httpLogger)
+                .build(),
+          )
         }
       return FhirServices(
         fhirEngine = engine,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import org.robolectric.annotation.Config
 class NumberSearchParameterizedTest(
   private val num: BigDecimal,
   private val lowerBound: BigDecimal,
-  private val upperBound: BigDecimal
+  private val upperBound: BigDecimal,
 ) {
   companion object {
     @JvmStatic
@@ -56,7 +56,8 @@ class NumberSearchParameterizedTest(
     WHERE a.resourceType = ?
     AND a.resourceUuid IN (
     SELECT resourceUuid FROM NumberIndexEntity
-    """.trimIndent()
+        """
+      .trimIndent()
 
   @Test
   fun `should search equal values`() {
@@ -68,7 +69,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.EQUAL
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -77,7 +78,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value < ?)
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -87,8 +90,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           lowerBound.toDouble(),
-          upperBound.toDouble()
-        )
+          upperBound.toDouble(),
+        ),
       )
   }
 
@@ -102,7 +105,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.NOT_EQUAL
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -111,7 +114,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -121,8 +126,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           lowerBound.toDouble(),
-          upperBound.toDouble()
-        )
+          upperBound.toDouble(),
+        ),
       )
   }
 
@@ -136,7 +141,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.GREATERTHAN
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -145,7 +150,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -154,8 +161,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -169,7 +176,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -178,7 +185,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value >= ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -187,8 +196,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -202,7 +211,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.LESSTHAN
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -211,7 +220,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -220,8 +231,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -235,7 +246,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -244,7 +255,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value <= ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
     assertThat(search.args)
       .isEqualTo(
@@ -252,8 +265,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -268,7 +281,7 @@ class NumberSearchParameterizedTest(
               {
                 prefix = ParamPrefixEnum.ENDS_BEFORE
                 value = BigDecimal("100")
-              }
+              },
             )
           }
           .getQuery()
@@ -287,7 +300,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.ENDS_BEFORE
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -296,7 +309,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value < ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -305,8 +320,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -321,7 +336,7 @@ class NumberSearchParameterizedTest(
               {
                 prefix = ParamPrefixEnum.STARTS_AFTER
                 value = BigDecimal(100)
-              }
+              },
             )
           }
           .getQuery()
@@ -340,7 +355,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
               value = num
-            }
+            },
           )
         }
         .getQuery()
@@ -349,7 +364,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND index_value > ?
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -358,8 +375,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
-          num.toDouble()
-        )
+          num.toDouble(),
+        ),
       )
   }
 
@@ -373,7 +390,7 @@ class NumberSearchParameterizedTest(
             {
               prefix = ParamPrefixEnum.APPROXIMATE
               value = BigDecimal("1e-1")
-            }
+            },
           )
         }
         .getQuery()
@@ -382,7 +399,9 @@ class NumberSearchParameterizedTest(
         """
         |$baseQuery
         |WHERE resourceType = ? AND index_name = ? AND (index_value >= ? AND index_value <= ?)
-        |)""".trimMargin()
+        |)
+                """
+          .trimMargin(),
       )
 
     assertThat(search.args)
@@ -392,8 +411,8 @@ class NumberSearchParameterizedTest(
           ResourceType.RiskAssessment.name,
           RiskAssessment.PROBABILITY.paramName,
           0.09,
-          0.11
-        )
+          0.11,
+        ),
       )
   }
 }

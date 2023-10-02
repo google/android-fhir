@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,7 @@ class MinLengthValidatorTest {
           Extension().apply {
             url = MIN_LENGTH_EXTENSION_URL
             this.setValue(IntegerType(100))
-          }
+          },
         )
       }
     val answer =
@@ -170,14 +170,14 @@ class MinLengthValidatorTest {
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)
         .isEqualTo(
-          "The minimum number of characters that are permitted in the answer is: $minLength"
+          "The minimum number of characters that are permitted in the answer is: $minLength",
         )
     }
 
     @JvmStatic
     fun createMaxLengthQuestionnaireTestItem(
       minLength: Int,
-      value: PrimitiveType<*>
+      value: PrimitiveType<*>,
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -185,7 +185,7 @@ class MinLengthValidatorTest {
             Extension().apply {
               url = MIN_LENGTH_EXTENSION_URL
               this.setValue(IntegerType(minLength))
-            }
+            },
           )
         }
       val answer =

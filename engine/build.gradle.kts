@@ -1,4 +1,4 @@
-import codegen.GenerateSourcesTask
+import codegen.GenerateSearchParamsTask
 import java.net.URL
 
 plugins {
@@ -14,8 +14,8 @@ publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
 
-val generateSourcesTask =
-  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
+val generateSearchParamsTask =
+  project.tasks.register("generateSearchParamsTask", GenerateSearchParamsTask::class) {
     srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
     testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
   }
@@ -24,35 +24,39 @@ kotlin {
   sourceSets {
     val main by getting
     val test by getting
-    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
-    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
+    main.kotlin.srcDirs(generateSearchParamsTask.map { it.srcOutputDir })
+    test.kotlin.srcDirs(generateSearchParamsTask.map { it.testOutputDir })
   }
+  jvmToolchain(11)
 }
 
 android {
+  namespace = "com.google.android.fhir"
   compileSdk = Sdk.compileSdk
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+
+    javaCompileOptions {
+      annotationProcessorOptions {
+        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
+      }
+    }
   }
 
   sourceSets {
     getByName("androidTest").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
+      resources.setSrcDirs(listOf("test-data"))
+      assets.srcDirs("$projectDir/schemas")
     }
 
-    getByName("test").apply {
-      java.srcDirs("src/test-common/java")
-      resources.setSrcDirs(listOf("sampledata"))
-    }
+    getByName("test").apply { resources.setSrcDirs(listOf("test-data")) }
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
     }
@@ -62,20 +66,14 @@ android {
     // Flag to enable support for the new language APIs
     // See https = //developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
   }
 
-  packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
-  }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+  packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
 
   configureJacocoTestOptions()
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {
@@ -94,6 +92,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
@@ -119,6 +118,7 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  implementation(Dependencies.truth)
 
   kapt(Dependencies.Room.compiler)
 
@@ -145,14 +145,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

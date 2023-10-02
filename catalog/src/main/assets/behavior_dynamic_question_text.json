@@ -1,0 +1,68 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "text": "Choose an option below",
+      "type": "choice",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "radio-button",
+                "display": "Radio Button"
+              }
+            ]
+          }
+        }
+      ],
+      "linkId": "1",
+      "required": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "option1",
+            "display": "First Option"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option2",
+            "display": "Second Option"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option3",
+            "display": "Third Option"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "option4",
+            "display": "Fourth Option"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "required": true,
+      "text": "Option Date",
+      "_text": {
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+            "valueExpression": {
+              "language": "text/fhirpath",
+              "expression": "'Provide \"'+ %resource.descendants().where(linkId = '1').answer.value.display + '\" Date'"
+            }
+          }
+        ]
+      },
+      "type": "date"
+    }
+  ]
+}

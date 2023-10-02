@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.extensions.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -48,6 +49,7 @@ import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
@@ -337,7 +339,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -467,7 +470,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -527,7 +531,8 @@ class ResourceMapperTest {
           }
         ]
       }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -559,7 +564,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -625,7 +631,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       @Language("JSON")
       val questionnaireResponseJson =
@@ -673,7 +680,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       val iParser: IParser = FhirContext.forR4().newJsonParser()
 
@@ -743,7 +751,8 @@ class ResourceMapperTest {
                 }
               ]
             }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -778,7 +787,8 @@ class ResourceMapperTest {
                 }
               ]
             }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val uriTestQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -812,10 +822,10 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "today()"
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
 
       val patientId = UUID.randomUUID().toString()
@@ -952,7 +962,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       @Language("JSON")
       val questionnaireResponseJson =
@@ -1045,7 +1056,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       val uriTestQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -1119,7 +1131,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       @Language("JSON")
       val questionnaireResponseJson =
@@ -1147,7 +1160,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       val pulseOximetryQuestionnaire =
         iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -1354,7 +1368,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       val uriTestQuestionnaire =
         iParser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, questionnaireJson)
@@ -1392,7 +1407,7 @@ class ResourceMapperTest {
               HumanName().apply {
                 given = listOf(StringType("John"))
                 family = "Doe"
-              }
+              },
             )
           birthDate = "1990-05-20".toDateFromFormatYyyyMmDd()
         }
@@ -1416,10 +1431,10 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "Patient.name.given"
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
@@ -1437,12 +1452,12 @@ class ResourceMapperTest {
                           Expression().apply {
                             language = "text/fhirpath"
                             expression = "RelatedPerson.name.family"
-                          }
-                        )
+                          },
+                        ),
                       )
-                  }
+                  },
                 )
-            }
+            },
           )
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
@@ -1455,10 +1470,10 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "RelatedPerson.birthDate"
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
@@ -1471,10 +1486,10 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "Observation.value"
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
 
       val patient = createPatientResource()
@@ -1484,7 +1499,7 @@ class ResourceMapperTest {
       assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
         .isEqualTo("Salman")
       assertThat(
-          ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString
+          ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString,
         )
         .isEqualTo("Doe")
       assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
@@ -1508,10 +1523,10 @@ class ResourceMapperTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.id"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     val patientId = UUID.randomUUID().toString()
@@ -1521,6 +1536,97 @@ class ResourceMapperTest {
     assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
       .isEqualTo(patientId)
   }
+
+  @Test
+  fun `populate() should correctly populate Reference value in QuestionnaireResponse`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-id"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.id"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val patientId = UUID.randomUUID().toString()
+      val patient = Patient().apply { id = "Patient/$patientId" }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+      assertThat((questionnaireResponse.item[0].answer[0].value as Reference).reference)
+        .isEqualTo(patient.id)
+    }
+
+  @Test
+  fun `populate() should throw error when Reference value in QuestionnaireResponse but FhirExpression `() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-id"
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "Patient.gender"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val patientId = UUID.randomUUID().toString()
+      val patient =
+        Patient().apply {
+          id = "Patient/$patientId"
+          gender = Enumerations.AdministrativeGender.MALE
+        }
+
+      val errorMessage =
+        assertFailsWith<FHIRException> { ResourceMapper.populate(questionnaire, patient) }
+          .localizedMessage
+      assertThat(errorMessage).isEqualTo("Expression supplied does not evaluate to IdType.")
+    }
+
+  @Test
+  fun `populate() should correctly populate Reference value in QuestionnaireResponse when expression resolves to type Resource`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              type = Questionnaire.QuestionnaireItemType.REFERENCE
+              addExtension(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "Patient"
+                  },
+                ),
+              )
+            },
+          )
+      val patient = Patient().apply { id = UUID.randomUUID().toString() }
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+
+      assertThat(questionnaireResponse.itemFirstRep.answerFirstRep.valueReference.reference)
+        .isEqualTo("Patient/${patient.id}")
+    }
 
   @Test
   fun `populate() should correctly populate IdType value with history in QuestionnaireResponse`() =
@@ -1538,10 +1644,10 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "Patient.id"
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
 
       val patientId = UUID.randomUUID().toString()
@@ -1568,8 +1674,8 @@ class ResourceMapperTest {
                     Expression().apply {
                       language = "text/fhirpath"
                       expression = "Patient.gender"
-                    }
-                  )
+                    },
+                  ),
                 )
               answerOption =
                 listOf(
@@ -1577,16 +1683,16 @@ class ResourceMapperTest {
                     Coding().apply {
                       code = AdministrativeGender.MALE.toCode()
                       display = AdministrativeGender.MALE.display
-                    }
+                    },
                   ),
                   Questionnaire.QuestionnaireItemAnswerOptionComponent(
                     Coding().apply {
                       code = AdministrativeGender.FEMALE.toCode()
                       display = AdministrativeGender.FEMALE.display
-                    }
-                  )
+                    },
+                  ),
                 )
-            }
+            },
           )
 
       val patient = Patient().apply { gender = Enumerations.AdministrativeGender.FEMALE }
@@ -1612,8 +1718,8 @@ class ResourceMapperTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
-                  }
-                )
+                  },
+                ),
               )
             answerOption =
               listOf(
@@ -1621,14 +1727,14 @@ class ResourceMapperTest {
                   Coding().apply {
                     code = AdministrativeGender.MALE.toCode()
                     display = AdministrativeGender.MALE.display
-                  }
+                  },
                 ),
                 Questionnaire.QuestionnaireItemAnswerOptionComponent(
                   Coding().apply {
                     code = AdministrativeGender.FEMALE.toCode()
                     display = AdministrativeGender.FEMALE.display
-                  }
-                )
+                  },
+                ),
               )
             item =
               listOf(
@@ -1642,12 +1748,12 @@ class ResourceMapperTest {
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "Patient.id"
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-          }
+          },
         )
 
     val patientId = UUID.randomUUID().toString()
@@ -1662,7 +1768,7 @@ class ResourceMapperTest {
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
       .isEqualTo(AdministrativeGender.FEMALE.display)
     assertThat(
-        (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value
+        (questionnaireResponse.item[0].answer[0].item[0].answer[0].value as StringType).value,
       )
       .isEqualTo(patientId)
   }
@@ -1677,14 +1783,14 @@ class ResourceMapperTest {
           Address().apply {
             city = "Lahore"
             country = "Pakistan"
-          }
+          },
         )
       name =
         listOf(
           HumanName().apply {
             given = mutableListOf(StringType("Salman"))
             family = "Ali"
-          }
+          },
         )
       telecom = listOf(ContactPoint().apply { value = "12345" })
     }
@@ -1792,7 +1898,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -1917,7 +2024,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val mapping =
       """map "http://hl7.org/fhir/StructureMap/PatientRegistration" = 'PatientRegistration'
@@ -1996,7 +2104,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       @Language("JSON")
       val questionnaireResponseJson =
@@ -2015,7 +2124,8 @@ class ResourceMapperTest {
             }
           ]
         }
-        """.trimIndent()
+                """
+          .trimIndent()
 
       val mapping =
         """map "http://hl7.org/fhir/StructureMap/ImmunizationReg" = 'ImmunizationReg'
@@ -2049,7 +2159,7 @@ class ResourceMapperTest {
           uriTestQuestionnaireResponse,
           StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
             StructureMapUtilities(worker).parse(mapping, "")
-          }
+          },
         )
 
       assertThat(bundle.entry.get(0).resource).isInstanceOf(Immunization::class.java)
@@ -2184,7 +2294,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val response =
@@ -2225,7 +2336,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
     val temperatureQuestionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =
@@ -2293,7 +2405,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -2321,7 +2434,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2436,7 +2550,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -2500,7 +2615,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
     val response =
@@ -2544,11 +2660,11 @@ class ResourceMapperTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "Patient.gender"
-                  }
-                )
+                  },
+                ),
               )
             initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("female")))
-          }
+          },
         )
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
@@ -2557,7 +2673,7 @@ class ResourceMapperTest {
         .localizedMessage
     assertThat(errorMessage)
       .isEqualTo(
-        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
+        "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression.",
       )
   }
 
@@ -2604,7 +2720,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
 
     @Language("JSON")
     val response =
@@ -2634,7 +2751,8 @@ class ResourceMapperTest {
             }
           ]
         }
-      """.trimIndent()
+            """
+        .trimIndent()
     val questionnaireObj =
       iParser.parseResource(Questionnaire::class.java, questionnaire) as Questionnaire
     val temperatureQuestionnaireResponse =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,13 @@ import androidx.annotation.WorkerThread
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.knowledge.KnowledgeManager
 import java.util.function.Supplier
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Endpoint
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.opencds.cqf.cql.engine.data.CompositeDataProvider
@@ -59,32 +58,40 @@ import org.opencds.cqf.cql.evaluator.plandefinition.r4.PlanDefinitionProcessor
 // Uses the already cached FhirContext instead of creating a new one
 // on the default protected R4FhirModelResolver() constructor.
 // This is a heavy object to load. Avoid having to create a new one.
-object cachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
+object CachedR4FhirModelResolver : R4FhirModelResolver(FhirContext.forR4Cached())
 
-class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
+class FhirOperator
+internal constructor(
+  fhirContext: FhirContext,
+  fhirEngine: FhirEngine,
+  knowledgeManager: KnowledgeManager,
+) {
   // Initialize the measure processor
-  private val fhirEngineTerminologyProvider = FhirEngineTerminologyProvider(fhirContext, fhirEngine)
+  private val fhirEngineTerminologyProvider =
+    FhirEngineTerminologyProvider(fhirContext, fhirEngine, knowledgeManager)
   private val adapterFactory = AdapterFactory()
-  private val libraryContentProvider = FhirEngineLibraryContentProvider(adapterFactory)
+  private val libraryContentProvider =
+    FhirEngineLibraryContentProvider(adapterFactory, knowledgeManager)
   private val fhirTypeConverter = FhirTypeConverterFactory().create(FhirVersionEnum.R4)
   private val fhirEngineRetrieveProvider =
     FhirEngineRetrieveProvider(fhirEngine).apply {
       terminologyProvider = fhirEngineTerminologyProvider
       isExpandValueSets = true
     }
+
   private val dataProvider =
     CompositeDataProvider(
-      CachingModelResolverDecorator(cachedR4FhirModelResolver),
-      fhirEngineRetrieveProvider
+      CachingModelResolverDecorator(CachedR4FhirModelResolver),
+      fhirEngineRetrieveProvider,
     )
-  private val fhirEngineDal = FhirEngineDal(fhirEngine)
+  private val fhirEngineDal = FhirEngineDal(fhirEngine, knowledgeManager)
 
   private val measureProcessor =
     R4MeasureProcessor(
       fhirEngineTerminologyProvider,
       libraryContentProvider,
       dataProvider,
-      fhirEngineDal
+      fhirEngineDal,
     )
 
   // Initialize the plan definition processor
@@ -97,10 +104,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       hashSetOf<TypedLibrarySourceProviderFactory>(
         object : TypedLibrarySourceProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
-        }
+        },
       ),
-      LibraryVersionSelector(adapterFactory)
+      LibraryVersionSelector(adapterFactory),
     )
   private val fhirModelResolverFactory = FhirModelResolverFactory()
 
@@ -111,10 +119,11 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       hashSetOf<TypedRetrieveProviderFactory>(
         object : TypedRetrieveProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) =
             fhirEngineRetrieveProvider
-        }
-      )
+        },
+      ),
     )
   private val terminologyProviderFactory =
     TerminologyProviderFactory(
@@ -122,18 +131,30 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       hashSetOf<TypedTerminologyProviderFactory>(
         object : TypedTerminologyProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) =
             fhirEngineTerminologyProvider
-        }
-      )
+        },
+      ),
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
+
+  // Keeps a cached copy of all **compiled** libraries.
+  // TODO: Migrate the upstream's CqlEvaluatorBuilder.withLibraryCache code, where this variable
+  //  is used, to an interface and then this HashMap to a lifecycle-aware caching data structure
+  //  (e.g. LruCache).
+  val compiledLibraryCache =
+    HashMap<
+      org.cqframework.cql.elm.execution.VersionedIdentifier,
+      org.cqframework.cql.elm.execution.Library,
+    >()
 
   private val evaluatorBuilderSupplier = Supplier {
     CqlEvaluatorBuilder()
       .withLibrarySourceProvider(libraryContentProvider)
       .withCqlOptions(CqlOptions.defaultOptions())
       .withTerminologyProvider(fhirEngineTerminologyProvider)
+      .withLibraryCache(compiledLibraryCache)
   }
 
   private val libraryProcessor =
@@ -145,7 +166,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       terminologyProviderFactory,
       endpointConverter,
       fhirModelResolverFactory,
-      evaluatorBuilderSupplier
+      evaluatorBuilderSupplier,
     )
 
   private val expressionEvaluator =
@@ -157,14 +178,13 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       terminologyProviderFactory,
       endpointConverter,
       fhirModelResolverFactory,
-      evaluatorBuilderSupplier
+      evaluatorBuilderSupplier,
     )
 
   private val activityDefinitionProcessor =
     ActivityDefinitionProcessor(fhirContext, fhirEngineDal, libraryProcessor)
   private val operationParametersParser =
     OperationParametersParser(adapterFactory, fhirTypeConverter)
-
   private val planDefinitionProcessor =
     PlanDefinitionProcessor(
       fhirContext,
@@ -172,29 +192,15 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       libraryProcessor,
       expressionEvaluator,
       activityDefinitionProcessor,
-      operationParametersParser
+      operationParametersParser,
     )
-
-  fun loadLib(lib: Library) {
-    if (lib.url != null) {
-      fhirEngineDal.libs[lib.url] = lib
-    }
-    if (lib.name != null) {
-      libraryContentProvider.libs[lib.name] = lib
-    }
-  }
-
-  fun loadLibs(libBundle: Bundle) {
-    for (entry in libBundle.entry) {
-      loadLib(entry.resource as Library)
-    }
-  }
 
   /**
    * The function evaluates a FHIR library against the database.
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested.
@@ -209,6 +215,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
    * @param expressions names of expressions in the Library to evaluate.
@@ -218,7 +225,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     return evaluateLibrary(libraryUrl, patientId, null, expressions)
   }
@@ -228,6 +235,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param parameters list of parameters to be passed to the CQL library
    * @param expressions names of expressions in the Library to evaluate.
@@ -237,7 +245,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   fun evaluateLibrary(
     libraryUrl: String,
     parameters: Parameters,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     return evaluateLibrary(libraryUrl, null, parameters, expressions)
   }
@@ -247,6 +255,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated, if applicable
    * @param parameters list of parameters to be passed to the CQL library, if applicable
@@ -258,7 +267,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     libraryUrl: String,
     patientId: String?,
     parameters: Parameters?,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     val dataEndpoint =
       Endpoint()
@@ -273,7 +282,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       null,
       dataEndpoint,
       null,
-      expressions
+      expressions,
     )
   }
 
@@ -290,7 +299,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
     end: String,
     reportType: String,
     subject: String?,
-    practitioner: String?
+    practitioner: String?,
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       measureUrl,
@@ -303,7 +312,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* contentEndpoint= */ null,
       /* terminologyEndpoint= */ null,
       /* dataEndpoint= */ null,
-      /* additionalData= */ null
+      /* additionalData= */ null,
     )
   }
 
@@ -328,7 +337,7 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
   fun generateCarePlan(
     planDefinitionId: String,
     patientId: String,
-    encounterId: String?
+    encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
@@ -346,9 +355,12 @@ class FhirOperator(fhirContext: FhirContext, fhirEngine: FhirEngine) {
       /* useServerData= */ null,
       /* bundle= */ null,
       /* prefetchData= */ null,
-      /* dataEndpoint= */ null,
-      /* contentEndpoint*/ null,
-      /* terminologyEndpoint= */ null
+      /* dataEndpoint= */ Endpoint()
+        .setAddress("localhost")
+        .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES)),
+      /* contentEndpoint*/
+      null,
+      /* terminologyEndpoint= */ null,
     ) as IBaseResource
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,26 +50,26 @@ class QuestionnaireResponseItemValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(250))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(300))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = REGEX_EXTENSION_URL
             this.setValue(StringType("[0-9]+"))
-          }
+          },
         )
       }
     val answers =
       listOf(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
           value = IntegerType(275)
-        }
+        },
       )
 
     val validationResult =
@@ -88,13 +88,13 @@ class QuestionnaireResponseItemValidatorTest {
           Extension().apply {
             url = MIN_VALUE_EXTENSION_URL
             this.setValue(IntegerType(100))
-          }
+          },
         )
         addExtension(
           Extension().apply {
             url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200))
-          }
+          },
         )
       }
     val answers =

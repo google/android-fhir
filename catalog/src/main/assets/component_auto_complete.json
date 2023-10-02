@@ -25,6 +25,26 @@
           }
         }
       ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "instruction",
+          "text": "Try typing Asthma, Chronic Lung Disease, Depression, Diabetes, Hypertension, High Blood Pressure, or High Cholesterol",
+          "type": "display"
+        }
+      ],
       "repeats": true,
       "linkId": "1",
       "text": "Do you have any existing conditions",
@@ -33,7 +53,8 @@
           "valueCoding": {
             "code": "asthma",
             "display": "Asthma"
-          }
+          },
+          "initialSelected": true
         },
         {
           "valueCoding": {
@@ -71,13 +92,7 @@
             "display": "High Cholesterol"
           }
         }
-      ],
-      "initial": {
-        "valueCoding": {
-          "code": "asthma",
-          "display": "Asthma"
-        }
-      }
+      ]
     }
   ]
 }
