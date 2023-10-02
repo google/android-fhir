@@ -87,12 +87,6 @@ class DemoQuestionnaireFragment : Fragment() {
     childFragmentManager.setFragmentResultListener(SUBMIT_REQUEST_KEY, viewLifecycleOwner) { _, _ ->
       onSubmitQuestionnaireClick()
     }
-    childFragmentManager.setFragmentResultListener(
-      QuestionnaireFragment.CANCEL_REQUEST_KEY,
-      viewLifecycleOwner,
-    ) { _, _ ->
-      NavHostFragment.findNavController(this).navigateUp()
-    }
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
