@@ -487,6 +487,11 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
 
+    /**
+     * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is false.
+     */
+    internal const val EXTRA_SHOW_CANCEL_BUTTON = "show-cancel-button"
+
     internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
 
     internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"

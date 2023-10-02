@@ -221,8 +221,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
-  /** Flag to show/hide cancel button. */
-  private var shouldShowCancelButton = false
+  /** Flag to show/hide cancel button. Default is false */
+  private var shouldShowCancelButton = state[QuestionnaireFragment.EXTRA_SHOW_CANCEL_BUTTON] ?: false
 
   /** Flag to control whether asterisk text is shown for required questions. */
   private val showAsterisk = state[QuestionnaireFragment.EXTRA_SHOW_ASTERISK_TEXT] ?: false
