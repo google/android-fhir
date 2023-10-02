@@ -221,6 +221,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
+  /** Flag to show/hide cancel button. Default is false */
+  private var shouldShowCancelButton =
+    state[QuestionnaireFragment.EXTRA_SHOW_CANCEL_BUTTON] ?: false
+
   /** Flag to control whether asterisk text is shown for required questions. */
   private val showAsterisk = state[QuestionnaireFragment.EXTRA_SHOW_ASTERISK_TEXT] ?: false
 
@@ -493,6 +497,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
+    this.shouldShowSubmitButton = showSubmitButton
+  }
+
+  internal fun setShowCancelButtonFlag(showCancelButton: Boolean) {
+    this.shouldShowCancelButton = showCancelButton
+  }
+
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
@@ -613,6 +625,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           DisplayMode.ReviewMode(
             showEditButton = !isReadOnly,
             showSubmitButton = !isReadOnly && shouldShowSubmitButton,
+            showCancelButton = !isReadOnly && shouldShowCancelButton,
           ),
       )
     }
@@ -622,18 +635,28 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (!questionnaire.isPaginated) {
         val showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
         val showSubmitButton = shouldShowSubmitButton && !showReviewButton
-        QuestionnairePagination(false, emptyList(), -1, showSubmitButton, showReviewButton)
+        val showCancelButton = shouldShowCancelButton && !showReviewButton
+        QuestionnairePagination(
+          false,
+          emptyList(),
+          -1,
+          showSubmitButton,
+          showCancelButton,
+          showReviewButton,
+        )
       } else {
         val hasNextPage =
           QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndexFlow.value!!)
             .hasNextPage
         val showReviewButton = shouldEnableReviewPage && !hasNextPage
         val showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
+        val showCancelButton = shouldShowCancelButton
         QuestionnairePagination(
           true,
           pages!!,
           currentPageIndexFlow.value!!,
           showSubmitButton,
+          showCancelButton,
           showReviewButton,
         )
       }
@@ -899,7 +922,11 @@ internal data class QuestionnaireState(
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
 
-  data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
+  data class ReviewMode(
+    val showEditButton: Boolean,
+    val showSubmitButton: Boolean,
+    val showCancelButton: Boolean,
+  ) : DisplayMode()
 
   // Sentinel displayMode that's used in setting the initial default QuestionnaireState
   object InitMode : DisplayMode()
@@ -914,6 +941,7 @@ internal data class QuestionnairePagination(
   val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
   val showSubmitButton: Boolean = false,
+  val showCancelButton: Boolean = false,
   val showReviewButton: Boolean = false,
 )
 
