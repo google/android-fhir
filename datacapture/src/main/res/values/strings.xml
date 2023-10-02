@@ -10,6 +10,7 @@
     <string name="review_answers_text">Review answers</string>
     <string name="button_review">Review</string>
     <string name="submit_questionnaire">Submit</string>
+    <string name="cancel_questionnaire">@android:string/cancel</string>
 
     <!-- 1.2 Submit Pop-up -->
     <string name="questionnaire_validation_error_headline">Errors found</string>

@@ -135,6 +135,7 @@
             <Button
                 android:id="@+id/cancel_questionnaire"
                 style="?attr/questionnaireCancelButtonStyle"
+                android:text="@string/cancel_questionnaire"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
