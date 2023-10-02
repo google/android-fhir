@@ -35,7 +35,6 @@
         style="?attr/questionnaireValidationDialogBodyStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_default"
         android:text="@string/questionnaire_validation_error_supporting_text"
         tools:text="Fields that need to be completed:"
         tools:visibility="visible"
@@ -45,7 +44,6 @@
         android:layout_marginVertical="@dimen/dialog_content_scroll_margin_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="@dimen/item_margin_vertical"
     >
 
         <TextView
