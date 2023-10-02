@@ -495,7 +495,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       isInReviewModeFlow.value = false
     }
   }
- 
+
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
     this.shouldShowSubmitButton = showSubmitButton
   }
@@ -503,7 +503,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   internal fun setShowCancelButtonFlag(showCancelButton: Boolean) {
     this.shouldShowCancelButton = showCancelButton
   }
- 
+
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
@@ -641,7 +641,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           -1,
           showSubmitButton,
           showCancelButton,
-          showReviewButton
+          showReviewButton,
         )
       } else {
         val hasNextPage =
@@ -924,7 +924,7 @@ internal sealed class DisplayMode {
   data class ReviewMode(
     val showEditButton: Boolean,
     val showSubmitButton: Boolean,
-    val showCancelButton: Boolean
+    val showCancelButton: Boolean,
   ) : DisplayMode()
 
   data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()

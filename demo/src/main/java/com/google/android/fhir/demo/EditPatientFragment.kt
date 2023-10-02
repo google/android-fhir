@@ -64,12 +64,16 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     /** Use the provided cancel|submit buttons from the sdc library */
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onSubmitAction() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.CANCEL_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onCancelQuestionnaireClick() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onCancelQuestionnaireClick()
+    }
   }
 
   private fun onCancelQuestionnaireClick() {

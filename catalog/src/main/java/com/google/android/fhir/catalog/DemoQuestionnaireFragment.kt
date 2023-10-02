@@ -89,8 +89,10 @@ class DemoQuestionnaireFragment : Fragment() {
     }
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.CANCEL_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> NavHostFragment.findNavController(this).navigateUp() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      NavHostFragment.findNavController(this).navigateUp()
+    }
     updateArguments()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()

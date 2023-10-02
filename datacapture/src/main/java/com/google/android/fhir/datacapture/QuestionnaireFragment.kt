@@ -124,7 +124,7 @@ class QuestionnaireFragment : Fragment() {
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
- 
+
     val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
     // Reads submit button visibility value initially defined in
     // [R.attr.submitButtonStyleQuestionnaire] style.
@@ -134,7 +134,6 @@ class QuestionnaireFragment : Fragment() {
     // [R.attr.cancelButtonStyleQuestionnaire] style.
     val cancelButtonVisibilityInStyle = cancelButton.visibility
     viewModel.setShowCancelButtonFlag(cancelButtonVisibilityInStyle == View.VISIBLE)
- 
 
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
@@ -272,7 +271,7 @@ class QuestionnaireFragment : Fragment() {
     /** Listen to Button Clicks from the Cancel Dialog */
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireCancelDialogFragment.RESULT_CALLBACK,
-      viewLifecycleOwner
+      viewLifecycleOwner,
     ) { _, bundle ->
       when (bundle[QuestionnaireCancelDialogFragment.RESULT_KEY]) {
         QuestionnaireCancelDialogFragment.RESULT_VALUE_NO -> {
@@ -283,7 +282,7 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
           )
       }
     }
@@ -489,9 +488,9 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_MATCHERS_FACTORY = "matcher_factory_class"
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
- 
+
     const val CANCEL_REQUEST_KEY = "cancel-request-key"
- 
+
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
@@ -504,7 +503,6 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     fun builder() = Builder()
- 
   }
 
   /**
