@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ class InputInfoTest {
 
   @Test
   fun cameraInput_toBitmap() {
-
     val byteBuffer = ByteBuffer.allocate(24)
     val frameMetaData = FrameMetadata(10, 10, 0)
     val inputInfo = CameraInputInfo(byteBuffer, frameMetaData)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import org.hl7.fhir.r4.model.StructureDefinition
 interface ProfileLoader {
   /**
    * @param url the canonical URL for the [StructureDefinition] to be loaded. This may come from
-   * `resource.meta.profile` or as part of `questionnaire.item.definition` to inform extraction of
-   * values into fields defined in the profile.
+   *   `resource.meta.profile` or as part of `questionnaire.item.definition` to inform extraction of
+   *   values into fields defined in the profile.
    * @return a [StructureDefinition] with the specified canonical `url` or `null` if it cannot be
-   * found
+   *   found
    */
   fun loadProfile(url: CanonicalType): StructureDefinition?
 }

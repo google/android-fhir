@@ -48,7 +48,7 @@ fun Project.createJacocoTestReportTask() {
     dependsOn(
       setOf(
         "testDebugUnitTest", // Generates unit test coverage report
-      )
+      ),
     )
     reports {
       xml.required.set(true)
@@ -64,8 +64,8 @@ fun Project.createJacocoTestReportTask() {
           "**/BuildConfig.*",
           "**/Manifest*.*",
           "**/*Test*.*",
-          "android/**/*.*"
-        )
+          "android/**/*.*",
+        ),
     )
 
     executionData.setFrom(
@@ -78,9 +78,9 @@ fun Project.createJacocoTestReportTask() {
             "outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
             // Instrumentation coverage report location from Firebase Test Lab
             "fladle/results/**/*.ec",
-          )
+          ),
         )
-      }
+      },
     )
   }
 

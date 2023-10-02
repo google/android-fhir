@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ class PlanDefinitionProcessorJavaTest {
     PlanDefinition.Assert.that(
         "ChildRoutineVisit-PlanDefinition-1.0.0",
         "Patient/ChildRoutine-Reportable",
-        null
+        null,
       )
       .withData("/plan-definition/child-routine-visit/child_routine_visit_patient.json")
       .withLibrary("/plan-definition/child-routine-visit/child_routine_visit_plan_definition.json")
@@ -41,7 +41,7 @@ class PlanDefinitionProcessorJavaTest {
     PlanDefinition.Assert.that(
         "hello-world-patient-view",
         "helloworld-patient-1",
-        "helloworld-patient-1-encounter-1"
+        "helloworld-patient-1-encounter-1",
       )
       .withData("/plan-definition/hello-world/hello-world-patient-data.json")
       .withLibrary("/plan-definition/hello-world/hello-world-patient-view-bundle.json")
@@ -54,17 +54,17 @@ class PlanDefinitionProcessorJavaTest {
     PlanDefinition.Assert.that(
         "opioidcds-10-patient-view",
         "example-rec-10-patient-view-POS-Cocaine-drugs",
-        "example-rec-10-patient-view-POS-Cocaine-drugs-prefetch"
+        "example-rec-10-patient-view-POS-Cocaine-drugs-prefetch",
       )
       .withData(
-        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-patient-data.json"
+        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-patient-data.json",
       )
       .withLibrary(
-        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-bundle.json"
+        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-bundle.json",
       )
       .apply()
       .isEqualsTo(
-        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-careplan.json"
+        "/plan-definition/opioid-Rec10-patient-view/opioid-Rec10-patient-view-careplan.json",
       )
 
   @Test

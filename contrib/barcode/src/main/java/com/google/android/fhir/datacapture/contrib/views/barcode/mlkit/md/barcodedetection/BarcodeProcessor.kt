@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,9 +45,8 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
   override fun onSuccess(
     inputInfo: InputInfo,
     results: List<Barcode>,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
   ) {
-
     if (!workflowModel.isCameraLive) return
 
     Timber.d("Barcode result size: ${results.size}")
@@ -92,7 +91,7 @@ class BarcodeProcessor(graphicOverlay: GraphicOverlay, private val workflowModel
 
   private fun createLoadingAnimator(
     graphicOverlay: GraphicOverlay,
-    barcode: Barcode
+    barcode: Barcode,
   ): ValueAnimator {
     val endProgress = 1.1f
     return ValueAnimator.ofFloat(0f, endProgress).apply {

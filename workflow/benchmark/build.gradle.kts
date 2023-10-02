@@ -39,7 +39,7 @@ android {
         "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
-      )
+      ),
     )
   }
   kotlin { jvmToolchain(11) }

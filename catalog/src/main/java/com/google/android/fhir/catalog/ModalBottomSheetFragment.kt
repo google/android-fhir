@@ -33,7 +33,7 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R.layout.fragment_modal_bottom_sheet, container, false)
   }
@@ -48,15 +48,15 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
             R.string.hide_error_state
           } else {
             R.string.show_error_state
-          }
+          },
         )
     showHideErrorButton.setOnClickListener {
       setFragmentResult(
         REQUEST_ERROR_KEY,
         bundleOf(
           BUNDLE_ERROR_KEY to
-            (showHideErrorButton.text == requireContext().getString(R.string.show_error_state))
-        )
+            (showHideErrorButton.text == requireContext().getString(R.string.show_error_state)),
+        ),
       )
       NavHostFragment.findNavController(this).navigateUp()
     }

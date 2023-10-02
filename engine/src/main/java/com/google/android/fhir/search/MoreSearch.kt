@@ -50,7 +50,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       null
     } else {
       database.searchReferencedResources(
-        getIncludeQuery(includeIds = baseResources.map { it.logicalId })
+        getIncludeQuery(includeIds = baseResources.map { it.logicalId }),
       )
     }
   val revIncludedResources =
@@ -58,7 +58,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       null
     } else {
       database.searchReferencedResources(
-        getRevIncludeQuery(includeIds = baseResources.map { "${it.resourceType}/${it.logicalId}" })
+        getRevIncludeQuery(includeIds = baseResources.map { "${it.resourceType}/${it.logicalId}" }),
       )
     }
 
@@ -77,7 +77,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
             it.idOfBaseResourceOnWhichThisMatched ==
               "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource })
+          ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource }),
     )
   }
 }
@@ -139,8 +139,9 @@ private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     ON  a.resourceUuid = b.resourceUuid
     AND  a.index_value IN( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
     ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
-    """.trimIndent(),
-    args = args
+        """
+        .trimIndent(),
+    args = args,
   )
 }
 
@@ -198,7 +199,7 @@ private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
     ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
     """.trimIndent(),
     //  spotless:on
-    args = args
+    args = args,
   )
 }
 
@@ -214,7 +215,7 @@ private fun Search.getFilterQueries() =
 
 internal fun Search.getQuery(
   isCount: Boolean = false,
-  nestedContext: NestedContext? = null
+  nestedContext: NestedContext? = null,
 ): SearchQuery {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
@@ -252,7 +253,8 @@ internal fun Search.getQuery(
         if (index == 0) {
           """
             ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
-          """.trimIndent()
+                    """
+            .trimIndent()
         } else {
           ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
         }
@@ -366,7 +368,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         diffStart,
         diffEnd,
         diffStart,
-        diffEnd
+        diffEnd,
       )
     }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
@@ -377,7 +379,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.EQUAL ->
       ConditionParam(
@@ -385,7 +387,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
@@ -396,7 +398,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
 
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum,
-  value: DateTimeType
+  value: DateTimeType,
 ): ConditionParam<Long> {
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
@@ -412,7 +414,7 @@ internal fun getConditionParamPair(
         diffStart,
         diffEnd,
         diffStart,
-        diffEnd
+        diffEnd,
       )
     }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
@@ -423,7 +425,7 @@ internal fun getConditionParamPair(
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.EQUAL ->
       ConditionParam(
@@ -431,7 +433,7 @@ internal fun getConditionParamPair(
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
@@ -446,22 +448,24 @@ internal fun getConditionParamPair(
  */
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
-  value: BigDecimal
+  value: BigDecimal,
 ): ConditionParam<Double> {
   // Ends_Before and Starts_After are not used with integer values. see
   // https://www.hl7.org/fhir/search.html#prefix
   require(
     value.scale() > 0 ||
-      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
-  ) { "Prefix $prefix not allowed for Integer type" }
+      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE),
+  ) {
+    "Prefix $prefix not allowed for Integer type"
+  }
   return when (prefix) {
     ParamPrefixEnum.EQUAL,
-    null -> {
+    null, -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
         (value - precision).toDouble(),
-        (value + precision).toDouble()
+        (value + precision).toDouble(),
       )
     }
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", value.toDouble())
@@ -473,7 +477,7 @@ internal fun getConditionParamPair(
       ConditionParam(
         "index_value < ? OR index_value >= ?",
         (value - precision).toDouble(),
-        (value + precision).toDouble()
+        (value + precision).toDouble(),
       )
     }
     ParamPrefixEnum.ENDS_BEFORE -> {
@@ -487,7 +491,7 @@ internal fun getConditionParamPair(
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
         (value - range).toDouble(),
-        (value + range).toDouble()
+        (value + range).toDouble(),
       )
     }
   }
@@ -501,7 +505,7 @@ internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal,
   system: String?,
-  unit: String?
+  unit: String?,
 ): ConditionParam<Any> {
   var canonicalizedUnit = unit
   var canonicalizedValue = value
@@ -583,13 +587,13 @@ private enum class SortTableInfo(val tableName: String, val columnName: String) 
   STRING_SORT_TABLE_INFO("StringIndexEntity", "index_value"),
   NUMBER_SORT_TABLE_INFO("NumberIndexEntity", "index_value"),
   DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from"),
-  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
+  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from"),
 }
 
 private fun getApproximateDateRange(
   valueRange: LongRange,
   currentRange: LongRange,
-  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
+  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT,
 ): ApproximateDateRange {
   return ApproximateDateRange(
     (valueRange.first -
@@ -597,7 +601,7 @@ private fun getApproximateDateRange(
       .roundToLong(),
     (valueRange.last +
         approximationCoefficient * (valueRange.last - currentRange.last).absoluteValue)
-      .roundToLong()
+      .roundToLong(),
   )
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
-      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question) as
-        Questionnaire
+      parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
+        as Questionnaire
 
     val questionnaireResponse: QuestionnaireResponse =
       ResourceMapper.populate(questionnaire, patient)
@@ -59,12 +59,13 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private val questionnaire: String
     get() = getQuestionnaireJson()
+
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
-        Questionnaire
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
+        as Questionnaire
 
   private var questionnaireJson: String? = null
 
@@ -78,7 +79,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
-      if (patient.hasName() &&
+      if (
+        patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
           patient.hasBirthDate() &&

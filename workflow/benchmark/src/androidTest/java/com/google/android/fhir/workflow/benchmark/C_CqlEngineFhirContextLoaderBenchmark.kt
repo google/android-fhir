@@ -28,6 +28,7 @@ import org.opencds.cqf.cql.engine.fhir.model.Dstu3FhirModelResolver
 import org.opencds.cqf.cql.engine.fhir.model.R4FhirModelResolver
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class C_CqlEngineFhirContextLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()

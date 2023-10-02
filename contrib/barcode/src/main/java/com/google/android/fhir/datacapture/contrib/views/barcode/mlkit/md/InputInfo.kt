@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ interface InputInfo {
 
 class CameraInputInfo(
   private val frameByteBuffer: ByteBuffer,
-  private val frameMetadata: FrameMetadata
+  private val frameMetadata: FrameMetadata,
 ) : InputInfo {
 
   private var bitmap: Bitmap? = null
@@ -40,7 +40,7 @@ class CameraInputInfo(
             frameByteBuffer,
             frameMetadata.width,
             frameMetadata.height,
-            frameMetadata.rotation
+            frameMetadata.rotation,
           )
         bitmap!!
       }

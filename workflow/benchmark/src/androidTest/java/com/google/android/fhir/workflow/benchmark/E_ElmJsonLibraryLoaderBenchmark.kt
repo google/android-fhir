@@ -31,6 +31,7 @@ import org.junit.runner.RunWith
 import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class E_ElmJsonLibraryLoaderBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()

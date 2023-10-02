@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 
 class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
   private val viewModel: BehaviorListViewModel by viewModels()
+
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
     setUpBehaviorsRecyclerView()
@@ -44,7 +45,7 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
   private fun setUpActionBar() {
     (activity as MainActivity).setActionBar(
       getString(R.string.toolbar_text),
-      Gravity.CENTER_HORIZONTAL
+      Gravity.CENTER_HORIZONTAL,
     )
     setHasOptionsMenu(true)
   }
@@ -77,8 +78,8 @@ class BehaviorListFragment : Fragment(R.layout.behavior_list_fragment) {
                 backgroundContext = coroutineContext,
                 fileName = behavior.questionnaireFileName,
               ),
-            workflow = behavior.workFlow
-          )
+            workflow = behavior.workFlow,
+          ),
         )
     }
   }
