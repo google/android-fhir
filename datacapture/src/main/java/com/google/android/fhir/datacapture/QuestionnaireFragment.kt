@@ -264,14 +264,14 @@ class QuestionnaireFragment : Fragment() {
     }
     /** Listen to Button Clicks from the Cancel Dialog */
     requireActivity().supportFragmentManager.setFragmentResultListener(
-      QuestionnaireCancelDialogFragment.RESULT_CALLBACK,
+      QuestionnaireCancelDialogFragment.REQUEST_KEY,
       viewLifecycleOwner,
     ) { _, bundle ->
       when (val result = bundle.getString(QuestionnaireCancelDialogFragment.RESULT_KEY)) {
-        QuestionnaireCancelDialogFragment.RESULT_VALUE_NO -> {
+        QuestionnaireCancelDialogFragment.RESULT_NO -> {
           // Allow the user to continue with the questionnaire
         }
-        QuestionnaireCancelDialogFragment.RESULT_VALUE_YES -> {
+        QuestionnaireCancelDialogFragment.RESULT_YES -> {
           setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
         }
         else ->
@@ -404,6 +404,11 @@ class QuestionnaireFragment : Fragment() {
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
+    /**
+     * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is true.
+     */
+    fun setShowCancelButton(value: Boolean) = apply { args.add(EXTRA_SHOW_CANCEL_BUTTON to value) }
 
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 

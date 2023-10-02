@@ -95,7 +95,10 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,
-        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaireJson).build(),
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(viewModel.questionnaireJson)
+          .setShowCancelButton(true)
+          .build(),
         QUESTIONNAIRE_FRAGMENT_TAG,
       )
     }
