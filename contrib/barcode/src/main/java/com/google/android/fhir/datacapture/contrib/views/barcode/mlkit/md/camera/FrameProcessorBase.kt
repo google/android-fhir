@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
   override fun process(
     data: ByteBuffer,
     frameMetadata: FrameMetadata,
-    graphicOverlay: GraphicOverlay
+    graphicOverlay: GraphicOverlay,
   ) {
     latestFrame = data
     latestFrameMetaData = frameMetadata
@@ -69,7 +69,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
         frameMetaData.width,
         frameMetaData.height,
         frameMetaData.rotation,
-        InputImage.IMAGE_FORMAT_NV21
+        InputImage.IMAGE_FORMAT_NV21,
       )
     val startMs = SystemClock.elapsedRealtime()
     detectInImage(image)
@@ -78,7 +78,7 @@ abstract class FrameProcessorBase<T> : FrameProcessor {
         this@FrameProcessorBase.onSuccess(
           CameraInputInfo(frame, frameMetaData),
           results,
-          graphicOverlay
+          graphicOverlay,
         )
         processLatestFrame(graphicOverlay)
       }

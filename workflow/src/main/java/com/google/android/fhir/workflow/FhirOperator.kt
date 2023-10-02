@@ -64,7 +64,7 @@ class FhirOperator
 internal constructor(
   fhirContext: FhirContext,
   fhirEngine: FhirEngine,
-  knowledgeManager: KnowledgeManager
+  knowledgeManager: KnowledgeManager,
 ) {
   // Initialize the measure processor
   private val fhirEngineTerminologyProvider =
@@ -82,7 +82,7 @@ internal constructor(
   private val dataProvider =
     CompositeDataProvider(
       CachingModelResolverDecorator(CachedR4FhirModelResolver),
-      fhirEngineRetrieveProvider
+      fhirEngineRetrieveProvider,
     )
   private val fhirEngineDal = FhirEngineDal(fhirEngine, knowledgeManager)
 
@@ -91,7 +91,7 @@ internal constructor(
       fhirEngineTerminologyProvider,
       libraryContentProvider,
       dataProvider,
-      fhirEngineDal
+      fhirEngineDal,
     )
 
   // Initialize the plan definition processor
@@ -104,10 +104,11 @@ internal constructor(
       hashSetOf<TypedLibrarySourceProviderFactory>(
         object : TypedLibrarySourceProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) = libraryContentProvider
-        }
+        },
       ),
-      LibraryVersionSelector(adapterFactory)
+      LibraryVersionSelector(adapterFactory),
     )
   private val fhirModelResolverFactory = FhirModelResolverFactory()
 
@@ -118,10 +119,11 @@ internal constructor(
       hashSetOf<TypedRetrieveProviderFactory>(
         object : TypedRetrieveProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) =
             fhirEngineRetrieveProvider
-        }
-      )
+        },
+      ),
     )
   private val terminologyProviderFactory =
     TerminologyProviderFactory(
@@ -129,10 +131,11 @@ internal constructor(
       hashSetOf<TypedTerminologyProviderFactory>(
         object : TypedTerminologyProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String?, headers: MutableList<String>?) =
             fhirEngineTerminologyProvider
-        }
-      )
+        },
+      ),
     )
   private val endpointConverter = EndpointConverter(adapterFactory)
 
@@ -143,7 +146,7 @@ internal constructor(
   val compiledLibraryCache =
     HashMap<
       org.cqframework.cql.elm.execution.VersionedIdentifier,
-      org.cqframework.cql.elm.execution.Library
+      org.cqframework.cql.elm.execution.Library,
     >()
 
   private val evaluatorBuilderSupplier = Supplier {
@@ -163,7 +166,7 @@ internal constructor(
       terminologyProviderFactory,
       endpointConverter,
       fhirModelResolverFactory,
-      evaluatorBuilderSupplier
+      evaluatorBuilderSupplier,
     )
 
   private val expressionEvaluator =
@@ -175,7 +178,7 @@ internal constructor(
       terminologyProviderFactory,
       endpointConverter,
       fhirModelResolverFactory,
-      evaluatorBuilderSupplier
+      evaluatorBuilderSupplier,
     )
 
   private val activityDefinitionProcessor =
@@ -189,7 +192,7 @@ internal constructor(
       libraryProcessor,
       expressionEvaluator,
       activityDefinitionProcessor,
-      operationParametersParser
+      operationParametersParser,
     )
 
   /**
@@ -197,6 +200,7 @@ internal constructor(
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param expressions names of expressions in the Library to evaluate.
    * @return a Parameters resource that contains an evaluation result for each expression requested.
@@ -211,6 +215,7 @@ internal constructor(
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated
    * @param expressions names of expressions in the Library to evaluate.
@@ -220,7 +225,7 @@ internal constructor(
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     return evaluateLibrary(libraryUrl, patientId, null, expressions)
   }
@@ -230,6 +235,7 @@ internal constructor(
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param parameters list of parameters to be passed to the CQL library
    * @param expressions names of expressions in the Library to evaluate.
@@ -239,7 +245,7 @@ internal constructor(
   fun evaluateLibrary(
     libraryUrl: String,
     parameters: Parameters,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     return evaluateLibrary(libraryUrl, null, parameters, expressions)
   }
@@ -249,6 +255,7 @@ internal constructor(
    *
    * NOTE: The API may internally result in a blocking IO operation. The user should call the API
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated, if applicable
    * @param parameters list of parameters to be passed to the CQL library, if applicable
@@ -260,7 +267,7 @@ internal constructor(
     libraryUrl: String,
     patientId: String?,
     parameters: Parameters?,
-    expressions: Set<String>
+    expressions: Set<String>,
   ): IBaseParameters {
     val dataEndpoint =
       Endpoint()
@@ -275,7 +282,7 @@ internal constructor(
       null,
       dataEndpoint,
       null,
-      expressions
+      expressions,
     )
   }
 
@@ -292,7 +299,7 @@ internal constructor(
     end: String,
     reportType: String,
     subject: String?,
-    practitioner: String?
+    practitioner: String?,
   ): MeasureReport {
     return measureProcessor.evaluateMeasure(
       measureUrl,
@@ -305,7 +312,7 @@ internal constructor(
       /* contentEndpoint= */ null,
       /* terminologyEndpoint= */ null,
       /* dataEndpoint= */ null,
-      /* additionalData= */ null
+      /* additionalData= */ null,
     )
   }
 
@@ -330,7 +337,7 @@ internal constructor(
   fun generateCarePlan(
     planDefinitionId: String,
     patientId: String,
-    encounterId: String?
+    encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       IdType("PlanDefinition", planDefinitionId),
@@ -351,8 +358,9 @@ internal constructor(
       /* dataEndpoint= */ Endpoint()
         .setAddress("localhost")
         .setConnectionType(Coding().setCode(Constants.HL7_FHIR_FILES)),
-      /* contentEndpoint*/ null,
-      /* terminologyEndpoint= */ null
+      /* contentEndpoint*/
+      null,
+      /* terminologyEndpoint= */ null,
     ) as IBaseResource
   }
 }

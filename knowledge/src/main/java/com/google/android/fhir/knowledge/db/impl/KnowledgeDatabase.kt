@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,10 +39,10 @@ import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
     [
       ImplementationGuideEntity::class,
       ResourceMetadataEntity::class,
-      ImplementationGuideResourceMetadataEntity::class
+      ImplementationGuideResourceMetadataEntity::class,
     ],
   version = 1,
-  exportSchema = false
+  exportSchema = false,
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class KnowledgeDatabase : RoomDatabase() {

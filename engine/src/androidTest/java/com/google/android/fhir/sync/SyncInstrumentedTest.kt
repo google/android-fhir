@@ -50,8 +50,11 @@ class SyncInstrumentedTest {
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
+
     override fun getDataSource(): DataSource = TestDataSourceImpl
+
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -83,7 +86,7 @@ class SyncInstrumentedTest {
           periodicSyncConfiguration =
             PeriodicSyncConfiguration(
               syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES)
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
             ),
         )
         .transformWhile {

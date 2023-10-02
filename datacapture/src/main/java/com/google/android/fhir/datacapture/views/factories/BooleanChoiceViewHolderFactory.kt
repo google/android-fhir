@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,8 @@ internal object BooleanChoiceViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
+          if (
+            questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
           ) {
             questionnaireViewItem.clearAnswer()
             yesRadioButton.isChecked = false
@@ -101,14 +102,14 @@ internal object BooleanChoiceViewHolderFactory :
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
           }
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
-              false
+          if (
+            questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == false
           ) {
             questionnaireViewItem.clearAnswer()
             noRadioButton.isChecked = false
@@ -116,7 +117,7 @@ internal object BooleanChoiceViewHolderFactory :
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
-              }
+              },
             )
           }
         }
@@ -132,23 +133,23 @@ internal object BooleanChoiceViewHolderFactory :
       }
 
       private fun RadioButton.setLayoutParamsByOrientation(
-        choiceOrientation: ChoiceOrientationTypes
+        choiceOrientation: ChoiceOrientationTypes,
       ) {
         layoutParams =
           LinearLayout.LayoutParams(
             when (choiceOrientation) {
-              ChoiceOrientationTypes.HORIZONTAL -> /* width= */ 0
+              ChoiceOrientationTypes.HORIZONTAL -> 0
               ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
             },
             ViewGroup.LayoutParams.WRAP_CONTENT,
-            /* weight= */ 1.0f
+            1.0f,
           )
       }
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
+          Valid, -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
             header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }

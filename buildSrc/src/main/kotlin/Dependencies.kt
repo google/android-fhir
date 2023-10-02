@@ -17,22 +17,6 @@
 import org.gradle.api.artifacts.Configuration
 import org.gradle.kotlin.dsl.exclude
 
-/*
- * Copyright 2022 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 object Dependencies {
 
   object Androidx {
@@ -275,6 +259,7 @@ object Dependencies {
     const val hapiFhirCore = "5.6.36"
 
     const val http = "4.11.0"
+
     // Maximum version that supports Android API Level 24:
     // https://github.com/FasterXML/jackson-databind/issues/3658
     const val jackson = "2.13.5"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,8 +64,10 @@ class QuestionnaireViewModelParameterizedTest(
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        is DataCaptureConfig.Provider
-    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+        is DataCaptureConfig.Provider,
+    ) {
+      "Few tests require a custom application class that implements DataCaptureConfig.Provider"
+    }
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
@@ -79,7 +81,7 @@ class QuestionnaireViewModelParameterizedTest(
             linkId = "a-link-id"
             text = "Yes or no?"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
 
@@ -93,9 +95,9 @@ class QuestionnaireViewModelParameterizedTest(
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             linkId = "a-link-id"
             text = "Yes or no?"
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -109,7 +111,7 @@ class QuestionnaireViewModelParameterizedTest(
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -122,9 +124,9 @@ class QuestionnaireViewModelParameterizedTest(
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -156,7 +158,7 @@ class QuestionnaireViewModelParameterizedTest(
       if (questionnaireResponseSource == QuestionnaireResponseSource.STRING) {
         state.set(
           EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-          printer.encodeResourceToString(questionnaireResponse)
+          printer.encodeResourceToString(questionnaireResponse),
         )
       } else if (questionnaireResponseSource == QuestionnaireResponseSource.URI) {
         val questionnaireResponseFile = File(context.cacheDir, "test_questionnaire_response")
@@ -189,7 +191,7 @@ class QuestionnaireViewModelParameterizedTest(
         arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.URI),
         arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.STRING),
         arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
+        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING),
       )
   }
 }
@@ -197,11 +199,11 @@ class QuestionnaireViewModelParameterizedTest(
 /** The source of questionnaire. */
 enum class QuestionnaireSource {
   STRING,
-  URI
+  URI,
 }
 
 /** The source of questionnaire-response. */
 enum class QuestionnaireResponseSource {
   STRING,
-  URI
+  URI,
 }

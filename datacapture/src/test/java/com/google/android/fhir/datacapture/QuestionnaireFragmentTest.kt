@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,8 +50,10 @@ class QuestionnaireFragmentTest {
   fun setup() {
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        is DataCaptureConfig.Provider
-    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+        is DataCaptureConfig.Provider,
+    ) {
+      "Few tests require a custom application class that implements DataCaptureConfig.Provider"
+    }
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
@@ -64,13 +66,13 @@ class QuestionnaireFragmentTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -85,7 +87,7 @@ class QuestionnaireFragmentTest {
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -99,7 +101,7 @@ class QuestionnaireFragmentTest {
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson)
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -116,7 +118,7 @@ class QuestionnaireFragmentTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
@@ -125,8 +127,8 @@ class QuestionnaireFragmentTest {
         bundleOf(
           EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
           EXTRA_ENABLE_REVIEW_PAGE to true,
-          EXTRA_SHOW_REVIEW_PAGE_FIRST to true
-        )
+          EXTRA_SHOW_REVIEW_PAGE_FIRST to true,
+        ),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     val view = scenario.withFragment { requireView() }
@@ -143,7 +145,7 @@ class QuestionnaireFragmentTest {
       .dataCaptureConfiguration =
       DataCaptureConfig(
         questionnaireItemViewHolderFactoryMatchersProviderFactory =
-          QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl
+          QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl,
       )
     val questionnaire =
       Questionnaire().apply {
@@ -152,7 +154,7 @@ class QuestionnaireFragmentTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
@@ -161,7 +163,7 @@ class QuestionnaireFragmentTest {
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
-          .buildArgs()
+          .buildArgs(),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -171,12 +173,11 @@ class QuestionnaireFragmentTest {
 
   @Test
   fun `questionnaireItemViewHolderFactoryMatchersProvider should have no custom QuestionnaireItemViewHolderFactoryMatchers if provider is not set`() {
-
     ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
       .dataCaptureConfiguration =
       DataCaptureConfig(
         questionnaireItemViewHolderFactoryMatchersProviderFactory =
-          QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl
+          QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl,
       )
 
     val questionnaire =
@@ -186,13 +187,13 @@ class QuestionnaireFragmentTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
-        QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).buildArgs()
+        QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).buildArgs(),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -213,7 +214,7 @@ class QuestionnaireFragmentTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
@@ -222,7 +223,7 @@ class QuestionnaireFragmentTest {
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
-          .buildArgs()
+          .buildArgs(),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -233,7 +234,7 @@ class QuestionnaireFragmentTest {
   object QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl :
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory {
     override fun get(
-      provider: String
+      provider: String,
     ): QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider {
       return QuestionnaireItemViewHolderFactoryMatchersProviderTestImpl
     }
@@ -245,8 +246,8 @@ class QuestionnaireFragmentTest {
       return listOf(
         QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
           factory = DateTimePickerViewHolderFactory,
-          matches = { true }
-        )
+          matches = { true },
+        ),
       )
     }
   }

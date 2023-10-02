@@ -34,7 +34,7 @@ android {
 
   packaging {
     resources.excludes.addAll(
-      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
     )
   }
   kotlin { jvmToolchain(11) }
@@ -56,6 +56,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
 
   implementation(project(path = ":datacapture"))
+  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
 
   testImplementation(Dependencies.junit)

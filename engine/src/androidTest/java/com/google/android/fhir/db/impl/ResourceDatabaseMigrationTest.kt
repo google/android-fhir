@@ -55,14 +55,14 @@ class ResourceDatabaseMigrationTest {
             HumanName().apply {
               addGiven("Jane")
               family = "Doe"
-            }
+            },
           )
         }
         .let { iParser.encodeResourceToString(it) }
 
     helper.createDatabase(DB_NAME, 1).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('migrate1-2-test', 'Patient', 'migrate1-2-test', '$insertedPatientJson' );"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('migrate1-2-test', 'Patient', 'migrate1-2-test', '$insertedPatientJson' );",
       )
       close()
     }
@@ -95,7 +95,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 2).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -127,7 +127,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 3).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -158,7 +158,7 @@ class ResourceDatabaseMigrationTest {
 
     helper.createDatabase(DB_NAME, 4).apply {
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask');",
       )
       close()
     }
@@ -192,15 +192,15 @@ class ResourceDatabaseMigrationTest {
     helper.createDatabase(DB_NAME, 5).apply {
       val date = Date()
       execSQL(
-        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );"
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('bed-net-001', 'Task', 'bed-net-001', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );",
       )
 
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'bed-net-001', '${date.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
       )
 
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'id-corrupted-timestamp', 'date-not-good', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );"
+        "INSERT INTO LocalChangeEntity (resourceType, resourceId, timestamp, type, payload) VALUES ('Task', 'id-corrupted-timestamp', 'date-not-good', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
       )
       close()
     }
@@ -239,7 +239,7 @@ class ResourceDatabaseMigrationTest {
     Room.databaseBuilder(
         InstrumentationRegistry.getInstrumentation().targetContext,
         ResourceDatabase::class.java,
-        DB_NAME
+        DB_NAME,
       )
       .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
       .build()

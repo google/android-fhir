@@ -48,18 +48,18 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  *
  * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
  * @param questionnaireResponseItem the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
- * in the [QuestionnaireResponse]
+ *   in the [QuestionnaireResponse]
  * @param validationResult the [ValidationResult] of the answer(s) against the `questionnaireItem`
  * @param answersChangedCallback the callback to notify the view model that the answers have been
- * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
+ *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
- * extension exists options
+ *   extension exists options
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
  * @param showOptionalText the optional text is being added to the end of the question text
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
- * in the header view.
+ *   in the header view.
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -70,7 +70,7 @@ data class QuestionnaireViewItem(
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-      Any?
+      Any?,
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
@@ -97,7 +97,7 @@ data class QuestionnaireViewItem(
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
   fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
@@ -106,7 +106,7 @@ data class QuestionnaireViewItem(
       questionnaireItem,
       questionnaireResponseItem,
       questionnaireResponseItemAnswerComponent.toList(),
-      null
+      null,
     )
   }
 
@@ -118,7 +118,7 @@ data class QuestionnaireViewItem(
   /** Adds an answer to the existing answers and removes the draft answer. */
   fun addAnswer(
     questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
@@ -127,14 +127,14 @@ data class QuestionnaireViewItem(
       questionnaireItem,
       questionnaireResponseItem,
       answers + questionnaireResponseItemAnswerComponent,
-      null
+      null,
     )
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
   fun removeAnswer(
     vararg questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
@@ -145,7 +145,7 @@ data class QuestionnaireViewItem(
       answers.filterNot { ans ->
         questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
       },
-      null
+      null,
     )
   }
 
@@ -167,7 +167,7 @@ data class QuestionnaireViewItem(
   }
 
   fun isAnswerOptionSelected(
-    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
   ): Boolean {
     return answers.any { it.value.equalsDeep(answerOption.value) }
   }

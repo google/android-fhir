@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,14 +73,15 @@ object PlanDefinition : Loadable() {
       setOf<TypedLibrarySourceProviderFactory>(
         object : TypedLibrarySourceProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String, headers: List<String>?) =
             BundleFhirLibrarySourceProvider(
               fhirContext,
               parse(url) as IBaseBundle,
               adapterFactory,
-              libraryVersionSelector
+              libraryVersionSelector,
             )
-        }
+        },
       )
 
     val librarySourceProviderFactory =
@@ -88,16 +89,17 @@ object PlanDefinition : Loadable() {
         fhirContext,
         adapterFactory,
         librarySourceProviderFactories,
-        libraryVersionSelector
+        libraryVersionSelector,
       )
 
     val retrieveProviderFactories =
       setOf<TypedRetrieveProviderFactory>(
         object : TypedRetrieveProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String, headers: List<String>?) =
             BundleRetrieveProvider(fhirContext, parse(url) as IBaseBundle)
-        }
+        },
       )
 
     val dataProviderFactory =
@@ -107,9 +109,10 @@ object PlanDefinition : Loadable() {
       setOf<TypedTerminologyProviderFactory>(
         object : TypedTerminologyProviderFactory {
           override fun getType() = Constants.HL7_FHIR_FILES
+
           override fun create(url: String, headers: List<String>?) =
             BundleTerminologyProvider(fhirContext, parse(url) as IBaseBundle)
-        }
+        },
       )
 
     val terminologyProviderFactory =
@@ -125,8 +128,10 @@ object PlanDefinition : Loadable() {
         dataProviderFactory,
         terminologyProviderFactory,
         endpointConverter,
-        fhirModelResolverFactory
-      ) { CqlEvaluatorBuilder() }
+        fhirModelResolverFactory,
+      ) {
+        CqlEvaluatorBuilder()
+      }
 
     val evaluator =
       ExpressionEvaluator(
@@ -136,8 +141,10 @@ object PlanDefinition : Loadable() {
         dataProviderFactory,
         terminologyProviderFactory,
         endpointConverter,
-        fhirModelResolverFactory
-      ) { CqlEvaluatorBuilder() }
+        fhirModelResolverFactory,
+      ) {
+        CqlEvaluatorBuilder()
+      }
 
     val activityDefProcessor = ActivityDefinitionProcessor(fhirContext, fhirDal, libraryProcessor)
     val operationParametersParser = OperationParametersParser(adapterFactory, fhirTypeConverter)
@@ -148,7 +155,7 @@ object PlanDefinition : Loadable() {
       libraryProcessor,
       evaluator,
       activityDefProcessor,
-      operationParametersParser
+      operationParametersParser,
     )
   }
 
@@ -162,7 +169,7 @@ object PlanDefinition : Loadable() {
   class Apply(
     private val planDefinitionID: String,
     private val patientID: String?,
-    private val encounterID: String?
+    private val encounterID: String?,
   ) {
     private val fhirDal = FakeFhirDal()
     private lateinit var dataEndpoint: Endpoint
@@ -211,8 +218,8 @@ object PlanDefinition : Loadable() {
             null,
             dataEndpoint,
             libraryEndpoint,
-            libraryEndpoint
-          )
+            libraryEndpoint,
+          ),
       )
     }
   }
@@ -223,7 +230,7 @@ object PlanDefinition : Loadable() {
         JSONAssert.assertEquals(
           load(expectedCarePlanAssetName),
           jsonParser.encodeResourceToString(carePlan),
-          true
+          true,
         )
       } catch (e: JSONException) {
         e.printStackTrace()

@@ -63,13 +63,13 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         prefix.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedPrefixSpanned
+          questionnaireViewItem.questionnaireItem.localizedPrefixSpanned,
         )
         question.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedTextSpanned
+          questionnaireViewItem.questionnaireItem.localizedTextSpanned,
         )
         hint.updateTextAndVisibility(
-          questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned()
+          questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
         )
         header.visibility = getHeaderViewVisibility(prefix, question, hint)
 
@@ -86,7 +86,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         }
         when (questionnaireViewItem.questionnaireItem.type) {
           Questionnaire.QuestionnaireItemType.GROUP,
-          Questionnaire.QuestionnaireItemType.DISPLAY -> {
+          Questionnaire.QuestionnaireItemType.DISPLAY, -> {
             errorView.visibility = GONE
             answerView.visibility = GONE
           }
@@ -104,7 +104,8 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         }
 
         divider.visibility =
-          if (header.visibility == VISIBLE ||
+          if (
+            header.visibility == VISIBLE ||
               flyOverTextView.visibility == VISIBLE ||
               answerView.visibility == VISIBLE ||
               errorView.visibility == VISIBLE

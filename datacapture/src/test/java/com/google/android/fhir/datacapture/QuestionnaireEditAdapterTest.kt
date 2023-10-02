@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,9 +59,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -80,9 +80,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -101,9 +101,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -127,9 +127,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -148,9 +148,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -169,17 +169,18 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE.value)
   }
 
+  @Suppress("ktlint:standard:max-line-length")
   @Test
-  fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() { // ktlint-disable max-line-length
+  fun getItemViewType_stringItemType_androidItemControlExtension_shouldReturnPhoneNumberViewHolderType() {
     val questionnaireEditAdapter = QuestionnaireEditAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.STRING)
@@ -191,9 +192,9 @@ class QuestionnaireEditAdapterTest {
             .addCoding(
               Coding()
                 .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
-            )
-        )
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR),
+            ),
+        ),
     )
     questionnaireEditAdapter.submitList(
       listOf(
@@ -203,9 +204,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -229,9 +230,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -250,9 +251,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -271,9 +272,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -295,9 +296,9 @@ class QuestionnaireEditAdapterTest {
               Coding()
                 .setCode(ItemControlTypes.SLIDER.extensionCode)
                 .setDisplay("Slider")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+            ),
+        ),
     )
     questionnaireEditAdapter.submitList(
       listOf(
@@ -307,9 +308,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -333,9 +334,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -354,9 +355,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -375,9 +376,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -402,17 +403,18 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireViewHolderType.DROP_DOWN.value)
   }
 
+  @Suppress("ktlint:standard:max-line-length")
   @Test
-  fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() { // ktlint-disable max-line-length
+  fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_shouldReturnRadioGroupViewHolder() {
     val answerOptions =
       List(QuestionnaireEditAdapter.MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DROP_DOWN) {
         Questionnaire.QuestionnaireItemAnswerOptionComponent()
@@ -432,9 +434,9 @@ class QuestionnaireEditAdapterTest {
               Coding()
                 .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                 .setDisplay("Radio Button")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+            ),
+        ),
     )
     questionnaireEditAdapter.submitList(
       listOf(
@@ -444,17 +446,18 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireViewHolderType.RADIO_GROUP.value)
   }
 
+  @Suppress("ktlint:standard:max-line-length")
   @Test
-  fun getItemViewType_choiceItemType_itemControlExtensionWithDropDown_shouldReturnDropDownViewHolderType() { // ktlint-disable max-line-length
+  fun getItemViewType_choiceItemType_itemControlExtensionWithDropDown_shouldReturnDropDownViewHolderType() {
     val questionnaireEditAdapter = QuestionnaireEditAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
@@ -467,9 +470,9 @@ class QuestionnaireEditAdapterTest {
               Coding()
                 .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                 .setDisplay("Drop Down")
-                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-            )
-        )
+                .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+            ),
+        ),
     )
     questionnaireEditAdapter.submitList(
       listOf(
@@ -479,9 +482,9 @@ class QuestionnaireEditAdapterTest {
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
             answersChangedCallback = { _, _, _, _ -> },
-          )
-        )
-      )
+          ),
+        ),
+      ),
     )
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
@@ -504,7 +507,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -512,9 +515,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -532,7 +535,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -540,9 +543,9 @@ class QuestionnaireEditAdapterTest {
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -559,7 +562,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -567,9 +570,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isTrue()
   }
@@ -588,7 +591,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -596,9 +599,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -616,7 +619,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -624,9 +627,9 @@ class QuestionnaireEditAdapterTest {
               otherQuestionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -643,7 +646,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -656,11 +659,11 @@ class QuestionnaireEditAdapterTest {
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = StringType("answer")
-                  }
+                  },
                 )
-              }
+              },
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -677,7 +680,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -685,9 +688,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = Invalid(listOf()),
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isFalse()
   }
@@ -704,7 +707,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -712,9 +715,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isTrue()
   }
@@ -731,7 +734,7 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
           QuestionnaireAdapterItem.Question(
             QuestionnaireViewItem(
@@ -739,9 +742,9 @@ class QuestionnaireEditAdapterTest {
               questionnaireResponseItem,
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
+            ),
           ),
-        )
+        ),
       )
       .isTrue()
   }
@@ -753,8 +756,8 @@ class QuestionnaireEditAdapterTest {
     assertThat(
         questionnaireEditAdapter.onCreateViewHolder(
           mock(),
-          QuestionnaireViewHolderType.values().size
-        )
+          QuestionnaireViewHolderType.values().size,
+        ),
       )
       .isEqualTo(viewFactoryMatchers[0].factory.create(mock()))
   }
@@ -767,7 +770,7 @@ class QuestionnaireEditAdapterTest {
       QuestionnaireEditAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
       questionnaireEditAdapter.onCreateViewHolder(
         mock(),
-        QuestionnaireViewHolderType.values().size + viewFactoryMatchers.size
+        QuestionnaireViewHolderType.values().size + viewFactoryMatchers.size,
       )
     }
   }
@@ -788,7 +791,7 @@ class QuestionnaireEditAdapterTest {
     assertThat(expectedItemViewType)
       .isEqualTo(
         QuestionnaireEditAdapter(getQuestionnaireItemViewHolderFactoryMatchers())
-          .getItemViewTypeForQuestion(questionnaireViewItem)
+          .getItemViewTypeForQuestion(questionnaireViewItem),
       )
   }
 
@@ -798,8 +801,10 @@ class QuestionnaireEditAdapterTest {
       QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
         mock<QuestionnaireItemViewHolderFactory>().apply {
           whenever(create(any())).thenReturn(mock())
-        }
-      ) { questionnaireItem -> questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE }
+        },
+      ) { questionnaireItem ->
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE
+      },
     )
   }
 }

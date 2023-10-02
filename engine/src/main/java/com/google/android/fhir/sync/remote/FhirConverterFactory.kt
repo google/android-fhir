@@ -37,14 +37,14 @@ class FhirConverterFactory private constructor(private val fhirContext: FhirCont
   override fun responseBodyConverter(
     type: Type,
     annotations: Array<Annotation>,
-    retrofit: Retrofit
+    retrofit: Retrofit,
   ): Converter<ResponseBody, *> = FhirResponseBodyConverter(fhirContext.newJsonParser())
 
   override fun requestBodyConverter(
     type: Type,
     parameterAnnotations: Array<out Annotation>,
     methodAnnotations: Array<out Annotation>,
-    retrofit: Retrofit
+    retrofit: Retrofit,
   ): Converter<*, RequestBody> =
     when (type) {
       Resource::class.java -> FhirRequestBodyConverter(fhirContext.newJsonParser())

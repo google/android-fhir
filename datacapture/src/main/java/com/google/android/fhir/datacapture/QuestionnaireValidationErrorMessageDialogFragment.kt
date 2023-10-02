@@ -46,7 +46,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
   /**
    * Factory helps with testing and should not be set to anything in the regular production flow.
    */
-  private val factoryProducer: (() -> ViewModelProvider.Factory)? = null
+  private val factoryProducer: (() -> ViewModelProvider.Factory)? = null,
 ) : DialogFragment() {
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -72,7 +72,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       }
 
@@ -106,7 +106,7 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
 
   fun setQuestionnaireAndValidation(
     questionnaire: Questionnaire,
-    validation: Map<String, List<ValidationResult>>
+    validation: Map<String, List<ValidationResult>>,
   ) {
     this.questionnaire = questionnaire
     this.validation = validation
