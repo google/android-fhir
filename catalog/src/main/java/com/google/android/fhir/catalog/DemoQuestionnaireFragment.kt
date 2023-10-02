@@ -93,7 +93,6 @@ class DemoQuestionnaireFragment : Fragment() {
     ) { _, _ ->
       NavHostFragment.findNavController(this).navigateUp()
     }
-    updateArguments()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()
     }
