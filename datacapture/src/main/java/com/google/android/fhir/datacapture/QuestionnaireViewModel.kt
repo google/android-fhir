@@ -650,7 +650,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             .hasNextPage
         val showReviewButton = shouldEnableReviewPage && !hasNextPage
         val showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
-        val showCancelButton = shouldShowCancelButton && !showReviewButton && !hasNextPage
+        val showCancelButton = shouldShowCancelButton
         QuestionnairePagination(
           true,
           pages!!,
