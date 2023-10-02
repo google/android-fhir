@@ -235,6 +235,7 @@ class QuestionnaireFragment : Fragment() {
             paginationNextButton.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             submitButton.visibility = View.GONE
+            cancelButton.visibility = View.GONE
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
           }
@@ -245,7 +246,9 @@ class QuestionnaireFragment : Fragment() {
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
       viewLifecycleOwner,
     ) { _, bundle ->
-      when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
+      when (
+        val result = bundle.getString(QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY)
+      ) {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
           // Go back to the Edit mode if currently in the Review mode.
           viewModel.setReviewMode(false)
@@ -255,7 +258,7 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
+            "Unknown fragment result $result",
           )
       }
     }
@@ -264,16 +267,16 @@ class QuestionnaireFragment : Fragment() {
       QuestionnaireCancelDialogFragment.RESULT_CALLBACK,
       viewLifecycleOwner,
     ) { _, bundle ->
-      when (bundle[QuestionnaireCancelDialogFragment.RESULT_KEY]) {
+      when (val result = bundle.getString(QuestionnaireCancelDialogFragment.RESULT_KEY)) {
         QuestionnaireCancelDialogFragment.RESULT_VALUE_NO -> {
-          // Do nothing [Allow the user to proceed with the questionnaire]
+          // Allow the user to continue with the questionnaire
         }
         QuestionnaireCancelDialogFragment.RESULT_VALUE_YES -> {
           setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}",
+            "Unknown fragment result $result",
           )
       }
     }
