@@ -35,11 +35,11 @@ internal class QuestionnaireCancelDialogFragment : DialogFragment() {
     isCancelable = false
     return MaterialAlertDialogBuilder(requireContext())
       .setView(onCreateCustomView())
-      .setPositiveButton(R.string.questionnaire_yes_button_text) { dialog, _ ->
+      .setPositiveButton(android.R.string.ok) { dialog, _ ->
         setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_YES))
         dialog?.dismiss()
       }
-      .setNegativeButton(R.string.questionnaire_no_button_text) { dialog, _ ->
+      .setNegativeButton(android.R.string.cancel) { dialog, _ ->
         setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_NO))
         dialog?.dismiss()
       }
