@@ -476,6 +476,4 @@
             name="android:paddingLeft"
         >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
-
-    <string name="cancel_questionnaire">Cancel</string>
 </resources>
