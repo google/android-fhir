@@ -102,7 +102,7 @@ class FhirEngineImplTest {
       }
     assertThat(exception.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!",
+        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and ID $TEST_PATIENT_2_ID!",
       )
   }
 
@@ -161,7 +161,7 @@ class FhirEngineImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${ResourceType.Patient.name} and id nonexistent_patient!",
+        "Resource not found with type ${ResourceType.Patient.name} and ID nonexistent_patient!",
       )
   }
 
@@ -423,7 +423,7 @@ class FhirEngineImplTest {
         runBlocking { fhirEngine.get(ResourceType.Patient, patient.logicalId) }
       }
     assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
+      .isEqualTo("Resource not found with type Patient and ID ${patient.logicalId}!")
   }
 
   @Test
@@ -436,7 +436,7 @@ class FhirEngineImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!",
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and ID $TEST_PATIENT_1_ID!",
       )
     assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
   }
@@ -462,7 +462,7 @@ class FhirEngineImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id nonexistent_patient!",
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and ID nonexistent_patient!",
       )
   }
 
