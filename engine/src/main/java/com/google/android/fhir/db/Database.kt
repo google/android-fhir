@@ -139,10 +139,9 @@ internal interface Database {
 
   /**
    * Update the resource ID for [LocalChange]s for [ResourceEntity] with
-   * [ResourceEntity.resourceUuid] resourceUuid and [ResourceEntity.resourceType] resourceType.
+   * [ResourceEntity.resourceUuid] resourceUuid.
    */
   suspend fun updateResourceIdForResourceChanges(
-    resourceType: ResourceType,
     resourceUuid: UUID,
     updatedResourceId: String,
   )
@@ -184,17 +183,16 @@ internal interface Database {
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
-   * Retrieve a list of [LocalChange] for [ResourceEntity] with given type and UUID, which can be
-   * used to purge resource from database. If there is no local change for given [resourceType] and
-   * [ResourceEntity.resourceUuid], return an empty list.
+   * Retrieve a list of [LocalChange] for [ResourceEntity] with given UUID, which can be used to
+   * purge resource from database. If there is no local change for [ResourceEntity.resourceUuid],
+   * return an empty list.
    *
-   * @param type The [ResourceType]
    * @param resourceUuid The resource UUID [ResourceEntity.resourceUuid]
    * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
    *   [Resource.id] . If there is no local change for given [resourceType] and
    *   [ResourceEntity.resourceUuid], return empty list.
    */
-  suspend fun getLocalChanges(type: ResourceType, resourceUuid: UUID): List<LocalChange>
+  suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from

@@ -288,12 +288,11 @@ internal class DatabaseImpl(
   }
 
   override suspend fun updateResourceIdForResourceChanges(
-    resourceType: ResourceType,
     resourceUuid: UUID,
     updatedResourceId: String,
   ) {
     db.withTransaction {
-      val localChanges = localChangeDao.getLocalChanges(resourceType, resourceUuid)
+      val localChanges = localChangeDao.getLocalChanges(resourceUuid)
       localChanges
         .map { localChangeEntity -> localChangeEntity.copy(resourceId = updatedResourceId) }
         // Add LocalChangeEntity with replace strategy
@@ -307,7 +306,7 @@ internal class DatabaseImpl(
     updatedChanges: List<LocalChange>,
   ) {
     db.withTransaction {
-      val localChanges = localChangeDao.getLocalChanges(resourceType, resourceUuid)
+      val localChanges = localChangeDao.getLocalChanges(resourceUuid)
       localChangeDao.discardLocalChanges(localChanges.first().resourceId, resourceType)
       updatedChanges.forEach { localChangeDao.createLocalChange(it, resourceUuid) }
     }
@@ -344,11 +343,9 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun getLocalChanges(type: ResourceType, resourceUuid: UUID): List<LocalChange> {
+  override suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange> {
     return db.withTransaction {
-      localChangeDao.getLocalChanges(resourceType = type, resourceUuid = resourceUuid).map {
-        it.toLocalChange()
-      }
+      localChangeDao.getLocalChanges(resourceUuid = resourceUuid).map { it.toLocalChange() }
     }
   }
 

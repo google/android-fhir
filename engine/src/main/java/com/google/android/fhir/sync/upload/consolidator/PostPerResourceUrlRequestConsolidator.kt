@@ -82,7 +82,6 @@ internal class PostPerResourceUrlRequestConsolidator(
 
     // update all the local changes for this resource with the new resource Id
     database.updateResourceIdForResourceChanges(
-      resourceEntity.resourceType,
       resourceEntity.resourceUuid,
       createdResourceUpdatedId,
     )
@@ -116,8 +115,7 @@ internal class PostPerResourceUrlRequestConsolidator(
       )
     database.updateResourceWithUuid(resourceWithUpdatedReferences, referringResource.resourceUuid)
 
-    val referringResourceChanges =
-      database.getLocalChanges(referringResource.resourceType, referringResource.resourceUuid)
+    val referringResourceChanges = database.getLocalChanges(referringResource.resourceUuid)
     val updatedResourceChanges =
       referringResourceChanges.map {
         replaceReferencesInLocalChange(it, currentReference, updatedReference)

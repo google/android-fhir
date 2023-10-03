@@ -236,11 +236,10 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        WHERE resourceUuid = :resourceUuid AND resourceType = :resourceType
+        WHERE resourceUuid = :resourceUuid
     """,
   )
   abstract suspend fun getLocalChanges(
-    resourceType: ResourceType,
     resourceUuid: UUID,
   ): List<LocalChangeEntity>
 

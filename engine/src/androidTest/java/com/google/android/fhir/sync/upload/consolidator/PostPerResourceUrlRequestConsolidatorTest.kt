@@ -122,7 +122,6 @@ class PostPerResourceUrlRequestConsolidatorTest {
     // verify that all the local changes are deleted for this newly server created resource
     val patientLocalChangesAfterConsolidation =
       database.getLocalChanges(
-        locallyCreatedPatient.resourceType,
         updatedPatientResourceEntity.resourceUuid,
       )
     assertThat(patientLocalChangesAfterConsolidation).isEmpty()
@@ -229,7 +228,6 @@ class PostPerResourceUrlRequestConsolidatorTest {
       // verify that all the local changes are deleted for this newly created resource
       val patientLocalChangesAfterConsolidation =
         database.getLocalChanges(
-          locallyCreatedPatient.resourceType,
           updatedPatientResourceEntity.resourceUuid,
         )
       assertThat(patientLocalChangesAfterConsolidation).isEmpty()
@@ -354,7 +352,6 @@ class PostPerResourceUrlRequestConsolidatorTest {
       // verify that all the local changes are deleted for this newly created resource
       val patientLocalChangesAfterConsolidation =
         database.getLocalChanges(
-          serverImitatedResponse.resourceType,
           updatedPatientResourceEntity.resourceUuid,
         )
       assertThat(patientLocalChangesAfterConsolidation).isEmpty()
