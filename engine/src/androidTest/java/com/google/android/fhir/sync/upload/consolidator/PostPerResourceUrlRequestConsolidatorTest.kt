@@ -28,7 +28,10 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.testing.assertResourceEquals
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
+import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Observation
@@ -75,22 +78,24 @@ class PostPerResourceUrlRequestConsolidatorTest {
 
   @Test
   fun insertPatientAndReferringResource_shouldUpdateReferencesAndUpdateResourceId() = runBlocking {
+    // create a patient
     val locallyCreatedPatientResourceId = "local-patient-1"
     val locallyCreatedPatient =
       Patient().apply {
         id = locallyCreatedPatientResourceId
         name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
       }
+    database.insert(locallyCreatedPatient)
 
+    // create an observation for the patient
     val locallyCreatedObservationResourceId = "local-observation-1"
     val locallyCreatedPatientObservation =
       Observation().apply {
         subject = Reference("Patient/$locallyCreatedPatientResourceId")
         id = locallyCreatedObservationResourceId
       }
-
-    database.insert(locallyCreatedPatient)
     database.insert(locallyCreatedPatientObservation)
+
     val patientResourceEntity =
       database.selectEntity(locallyCreatedPatient.resourceType, locallyCreatedPatientResourceId)
 
@@ -102,18 +107,19 @@ class PostPerResourceUrlRequestConsolidatorTest {
     val remotelyCreatedPatient =
       locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
 
+    // perform consolidation
     postPerResourceUrlRequestConsolidator.consolidate(
       LocalChangeToken(patientLocalChanges.flatMap { it.token.ids }),
       remotelyCreatedPatient,
     )
 
-    // check if resource is fetch-able by its new ID
+    // check if resource is fetch-able by its new server assigned ID
     val updatedPatientResourceEntity =
       database.selectEntity(remotelyCreatedPatient.resourceType, remotelyCreatedPatient.id)
     assertThat(updatedPatientResourceEntity.resourceUuid)
       .isEqualTo(patientResourceEntity.resourceUuid)
 
-    // verify that all the local changes are deleted for this synced resource
+    // verify that all the local changes are deleted for this newly server created resource
     val patientLocalChangesAfterConsolidation =
       database.getLocalChanges(
         locallyCreatedPatient.resourceType,
@@ -121,7 +127,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
       )
     assertThat(patientLocalChangesAfterConsolidation).isEmpty()
 
-    // verify that Observation is updated
+    // verify that Observation is updated with new patient ID reference
     val updatedObservationResource =
       database.select(
         locallyCreatedPatientObservation.resourceType,
@@ -130,11 +136,11 @@ class PostPerResourceUrlRequestConsolidatorTest {
     assertThat(updatedObservationResource.subject.reference)
       .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
 
-    // verify that Observation's LocalChanges are updated
+    // verify that Observation's LocalChanges are updated with new patient ID reference
     val updatedObservationLocalChanges =
       database.getLocalChanges(
         locallyCreatedPatientObservation.resourceType,
-        locallyCreatedObservationResourceId
+        locallyCreatedObservationResourceId,
       )
     assertThat(updatedObservationLocalChanges.size).isEqualTo(1)
     val observationLocalChange = updatedObservationLocalChanges[0]
@@ -144,7 +150,8 @@ class PostPerResourceUrlRequestConsolidatorTest {
     assertThat(observationLocalChangePayload.subject.reference)
       .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
 
-    // verify that Observation is searchable i.e. ReferenceIndex is updated
+    // verify that Observation is searchable i.e. ReferenceIndex is updated with new patient ID
+    // reference
     val searchedObservations =
       database.search<Observation>(
         Search(ResourceType.Observation)
@@ -163,6 +170,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
   @Test
   fun insertPatientAndInsertUpdateReferringResource_shouldUpdateReferencesAndUpdateResourceId() =
     runBlocking {
+      // create a new patient
       val locallyCreatedPatientResourceId = "local-patient-1"
       val locallyCreatedPatient =
         Patient().apply {
@@ -171,6 +179,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
         }
       database.insert(locallyCreatedPatient)
 
+      // create an observation for the new patient
       val locallyCreatedObservationResourceId = "local-observation-1"
       val locallyCreatedPatientObservation =
         Observation().apply {
@@ -178,10 +187,12 @@ class PostPerResourceUrlRequestConsolidatorTest {
           id = locallyCreatedObservationResourceId
         }
       database.insert(locallyCreatedPatientObservation)
+      // update the observation resource (so that there are multiple local changes with references
+      // to the same patient)
       database.update(
         locallyCreatedPatientObservation.apply {
           performer = listOf(Reference("Patient/$locallyCreatedPatientResourceId"))
-        }
+        },
       )
 
       val patientResourceEntity =
@@ -190,7 +201,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
       val patientLocalChanges =
         database.getLocalChanges(
           locallyCreatedPatient.resourceType,
-          locallyCreatedPatientResourceId
+          locallyCreatedPatientResourceId,
         )
       val observationLocalChanges =
         database.getLocalChanges(
@@ -215,7 +226,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
       assertThat(updatedPatientResourceEntity.resourceUuid)
         .isEqualTo(patientResourceEntity.resourceUuid)
 
-      // verify that all the local changes are deleted for this synced resource
+      // verify that all the local changes are deleted for this newly created resource
       val patientLocalChangesAfterConsolidation =
         database.getLocalChanges(
           locallyCreatedPatient.resourceType,
@@ -236,7 +247,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
       val updatedObservationLocalChanges =
         database.getLocalChanges(
           locallyCreatedPatientObservation.resourceType,
-          locallyCreatedObservationResourceId
+          locallyCreatedObservationResourceId,
         )
       assertThat(updatedObservationLocalChanges.size).isEqualTo(2)
       val observationLocalChange1 = updatedObservationLocalChanges[0]
@@ -272,7 +283,118 @@ class PostPerResourceUrlRequestConsolidatorTest {
       assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
     }
 
-  // update and insert
-  // update and update
-  //
+  @Test
+  fun updatePatientAndInsertUpdateReferringResource_shouldUpdateReferencesAndUpdateResourceId() =
+    runBlocking {
+      // imitate syncing of a patient from the server
+      val serverCreatedPatientResourceId = "remote-patient-1"
+      val serverSyncedPatient =
+        Patient().apply {
+          id = serverCreatedPatientResourceId
+          name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+        }
+      database.insertRemote(serverSyncedPatient)
+
+      // update the patient resource
+      val updatedPatient =
+        serverSyncedPatient.apply {
+          name =
+            listOf(
+              HumanName().setFamily("Updated Family").setGiven(listOf(StringType("First Name")))
+            )
+        }
+      database.update(updatedPatient)
+
+      // create an observation for the new patient
+      val locallyCreatedObservationResourceId = "local-observation-1"
+      val locallyCreatedPatientObservation =
+        Observation().apply {
+          subject = Reference("Patient/$serverCreatedPatientResourceId")
+          id = locallyCreatedObservationResourceId
+        }
+      database.insert(locallyCreatedPatientObservation)
+      // update the observation (so that there are multiple local changes with references to the
+      // same patient)
+      database.update(
+        locallyCreatedPatientObservation.apply {
+          performer = listOf(Reference("Patient/$serverCreatedPatientResourceId"))
+        },
+      )
+
+      val patientResourceEntity =
+        database.selectEntity(serverSyncedPatient.resourceType, serverSyncedPatient.id)
+
+      val patientLocalChanges =
+        database.getLocalChanges(
+          serverSyncedPatient.resourceType,
+          serverCreatedPatientResourceId,
+        )
+      assertThat(patientLocalChanges.size).isEqualTo(1)
+      val observationLocalChanges =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(observationLocalChanges.size).isEqualTo(2)
+
+      // pretend that the resource has been updated on the server
+      val serverUpdatedTime = Date.from(Instant.now())
+      val serverImitatedResponse = updatedPatient.apply { meta.lastUpdated = serverUpdatedTime }
+      postPerResourceUrlRequestConsolidator.consolidate(
+        LocalChangeToken(patientLocalChanges.flatMap { it.token.ids }),
+        serverImitatedResponse,
+      )
+
+      // check if resource is fetch-able by its new ID
+      val updatedPatientResourceEntity =
+        database.selectEntity(updatedPatient.resourceType, serverImitatedResponse.id)
+      assertThat(updatedPatientResourceEntity.resourceUuid)
+        .isEqualTo(patientResourceEntity.resourceUuid)
+
+      // verify that all the local changes are deleted for this newly created resource
+      val patientLocalChangesAfterConsolidation =
+        database.getLocalChanges(
+          serverImitatedResponse.resourceType,
+          updatedPatientResourceEntity.resourceUuid,
+        )
+      assertThat(patientLocalChangesAfterConsolidation).isEmpty()
+
+      // verify that Observation is still the same as the last version
+      val observationResource =
+        database.select(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        ) as Observation
+      assertResourceEquals(locallyCreatedPatientObservation, observationResource)
+
+      // verify that Observation's LocalChanges are retained
+      val observationLocalChangesPostConsolidation =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(observationLocalChanges.size)
+        .isEqualTo(observationLocalChangesPostConsolidation.size)
+      observationLocalChanges.forEachIndexed { changeIndex, originalObservationChange ->
+        assertThat(originalObservationChange.token.ids)
+          .containsExactlyElementsIn(
+            observationLocalChangesPostConsolidation.get(changeIndex).token.ids
+          )
+      }
+
+      // verify that Observation is searchable i.e. ReferenceIndex is updated
+      val searchedObservations =
+        database.search<Observation>(
+          Search(ResourceType.Observation)
+            .apply {
+              filter(
+                Observation.SUBJECT,
+                { value = "Patient/$serverCreatedPatientResourceId" },
+              )
+            }
+            .getQuery(),
+        )
+      assertThat(searchedObservations.size).isEqualTo(1)
+      assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
+    }
 }
