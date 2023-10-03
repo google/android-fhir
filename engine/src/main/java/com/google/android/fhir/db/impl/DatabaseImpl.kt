@@ -125,10 +125,9 @@ internal class DatabaseImpl(
       logicalIds.addAll(
         resource.map {
           val timeOfLocalChange = Instant.now()
-          val resourceId = resourceDao.insertLocalResource(it, timeOfLocalChange)
-          val resourceEntity = selectEntity(it.resourceType, it.logicalId)
-          localChangeDao.addInsert(it, resourceEntity.resourceUuid, timeOfLocalChange)
-          resourceId
+          val resourceUuid = resourceDao.insertLocalResource(it, timeOfLocalChange)
+          localChangeDao.addInsert(it, resourceUuid, timeOfLocalChange)
+          it.logicalId
         },
       )
     }

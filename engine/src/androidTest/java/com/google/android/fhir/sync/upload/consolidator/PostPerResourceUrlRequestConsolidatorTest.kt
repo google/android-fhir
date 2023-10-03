@@ -300,7 +300,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
         serverSyncedPatient.apply {
           name =
             listOf(
-              HumanName().setFamily("Updated Family").setGiven(listOf(StringType("First Name")))
+              HumanName().setFamily("Updated Family").setGiven(listOf(StringType("First Name"))),
             )
         }
       database.update(updatedPatient)
@@ -378,7 +378,7 @@ class PostPerResourceUrlRequestConsolidatorTest {
       observationLocalChanges.forEachIndexed { changeIndex, originalObservationChange ->
         assertThat(originalObservationChange.token.ids)
           .containsExactlyElementsIn(
-            observationLocalChangesPostConsolidation.get(changeIndex).token.ids
+            observationLocalChangesPostConsolidation.get(changeIndex).token.ids,
           )
       }
 

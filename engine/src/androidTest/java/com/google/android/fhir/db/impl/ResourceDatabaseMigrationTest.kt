@@ -16,24 +16,19 @@
 
 package com.google.android.fhir.db.impl
 
-import androidx.room.Room
 import androidx.room.testing.MigrationTestHelper
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.toTimeZoneString
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
-import java.nio.ByteBuffer
 import java.time.Instant
 import java.util.Date
-import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 import org.junit.Rule
 import org.junit.Test
@@ -72,14 +67,16 @@ class ResourceDatabaseMigrationTest {
 
     // Open latest version of the database. Room will validate the schema
     // once all migrations execute.
-    helper.runMigrationsAndValidate(DB_NAME, 2, true, MIGRATION_1_2)
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 2, true, MIGRATION_1_2)
 
     val readPatientJson: String?
-    getMigratedRoomDatabase().apply {
-      readPatientJson = this.resourceDao().getResource("migrate1-2-test", ResourceType.Patient)
-      openHelper.writableDatabase.close()
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
+        it.moveToFirst()
+        readPatientJson = it.getString(0)
+      }
     }
-
+    migratedDatabase.close()
     assertThat(readPatientJson).isEqualTo(insertedPatientJson)
   }
 
@@ -104,14 +101,16 @@ class ResourceDatabaseMigrationTest {
     }
 
     // Re-open the database with version 3 and provide MIGRATION_2_3 as the migration process.
-    helper.runMigrationsAndValidate(DB_NAME, 3, true, MIGRATION_2_3)
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 3, true, MIGRATION_2_3)
 
     val retrievedTask: String?
-    getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
-      openHelper.writableDatabase.close()
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
+        it.moveToFirst()
+        retrievedTask = it.getString(0)
+      }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -136,14 +135,16 @@ class ResourceDatabaseMigrationTest {
     }
 
     // Re-open the database with version 4 and provide MIGRATION_3_4 as the migration process.
-    helper.runMigrationsAndValidate(DB_NAME, 4, true, MIGRATION_3_4)
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 4, true, MIGRATION_3_4)
 
     val retrievedTask: String?
-    getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
-      openHelper.writableDatabase.close()
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
+        it.moveToFirst()
+        retrievedTask = it.getString(0)
+      }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -166,15 +167,17 @@ class ResourceDatabaseMigrationTest {
       close()
     }
 
-    // Re-open the database with version 4 and provide MIGRATION_3_4 as the migration process.
-    helper.runMigrationsAndValidate(DB_NAME, 5, true, MIGRATION_4_5)
+    // Re-open the database with version 5 and provide MIGRATION_4_5 as the migration process.
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 5, true, MIGRATION_4_5)
 
     val retrievedTask: String?
-    getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
-      openHelper.writableDatabase.close()
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
+        it.moveToFirst()
+        retrievedTask = it.getString(0)
+      }
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
@@ -208,31 +211,33 @@ class ResourceDatabaseMigrationTest {
       close()
     }
 
-    helper.runMigrationsAndValidate(DB_NAME, 6, true, MIGRATION_5_6)
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 6, true, MIGRATION_5_6)
 
     val retrievedTask: String?
     val localChangeEntityTimeStamp: Long
     val resourceEntityLastUpdatedLocal: Long
     val localChangeEntityCorruptedTimeStamp: Long
 
-    getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResource(taskId, ResourceType.Task)
+    migratedDatabase.let { database ->
+      database.query("SELECT serializedResource FROM ResourceEntity").let {
+        it.moveToFirst()
+        retrievedTask = it.getString(0)
+      }
+
       resourceEntityLastUpdatedLocal =
-        query("Select lastUpdatedLocal from ResourceEntity", null).let {
+        database.query("Select lastUpdatedLocal from ResourceEntity").let {
           it.moveToFirst()
           it.getLong(0)
         }
 
-      query("SELECT timestamp FROM LocalChangeEntity", null).let {
+      database.query("SELECT timestamp FROM LocalChangeEntity").let {
         it.moveToFirst()
         localChangeEntityTimeStamp = it.getLong(0)
         it.moveToNext()
         localChangeEntityCorruptedTimeStamp = it.getLong(0)
       }
-
-      openHelper.writableDatabase.close()
     }
-
+    migratedDatabase.close()
     assertThat(retrievedTask).isEqualTo(bedNetTask)
     assertThat(localChangeEntityTimeStamp).isEqualTo(resourceEntityLastUpdatedLocal)
     assertThat(Instant.ofEpochMilli(localChangeEntityCorruptedTimeStamp)).isEqualTo(Instant.EPOCH)
@@ -263,43 +268,30 @@ class ResourceDatabaseMigrationTest {
       close()
     }
 
-    helper.runMigrationsAndValidate(DB_NAME, 6, true, MIGRATION_6_7)
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 7, true, MIGRATION_6_7)
 
-    val retrievedTask: ResourceEntity?
-    val localChangeUuid: UUID?
+    val retrievedTaskResourceId: String?
+    val retrievedTaskResourceUuid: String?
+    val localChangeResourceUuid: String?
+    val localChangeResourceId: String?
 
-    getMigratedRoomDatabase().apply {
-      retrievedTask = this.resourceDao().getResourceEntity(taskResourceUuid, ResourceType.Task)
-
-      query("SELECT resourceUuid FROM LocalChangeEntity", null).let {
+    migratedDatabase.let { database ->
+      database.query("SELECT resourceId, resourceUuid FROM ResourceEntity").let {
         it.moveToFirst()
-        it.moveToNext()
-        val byteBuffer = ByteBuffer.wrap(it.getBlob(0))
-        localChangeUuid = UUID(byteBuffer.getLong(), byteBuffer.getLong())
+        retrievedTaskResourceId = it.getString(0)
+        retrievedTaskResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
       }
 
-      openHelper.writableDatabase.close()
+      database.query("SELECT resourceId,resourceUuid FROM LocalChangeEntity").let {
+        it.moveToFirst()
+        localChangeResourceId = it.getString(0)
+        localChangeResourceUuid = String(it.getBlob(1), Charsets.UTF_8)
+      }
     }
-
-    assertThat(retrievedTask!!.resourceUuid).isEqualTo(taskResourceUuid)
-    assertThat(localChangeUuid).isEqualTo(taskResourceUuid)
+    migratedDatabase.close()
+    assertThat(retrievedTaskResourceUuid).isEqualTo(localChangeResourceUuid)
+    assertThat(localChangeResourceId).isEqualTo(retrievedTaskResourceId)
   }
-
-  private fun getMigratedRoomDatabase(): ResourceDatabase =
-    Room.databaseBuilder(
-        InstrumentationRegistry.getInstrumentation().targetContext,
-        ResourceDatabase::class.java,
-        DB_NAME,
-      )
-      .addMigrations(
-        MIGRATION_1_2,
-        MIGRATION_2_3,
-        MIGRATION_3_4,
-        MIGRATION_4_5,
-        MIGRATION_5_6,
-        MIGRATION_6_7,
-      )
-      .build()
 
   companion object {
     const val DB_NAME = "migration_tests.db"

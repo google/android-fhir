@@ -255,7 +255,7 @@ class DatabaseImplTest {
         runBlocking { database.select(ResourceType.Patient, patient.logicalId) }
       }
     assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type Patient and id ${patient.logicalId}!")
+      .isEqualTo("Resource not found with type Patient and ID ${patient.logicalId}!")
   }
 
   @Test
@@ -268,7 +268,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_1_ID!",
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and ID $TEST_PATIENT_1_ID!",
       )
     assertThat(database.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
   }
@@ -299,7 +299,7 @@ class DatabaseImplTest {
         runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
       }
     assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and ID $TEST_PATIENT_2_ID!")
   }
 
   @Test
@@ -316,7 +316,7 @@ class DatabaseImplTest {
         runBlocking { database.select(ResourceType.Patient, TEST_PATIENT_2_ID) }
       }
     assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type ${ResourceType.Patient} and id $TEST_PATIENT_2_ID!")
+      .isEqualTo("Resource not found with type ${ResourceType.Patient} and ID $TEST_PATIENT_2_ID!")
   }
 
   @Test
@@ -327,7 +327,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and id $TEST_PATIENT_2_ID!",
+        "Resource not found with type ${TEST_PATIENT_1.resourceType.name} and ID $TEST_PATIENT_2_ID!",
       )
   }
 
@@ -339,7 +339,7 @@ class DatabaseImplTest {
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
-        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and id $TEST_PATIENT_2_ID!",
+        "Resource not found with type ${TEST_PATIENT_2.resourceType.name} and ID $TEST_PATIENT_2_ID!",
       )
   }
 
@@ -350,7 +350,7 @@ class DatabaseImplTest {
         runBlocking { database.select(ResourceType.Patient, "nonexistent_patient") }
       }
     assertThat(resourceNotFoundException.message)
-      .isEqualTo("Resource not found with type Patient and id nonexistent_patient!")
+      .isEqualTo("Resource not found with type Patient and ID nonexistent_patient!")
   }
 
   @Test
