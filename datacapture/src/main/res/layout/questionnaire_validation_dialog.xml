@@ -25,8 +25,8 @@
         style="?attr/questionnaireValidationDialogTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Complete all required fields"
         android:text="@string/questionnaire_validation_error_headline"
+        tools:text="Complete all required fields"
     />
 
     <TextView
@@ -35,8 +35,8 @@
         style="?attr/questionnaireValidationDialogBodyStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="Fields that need to be completed:"
         android:text="@string/questionnaire_validation_error_supporting_text"
+        tools:text="Fields that need to be completed:"
         tools:visibility="visible"
     />
 
@@ -45,6 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
+
         <TextView
             android:id="@+id/body"
             style="?attr/questionnaireValidationDialogBodyStyle"
