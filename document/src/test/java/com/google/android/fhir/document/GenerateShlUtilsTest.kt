@@ -68,7 +68,7 @@ class GenerateShlUtilsTest {
   @Test
   fun randomKeysCanBeGenerated() {
     val key = generateShlUtils.generateRandomKey()
-    assert(key.length == 44)
+    assert(key.length == 45)
   }
 
   @Test

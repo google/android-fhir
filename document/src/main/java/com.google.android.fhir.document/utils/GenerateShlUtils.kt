@@ -19,12 +19,10 @@ package com.google.android.fhir.document.utils
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.widget.ImageView
-import androidx.annotation.RequiresApi
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.SHLData
@@ -36,12 +34,9 @@ import com.nimbusds.jose.JWEObject
 import com.nimbusds.jose.Payload
 import com.nimbusds.jose.crypto.DirectEncrypter
 import java.lang.Exception
-import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
-import java.time.LocalDate
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.util.Base64
+import android.util.Base64
+import java.text.SimpleDateFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -53,23 +48,22 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 internal class GenerateShlUtils(
   private val qrGeneratorUtils: QRGeneratorUtils,
+  // private val apiService: RetrofitSHLService
 ) {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   /* Encrypt a given string as a JWE token, using a given key */
-  @RequiresApi(Build.VERSION_CODES.O)
   fun encrypt(data: String, key: String): String {
     val header = JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
     val jweObj = JWEObject(header, Payload(data))
-    val decodedKey = Base64.getUrlDecoder().decode(key)
+    val decodedKey = Base64.decode(key, Base64.URL_SAFE)
     val encrypter = DirectEncrypter(decodedKey)
     jweObj.encrypt(encrypter)
     return jweObj.serialize()
   }
 
   /* POST the IPS document to the manifest URL */
-  @RequiresApi(Build.VERSION_CODES.O)
   suspend fun postPayload(
     file: String,
     manifestUrl: String,
@@ -107,32 +101,26 @@ internal class GenerateShlUtils(
   }
 
   /* Converts the inputted expiry date to epoch seconds */
-  @RequiresApi(Build.VERSION_CODES.O)
   fun dateStringToEpochSeconds(dateString: String): Long {
-    val formatter = DateTimeFormatter.ofPattern("yyyy-M-d")
-    val localDate = LocalDate.parse(dateString, formatter)
-    val zonedDateTime = localDate.atStartOfDay(ZoneOffset.UTC)
-    return zonedDateTime.toEpochSecond()
+    val format = SimpleDateFormat("yyyy-M-d")
+    val date = format.parse(dateString)
+    return date?.time?.div(1000) ?: 0L
   }
 
   /* Base64Url encodes a given string */
-  @RequiresApi(Build.VERSION_CODES.O)
-  fun base64UrlEncode(data: String): String {
-    val bytes = data.toByteArray(StandardCharsets.UTF_8)
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes)
+  private fun base64UrlEncode(data: String): String {
+    return Base64.encodeToString(data.toByteArray(), Base64.URL_SAFE)
   }
 
   /* Generate a random SHL-specific key */
-  @RequiresApi(Build.VERSION_CODES.O)
   fun generateRandomKey(): String {
     val random = SecureRandom()
     val keyBytes = ByteArray(32)
     random.nextBytes(keyBytes)
-    return Base64.getUrlEncoder().encodeToString(keyBytes)
+    return Base64.encodeToString(keyBytes, Base64.URL_SAFE)
   }
 
   /* Generate an SHL */
-  @RequiresApi(Build.VERSION_CODES.O)
   fun generateAndPostPayload(
     passcode: String,
     shlData: SHLData,
@@ -154,7 +142,6 @@ internal class GenerateShlUtils(
   }
 
   /* POST the data to the SHL server and return the link itself */
-  @RequiresApi(Build.VERSION_CODES.O)
   private suspend fun generateShLink(
     initialPostResponse: JSONObject,
     shlData: SHLData,
@@ -222,7 +209,6 @@ internal class GenerateShlUtils(
   }
 
   /* Constructs the SHL payload */
-  @RequiresApi(Build.VERSION_CODES.O)
   fun constructSHLinkPayload(
     manifestUrl: String,
     label: String?,
