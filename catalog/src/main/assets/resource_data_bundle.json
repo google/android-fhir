@@ -1,0 +1,116 @@
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "resourceType" : "Patient",
+        "id" : "P1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "b8e13d21-1a62-4172-a9ef-57670e6ac238",
+        "status": "ready",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "33879002",
+              "display": "Vaccination routine"
+            }
+          ]
+        },
+        "description": "BCG at birth",
+        "for": {
+          "reference": "Patient/P1"
+        },
+        "reasonCode": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "42284007",
+              "display": "BCG vaccine"
+            },
+            {
+              "system": "https://smartregister.org/immunization/vaccine-codes",
+              "code": "bcg",
+              "display": "BCG"
+            }
+          ],
+          "text": "BCG"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "4090ba9a-fbbb-4634-a06d-0cbe938ab090",
+        "status": "cancelled",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "33879002",
+              "display": "Vaccination routine"
+            }
+          ]
+        },
+        "description": "OPV 0 at birth",
+        "for": {
+          "reference": "Patient/P1"
+        },
+        "reasonCode": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "111164008",
+              "display": "Poliovirus vaccine"
+            },
+            {
+              "system": "https://smartregister.org/immunization/vaccine-codes",
+              "code": "opv0",
+              "display": "OPV 0"
+            }
+          ],
+          "text": "OPV 0"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "087e82c6-e346-4725-8db1-7e10aec99be9",
+        "status": "ready",
+        "code": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "33879002",
+              "display": "Vaccination routine"
+            }
+          ]
+        },
+        "description": "OPV 1 at 6 weeks",
+        "for": {
+          "reference": "Patient/P1"
+        },
+        "reasonCode": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "111164008",
+              "display": "Poliovirus vaccine"
+            },
+            {
+              "system": "https://smartregister.org/immunization/vaccine-codes",
+              "code": "opv1",
+              "display": "OPV 1"
+            }
+          ],
+          "text": "OPV 1"
+        }
+      }
+    }
+  ]
+}
