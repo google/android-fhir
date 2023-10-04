@@ -25,6 +25,7 @@ import com.google.android.fhir.toLocalChange
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
@@ -112,6 +113,7 @@ class UploaderTest {
         LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
+            resourceUuid = UUID.randomUUID(),
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.INSERT,
             payload =
