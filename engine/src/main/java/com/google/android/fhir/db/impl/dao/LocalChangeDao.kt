@@ -32,6 +32,7 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
@@ -51,7 +52,7 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsert(resource: Resource, timeOfLocalChange: Instant) {
+  open suspend fun addInsert(resource: Resource, resourceUuid: UUID, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
     val resourceString = iParser.encodeResourceToString(resource)
@@ -61,6 +62,7 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
+        resourceUuid = resourceUuid,
         timestamp = timeOfLocalChange,
         type = Type.INSERT,
         payload = resourceString,
@@ -95,6 +97,7 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
+        resourceUuid = oldEntity.resourceUuid,
         timestamp = timeOfLocalChange,
         type = Type.UPDATE,
         payload = jsonDiff.toString(),
@@ -103,12 +106,18 @@ internal abstract class LocalChangeDao {
     )
   }
 
-  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
+  suspend fun addDelete(
+    resourceId: String,
+    resourceUuid: UUID,
+    resourceType: ResourceType,
+    remoteVersionId: String?,
+  ) {
     addLocalChange(
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
+        resourceUuid = resourceUuid,
         timestamp = Date().toInstant(),
         type = Type.DELETE,
         payload = "",
