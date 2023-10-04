@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackage
+import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackageMetadata
 import com.google.android.fhir.knowledge.npm.NpmFileManager
 import com.google.android.fhir.knowledge.npm.PackageDownloader
 import com.google.common.truth.Truth.assertThat
@@ -94,9 +94,12 @@ class KnowledgeManagerNpmTest {
     val DEP1 = FhirNpmPackage("package1", "version")
     val DEP2 = FhirNpmPackage("package2", "version")
     val DEP3 = FhirNpmPackage("package3", "version")
-    val NPM1 = LocalFhirNpmPackage(DEP1.name, DEP1.version, null, listOf(DEP2), File("/fakePath"))
-    val NPM2 = LocalFhirNpmPackage(DEP2.name, DEP2.version, null, listOf(DEP3), File("/fakePath"))
-    val NPM3 = LocalFhirNpmPackage(DEP3.name, DEP1.version, null, emptyList(), File("/fakePath"))
+    val NPM1 =
+      LocalFhirNpmPackageMetadata(DEP1.name, DEP1.version, null, listOf(DEP2), File("/fakePath"))
+    val NPM2 =
+      LocalFhirNpmPackageMetadata(DEP2.name, DEP2.version, null, listOf(DEP3), File("/fakePath"))
+    val NPM3 =
+      LocalFhirNpmPackageMetadata(DEP3.name, DEP1.version, null, emptyList(), File("/fakePath"))
     val NPM_CACHE_MAP = mapOf(DEP1 to NPM1, DEP2 to NPM2, DEP3 to NPM3)
   }
 }

@@ -22,7 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackage
+import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackageMetadata
 import com.google.android.fhir.knowledge.npm.NpmFileManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -48,7 +48,7 @@ internal class KnowledgeManagerTest {
       context.dataDir,
       npmFileManager = npmFileManager,
       packageDownloader = { fhirPackage, _ ->
-        LocalFhirNpmPackage(
+        LocalFhirNpmPackageMetadata(
           fhirPackage.name,
           fhirPackage.version,
           fhirPackage.canonical,
