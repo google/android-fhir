@@ -58,6 +58,7 @@
     <string
         name="behavior_name_calculated_expression"
     >Calculated Expression</string>
+    <string name="behavior_name_answer_expression">Answer Expression</string>
     <string name="toolbar_text">Structured data capture \n Catalog</string>
     <string
         name="questionnaire_response_title"
