@@ -429,6 +429,52 @@ class FhirEngineRetrieveProviderTest : Loadable() {
   }
 
   @Test
+  fun `should return result when value set path is multiword`() = runBlockingOnWorkerThread {
+    loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+    loadBundle(parseJson("/retrieve-provider/TestBundleValueSets.json"))
+
+    val results: Iterable<Any> =
+      retrieveProvider.retrieve(
+        context = "Patient",
+        contextPath = "subject",
+        contextValue = "test-one-r4",
+        dataType = "Condition",
+        templateId = null,
+        codePath = "bodySite",
+        codes = null,
+        valueSet = "http://localhost/fhir/ValueSet/value-set-one",
+        datePath = null,
+        dateLowPath = null,
+        dateHighPath = null,
+        dateRange = null,
+      )
+    assertThat(results).isNotNull()
+    assertThat(results.toList().size).isEqualTo(1)
+  }
+
+  @Test(expected = IllegalArgumentException::class)
+  fun `should throw exception when value set path is not a valid search param`(): Unit =
+    runBlockingOnWorkerThread {
+      loadBundle(parseJson("/retrieve-provider/TestBundleTwoPatients.json"))
+      loadBundle(parseJson("/retrieve-provider/TestBundleValueSets.json"))
+
+      retrieveProvider.retrieve(
+        context = "Patient",
+        contextPath = "subject",
+        contextValue = "test-one-r4",
+        dataType = "Condition",
+        templateId = null,
+        codePath = "missingProperty", // code path is not valid
+        codes = null,
+        valueSet = "http://localhost/fhir/ValueSet/value-set-one",
+        datePath = null,
+        dateLowPath = null,
+        dateHighPath = null,
+        dateRange = null,
+      )
+    }
+
+  @Test
   fun testRetrieveByUrn() = runBlockingOnWorkerThread {
     loadBundle(parseJson("/retrieve-provider/TestBundleUrns.json"))
 

@@ -72,7 +72,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       val search = Search(ResourceType.fromCode(dataType))
       filterByContext(context, contextPath, contextValue, dataType, search)
       filterByCode(codePath, codes, dataType, search)
-      filterByValueSet(codePath, valueSet, search)
+      filterByValueSet(codePath, valueSet, dataType, search)
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
       fhirEngine.search(search)
     }
@@ -178,14 +178,19 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       val param = findSearchParamDefinition(dataType, codePath)
       require(param != null) {
         throw IllegalArgumentException(
-          "FhirEngineRetrieveProvider doesn't know how to search for $dataType.$codePath",
+          "FhirEngineRetrieveProvider doesn't know how to search for code $dataType.$codePath",
         )
       }
       search.filter(TokenClientParam(param.name), *inCodes.toTypedArray())
     }
   }
 
-  private fun filterByValueSet(codePath: String?, valueSetUrl: String?, search: Search) {
+  private fun filterByValueSet(
+    codePath: String?,
+    valueSetUrl: String?,
+    dataType: String,
+    search: Search,
+  ) {
     if (valueSetUrl == null || codePath == null) return
 
     val valueSet = terminologyProvider.expand(ValueSetInfo().withId(valueSetUrl))
@@ -199,7 +204,13 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       }
 
     if (inCodes.isNotEmpty()) {
-      search.filter(TokenClientParam(codePath), *inCodes.toTypedArray())
+      val param = findSearchParamDefinition(dataType, codePath)
+      require(param != null) {
+        throw IllegalArgumentException(
+          "FhirEngineRetrieveProvider doesn't know how to search for valueset $dataType.$codePath",
+        )
+      }
+      search.filter(TokenClientParam(param.name), *inCodes.toTypedArray())
     }
   }
 

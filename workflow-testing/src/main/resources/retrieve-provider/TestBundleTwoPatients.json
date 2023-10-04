@@ -84,6 +84,14 @@
             }
           ]
         },
+        "bodySite": {
+          "coding": [
+            {
+              "system": "http://localhost/unit-test",
+              "code": "111"
+            }
+          ]
+        },
         "subject": {
           "reference": "Patient/test-one-r4"
         }
