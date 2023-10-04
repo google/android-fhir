@@ -30,8 +30,8 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.FetchProgress
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
@@ -317,7 +317,7 @@ class FhirEngineImplTest {
   @Test
   fun syncUpload_uploadLocalChange_success() = runTest {
     val localChanges = mutableListOf<LocalChange>()
-    val emittedProgress = mutableListOf<FetchProgress>()
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
@@ -338,25 +338,26 @@ class FhirEngineImplTest {
     }
 
     assertThat(emittedProgress).hasSize(2)
-    assertThat(emittedProgress.first()).isEqualTo(FetchProgress(1, 1))
-    assertThat(emittedProgress.last()).isEqualTo(FetchProgress(0, 1))
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(0, 1))
   }
 
   @Test
   fun syncUpload_uploadLocalChange_failure() = runBlocking {
-    val emittedProgress = mutableListOf<FetchProgress>()
-
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
+    val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         UploadSyncResult.Failure(
-          ResourceSyncException(ResourceType.Patient, FHIRException("Did not work")),
+          uploadError,
           LocalChangeToken(it.flatMap { it.token.ids }),
         )
       }
       .collect { emittedProgress.add(it) }
 
-    assertThat(emittedProgress).hasSize(1)
-    assertThat(emittedProgress.first()).isEqualTo(FetchProgress(1, 1))
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(1, 1, uploadError))
   }
 
   @Test

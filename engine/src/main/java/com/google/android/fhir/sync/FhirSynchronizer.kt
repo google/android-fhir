@@ -22,7 +22,6 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -121,23 +120,16 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
     fhirEngine
-      .syncUpload(localChangesFetchMode) {
-        when (val result = uploader.upload(it)) {
-          is UploadSyncResult.Success -> result
-          is UploadSyncResult.Failure -> {
-            exceptions.add(result.syncError)
-            result
-          }
-        }
-      }
-      .collect {
-        setSyncState(
-          SyncJobStatus.InProgress(
-            SyncOperation.UPLOAD,
-            it.initialTotal,
-            it.initialTotal - it.remaining,
-          ),
-        )
+      .syncUpload(localChangesFetchMode) { uploader.upload(it) }
+      .collect { progress ->
+        progress.uploadError?.let { exceptions.add(it) }
+          ?: setSyncState(
+            SyncJobStatus.InProgress(
+              SyncOperation.UPLOAD,
+              progress.initialTotal,
+              progress.initialTotal - progress.remaining,
+            ),
+          )
       }
 
     return if (exceptions.isEmpty()) {

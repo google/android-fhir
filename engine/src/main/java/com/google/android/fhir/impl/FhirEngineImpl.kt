@@ -29,9 +29,9 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
-import com.google.android.fhir.sync.upload.FetchProgress
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -128,27 +128,37 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
     upload: (suspend (List<LocalChange>) -> UploadSyncResult),
-  ): Flow<FetchProgress> = flow {
+  ): Flow<SyncUploadProgress> = flow {
     val resourceConsolidator = DefaultResourceConsolidator(database)
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
 
-    emit(FetchProgress(localChangeFetcher.total, localChangeFetcher.total))
+    emit(
+      SyncUploadProgress(
+        remaining = localChangeFetcher.total,
+        initialTotal = localChangeFetcher.total,
+      ),
+    )
 
-    var continueSync = true
-    while (continueSync && localChangeFetcher.hasNext()) {
+    while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
       val uploadSyncResult = upload(localChanges)
 
       resourceConsolidator.consolidate(uploadSyncResult)
-
-      continueSync =
-        when (uploadSyncResult) {
-          is UploadSyncResult.Success -> {
-            emit(localChangeFetcher.getProgress())
-            true
+      when (uploadSyncResult) {
+        is UploadSyncResult.Success -> emit(localChangeFetcher.getProgress())
+        is UploadSyncResult.Failure -> {
+          with(localChangeFetcher.getProgress()) {
+            emit(
+              SyncUploadProgress(
+                remaining = remaining,
+                initialTotal = initialTotal,
+                uploadError = uploadSyncResult.syncError,
+              ),
+            )
           }
-          is UploadSyncResult.Failure -> false
+          break
         }
+      }
     }
   }
 }

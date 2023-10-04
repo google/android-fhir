@@ -141,7 +141,6 @@ class FhirSynchronizerTest {
           SyncJobStatus.Started,
           SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.Failed(exceptions = listOf(error)),
         )
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)

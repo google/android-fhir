@@ -50,30 +50,30 @@ internal class Uploader(private val dataSource: DataSource) {
     val successfulResponses = mutableListOf<Resource>()
 
     for (uploadRequest in requests) {
-      when (val result = attemptUpload(uploadRequest)) {
-        is UploadAttempt.Success -> successfulResponses.add(result.resource)
-        is UploadAttempt.Failure -> return UploadSyncResult.Failure(result.exception, token)
+      when (val result = handleUploadRequest(uploadRequest)) {
+        is UploadRequestResult.Success -> successfulResponses.add(result.resource)
+        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
       }
     }
 
     return UploadSyncResult.Success(token, successfulResponses)
   }
 
-  private suspend fun attemptUpload(uploadRequest: UploadRequest): UploadAttempt {
+  private suspend fun handleUploadRequest(uploadRequest: UploadRequest): UploadRequestResult {
     return try {
       val response = dataSource.upload(uploadRequest)
       when {
         response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE ->
-          UploadAttempt.Success(response)
+          UploadRequestResult.Success(response)
         response is OperationOutcome && response.issue.isNotEmpty() ->
-          UploadAttempt.Failure(
+          UploadRequestResult.Failure(
             ResourceSyncException(
               uploadRequest.resource.resourceType,
               FHIRException(response.issueFirstRep.diagnostics),
             ),
           )
         else ->
-          UploadAttempt.Failure(
+          UploadRequestResult.Failure(
             ResourceSyncException(
               uploadRequest.resource.resourceType,
               FHIRException("Unknown response for ${uploadRequest.resource.resourceType}"),
@@ -82,14 +82,14 @@ internal class Uploader(private val dataSource: DataSource) {
       }
     } catch (e: Exception) {
       Timber.e(e)
-      UploadAttempt.Failure(ResourceSyncException(ResourceType.Bundle, e))
+      UploadRequestResult.Failure(ResourceSyncException(ResourceType.Bundle, e))
     }
   }
 
-  private sealed class UploadAttempt {
-    data class Success(val resource: Resource) : UploadAttempt()
+  private sealed class UploadRequestResult {
+    data class Success(val resource: Resource) : UploadRequestResult()
 
-    data class Failure(val exception: ResourceSyncException) : UploadAttempt()
+    data class Failure(val exception: ResourceSyncException) : UploadRequestResult()
   }
 }
 
