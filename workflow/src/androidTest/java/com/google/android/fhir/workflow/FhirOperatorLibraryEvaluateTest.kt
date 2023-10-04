@@ -71,9 +71,9 @@ class FhirOperatorLibraryEvaluateTest {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator =
       FhirOperator.Builder(context)
-        .withFhirContext(fhirContext)
-        .withFhirEngine(fhirEngine)
-        .withIgManager(knowledgeManager)
+        .fhirContext(fhirContext)
+        .fhirEngine(fhirEngine)
+        .knowledgeManager(knowledgeManager)
         .build()
   }
 
