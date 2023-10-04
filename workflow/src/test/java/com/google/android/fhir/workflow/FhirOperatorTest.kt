@@ -21,7 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
@@ -67,7 +67,7 @@ class FhirOperatorTest {
     // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
     knowledgeManager.install(
-      ImplementationGuide(
+      FhirNpmPackage(
         "com.google.android.fhir",
         "1.0.0",
         "http://github.com/google/android-fhir",
