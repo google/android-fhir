@@ -36,6 +36,7 @@ import com.nimbusds.jose.crypto.DirectEncrypter
 import java.lang.Exception
 import java.security.SecureRandom
 import android.util.Base64
+import com.google.android.fhir.NetworkConfiguration
 import java.text.SimpleDateFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,7 +49,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 internal class GenerateShlUtils(
   private val qrGeneratorUtils: QRGeneratorUtils,
-  // private val apiService: RetrofitSHLService
+  private val apiService: RetrofitSHLService
 ) {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
@@ -66,24 +67,16 @@ internal class GenerateShlUtils(
   /* POST the IPS document to the manifest URL */
   suspend fun postPayload(
     file: String,
-    manifestUrl: String,
+    manifestToken: String,
     key: String,
     managementToken: String,
   ): JSONObject {
     try {
       val contentEncrypted = encrypt(file, key)
 
-      val retrofit =
-        Retrofit.Builder()
-          .baseUrl("$manifestUrl/")
-          .addConverterFactory(GsonConverterFactory.create())
-          .build()
-
-      val apiService = retrofit.create(RetrofitSHLService::class.java)
-
+      // val retrofit = RetrofitSHLService.builder("$manifestUrl/", NetworkConfiguration()).build()
       val authorization = "Bearer $managementToken"
-
-      val response = apiService.postPayload(contentEncrypted, authorization)
+      val response = apiService.postPayload(manifestToken, contentEncrypted, authorization)
 
       return if (response.isSuccessful) {
         println(response.message())
@@ -147,7 +140,8 @@ internal class GenerateShlUtils(
     shlData: SHLData,
     passcode: String,
   ): String {
-    val manifestUrl = "https://api.vaxx.link/api/shl/${initialPostResponse.getString("id")}"
+    val manifestToken = initialPostResponse.getString("id")
+    val manifestUrl = "https://api.vaxx.link/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
     val exp =
       if (shlData.expirationTime.isNotEmpty()) {
@@ -160,27 +154,20 @@ internal class GenerateShlUtils(
       constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
     val encodedPayload = base64UrlEncode(shLinkPayload)
     val data: String = parser.encodeResourceToString(shlData.ipsDoc.document)
-    postPayload(data, manifestUrl, key, managementToken)
+    postPayload(data, manifestToken, key, managementToken)
     return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
   }
 
   /* Send a POST request to the SHL server to get a new manifest URL.
   Can optionally add a passcode to the SHL here */
   suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val retrofit =
-      Retrofit.Builder()
-        .baseUrl("https://api.vaxx.link/api/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val apiService = retrofit.create(RetrofitSHLService::class.java)
     val requestBody =
       if (passcode.isNotBlank()) {
         "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
       } else {
         "{}".toRequestBody("application/json".toMediaTypeOrNull())
       }
-    val response = apiService.getManifestUrlAndToken(requestBody)
+    val response = apiService.getManifestUrlAndToken("", requestBody)
     return if (response.isSuccessful) {
       val responseBody = response.body()?.string()
       JSONObject(responseBody)

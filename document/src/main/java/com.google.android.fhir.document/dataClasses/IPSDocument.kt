@@ -25,6 +25,4 @@ data class IPSDocument(
   val document: Bundle,
   val titles: ArrayList<Title>,
   val patient: Patient,
-) {
-  class Builder()
-}
+)

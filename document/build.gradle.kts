@@ -27,6 +27,7 @@ android {
 }
 
 dependencies {
+  implementation(Dependencies.androidFhirEngineBeta4)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.material)

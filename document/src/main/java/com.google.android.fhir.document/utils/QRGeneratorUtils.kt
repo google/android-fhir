@@ -80,7 +80,7 @@ internal class QRGeneratorUtils {
   }
 
   /* Converts the logo into a bitmap */
-  fun convertDrawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
+  private fun convertDrawableToBitmap(drawable: Drawable, width: Int, height: Int): Bitmap {
     val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
     drawable.setBounds(0, 0, canvas.width, canvas.height)

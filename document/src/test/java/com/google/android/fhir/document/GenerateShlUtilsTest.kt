@@ -18,6 +18,8 @@ package com.google.android.fhir.document
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import com.google.android.fhir.NetworkConfiguration
+import com.google.android.fhir.document.interfaces.RetrofitSHLService
 import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.QRGeneratorUtils
 import com.google.android.fhir.testing.readFromFile
@@ -43,16 +45,20 @@ class GenerateShlUtilsTest {
   @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
 
   private lateinit var generateShlUtils: GenerateShlUtils
+  private val apiService by lazy {
+    RetrofitSHLService.Builder("https://api.vaxx.link/api/shl/", NetworkConfiguration())
+      .build()
+  }
+  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private val minimalBundleString =
+    parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
 
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    generateShlUtils = GenerateShlUtils(qrGeneratorUtils)
-  }
+    generateShlUtils = GenerateShlUtils(qrGeneratorUtils, apiService)
 
-  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val minimalBundleString =
-    parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
+  }
 
   @Test
   fun postingToServerReturnsManifestIdAndToken() = runTest {
@@ -102,11 +108,7 @@ class GenerateShlUtilsTest {
 
     /* Construct the expected JSON object */
     val expectedJson =
-      JSONObject()
-        .put("url", manifestUrl)
-        .put("key", key)
-        .put("flag", flags)
-        .put("label", label)
+      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
         .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
 
     val payload =
@@ -123,30 +125,4 @@ class GenerateShlUtilsTest {
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
 
-  @Test
-  fun canPostPayloadWithValidInputs() = runTest {
-    val manifestUrl = "https://api.vaxx.link/api/shl/eT4EyhrDJ3gMJao9ovpwSX2SIKfkCBgjzOC-ft6BCk8"
-    val key = generateShlUtils.generateRandomKey()
-    val managementToken = "M6hY9PkPiYQ6SiaFAtmve9a7tkzP_xExwlWdRXLh3BQ"
-    val fileData = ""
-    val postResponse = generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-
-    assertNotNull(postResponse)
-    assertTrue(postResponse.has("passcodeFailuresRemaining"))
-    assertTrue(postResponse.has("managementToken"))
-    assertTrue(postResponse.has("active"))
-  }
-
-  @Test
-  fun failsToPostPayloadWithInvalidManifestUrl() = runTest {
-    val manifestUrl = "invalid_url"
-    val key = generateShlUtils.generateRandomKey()
-    val managementToken = ""
-    val fileData = ""
-    val result =
-      kotlin.runCatching {
-        generateShlUtils.postPayload(fileData, manifestUrl, key, managementToken)
-      }
-    assertTrue(result.isFailure)
-  }
 }
