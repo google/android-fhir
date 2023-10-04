@@ -16,14 +16,14 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.Dependency
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import java.io.File
 
-/** Downloaded Npm Package metadata. */
-data class NpmPackage(
+/** Downloaded FHIR NPM Package metadata. */
+data class LocalFhirNpmPackageMetadata(
   val packageId: String,
   val version: String,
   val canonical: String?,
-  val dependencies: List<Dependency>,
+  val dependencies: List<FhirNpmPackage>,
   val rootDirectory: File,
 )

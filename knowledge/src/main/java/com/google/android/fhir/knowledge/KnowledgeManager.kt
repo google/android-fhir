@@ -49,16 +49,17 @@ internal constructor(
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
-   * Checks if the [dependencies] are present in DB. If necessary, downloads the dependencies from
-   * NPM and imports data from the package manager (populates the metadata of the FHIR Resources).
+   * Checks if the [fhirNpmPackages] are present in DB. If necessary, downloads the dependencies
+   * from NPM and imports data from the package manager (populates the metadata of the FHIR
+   * Resources).
    */
-  suspend fun install(vararg dependencies: Dependency) {
-    dependencies
-      .filter { knowledgeDao.getImplementationGuide(it.packageId, it.version) == null }
+  suspend fun install(vararg fhirNpmPackages: FhirNpmPackage) {
+    fhirNpmPackages
+      .filter { knowledgeDao.getImplementationGuide(it.name, it.version) == null }
       .forEach {
         val npmPackage =
-          if (npmFileManager.containsPackage(it.packageId, it.version)) {
-            npmFileManager.getPackage(it.packageId, it.version)
+          if (npmFileManager.containsPackage(it.name, it.version)) {
+            npmFileManager.getPackage(it.name, it.version)
           } else {
             packageDownloader.downloadPackage(it, PACKAGE_SERVER)
           }
@@ -68,12 +69,12 @@ internal constructor(
   }
 
   /**
-   * Checks if the [dependency] is present in DB. If necessary, populates the database with the
+   * Checks if the [fhirNpmPackage] is present in DB. If necessary, populates the database with the
    * metadata of FHIR Resource from the provided [rootDirectory].
    */
-  suspend fun install(dependency: Dependency, rootDirectory: File) {
+  suspend fun install(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId = knowledgeDao.insert(dependency.toEntity(rootDirectory))
+    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
     rootDirectory.listFiles()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
@@ -88,7 +89,7 @@ internal constructor(
     }
   }
 
-  /** Imports the Knolwedge Artifact from the provided [file] to the default dependency. */
+  /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
     importFile(null, file)
   }
@@ -117,10 +118,9 @@ internal constructor(
   }
 
   /** Deletes Implementation Guide, cleans up files. */
-  suspend fun delete(vararg igDependencies: Dependency) {
+  suspend fun delete(vararg igDependencies: FhirNpmPackage) {
     igDependencies.forEach { igDependency ->
-      val igEntity =
-        knowledgeDao.getImplementationGuide(igDependency.packageId, igDependency.version)
+      val igEntity = knowledgeDao.getImplementationGuide(igDependency.name, igDependency.version)
       if (igEntity != null) {
         knowledgeDao.deleteImplementationGuide(igEntity)
         igEntity.rootDirectory.deleteRecursively()

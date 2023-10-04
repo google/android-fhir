@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.Dependency
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -39,12 +39,12 @@ internal class OkHttpPackageDownloader(
 
   @Throws(IOException::class)
   override suspend fun downloadPackage(
-    dependency: Dependency,
+    fhirNpmPackage: FhirNpmPackage,
     packageServerUrl: String,
-  ): NpmPackage {
+  ): LocalFhirNpmPackageMetadata {
     return withContext(Dispatchers.IO) {
-      val packageName = dependency.packageId
-      val version = dependency.version
+      val packageName = fhirNpmPackage.name
+      val version = fhirNpmPackage.version
       val url = "$packageServerUrl$packageName/$version"
 
       val request = Request.Builder().url(url).get().build()
@@ -54,7 +54,8 @@ internal class OkHttpPackageDownloader(
       if (!response.isSuccessful) {
         throw IOException("Unexpected code $response")
       }
-      val packageFolder = npmFileManager.getPackageFolder(dependency.packageId, dependency.version)
+      val packageFolder =
+        npmFileManager.getPackageFolder(fhirNpmPackage.name, fhirNpmPackage.version)
 
       response.body?.use { responseBody ->
         packageFolder.mkdirs()
@@ -65,7 +66,7 @@ internal class OkHttpPackageDownloader(
 
         tgzFile.delete()
       }
-      npmFileManager.getPackage(dependency.packageId, dependency.version)
+      npmFileManager.getPackage(fhirNpmPackage.name, fhirNpmPackage.version)
     }
   }
 

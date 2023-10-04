@@ -22,8 +22,8 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
+import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackage
 import com.google.android.fhir.knowledge.npm.NpmFileManager
-import com.google.android.fhir.knowledge.npm.NpmPackage
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
@@ -36,7 +36,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 internal class KnowledgeManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val dependency = Dependency("anc-cds", "0.3.0", "http://url.com")
+  private val fhirNpmPackage = FhirNpmPackage("anc-cds", "0.3.0", "http://url.com")
   private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
   private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val knowledgeDb =
@@ -47,11 +47,11 @@ internal class KnowledgeManagerTest {
       knowledgeDb,
       context.dataDir,
       npmFileManager = npmFileManager,
-      packageDownloader = { dependency, _ ->
-        NpmPackage(
-          dependency.packageId,
-          dependency.version,
-          dependency.uri,
+      packageDownloader = { fhirPackage, _ ->
+        LocalFhirNpmPackage(
+          fhirPackage.name,
+          fhirPackage.version,
+          fhirPackage.canonical,
           emptyList(),
           dataFolder,
         )
@@ -65,7 +65,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runTest {
-    knowledgeManager.install(dependency, dataFolder)
+    knowledgeManager.install(fhirNpmPackage, dataFolder)
     val implementationGuideId =
       knowledgeDb.knowledgeDao().getImplementationGuide("anc-cds", "0.3.0")!!.implementationGuideId
 
@@ -83,9 +83,9 @@ internal class KnowledgeManagerTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
-    knowledgeManager.install(dependency, igRoot)
+    knowledgeManager.install(fhirNpmPackage, igRoot)
 
-    knowledgeManager.delete(dependency)
+    knowledgeManager.delete(fhirNpmPackage)
 
     assertThat(knowledgeDb.knowledgeDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
@@ -93,7 +93,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `imported entries are readable`() = runTest {
-    knowledgeManager.install(dependency, dataFolder)
+    knowledgeManager.install(fhirNpmPackage, dataFolder)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()
@@ -136,7 +136,7 @@ internal class KnowledgeManagerTest {
   }
 
   fun `installing from npmPackageManager`() = runTest {
-    knowledgeManager.install(dependency)
+    knowledgeManager.install(fhirNpmPackage)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()

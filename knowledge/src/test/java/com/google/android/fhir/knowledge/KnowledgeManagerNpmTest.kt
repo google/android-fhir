@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
+import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackage
 import com.google.android.fhir.knowledge.npm.NpmFileManager
-import com.google.android.fhir.knowledge.npm.NpmPackage
 import com.google.android.fhir.knowledge.npm.PackageDownloader
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -36,11 +36,11 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class KnowledgeManagerNpmTest {
 
-  private val downloadedDependencies = mutableSetOf<Dependency>()
+  private val downloadedDependencies = mutableSetOf<FhirNpmPackage>()
   private val fakePackageDownloader: PackageDownloader =
-    PackageDownloader { dependency: Dependency, _ ->
-      downloadedDependencies.add(dependency)
-      NPM_CACHE_MAP.getValue(dependency)
+    PackageDownloader { fhirNpmPackage: FhirNpmPackage, _ ->
+      downloadedDependencies.add(fhirNpmPackage)
+      NPM_CACHE_MAP.getValue(fhirNpmPackage)
     }
 
   private val context: Context = ApplicationProvider.getApplicationContext()
@@ -68,9 +68,9 @@ class KnowledgeManagerNpmTest {
   @Test
   fun install_alreadyCached() = runTest {
     whenever(mockNpmFileManager.containsPackage(any(), any())).thenReturn(true)
-    whenever(mockNpmFileManager.getPackage(DEP1.packageId, DEP1.version)).thenReturn(NPM1)
-    whenever(mockNpmFileManager.getPackage(DEP2.packageId, DEP2.version)).thenReturn(NPM2)
-    whenever(mockNpmFileManager.getPackage(DEP3.packageId, DEP3.version)).thenReturn(NPM3)
+    whenever(mockNpmFileManager.getPackage(DEP1.name, DEP1.version)).thenReturn(NPM1)
+    whenever(mockNpmFileManager.getPackage(DEP2.name, DEP2.version)).thenReturn(NPM2)
+    whenever(mockNpmFileManager.getPackage(DEP3.name, DEP3.version)).thenReturn(NPM3)
 
     knowledgeManager.install(DEP1)
 
@@ -79,24 +79,24 @@ class KnowledgeManagerNpmTest {
 
   @Test
   fun install_someCached() = runTest {
-    whenever(mockNpmFileManager.containsPackage(DEP1.packageId, DEP1.version)).thenReturn(false)
-    whenever(mockNpmFileManager.containsPackage(DEP2.packageId, DEP2.version)).thenReturn(true)
-    whenever(mockNpmFileManager.containsPackage(DEP3.packageId, DEP3.version)).thenReturn(true)
-    whenever(mockNpmFileManager.getPackage(DEP2.packageId, DEP2.version)).thenReturn(NPM2)
-    whenever(mockNpmFileManager.getPackage(DEP3.packageId, DEP3.version)).thenReturn(NPM3)
+    whenever(mockNpmFileManager.containsPackage(DEP1.name, DEP1.version)).thenReturn(false)
+    whenever(mockNpmFileManager.containsPackage(DEP2.name, DEP2.version)).thenReturn(true)
+    whenever(mockNpmFileManager.containsPackage(DEP3.name, DEP3.version)).thenReturn(true)
+    whenever(mockNpmFileManager.getPackage(DEP2.name, DEP2.version)).thenReturn(NPM2)
+    whenever(mockNpmFileManager.getPackage(DEP3.name, DEP3.version)).thenReturn(NPM3)
 
-    knowledgeManager.install(DEP1)
+    knowledgeManager.install(DEP1, DEP2)
 
     assertThat(downloadedDependencies).containsExactly(DEP1)
   }
 
   private companion object {
-    val DEP1 = Dependency("package1", "version")
-    val DEP2 = Dependency("package2", "version")
-    val DEP3 = Dependency("package3", "version")
-    val NPM1 = NpmPackage(DEP1.packageId, DEP1.version, null, listOf(DEP2), File("/fakePath"))
-    val NPM2 = NpmPackage(DEP2.packageId, DEP2.version, null, listOf(DEP3), File("/fakePath"))
-    val NPM3 = NpmPackage(DEP3.packageId, DEP1.version, null, emptyList(), File("/fakePath"))
+    val DEP1 = FhirNpmPackage("package1", "version")
+    val DEP2 = FhirNpmPackage("package2", "version")
+    val DEP3 = FhirNpmPackage("package3", "version")
+    val NPM1 = LocalFhirNpmPackage(DEP1.name, DEP1.version, null, listOf(DEP2), File("/fakePath"))
+    val NPM2 = LocalFhirNpmPackage(DEP2.name, DEP2.version, null, listOf(DEP3), File("/fakePath"))
+    val NPM3 = LocalFhirNpmPackage(DEP3.name, DEP1.version, null, emptyList(), File("/fakePath"))
     val NPM_CACHE_MAP = mapOf(DEP1 to NPM1, DEP2 to NPM2, DEP3 to NPM3)
   }
 }

@@ -18,7 +18,7 @@ package com.google.android.fhir.knowledge.npm
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.knowledge.Dependency
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.common.truth.Truth.assertThat
 import java.io.IOException
 import kotlinx.coroutines.test.runTest
@@ -42,13 +42,13 @@ class OkHttpPackageDownloaderTest {
   @Test
   fun downloadPackage_returnsNpmPackage() = runTest {
     val packageServerUrl = mockWebServer.url("/packages/$PACKAGE_ID#$VERSION").toString()
-    val dependency = Dependency(PACKAGE_ID, VERSION)
+    val fhirNpmPackage = FhirNpmPackage(PACKAGE_ID, VERSION)
     val testFileBytes = javaClass.getResourceAsStream("/okhttp_downloader/package.tgz")!!
     val testFileBuffer = Buffer().readFrom(testFileBytes)
     val responseBody = MockResponse().setResponseCode(200).setBody(testFileBuffer)
     mockWebServer.enqueue(responseBody)
 
-    val npmPackage = downloader.downloadPackage(dependency, packageServerUrl)
+    val npmPackage = downloader.downloadPackage(fhirNpmPackage, packageServerUrl)
 
     assertThat(npmPackage.packageId).isEqualTo(PACKAGE_ID)
     assertThat(npmPackage.version).isEqualTo(VERSION)
@@ -58,13 +58,13 @@ class OkHttpPackageDownloaderTest {
   @Test(expected = IOException::class)
   fun testDownloadPackage_serverError_throwsException() = runTest {
     val packageServerUrl = mockWebServer.url("/packages/$PACKAGE_ID#$VERSION").toString()
-    val dependency = Dependency(PACKAGE_ID, VERSION)
+    val fhirNpmPackage = FhirNpmPackage(PACKAGE_ID, VERSION)
 
     val responseBody = MockResponse().setResponseCode(500)
 
     mockWebServer.enqueue(responseBody)
 
-    downloader.downloadPackage(dependency, packageServerUrl)
+    downloader.downloadPackage(fhirNpmPackage, packageServerUrl)
   }
 
   companion object {
@@ -72,9 +72,9 @@ class OkHttpPackageDownloaderTest {
     const val VERSION = "13.3.7"
     val DEPENDENCIES =
       listOf(
-        Dependency("hl7.fhir.r4.core", "4.0.1"),
-        Dependency("hl7.terminology.r4", "5.0.0"),
-        Dependency("hl7.fhir.fr.core", "1.1.0"),
+        FhirNpmPackage("hl7.fhir.r4.core", "4.0.1"),
+        FhirNpmPackage("hl7.terminology.r4", "5.0.0"),
+        FhirNpmPackage("hl7.fhir.fr.core", "1.1.0"),
       )
   }
 }

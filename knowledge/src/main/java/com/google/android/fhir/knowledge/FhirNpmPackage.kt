@@ -17,7 +17,11 @@
 package com.google.android.fhir.knowledge
 
 /**
- * Holds Implementation Guide attributes. Used to define dependencies, load dependencies from
- * Package Manager
+ * A FHIR NPM Package as defined by the FHIR specification.
+ *
+ * See https://hl7.org/fhir/packages.html for the published FHIR NPM Packages specification.
+ *
+ * See https://confluence.hl7.org/display/FHIR/NPM+Package+Specification for more info under the
+ * management of FHIR Infrastructure.
  */
-data class Dependency(val packageId: String, val version: String, val uri: String? = null)
+data class FhirNpmPackage(val name: String, val version: String, val canonical: String? = null)

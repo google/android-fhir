@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.Dependency
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
@@ -59,7 +59,7 @@ class NpmFileManagerTest {
     const val MISSING_VERSION = "13.3.8"
     val DEPENDENCIES =
       listOf(
-        Dependency("hl7.fhir.r4.core", "4.0.1"),
+        FhirNpmPackage("hl7.fhir.r4.core", "4.0.1"),
       )
   }
 }

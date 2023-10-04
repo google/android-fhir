@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.knowledge.npm
 
-import com.google.android.fhir.knowledge.Dependency
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,7 +29,7 @@ internal class NpmFileManager(private val cacheRoot: File) {
    * Returns the NpmPackage for the given [packageId] and [version] from cache or `null` if the
    * package is not cached.
    */
-  suspend fun getPackage(packageId: String, version: String): NpmPackage {
+  suspend fun getPackage(packageId: String, version: String): LocalFhirNpmPackageMetadata {
     return withContext(Dispatchers.IO) {
       val packageFolder = File(getPackageFolder(packageId, version), "package")
       readNpmPackage(packageFolder)
@@ -51,18 +51,18 @@ internal class NpmFileManager(private val cacheRoot: File) {
   /** Returns the package folder for the given [packageId] and [version]. */
   fun getPackageFolder(packageId: String, version: String) = File(cacheRoot, "$packageId#$version")
 
-  /** Creates an [NpmPackage] parsing the package manifest file. */
-  private fun readNpmPackage(packageFolder: File): NpmPackage {
+  /** Creates an [LocalFhirNpmPackageMetadata] parsing the package manifest file. */
+  private fun readNpmPackage(packageFolder: File): LocalFhirNpmPackageMetadata {
     val packageJson = File(packageFolder, "package.json")
     val json = JSONObject(packageJson.readText())
     with(json) {
       val dependenciesList = optJSONObject("dependencies")
       val dependencies =
         dependenciesList?.keys()?.asSequence()?.map { key ->
-          Dependency(key, dependenciesList.getString(key))
+          FhirNpmPackage(key, dependenciesList.getString(key))
         }
 
-      return NpmPackage(
+      return LocalFhirNpmPackageMetadata(
         getString("name"),
         getString("version"),
         optString("canonical"),
