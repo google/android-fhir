@@ -87,7 +87,7 @@ object CqlBuilder : Loadable() {
   }
 
   /**
-   * Assembles an ELM Library exported as a JSON in to a FHIRLibrary
+   * Assembles an ELM Library exported as a JSON into a FHIRLibrary
    *
    * @param jsonElmStr the JSON representation of the ELM Library
    * @param libName the Library name
@@ -218,7 +218,7 @@ object CqlBuilder : Loadable() {
     }
 
     fun generatesFhirLibraryEqualsTo(expectedFhirAssetName: String): CompiledCql {
-      // Given the ELM is the same, builds the lib with the expented, not the new ELM to make sure
+      // Given the ELM is the same, builds the lib with the expected, not the new ELM to make sure
       // the base 64 representation of the Library matches.
       val library =
         assembleFhirLib(

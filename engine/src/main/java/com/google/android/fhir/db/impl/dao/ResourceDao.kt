@@ -58,7 +58,7 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
   lateinit var resourceIndexer: ResourceIndexer
 
-  open suspend fun update(resource: Resource, timeOfLocalChange: Instant) {
+  open suspend fun update(resource: Resource, timeOfLocalChange: Instant?) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
       // In case the resource has lastUpdated meta data, use it, otherwise use the old value.
       val lastUpdatedRemote: Date? = resource.meta.lastUpdated
@@ -76,12 +76,14 @@ internal abstract class ResourceDao {
       val index =
         ResourceIndices.Builder(resourceIndexer.index(resource))
           .apply {
-            addDateTimeIndex(
-              createLocalLastUpdatedIndex(
-                resource.resourceType,
-                InstantType(Date.from(timeOfLocalChange)),
-              ),
-            )
+            timeOfLocalChange?.let {
+              addDateTimeIndex(
+                createLocalLastUpdatedIndex(
+                  resource.resourceType,
+                  InstantType(Date.from(timeOfLocalChange)),
+                ),
+              )
+            }
             lastUpdatedRemote?.let { date ->
               addDateTimeIndex(createLastUpdatedIndex(resource.resourceType, InstantType(date)))
             }
@@ -92,7 +94,7 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insertAllRemote(resources: List<Resource>): List<String> {
+  open suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
     return resources.map { resource -> insertRemoteResource(resource) }
   }
 
@@ -182,15 +184,19 @@ internal abstract class ResourceDao {
   suspend fun insertLocalResource(resource: Resource, timeOfChange: Instant) =
     insertResource(resource, timeOfChange)
 
-  // Since the insert removes any old indexes and lastUpdatedLocal (data not contained in resource
-  // itself), we extract the lastUpdatedLocal if any and then set it back again.
-  private suspend fun insertRemoteResource(resource: Resource) =
-    insertResource(
-      resource,
-      getResourceEntity(resource.logicalId, resource.resourceType)?.lastUpdatedLocal,
-    )
+  // Check if the resource already exists using its logical ID, if it does, we just update the
+  // existing [ResourceEntity]
+  // Else, we insert with a new [ResourceEntity]
+  private suspend fun insertRemoteResource(resource: Resource): UUID {
+    val existingResourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
+    if (existingResourceEntity != null) {
+      update(resource, existingResourceEntity.lastUpdatedLocal)
+      return existingResourceEntity.resourceUuid
+    }
+    return insertResource(resource, null)
+  }
 
-  private suspend fun insertResource(resource: Resource, lastUpdatedLocal: Instant?): String {
+  private suspend fun insertResource(resource: Resource, lastUpdatedLocal: Instant?): UUID {
     val resourceUuid = UUID.randomUUID()
 
     // Use the local UUID as the logical ID of the resource
@@ -224,7 +230,7 @@ internal abstract class ResourceDao {
 
     updateIndicesForResource(index, resource.resourceType, resourceUuid)
 
-    return resource.id
+    return entity.resourceUuid
   }
 
   suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
