@@ -29,6 +29,7 @@ import java.io.IOException
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.mapNotNull
 
 @PublishedApi
@@ -43,7 +44,8 @@ internal class FhirDataStore(context: Context) {
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
       .create()
-  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus>>()
+  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
+  private val previousSyncJobStatusMap = mutableMapOf<String, SyncJobStatus?>()
 
   /**
    * Utilizes a flow from the DataStore to collect and transform data. It catches potential
@@ -54,7 +56,7 @@ internal class FhirDataStore(context: Context) {
    * @return A flow that emits the [FhirSyncWorkStatus].
    */
   @PublishedApi
-  internal fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatus> =
+  internal fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatus?> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
         .catch { exception ->
@@ -93,6 +95,13 @@ internal class FhirDataStore(context: Context) {
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }
   }
+
+  internal suspend fun updateLastJobState(key: String) {
+    val value = getSyncJobStatusPreferencesFlow(key).first()
+    previousSyncJobStatusMap[key] = value
+  }
+
+  internal fun getLastSyncJobStatus(key: String) = previousSyncJobStatusMap[key]
 
   companion object {
     private const val FHIR_PREFERENCES_NAME = "fhir_preferences"

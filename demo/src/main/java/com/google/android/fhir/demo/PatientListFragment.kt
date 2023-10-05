@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.OneTimeSyncState
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -153,22 +154,18 @@ class PatientListFragment : Fragment() {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
-          is SyncJobStatus.Started -> {
-            Timber.i("Sync: ${it::class.java.simpleName}")
+          is OneTimeSyncState.Running -> {
+            Timber.i("Sync: ${it::class.java.simpleName} with data ${it.currentJob}")
             fadeInTopBanner(it)
           }
-          is SyncJobStatus.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
-            fadeInTopBanner(it)
-          }
-          is SyncJobStatus.Finished -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
+          is OneTimeSyncState.Succeeded -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.succeededJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is SyncJobStatus.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
+          is OneTimeSyncState.Failed -> {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.failedJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
@@ -211,7 +208,7 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
-  private fun fadeInTopBanner(state: SyncJobStatus) {
+  private fun fadeInTopBanner(state: OneTimeSyncState) {
     if (topBanner.visibility != View.VISIBLE) {
       syncStatus.text = resources.getString(R.string.syncing).uppercase()
       syncPercent.text = ""
@@ -220,20 +217,23 @@ class PatientListFragment : Fragment() {
       topBanner.visibility = View.VISIBLE
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
-    } else if (state is SyncJobStatus.InProgress) {
+    } else if (state is OneTimeSyncState.Running && state.currentJob is SyncJobStatus.InProgress) {
+      val inProgressState = state.currentJob as? SyncJobStatus.InProgress
       val progress =
-        state
-          .let { it.completed.toDouble().div(it.total) }
-          .let { if (it.isNaN()) 0.0 else it }
-          .times(100)
-          .roundToInt()
-      "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
-      syncProgress.progress = progress
+        inProgressState
+          ?.let { it.completed.toDouble().div(it.total) }
+          ?.let { if (it.isNaN()) 0.0 else it }
+          ?.times(100)
+          ?.roundToInt()
+      "$progress% ${inProgressState?.syncOperation?.name?.lowercase()}ed".also {
+        syncPercent.text = it
+      }
+      syncProgress.progress = progress ?: 0
     }
   }
 
-  private fun fadeOutTopBanner(state: SyncJobStatus) {
-    if (state is SyncJobStatus.Finished) syncPercent.text = ""
+  private fun fadeOutTopBanner(state: OneTimeSyncState) {
+    if (state is OneTimeSyncState.Succeeded) syncPercent.text = ""
     syncProgress.visibility = View.GONE
 
     if (topBanner.visibility == View.VISIBLE) {

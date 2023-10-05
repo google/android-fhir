@@ -35,6 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -101,6 +102,12 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     setProgress(output)
 
     Timber.d("Received result from worker $result and sending output $output")
+
+    withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
+      val fhirDataStore = FhirEngineProvider.getFhirDataStore()
+      val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
+      fhirDataStore?.updateLastJobState(uniqueWorkerName) // previous syncJobStatus
+    }
 
     /**
      * In case of failure, we can check if its worth retrying and do retry based on
