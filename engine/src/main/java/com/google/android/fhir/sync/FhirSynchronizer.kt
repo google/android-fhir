@@ -120,7 +120,7 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
     fhirEngine
-      .syncUpload(localChangesFetchMode) { uploader.upload(it) }
+      .syncUpload(localChangesFetchMode, uploader::upload)
       .collect { progress ->
         progress.uploadError?.let { exceptions.add(it) }
           ?: setSyncState(
