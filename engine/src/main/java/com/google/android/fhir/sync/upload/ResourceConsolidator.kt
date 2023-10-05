@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync.upload
 
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
@@ -36,19 +35,29 @@ import timber.log.Timber
 internal fun interface ResourceConsolidator {
 
   /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
+  suspend fun consolidate(uploadSyncResult: UploadSyncResult)
 }
 
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource) {
-    database.deleteUpdates(localChangeToken)
-    when (response) {
-      is Bundle -> updateVersionIdAndLastUpdated(response)
-      else -> updateVersionIdAndLastUpdated(response)
+  override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
+    when (uploadSyncResult) {
+      is UploadSyncResult.Success -> {
+        database.deleteUpdates(uploadSyncResult.localChangeToken)
+        uploadSyncResult.resources.forEach {
+          when (it) {
+            is Bundle -> updateVersionIdAndLastUpdated(it)
+            else -> updateVersionIdAndLastUpdated(it)
+          }
+        }
+      }
+      is UploadSyncResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
+      }
     }
-  }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
     when (bundle.type) {

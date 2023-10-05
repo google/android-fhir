@@ -40,6 +40,7 @@ import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -49,7 +50,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -528,19 +529,23 @@ class DatabaseImplTest {
     database.insert(patient)
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
-    services.fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
-      it
-        .first { it.resourceId == "remote-patient-3" }
-        .let {
-          flowOf(
-            it.token to
-              Patient().apply {
-                id = it.resourceId
-                meta = remoteMeta
-              },
-          )
-        }
-    }
+    services.fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
+        it
+          .first { it.resourceId == "remote-patient-3" }
+          .let {
+            UploadSyncResult.Success(
+              it.token,
+              listOf(
+                Patient().apply {
+                  id = it.resourceId
+                  meta = remoteMeta
+                },
+              ),
+            )
+          }
+      }
+      .collect()
     val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")
     assertThat(selectedEntity.versionId).isEqualTo(remoteMeta.versionId)
     assertThat(selectedEntity.lastUpdatedRemote).isEqualTo(remoteMeta.lastUpdated.toInstant())
