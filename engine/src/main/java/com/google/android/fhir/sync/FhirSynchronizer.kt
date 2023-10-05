@@ -119,18 +119,16 @@ internal class FhirSynchronizer(
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
-    fhirEngine
-      .syncUpload(localChangesFetchMode, uploader::upload)
-      .collect { progress ->
-        progress.uploadError?.let { exceptions.add(it) }
-          ?: setSyncState(
-            SyncJobStatus.InProgress(
-              SyncOperation.UPLOAD,
-              progress.initialTotal,
-              progress.initialTotal - progress.remaining,
-            ),
-          )
-      }
+    fhirEngine.syncUpload(localChangesFetchMode, uploader::upload).collect { progress ->
+      progress.uploadError?.let { exceptions.add(it) }
+        ?: setSyncState(
+          SyncJobStatus.InProgress(
+            SyncOperation.UPLOAD,
+            progress.initialTotal,
+            progress.initialTotal - progress.remaining,
+          ),
+        )
+    }
 
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
