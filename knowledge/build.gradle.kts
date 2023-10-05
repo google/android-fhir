@@ -86,11 +86,14 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+  implementation(Dependencies.http)
+  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
+  implementation(Dependencies.apacheCommonsCompress)
 
   kapt(Dependencies.Room.compiler)
 
@@ -100,6 +103,7 @@ dependencies {
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }

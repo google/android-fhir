@@ -26,7 +26,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.workflow.FhirOperatorBuilder
+import com.google.android.fhir.workflow.FhirOperator
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
@@ -75,10 +75,10 @@ class F_CqlEvaluatorBenchmark {
           )
         }
 
-        FhirOperatorBuilder(context)
-          .withFhirContext(fhirContext)
-          .withFhirEngine(fhirEngine)
-          .withIgManager(knowledgeManager)
+        FhirOperator.Builder(context)
+          .fhirContext(fhirContext)
+          .fhirEngine(fhirEngine)
+          .knowledgeManager(knowledgeManager)
           .build()
       }
 
