@@ -22,11 +22,13 @@ import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemInitialComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 
 class MoreQuestionnaireResponsesTest {
@@ -403,6 +405,61 @@ class MoreQuestionnaireResponsesTest {
         )
       }
 
+    questionnaireResponse.unpackRepeatedGroups(questionnaire)
+    assertResourceEquals(questionnaireResponse, unpackedQuestionnaireResponse)
+  }
+
+  @Test
+  fun `should unpack correctly for only one group`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "group-item"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-item"
+                type = Questionnaire.QuestionnaireItemType.STRING
+                initial = listOf(QuestionnaireItemInitialComponent().setValue(StringType("ABC")))
+              },
+            )
+          },
+        )
+      }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "group-item"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-item"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().setValue(StringType("Sample Answer")),
+                )
+              },
+            )
+          },
+        )
+      }
+    val unpackedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "group-item"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-item"
+                addAnswer(
+                  QuestionnaireResponseItemAnswerComponent().setValue(StringType("Sample Answer")),
+                )
+              },
+            )
+          },
+        )
+      }
     questionnaireResponse.unpackRepeatedGroups(questionnaire)
     assertResourceEquals(questionnaireResponse, unpackedQuestionnaireResponse)
   }
