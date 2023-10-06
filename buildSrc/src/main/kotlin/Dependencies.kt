@@ -17,22 +17,6 @@
 import org.gradle.api.artifacts.Configuration
 import org.gradle.kotlin.dsl.exclude
 
-/*
- * Copyright 2022 Google LLC
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 object Dependencies {
 
   object Androidx {
@@ -175,6 +159,9 @@ object Dependencies {
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
   const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
+  const val apacheCommonsCompress =
+    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
+
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val gson = "com.google.code.gson:gson:${Versions.gson}"
@@ -259,6 +246,7 @@ object Dependencies {
     const val androidFhirCommon = "0.1.0-alpha04"
     const val androidFhirEngine = "0.1.0-beta03"
     const val androidFhirKnowledge = "0.1.0-alpha01"
+    const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"

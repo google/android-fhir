@@ -95,7 +95,14 @@ internal class DatabaseImpl(
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+          addMigrations(
+            MIGRATION_1_2,
+            MIGRATION_2_3,
+            MIGRATION_3_4,
+            MIGRATION_4_5,
+            MIGRATION_5_6,
+            MIGRATION_6_7,
+          )
         }
         .build()
   }
@@ -115,8 +122,9 @@ internal class DatabaseImpl(
       logicalIds.addAll(
         resource.map {
           val timeOfLocalChange = Instant.now()
-          localChangeDao.addInsert(it, timeOfLocalChange)
-          resourceDao.insertLocalResource(it, timeOfLocalChange)
+          val resourceUuid = resourceDao.insertLocalResource(it, timeOfLocalChange)
+          localChangeDao.addInsert(it, resourceUuid, timeOfLocalChange)
+          it.logicalId
         },
       )
     }
@@ -169,19 +177,16 @@ internal class DatabaseImpl(
 
   override suspend fun delete(type: ResourceType, id: String) {
     db.withTransaction {
-      val remoteVersionId: String? =
-        try {
-          selectEntity(type, id).versionId
-        } catch (e: ResourceNotFoundException) {
-          null
+      resourceDao.getResourceEntity(id, type)?.let {
+        val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+        if (rowsDeleted > 0) {
+          localChangeDao.addDelete(
+            resourceId = id,
+            resourceType = type,
+            resourceUuid = it.resourceUuid,
+            remoteVersionId = it.versionId,
+          )
         }
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-      if (rowsDeleted > 0) {
-        localChangeDao.addDelete(
-          resourceId = id,
-          resourceType = type,
-          remoteVersionId = remoteVersionId,
-        )
       }
     }
   }

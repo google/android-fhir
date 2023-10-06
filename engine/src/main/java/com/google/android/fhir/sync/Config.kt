@@ -48,7 +48,7 @@ object SyncDataParams {
 class PeriodicSyncConfiguration(
   /**
    * Constraints that specify the requirements needed before the synchronisation is triggered. E.g.
-   * network type (Wifi, 3G etc), the device should be charging etc.
+   * network type (WiFi, 3G etc), the device should be charging etc.
    */
   val syncConstraints: Constraints = Constraints.Builder().build(),
 
