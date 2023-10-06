@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_CANCEL_BUTTON
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_SUBMIT_BUTTON
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
@@ -189,7 +190,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Yes or no?"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -218,12 +219,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic questions"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-link-id"
                 text = "Name?"
                 type = Questionnaire.QuestionnaireItemType.STRING
@@ -260,7 +261,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
           },
@@ -290,7 +291,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -330,7 +331,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.GROUP
@@ -358,7 +359,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -386,7 +387,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -431,7 +432,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -510,7 +511,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -555,7 +556,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -593,7 +594,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question which allows multiple answers"
             type = Questionnaire.QuestionnaireItemType.STRING
@@ -633,7 +634,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -677,12 +678,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic questions"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-link-id"
                 text = "Is this true?"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -724,12 +725,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Is this true?"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-link-id"
                 text = "Name?"
                 type = Questionnaire.QuestionnaireItemType.STRING
@@ -776,12 +777,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "repeated-group"
             type = Questionnaire.QuestionnaireItemType.GROUP
             repeats = true
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "nested-question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
@@ -838,7 +839,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.CHOICE
@@ -877,7 +878,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.GROUP
@@ -1119,12 +1120,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic questions"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-link-id"
                 text = "Name?"
                 type = Questionnaire.QuestionnaireItemType.STRING
@@ -1157,7 +1158,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "link-id"
             text = "Name?"
             type = Questionnaire.QuestionnaireItemType.STRING
@@ -1179,7 +1180,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "link-id"
             text = "Name?"
             type = Questionnaire.QuestionnaireItemType.STRING
@@ -1206,14 +1207,14 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addInitial().apply { value = BooleanType(false) }
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-2"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -1244,14 +1245,14 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addInitial().apply { value = BooleanType(true) }
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-2"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -1280,7 +1281,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-boolean-item-1"
             text = "a question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -1303,7 +1304,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-boolean-item-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addExtension().apply {
@@ -1343,12 +1344,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1357,12 +1358,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1403,12 +1404,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1417,12 +1418,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1459,12 +1460,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1473,12 +1474,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1515,12 +1516,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1529,12 +1530,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1548,12 +1549,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page3"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page3-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 3"
@@ -1590,13 +1591,13 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addExtension(hiddenExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1605,12 +1606,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1619,12 +1620,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page3"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page3-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 3"
@@ -1659,12 +1660,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1673,13 +1674,13 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addExtension(hiddenExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1688,12 +1689,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page3"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page3-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 3"
@@ -1742,12 +1743,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1756,12 +1757,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1800,12 +1801,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1814,12 +1815,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -1859,12 +1860,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 required = true
@@ -1873,12 +1874,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
@@ -1914,12 +1915,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
@@ -1927,12 +1928,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 required = true
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -1971,12 +1972,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -1985,12 +1986,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2020,12 +2021,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -2034,12 +2035,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2064,12 +2065,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -2078,12 +2079,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2107,12 +2108,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -2121,12 +2122,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2157,12 +2158,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -2171,12 +2172,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2215,12 +2216,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 required = true
@@ -2229,12 +2230,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
@@ -2270,12 +2271,12 @@ class QuestionnaireViewModelTest {
         addExtension(entryModeExtension)
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -2284,12 +2285,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -2342,7 +2343,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2365,7 +2366,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2393,7 +2394,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2416,7 +2417,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2432,7 +2433,13 @@ class QuestionnaireViewModelTest {
       assertThat(viewModel.questionnaireStateFlow.first().displayMode)
         .isInstanceOf(DisplayMode.ReviewMode::class.java)
       assertThat(viewModel.questionnaireStateFlow.first().displayMode)
-        .isEqualTo(DisplayMode.ReviewMode(showEditButton = true, showSubmitButton = true))
+        .isEqualTo(
+          DisplayMode.ReviewMode(
+            showEditButton = true,
+            showSubmitButton = true,
+            showCancelButton = false,
+          ),
+        )
     }
   }
 
@@ -2443,7 +2450,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2471,12 +2478,12 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page1"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page1-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 1"
@@ -2485,12 +2492,12 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page2"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page2-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 2"
@@ -2518,13 +2525,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page1"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addExtension(hiddenExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page1-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 1"
@@ -2533,12 +2540,12 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page2"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page2-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 2"
@@ -2565,12 +2572,12 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page1"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page1-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 1"
@@ -2579,12 +2586,12 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page2"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page2-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 2"
@@ -2612,13 +2619,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page1"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addExtension(hiddenExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page1-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 1"
@@ -2627,12 +2634,12 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "page2"
               type = Questionnaire.QuestionnaireItemType.GROUP
               addExtension(paginationExtension)
               addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "page2-1"
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                   text = "Question on page 2"
@@ -2659,7 +2666,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2683,7 +2690,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2713,7 +2720,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-link-id"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -2741,7 +2748,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
@@ -2762,7 +2769,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
@@ -2783,7 +2790,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
@@ -2800,6 +2807,206 @@ class QuestionnaireViewModelTest {
 
   // ==================================================================== //
   //                                                                      //
+  //                            Cancel Button                             //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON set to false should not show cancel button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = false)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination
+          .showCancelButton,
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON set to true should show cancel button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = true)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination
+          .showCancelButton,
+      )
+      .isTrue()
+  }
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON not setting should not show cancel button`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = null)
+    assertThat(
+        (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+          .pagination
+          .showCancelButton,
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON set to false should not show cancel button in paginated layout`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                },
+              )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                },
+              )
+            },
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = false)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination
+            .showCancelButton,
+        )
+        .isFalse()
+    }
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON set to true should show cancel button in paginated layout`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                },
+              )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                },
+              )
+            },
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = true)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination
+            .showCancelButton,
+        )
+        .isTrue()
+    }
+
+  @Test
+  fun `EXTRA_SHOW_CANCEL_BUTTON not setting should not show cancel button in paginated layout`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page1"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page1-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 1"
+                },
+              )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "page2"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension(paginationExtension)
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "page2-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  text = "Question on page 2"
+                },
+              )
+            },
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire, showCancelButton = null)
+      assertThat(
+          (viewModel.questionnaireStateFlow.first().displayMode as DisplayMode.EditMode)
+            .pagination
+            .showCancelButton,
+        )
+        .isFalse()
+    }
+  // ==================================================================== //
+  //                                                                      //
   //                        Questionnaire Response                        //
   //                                                                      //
   // ==================================================================== //
@@ -2810,7 +3017,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -2848,7 +3055,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             textElement.apply {
               addExtension(
@@ -2893,12 +3100,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "a.1-link-id"
                 text = "Basic Nested question"
                 type = Questionnaire.QuestionnaireItemType.STRING
@@ -2946,14 +3153,14 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addInitial().apply { value = BooleanType(false) }
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-2"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -2991,14 +3198,14 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addInitial().apply { value = BooleanType(true) }
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-2"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -3041,13 +3248,13 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-2"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -3058,7 +3265,7 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "question-3"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addEnableWhen().apply {
@@ -3112,13 +3319,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-1"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-2"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               addEnableWhen().apply {
@@ -3129,7 +3336,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-3"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               addEnableWhen().apply {
@@ -3197,13 +3404,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-1"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-2"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               addEnableWhen().apply {
@@ -3214,7 +3421,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "question-3"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               addEnableWhen().apply {
@@ -3678,12 +3885,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-group-item"
             text = "Group question"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "a-nested-item"
                 text = "Basic question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -3733,20 +3940,20 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "repeated-group-a"
             text = "Group question A"
             type = Questionnaire.QuestionnaireItemType.GROUP
             repeats = true
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "nested-item-a"
                 text = "Basic question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
             )
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-nested-item-a"
                 text = "Basic question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -3755,20 +3962,20 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "repeated-group-b"
             text = "Group question B"
             type = Questionnaire.QuestionnaireItemType.GROUP
             repeats = true
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "nested-item-b"
                 text = "Basic question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
               },
             )
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "another-nested-item-b"
                 text = "Basic question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -3922,17 +4129,17 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-boolean-item"
             text = "Parent question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "a-nested-boolean-item"
                 text = "Nested question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 addItem(
-                  Questionnaire.QuestionnaireItemComponent().apply {
+                  QuestionnaireItemComponent().apply {
                     linkId = "a-nested-nested-boolean-item"
                     text = "Nested nested question"
                     type = Questionnaire.QuestionnaireItemType.BOOLEAN
@@ -4064,7 +4271,7 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "q-yesnodontknow"
             answerValueSet = "#$valueSetId"
           },
@@ -4122,7 +4329,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "q-codesystemyesno"
             answerValueSet = CODE_SYSTEM_YES_NO
           },
@@ -4184,7 +4391,7 @@ class QuestionnaireViewModelTest {
               },
           )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a"
             text = "answer expression question text"
             type = Questionnaire.QuestionnaireItemType.REFERENCE
@@ -4234,7 +4441,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a"
               text = "answer expression question text"
               type = Questionnaire.QuestionnaireItemType.REFERENCE
@@ -4278,7 +4485,7 @@ class QuestionnaireViewModelTest {
     val questionnaire =
       Questionnaire().apply {
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a"
             text = "answer expression question text"
             type = Questionnaire.QuestionnaireItemType.REFERENCE
@@ -4437,7 +4644,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -4540,7 +4747,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               text = "Is Married?"
@@ -4549,7 +4756,7 @@ class QuestionnaireViewModelTest {
           )
 
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -4684,7 +4891,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -4801,7 +5008,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -4914,7 +5121,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -5010,7 +5217,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b-link"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -5100,7 +5307,7 @@ class QuestionnaireViewModelTest {
       val questionnaire =
         Questionnaire().apply {
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               text = "Is Married?"
@@ -5108,7 +5315,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "b"
               type = Questionnaire.QuestionnaireItemType.CHOICE
               text = "Select an option"
@@ -5249,7 +5456,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
               addExtension().apply {
@@ -5265,7 +5472,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.QUANTITY
               addInitial(
@@ -5309,7 +5516,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
               addExtension().apply {
@@ -5325,7 +5532,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.INTEGER
             },
@@ -5373,7 +5580,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
               addExtension().apply {
@@ -5389,7 +5596,7 @@ class QuestionnaireViewModelTest {
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.INTEGER
             },
@@ -5452,7 +5659,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-birthdate"
             type = Questionnaire.QuestionnaireItemType.DATE
             addInitial(
@@ -5474,7 +5681,7 @@ class QuestionnaireViewModelTest {
         )
 
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-age-years"
             type = Questionnaire.QuestionnaireItemType.INTEGER
             addExtension().apply {
@@ -5508,7 +5715,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-birthdate"
               type = Questionnaire.QuestionnaireItemType.DATE
               addInitial(
@@ -5539,7 +5746,7 @@ class QuestionnaireViewModelTest {
             type = Questionnaire.QuestionnaireItemType.GROUP
           }
           .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-age-years"
               type = Questionnaire.QuestionnaireItemType.INTEGER
               addExtension().apply {
@@ -5579,13 +5786,13 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "parent-question"
             text = "parent question text"
             type = Questionnaire.QuestionnaireItemType.GROUP
             item =
               listOf(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   linkId = "nested-display-question"
                   text = "subtitle text"
                   type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -5628,13 +5835,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "parent-question"
               text = "parent question text"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
               item =
                 listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
+                  QuestionnaireItemComponent().apply {
                     linkId = "nested-display-question"
                     text = "subtitle text"
                     type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -5683,13 +5890,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "parent-question"
               text = "parent question text"
               type = Questionnaire.QuestionnaireItemType.STRING
               item =
                 listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
+                  QuestionnaireItemComponent().apply {
                     linkId = "nested-display-question"
                     text = "flyover text"
                     type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -5738,13 +5945,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "parent-question"
               text = "parent question text"
               type = Questionnaire.QuestionnaireItemType.STRING
               item =
                 listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
+                  QuestionnaireItemComponent().apply {
                     linkId = "nested-display-question"
                     text = "help description"
                     type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -5782,12 +5989,12 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page1"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page1-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 1"
@@ -5796,12 +6003,12 @@ class QuestionnaireViewModelTest {
           },
         )
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "page2"
             type = Questionnaire.QuestionnaireItemType.GROUP
             addExtension(paginationExtension)
             addItem(
-              Questionnaire.QuestionnaireItemComponent().apply {
+              QuestionnaireItemComponent().apply {
                 linkId = "page2-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 text = "Question on page 2"
@@ -5855,13 +6062,13 @@ class QuestionnaireViewModelTest {
         title = "Questionnaire Enabled Display"
         status = Enumerations.PublicationStatus.ACTIVE
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "1"
             text = "Questionnaire Text"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
             initial = it
             addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(false))
                   linkId = "1.1"
                   text = "Text when no is selected"
@@ -5869,7 +6076,7 @@ class QuestionnaireViewModelTest {
                 },
               )
               .addItem(
-                Questionnaire.QuestionnaireItemComponent().apply {
+                QuestionnaireItemComponent().apply {
                   extension = listOf(displayCategoryExtension, enableWhenExpressionExtension(true))
                   linkId = "1.2"
                   text = "Text when yes is selected"
@@ -5952,13 +6159,13 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-age"
               type = Questionnaire.QuestionnaireItemType.INTEGER
             },
           )
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-description"
               type = Questionnaire.QuestionnaireItemType.STRING
               textElement.addExtension().apply {
@@ -6044,7 +6251,7 @@ class QuestionnaireViewModelTest {
             )
           }
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-description"
               type = Questionnaire.QuestionnaireItemType.STRING
               addExtension().apply {
@@ -6089,6 +6296,7 @@ class QuestionnaireViewModelTest {
     showReviewPageFirst: Boolean = false,
     readOnlyMode: Boolean = false,
     showSubmitButton: Boolean? = null,
+    showCancelButton: Boolean? = null,
   ): QuestionnaireViewModel {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
 
@@ -6102,6 +6310,7 @@ class QuestionnaireViewModelTest {
     showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
     readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
     showSubmitButton?.let { state.set(EXTRA_SHOW_SUBMIT_BUTTON, it) }
+    showCancelButton?.let { state.set(EXTRA_SHOW_CANCEL_BUTTON, it) }
 
     return QuestionnaireViewModel(context, state)
   }

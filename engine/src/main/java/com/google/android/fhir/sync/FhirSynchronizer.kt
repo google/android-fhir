@@ -22,10 +22,10 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.UploadState
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -52,24 +52,13 @@ internal class FhirSynchronizer(
   private val downloader: Downloader,
   private val conflictResolver: ConflictResolver,
 ) {
-  private var syncState: MutableSharedFlow<SyncJobStatus>? = null
+
+  private val _syncState = MutableSharedFlow<SyncJobStatus>()
+  val syncState: SharedFlow<SyncJobStatus> = _syncState
+
   private val datastoreUtil = DatastoreUtil(context)
 
-  private fun isSubscribed(): Boolean {
-    return syncState != null
-  }
-
-  fun subscribe(flow: MutableSharedFlow<SyncJobStatus>) {
-    if (isSubscribed()) {
-      throw IllegalStateException("Already subscribed to a flow")
-    }
-
-    this.syncState = flow
-  }
-
-  private suspend fun setSyncState(state: SyncJobStatus) {
-    syncState?.emit(state)
-  }
+  private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 
   private suspend fun setSyncState(result: SyncResult): SyncJobStatus {
     // todo: emit this properly instead of using datastore?
@@ -77,7 +66,7 @@ internal class FhirSynchronizer(
 
     val state =
       when (result) {
-        is SyncResult.Success -> SyncJobStatus.Finished()
+        is SyncResult.Success -> SyncJobStatus.Finished
         is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
       }
 
@@ -86,7 +75,7 @@ internal class FhirSynchronizer(
   }
 
   suspend fun synchronize(): SyncJobStatus {
-    setSyncState(SyncJobStatus.Started())
+    setSyncState(SyncJobStatus.Started)
 
     return listOf(download(), upload())
       .filterIsInstance<SyncResult.Error>()
@@ -123,7 +112,6 @@ internal class FhirSynchronizer(
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
     } else {
-      setSyncState(SyncJobStatus.Glitch(exceptions))
       SyncResult.Error(exceptions)
     }
   }
@@ -131,27 +119,20 @@ internal class FhirSynchronizer(
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
-    fhirEngine.syncUpload(localChangesFetchMode) { list ->
-      flow {
-        uploader.upload(list).collect { result ->
-          when (result) {
-            is UploadState.Started ->
-              setSyncState(SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total))
-            is UploadState.Success ->
-              emit(result.localChangeToken to result.resource).also {
-                setSyncState(
-                  SyncJobStatus.InProgress(SyncOperation.UPLOAD, result.total, result.completed),
-                )
-              }
-            is UploadState.Failure -> exceptions.add(result.syncError)
-          }
-        }
-      }
+    fhirEngine.syncUpload(localChangesFetchMode, uploader::upload).collect { progress ->
+      progress.uploadError?.let { exceptions.add(it) }
+        ?: setSyncState(
+          SyncJobStatus.InProgress(
+            SyncOperation.UPLOAD,
+            progress.initialTotal,
+            progress.initialTotal - progress.remaining,
+          ),
+        )
     }
+
     return if (exceptions.isEmpty()) {
       SyncResult.Success()
     } else {
-      setSyncState(SyncJobStatus.Glitch(exceptions))
       SyncResult.Error(exceptions)
     }
   }

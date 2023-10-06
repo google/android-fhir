@@ -33,7 +33,7 @@ jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04-64core
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
