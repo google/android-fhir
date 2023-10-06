@@ -71,7 +71,7 @@ data class DataCaptureConfig(
 ) {
 
   internal val simpleWorkerContext: SimpleWorkerContext by lazy {
-    if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
+    if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage, true)
   }
 
   /**
