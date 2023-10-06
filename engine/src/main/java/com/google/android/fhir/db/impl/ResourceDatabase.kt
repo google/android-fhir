@@ -151,3 +151,21 @@ val MIGRATION_6_7 =
       )
     }
   }
+
+
+/** Create [LocalChangeResourceReferenceEntity] */
+val MIGRATION_7_8 =
+  object : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE TABLE IF NOT EXISTS `LocalChangeResourceReferenceEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `localChangeId` INTEGER NOT NULL, `resourceReferenceValue` TEXT NOT NULL, `resourceReferenceName` TEXT NOT NULL, FOREIGN KEY(`localChangeId`) REFERENCES `LocalChangeEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)"
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeResourceReferenceEntity_resourceReferenceValue` ON `LocalChangeResourceReferenceEntity` (`resourceReferenceValue`)",
+      )
+
+      database.query("SELECT id,payload from LocalChangeEntity")
+
+    }
+  }
+
