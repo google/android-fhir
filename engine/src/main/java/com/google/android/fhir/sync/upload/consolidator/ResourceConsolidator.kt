@@ -22,7 +22,7 @@ import org.hl7.fhir.r4.model.Resource
 /**
  * Represents a mechanism to consolidate resources after they are uploaded.
  *
- * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
+ * INTERNAL ONLY. This interface should NEVER be exposed as an external API because it works
  * together with other components in the upload package to fulfill a specific upload strategy. After
  * a resource is uploaded to a remote FHIR server and a response is returned, we need to consolidate
  * any changes in the database, Examples of this would be, updating the lastUpdated timestamp field,

@@ -19,7 +19,6 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.MediumTest
-import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
@@ -106,7 +105,6 @@ class DatabaseImplTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
   private lateinit var services: FhirServices
   private lateinit var database: Database
-  private val iParser = FhirContext.forR4Cached().newJsonParser()
 
   @Before
   fun setUp(): Unit = runBlocking {
@@ -3600,7 +3598,7 @@ class DatabaseImplTest {
       val observationLocalChange = updatedObservationLocalChanges[0]
       assertThat(observationLocalChange.type).isEqualTo(LocalChange.Type.INSERT)
       val observationLocalChangePayload =
-        iParser.parseResource(observationLocalChange.payload) as Observation
+        services.parser.parseResource(observationLocalChange.payload) as Observation
       assertThat(observationLocalChangePayload.subject.reference)
         .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
 
@@ -3703,7 +3701,7 @@ class DatabaseImplTest {
       val observationLocalChange1 = updatedObservationLocalChanges[0]
       assertThat(observationLocalChange1.type).isEqualTo(LocalChange.Type.INSERT)
       val observationLocalChange1Payload =
-        iParser.parseResource(observationLocalChange1.payload) as Observation
+        services.parser.parseResource(observationLocalChange1.payload) as Observation
       assertThat(observationLocalChange1Payload.subject.reference)
         .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
 
@@ -3810,7 +3808,7 @@ class DatabaseImplTest {
       val observationLocalChange1 = updatedObservationLocalChanges[0]
       assertThat(observationLocalChange1.type).isEqualTo(LocalChange.Type.INSERT)
       val observationLocalChange1Payload =
-        iParser.parseResource(observationLocalChange1.payload) as Observation
+        services.parser.parseResource(observationLocalChange1.payload) as Observation
       assertThat(observationLocalChange1Payload.subject.reference)
         .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
 

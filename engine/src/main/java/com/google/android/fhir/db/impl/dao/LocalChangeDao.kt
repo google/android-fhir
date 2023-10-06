@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db.impl.dao
 
+import androidx.annotation.VisibleForTesting
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -49,6 +50,7 @@ import timber.log.Timber
  * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
  */
 @Dao
+@VisibleForTesting
 internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
@@ -87,7 +89,7 @@ internal abstract class LocalChangeDao {
     createLocalChange(localChangeEntity, localChangeReferences)
   }
 
-  suspend fun createLocalChange(
+  private suspend fun createLocalChange(
     localChange: LocalChangeEntity,
     localChangeReferences: List<LocalChangeResourceReferenceEntity>,
   ) {
@@ -172,6 +174,10 @@ internal abstract class LocalChangeDao {
   private fun extractResourceReferences(resource: Resource) =
     fhirTerser.getAllResourceReferences(resource).toSet()
 
+  /**
+   * Extract the difference in the [ResourceReferenceInfo] by getting all the references from both
+   * the versions of the resource and then finding out the difference in the two sets.
+   */
   private fun extractReferencesDiff(
     resource1: Resource,
     resource2: Resource,
@@ -182,6 +188,16 @@ internal abstract class LocalChangeDao {
     return resource1References.minus(resource2References) +
       resource2References.minus(resource1References)
   }
+
+  private fun Set<ResourceReferenceInfo>.minus(set: Set<ResourceReferenceInfo>) =
+    filter { ref ->
+        set.none {
+          it.name == ref.name &&
+            it.resourceReference.referenceElement.value ==
+              ref.resourceReference.referenceElement.value
+        }
+      }
+      .toSet()
 
   @Query(
     """
@@ -315,7 +331,7 @@ internal abstract class LocalChangeDao {
 
   /**
    * Updates the [LocalChangeEntity]s for the updated resource by updating the
-   * [LocalChangeEntity.resourceId] Looks for [LocalChangeEntity] which refer to the updated
+   * [LocalChangeEntity.resourceId]. Looks for [LocalChangeEntity] which refer to the updated
    * resource through [LocalChangeResourceReferenceEntity]. For each [LocalChangeEntity] which
    * contains reference to the updated resource in its payload, we update the payload with the
    * reference and also update the corresponding [LocalChangeResourceReferenceEntity]. We delete the
