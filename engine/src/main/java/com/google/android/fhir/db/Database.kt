@@ -19,7 +19,6 @@ package com.google.android.fhir.db
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
-import com.google.android.fhir.db.impl.dao.ReferringResource
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -54,14 +53,6 @@ internal interface Database {
    * @param <R> The resource type
    */
   suspend fun update(vararg resources: Resource)
-
-  /**
-   * Updates the uploaded `resource` with the provided 'resourceUuid' in the FHIR resource database.
-   *
-   * @param resource: uploaded resource
-   * @param uuid: The UUID of the [ResourceEntity] associated with the resource
-   */
-  suspend fun updateResourceWithUuid(resource: Resource, uuid: UUID)
 
   /** Updates the `resource` meta in the FHIR resource database. */
   suspend fun updateVersionIdAndLastUpdated(
@@ -107,16 +98,6 @@ internal interface Database {
 
   suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
 
-  /**
-   * Fetches all [ResourceEntity]s whose resource refers to the requested {resource} along with the
-   * respective list of FHIR paths in the referring resources where the requested resource is
-   * referred.
-   */
-  suspend fun getAllResourcesReferringToResourceWithPath(
-    resourceType: ResourceType,
-    resourceId: String,
-  ): List<ReferringResource>
-
   suspend fun count(query: SearchQuery): Long
 
   /**
@@ -124,9 +105,6 @@ internal interface Database {
    * server.
    */
   suspend fun getAllLocalChanges(): List<LocalChange>
-
-  /** Retrieves [LocalChange]s with the Ids provided in the {localChangeToken} */
-  suspend fun getAllLocalChanges(localChangeToken: LocalChangeToken): List<LocalChange>
 
   /** Retrieves the count of [LocalChange]s stored in the database. */
   suspend fun getLocalChangesCount(): Int
@@ -138,23 +116,15 @@ internal interface Database {
   suspend fun deleteUpdates(resources: List<Resource>)
 
   /**
-   * Update the resource ID for [LocalChange]s for [ResourceEntity] with
-   * [ResourceEntity.resourceUuid] resourceUuid.
+   * Updates the [ResourceEntity.serializedResource] and [ResourceEntity.resourceId] corresponding
+   * to the updatedResource. Updates all the [LocalChangeEntity] for this updated resource as well
+   * as all the [LocalChangeEntity] referring to this resource in their [LocalChangeEntity.payload]
+   * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
+   * updated resource.
    */
-  suspend fun updateResourceIdForResourceChanges(
-    resourceUuid: UUID,
-    updatedResourceId: String,
-  )
-
-  /**
-   * Removes all the existing [LocalChange] for the [Resource] with [ResourceEntity.resourceUuid]
-   * {resourceUuid} and [ResourceEntity.resourceType] resourceType. Adds the new {updatedChanges}
-   * for the resource.
-   */
-  suspend fun replaceResourceChanges(
-    resourceType: ResourceType,
-    resourceUuid: UUID,
-    updatedChanges: List<LocalChange>,
+  suspend fun updateResourceAndId(
+    currentResourceId: String,
+    updatedResource: Resource,
   )
 
   /** Runs the block as a database transaction. */

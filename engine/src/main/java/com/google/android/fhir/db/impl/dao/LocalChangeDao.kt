@@ -22,14 +22,18 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.util.FhirTerser
+import ca.uhn.fhir.util.ResourceReferenceInfo
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.diff.JsonDiff
-import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.impl.addUpdatedReferenceToResource
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
+import com.google.android.fhir.db.impl.entities.LocalChangeResourceReferenceEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
+import com.google.android.fhir.db.impl.replaceJsonValue
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.versionId
 import java.time.Instant
@@ -42,17 +46,16 @@ import timber.log.Timber
 
 /**
  * Dao for local changes made to a resource. One row in LocalChangeEntity corresponds to one change
- * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches. When a
- * resource needs to be synced, all corresponding LocalChanges are 'squashed' to create a a single
- * LocalChangeEntity to sync with the server.
+ * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
  */
 @Dao
 internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
+  lateinit var fhirTerser: FhirTerser
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
+  abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity): Long
 
   @Transaction
   open suspend fun addInsert(resource: Resource, resourceUuid: UUID, timeOfLocalChange: Instant) {
@@ -60,7 +63,7 @@ internal abstract class LocalChangeDao {
     val resourceType = resource.resourceType
     val resourceString = iParser.encodeResourceToString(resource)
 
-    addLocalChange(
+    val localChangeEntity =
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
@@ -70,28 +73,39 @@ internal abstract class LocalChangeDao {
         type = Type.INSERT,
         payload = resourceString,
         versionId = resource.versionId,
-      ),
-    )
+      )
+
+    val localChangeReferences =
+      extractResourceReferences(resource).map { resourceReferenceInfo ->
+        LocalChangeResourceReferenceEntity(
+          id = 0,
+          localChangeId = 0,
+          resourceReferenceName = resourceReferenceInfo.name,
+          resourceReferenceValue = resourceReferenceInfo.resourceReference.referenceElement.value,
+        )
+      }
+    createLocalChange(localChangeEntity, localChangeReferences)
   }
 
-  suspend fun createLocalChange(localChange: LocalChange, resourceUuid: UUID) {
-    addLocalChange(
-      LocalChangeEntity(
-        id = 0,
-        resourceType = localChange.resourceType,
-        resourceId = localChange.resourceId,
-        resourceUuid = resourceUuid,
-        timestamp = localChange.timestamp,
-        type = Type.from(localChange.type.value),
-        payload = localChange.payload,
-        versionId = localChange.versionId,
-      ),
-    )
+  suspend fun createLocalChange(
+    localChange: LocalChangeEntity,
+    localChangeReferences: List<LocalChangeResourceReferenceEntity>,
+  ) {
+    val localChangeId = addLocalChange(localChange)
+    if (localChangeReferences.isNotEmpty()) {
+      insertLocalChangeResourceReferences(
+        localChangeReferences.map { it.copy(localChangeId = localChangeId) },
+      )
+    }
   }
 
-  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource, timeOfLocalChange: Instant) {
-    val resourceId = resource.logicalId
-    val resourceType = resource.resourceType
+  suspend fun addUpdate(
+    oldEntity: ResourceEntity,
+    updatedResource: Resource,
+    timeOfLocalChange: Instant,
+  ) {
+    val resourceId = updatedResource.logicalId
+    val resourceType = updatedResource.resourceType
 
     if (
       !localChangeIsEmpty(resourceId, resourceType) &&
@@ -101,16 +115,16 @@ internal abstract class LocalChangeDao {
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed.",
       )
     }
-    val jsonDiff =
-      diff(iParser, iParser.parseResource(oldEntity.serializedResource) as Resource, resource)
+    val oldResource = iParser.parseResource(oldEntity.serializedResource) as Resource
+    val jsonDiff = diff(iParser, oldResource, updatedResource)
     if (jsonDiff.length() == 0) {
       Timber.i(
-        "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
+        "New resource ${updatedResource.resourceType}/${updatedResource.id} is same as old resource. " +
           "Not inserting UPDATE LocalChange.",
       )
       return
     }
-    addLocalChange(
+    val localChangeEntity =
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
@@ -120,8 +134,18 @@ internal abstract class LocalChangeDao {
         type = Type.UPDATE,
         payload = jsonDiff.toString(),
         versionId = oldEntity.versionId,
-      ),
-    )
+      )
+
+    val localChangeReferences =
+      extractReferencesDiff(oldResource, updatedResource).map { resourceReferenceInfo ->
+        LocalChangeResourceReferenceEntity(
+          id = 0,
+          localChangeId = 0,
+          resourceReferenceName = resourceReferenceInfo.name,
+          resourceReferenceValue = resourceReferenceInfo.resourceReference.referenceElement.value,
+        )
+      }
+    createLocalChange(localChangeEntity, localChangeReferences)
   }
 
   suspend fun addDelete(
@@ -130,7 +154,7 @@ internal abstract class LocalChangeDao {
     resourceType: ResourceType,
     remoteVersionId: String?,
   ) {
-    addLocalChange(
+    createLocalChange(
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
@@ -141,7 +165,22 @@ internal abstract class LocalChangeDao {
         payload = "",
         versionId = remoteVersionId,
       ),
+      emptyList(),
     )
+  }
+
+  private fun extractResourceReferences(resource: Resource) =
+    fhirTerser.getAllResourceReferences(resource).toSet()
+
+  private fun extractReferencesDiff(
+    resource1: Resource,
+    resource2: Resource,
+  ): Set<ResourceReferenceInfo> {
+    require(resource1.resourceType.equals(resource2.resourceType))
+    val resource1References = extractResourceReferences(resource1).toSet()
+    val resource2References = extractResourceReferences(resource2).toSet()
+    return resource1References.minus(resource2References) +
+      resource2References.minus(resource1References)
   }
 
   @Query(
@@ -174,7 +213,7 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        ORDER BY LocalChangeEntity.id ASC""",
+        ORDER BY timestamp ASC""",
   )
   abstract suspend fun getAllLocalChanges(): List<LocalChangeEntity>
 
@@ -182,14 +221,16 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        WHERE LocalChangeEntity.id IN (:ids)""",
+        WHERE LocalChangeEntity.id IN (:ids) 
+        ORDER BY timestamp ASC""",
   )
   abstract suspend fun getLocalChanges(ids: List<Long>): List<LocalChangeEntity>
 
   @Query(
     """
         SELECT COUNT(*)
-        FROM LocalChangeEntity
+        FROM LocalChangeEntity 
+        ORDER BY timestamp ASC
         """,
   )
   abstract suspend fun getLocalChangesCount(): Int
@@ -224,7 +265,8 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        WHERE resourceId = :resourceId AND resourceType = :resourceType
+        WHERE resourceId = :resourceId AND resourceType = :resourceType 
+        ORDER BY timestamp ASC
     """,
   )
   abstract suspend fun getLocalChanges(
@@ -236,12 +278,131 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        WHERE resourceUuid = :resourceUuid
+        WHERE resourceUuid = :resourceUuid 
+        ORDER BY timestamp ASC
     """,
   )
   abstract suspend fun getLocalChanges(
     resourceUuid: UUID,
   ): List<LocalChangeEntity>
+
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeResourceReferenceEntity
+        WHERE resourceReferenceValue = :resourceReferenceValue
+    """,
+  )
+  abstract suspend fun getLocalChangeReferencesWithValue(
+    resourceReferenceValue: String,
+  ): List<LocalChangeResourceReferenceEntity>
+
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeResourceReferenceEntity
+        WHERE localChangeId = :localChangeId
+    """,
+  )
+  abstract suspend fun getReferencesForLocalChange(
+    localChangeId: Long,
+  ): List<LocalChangeResourceReferenceEntity>
+
+  @Insert(onConflict = OnConflictStrategy.REPLACE)
+  abstract suspend fun insertLocalChangeResourceReferences(
+    resourceReferences: List<LocalChangeResourceReferenceEntity>,
+  )
+
+  /**
+   * Updates the [LocalChangeEntity]s for the updated resource by updating the
+   * [LocalChangeEntity.resourceId] Looks for [LocalChangeEntity] which refer to the updated
+   * resource through [LocalChangeResourceReferenceEntity]. For each [LocalChangeEntity] which
+   * contains reference to the updated resource in its payload, we update the payload with the
+   * reference and also update the corresponding [LocalChangeResourceReferenceEntity]. We delete the
+   * original [LocalChangeEntity] and create a new one with new
+   * [LocalChangeResourceReferenceEntity]s in its place.
+   */
+  suspend fun updateResourceId(
+    resourceUuid: UUID,
+    oldResource: Resource,
+    updatedResource: Resource,
+  ): List<UUID> {
+    // update the resource ID in the local change entity
+    val localChanges = getLocalChanges(resourceUuid)
+    localChanges
+      .map { localChangeEntity -> localChangeEntity.copy(resourceId = updatedResource.logicalId) }
+      // Add LocalChangeEntity with replace strategy, the references need not be updated
+      .forEach { addLocalChange(it) }
+
+    // update all local changes referring to the resource
+    val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
+    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    val localChangeReferences = getLocalChangeReferencesWithValue(oldReferenceValue)
+    val localChangeIds = localChangeReferences.map { it.localChangeId }.distinct()
+    val localChangesWithReferences = getLocalChanges(localChangeIds).associateBy { it.id }
+
+    localChangeIds.forEach { localChangeId ->
+      val existingLocalChangeEntity = localChangesWithReferences[localChangeId]!!
+      val updatedLocalChangeEntity =
+        replaceReferencesInLocalChangeEntity(
+            localChange = existingLocalChangeEntity,
+            oldReference = oldReferenceValue,
+            updatedReference = updatedReferenceValue,
+          )
+          .copy(id = 0)
+      val updatedLocalChangeReferences =
+        getReferencesForLocalChange(localChangeId).map { reference ->
+          if (reference.resourceReferenceValue == oldReferenceValue) {
+            LocalChangeResourceReferenceEntity(
+              id = 0,
+              localChangeId = 0,
+              resourceReferenceName = reference.resourceReferenceName,
+              resourceReferenceValue = updatedReferenceValue,
+            )
+          } else {
+            reference.copy(id = 0, localChangeId = 0)
+          }
+        }
+      discardLocalChanges(localChangeId)
+      createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
+    }
+    return localChangesWithReferences.values.map { it.resourceUuid }.distinct()
+  }
+
+  private fun replaceReferencesInLocalChangeEntity(
+    localChange: LocalChangeEntity,
+    oldReference: String,
+    updatedReference: String,
+  ): LocalChangeEntity {
+    return when (localChange.type) {
+      LocalChangeEntity.Type.INSERT -> {
+        val insertResourcePayload = iParser.parseResource(localChange.payload) as Resource
+        val updatedResourcePayload =
+          addUpdatedReferenceToResource(
+            iParser,
+            insertResourcePayload,
+            oldReference,
+            updatedReference,
+          )
+        return localChange.copy(
+          payload = iParser.encodeResourceToString(updatedResourcePayload),
+        )
+      }
+      LocalChangeEntity.Type.UPDATE -> {
+        val patchArray = JSONArray(localChange.payload)
+        val updatedPatchArray = JSONArray()
+        for (i in 0 until patchArray.length()) {
+          val updatedPatch =
+            replaceJsonValue(patchArray.getJSONObject(i), oldReference, updatedReference)
+          updatedPatchArray.put(updatedPatch)
+        }
+        return localChange.copy(
+          payload = updatedPatchArray.toString(),
+        )
+      }
+      LocalChangeEntity.Type.DELETE -> localChange
+    }
+  }
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }

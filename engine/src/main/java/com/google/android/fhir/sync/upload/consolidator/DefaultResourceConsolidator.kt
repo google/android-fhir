@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.sync.upload.consolidator
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -26,15 +28,18 @@ import timber.log.Timber
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource) {
+  override suspend fun consolidate(localChanges: List<LocalChange>, response: Resource) {
+    val localChangeToken = LocalChangeToken(localChanges.flatMap { it.token.ids })
     database.deleteUpdates(localChangeToken)
     when (response) {
       is Bundle -> updateVersionIdAndLastUpdated(response)
-      else -> updateVersionIdAndLastUpdated(response)
+      else -> updateVersionIdAndLastUpdated(localChanges, response)
     }
   }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
+    // TODO: Support POST in Bundle transactions. Assumption is that only PUT operations are used in
+    // Bundle requests
     when (bundle.type) {
       Bundle.BundleType.TRANSACTIONRESPONSE -> {
         bundle.entry.forEach {
@@ -65,6 +70,23 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
   }
 
   private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
+      database.updateVersionIdAndLastUpdated(
+        resource.id,
+        resource.resourceType,
+        resource.meta.versionId,
+        resource.meta.lastUpdated.toInstant(),
+      )
+    }
+  }
+
+  private suspend fun updateVersionIdAndLastUpdated(
+    localChanges: List<LocalChange>,
+    resource: Resource,
+  ) {
+    if (localChanges.first().resourceId != resource.logicalId) {
+      database.updateResourceAndId(localChanges.first().resourceId, resource)
+    }
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       database.updateVersionIdAndLastUpdated(
         resource.id,

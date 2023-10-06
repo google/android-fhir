@@ -16,35 +16,34 @@
 
 package com.google.android.fhir.db
 
+import java.util.UUID
+
 /** Thrown to indicate that the requested resource is not found. */
 class ResourceNotFoundException : Exception {
-  val type: String
-  val identifierType: ResourceIdentifierType
-  val identifier: String
+  lateinit var type: String
+  lateinit var id: String
+  lateinit var uuid: UUID
 
   constructor(
     type: String,
-    identifier: String,
-    identifierType: ResourceIdentifierType,
+    id: String,
     cause: Throwable,
-  ) : super("Resource not found with type $type and $identifierType $identifier!", cause) {
+  ) : super("Resource not found with type $type and id $id!", cause) {
     this.type = type
-    this.identifier = identifier
-    this.identifierType = identifierType
+    this.id = id
   }
 
   constructor(
     type: String,
-    identifierType: ResourceIdentifierType,
-    identifier: String,
-  ) : super("Resource not found with type $type and $identifierType $identifier!") {
+    id: String,
+  ) : super("Resource not found with type $type and id $id!") {
     this.type = type
-    this.identifier = identifier
-    this.identifierType = identifierType
+    this.id = id
   }
-}
 
-enum class ResourceIdentifierType {
-  ID,
-  UUID,
+  constructor(
+    uuid: UUID,
+  ) : super("Resource not found with UUID $uuid!") {
+    this.uuid = uuid
+  }
 }

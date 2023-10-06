@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.sync.upload.consolidator
 
-import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.LocalChange
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -32,5 +32,5 @@ import org.hl7.fhir.r4.model.Resource
 internal fun interface ResourceConsolidator {
 
   /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
+  suspend fun consolidate(localChanges: List<LocalChange>, response: Resource)
 }

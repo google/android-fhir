@@ -25,7 +25,6 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.db.ResourceIdentifierType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -65,19 +64,16 @@ internal abstract class ResourceDao {
     }
       ?: throw ResourceNotFoundException(
         resource.resourceType.name,
-        ResourceIdentifierType.ID,
         resource.id,
       )
   }
 
-  suspend fun updateResourceWithUuid(updatedResource: Resource, resourceUuid: UUID) {
+  suspend fun updateResourceWithUuid(resourceUuid: UUID, updatedResource: Resource) {
     getResourceEntity(resourceUuid)?.let {
       updateResourceEntity(it, updatedResource, it.lastUpdatedLocal)
     }
       ?: throw ResourceNotFoundException(
-        updatedResource.resourceType.name,
-        ResourceIdentifierType.UUID,
-        updatedResource.id,
+        resourceUuid,
       )
   }
 
@@ -220,11 +216,6 @@ internal abstract class ResourceDao {
   abstract suspend fun getReferencedResources(
     query: SupportSQLiteQuery,
   ): List<IndexedIdAndSerializedResource>
-
-  @RawQuery
-  abstract suspend fun getReferringResources(
-    query: SupportSQLiteQuery,
-  ): List<ReferringSerialisedResourceWithReferringPath>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
@@ -423,30 +414,4 @@ internal data class IndexedIdAndResource(
   val matchingIndex: String,
   val idOfBaseResourceOnWhichThisMatched: String,
   val resource: Resource,
-)
-
-/**
- * Data class representing a [ResourceEntity] which is referring to the requested resource, and the
- * FHIR path of the referring [Resource]. The referring resource payload is serialized.
- */
-internal data class ReferringSerialisedResourceWithReferringPath(
-  @ColumnInfo(name = "resourceUuid") val resourceUuid: UUID,
-  @ColumnInfo(name = "resourceId") val resourceId: String,
-  @ColumnInfo(name = "resourceType") val resourceType: String,
-  @ColumnInfo(name = "serializedResource") val serializedResource: String,
-  @ColumnInfo(name = "index_path") val path: String,
-)
-
-/**
- * Data class representing a [ResourceEntity] which is referring to the requested resource, and a
- * list of the FHIR Paths of the referring [Resource] where the requested resource is referred. The
- * referring resource payload is deserialized into a [Resource] object.
- */
-internal data class ReferringResource(
-  val resourceUuid: UUID,
-  val resourceId: String,
-  val resourceType: ResourceType,
-  val resource: Resource,
-  val referenceValue: String,
-  val referringPaths: List<String>,
 )

@@ -130,9 +130,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     val resourceConsolidator = DefaultResourceConsolidator(database)
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
     while (localChangeFetcher.hasNext()) {
-      upload(localChangeFetcher.next()).collect {
-        resourceConsolidator.consolidate(it.first, it.second)
-      }
+      val localChanges = localChangeFetcher.next()
+      upload(localChanges).collect { resourceConsolidator.consolidate(localChanges, it.second) }
     }
   }
 }

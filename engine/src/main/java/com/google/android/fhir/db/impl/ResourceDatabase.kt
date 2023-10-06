@@ -26,6 +26,7 @@ import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeResourceReferenceEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
@@ -49,8 +50,9 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       NumberIndexEntity::class,
       LocalChangeEntity::class,
       PositionIndexEntity::class,
+      LocalChangeResourceReferenceEntity::class,
     ],
-  version = 7,
+  version = 8,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)

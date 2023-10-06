@@ -22,14 +22,13 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.ResourceIdentifierType
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
-import com.google.android.fhir.db.impl.dao.ReferringResource
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
@@ -48,6 +47,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
+  private val fhirTerser: FhirTerser,
   databaseConfig: DatabaseConfig,
   private val resourceIndexer: ResourceIndexer,
 ) : com.google.android.fhir.db.Database {
@@ -117,7 +117,11 @@ internal class DatabaseImpl(
     }
   }
 
-  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val localChangeDao =
+    db.localChangeDao().also {
+      it.iParser = iParser
+      it.fhirTerser = fhirTerser
+    }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
@@ -149,10 +153,6 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateResourceWithUuid(resource: Resource, uuid: UUID) {
-    db.withTransaction { resourceDao.updateResourceWithUuid(resource, uuid) }
-  }
-
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
@@ -174,7 +174,7 @@ internal class DatabaseImpl(
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
         iParser.parseResource(it)
       }
-        ?: throw ResourceNotFoundException(type.name, ResourceIdentifierType.ID, id)
+        ?: throw ResourceNotFoundException(type.name, id)
     } as Resource
   }
 
@@ -221,48 +221,6 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun getAllResourcesReferringToResourceWithPath(
-    resourceType: ResourceType,
-    resourceId: String,
-  ): List<ReferringResource> {
-    val searchForReferenceValue = "$resourceType/$resourceId"
-    val referringResourceSearchQuery =
-      SearchQuery(
-        query =
-          """
-          SELECT refIndex.index_path, refIndex.resourceUuid, resource.resourceId, 
-          resource.serializedResource, resource.resourceType 
-          FROM ReferenceIndexEntity as refIndex 
-          JOIN ResourceEntity as resource on refIndex.resourceUuid = resource.resourceUuid 
-          WHERE refIndex.index_value = ?
-            """
-            .trimIndent(),
-        args = listOf(searchForReferenceValue),
-      )
-    return db.withTransaction {
-      resourceDao
-        .getReferringResources(
-          SimpleSQLiteQuery(
-            referringResourceSearchQuery.query,
-            referringResourceSearchQuery.args.toTypedArray(),
-          ),
-        )
-        .groupBy { it.resourceUuid }
-        .map { (resourceUuid, referringResourceWithPath) ->
-          val paths = referringResourceWithPath.map { it.path }
-          val referringResource = referringResourceWithPath.first()
-          ReferringResource(
-            resourceUuid = resourceUuid,
-            resourceId = referringResource.resourceId,
-            resourceType = ResourceType.fromCode(referringResource.resourceType),
-            resource = iParser.parseResource(referringResource.serializedResource) as Resource,
-            referringPaths = paths,
-            referenceValue = searchForReferenceValue,
-          )
-        }
-    }
-  }
-
   override suspend fun count(query: SearchQuery): Long {
     return db.withTransaction {
       resourceDao.countResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
@@ -273,12 +231,6 @@ internal class DatabaseImpl(
     return db.withTransaction { localChangeDao.getAllLocalChanges().map { it.toLocalChange() } }
   }
 
-  override suspend fun getAllLocalChanges(localChangeToken: LocalChangeToken): List<LocalChange> {
-    return db
-      .withTransaction { localChangeDao.getLocalChanges(localChangeToken.ids) }
-      .map { it.toLocalChange() }
-  }
-
   override suspend fun getLocalChangesCount(): Int {
     return db.withTransaction { localChangeDao.getLocalChangesCount() }
   }
@@ -287,35 +239,10 @@ internal class DatabaseImpl(
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
 
-  override suspend fun updateResourceIdForResourceChanges(
-    resourceUuid: UUID,
-    updatedResourceId: String,
-  ) {
-    db.withTransaction {
-      val localChanges = localChangeDao.getLocalChanges(resourceUuid)
-      localChanges
-        .map { localChangeEntity -> localChangeEntity.copy(resourceId = updatedResourceId) }
-        // Add LocalChangeEntity with replace strategy
-        .forEach { localChangeDao.addLocalChange(it) }
-    }
-  }
-
-  override suspend fun replaceResourceChanges(
-    resourceType: ResourceType,
-    resourceUuid: UUID,
-    updatedChanges: List<LocalChange>,
-  ) {
-    db.withTransaction {
-      val localChanges = localChangeDao.getLocalChanges(resourceUuid)
-      localChangeDao.discardLocalChanges(localChanges.first().resourceId, resourceType)
-      updatedChanges.forEach { localChangeDao.createLocalChange(it, resourceUuid) }
-    }
-  }
-
   override suspend fun selectEntity(type: ResourceType, id: String): ResourceEntity {
     return db.withTransaction {
       resourceDao.getResourceEntity(resourceId = id, resourceType = type)
-        ?: throw ResourceNotFoundException(type.name, ResourceIdentifierType.ID, id)
+        ?: throw ResourceNotFoundException(type.name, id)
     }
   }
 
@@ -325,6 +252,42 @@ internal class DatabaseImpl(
 
   override suspend fun deleteUpdates(resources: List<Resource>) {
     localChangeDao.discardLocalChanges(resources)
+  }
+
+  override suspend fun updateResourceAndId(currentResourceId: String, updatedResource: Resource) {
+    val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
+    val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+    val resourceUuid = currentResourceEntity.resourceUuid
+    val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
+    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    db.withTransaction {
+      // update the resource entity
+      resourceDao.updateResourceWithUuid(currentResourceEntity.resourceUuid, updatedResource)
+
+      // update the local changes of this resource and any resource referring to the updated
+      // resource
+      val uuidsOfResourcesWithReferencesToResource =
+        localChangeDao.updateResourceId(
+          resourceUuid = resourceUuid,
+          oldResource = oldResource,
+          updatedResource = updatedResource,
+        )
+
+      // update the references in the resources referring to the updated resource
+      uuidsOfResourcesWithReferencesToResource.forEach { resourceUuid ->
+        resourceDao.getResourceEntity(resourceUuid)?.let {
+          val referringResource = iParser.parseResource(it.serializedResource) as Resource
+          val updatedReferringResource =
+            addUpdatedReferenceToResource(
+              iParser,
+              referringResource,
+              oldReferenceValue,
+              updatedReferenceValue,
+            )
+          resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
+        }
+      }
+    }
   }
 
   override fun close() {
