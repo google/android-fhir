@@ -39,7 +39,7 @@ fun Project.configureLicensee() {
     ignoreDependencies("org.jacoco", "org.jacoco.agent") {
       because("JaCoCo is used in tests only, so it is not distributed with our library")
     }
-    allowDependency("org.javassist", "javassist", "3.29.0-GA") {
+    allowDependency("org.javassist", "javassist", "3.20.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
 
