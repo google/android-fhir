@@ -769,10 +769,9 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
  * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
  * applied to each pair of questionnaire item and questionnaire response item.
  *
- * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
- *
- * Although linkIds may appear more than once in questionnaire response, they would not appear more
- * than once within a list of questionnaire response items sharing the same parent.
+ * In case of repeated group item, `questionnaireResponseItemList` will contain
+ * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
+ * associated with its questionnaire item linkId.
  */
 internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
@@ -782,18 +781,13 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
     ) -> T,
 ): List<T> {
-  val linkIdToQuestionnaireItemMap = associateBy { it.linkId }
-
-  // Questionnaire item with type = group and repeats = true can have multiple questionnaire
-  // response item components for the same questionnaire item linkId. Therefore, it must traverse
-  // the structure based on the linkId
-  // present in the questionnaire response item component to avoid missing any remaining response
-  // items with the same linkId.
-  return questionnaireResponseItemList.mapNotNull { questionnaireResponseItem ->
-    linkIdToQuestionnaireItemMap[questionnaireResponseItem.linkId]?.let { questionnaireItem,
-      ->
+  val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
+  return flatMap { questionnaireItem ->
+    linkIdToQuestionnaireResponseItemListMap[questionnaireItem.linkId]?.mapNotNull {
+      questionnaireResponseItem ->
       transform(questionnaireItem, questionnaireResponseItem)
     }
+      ?: emptyList()
   }
 }
 
@@ -805,8 +799,11 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
  * This is true for the following two cases:
  * 1. Questions with nested items
  * 2. Repeated groups with nested items (Note that this is how repeated groups are organized in the
+ *
+ * ```
  *    [QuestionnaireViewModel], and that they will be flattened in the final
  *    [QuestionnaireResponse].)
+ * ```
  *
  * Non-repeated groups should have child items nested directly under the group itself.
  *
