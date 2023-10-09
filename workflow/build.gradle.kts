@@ -65,7 +65,7 @@ android {
         "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
-      )
+      ),
     )
   }
   configureJacocoTestOptions()
@@ -84,6 +84,7 @@ configurations {
 }
 
 dependencies {
+  testImplementation(project(mapOf("path" to ":knowledge")))
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -134,7 +135,7 @@ dependencies {
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
   implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
-  implementation(Dependencies.androidFhirKnowledge)
+  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
@@ -156,14 +157,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
       externalDocumentationLink {

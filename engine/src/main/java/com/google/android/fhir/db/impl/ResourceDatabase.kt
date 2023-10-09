@@ -48,81 +48,104 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       DateTimeIndexEntity::class,
       NumberIndexEntity::class,
       LocalChangeEntity::class,
-      PositionIndexEntity::class
+      PositionIndexEntity::class,
     ],
-  version = 6,
-  exportSchema = true
+  version = 7,
+  exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
 internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun resourceDao(): ResourceDao
+
   abstract fun localChangeDao(): LocalChangeDao
 }
 
 val MIGRATION_1_2 =
-  object : Migration(/* startVersion = */ 1, /* endVersion = */ 2) {
+  object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL("DROP table if exists SyncedResourceEntity")
     }
   }
 
 val MIGRATION_2_3 =
-  object : Migration(/* startVersion = */ 2, /* endVersion = */ 3) {
+  object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)"
+        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_index_from` ON `DateTimeIndexEntity` (`index_from`)",
       )
     }
   }
 
 val MIGRATION_3_4 =
-  object : Migration(/* startVersion = */ 3, /* endVersion = */ 4) {
+  object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateTimeIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
+        "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateTimeIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)",
       )
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
+        "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)",
       )
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_system`, `index_value`, `resourceUuid`)"
+        "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_system`, `index_value`, `resourceUuid`)",
       )
       database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_index_from`")
       database.execSQL(
-        "DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to`"
+        "DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to`",
       )
       database.execSQL(
-        "DROP INDEX IF EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to`"
+        "DROP INDEX IF EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to`",
       )
       database.execSQL(
-        "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value`"
+        "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value`",
       )
     }
   }
 
 val MIGRATION_4_5 =
-  object : Migration(/* startVersion = */ 4, /* endVersion = */ 5) {
+  object : Migration(4, 5) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "ALTER TABLE `ResourceEntity` ADD COLUMN `lastUpdatedLocal` INTEGER DEFAULT NULL"
+        "ALTER TABLE `ResourceEntity` ADD COLUMN `lastUpdatedLocal` INTEGER DEFAULT NULL",
       )
     }
   }
 
 /** Changes column type of [LocalChangeEntity.timestamp] from [String] to [java.time.Instant]. */
 val MIGRATION_5_6 =
-  object : Migration(/* startVersion = */ 5, /* endVersion = */ 6) {
+  object : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
-        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)"
+        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
       )
       database.execSQL(
-        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`timestamp`,`type`,`payload`,`versionId`) SELECT `id`,`resourceType`,`resourceId`, COALESCE(strftime('%s', `timestamp`) ||  substr(strftime('%f', `timestamp`), 4) , /* default is EPOCH*/ 0 ),`type`,`payload`,`versionId` FROM `LocalChangeEntity`"
+        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`timestamp`,`type`,`payload`,`versionId`) SELECT `id`,`resourceType`,`resourceId`, COALESCE(strftime('%s', `timestamp`) ||  substr(strftime('%f', `timestamp`), 4) , /* default is EPOCH*/ 0 ),`type`,`payload`,`versionId` FROM `LocalChangeEntity`",
       )
       database.execSQL("DROP TABLE `LocalChangeEntity`")
       database.execSQL("ALTER TABLE `_new_LocalChangeEntity` RENAME TO `LocalChangeEntity`")
       database.execSQL(
-        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `LocalChangeEntity` (`resourceType`, `resourceId`)"
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `LocalChangeEntity` (`resourceType`, `resourceId`)",
+      )
+    }
+  }
+
+/** Add column resourceUuid in [LocalChangeEntity] */
+val MIGRATION_6_7 =
+  object : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE TABLE IF NOT EXISTS `_new_LocalChangeEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `resourceId` TEXT NOT NULL, `resourceUuid` BLOB NOT NULL, `timestamp` INTEGER NOT NULL, `type` INTEGER NOT NULL, `payload` TEXT NOT NULL, `versionId` TEXT)",
+      )
+      database.execSQL(
+        "INSERT INTO `_new_LocalChangeEntity` (`id`,`resourceType`,`resourceId`,`resourceUuid`,`timestamp`,`type`,`payload`,`versionId`) " +
+          "SELECT localChange.id, localChange.resourceType, localChange.resourceId, resource.resourceUuid, localChange.timestamp, localChange.type, localChange.payload, localChange.versionId FROM `LocalChangeEntity` localChange LEFT JOIN ResourceEntity resource ON localChange.resourceId= resource.resourceId",
+      )
+      database.execSQL("DROP TABLE `LocalChangeEntity`")
+      database.execSQL("ALTER TABLE `_new_LocalChangeEntity` RENAME TO `LocalChangeEntity`")
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceType_resourceId` ON `LocalChangeEntity` (`resourceType`, `resourceId`)",
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceUuid` ON `LocalChangeEntity` (`resourceUuid`)",
       )
     }
   }

@@ -46,7 +46,7 @@ internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
   databaseConfig: DatabaseConfig,
-  private val resourceIndexer: ResourceIndexer
+  private val resourceIndexer: ResourceIndexer,
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -88,12 +88,21 @@ internal class DatabaseImpl(
             openHelperFactory {
               SQLCipherSupportHelper(
                 it,
-                databaseErrorStrategy = databaseConfig.databaseErrorStrategy
-              ) { DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME) }
+                databaseErrorStrategy = databaseConfig.databaseErrorStrategy,
+              ) {
+                DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
+              }
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+          addMigrations(
+            MIGRATION_1_2,
+            MIGRATION_2_3,
+            MIGRATION_3_4,
+            MIGRATION_4_5,
+            MIGRATION_5_6,
+            MIGRATION_6_7,
+          )
         }
         .build()
   }
@@ -113,9 +122,10 @@ internal class DatabaseImpl(
       logicalIds.addAll(
         resource.map {
           val timeOfLocalChange = Instant.now()
-          localChangeDao.addInsert(it, timeOfLocalChange)
-          resourceDao.insertLocalResource(it, timeOfLocalChange)
-        }
+          val resourceUuid = resourceDao.insertLocalResource(it, timeOfLocalChange)
+          localChangeDao.addInsert(it, resourceUuid, timeOfLocalChange)
+          it.logicalId
+        },
       )
     }
     return logicalIds
@@ -140,14 +150,14 @@ internal class DatabaseImpl(
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,
-    lastUpdated: Instant
+    lastUpdated: Instant,
   ) {
     db.withTransaction {
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
-        lastUpdated
+        lastUpdated,
       )
     }
   }
@@ -167,19 +177,17 @@ internal class DatabaseImpl(
 
   override suspend fun delete(type: ResourceType, id: String) {
     db.withTransaction {
-      val remoteVersionId: String? =
-        try {
-          selectEntity(type, id).versionId
-        } catch (e: ResourceNotFoundException) {
-          null
+      resourceDao.getResourceEntity(id, type)?.let {
+        val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+        if (rowsDeleted > 0) {
+          localChangeDao.addDelete(
+            resourceId = id,
+            resourceType = type,
+            resourceUuid = it.resourceUuid,
+            remoteVersionId = it.versionId,
+          )
         }
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-      if (rowsDeleted > 0)
-        localChangeDao.addDelete(
-          resourceId = id,
-          resourceType = type,
-          remoteVersionId = remoteVersionId
-        )
+      }
     }
   }
 
@@ -200,7 +208,7 @@ internal class DatabaseImpl(
           IndexedIdAndResource(
             it.matchingIndex,
             it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
-            iParser.parseResource(it.serializedResource) as Resource
+            iParser.parseResource(it.serializedResource) as Resource,
           )
         }
     }
@@ -214,6 +222,10 @@ internal class DatabaseImpl(
 
   override suspend fun getAllLocalChanges(): List<LocalChange> {
     return db.withTransaction { localChangeDao.getAllLocalChanges().map { it.toLocalChange() } }
+  }
+
+  override suspend fun getLocalChangesCount(): Int {
+    return db.withTransaction { localChangeDao.getLocalChangesCount() }
   }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
@@ -265,12 +277,12 @@ internal class DatabaseImpl(
         if (forcePurge) {
           resourceDao.deleteResource(resourceId = id, resourceType = type)
           localChangeDao.discardLocalChanges(
-            token = LocalChangeToken(localChangeEntityList.map { it.id })
+            token = LocalChangeToken(localChangeEntityList.map { it.id }),
           )
         } else {
           // local change is available but FORCE_PURGE = false then throw exception
           throw IllegalStateException(
-            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
           )
         }
       }
@@ -301,5 +313,5 @@ internal class DatabaseImpl(
 data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
-  val databaseErrorStrategy: DatabaseErrorStrategy
+  val databaseErrorStrategy: DatabaseErrorStrategy,
 )

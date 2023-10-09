@@ -1,0 +1,9 @@
+{
+  "name": "anc-cds",
+  "version": "0.0.3",
+  "type": "IG",
+  "title": "anc-cds",
+  "fhirVersions": [
+    "4.0.1"
+  ]
+}

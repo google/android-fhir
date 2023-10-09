@@ -126,6 +126,6 @@ internal fun getLocalizedDatePattern(): String {
     FormatStyle.SHORT,
     null,
     IsoChronology.INSTANCE,
-    Locale.getDefault()
+    Locale.getDefault(),
   )
 }

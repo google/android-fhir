@@ -35,3 +35,22 @@ internal interface PatchGenerator {
    */
   fun generate(localChanges: List<LocalChange>): List<Patch>
 }
+
+internal object PatchGeneratorFactory {
+  fun byMode(
+    mode: PatchGeneratorMode,
+  ): PatchGenerator =
+    when (mode) {
+      is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
+    }
+}
+
+/**
+ * Mode to decide the type of [PatchGenerator] that needs to be used to upload the [LocalChange]s
+ */
+internal sealed class PatchGeneratorMode {
+  object PerResource : PatchGeneratorMode()
+
+  object PerChange : PatchGeneratorMode()
+}

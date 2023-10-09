@@ -97,7 +97,8 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
   val variantToPublish = "release"
   project.extensions
     .getByType<com.android.build.gradle.LibraryExtension>()
-    .publishing.singleVariant(variantToPublish) { withSourcesJar() }
+    .publishing
+    .singleVariant(variantToPublish) { withSourcesJar() }
   afterEvaluate {
     configure<PublishingExtension> {
       publications {

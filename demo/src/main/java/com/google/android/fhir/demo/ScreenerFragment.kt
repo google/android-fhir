@@ -48,8 +48,10 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     }
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onSubmitAction() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -77,7 +79,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       add(
         R.id.add_patient_container,
         QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
-        QUESTIONNAIRE_FRAGMENT_TAG
+        QUESTIONNAIRE_FRAGMENT_TAG,
       )
     }
   }
@@ -87,7 +89,7 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     viewModel.saveScreenerEncounter(
       questionnaireFragment.getQuestionnaireResponse(),
-      args.patientId
+      args.patientId,
     )
   }
 

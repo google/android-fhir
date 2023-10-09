@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import androidx.room.Relation
     [
       Index(value = ["implementationGuideId"]),
       Index(value = ["resourceMetadataId"]),
-      Index(value = ["implementationGuideId", "resourceMetadataId"], unique = true)
+      Index(value = ["implementationGuideId", "resourceMetadataId"], unique = true),
     ],
   foreignKeys =
     [
@@ -38,15 +38,15 @@ import androidx.room.Relation
         entity = ImplementationGuideEntity::class,
         parentColumns = ["implementationGuideId"],
         childColumns = ["implementationGuideId"],
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
       ),
       ForeignKey(
         entity = ResourceMetadataEntity::class,
         parentColumns = ["resourceMetadataId"],
         childColumns = ["resourceMetadataId"],
-        onDelete = ForeignKey.CASCADE
-      )
-    ]
+        onDelete = ForeignKey.CASCADE,
+      ),
+    ],
 )
 internal data class ImplementationGuideResourceMetadataEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
@@ -59,7 +59,7 @@ internal data class ImplementationGuideWithResources(
   @Relation(
     parentColumn = "implementationGuideId",
     entityColumn = "resourceMetadataId",
-    associateBy = Junction(ImplementationGuideResourceMetadataEntity::class)
+    associateBy = Junction(ImplementationGuideResourceMetadataEntity::class),
   )
   val resources: List<ResourceMetadataEntity>,
 )

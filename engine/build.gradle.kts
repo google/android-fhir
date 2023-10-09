@@ -1,4 +1,4 @@
-import codegen.GenerateSourcesTask
+import codegen.GenerateSearchParamsTask
 import java.net.URL
 
 plugins {
@@ -14,8 +14,8 @@ publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
 
-val generateSourcesTask =
-  project.tasks.register("generateSearchParamsTask", GenerateSourcesTask::class) {
+val generateSearchParamsTask =
+  project.tasks.register("generateSearchParamsTask", GenerateSearchParamsTask::class) {
     srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
     testOutputDir.set(project.layout.buildDirectory.dir("gen/test"))
   }
@@ -24,8 +24,8 @@ kotlin {
   sourceSets {
     val main by getting
     val test by getting
-    main.kotlin.srcDirs(generateSourcesTask.map { it.srcOutputDir })
-    test.kotlin.srcDirs(generateSourcesTask.map { it.testOutputDir })
+    main.kotlin.srcDirs(generateSearchParamsTask.map { it.srcOutputDir })
+    test.kotlin.srcDirs(generateSearchParamsTask.map { it.testOutputDir })
   }
   jvmToolchain(11)
 }
@@ -145,14 +145,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/engine/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

@@ -23,7 +23,6 @@ import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.sync.upload.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.jsonParser
 import com.google.android.fhir.testing.readFromFile
@@ -33,6 +32,7 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -136,6 +136,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -147,11 +148,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -159,12 +160,13 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(2)) }
+          .apply { LocalChangeToken(listOf(2)) },
       )
     val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
@@ -179,6 +181,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -190,11 +193,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -202,6 +205,7 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.UPDATE,
             payload =
               diff(
@@ -212,7 +216,7 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("Jane")
                         family = "Doe"
-                      }
+                      },
                     )
                   },
                   Patient().apply {
@@ -221,12 +225,12 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("Janet")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 )
                 .toString(),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -234,14 +238,15 @@ class PerResourcePatchGeneratorTest {
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
       )
-    val patchToUpload = SquashedChangesUploadWorkManager().generatePatches(changes)
+    val patchToUpload = PerResourcePatchGenerator.generate(changes)
 
     assertThat(patchToUpload).isEmpty()
   }
@@ -293,7 +298,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       PerResourcePatchGenerator.generate(
-        listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange)
+        listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
       )
 
     with(patches.single()) {
@@ -315,7 +320,8 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
-            timestamp = Instant.now()
+            resourceUuid = UUID.randomUUID(),
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
@@ -325,7 +331,8 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
-            timestamp = Instant.now()
+            resourceUuid = UUID.randomUUID(),
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
@@ -350,7 +357,8 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
-            timestamp = Instant.now()
+            resourceUuid = UUID.randomUUID(),
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
@@ -358,6 +366,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -369,11 +378,11 @@ class PerResourcePatchGeneratorTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
@@ -391,7 +400,7 @@ class PerResourcePatchGeneratorTest {
   private fun createUpdateLocalChange(
     oldEntity: Resource,
     updatedResource: Resource,
-    currentChangeId: Long
+    currentChangeId: Long,
   ): LocalChange {
     val jsonDiff = diff(jsonParser, oldEntity, updatedResource)
     return LocalChange(
@@ -401,7 +410,7 @@ class PerResourcePatchGeneratorTest {
       payload = jsonDiff.toString(),
       versionId = oldEntity.versionId,
       token = LocalChangeToken(listOf(currentChangeId + 1)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 
@@ -413,7 +422,7 @@ class PerResourcePatchGeneratorTest {
       payload = jsonParser.encodeResourceToString(entity),
       versionId = entity.versionId,
       token = LocalChangeToken(listOf(1L)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 
@@ -425,7 +434,7 @@ class PerResourcePatchGeneratorTest {
       payload = "",
       versionId = entity.versionId,
       token = LocalChangeToken(listOf(currentChangeId + 1)),
-      timestamp = Instant.now()
+      timestamp = Instant.now(),
     )
   }
 }

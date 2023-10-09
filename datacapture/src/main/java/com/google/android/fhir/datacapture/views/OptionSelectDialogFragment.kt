@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ import kotlinx.coroutines.launch
 internal class OptionSelectDialogFragment(
   private val title: CharSequence,
   private val config: Config,
-  private val selectedOptions: SelectedOptions
+  private val selectedOptions: SelectedOptions,
 ) : DialogFragment() {
 
   /** Configures this [OptionSelectDialogFragment]. */
@@ -75,7 +75,7 @@ internal class OptionSelectDialogFragment(
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       }
 
@@ -87,8 +87,8 @@ internal class OptionSelectDialogFragment(
     recyclerView.addItemDecoration(
       MarginItemDecoration(
         marginVertical = resources.getDimensionPixelOffset(R.dimen.option_item_margin_vertical),
-        marginHorizontal = resources.getDimensionPixelOffset(R.dimen.option_item_margin_horizontal)
-      )
+        marginHorizontal = resources.getDimensionPixelOffset(R.dimen.option_item_margin_horizontal),
+      ),
     )
 
     val adapter = OptionSelectAdapter(multiSelectEnabled = config.multiSelect)
@@ -103,7 +103,7 @@ internal class OptionSelectDialogFragment(
             // https://stackoverflow.com/a/9118027
             it.clearFlags(
               WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM
+                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
             )
             // Adjust the dialog after the keyboard is on so that OK-CANCEL buttons are visible.
             // SOFT_INPUT_ADJUST_RESIZE is deprecated and the suggested alternative
@@ -136,7 +136,7 @@ internal class OptionSelectDialogFragment(
           options = currentList.filterIsInstance<OptionSelectRow.Option>().map { it.option },
           otherOptions =
             currentList.filterIsInstance<OptionSelectRow.OtherEditText>().map { it.currentText },
-        )
+        ),
       )
     }
   }
@@ -172,10 +172,11 @@ internal class OptionSelectDialogFragment(
 private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
   ListAdapter<OptionSelectRow, OptionSelectViewHolder>(DIFF_CALLBACK) {
   lateinit var recyclerView: RecyclerView
+
   override fun getItemViewType(position: Int): Int =
     when (getItem(position)) {
       is OptionSelectRow.Option,
-      is OptionSelectRow.OtherRow ->
+      is OptionSelectRow.OtherRow, ->
         if (multiSelectEnabled) Types.OPTION_MULTI else Types.OPTION_SINGLE
       is OptionSelectRow.OtherEditText -> Types.OTHER_EDIT_TEXT
       OptionSelectRow.OtherAddAnother -> Types.OTHER_ADD_ANOTHER
@@ -203,7 +204,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           item.option.item.itemAnswerOptionImage(compoundButton.context),
           null,
           null,
-          null
+          null,
         )
         compoundButton.setOnCheckedChangeListener(null)
         compoundButton.isChecked = item.option.selected
@@ -288,7 +289,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
       is OptionSelectRow.Option -> copy(option = option.copy(selected = selected))
       is OptionSelectRow.OtherRow -> copy(selected = selected)
       OptionSelectRow.OtherAddAnother,
-      is OptionSelectRow.OtherEditText -> null
+      is OptionSelectRow.OtherEditText, -> null
     }
 
   private enum class Types {
@@ -305,7 +306,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
 }
 
 private fun List<OptionSelectRow>.sanitizeOtherOptionRows(
-  multiSelectEnabled: Boolean
+  multiSelectEnabled: Boolean,
 ): List<OptionSelectRow> {
   var sanitized = this
   // Now that we've set the selected states properly, we need to make sure that the "Other" rows
@@ -331,10 +332,10 @@ private fun List<OptionSelectRow>.sanitizeOtherOptionRows(
         when (it) {
           // don't drop these
           is OptionSelectRow.Option,
-          is OptionSelectRow.OtherRow -> false
+          is OptionSelectRow.OtherRow, -> false
           // drop these
           is OptionSelectRow.OtherEditText,
-          OptionSelectRow.OtherAddAnother -> true
+          OptionSelectRow.OtherAddAnother, -> true
         }
       }
   }

@@ -159,7 +159,8 @@ val Questionnaire.entryMode: EntryMode?
 enum class EntryMode(val value: String) {
   PRIOR_EDIT("prior-edit"),
   RANDOM("random"),
-  SEQUENTIAL("sequential");
+  SEQUENTIAL("sequential"),
+  ;
 
   companion object {
     fun from(type: String?): EntryMode? = values().find { it.value == type }

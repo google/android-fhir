@@ -59,6 +59,7 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
 
   private val questionnaire: String
     get() = getQuestionnaireJson()
+
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire

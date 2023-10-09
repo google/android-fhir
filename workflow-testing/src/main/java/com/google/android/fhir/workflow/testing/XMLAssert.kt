@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ object XMLAssert {
         .withTest(actual)
         .withNodeMatcher(DefaultNodeMatcher(ElementSelectors.byName))
         .withDocumentBuilderFactory(
-          DocumentBuilderFactoryImpl() // Overrides the incomplete default DocumentBuilderFactory
+          DocumentBuilderFactoryImpl(), // Overrides the incomplete default DocumentBuilderFactory
         )
         .checkForSimilar()
         .build()

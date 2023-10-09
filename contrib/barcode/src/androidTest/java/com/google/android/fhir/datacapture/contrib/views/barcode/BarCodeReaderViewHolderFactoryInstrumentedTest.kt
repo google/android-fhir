@@ -46,7 +46,7 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
     context =
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        com.google.android.material.R.style.Theme_MaterialComponents
+        com.google.android.material.R.style.Theme_MaterialComponents,
       )
     parent = FrameLayout(context)
     viewHolder = BarCodeReaderViewHolderFactory.create(parent)
@@ -60,7 +60,7 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
@@ -77,7 +77,7 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
@@ -92,7 +92,7 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -110,11 +110,11 @@ class BarCodeReaderViewHolderFactoryInstrumentedTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("Barcode Result")
-            }
+            },
           ),
         validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> }
-      )
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.textInputEditText).text.toString())

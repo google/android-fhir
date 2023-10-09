@@ -223,6 +223,30 @@
                     "value": "Mwanaume"
                   }]
               }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "other",
+                "display": "Other",
+                "designation": [
+                  {
+                    "language": "sw",
+                    "value": "Nyingine"
+                  }]
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/administrative-gender",
+                "code": "unknown",
+                "display": "Unknown",
+                "designation": [
+                  {
+                    "language": "sw",
+                    "value": "Haijulikani"
+                  }]
+              }
             }
           ]
         },
