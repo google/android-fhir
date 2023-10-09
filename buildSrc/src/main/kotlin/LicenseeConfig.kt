@@ -42,6 +42,7 @@ fun Project.configureLicensee() {
     allowDependency("org.javassist", "javassist", "3.29.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
+    // Remove once Evaluator 3 migration is over
     allowDependency("org.javassist", "javassist", "3.20.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
