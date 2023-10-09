@@ -45,7 +45,6 @@ fun replaceJsonValue(
     if (jsonObject.optJSONArray(key) == null && jsonObject.optJSONObject(key) == null) {
       if (jsonObject.optString(key) == currentValue) {
         jsonObject.put(key, newValue)
-        return jsonObject
       }
     }
 
@@ -57,12 +56,27 @@ fun replaceJsonValue(
     // if it's jsonarray
     if (jsonObject.optJSONArray(key) != null) {
       val jArray = jsonObject.getJSONArray(key)
-      for (i in 0 until jArray.length()) {
-        replaceJsonValue(jArray.getJSONObject(i), currentValue, newValue)
-      }
+      replaceJsonValue(jArray, currentValue, newValue)
     }
   }
   return jsonObject
+}
+
+fun replaceJsonValue(
+  jsonArray: JSONArray,
+  currentValue: String,
+  newValue: String,
+): JSONArray {
+  for (i in 0 until jsonArray.length()) {
+    if (jsonArray.optJSONArray(i) != null) {
+      replaceJsonValue(jsonArray.getJSONArray(i), currentValue, newValue)
+    } else if (jsonArray.optJSONObject(i) != null) {
+      replaceJsonValue(jsonArray.getJSONObject(i), currentValue, newValue)
+    } else if (currentValue.equals(jsonArray.optString(i))) {
+      jsonArray.put(i, newValue)
+    }
+  }
+  return jsonArray
 }
 
 fun lookForReferencesInJsonPatch(jsonObject: JSONObject): String? {
@@ -94,21 +108,21 @@ fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<Str
     // if it's jsonarray
     if (jsonObject.optJSONArray(key) != null) {
       referenceValues.addAll(
-        extractAllValuesWithKeyFromJsonArray(lookupKey, jsonObject.getJSONArray(key)),
+        extractAllValuesWithKey(lookupKey, jsonObject.getJSONArray(key)),
       )
     }
   }
   return referenceValues
 }
 
-fun extractAllValuesWithKeyFromJsonArray(lookupKey: String, jArray: JSONArray): List<String> {
+fun extractAllValuesWithKey(lookupKey: String, jArray: JSONArray): List<String> {
   val referenceValues = mutableListOf<String>()
   for (i in 0 until jArray.length()) {
     if (jArray.optJSONObject(i) != null) {
       referenceValues.addAll(extractAllValuesWithKey(lookupKey, jArray.getJSONObject(i)))
     } else if (jArray.optJSONArray(i) != null) {
       referenceValues.addAll(
-        extractAllValuesWithKeyFromJsonArray(lookupKey, jArray.getJSONArray(i)),
+        extractAllValuesWithKey(lookupKey, jArray.getJSONArray(i)),
       )
     }
   }
