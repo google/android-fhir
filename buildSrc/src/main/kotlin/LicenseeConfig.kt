@@ -24,6 +24,12 @@ fun Project.configureLicensee() {
     allow("Apache-2.0")
     allow("MIT")
 
+    ignoreDependencies("com.ibm.icu", "icu4j") {
+      because(
+        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+      )
+    }
+
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
     nonStandardLicenseUrls.forEach { allowUrl(it) }
 
