@@ -25,6 +25,8 @@ import androidx.room.PrimaryKey
   indices =
     [
       Index(value = ["resourceReferenceValue"]),
+      // To avoid full table scans whenever parent table is modified.
+      Index(value = ["localChangeId"]),
     ],
   foreignKeys =
     [

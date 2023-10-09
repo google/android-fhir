@@ -164,6 +164,9 @@ val MIGRATION_7_8 =
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_LocalChangeResourceReferenceEntity_resourceReferenceValue` ON `LocalChangeResourceReferenceEntity` (`resourceReferenceValue`)",
       )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeResourceReferenceEntity_localChangeId` ON `LocalChangeResourceReferenceEntity` (`localChangeId`)",
+      )
 
       database.query("SELECT id,type,payload from LocalChangeEntity").let {
         var continueIterating = it.moveToFirst()

@@ -26,8 +26,8 @@ import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
 import java.util.UUID
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -38,31 +38,18 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class UploaderImplTest {
+class UploaderTest {
 
   @Test
-  fun `upload should start`() = runBlocking {
-    val result = Uploader(BundleDataSource { Bundle() }).upload(localChanges).toList()
-
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-  }
-
-  @Test
-  fun `upload should succeed if response is transaction response`() = runBlocking {
+  fun `upload should succeed if response is transaction response`() = runTest {
     val result =
       Uploader(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-    assertThat(result.last()).isInstanceOf(UploadState.Success::class.java)
-
-    val success = result.last() as UploadState.Success
-    assertThat(success.total).isEqualTo(1)
-    assertThat(success.completed).isEqualTo(1)
+    assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
+    with(result as UploadSyncResult.Success) { assertThat(resources).hasSize(1) }
   }
 
   @Test
@@ -82,10 +69,8 @@ class UploaderImplTest {
           },
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
 
   @Test
@@ -95,10 +80,8 @@ class UploaderImplTest {
           BundleDataSource { OperationOutcome() },
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
 
   @Test
@@ -109,10 +92,8 @@ class UploaderImplTest {
             BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
           )
           .upload(localChanges)
-          .toList()
 
-      assertThat(result).hasSize(2)
-      assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+      assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
     }
 
   @Test
@@ -122,10 +103,8 @@ class UploaderImplTest {
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
 
   companion object {

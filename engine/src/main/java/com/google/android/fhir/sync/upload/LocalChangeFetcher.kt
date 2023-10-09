@@ -18,6 +18,7 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.sync.ResourceSyncException
 import kotlin.properties.Delegates
 
 /**
@@ -40,15 +41,16 @@ internal interface LocalChangeFetcher {
   suspend fun next(): List<LocalChange>
 
   /**
-   * Returns [FetchProgress], which contains the remaining changes left to upload and the initial
-   * total to upload.
+   * Returns [SyncUploadProgress], which contains the remaining changes left to upload and the
+   * initial total to upload.
    */
-  suspend fun getProgress(): FetchProgress
+  suspend fun getProgress(): SyncUploadProgress
 }
 
-data class FetchProgress(
+data class SyncUploadProgress(
   val remaining: Int,
   val initialTotal: Int,
+  val uploadError: ResourceSyncException? = null,
 )
 
 internal class AllChangesLocalChangeFetcher(
@@ -65,8 +67,8 @@ internal class AllChangesLocalChangeFetcher(
 
   override suspend fun next(): List<LocalChange> = database.getAllLocalChanges()
 
-  override suspend fun getProgress(): FetchProgress =
-    FetchProgress(database.getLocalChangesCount(), total)
+  override suspend fun getProgress(): SyncUploadProgress =
+    SyncUploadProgress(database.getLocalChangesCount(), total)
 }
 
 /** Represents the mode in which local changes should be fetched. */

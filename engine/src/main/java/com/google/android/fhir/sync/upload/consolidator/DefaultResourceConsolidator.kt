@@ -20,6 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -28,14 +29,25 @@ import timber.log.Timber
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(localChanges: List<LocalChange>, response: Resource) {
-    val localChangeToken = LocalChangeToken(localChanges.flatMap { it.token.ids })
-    database.deleteUpdates(localChangeToken)
-    when (response) {
-      is Bundle -> updateVersionIdAndLastUpdated(response)
-      else -> updateVersionIdAndLastUpdated(localChanges, response)
+  override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
+    when (uploadSyncResult) {
+      is UploadSyncResult.Success -> {
+        database.deleteUpdates(
+          LocalChangeToken(uploadSyncResult.localChanges.flatMap { it.token.ids }),
+        )
+        uploadSyncResult.resources.forEach {
+          when (it) {
+            is Bundle -> updateVersionIdAndLastUpdated(it)
+            else -> updateVersionIdAndLastUpdated(uploadSyncResult.localChanges, it)
+          }
+        }
+      }
+      is UploadSyncResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
+      }
     }
-  }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
     // TODO: Support POST in Bundle transactions. Assumption is that only PUT operations are used in
