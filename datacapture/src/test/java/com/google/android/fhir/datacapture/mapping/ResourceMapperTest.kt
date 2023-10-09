@@ -1088,7 +1088,7 @@ class ResourceMapperTest {
     }
 
   @Test
-  fun `extract_updateIntegerObservationForDecimalDefination_shouldUpdateAsDecimal() `() =
+  fun `extract_updateIntegerObservationForDecimalDefinition_shouldUpdateAsDecimal() `() =
     runBlocking {
       @Language("JSON")
       val questionnaireJson =
