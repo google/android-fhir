@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.files.NpmFileManager
+import com.google.common.truth.Truth.assertThat
 import java.io.IOException
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
@@ -49,15 +50,16 @@ class OkHttpNpmPackageDownloaderTest {
     val responseBody = MockResponse().setResponseCode(200).setBody(testFileBuffer)
     mockWebServer.enqueue(responseBody)
 
-    val npmPackage =
-      downloader.downloadPackage(
-        fhirNpmPackage,
-        npmFileManager.getPackageDir(fhirNpmPackage.name, fhirNpmPackage.version),
-      )
+    downloader.downloadPackage(
+      fhirNpmPackage,
+      npmFileManager.getPackageDir(fhirNpmPackage.name, fhirNpmPackage.version),
+    )
 
-    //    assertThat(npmPackage.packageId).isEqualTo(PACKAGE_ID)
-    //    assertThat(npmPackage.version).isEqualTo(VERSION)
-    //    assertThat(npmPackage.dependencies).isEqualTo(DEPENDENCIES)
+    val npmPackage =
+      npmFileManager.getLocalFhirNpmPackageMetadata(fhirNpmPackage.name, fhirNpmPackage.version)
+    assertThat(npmPackage.packageId).isEqualTo(PACKAGE_ID)
+    assertThat(npmPackage.version).isEqualTo(VERSION)
+    assertThat(npmPackage.dependencies).isEqualTo(DEPENDENCIES)
   }
 
   @Test(expected = IOException::class)
