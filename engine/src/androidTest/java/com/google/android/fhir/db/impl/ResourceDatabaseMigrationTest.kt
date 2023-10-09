@@ -296,15 +296,15 @@ class ResourceDatabaseMigrationTest {
 
   @Test
   fun migrate7To8_should_execute_with_no_exception(): Unit = runBlocking {
-    val taskId = "bed-net-001"
-    val taskResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
-    val bedNetTask: String =
-      Task()
+    val patientId = "patient-001"
+    val patientResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val patient: String =
+      Patient()
         .apply {
-          id = taskId
-          addBasedOn(Reference("CarePlan/123"))
-          `for` = Reference("Patient/123")
-          description = "Issue bed net"
+          id = patientId
+          addName(HumanName().apply { addGiven("Brad") })
+          addGeneralPractitioner(Reference("Practitioner/123"))
+          managingOrganization = Reference("Organization/123")
           meta.lastUpdated = Date()
         }
         .let { iParser.encodeResourceToString(it) }
@@ -312,17 +312,17 @@ class ResourceDatabaseMigrationTest {
     helper.createDatabase(DB_NAME, 7).apply {
       val insertionDate = Date()
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Task', '$taskResourceUuid', '$taskId', '${insertionDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$bedNetTask'  );",
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${insertionDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$patient'  );",
       )
       val updateDate = Date()
       val patch =
-        "[{\"op\":\"replace\",\"path\":\"\\/basedOn\\/0\\/reference\",\"value\":\"CarePlan\\/345\"}]"
+        "[{\"op\":\"replace\",\"path\":\"\\/generalPractitioner\\/0\\/reference\",\"value\":\"Practitioner\\/345\"}]"
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Task', '$taskResourceUuid', '$taskId', '${updateDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.UPDATE)}', '$patch'  );",
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${updateDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.UPDATE)}', '$patch'  );",
       )
       val deleteDate = Date()
       execSQL(
-        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Task', '$taskResourceUuid', '$taskId', '${deleteDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.DELETE)}', ''  );",
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${deleteDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.DELETE)}', ''  );",
       )
       close()
     }
@@ -365,8 +365,8 @@ class ResourceDatabaseMigrationTest {
     assertThat(localChangeReferences[localChange1Id]!!.size).isEqualTo(2)
     assertThat(localChangeReferences[localChange2Id]!!.size).isEqualTo(1)
     assertThat(localChangeReferences[localChange1Id]!!)
-      .containsExactly("CarePlan/123", "Patient/123")
-    assertThat(localChangeReferences[localChange2Id]!!).containsExactly("CarePlan/345")
+      .containsExactly("Practitioner/123", "Organization/123")
+    assertThat(localChangeReferences[localChange2Id]!!).containsExactly("Practitioner/345")
   }
 
   companion object {

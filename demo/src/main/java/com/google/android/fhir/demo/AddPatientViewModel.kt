@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Reference
 
 /** ViewModel for patient registration screen {@link AddPatientFragment}. */
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :

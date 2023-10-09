@@ -18,6 +18,7 @@ package com.google.android.fhir.db.impl
 
 import ca.uhn.fhir.parser.IParser
 import org.hl7.fhir.r4.model.Resource
+import org.json.JSONArray
 import org.json.JSONObject
 
 fun addUpdatedReferenceToResource(
@@ -92,10 +93,23 @@ fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<Str
 
     // if it's jsonarray
     if (jsonObject.optJSONArray(key) != null) {
-      val jArray = jsonObject.getJSONArray(key)
-      for (i in 0 until jArray.length()) {
-        referenceValues.addAll(extractAllValuesWithKey(lookupKey, jArray.getJSONObject(i)))
-      }
+      referenceValues.addAll(
+        extractAllValuesWithKeyFromJsonArray(lookupKey, jsonObject.getJSONArray(key)),
+      )
+    }
+  }
+  return referenceValues
+}
+
+fun extractAllValuesWithKeyFromJsonArray(lookupKey: String, jArray: JSONArray): List<String> {
+  val referenceValues = mutableListOf<String>()
+  for (i in 0 until jArray.length()) {
+    if (jArray.optJSONObject(i) != null) {
+      referenceValues.addAll(extractAllValuesWithKey(lookupKey, jArray.getJSONObject(i)))
+    } else if (jArray.optJSONArray(i) != null) {
+      referenceValues.addAll(
+        extractAllValuesWithKeyFromJsonArray(lookupKey, jArray.getJSONArray(i)),
+      )
     }
   }
   return referenceValues
