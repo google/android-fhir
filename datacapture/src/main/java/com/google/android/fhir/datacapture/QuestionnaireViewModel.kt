@@ -33,7 +33,7 @@ import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
-import com.google.android.fhir.datacapture.extensions.filterLaunchContextsByCodeInNameExtension
+import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
@@ -167,19 +167,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   init {
     questionnaireLaunchContextMap =
-      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP_STRINGS)) {
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP)) {
 
         val launchContextMapString: Map<String, String> =
-          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP_STRINGS]!!
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP]!!
 
         val launchContextMapResource =
           launchContextMapString.mapValues { parser.parseResource(it.value) as Resource }
         questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
           validateLaunchContextExtensions(launchContextExtensions)
-          filterLaunchContextsByCodeInNameExtension(
-            launchContextMapResource,
-            launchContextExtensions
-          )
+          filterByCodeInNameExtension(launchContextMapResource, launchContextExtensions)
         }
       } else {
         null

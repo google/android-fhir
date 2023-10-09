@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
@@ -23,6 +24,7 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The StructureMap url in the
@@ -65,12 +67,7 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
  */
 internal fun validateLaunchContextExtensions(launchContextExtensions: List<Extension>) =
   launchContextExtensions.forEach { launchExtension ->
-    validateLaunchContextExtension(
-      Extension().apply {
-        addExtension(launchExtension.extension.firstOrNull { it.url == "name" })
-        addExtension(launchExtension.extension.firstOrNull { it.url == "type" })
-      }
-    )
+    validateLaunchContextExtension(launchExtension)
   }
 
 /**
@@ -79,21 +76,31 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
   check(launchExtension.extension.size == 2) {
-    "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+    "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchExtension.extension.size}."
   }
 
-  val nameCoding = launchExtension.getExtensionByUrl("name").value as Coding
-  val typeCodeType = launchExtension.getExtensionByUrl("type").value as CodeType
+  val nameCoding =
+    launchExtension.getExtensionByUrl("name")?.value as? Coding
+      ?: error(
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+      )
 
-  val hasNameCodingSystem = nameCoding.system == EXTENSION_LAUNCH_CONTEXT
-  val isValidResourceType = MoreResourceTypes.isValidCode(typeCodeType.value)
+  val typeCodeType =
+    launchExtension.getExtensionByUrl("type")?.value as? CodeType
+      ?: error(
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+      )
 
-  val isValidExtension = hasNameCodingSystem && isValidResourceType
+  val isValidResourceType =
+    try {
+      ResourceType.fromCode(typeCodeType.value) != null
+    } catch (exception: FHIRException) {
+      false
+    }
 
-  if (!isValidExtension) {
+  if (nameCoding.system != EXTENSION_LAUNCH_CONTEXT || !isValidResourceType) {
     error(
-      "The extension:name extension and/or extension:type extension do not follow the format " +
-        "specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+      "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
     )
   }
 }
@@ -102,14 +109,14 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
  * Filters the provided launch contexts by matching the keys with the `code` values found in the
  * "name" extensions.
  */
-internal fun filterLaunchContextsByCodeInNameExtension(
+internal fun filterByCodeInNameExtension(
   launchContexts: Map<String, Resource>,
   launchContextExtensions: List<Extension>
 ): Map<String, Resource> {
   val nameCodes =
-    launchContextExtensions.mapNotNull { extension ->
-      (extension.getExtensionByUrl("name").value as? Coding)?.code
-    }
+    launchContextExtensions
+      .mapNotNull { extension -> (extension.getExtensionByUrl("name").value as? Coding)?.code }
+      .toSet()
 
   return launchContexts.filterKeys { nameCodes.contains(it) }
 }

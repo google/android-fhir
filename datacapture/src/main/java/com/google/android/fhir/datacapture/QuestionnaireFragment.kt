@@ -322,7 +322,7 @@ class QuestionnaireFragment : Fragment() {
      * @param launchContextMap map of launchContext name and serialized resources
      */
     fun setQuestionnaireLaunchContextMap(launchContextMap: Map<String, String>) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP_STRINGS to launchContextMap)
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP to launchContextMap)
     }
 
     /**
@@ -419,8 +419,7 @@ class QuestionnaireFragment : Fragment() {
     /**
      * A map of launchContext name and JSON encoded strings extra for each questionnaire context.
      */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP_STRINGS =
-      "questionnaire-launch-contexts"
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP = "questionnaire-launch-contexts"
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
