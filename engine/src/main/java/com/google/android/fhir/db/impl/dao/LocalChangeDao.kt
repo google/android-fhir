@@ -336,7 +336,9 @@ internal abstract class LocalChangeDao {
    * contains reference to the updated resource in its payload, we update the payload with the
    * reference and also update the corresponding [LocalChangeResourceReferenceEntity]. We delete the
    * original [LocalChangeEntity] and create a new one with new
-   * [LocalChangeResourceReferenceEntity]s in its place.
+   * [LocalChangeResourceReferenceEntity]s in its place. This method returns a list of the
+   * [ResourceEntity.resourceUuid] for all the resources whose [LocalChange] contained references to
+   * the oldResource
    */
   suspend fun updateResourceId(
     resourceUuid: UUID,
