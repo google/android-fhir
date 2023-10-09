@@ -20,7 +20,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.UploadState
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -40,6 +39,7 @@ import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.robolectric.RobolectricTestRunner
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 class FhirSynchronizerTest {
 
@@ -64,20 +64,15 @@ class FhirSynchronizerTest {
       )
   }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun `synchronize should return Success on successful download and upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          flowOf(
-            UploadState.Success(
-              LocalChangeToken(listOf()),
-              Patient(),
-              1,
-              1,
-            ),
+          UploadSyncResult.Success(
+            LocalChangeToken(listOf()),
+            listOf(),
           ),
         )
 
@@ -90,6 +85,7 @@ class FhirSynchronizerTest {
         .containsExactly(
           SyncJobStatus.Started,
           SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
+          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
           SyncJobStatus.Finished,
         )
@@ -97,7 +93,6 @@ class FhirSynchronizerTest {
       assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
     }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun `synchronize should return Failed on failed download`() =
     runTest(UnconfinedTestDispatcher()) {
@@ -105,13 +100,9 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          flowOf(
-            UploadState.Success(
-              LocalChangeToken(listOf()),
-              Patient(),
-              1,
-              1,
-            ),
+          UploadSyncResult.Success(
+            LocalChangeToken(listOf()),
+            listOf(),
           ),
         )
 
@@ -123,23 +114,22 @@ class FhirSynchronizerTest {
       assertThat(emittedValues)
         .containsExactly(
           SyncJobStatus.Started,
+          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
           SyncJobStatus.Failed(exceptions = listOf(error)),
         )
+
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }
 
-  @OptIn(ExperimentalCoroutinesApi::class)
   @Test
   fun `synchronize should return Failed on failed upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
       `when`(uploader.upload(any()))
-        .thenReturn(
-          flowOf(UploadState.Failure(error)),
-        )
+        .thenReturn(UploadSyncResult.Failure(error, LocalChangeToken(listOf())))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
       backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
@@ -150,6 +140,7 @@ class FhirSynchronizerTest {
         .containsExactly(
           SyncJobStatus.Started,
           SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
+          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.Failed(exceptions = listOf(error)),
         )
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)

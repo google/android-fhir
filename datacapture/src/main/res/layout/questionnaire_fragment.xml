@@ -16,21 +16,21 @@
 -->
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_alignParentBottom="true"
     android:layout_alignParentTop="true"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_alignParentBottom="true"
 >
 
     <Button
         android:id="@+id/review_mode_edit_button"
         style="?attr/questionnaireEditButtonStyle"
-        app:icon="@drawable/ic_outline_edit_24"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
         android:layout_marginVertical="@dimen/action_button_margin_vertical"
+        app:icon="@drawable/ic_outline_edit_24"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />
@@ -40,10 +40,10 @@
         style="?attr/questionnaireLinearProgressIndicatorStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
         app:layout_constraintBottom_toTopOf="@id/questionnaire_edit_recycler_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
     <androidx.recyclerview.widget.RecyclerView
@@ -65,22 +65,39 @@
     />
 
     <com.google.android.material.divider.MaterialDivider
-        style="?attr/questionnaireBottomNavContainerDividerStyle"
         android:id="@+id/bottom_nav_container_divider"
+        style="?attr/questionnaireBottomNavContainerDividerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_container"
     />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        style="?attr/questionnaireBottomNavContainerStyle"
+    <LinearLayout
         android:id="@+id/bottom_nav_container"
+        style="?attr/questionnaireBottomNavContainerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
     >
+
+        <Button
+            android:id="@+id/cancel_questionnaire"
+            style="?attr/questionnaireCancelButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/cancel_questionnaire"
+        />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+        />
 
         <Button
             android:id="@+id/pagination_previous_button"
@@ -90,10 +107,6 @@
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_previous"
-            android:textAllCaps="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
         />
 
         <Button
@@ -104,10 +117,6 @@
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_next"
-            android:textAllCaps="false"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
         />
 
         <Button
@@ -118,23 +127,18 @@
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_review"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone"
-            app:layout_constraintTop_toTopOf="parent"
         />
 
         <Button
-            style="?attr/questionnaireSubmitButtonStyle"
             android:id="@+id/submit_questionnaire"
+            style="?attr/questionnaireSubmitButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/submit_questionnaire"
         />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
