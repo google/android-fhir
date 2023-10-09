@@ -24,6 +24,7 @@
     />
 
     <application
+        android:name=".CatalogApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_card_file_box"
         android:label="@string/app_name"
