@@ -82,13 +82,13 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
   val nameCoding =
     launchExtension.getExtensionByUrl("name")?.value as? Coding
       ?: error(
-        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
 
   val typeCodeType =
     launchExtension.getExtensionByUrl("type")?.value as? CodeType
       ?: error(
-        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
 
   val isValidResourceType =
@@ -100,7 +100,7 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
 
   if (nameCoding.system != EXTENSION_LAUNCH_CONTEXT || !isValidResourceType) {
     error(
-      "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+      "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
     )
   }
 }
@@ -111,7 +111,7 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
  */
 internal fun filterByCodeInNameExtension(
   launchContexts: Map<String, Resource>,
-  launchContextExtensions: List<Extension>
+  launchContextExtensions: List<Extension>,
 ): Map<String, Resource> {
   val nameCodes =
     launchContextExtensions

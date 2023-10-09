@@ -220,12 +220,12 @@ object ResourceMapper {
    */
   suspend fun populate(
     questionnaire: Questionnaire,
-    launchContexts: Map<String, Resource>
+    launchContexts: Map<String, Resource>,
   ): QuestionnaireResponse {
     val filteredLaunchContexts =
       filterByCodeInNameExtension(
         launchContexts,
-        questionnaire.questionnaireLaunchContexts ?: listOf()
+        questionnaire.questionnaireLaunchContexts ?: listOf(),
       )
     populateInitialValues(questionnaire.item, filteredLaunchContexts)
     return QuestionnaireResponse().apply {
@@ -235,14 +235,14 @@ object ResourceMapper {
 
   private suspend fun populateInitialValues(
     questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-    launchContexts: Map<String, Resource>
+    launchContexts: Map<String, Resource>,
   ) {
     questionnaireItems.forEach { populateInitialValue(it, launchContexts) }
   }
 
   private suspend fun populateInitialValue(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    launchContexts: Map<String, Resource>
+    launchContexts: Map<String, Resource>,
   ) {
     check(questionnaireItem.initial.isEmpty() || questionnaireItem.initialExpression == null) {
       "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."

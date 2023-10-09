@@ -43,8 +43,8 @@ class MoreQuestionnairesTest {
       listOf(
         Extension(
           "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap",
-          CanonicalType(structureMapUrl)
-        )
+          CanonicalType(structureMapUrl),
+        ),
       )
 
     assertThat(questionnaire.targetStructureMap).isEqualTo(structureMapUrl)
@@ -64,11 +64,11 @@ class MoreQuestionnairesTest {
                     .addCoding(
                       Coding()
                         .setCode(DisplayItemControlType.PAGE.extensionCode)
-                        .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                    )
-                )
+                        .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                    ),
+                ),
             )
-          }
+          },
         )
       }
 
@@ -117,7 +117,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
           )
         }
 
@@ -129,7 +129,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}."
+        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}.",
       )
   }
 
@@ -140,7 +140,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
           )
           addExtension("type", CodeType("Patient"))
           addExtension("waitwhat", CodeType("Patient"))
@@ -154,7 +154,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}."
+        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}.",
       )
   }
 
@@ -165,7 +165,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
           )
           addExtension("type", CodeType("Avocado"))
         }
@@ -178,7 +178,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
@@ -198,7 +198,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
@@ -219,7 +219,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
@@ -240,7 +240,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
@@ -251,7 +251,7 @@ class MoreQuestionnairesTest {
         .apply {
           addExtension(
             "waitwhat",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "grandma", "Grandma")
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "grandma", "Grandma"),
           )
           addExtension("type", CodeType("Patient"))
         }
@@ -264,7 +264,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
@@ -285,7 +285,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 }

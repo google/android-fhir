@@ -79,7 +79,8 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
       val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) return@launch
       val patient = entry.resource as Patient
-      if (patient.hasName() &&
+      if (
+        patient.hasName() &&
           patient.name[0].hasGiven() &&
           patient.name[0].hasFamily() &&
           patient.hasBirthDate() &&
