@@ -16,7 +16,7 @@
 <resources>
   <string name="app_name">FHIR Engine Sample App</string>
 
-  <string name="title_patient_list">Registered Patients</string>
+  <string name="title_patient_list">Patient List</string>
   <string name="title_patient_detail">SamplePatient Detail</string>
 
   <string name="menu_about">About Fhir Engine</string>
