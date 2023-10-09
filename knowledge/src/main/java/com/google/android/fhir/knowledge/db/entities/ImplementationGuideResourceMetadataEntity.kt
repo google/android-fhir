@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge.db.impl.entities
+package com.google.android.fhir.knowledge.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Entity
