@@ -121,6 +121,9 @@
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
 
+    <!--   Style for cancel button. -->
+    <attr name="questionnaireCancelButtonStyle" format="reference" />
+ 
     <!--   Style for edit button. -->
     <attr name="questionnaireEditButtonStyle" format="reference" />
 
