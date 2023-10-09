@@ -34,7 +34,6 @@ import com.google.android.fhir.search.LAST_UPDATED
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.CanonicalType
@@ -68,9 +67,7 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
 internal class ResourceIndexer(
   private val searchParamDefinitionsProvider: SearchParamDefinitionsProvider,
 ) {
-  // Switched HapiWorkerContext to SimpleWorkerContext as a fix for
-  // https://github.com/google/android-fhir/issues/768
-  private val fhirPathEngine = FHIRPathEngine(SimpleWorkerContext())
+  private val fhirPathEngine = FHIRPathEngine(DualHapiWorkerContext())
 
   fun <R : Resource> index(resource: R) = extractIndexValues(resource)
 

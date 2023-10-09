@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import java.net.URL
 
 plugins {
@@ -52,7 +53,12 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations { all { exclude(module = "xpp3") } }
+configurations {
+  all {
+    exclude(module = "xpp3")
+    forceGuava()
+  }
+}
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -77,6 +83,7 @@ dependencies {
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Glide.glide)
+  implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
