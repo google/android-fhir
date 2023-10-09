@@ -63,3 +63,40 @@ fun replaceJsonValue(
   }
   return jsonObject
 }
+
+fun lookForReferencesInJsonPatch(jsonObject: JSONObject): String? {
+  // "[{\"op\":\"replace\",\"path\":\"\\/basedOn\\/0\\/reference\",\"value\":\"CarePlan\\/345\"}]"
+  if (jsonObject.getString("path").endsWith("reference")) {
+    return jsonObject.getString("value")
+  }
+  return null
+}
+
+fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<String> {
+  val iterator: Iterator<*> = jsonObject.keys()
+  var key: String?
+  val referenceValues = mutableListOf<String>()
+  while (iterator.hasNext()) {
+    key = iterator.next() as String
+    // if object is just string we change value in key
+    if (jsonObject.optJSONArray(key) == null && jsonObject.optJSONObject(key) == null) {
+      if (key.equals(lookupKey)) {
+        referenceValues.add(jsonObject.getString(key))
+      }
+    }
+
+    // if it's jsonobject
+    if (jsonObject.optJSONObject(key) != null) {
+      referenceValues.addAll(extractAllValuesWithKey(lookupKey, jsonObject.getJSONObject(key)))
+    }
+
+    // if it's jsonarray
+    if (jsonObject.optJSONArray(key) != null) {
+      val jArray = jsonObject.getJSONArray(key)
+      for (i in 0 until jArray.length()) {
+        referenceValues.addAll(extractAllValuesWithKey(lookupKey, jArray.getJSONObject(i)))
+      }
+    }
+  }
+  return referenceValues
+}

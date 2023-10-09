@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 8,
-    "identityHash": "8dddbb1e8b44cb78ebe88f61aeab9aeb",
+    "identityHash": "81bc60d60855266f7fc233eb1c164a89",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -948,7 +948,7 @@
       },
       {
         "tableName": "LocalChangeResourceReferenceEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `localChangeId` INTEGER NOT NULL, `resourceReferenceValue` TEXT NOT NULL, `resourceReferenceName` TEXT NOT NULL, FOREIGN KEY(`localChangeId`) REFERENCES `LocalChangeEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `localChangeId` INTEGER NOT NULL, `resourceReferenceValue` TEXT NOT NULL, `resourceReferenceName` TEXT, FOREIGN KEY(`localChangeId`) REFERENCES `LocalChangeEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
         "fields": [
           {
             "fieldPath": "id",
@@ -972,7 +972,7 @@
             "fieldPath": "resourceReferenceName",
             "columnName": "resourceReferenceName",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -1010,7 +1010,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8dddbb1e8b44cb78ebe88f61aeab9aeb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81bc60d60855266f7fc233eb1c164a89')"
     ]
   }
 }
