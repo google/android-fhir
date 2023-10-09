@@ -1,10 +1,10 @@
 # https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
-
 version: 2
+
+# Gotta Catch 'Em All! (i.e. don't wait and propose them only "trickled")
+open-pull-requests-limit: 99
+
 updates:
-    # Gotta Catch 'Em All! (i.e. don't wait and propose them only "trickled")
-    open-pull-requests-limit: 99
-    
   - package-ecosystem: gradle
     directory: /
     schedule:
