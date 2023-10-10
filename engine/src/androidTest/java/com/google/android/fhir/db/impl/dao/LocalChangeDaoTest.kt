@@ -102,10 +102,10 @@ class LocalChangeDaoTest {
     val localChangeResourceReferences =
       localChangeDao.getReferencesForLocalChange(carePlanLocalChange1Id)
     assertThat(localChangeResourceReferences.size).isEqualTo(2)
-    assertThat(localChangeResourceReferences[0].resourceReferenceName).isEqualTo("subject")
+    assertThat(localChangeResourceReferences[0].resourceReferencePath).isEqualTo("subject")
     assertThat(localChangeResourceReferences[0].resourceReferenceValue)
       .isEqualTo("Patient/$patientId")
-    assertThat(localChangeResourceReferences[1].resourceReferenceName)
+    assertThat(localChangeResourceReferences[1].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[1].resourceReferenceValue)
       .isEqualTo("Patient/$patientId")
@@ -177,14 +177,14 @@ class LocalChangeDaoTest {
     val localChangeResourceReferences =
       localChangeDao.getReferencesForLocalChange(carePlanLocalChange2Id)
     assertThat(localChangeResourceReferences.size).isEqualTo(3)
-    assertThat(localChangeResourceReferences[0].resourceReferenceName)
+    assertThat(localChangeResourceReferences[0].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[0].resourceReferenceValue)
       .isEqualTo("Patient/$patientId")
-    assertThat(localChangeResourceReferences[1].resourceReferenceName).isEqualTo("author")
+    assertThat(localChangeResourceReferences[1].resourceReferencePath).isEqualTo("author")
     assertThat(localChangeResourceReferences[1].resourceReferenceValue)
       .isEqualTo(practitionerReference)
-    assertThat(localChangeResourceReferences[2].resourceReferenceName)
+    assertThat(localChangeResourceReferences[2].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[2].resourceReferenceValue)
       .isEqualTo(practitionerReference)
@@ -291,7 +291,7 @@ class LocalChangeDaoTest {
 
     val updatedPatientId = "SyncedPatient1"
     val updatedPatient = patient.copy().apply { id = updatedPatientId }
-    localChangeDao.updateResourceId(
+    localChangeDao.updateResourceIdAndReferences(
       resourceUuid = patientResourceUuid,
       oldResource = patient,
       updatedResource = updatedPatient,
@@ -322,10 +322,10 @@ class LocalChangeDaoTest {
     val localChange1ResourceReferences =
       localChangeDao.getReferencesForLocalChange(carePlanLocalChange1Id)
     assertThat(localChange1ResourceReferences.size).isEqualTo(2)
-    assertThat(localChange1ResourceReferences[0].resourceReferenceName).isEqualTo("subject")
+    assertThat(localChange1ResourceReferences[0].resourceReferencePath).isEqualTo("subject")
     assertThat(localChange1ResourceReferences[0].resourceReferenceValue)
       .isEqualTo("Patient/$updatedPatientId")
-    assertThat(localChange1ResourceReferences[1].resourceReferenceName)
+    assertThat(localChange1ResourceReferences[1].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChange1ResourceReferences[1].resourceReferenceValue)
       .isEqualTo("Patient/$updatedPatientId")
@@ -344,14 +344,14 @@ class LocalChangeDaoTest {
     val localChangeResourceReferences =
       localChangeDao.getReferencesForLocalChange(carePlanLocalChange2Id)
     assertThat(localChangeResourceReferences.size).isEqualTo(3)
-    assertThat(localChangeResourceReferences[0].resourceReferenceName)
+    assertThat(localChangeResourceReferences[0].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[0].resourceReferenceValue)
       .isEqualTo("Patient/$updatedPatientId")
-    assertThat(localChangeResourceReferences[1].resourceReferenceName).isEqualTo("author")
+    assertThat(localChangeResourceReferences[1].resourceReferencePath).isEqualTo("author")
     assertThat(localChangeResourceReferences[1].resourceReferenceValue)
       .isEqualTo(practitionerReference)
-    assertThat(localChangeResourceReferences[2].resourceReferenceName)
+    assertThat(localChangeResourceReferences[2].resourceReferencePath)
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[2].resourceReferenceValue)
       .isEqualTo(practitionerReference)

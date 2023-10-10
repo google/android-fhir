@@ -44,5 +44,5 @@ internal data class LocalChangeResourceReferenceEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val localChangeId: Long,
   val resourceReferenceValue: String,
-  val resourceReferenceName: String?,
+  val resourceReferencePath: String?,
 )

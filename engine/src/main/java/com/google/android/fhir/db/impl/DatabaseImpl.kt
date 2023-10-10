@@ -255,38 +255,63 @@ internal class DatabaseImpl(
     localChangeDao.discardLocalChanges(resources)
   }
 
-  override suspend fun updateResourceAndId(currentResourceId: String, updatedResource: Resource) {
+  override suspend fun updateResourceAndReferences(
+    currentResourceId: String,
+    updatedResource: Resource,
+  ) {
     val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
     val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
     val resourceUuid = currentResourceEntity.resourceUuid
-    val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
-    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
     db.withTransaction {
-      // update the resource entity
-      resourceDao.updateResourceWithUuid(currentResourceEntity.resourceUuid, updatedResource)
+      updateResourceEntity(resourceUuid, updatedResource)
 
-      // update the local changes of this resource and any resource referring to the updated
-      // resource
-      val uuidsOfResourcesWithReferencesToResource =
-        localChangeDao.updateResourceId(
+      val uuidsOfReferringResources =
+        updateLocalChangeResourceIdAndReferences(
           resourceUuid = resourceUuid,
           oldResource = oldResource,
           updatedResource = updatedResource,
         )
 
-      // update the references in the resources referring to the updated resource
-      uuidsOfResourcesWithReferencesToResource.forEach { resourceUuid ->
-        resourceDao.getResourceEntity(resourceUuid)?.let {
-          val referringResource = iParser.parseResource(it.serializedResource) as Resource
-          val updatedReferringResource =
-            addUpdatedReferenceToResource(
-              iParser,
-              referringResource,
-              oldReferenceValue,
-              updatedReferenceValue,
-            )
-          resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
-        }
+      updateReferringResources(
+        referringResourcesUuids = uuidsOfReferringResources,
+        oldResource = oldResource,
+        updatedResource = updatedResource,
+      )
+    }
+  }
+
+  private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
+    resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
+
+  private suspend fun updateLocalChangeResourceIdAndReferences(
+    resourceUuid: UUID,
+    oldResource: Resource,
+    updatedResource: Resource,
+  ) =
+    localChangeDao.updateResourceIdAndReferences(
+      resourceUuid = resourceUuid,
+      oldResource = oldResource,
+      updatedResource = updatedResource,
+    )
+
+  private suspend fun updateReferringResources(
+    referringResourcesUuids: List<UUID>,
+    oldResource: Resource,
+    updatedResource: Resource,
+  ) {
+    val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
+    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    referringResourcesUuids.forEach { resourceUuid ->
+      resourceDao.getResourceEntity(resourceUuid)?.let {
+        val referringResource = iParser.parseResource(it.serializedResource) as Resource
+        val updatedReferringResource =
+          addUpdatedReferenceToResource(
+            iParser,
+            referringResource,
+            oldReferenceValue,
+            updatedReferenceValue,
+          )
+        resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
       }
     }
   }

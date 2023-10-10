@@ -21,7 +21,7 @@ import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
 
-fun addUpdatedReferenceToResource(
+internal fun addUpdatedReferenceToResource(
   iParser: IParser,
   resource: Resource,
   outdatedReference: String,
@@ -32,7 +32,7 @@ fun addUpdatedReferenceToResource(
   return iParser.parseResource(updatedResource.toString()) as Resource
 }
 
-fun replaceJsonValue(
+internal fun replaceJsonValue(
   jsonObject: JSONObject,
   currentValue: String,
   newValue: String,
@@ -62,7 +62,7 @@ fun replaceJsonValue(
   return jsonObject
 }
 
-fun replaceJsonValue(
+internal fun replaceJsonValue(
   jsonArray: JSONArray,
   currentValue: String,
   newValue: String,
@@ -79,7 +79,7 @@ fun replaceJsonValue(
   return jsonArray
 }
 
-fun lookForReferencesInJsonPatch(jsonObject: JSONObject): String? {
+internal fun lookForReferencesInJsonPatch(jsonObject: JSONObject): String? {
   // "[{\"op\":\"replace\",\"path\":\"\\/basedOn\\/0\\/reference\",\"value\":\"CarePlan\\/345\"}]"
   if (jsonObject.getString("path").endsWith("reference")) {
     return jsonObject.getString("value")
@@ -87,7 +87,7 @@ fun lookForReferencesInJsonPatch(jsonObject: JSONObject): String? {
   return null
 }
 
-fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<String> {
+internal fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<String> {
   val iterator: Iterator<*> = jsonObject.keys()
   var key: String?
   val referenceValues = mutableListOf<String>()
@@ -115,7 +115,7 @@ fun extractAllValuesWithKey(lookupKey: String, jsonObject: JSONObject): List<Str
   return referenceValues
 }
 
-fun extractAllValuesWithKey(lookupKey: String, jArray: JSONArray): List<String> {
+internal fun extractAllValuesWithKey(lookupKey: String, jArray: JSONArray): List<String> {
   val referenceValues = mutableListOf<String>()
   for (i in 0 until jArray.length()) {
     if (jArray.optJSONObject(i) != null) {

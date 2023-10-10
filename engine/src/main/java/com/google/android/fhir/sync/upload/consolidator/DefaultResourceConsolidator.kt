@@ -32,15 +32,15 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
   override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
     when (uploadSyncResult) {
       is UploadSyncResult.Success -> {
-        database.deleteUpdates(
-          LocalChangeToken(uploadSyncResult.localChanges.flatMap { it.token.ids }),
-        )
         uploadSyncResult.resources.forEach {
           when (it) {
             is Bundle -> updateVersionIdAndLastUpdated(it)
-            else -> updateVersionIdAndLastUpdated(uploadSyncResult.localChanges, it)
+            else -> consolidateResourceAndItsReferences(uploadSyncResult.localChanges, it)
           }
         }
+        database.deleteUpdates(
+          LocalChangeToken(uploadSyncResult.localChanges.flatMap { it.token.ids }),
+        )
       }
       is UploadSyncResult.Failure -> {
         /* For now, do nothing (we do not delete the local changes from the database as they were
@@ -49,9 +49,12 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
       }
     }
 
+  /**
+   * TODO: Support POST in Bundle transactions. Assumption is that only PUT operations are used in
+   *   Bundle requests. We should not support any [UploadStrategy] that supports POST Bundle
+   *   operations.
+   */
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
-    // TODO: Support POST in Bundle transactions. Assumption is that only PUT operations are used in
-    // Bundle requests
     when (bundle.type) {
       Bundle.BundleType.TRANSACTIONRESPONSE -> {
         bundle.entry.forEach {
@@ -92,21 +95,15 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(
+  /** The function expects [List<[LocalChange]>] which belong only to the resource. */
+  private suspend fun consolidateResourceAndItsReferences(
     localChanges: List<LocalChange>,
     resource: Resource,
   ) {
     if (localChanges.first().resourceId != resource.logicalId) {
-      database.updateResourceAndId(localChanges.first().resourceId, resource)
+      database.updateResourceAndReferences(localChanges.first().resourceId, resource)
     }
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant(),
-      )
-    }
+    updateVersionIdAndLastUpdated(resource)
   }
 
   /**

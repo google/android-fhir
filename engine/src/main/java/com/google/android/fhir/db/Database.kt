@@ -122,7 +122,7 @@ internal interface Database {
    * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
    * updated resource.
    */
-  suspend fun updateResourceAndId(
+  suspend fun updateResourceAndReferences(
     currentResourceId: String,
     updatedResource: Resource,
   )

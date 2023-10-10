@@ -3564,7 +3564,7 @@ class DatabaseImplTest {
         locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
 
       // perform updates
-      database.updateResourceAndId(
+      database.updateResourceAndReferences(
         locallyCreatedPatientResourceId,
         remotelyCreatedPatient,
       )
@@ -3667,7 +3667,7 @@ class DatabaseImplTest {
       val remotelyCreatedPatient =
         locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
 
-      database.updateResourceAndId(
+      database.updateResourceAndReferences(
         locallyCreatedPatientResourceId,
         remotelyCreatedPatient,
       )
@@ -3783,7 +3783,7 @@ class DatabaseImplTest {
       val remotelyCreatedPatient =
         locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
 
-      database.updateResourceAndId(
+      database.updateResourceAndReferences(
         locallyCreatedPatientResourceId,
         remotelyCreatedPatient,
       )
