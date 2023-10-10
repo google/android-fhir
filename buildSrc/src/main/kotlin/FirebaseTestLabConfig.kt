@@ -33,7 +33,6 @@ fun Project.configureFirebaseTestLabForLibraries() {
         "clearPackageData" to "true",
       ),
     )
-    flakyTestAttempts.set(3)
     devices.set(
       listOf(
         mapOf(
