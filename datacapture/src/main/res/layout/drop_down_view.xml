@@ -45,6 +45,9 @@
             android:drawablePadding="@dimen/icon_drawable_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:editable="false"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
         />
 
     </com.google.android.material.textfield.TextInputLayout>
