@@ -63,16 +63,24 @@ internal constructor(
     fhirNpmPackages
       .filter { knowledgeDao.getImplementationGuide(it.name, it.version) == null }
       .forEach {
-        if (!npmFileManager.containsPackage(it.name, it.version)) {
-          npmPackageDownloader.downloadPackage(
-            it,
-            npmFileManager.getPackageDir(it.name, it.version),
-          )
+        try {
+          if (!npmFileManager.containsPackage(it.name, it.version)) {
+            npmPackageDownloader.downloadPackage(
+              it,
+              npmFileManager.getPackageDir(it.name, it.version),
+            )
+          }
+        } catch (e: Exception) {
+          Timber.w("Unable to download package ${it.name} ${it.version}")
         }
-        val localFhirNpmPackageMetadata =
-          npmFileManager.getLocalFhirNpmPackageMetadata(it.name, it.version)
-        install(it, localFhirNpmPackageMetadata.rootDirectory)
-        install(*localFhirNpmPackageMetadata.dependencies.toTypedArray())
+        try {
+          val localFhirNpmPackageMetadata =
+            npmFileManager.getLocalFhirNpmPackageMetadata(it.name, it.version)
+          install(it, localFhirNpmPackageMetadata.rootDirectory)
+          install(*localFhirNpmPackageMetadata.dependencies.toTypedArray())
+        } catch (e: Exception) {
+          Timber.w("Unable to install package ${it.name} ${it.version}")
+        }
       }
   }
 
