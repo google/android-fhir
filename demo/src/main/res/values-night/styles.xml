@@ -1,0 +1,64 @@
+<!--
+ Copyright 2020 Google LLC
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+  <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+      <item name="colorPrimary">@color/primary_blue_80</item>
+      <item name="colorOnPrimary">@color/onPrimary_blue_20</item>
+      <item name="colorPrimaryContainer">@color/primaryContainer_blue_30</item>
+      <item
+            name="colorOnPrimaryContainer"
+        >@color/onPrimaryContainer_blue_90</item>
+
+      <item name="colorSecondary">@color/secondary_blue_80</item>
+      <item name="colorOnSecondary">@color/onSecondary_blue_20</item>
+      <item
+            name="colorSecondaryContainer"
+        >@color/secondaryContainer_blue_30</item>
+      <item
+            name="colorOnSecondaryContainer"
+        >@color/onSecondaryContainer_blue_90</item>
+
+      <item name="colorTertiary">@color/tertiary_green_80</item>
+      <item name="colorOnTertiary">@color/onTertiary_green_20</item>
+      <item
+            name="colorTertiaryContainer"
+        >@color/tertiaryContainer_green_30</item>
+      <item
+            name="colorOnTertiaryContainer"
+        >@color/onTertiaryContainer_green_90</item>
+
+      <item name="colorError">@color/error_red_80</item>
+      <item name="colorErrorContainer">@color/errorContainer_red_20</item>
+      <item name="colorOnError">@color/onError_red_30</item>
+      <item name="colorOnErrorContainer">@color/onErrorContainer_red_90</item>
+
+      <item name="android:colorBackground">@color/background_neutral_10</item>
+      <item name="colorOnBackground">@color/onBackground_neutral_90</item>
+
+      <item name="colorSurface">@color/surface_neutral_10</item>
+      <item name="colorOnSurface">@color/onSurface_neutral_90</item>
+
+      <item
+            name="colorSurfaceVariant"
+        >@color/surfaceVariant_neutral_variant_30</item>
+      <item
+            name="colorOnSurfaceVariant"
+        >@color/onSurfaceVariant_neutral_variant_80</item>
+
+      <item name="colorOutline">@color/outline_neutral_variant_60</item>
+    </style>
+</resources>
