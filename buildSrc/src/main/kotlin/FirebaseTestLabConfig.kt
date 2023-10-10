@@ -42,7 +42,7 @@ fun Project.configureFirebaseTestLabForLibraries() {
           "locale" to "en_US",
         ),
         mapOf(
-          "model" to "panther",
+          "model" to "MediumPhone.arm",
           "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
           "locale" to "en_US",
         ),
@@ -85,7 +85,8 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
     },
   )
   useOrchestrator.set(true)
-  maxTestShards.set(10)
+  flakyTestAttempts.set(1)
+  numUniformShards.set(10)
   directoriesToPull.set(listOf("/sdcard/Download"))
   resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(
