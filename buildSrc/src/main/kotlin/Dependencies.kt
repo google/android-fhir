@@ -100,7 +100,7 @@ object Dependencies {
 
     const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
     const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
-    const val core = "$coreGroup:jackson-core:${Versions.jackson}"
+    const val core = "$coreGroup:jackson-core:${Versions.jacksonCore}"
     const val databind = "$coreGroup:jackson-databind:${Versions.jackson}"
     const val dataformatXml = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
     const val jaxbAnnotations = "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
@@ -259,9 +259,13 @@ object Dependencies {
 
     const val http = "4.11.0"
 
-    // Maximum version that supports Android API Level 24:
+    // Maximum Jackson libraries (excluding core) version that supports Android API Level 24:
     // https://github.com/FasterXML/jackson-databind/issues/3658
-    const val jackson = "2.15.2"
+    const val jackson = "2.13.5"
+
+    // Maximum Jackson Core library version that supports Android API Level 24:
+    const val jacksonCore = "2.15.2"
+
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val material = "1.9.0"

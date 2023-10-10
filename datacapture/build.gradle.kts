@@ -1,4 +1,6 @@
 import Dependencies.forceGuava
+import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import java.net.URL
 
 plugins {
@@ -56,7 +58,10 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations {
   all {
     exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
     forceGuava()
+    forceHapiVersion()
+    forceJacksonVersion()
   }
 }
 
@@ -87,7 +92,6 @@ dependencies {
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
-    exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
