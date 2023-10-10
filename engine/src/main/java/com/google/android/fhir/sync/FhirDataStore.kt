@@ -90,7 +90,7 @@ internal class FhirDataStore(context: Context) {
       val data =
         workDataOf(
           STATE_TYPE to syncJobStatus::class.java.name,
-          STATE to gson.toJson(syncJobStatus)
+          STATE to gson.toJson(syncJobStatus),
         )
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }

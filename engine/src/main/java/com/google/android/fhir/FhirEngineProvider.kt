@@ -146,7 +146,7 @@ enum class DatabaseErrorStrategy {
    * This strategy is NOT respected when opening a previously unencrypted database with an encrypted
    * configuration or vice versa. An [IllegalStateException] is thrown instead.
    */
-  RECREATE_AT_OPEN
+  RECREATE_AT_OPEN,
 }
 
 /** A configuration to provide necessary params for network connection. */
@@ -158,7 +158,7 @@ data class ServerConfiguration(
   /** An [HttpAuthenticator] for providing HTTP authorization header. */
   val authenticator: HttpAuthenticator? = null,
   /** Logs the communication between the engine and the remote server. */
-  val httpLogger: HttpLogger = HttpLogger.NONE
+  val httpLogger: HttpLogger = HttpLogger.NONE,
 )
 
 /** A configuration to provide the network connection parameters. */

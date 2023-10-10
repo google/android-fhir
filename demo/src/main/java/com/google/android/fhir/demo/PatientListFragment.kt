@@ -61,12 +61,13 @@ class PatientListFragment : Fragment() {
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
+
   private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
     return binding.root
@@ -82,7 +83,7 @@ class PatientListFragment : Fragment() {
     patientListViewModel =
       ViewModelProvider(
           this,
-          PatientListViewModelFactory(requireActivity().application, fhirEngine)
+          PatientListViewModelFactory(requireActivity().application, fhirEngine),
         )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
@@ -91,7 +92,7 @@ class PatientListFragment : Fragment() {
     recyclerView.addItemDecoration(
       DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
         setDrawable(ColorDrawable(Color.LTGRAY))
-      }
+      },
     )
 
     patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
@@ -119,7 +120,7 @@ class PatientListFragment : Fragment() {
           patientListViewModel.searchPatientsByName(query)
           return true
         }
-      }
+      },
     )
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
@@ -129,7 +130,8 @@ class PatientListFragment : Fragment() {
       }
     }
     requireActivity()
-      .onBackPressedDispatcher.addCallback(
+      .onBackPressedDispatcher
+      .addCallback(
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
@@ -140,7 +142,7 @@ class PatientListFragment : Fragment() {
               activity?.onBackPressed()
             }
           }
-        }
+        },
       )
 
     binding.apply {
@@ -225,9 +227,8 @@ class PatientListFragment : Fragment() {
           ?.let { if (it.isNaN()) 0.0 else it }
           ?.times(100)
           ?.roundToInt()
-      "$progress% ${inProgressState?.syncOperation?.name?.lowercase()}ed".also {
-        syncPercent.text = it
-      }
+      "$progress% ${inProgressState?.syncOperation?.name?.lowercase()}ed"
+        .also { syncPercent.text = it }
       syncProgress.progress = progress ?: 0
     }
   }
@@ -237,9 +238,8 @@ class PatientListFragment : Fragment() {
     syncProgress.visibility = View.GONE
 
     if (topBanner.visibility == View.VISIBLE) {
-      "${resources.getString(R.string.sync).uppercase()} ${state::class.java.simpleName.uppercase()}".also {
-        syncStatus.text = it
-      }
+      "${resources.getString(R.string.sync).uppercase()} ${state::class.java.simpleName.uppercase()}"
+        .also { syncStatus.text = it }
 
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
       topBanner.startAnimation(animation)

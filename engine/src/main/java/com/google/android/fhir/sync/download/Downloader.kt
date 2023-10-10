@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.sync.ResourceSyncException
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -24,7 +25,7 @@ import org.hl7.fhir.r4.model.ResourceType
 internal interface Downloader {
   /**
    * @return Flow of the [DownloadState] which keeps emitting [Resource]s or Error based on the
-   * response of each page download request. It also updates progress if [ProgressCallback] exists
+   *   response of each page download request. It also updates progress if [ProgressCallback] exists
    */
   suspend fun download(): Flow<DownloadState>
 }

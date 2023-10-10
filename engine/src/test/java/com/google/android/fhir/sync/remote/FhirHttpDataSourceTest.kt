@@ -17,10 +17,9 @@
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.sync.UrlUploadRequest
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
 import com.google.android.fhir.sync.remote.RetrofitHttpService
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.common.truth.Truth.assertThat
 import java.net.HttpURLConnection
@@ -56,8 +55,8 @@ internal class FhirHttpDataSourceTest {
           Bundle().apply {
             id = "transaction-response-1"
             type = Bundle.BundleType.TRANSACTIONRESPONSE
-          }
-        )
+          },
+        ),
       )
     }
 
@@ -83,11 +82,10 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
-    val request =
-      UrlUploadRequest(HttpVerb.POST, "Patient", patient, LocalChangeToken(listOf(1)), emptyMap())
+    val request = UrlUploadRequest(HttpVerb.POST, "Patient", patient, emptyMap())
     mockWebServer.enqueue(mockResponse)
     dataSource.upload(request)
     val recordedRequest: RecordedRequest = mockWebServer.takeRequest()
@@ -106,7 +104,7 @@ internal class FhirHttpDataSourceTest {
           HumanName().apply {
             addGiven("John")
             family = "Doe"
-          }
+          },
         )
       }
     val request =
@@ -114,8 +112,7 @@ internal class FhirHttpDataSourceTest {
         HttpVerb.PUT,
         "Patient/Patient-001",
         patient,
-        LocalChangeToken(listOf(1)),
-        emptyMap()
+        emptyMap(),
       )
     mockWebServer.enqueue(mockResponse)
     dataSource.upload(request)
@@ -131,7 +128,8 @@ internal class FhirHttpDataSourceTest {
     val patchToApply =
       Binary().apply {
         data =
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]".toByteArray()
+          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]"
+            .toByteArray()
       }
 
     val request =
@@ -139,8 +137,7 @@ internal class FhirHttpDataSourceTest {
         HttpVerb.PATCH,
         "Patient/Patient-001",
         patchToApply,
-        LocalChangeToken(listOf(1)),
-        mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH)
+        mapOf("Content-Type" to ContentTypes.APPLICATION_JSON_PATCH),
       )
     mockWebServer.enqueue(mockResponse)
     dataSource.upload(request)

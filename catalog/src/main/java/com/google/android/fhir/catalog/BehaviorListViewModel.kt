@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,27 +31,37 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
     val questionnaireFileName: String,
-    val workFlow: WorkflowType = WorkflowType.BEHAVIOR
+    val workFlow: WorkflowType = WorkflowType.BEHAVIOR,
   ) {
     CALCULATED_EXPRESSION(
       R.drawable.ic_calculations_behavior,
       R.string.behavior_name_calculated_expression,
-      "behavior_calculated_expression.json"
+      "behavior_calculated_expression.json",
+    ),
+    ANSWER_EXPRESSION(
+      R.drawable.ic_answers_behavior,
+      R.string.behavior_name_answer_expression,
+      "behavior_answer_expression.json",
     ),
     CONTEXT_VARIABLES(
       R.drawable.ic_context,
       R.string.behavior_name_context_variables,
-      "behavior_context_variables.json"
+      "behavior_context_variables.json",
     ),
     SKIP_LOGIC(
       R.drawable.ic_skiplogic_behavior,
       R.string.behavior_name_skip_logic,
-      "behavior_skip_logic.json"
+      "behavior_skip_logic.json",
+    ),
+    SKIP_LOGIC_WITH_EXPRESSION(
+      R.drawable.ic_skiplogic_behavior,
+      R.string.behavior_name_skip_logic_with_expression,
+      "behavior_skip_logic_with_expression.json",
     ),
     DYNAMIC_QUESTION_TEXT(
       R.drawable.ic_dynamic_text_behavior,
       R.string.behavior_name_dynamic_question_text,
-      "behavior_dynamic_question_text.json"
-    )
+      "behavior_dynamic_question_text.json",
+    ),
   }
 }

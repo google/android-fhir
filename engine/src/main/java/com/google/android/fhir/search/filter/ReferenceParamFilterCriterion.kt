@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.google.android.fhir.search.SearchDslMarker
 @SearchDslMarker
 data class ReferenceParamFilterCriterion(
   val parameter: ReferenceClientParam,
-  var value: String? = null
+  var value: String? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() = listOf(ConditionParam("index_value = ?", value!!))

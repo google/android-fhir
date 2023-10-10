@@ -73,7 +73,8 @@ class AutoCompleteViewHolderFactoryEspressoTest {
     assertThat(
         viewHolder.itemView
           .findViewById<MaterialAutoCompleteTextView>(R.id.autoCompleteTextView)
-          .adapter.count
+          .adapter
+          .count,
       )
       .isEqualTo(1)
   }
@@ -102,7 +103,7 @@ class AutoCompleteViewHolderFactoryEspressoTest {
       .check(ViewAssertions.matches(ViewMatchers.isDisplayed()))
       .perform(ViewActions.click())
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.autoCompleteTextView).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.autoCompleteTextView).text.toString(),
       )
       .isEmpty()
     assertThat(answerHolder!!.map { it.valueCoding.display })
@@ -146,7 +147,7 @@ class AutoCompleteViewHolderFactoryEspressoTest {
                 code = option.replace(" ", "_")
                 display = option
               }
-          }
+          },
         )
       }
     }
@@ -161,7 +162,7 @@ class AutoCompleteViewHolderFactoryEspressoTest {
                 code = option.replace(" ", "_")
                 display = option
               }
-          }
+          },
         )
       }
     }

@@ -152,7 +152,7 @@ class GzipUploadInterceptorBenchmark {
                 code = "kPa"
                 system = "http://unitsofmeasure.org"
               }
-          }
+          },
         )
       interpretation =
         listOf(
@@ -160,9 +160,9 @@ class GzipUploadInterceptorBenchmark {
             Coding(
               "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
               "H",
-              "high"
-            )
-          )
+              "high",
+            ),
+          ),
         )
     }
 
@@ -174,7 +174,7 @@ class GzipUploadInterceptorBenchmark {
 
     class Builder(
       private val baseUrl: String,
-      private val networkConfiguration: NetworkConfiguration
+      private val networkConfiguration: NetworkConfiguration,
     ) {
 
       fun build(): TestHttpService {

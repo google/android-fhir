@@ -10,6 +10,7 @@
     <string name="review_answers_text">Review answers</string>
     <string name="button_review">Review</string>
     <string name="submit_questionnaire">Submit</string>
+    <string name="cancel_questionnaire">@android:string/cancel</string>
 
     <!-- 1.2 Submit Pop-up -->
     <string name="questionnaire_validation_error_headline">Errors found</string>
@@ -25,6 +26,11 @@
     <string
         name="questionnaire_validation_error_fix_button_text"
     >Fix questions</string>
+
+    <!-- 1.3 Cancel Pop-up-->
+    <string
+        name="questionnaire_cancel_text"
+    >Do you want to exit the questionnaire?</string>
     
     <!-- 2. The following sections include strings used in widgets -->
 

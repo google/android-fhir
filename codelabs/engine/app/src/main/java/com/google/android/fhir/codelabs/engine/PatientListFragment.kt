@@ -99,7 +99,7 @@ class PatientListFragment : Fragment() {
         }
       },
       viewLifecycleOwner,
-      Lifecycle.State.RESUMED
+      Lifecycle.State.RESUMED,
     )
   }
 
@@ -116,7 +116,7 @@ class PatientListFragment : Fragment() {
           viewModel.searchPatientsByName(query)
           return true
         }
-      }
+      },
     )
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
@@ -125,7 +125,8 @@ class PatientListFragment : Fragment() {
       }
     }
     requireActivity()
-      .onBackPressedDispatcher.addCallback(
+      .onBackPressedDispatcher
+      .addCallback(
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
@@ -136,7 +137,7 @@ class PatientListFragment : Fragment() {
               activity?.onBackPressed()
             }
           }
-        }
+        },
       )
   }
 

@@ -24,6 +24,12 @@ fun Project.configureLicensee() {
     allow("Apache-2.0")
     allow("MIT")
 
+    ignoreDependencies("com.ibm.icu", "icu4j") {
+      because(
+        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+      )
+    }
+
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
     nonStandardLicenseUrls.forEach { allowUrl(it) }
 
@@ -71,7 +77,7 @@ fun Project.configureLicensee() {
     // Jakarta Activation API 2.1 Specification
     allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
       because(
-        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php"
+        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php",
       )
     }
 

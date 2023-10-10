@@ -61,7 +61,8 @@ class QuestionnaireFragment : Fragment() {
     QuestionnaireItemViewHolderFactoryMatchersProvider by lazy {
     requireArguments().getString(EXTRA_MATCHERS_FACTORY)?.let {
       DataCapture.getConfiguration(requireContext())
-        .questionnaireItemViewHolderFactoryMatchersProviderFactory?.get(it)
+        .questionnaireItemViewHolderFactoryMatchersProviderFactory
+        ?.get(it)
     }
       ?: EmptyQuestionnaireItemViewHolderFactoryMatchersProviderImpl
   }
@@ -70,7 +71,7 @@ class QuestionnaireFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View {
     inflater.context.obtainStyledAttributes(R.styleable.QuestionnaireTheme).use {
       val themeId =
@@ -78,7 +79,7 @@ class QuestionnaireFragment : Fragment() {
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire
+          R.style.Theme_Questionnaire,
         )
       return inflater
         .cloneInContext(ContextThemeWrapper(inflater.context, themeId))
@@ -96,6 +97,11 @@ class QuestionnaireFragment : Fragment() {
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
     val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
+    view.findViewById<Button>(R.id.cancel_questionnaire).setOnClickListener {
+      QuestionnaireCancelDialogFragment()
+        .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
+    }
+
     view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
       viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
         if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
@@ -106,7 +112,7 @@ class QuestionnaireFragment : Fragment() {
           QuestionnaireValidationErrorMessageDialogFragment()
             .show(
               requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG
+              QuestionnaireValidationErrorMessageDialogFragment.TAG,
             )
         }
       }
@@ -118,6 +124,7 @@ class QuestionnaireFragment : Fragment() {
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
     val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
+    val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
 
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
@@ -146,12 +153,14 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
+              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>(),
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
             // Set button visibility
             submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
+            cancelButton.visibility = if (displayMode.showCancelButton) View.VISIBLE else View.GONE
+
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
@@ -174,9 +183,12 @@ class QuestionnaireFragment : Fragment() {
             // Set button visibility
             submitButton.visibility =
               if (displayMode.pagination.showSubmitButton) View.VISIBLE else View.GONE
+            cancelButton.visibility =
+              if (displayMode.pagination.showCancelButton) View.VISIBLE else View.GONE
             reviewModeButton.visibility =
               if (displayMode.pagination.showReviewButton) View.VISIBLE else View.GONE
             reviewModeEditButton.visibility = View.GONE
+
             if (displayMode.pagination.isPaginated) {
               paginationPreviousButton.visibility = View.VISIBLE
               paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
@@ -195,8 +207,8 @@ class QuestionnaireFragment : Fragment() {
                   count =
                     (displayMode.pagination.currentPageIndex +
                       1), // incremented by 1 due to initialPageIndex starts with 0.
-                  totalCount = displayMode.pagination.pages.size
-                )
+                  totalCount = displayMode.pagination.pages.size,
+                ),
               )
             } else {
               questionnaireEditRecyclerView.addOnScrollListener(
@@ -208,11 +220,11 @@ class QuestionnaireFragment : Fragment() {
                         count =
                           (linearLayoutManager.findLastVisibleItemPosition() +
                             1), // incremented by 1 due to findLastVisiblePosition() starts with 0.
-                        totalCount = linearLayoutManager.itemCount
-                      )
+                        totalCount = linearLayoutManager.itemCount,
+                      ),
                     )
                   }
-                }
+                },
               )
             }
           }
@@ -223,6 +235,7 @@ class QuestionnaireFragment : Fragment() {
             paginationNextButton.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             submitButton.visibility = View.GONE
+            cancelButton.visibility = View.GONE
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
           }
@@ -231,9 +244,11 @@ class QuestionnaireFragment : Fragment() {
     }
     requireActivity().supportFragmentManager.setFragmentResultListener(
       QuestionnaireValidationErrorMessageDialogFragment.RESULT_CALLBACK,
-      viewLifecycleOwner
+      viewLifecycleOwner,
     ) { _, bundle ->
-      when (bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]) {
+      when (
+        val result = bundle.getString(QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY)
+      ) {
         QuestionnaireValidationErrorMessageDialogFragment.RESULT_VALUE_FIX -> {
           // Go back to the Edit mode if currently in the Review mode.
           viewModel.setReviewMode(false)
@@ -243,7 +258,25 @@ class QuestionnaireFragment : Fragment() {
         }
         else ->
           Timber.e(
-            "Unknown fragment result ${bundle[QuestionnaireValidationErrorMessageDialogFragment.RESULT_KEY]}"
+            "Unknown fragment result $result",
+          )
+      }
+    }
+    /** Listen to Button Clicks from the Cancel Dialog */
+    requireActivity().supportFragmentManager.setFragmentResultListener(
+      QuestionnaireCancelDialogFragment.REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, bundle ->
+      when (val result = bundle.getString(QuestionnaireCancelDialogFragment.RESULT_KEY)) {
+        QuestionnaireCancelDialogFragment.RESULT_NO -> {
+          // Allow the user to continue with the questionnaire
+        }
+        QuestionnaireCancelDialogFragment.RESULT_YES -> {
+          setFragmentResult(CANCEL_REQUEST_KEY, Bundle.EMPTY)
+        }
+        else ->
+          Timber.e(
+            "Unknown fragment result $result",
           )
       }
     }
@@ -364,13 +397,18 @@ class QuestionnaireFragment : Fragment() {
      * [QuestionnaireItemViewHolderFactoryMatchersProvider].
      */
     fun setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-      matchersProviderFactory: String
+      matchersProviderFactory: String,
     ) = apply { args.add(EXTRA_MATCHERS_FACTORY to matchersProviderFactory) }
 
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
+
+    /**
+     * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is true.
+     */
+    fun setShowCancelButton(value: Boolean) = apply { args.add(EXTRA_SHOW_CANCEL_BUTTON to value) }
 
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
@@ -419,6 +457,7 @@ class QuestionnaireFragment : Fragment() {
     /** A list of JSON encoded strings extra for each questionnaire context. */
     internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
       "questionnaire-launch-contexts"
+
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.
      *
@@ -449,10 +488,17 @@ class QuestionnaireFragment : Fragment() {
 
     const val SUBMIT_REQUEST_KEY = "submit-request-key"
 
+    const val CANCEL_REQUEST_KEY = "cancel-request-key"
+
     /**
      * A [Boolean] extra to show or hide the Submit button in the questionnaire. Default is true.
      */
     internal const val EXTRA_SHOW_SUBMIT_BUTTON = "show-submit-button"
+
+    /**
+     * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is false.
+     */
+    internal const val EXTRA_SHOW_CANCEL_BUTTON = "show-cancel-button"
 
     internal const val EXTRA_SHOW_OPTIONAL_TEXT = "show-optional-text"
 
@@ -501,8 +547,8 @@ class QuestionnaireFragment : Fragment() {
      * Implementation should specify when custom questionnaire components should be used.
      *
      * @return A [List] of [QuestionnaireItemViewHolderFactoryMatcher]s which are used to evaluate
-     * whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
-     * questionnaire item.
+     *   whether a custom [QuestionnaireItemViewHolderFactory] should be used to render a given
+     *   questionnaire item.
      */
     abstract fun get(): List<QuestionnaireItemViewHolderFactoryMatcher>
   }

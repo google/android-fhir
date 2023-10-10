@@ -49,6 +49,7 @@ internal object AutoCompleteViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
+
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var errorTextView: TextView
 
@@ -85,7 +86,7 @@ internal object AutoCompleteViewHolderFactory :
           questionnaireViewItem.enabledAnswerOptions.map {
             AutoCompleteViewAnswerOption(
               answerId = it.value.identifierString(header.context),
-              answerDisplay = it.value.displayString(header.context)
+              answerDisplay = it.value.displayString(header.context),
             )
           }
         val adapter =
@@ -93,7 +94,7 @@ internal object AutoCompleteViewHolderFactory :
             header.context,
             R.layout.drop_down_list_item,
             R.id.answer_option_textview,
-            answerOptionValues
+            answerOptionValues,
           )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
@@ -119,7 +120,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun onAnswerSelected(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         if (canHaveMultipleAnswers) {
           handleSelectionWhenQuestionCanHaveMultipleAnswers(answer)
@@ -134,7 +135,7 @@ internal object AutoCompleteViewHolderFactory :
        * will happen if the user selects an already selected answer.
        */
       private fun addNewChipIfNotPresent(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ): Boolean {
         if (chipIsAlreadyPresent(answer)) return false
 
@@ -155,16 +156,17 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun chipIsAlreadyPresent(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ): Boolean {
         return chipContainer.children.any { chip ->
           (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent)
-            .value.equalsDeep(answer.value)
+            .value
+            .equalsDeep(answer.value)
         }
       }
 
       private fun handleSelectionWhenQuestionCanHaveSingleAnswer(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         if (chipContainer.isEmpty()) {
           addNewChipIfNotPresent(answer)
@@ -178,7 +180,7 @@ internal object AutoCompleteViewHolderFactory :
       }
 
       private fun handleSelectionWhenQuestionCanHaveMultipleAnswers(
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ) {
         val answerNotPresent =
           questionnaireViewItem.answers.none { it.value.equalsDeep(answer.value) }
@@ -205,7 +207,7 @@ internal object AutoCompleteViewHolderFactory :
         // textInputLayout to show the error icon and the box color.
         when (validationResult) {
           is NotValidated,
-          Valid -> {
+          Valid, -> {
             errorTextView.visibility = View.GONE
             textInputLayout.error = null
           }

@@ -69,14 +69,15 @@ object Sync {
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
-    retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
+    retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
   ): Flow<OneTimeSyncState> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         uniqueWorkName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
+        createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName),
       )
     return combineSyncJobStatusAndWorkInfoStateForOnetimeSync(context, uniqueWorkName)
   }
@@ -88,20 +89,21 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
-   * mechanism
+   *   mechanism
    * @return a [Flow] of [FhirSyncWorkStatus]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
-    periodicSyncConfiguration: PeriodicSyncConfiguration
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
   ): Flow<PeriodicSyncState> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         uniqueWorkName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName)
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName),
       )
     return createPeriodicSyncState(context, uniqueWorkName)
   }
@@ -184,13 +186,13 @@ object Sync {
       oneTimeWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
-        it.backoffCriteria.timeUnit
+        it.backoffCriteria.timeUnit,
       )
       oneTimeWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
           .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
-          .build()
+          .build(),
       )
     }
     return oneTimeWorkRequestBuilder.build()
@@ -206,7 +208,7 @@ object Sync {
       PeriodicWorkRequest.Builder(
           clazz,
           periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
+          periodicSyncConfiguration.repeat.timeUnit,
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
@@ -214,14 +216,12 @@ object Sync {
       periodicWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
-        it.backoffCriteria.timeUnit
+        it.backoffCriteria.timeUnit,
       )
-      periodicWorkRequestBuilder.setInputData(
-        Data.Builder()
-          .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
-          .build()
-      )
+      Data.Builder()
+        .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
+        .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+        .build()
     }
     return periodicWorkRequestBuilder.build()
   }
@@ -233,9 +233,8 @@ object Sync {
 
   private fun createOneTimeSyncState(
     syncJobStatus: SyncJobStatus? = null,
-    schedulingStatus: WorkInfo.State
+    schedulingStatus: WorkInfo.State,
   ): OneTimeSyncState {
-
     return when (schedulingStatus) {
       ENQUEUED -> {
         Enqueued()
@@ -265,8 +264,7 @@ object Sync {
       is SyncJobStatus.Finished -> {
         createOneTimeSyncState(lastSyncJobStatus, SUCCEEDED)
       }
-      is SyncJobStatus.Failed,
-      is SyncJobStatus.Glitch -> {
+      is SyncJobStatus.Failed, -> {
         createOneTimeSyncState(lastSyncJobStatus, FAILED)
       }
       else -> {
@@ -276,20 +274,19 @@ object Sync {
 
   private fun createCurrentJobState(
     currentSyncJobStatus: SyncJobStatus,
-    schedulingStatus: WorkInfo.State
+    schedulingStatus: WorkInfo.State,
   ) =
     when (schedulingStatus) {
       RUNNING -> {
         when (currentSyncJobStatus) {
           is SyncJobStatus.Started,
-          is SyncJobStatus.InProgress -> {
+          is SyncJobStatus.InProgress, -> {
             Running(currentSyncJobStatus)
           }
           is SyncJobStatus.Finished -> {
             Succeeded(currentSyncJobStatus)
           }
-          is SyncJobStatus.Failed,
-          is SyncJobStatus.Glitch -> {
+          is SyncJobStatus.Failed, -> {
             Failed(currentSyncJobStatus)
           }
         }
@@ -299,8 +296,3 @@ object Sync {
       }
     }
 }
-
-data class FhirSyncWorkStatus(
-  val lastSyncJobStatus: SyncJobStatus? = null,
-  var schedulingStatus: WorkInfo.State? = null,
-)

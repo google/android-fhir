@@ -56,7 +56,7 @@ class FhirEngineProviderTest {
       FhirEngineConfiguration(
         testMode = true,
         context = ApplicationProvider.getApplicationContext(),
-      )
+      ),
     )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
@@ -70,7 +70,7 @@ class FhirEngineProviderTest {
       FhirEngineConfiguration(
         testMode = false,
         context = ApplicationProvider.getApplicationContext(),
-      )
+      ),
     )
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -96,8 +96,8 @@ class FhirEngineProviderTest {
         serverConfiguration =
           ServerConfiguration(
             "",
-            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
-          )
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6),
+          ),
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(5)

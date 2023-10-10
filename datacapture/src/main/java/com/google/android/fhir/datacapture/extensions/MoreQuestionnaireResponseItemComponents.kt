@@ -30,7 +30,7 @@ val QuestionnaireResponse.QuestionnaireResponseItemComponent.descendant:
     }
 
 private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.appendDescendantTo(
-  output: MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  output: MutableList<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
 ) {
   output.add(this)
   item.forEach { it.appendDescendantTo(output) }
@@ -45,7 +45,7 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.appendDesce
  * See https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
 fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
 ) {
   answer.forEach { it.item = questionnaireItem.getNestedQuestionnaireResponseItems() }
 }

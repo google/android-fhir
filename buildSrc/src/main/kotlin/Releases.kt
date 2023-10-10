@@ -42,13 +42,13 @@ object Releases {
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
-    override val version = "0.1.0-alpha04"
+    override val version = "0.1.0-alpha05"
     override val name = "Android FHIR Common Library"
   }
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "0.1.0-beta03"
+    override val version = "0.1.0-beta04"
     override val name = "Android FHIR Engine Library"
   }
 
@@ -97,7 +97,8 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
   val variantToPublish = "release"
   project.extensions
     .getByType<com.android.build.gradle.LibraryExtension>()
-    .publishing.singleVariant(variantToPublish) { withSourcesJar() }
+    .publishing
+    .singleVariant(variantToPublish) { withSourcesJar() }
   afterEvaluate {
     configure<PublishingExtension> {
       publications {

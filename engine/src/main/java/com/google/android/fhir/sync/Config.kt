@@ -43,7 +43,6 @@ val defaultRetryConfiguration =
 object SyncDataParams {
   const val SORT_KEY = "_sort"
   const val LAST_UPDATED_KEY = "_lastUpdated"
-  const val ADDRESS_COUNTRY_KEY = "address-country"
   const val SUMMARY_KEY = "_summary"
   const val SUMMARY_COUNT_VALUE = "count"
 }
@@ -52,7 +51,7 @@ object SyncDataParams {
 class PeriodicSyncConfiguration(
   /**
    * Constraints that specify the requirements needed before the synchronisation is triggered. E.g.
-   * network type (Wifi, 3G etc), the device should be charging etc.
+   * network type (WiFi, 3G etc), the device should be charging etc.
    */
   val syncConstraints: Constraints = Constraints.Builder().build(),
 
@@ -63,14 +62,14 @@ class PeriodicSyncConfiguration(
   val repeat: RepeatInterval,
 
   /** Configuration for synchronization retry */
-  val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
+  val retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
 )
 
 data class RepeatInterval(
   /** The interval at which the sync should be triggered in */
   val interval: Long,
   /** The time unit for the repeat interval */
-  val timeUnit: TimeUnit
+  val timeUnit: TimeUnit,
 )
 
 fun ParamMap.concatParams(): String {
@@ -88,7 +87,7 @@ data class RetryConfiguration(
   val backoffCriteria: BackoffCriteria,
 
   /** Maximum retries for a failing [FhirSyncWorker] */
-  val maxRetries: Int
+  val maxRetries: Int,
 )
 
 /**
@@ -107,5 +106,5 @@ data class BackoffCriteria(
   val backoffDelay: Long,
 
   /** The time unit for [backoffDelay] */
-  val timeUnit: TimeUnit
+  val timeUnit: TimeUnit,
 )

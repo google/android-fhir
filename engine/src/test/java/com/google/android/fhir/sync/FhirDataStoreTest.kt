@@ -42,7 +42,7 @@ class FhirDataStoreTest {
       listOf(
         SyncJobStatus.Started(),
         SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, 256, 20),
-        SyncJobStatus.Finished()
+        SyncJobStatus.Finished(),
       )
     val editJob = launch {
       syncJobStatusList.forEach { fhirDataStore.updateSyncJobStatus(key, it) }

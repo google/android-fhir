@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge
+package com.google.android.fhir.knowledge.npm
 
-/**
- * Holds Implementation Guide attributes. Used to define dependencies, load dependencies from
- * Package Manager
- */
-data class ImplementationGuide(val packageId: String, val version: String, val uri: String)
+import com.google.android.fhir.knowledge.FhirNpmPackage
+
+/** Downloads Npm package from the provided package server. */
+fun interface PackageDownloader {
+
+  /** Downloads the [fhirNpmPackage] from the [packageServerUrl]. */
+  suspend fun downloadPackage(
+    fhirNpmPackage: FhirNpmPackage,
+    packageServerUrl: String,
+  ): LocalFhirNpmPackageMetadata
+}

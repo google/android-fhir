@@ -63,7 +63,7 @@
             name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="questionnaireHelpButtonStyle">
-            @style/Widget.MaterialComponents.Button.TextButton.Icon
+            @style/Questionnaire.HelpIconStyle
         </item>
         <item name="questionnaireMediaImageStyle">
             @style/Questionnaire.MediaImageStyle
@@ -124,6 +124,10 @@
         <item
             name="questionnaireSubmitButtonStyle"
         >@style/Questionnaire.SubmitButtonStyle
+        </item>
+        <item
+            name="questionnaireCancelButtonStyle"
+        >@style/Questionnaire.CancelButtonStyle
         </item>
         <item
             name="questionnaireEditButtonStyle"
@@ -372,6 +376,13 @@
         >@dimen/option_item_after_text_padding</item>
     </style>
 
+  <style
+        name="Questionnaire.HelpIconStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Icon"
+    >
+    <item name="android:padding">@dimen/help_icon_padding</item>
+  </style>
+
     <style
         name="Questionnaire.EditButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton.Icon"
@@ -384,7 +395,13 @@
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
     >
-        <item name="android:text">@string/submit_questionnaire</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:visibility">visible</item>
+    </style>
+    <style
+        name="Questionnaire.CancelButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">visible</item>
     </style>
@@ -457,5 +474,4 @@
             name="android:paddingLeft"
         >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
-
 </resources>

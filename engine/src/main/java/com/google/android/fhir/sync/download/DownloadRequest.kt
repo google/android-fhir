@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync
+package com.google.android.fhir.sync.download
 
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Structure represents a request that can be made to download resources from the FHIR server. The
@@ -33,9 +30,11 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  *
  * The application developer may use a request like below to get an update on Patient/123 since it
  * was last downloaded.
+ *
  * ```
  *  Request.of("/Patient/123", mapOf("If-Modified-Since" to "knownLastUpdatedOfPatient123"))
  * ```
+ *
  * **BundleRequest**
  *
  * The application developer may use a request like below to download multiple resources in a single
@@ -85,33 +84,3 @@ internal constructor(val url: String, override val headers: Map<String, String> 
 data class BundleDownloadRequest
 internal constructor(val bundle: Bundle, override val headers: Map<String, String> = emptyMap()) :
   DownloadRequest(headers)
-
-/**
- * Structure represents a request that can be made to upload resources/resource modifications to the
- * FHIR server.
- */
-sealed class UploadRequest(
-  open val url: String,
-  open val headers: Map<String, String> = emptyMap(),
-  open val resource: Resource,
-  open val localChangeToken: LocalChangeToken,
-)
-
-/**
- * A FHIR [Bundle] based request for uploads. Multiple resources/resource modifications can be
- * uploaded as a single request using this.
- */
-data class BundleUploadRequest(
-  override val headers: Map<String, String> = emptyMap(),
-  override val resource: Bundle,
-  override val localChangeToken: LocalChangeToken,
-) : UploadRequest(".", headers, resource, localChangeToken)
-
-/** A [url] based FHIR request to upload resources to the server. */
-data class UrlUploadRequest(
-  val httpVerb: HttpVerb,
-  override val url: String,
-  override val resource: Resource,
-  override val localChangeToken: LocalChangeToken,
-  override val headers: Map<String, String> = emptyMap()
-) : UploadRequest(url, headers, resource, localChangeToken)

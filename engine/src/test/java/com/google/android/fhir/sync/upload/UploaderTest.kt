@@ -18,16 +18,16 @@ package com.google.android.fhir.sync.upload
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.toLocalChange
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
-import com.google.android.fhir.sync.upload.patch.SquashedChangesUploadWorkManager
 import com.google.android.fhir.testing.BundleDataSource
+import com.google.android.fhir.toLocalChange
 import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
-import kotlinx.coroutines.flow.toList
+import java.util.UUID
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -38,41 +38,24 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class UploaderImplTest {
+class UploaderTest {
 
   @Test
-  fun `upload Bundle transaction should emit Success`() = runBlocking {
+  fun `upload should succeed if response is transaction response`() = runTest {
     val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
-          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-    assertThat(result.last()).isInstanceOf(UploadState.Success::class.java)
-
-    val success = result.last() as UploadState.Success
-    assertThat(success.total).isEqualTo(1)
-    assertThat(success.completed).isEqualTo(1)
+    assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
+    with(result as UploadSyncResult.Success) { assertThat(resources).hasSize(1) }
   }
 
   @Test
-  fun `upload Bundle transaction should emit Started state`() = runBlocking {
+  fun `upload should fail if response is operation outcome with issue`() = runBlocking {
     val result =
-      UploaderImpl(BundleDataSource { Bundle() }, SquashedChangesUploadWorkManager())
-        .upload(localChanges)
-        .toList()
-
-    assertThat(result.first()).isInstanceOf(UploadState.Started::class.java)
-  }
-
-  @Test
-  fun `upload Bundle Transaction server error should emit Failure`() = runBlocking {
-    val result =
-      UploaderImpl(
+      Uploader(
           BundleDataSource {
             OperationOutcome().apply {
               addIssue(
@@ -80,38 +63,57 @@ class UploaderImplTest {
                   severity = OperationOutcome.IssueSeverity.WARNING
                   code = OperationOutcome.IssueType.CONFLICT
                   diagnostics = "The resource has already been updated."
-                }
+                },
               )
             }
           },
-          SquashedChangesUploadWorkManager()
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
 
   @Test
-  fun `upload Bundle transaction error during upload should emit Failure`() = runBlocking {
+  fun `upload should fail if response is empty operation outcome`() = runBlocking {
     val result =
-      UploaderImpl(
-          BundleDataSource { throw ConnectException("Failed to connect to server.") },
-          SquashedChangesUploadWorkManager()
+      Uploader(
+          BundleDataSource { OperationOutcome() },
         )
         .upload(localChanges)
-        .toList()
 
-    assertThat(result).hasSize(2)
-    assertThat(result.last()).isInstanceOf(UploadState.Failure::class.java)
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
+
+  @Test
+  fun `upload should fail if response is neither transaction response nor operation outcome`() =
+    runBlocking {
+      val result =
+        Uploader(
+            BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
+          )
+          .upload(localChanges)
+
+      assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    }
+
+  @Test
+  fun `upload should fail if there is connection exception`() = runBlocking {
+    val result =
+      Uploader(
+          BundleDataSource { throw ConnectException("Failed to connect to server.") },
+        )
+        .upload(localChanges)
+
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+  }
+
   companion object {
     val localChanges =
       listOf(
         LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
+            resourceUuid = UUID.randomUUID(),
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.INSERT,
             payload =
@@ -124,14 +126,14 @@ class UploaderImplTest {
                       HumanName().apply {
                         addGiven("John")
                         family = "Doe"
-                      }
+                      },
                     )
-                  }
+                  },
                 ),
-            timestamp = Instant.now()
+            timestamp = Instant.now(),
           )
           .toLocalChange()
-          .apply { LocalChangeToken(listOf(1)) }
+          .apply { LocalChangeToken(listOf(1)) },
       )
   }
 }

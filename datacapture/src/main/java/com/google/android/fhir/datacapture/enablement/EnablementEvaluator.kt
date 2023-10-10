@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,12 @@ package com.google.android.fhir.datacapture.enablement
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.enableWhenExpression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import com.google.android.fhir.equals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Resource
 
 /**
  * Evaluator for the enablement status of a [Questionnaire.QuestionnaireItemComponent].
@@ -34,6 +36,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  *
  * For example, the following `enableWhen` constraint in a
  * [Questionnaire.QuestionnaireItemComponent]
+ *
  * ```
  *     "enableWhen": [
  *       {
@@ -43,6 +46,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  *       }
  *     ],
  * ```
+ *
  * specifies that the [Questionnaire.QuestionnaireItemComponent] should be enabled only if the
  * question with linkId `vitaminKgiven` has been answered.
  *
@@ -50,16 +54,39 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * is shown or hidden. However, it is also possible that only user interaction is enabled or
  * disabled (e.g. grayed out) with the [Questionnaire.QuestionnaireItemComponent] always shown.
  *
- * The evaluator does not track the changes in the `questionnaire` and `questionnaireResponse`.
- * Therefore, a new evaluator should be created if they were modified.
+ * The evaluator works in the context of a Questionnaire and the corresponding
+ * QuestionnaireResponse. It is the caller's responsibility to make sure to call the evaluator with
+ * QuestionnaireItems and QuestionnaireResponseItems that belong to the Questionnaire and the
+ * QuestionnaireResponse.
  *
  * For more information see
  * [Questionnaire.item.enableWhen](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableWhen)
  * and
  * [Questionnaire.item.enableBehavior](https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.enableBehavior)
  * .
+ *
+ * @param questionnaire the [Questionnaire] where the expression belong to
+ * @param questionnaireResponse the [QuestionnaireResponse] related to the [Questionnaire]
+ * @param questionnaireItemParentMap the [Map] of items parent
+ * @param questionnaireLaunchContextMap the [Map] of launchContext names to their resource values
  */
-internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireResponse) {
+internal class EnablementEvaluator(
+  private val questionnaire: Questionnaire,
+  private val questionnaireResponse: QuestionnaireResponse,
+  private val questionnaireItemParentMap:
+    Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
+    emptyMap(),
+  private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+) {
+
+  private val expressionEvaluator =
+    ExpressionEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+    )
+
   /**
    * The pre-order traversal trace of the items in the [QuestionnaireResponse]. This essentially
    * represents the order in which all items are displayed in the UI.
@@ -70,7 +97,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
   private val questionnaireResponseItemParentMap =
     mutableMapOf<
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
     >()
 
   init {
@@ -95,6 +122,7 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
   /**
    * Returns whether [questionnaireItem] should be enabled.
    *
+   * @param questionnaireItem the corresponding questionnaire item.
    * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
   fun evaluate(
@@ -110,10 +138,16 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
 
     // Evaluate `enableWhenExpression`.
     if (enableWhenExpression != null && enableWhenExpression.hasExpression()) {
+      val contextMap =
+        expressionEvaluator.extractDependentVariables(
+          questionnaireItem.enableWhenExpression!!,
+          questionnaireItem,
+        )
       return evaluateToBoolean(
         questionnaireResponse,
         questionnaireResponseItem,
-        enableWhenExpression.expression
+        enableWhenExpression.expression,
+        contextMap,
       )
     }
 
@@ -148,11 +182,14 @@ internal class EnablementEvaluator(val questionnaireResponse: QuestionnaireRespo
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {
     val targetQuestionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent? =
-      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
+      if (
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
           questionnaireResponseItem.linkId == enableWhen.question
-      )
+      ) {
         questionnaireResponseItem
-      else findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+      } else {
+        findEnableWhenQuestionnaireResponseItem(questionnaireResponseItem, enableWhen.question)
+      }
     return if (Questionnaire.QuestionnaireItemOperator.EXISTS == enableWhen.operator) {
       // True iff the answer value of the enable when is equal to whether an answer exists in the
       // target questionnaire response item

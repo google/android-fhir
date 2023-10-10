@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.google.android.fhir.knowledge.db.impl.entities
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import java.io.File
 
 /**
@@ -34,8 +34,8 @@ import java.io.File
   indices =
     [
       Index(value = ["implementationGuideId"]),
-      Index(value = ["packageId", "url", "version"], unique = true)
-    ]
+      Index(value = ["packageId", "url", "version"], unique = true),
+    ],
 )
 internal data class ImplementationGuideEntity(
   @PrimaryKey(autoGenerate = true) val implementationGuideId: Long,
@@ -46,6 +46,6 @@ internal data class ImplementationGuideEntity(
   val rootDirectory: File,
 )
 
-internal fun ImplementationGuide.toEntity(rootFolder: File): ImplementationGuideEntity {
-  return ImplementationGuideEntity(0L, uri, packageId, version, rootFolder)
+internal fun FhirNpmPackage.toEntity(rootFolder: File): ImplementationGuideEntity {
+  return ImplementationGuideEntity(0L, canonical ?: "", name, version, rootFolder)
 }

@@ -32,9 +32,9 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
-import com.google.android.fhir.sync.DownloadRequest
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
+import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -77,13 +77,15 @@ class FhirSyncWorkerBenchmark {
 
   class BenchmarkTestOneTimeSyncWorker(
     private val appContext: Context,
-    workerParams: WorkerParameters
+    workerParams: WorkerParameters,
   ) : FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine {
       return FhirEngineProvider.getInstance(appContext)
     }
+
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
+
     override fun getConflictResolver() = AcceptRemoteConflictResolver
   }
 
@@ -92,6 +94,7 @@ class FhirSyncWorkerBenchmark {
     private val urls = LinkedList(queries)
 
     override suspend fun getNextRequest() = urls.poll()?.let { DownloadRequest.of(it) }
+
     override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
       return emptyMap()
     }
@@ -142,7 +145,7 @@ class FhirSyncWorkerBenchmark {
   private fun setupMockServerDispatcher(
     numberPatients: Int,
     numberObservations: Int,
-    numberEncounters: Int
+    numberEncounters: Int,
   ) {
     mockWebServer.dispatcher =
       object : Dispatcher() {
@@ -209,14 +212,17 @@ class FhirSyncWorkerBenchmark {
     return Patient().apply {
       id = patientId
       gender =
-        if (patientId.last().isDigit()) Enumerations.AdministrativeGender.FEMALE
-        else Enumerations.AdministrativeGender.MALE
+        if (patientId.last().isDigit()) {
+          Enumerations.AdministrativeGender.FEMALE
+        } else {
+          Enumerations.AdministrativeGender.MALE
+        }
       name =
         listOf(
           HumanName().apply {
             given = listOf(StringType("Test patient Name $patientId"))
             family = "Patient Family"
-          }
+          },
         )
       address =
         listOf(
@@ -227,7 +233,7 @@ class FhirSyncWorkerBenchmark {
             state = "Vic"
             postalCode = "postalCode"
             line = listOf(StringType("534 Erewhon St"))
-          }
+          },
         )
       contact =
         listOf(
@@ -242,11 +248,14 @@ class FhirSyncWorkerBenchmark {
                       family = "Patient Family"
                     }
                   gender =
-                    if (patientId.last().isDigit()) Enumerations.AdministrativeGender.MALE
-                    else Enumerations.AdministrativeGender.FEMALE
-                }
+                    if (patientId.last().isDigit()) {
+                      Enumerations.AdministrativeGender.MALE
+                    } else {
+                      Enumerations.AdministrativeGender.FEMALE
+                    }
+                },
               )
-          }
+          },
         )
       telecom =
         listOf(
@@ -259,7 +268,7 @@ class FhirSyncWorkerBenchmark {
             system = ContactPoint.ContactPointSystem.PHONE
             value = "(03) 3410 5613"
             use = ContactPoint.ContactPointUse.WORK
-          }
+          },
         )
     }
   }
@@ -298,7 +307,7 @@ class FhirSyncWorkerBenchmark {
                 code = "kPa"
                 system = "http://unitsofmeasure.org"
               }
-          }
+          },
         )
       interpretation =
         listOf(
@@ -306,9 +315,9 @@ class FhirSyncWorkerBenchmark {
             Coding(
               "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
               "H",
-              "high"
-            )
-          )
+              "high",
+            ),
+          ),
         )
     }
   }
@@ -328,7 +337,7 @@ class FhirSyncWorkerBenchmark {
           CodeableConcept().apply {
             coding =
               listOf(Coding("http://snomed.info/sct", "183807002", "Inpatient stay for nine days"))
-          }
+          },
         )
       subject = Reference("Patient/$patientId")
       episodeOfCare = listOf(Reference("Episode/${UUID.randomUUID()}"))
@@ -345,12 +354,12 @@ class FhirSyncWorkerBenchmark {
                       Coding(
                         "http://terminology.hl7.org/CodeSystem/v3-ParticipationType",
                         "PART",
-                        "Participant"
-                      )
+                        "Participant",
+                      ),
                     )
-                }
+                },
               )
-          }
+          },
         )
       diagnosis =
         listOf(
@@ -363,8 +372,8 @@ class FhirSyncWorkerBenchmark {
                     Coding(
                       "http://terminology.hl7.org/CodeSystem/diagnosis-role",
                       "AD",
-                      "Admission diagnosis"
-                    )
+                      "Admission diagnosis",
+                    ),
                   )
               }
           },
@@ -377,11 +386,11 @@ class FhirSyncWorkerBenchmark {
                     Coding(
                       "http://terminology.hl7.org/CodeSystem/diagnosis-role",
                       "DD",
-                      "Discharge diagnosis"
-                    )
+                      "Discharge diagnosis",
+                    ),
                   )
               }
-          }
+          },
         )
     }
   }
@@ -397,8 +406,8 @@ class FhirSyncWorkerBenchmark {
       FhirEngineProvider.init(
         FhirEngineConfiguration(
           serverConfiguration = ServerConfiguration("http://127.0.0.1:$mockServerPort/fhir/"),
-          testMode = true
-        )
+          testMode = true,
+        ),
       )
       mockWebServer.start(mockServerPort)
     }
