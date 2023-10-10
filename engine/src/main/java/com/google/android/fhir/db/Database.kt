@@ -105,6 +105,12 @@ internal interface Database {
    */
   suspend fun getAllLocalChanges(): List<LocalChange>
 
+  /**
+   * Retrieves all [LocalChange]s for the [Resource] which has the [LocalChange] with the minimum
+   * [LocalChange.timestamp]
+   */
+  suspend fun getAllChangesForResourceWithEarliestChange(): List<LocalChange>
+
   /** Retrieves the count of [LocalChange]s stored in the database. */
   suspend fun getLocalChangesCount(): Int
 

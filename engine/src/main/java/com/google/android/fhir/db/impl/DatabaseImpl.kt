@@ -228,6 +228,10 @@ internal class DatabaseImpl(
     return db.withTransaction { localChangeDao.getLocalChangesCount() }
   }
 
+  override suspend fun getAllChangesForResourceWithEarliestChange(): List<LocalChange> {
+    return localChangeDao.getChangesForResourceWithEarliestChange().map { it.toLocalChange() }
+  }
+
   override suspend fun deleteUpdates(token: LocalChangeToken) {
     db.withTransaction { localChangeDao.discardLocalChanges(token) }
   }
