@@ -35,8 +35,7 @@ internal class NpmFileManager(private val cacheRoot: File) {
   suspend fun containsPackage(packageId: String, version: String): Boolean {
     return withContext(Dispatchers.IO) {
       val packageFolder = File(getPackageDir(packageId, version), "package")
-      val packageJson = File(packageFolder, "package.json")
-      packageJson.exists()
+      File(packageFolder, "package.json").exists()
     }
   }
 
