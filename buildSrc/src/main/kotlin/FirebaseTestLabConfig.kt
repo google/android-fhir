@@ -86,7 +86,7 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
   )
   useOrchestrator.set(true)
   flakyTestAttempts.set(1)
-  numUniformShards.set(10)
+  maxTestShards.set(10)
   directoriesToPull.set(listOf("/sdcard/Download"))
   resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(
