@@ -48,7 +48,7 @@ class FhirOperatorTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeManager = KnowledgeManager.create(context, inMemory = true)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()

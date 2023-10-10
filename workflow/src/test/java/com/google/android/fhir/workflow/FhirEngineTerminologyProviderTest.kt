@@ -59,7 +59,7 @@ class FhirEngineTerminologyProviderTest : Loadable() {
       FhirEngineTerminologyProvider(
         FhirContext.forR4Cached(),
         fhirEngine,
-        KnowledgeManager.create(context, inMemory = true),
+        KnowledgeManager.create(context = context, inMemory = true),
       )
   }
 

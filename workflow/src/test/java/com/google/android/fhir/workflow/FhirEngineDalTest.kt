@@ -48,7 +48,8 @@ class FhirEngineDalTest {
   fun setupTest() {
     val context: Context = ApplicationProvider.getApplicationContext()
     fhirEngine = FhirEngineProvider.getInstance(context)
-    fhirEngineDal = FhirEngineDal(fhirEngine, KnowledgeManager.create(context, inMemory = true))
+    fhirEngineDal =
+      FhirEngineDal(fhirEngine, KnowledgeManager.create(context = context, inMemory = true))
     runBlocking { fhirEngine.create(testPatient) }
   }
 
