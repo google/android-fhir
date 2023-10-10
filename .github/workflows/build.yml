@@ -44,7 +44,7 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Fetch origin/master for spotless ratchet to work
           # https://github.com/diffplug/spotless/issues/1242
