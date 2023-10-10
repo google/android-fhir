@@ -1,3 +1,4 @@
+import Dependencies.forceJacksonVersion
 import Dependencies.guava
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
@@ -104,9 +105,7 @@ configurations {
       force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.0.1")
       force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:6.0.1")
     }
-
-    // forceHapiVersion()
-    // forceJacksonVersion()
+    forceJacksonVersion()
   }
 }
 
