@@ -42,7 +42,7 @@ class PerResourceLocalChangeFetcherTest {
   fun `fetcher is created correctly`() = runTest {
     database.insert(TEST_PATIENT_1, TEST_PATIENT_2)
     database.update(
-      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE }
+      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE },
     )
     val fetcher = PerResourceLocalChangeFetcher(database).apply { initTotalCount() }
 
@@ -53,7 +53,7 @@ class PerResourceLocalChangeFetcherTest {
   fun `hasNext returns correct value`() = runTest {
     database.insert(TEST_PATIENT_1, TEST_PATIENT_2)
     database.update(
-      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE }
+      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE },
     )
     val fetcher = PerResourceLocalChangeFetcher(database).apply { initTotalCount() }
 
@@ -68,7 +68,7 @@ class PerResourceLocalChangeFetcherTest {
   fun `next returns correct set of changes in the right order`() = runTest {
     database.insert(TEST_PATIENT_1, TEST_PATIENT_2)
     database.update(
-      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE }
+      TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE },
     )
     val fetcher = PerResourceLocalChangeFetcher(database).apply { initTotalCount() }
 
