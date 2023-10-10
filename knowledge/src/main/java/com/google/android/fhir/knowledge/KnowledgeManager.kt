@@ -179,15 +179,15 @@ internal constructor(
      * @param context the application context
      * @param inMemory whether the knowledge manager instance is in-memory or backed by a Room
      *   database
-     * @param downloadedDataDir the directory to store downloaded NPM packages
+     * @param downloadedNpmDir the directory to store downloaded NPM packages
      * @param packageServer the package server to download FHIR NPM packages from. Defaulted to
      *   https://packages.fhir.org/packages/.
      */
     fun create(
       context: Context,
       inMemory: Boolean = false,
-      downloadedDataDir: String,
-      packageServer: String?,
+      downloadedNpmDir: File? = context.dataDir,
+      packageServer: String? = DEFAULT_PACKAGE_SERVER,
     ) =
       KnowledgeManager(
         if (inMemory) {
@@ -195,8 +195,8 @@ internal constructor(
         } else {
           Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build()
         },
-        NpmFileManager(File(downloadedDataDir, DOWNLOADED_DATA_SUB_DIR)),
-        OkHttpNpmPackageDownloader(packageServer ?: DEFAULT_PACKAGE_SERVER),
+        NpmFileManager(File(downloadedNpmDir, DOWNLOADED_DATA_SUB_DIR)),
+        OkHttpNpmPackageDownloader(packageServer!!),
       )
   }
 }
