@@ -61,7 +61,7 @@ class F_CqlEvaluatorBenchmark {
         val patientImmunizationHistory =
           jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
         val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        val knowledgeManager = KnowledgeManager.createInMemory(context)
+        val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
         val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
 
         runBlocking {

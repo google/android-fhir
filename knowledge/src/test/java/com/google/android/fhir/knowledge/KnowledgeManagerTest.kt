@@ -21,9 +21,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackageMetadata
-import com.google.android.fhir.knowledge.npm.NpmFileManager
+import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.files.NpmFileManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
@@ -45,9 +44,8 @@ internal class KnowledgeManagerTest {
   private val knowledgeManager =
     KnowledgeManager(
       knowledgeDb,
-      context.dataDir,
       npmFileManager = npmFileManager,
-      packageDownloader = { fhirPackage, _ ->
+      npmPackageDownloader = { fhirPackage, _ ->
         LocalFhirNpmPackageMetadata(
           fhirPackage.name,
           fhirPackage.version,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge.npm
+package com.google.android.fhir.knowledge.db
 
-import com.google.android.fhir.knowledge.FhirNpmPackage
+import androidx.room.TypeConverter
 import java.io.File
 
-/** Downloaded FHIR NPM Package metadata. */
-data class LocalFhirNpmPackageMetadata(
-  val packageId: String,
-  val version: String,
-  val canonical: String?,
-  val dependencies: List<FhirNpmPackage>,
-  val rootDirectory: File,
-)
+internal object DbTypeConverters {
+
+  @JvmStatic @TypeConverter fun filePathToFile(filePath: String) = File(filePath)
+
+  @JvmStatic @TypeConverter fun fileToFilePath(file: File): String = file.path
+}

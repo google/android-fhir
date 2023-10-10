@@ -31,17 +31,17 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 
 /** Downloads Npm package from the provided package server using OkHttp library. */
-internal class OkHttpPackageDownloader(
-  private val npmFileManager: NpmFileManager,
-) : PackageDownloader {
+internal class OkHttpNpmPackageDownloader(
+  private val packageServerUrl: String,
+) : NpmPackageDownloader {
 
   val client = OkHttpClient()
 
   @Throws(IOException::class)
   override suspend fun downloadPackage(
     fhirNpmPackage: FhirNpmPackage,
-    packageServerUrl: String,
-  ): LocalFhirNpmPackageMetadata {
+    packageFolder: File,
+  ) {
     return withContext(Dispatchers.IO) {
       val packageName = fhirNpmPackage.name
       val version = fhirNpmPackage.version
@@ -54,8 +54,6 @@ internal class OkHttpPackageDownloader(
       if (!response.isSuccessful) {
         throw IOException("Unexpected code $response")
       }
-      val packageFolder =
-        npmFileManager.getPackageFolder(fhirNpmPackage.name, fhirNpmPackage.version)
 
       response.body?.use { responseBody ->
         packageFolder.mkdirs()
@@ -66,7 +64,6 @@ internal class OkHttpPackageDownloader(
 
         tgzFile.delete()
       }
-      npmFileManager.getPackage(fhirNpmPackage.name, fhirNpmPackage.version)
     }
   }
 
