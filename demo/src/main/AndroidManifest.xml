@@ -29,7 +29,6 @@
         <activity
             android:name="com.google.android.fhir.demo.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize"
             android:exported="true"
         >

@@ -15,10 +15,6 @@
  limitations under the License.
 -->
 <resources>
-    <color name="colorPrimary">#175adf</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#175adf</color>
-    <color name="colorStatusBar">#175adf</color>
     <color name="low_risk">#388e3c</color>
     <color name="low_risk_background">#e8f5e9</color>
     <color name="moderate_risk">#FFBF00</color>
@@ -28,6 +24,67 @@
     <color name="unknown_risk_background">#10156125</color>
     <color name="unknown_risk">#ffffff</color>
     <color name="syncing_background">#E8F0FE</color>
-    <color name="white">#FFFFFFFF</color>
     <color name="disable_state">#9AFFFFFF</color>
+
+    <color name="primary_blue_40">#0B57D0</color>
+    <color name="onPrimary_blue_100">#FFFFFF</color>
+    <color name="primaryContainer_blue_90">#D3E3FD</color>
+    <color name="onPrimaryContainer_blue_10">#041E49</color>
+
+    <color name="secondary_blue_40">#00639B</color>
+    <color name="onSecondary_blue_100">#FFFFFF</color>
+    <color name="secondaryContainer_blue_90">#C2E7FF</color>
+    <color name="onSecondaryContainer_blue_10">#001D35</color>
+
+    <color name="tertiary_green_40">#146C2E</color>
+    <color name="onTertiary_green_100">#FFFFFF</color>
+    <color name="tertiaryContainer_green_90">#C4EED0</color>
+    <color name="onTertiaryContainer_green_10">#072711</color>
+
+    <color name="error_red_40">#B3261E</color>
+    <color name="errorContainer_red_100">#FFFFFF</color>
+    <color name="onError_red_90">#F9DEDC</color>
+    <color name="onErrorContainer_red_10">#410E0B</color>
+
+    <color name="background_neutral_100">#FFFFFF</color>
+    <color name="onBackground_neutral_10">#1F1F1F</color>
+
+    <color name="surface_neutral_100">#FFFFFF</color>
+    <color name="onSurface_neutral_10">#1F1F1F</color>
+
+    <color name="surfaceVariant_neutral_variant_90">#E1E3E1</color>
+    <color name="onSurfaceVariant_neutral_variant_30">#444746</color>
+
+    <color name="outline_neutral_variant_50">#747775</color>
+
+    <color name="primary_blue_80">#A8C7FA</color>
+    <color name="onPrimary_blue_20">#062E6F</color>
+    <color name="primaryContainer_blue_30">#0842A0</color>
+    <color name="onPrimaryContainer_blue_90">#D3E3FD</color>
+
+    <color name="secondary_blue_80">#7FCFFF</color>
+    <color name="onSecondary_blue_20">#003355</color>
+    <color name="secondaryContainer_blue_30">#004A77</color>
+    <color name="onSecondaryContainer_blue_90">#C2E7FF</color>
+
+    <color name="tertiary_green_80">#146C2E</color>
+    <color name="onTertiary_green_20">#0A3818</color>
+    <color name="tertiaryContainer_green_30">#0F5223</color>
+    <color name="onTertiaryContainer_green_90">#C4EED0</color>
+
+    <color name="error_red_80">#F2B8B5</color>
+    <color name="onError_red_30">#8C1D18</color>
+    <color name="errorContainer_red_20">#601410</color>
+    <color name="onErrorContainer_red_90">#F9DEDC</color>
+
+    <color name="background_neutral_10">#1F1F1F</color>
+    <color name="onBackground_neutral_90">#E3E3E3</color>
+
+    <color name="surface_neutral_10">#1F1F1F</color>
+    <color name="onSurface_neutral_90">#E3E3E3</color>
+
+    <color name="surfaceVariant_neutral_variant_30">#444746</color>
+    <color name="onSurfaceVariant_neutral_variant_80">#C4C7C5</color>
+
+    <color name="outline_neutral_variant_60">#8E918F</color>
 </resources>
