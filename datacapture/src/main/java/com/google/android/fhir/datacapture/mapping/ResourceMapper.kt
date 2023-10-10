@@ -775,13 +775,21 @@ private fun Base.asExpectedReferenceType(): Type {
       this@asExpectedReferenceType as Resource
       Reference().apply {
         reference =
-          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+          if (this@asExpectedReferenceType.resourceType != null) {
+            "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.logicalId}"
+          } else {
+            this@asExpectedReferenceType.logicalId
+          }
       }
     }
     this is IdType ->
       Reference().apply {
         reference =
-          "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
+          if (this@asExpectedReferenceType.resourceType != null) {
+            "${this@asExpectedReferenceType.resourceType}/${this@asExpectedReferenceType.idPart}"
+          } else {
+            this@asExpectedReferenceType.idPart
+          }
       }
     else -> throw FHIRException("Expression supplied does not evaluate to IdType.")
   }

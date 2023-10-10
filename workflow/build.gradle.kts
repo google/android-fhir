@@ -1,5 +1,5 @@
-import Dependencies.forceHapiVersion
 import Dependencies.forceJacksonVersion
+import Dependencies.guava
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -78,7 +78,33 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations {
   all {
     removeIncompatibleDependencies()
-    forceHapiVersion()
+    exclude(
+      module = "hapi-fhir-structures-r4b",
+    )
+    resolutionStrategy {
+      force(Dependencies.guava)
+      force("ca.uhn.hapi.fhir:hapi-fhir-base:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-client:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:5.6.36")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:5.6.36")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r5:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.utilities:5.6.36")
+
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4b:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r5:5.6.36")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:6.0.1")
+    }
     forceJacksonVersion()
   }
 }
@@ -98,7 +124,7 @@ dependencies {
   androidTestImplementation(Dependencies.xmlUnit)
   androidTestImplementation(project(":workflow-testing"))
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1") { exclude(module = "junit") }
 
   implementation(Dependencies.Androidx.coreKtx)
 
