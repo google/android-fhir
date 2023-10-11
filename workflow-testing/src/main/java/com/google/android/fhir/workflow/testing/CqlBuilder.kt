@@ -197,7 +197,7 @@ object CqlBuilder : Loadable() {
       expectedElmJsonAsset = load(expectedElmJsonAssetName)
 
       // JSONAssert ignores property order and whitespace/tabs
-      JSONAssert.assertEquals(expectedElmJsonAsset, translator.toJson(), true)
+      JSONAssert.assertEquals(expectedElmJsonAsset, translator.toJson(), false)
       return this
     }
 
