@@ -16,21 +16,9 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.search.search
-import org.hl7.fhir.r4.model.CodeSystem
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.ValueSet
-import org.opencds.cqf.cql.engine.exception.TerminologyProviderException
-import org.opencds.cqf.cql.engine.runtime.Code
-import org.opencds.cqf.cql.engine.terminology.CodeSystemInfo
-import org.opencds.cqf.cql.engine.terminology.TerminologyProvider
-import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
-import org.opencds.cqf.cql.evaluator.engine.util.ValueSetUtil
+/*
+
+TODO: These operators must be migrated to equivalent calls in the Repository classes
 
 internal class FhirEngineTerminologyProvider(
   private val fhirContext: FhirContext,
@@ -60,8 +48,8 @@ internal class FhirEngineTerminologyProvider(
     runBlockingOrThrowMainThreadException {
       try {
         resolveValueSet(valueSetInfo).let {
-          ValueSetUtil.getCodesInExpansion(fhirContext, it)
-            ?: ValueSetUtil.getCodesInCompose(fhirContext, it)
+          ValueSets.getCodesInExpansion(fhirContext, it)
+            ?: ValueSets.getCodesInCompose(fhirContext, it)
         }
       } catch (e: Exception) {
         throw TerminologyProviderException(
@@ -80,6 +68,7 @@ internal class FhirEngineTerminologyProvider(
             filter(CodeSystem.SYSTEM, { value = codeSystem.id })
           }
           .first()
+          .resource
           .concept
           .first { it.code == code.code }
           .let {
@@ -101,12 +90,15 @@ internal class FhirEngineTerminologyProvider(
     if (url == null) return emptyList()
     return knowledgeManager
       .loadResources(resourceType = ResourceType.ValueSet.name, url = url)
-      .map { it as ValueSet } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
+      .map { it as ValueSet } +
+      fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = url }) }.map { it.resource }
   }
 
   private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
     if (identifier == null) return emptyList()
-    return fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+    return fhirEngine
+      .search<ValueSet> { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+      .map { it.resource }
   }
 
   private suspend fun searchById(id: String): List<ValueSet> =
@@ -155,3 +147,4 @@ internal class FhirEngineTerminologyProvider(
     return resolveValueSet(valueSet).idElement.idPart
   }
 }
+*/
