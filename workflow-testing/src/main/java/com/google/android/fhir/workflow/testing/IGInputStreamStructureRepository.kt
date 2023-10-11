@@ -162,7 +162,7 @@ class IGInputStreamStructureRepository(
   }
 
   protected fun getCqlContent(rootPath: String?, relativePath: String?): String {
-    val p = File(File(rootPath).parent, relativePath).toString()
+    val p = File(File(rootPath).parent, relativePath).normalize().toString()
     return try {
       load(p)
     } catch (e: Exception) {
@@ -212,6 +212,7 @@ class IGInputStreamStructureRepository(
     try {
       r = readLocation<T, IIdType>(resourceType, location)
     } catch (e: RuntimeException) {
+      e.printStackTrace()
       if (e.cause is FileNotFoundException) {
         throw ResourceNotFoundException(id)
       }
