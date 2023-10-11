@@ -17,11 +17,9 @@
 package com.google.android.fhir.document.interfaces
 
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.GzipUploadInterceptor
 import com.google.android.fhir.sync.remote.HttpLogger
 import java.util.concurrent.TimeUnit
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -59,13 +57,7 @@ interface RetrofitSHLService {
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration,
   ) {
-
-    private var authenticator: HttpAuthenticator? = null
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
-
-    fun setAuthenticator(authenticator: HttpAuthenticator?) = apply {
-      this.authenticator = authenticator
-    }
 
     fun setHttpLogger(httpLogger: HttpLogger) = apply {
       httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
@@ -82,22 +74,6 @@ interface RetrofitSHLService {
               addInterceptor(GzipUploadInterceptor)
             }
             httpLoggingInterceptor?.let { addInterceptor(it) }
-            authenticator?.let {
-              addInterceptor(
-                Interceptor { chain: Interceptor.Chain ->
-                  val request =
-                    chain
-                      .request()
-                      .newBuilder()
-                      .addHeader(
-                        "Authorization",
-                        it.getAuthenticationMethod().getAuthorizationHeader(),
-                      )
-                      .build()
-                  chain.proceed(request)
-                },
-              )
-            }
           }
           .build()
       return Retrofit.Builder()
