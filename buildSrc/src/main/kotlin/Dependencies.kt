@@ -292,6 +292,8 @@ object Dependencies {
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
+    exclude(group = "org.antlr", module = "antlr4")
+    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
   }
 
   fun Configuration.forceGuava() {

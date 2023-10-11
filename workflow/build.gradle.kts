@@ -115,7 +115,7 @@ dependencies {
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
-  implementation(project(":engine"))
+  implementation(project(":engine")) { exclude(module = "truth") }
   implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
