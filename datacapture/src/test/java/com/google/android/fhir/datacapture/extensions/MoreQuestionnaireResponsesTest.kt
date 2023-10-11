@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class MoreQuestionnaireResponsesTest {
             // Nested questions under answer
             addItem(questionnaireResponseItem21)
             addItem(questionnaireResponseItem22)
-          }
+          },
         )
       }
 
@@ -85,11 +85,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -98,11 +98,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -117,11 +117,13 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
@@ -131,13 +133,13 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = BooleanType(false)
-                      }
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -156,11 +158,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-1"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -169,11 +171,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-2"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -186,11 +188,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-1"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -199,11 +201,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-2"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -224,9 +226,9 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
+              },
             )
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -240,11 +242,13 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
@@ -254,13 +258,13 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = BooleanType(false)
-                      }
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
     val unpackedQuestionnaireResponse =
@@ -272,11 +276,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -285,11 +289,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -305,7 +309,7 @@ class MoreQuestionnaireResponsesTest {
           QuestionnaireItemComponent().apply {
             linkId = "simple-question-1"
             type = Questionnaire.QuestionnaireItemType.STRING
-          }
+          },
         )
         addItem(
           QuestionnaireItemComponent().apply {
@@ -316,15 +320,15 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
+              },
             )
             addItem(
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question-2"
                 type = Questionnaire.QuestionnaireItemType.REFERENCE
-              }
+              },
             )
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -342,11 +346,11 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = Reference().apply { reference = "Patient/123" }
-                      }
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
@@ -356,13 +360,13 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = Reference().apply { reference = "Patient/456" }
-                      }
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
     val unpackedQuestionnaireResponse =
@@ -376,11 +380,11 @@ class MoreQuestionnaireResponsesTest {
                 addAnswer(
                   QuestionnaireResponseItemAnswerComponent().apply {
                     value = Reference().apply { reference = "Patient/123" }
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -391,11 +395,11 @@ class MoreQuestionnaireResponsesTest {
                 addAnswer(
                   QuestionnaireResponseItemAnswerComponent().apply {
                     value = Reference().apply { reference = "Patient/456" }
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -415,9 +419,9 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireItemComponent().apply {
                 linkId = "nested-question-1"
                 type = Questionnaire.QuestionnaireItemType.BOOLEAN
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireItemComponent().apply {
@@ -430,9 +434,9 @@ class MoreQuestionnaireResponsesTest {
                 QuestionnaireItemComponent().apply {
                   type = Questionnaire.QuestionnaireItemType.BOOLEAN
                 }
-              }
+              },
             )
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -446,13 +450,15 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question-1"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -465,11 +471,11 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = BooleanType(false)
-                      }
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponseItemAnswerComponent().apply {
@@ -477,13 +483,15 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question-2"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
     val unpackedQuestionnaireResponse =
@@ -497,13 +505,15 @@ class MoreQuestionnaireResponsesTest {
                   QuestionnaireResponseItemComponent().apply {
                     linkId = "nested-question-1"
                     addAnswer(
-                      QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
                     )
-                  }
+                  },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -512,11 +522,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-2"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(false) },
                 )
-              }
+              },
             )
-          }
+          },
         )
         addItem(
           QuestionnaireResponseItemComponent().apply {
@@ -525,11 +535,11 @@ class MoreQuestionnaireResponsesTest {
               QuestionnaireResponseItemComponent().apply {
                 linkId = "nested-question-2"
                 addAnswer(
-                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) }
+                  QuestionnaireResponseItemAnswerComponent().apply { value = BooleanType(true) },
                 )
-              }
+              },
             )
-          }
+          },
         )
       }
 
@@ -538,6 +548,7 @@ class MoreQuestionnaireResponsesTest {
   }
 
   private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
   /** Asserts that the `expected` and the `actual` FHIR resources are equal. */
   private fun assertResourceEquals(expected: Resource, actual: Resource) {
     assertThat(iParser.encodeResourceToString(actual))

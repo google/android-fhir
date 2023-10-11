@@ -1,3 +1,6 @@
+import Dependencies.forceGuava
+import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
 import java.net.URL
 
 plugins {
@@ -13,11 +16,10 @@ publishArtifact(Releases.DataCapture)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.datacapture"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
     minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -26,7 +28,7 @@ android {
   buildFeatures { viewBinding = true }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
@@ -35,28 +37,33 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
   }
 
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
-      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
     )
   }
 
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
 
   sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
 
   testOptions { animationsDisabled = true }
+  kotlin { jvmToolchain(11) }
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations { all { exclude(module = "xpp3") } }
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
+    forceGuava()
+    forceHapiVersion()
+    forceJacksonVersion()
+  }
+}
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -81,16 +88,15 @@ dependencies {
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Glide.glide)
+  implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
-    exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.material)
-  implementation(Dependencies.lifecycleExtensions)
   implementation(Dependencies.timber)
 
   testImplementation(Dependencies.AndroidxTest.core)
@@ -102,12 +108,11 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(project(":testing"))
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
@@ -118,14 +123,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

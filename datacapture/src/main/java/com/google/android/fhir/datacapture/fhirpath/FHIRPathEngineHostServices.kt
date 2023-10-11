@@ -20,7 +20,6 @@ import com.google.android.fhir.datacapture.ContextVariable
 import com.google.android.fhir.datacapture.ContextVariableImmutable
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.TypeDetails
 import org.hl7.fhir.r4.model.ValueSet
 import org.hl7.fhir.r4.utils.FHIRPathEngine
@@ -37,7 +36,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     fun toContextExpression(base: Base) = this.constant to ContextVariableImmutable(this.constant, base)
   }
 
-  fun QuestionnaireItemComponent.buildContextMap(questionnaire: Questionnaire):
+  fun Questionnaire.QuestionnaireItemComponent.buildContextMap(questionnaire: Questionnaire):
           Map<String, ContextVariable> {
     return mapOf(
       ContextVariableType.QUESTIONNAIRE.toContextExpression(questionnaire),
@@ -45,8 +44,12 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     )
   }
 
-  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? =
-    (appContext as? Map<*, *>)?.get(name) as? Base
+  override fun resolveConstant(
+    appContext: Any?,
+    name: String?,
+    beforeContext: Boolean,
+  ): List<Base>? =
+    ((appContext as? Map<*, *>)?.get(name) as? Base)?.let { listOf(it) } ?: emptyList()
 
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
     throw UnsupportedOperationException()
@@ -57,7 +60,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   }
 
   override fun resolveFunction(
-    functionName: String?
+    functionName: String?,
   ): FHIRPathEngine.IEvaluationContext.FunctionDetails {
     throw UnsupportedOperationException()
   }
@@ -65,7 +68,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
   override fun checkFunction(
     appContext: Any?,
     functionName: String?,
-    parameters: MutableList<TypeDetails>?
+    parameters: MutableList<TypeDetails>?,
   ): TypeDetails {
     throw UnsupportedOperationException()
   }
@@ -74,12 +77,12 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     appContext: Any?,
     focus: MutableList<Base>?,
     functionName: String?,
-    parameters: MutableList<MutableList<Base>>?
+    parameters: MutableList<MutableList<Base>>?,
   ): MutableList<Base> {
     throw UnsupportedOperationException()
   }
 
-  override fun resolveReference(appContext: Any?, url: String?): Base {
+  override fun resolveReference(appContext: Any?, url: String?, refContext: Base?): Base? {
     throw UnsupportedOperationException()
   }
 
@@ -87,7 +90,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     throw UnsupportedOperationException()
   }
 
-  override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
+  override fun resolveValueSet(appContext: Any?, url: String?): ValueSet? {
     throw UnsupportedOperationException()
   }
 }

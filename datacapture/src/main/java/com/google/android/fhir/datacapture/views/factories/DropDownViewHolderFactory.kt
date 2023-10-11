@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -58,28 +59,34 @@ internal object DropDownViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
         header.bind(questionnaireViewItem)
-        textInputLayout.hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
         with(textInputLayout) {
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
           helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
         val answerOptionList =
-          this.questionnaireViewItem.answerOption
+          this.questionnaireViewItem.enabledAnswerOptions
             .map {
               DropDownAnswerOption(
+                it.value.identifierString(context),
                 it.value.displayString(context),
-                it.itemAnswerOptionImage(context)
+                it.itemAnswerOptionImage(context),
               )
             }
             .toMutableList()
-        answerOptionList.add(0, DropDownAnswerOption(context.getString(R.string.hyphen), null))
+        answerOptionList.add(
+          0,
+          DropDownAnswerOption(
+            context.getString(R.string.hyphen),
+            context.getString(R.string.hyphen),
+            null,
+          ),
+        )
         val adapter =
           AnswerOptionDropDownArrayAdapter(context, R.layout.drop_down_list_item, answerOptionList)
-        val selectedAnswer =
-          questionnaireViewItem.answers.singleOrNull()?.value?.displayString(header.context)
+        val selectedAnswerIdentifier =
+          questionnaireViewItem.answers.singleOrNull()?.value?.identifierString(header.context)
         answerOptionList
-          .filter { it.answerOptionString == selectedAnswer }
-          .singleOrNull()
+          .firstOrNull { it.answerId == selectedAnswerIdentifier }
           ?.let {
             autoCompleteTextView.setText(it.answerOptionString)
             autoCompleteTextView.setSelection(it.answerOptionString.length)
@@ -87,7 +94,7 @@ internal object DropDownViewHolderFactory :
               it.answerOptionImage,
               null,
               null,
-              null
+              null,
             )
           }
         autoCompleteTextView.setAdapter(adapter)
@@ -99,11 +106,11 @@ internal object DropDownViewHolderFactory :
               adapter.getItem(position)?.answerOptionImage,
               null,
               null,
-              null
+              null,
             )
             val selectedAnswer =
-              questionnaireViewItem.answerOption
-                .firstOrNull { it.value.displayString(context) == selectedItem?.answerOptionString }
+              questionnaireViewItem.enabledAnswerOptions
+                .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
                 ?.value
 
             if (selectedAnswer == null) {
@@ -111,7 +118,7 @@ internal object DropDownViewHolderFactory :
             } else {
               questionnaireViewItem.setAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(selectedAnswer)
+                  .setValue(selectedAnswer),
               )
             }
           }
@@ -124,7 +131,7 @@ internal object DropDownViewHolderFactory :
           getValidationErrorMessage(
             textInputLayout.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -143,7 +150,7 @@ internal object DropDownViewHolderFactory :
 internal class AnswerOptionDropDownArrayAdapter(
   context: Context,
   private val layoutResourceId: Int,
-  answerOption: List<DropDownAnswerOption>
+  answerOption: List<DropDownAnswerOption>,
 ) : ArrayAdapter<DropDownAnswerOption>(context, layoutResourceId, answerOption) {
   override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
     val listItemView =
@@ -157,7 +164,7 @@ internal class AnswerOptionDropDownArrayAdapter(
         answerOption?.answerOptionImage,
         null,
         null,
-        null
+        null,
       )
     } catch (e: Exception) {
       Timber.w("Could not set data to dropdown UI", e)
@@ -167,8 +174,9 @@ internal class AnswerOptionDropDownArrayAdapter(
 }
 
 internal data class DropDownAnswerOption(
+  val answerId: String,
   val answerOptionString: String,
-  val answerOptionImage: Drawable?
+  val answerOptionImage: Drawable? = null,
 ) {
   override fun toString(): String {
     return this.answerOptionString

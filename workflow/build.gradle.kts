@@ -1,4 +1,5 @@
-import Dependencies.forceHapiVersion
+import Dependencies.forceJacksonVersion
+import Dependencies.guava
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -15,11 +16,10 @@ publishArtifact(Releases.Workflow)
 createJacocoTestReportTask()
 
 android {
+  namespace = "com.google.android.fhir.workflow"
   compileSdk = Sdk.compileSdk
-
   defaultConfig {
-    minSdk = Sdk.minSdkWorkflow
-    targetSdk = Sdk.targetSdk
+    minSdk = Sdk.minSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -38,18 +38,13 @@ android {
   }
 
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
 
-  compileOptions {
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-
-  packagingOptions {
+  packaging {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -70,25 +65,54 @@ android {
         "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
-      )
+      ),
     )
   }
-
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-
   configureJacocoTestOptions()
+  kotlin { jvmToolchain(11) }
+  compileOptions { isCoreLibraryDesugaringEnabled = true }
 }
 
-afterEvaluate { configureFirebaseTestLab() }
+afterEvaluate { configureFirebaseTestLabForLibraries() }
 
 configurations {
   all {
     removeIncompatibleDependencies()
-    forceHapiVersion()
+    exclude(
+      module = "hapi-fhir-structures-r4b",
+    )
+    resolutionStrategy {
+      force(Dependencies.guava)
+      force("ca.uhn.hapi.fhir:hapi-fhir-base:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-client:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:5.6.36")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:5.6.36")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r5:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.utilities:5.6.36")
+
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4b:5.6.36")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r5:5.6.36")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:6.0.1")
+    }
+    forceJacksonVersion()
   }
 }
 
 dependencies {
+  testImplementation(project(mapOf("path" to ":knowledge")))
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -98,10 +122,9 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
-  androidTestImplementation(project(":testing"))
   androidTestImplementation(project(":workflow-testing"))
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1") { exclude(module = "junit") }
 
   implementation(Dependencies.Androidx.coreKtx)
 
@@ -137,7 +160,7 @@ dependencies {
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
-  implementation(project(":engine"))
+  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
   implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
@@ -146,7 +169,6 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
-  testImplementation(project(":testing"))
   testImplementation(project(":workflow-testing"))
 }
 
@@ -161,14 +183,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
       externalDocumentationLink {

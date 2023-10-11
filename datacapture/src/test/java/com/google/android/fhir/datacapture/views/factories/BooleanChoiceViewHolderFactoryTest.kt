@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -44,7 +44,9 @@ import org.robolectric.RuntimeEnvironment
 class BooleanChoiceViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
+      RuntimeEnvironment.getApplication().apply {
+        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
+      },
     )
   private val viewHolder = BooleanChoiceViewHolderFactory.create(parent)
 
@@ -59,7 +61,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -88,7 +90,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -106,7 +108,7 @@ class BooleanChoiceViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -125,11 +127,11 @@ class BooleanChoiceViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -147,7 +149,7 @@ class BooleanChoiceViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
-            }
+            },
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -166,11 +168,11 @@ class BooleanChoiceViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
-            }
+            },
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isChecked)
@@ -221,7 +223,7 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -242,7 +244,7 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -267,7 +269,7 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -288,7 +290,7 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(false)
-            }
+            },
           )
         },
         validationResult = NotValidated,
@@ -311,7 +313,7 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field.")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
@@ -327,12 +329,12 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).text)
@@ -351,12 +353,12 @@ class BooleanChoiceViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat((viewHolder.itemView.findViewById<RadioButton>(R.id.yes_radio_button).isEnabled))
       .isFalse()
@@ -375,8 +377,8 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -394,8 +396,8 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -410,12 +412,12 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Required")
   }
@@ -428,12 +430,12 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
@@ -448,12 +450,12 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Optional")
   }
@@ -466,12 +468,12 @@ class BooleanChoiceViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
@@ -486,11 +488,11 @@ class BooleanChoiceViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 }

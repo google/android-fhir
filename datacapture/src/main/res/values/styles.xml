@@ -37,14 +37,19 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
+        <item name="questionnaireGroupTypeHeaderStyle">
+            @style/Questionnaire.GroupTypeHeaderStyle
+        </item>
         <item name="questionnaireGroupTypeQuestionTextStyle">
             @style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item name="questionnaireQuestionHeaderStyle">
+            @style/Questionnaire.QuestionHeaderStyle
         </item>
         <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
-
-      <item
+        <item
             name="questionnaireReviewModeQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
@@ -58,7 +63,10 @@
             name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="questionnaireHelpButtonStyle">
-            @style/Widget.MaterialComponents.Button.TextButton.Icon
+            @style/Questionnaire.HelpIconStyle
+        </item>
+        <item name="questionnaireMediaImageStyle">
+            @style/Questionnaire.MediaImageStyle
         </item>
       <item
             name="questionnaireBottomNavContainerStyle"
@@ -118,6 +126,10 @@
         >@style/Questionnaire.SubmitButtonStyle
         </item>
         <item
+            name="questionnaireCancelButtonStyle"
+        >@style/Questionnaire.CancelButtonStyle
+        </item>
+        <item
             name="questionnaireEditButtonStyle"
         >@style/Questionnaire.EditButtonStyle
         </item>
@@ -172,6 +184,14 @@
         </item>
     </style>
 
+    <style name="Questionnaire.GroupTypeHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
+    <style name="Questionnaire.QuestionHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
     <style
         name="Questionnaire.HelpStyle"
         parent="TextAppearance.Material3.TitleSmall"
@@ -184,6 +204,25 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.MediaImageStyle" parent="">
+        <item name="android:maxWidth">@dimen/item_media_image_max_width</item>
+        <item name="android:maxHeight">@dimen/item_media_image_max_width</item>
+        <item name="android:layout_gravity">center</item>
+        <item
+            name="android:layout_marginTop"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginBottom"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginStart"
+        >@dimen/item_media_image_margin_horizontal</item>
+        <item
+            name="android:layout_marginEnd"
+        >@dimen/item_media_image_margin_horizontal</item>
+
     </style>
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">
@@ -337,6 +376,13 @@
         >@dimen/option_item_after_text_padding</item>
     </style>
 
+  <style
+        name="Questionnaire.HelpIconStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Icon"
+    >
+    <item name="android:padding">@dimen/help_icon_padding</item>
+  </style>
+
     <style
         name="Questionnaire.EditButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton.Icon"
@@ -349,7 +395,13 @@
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
     >
-        <item name="android:text">@string/submit_questionnaire</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:visibility">visible</item>
+    </style>
+    <style
+        name="Questionnaire.CancelButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">visible</item>
     </style>
@@ -422,5 +474,4 @@
             name="android:paddingLeft"
         >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
-
 </resources>

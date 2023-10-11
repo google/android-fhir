@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               OptionSelectDialogFragment(
                 title = questionnaireItem.localizedTextSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
-                selectedOptions = selectedOptions
+                selectedOptions = selectedOptions,
               )
             fragment.arguments =
               bundleOf(
@@ -117,7 +117,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           getValidationErrorMessage(
             holder.summaryHolder.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -168,7 +168,7 @@ internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   }
 
   private fun selectedOptionsFlow(linkId: String) =
-    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 1) }
+    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 0) }
 }
 
 data class SelectedOptions(
@@ -190,11 +190,11 @@ data class OptionSelectOption(
 
 private fun QuestionnaireViewItem.extractInitialOptions(context: Context): SelectedOptions {
   val options =
-    answerOption.map { answerOption ->
+    enabledAnswerOptions.map { answerOption ->
       OptionSelectOption(
         item = answerOption,
         selected = isAnswerOptionSelected(answerOption),
-        context = context
+        context = context,
       )
     }
   return SelectedOptions(
@@ -204,7 +204,7 @@ private fun QuestionnaireViewItem.extractInitialOptions(context: Context): Selec
         // All of the Other options will be encoded as String value types
         .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
         // We should also make sure that these values aren't present in the predefined options
-        .filter { value -> value !in options.map { it.item.value.asStringValue() } }
+        .filter { value -> value !in options.map { it.item.value.asStringValue() } },
   )
 }
 

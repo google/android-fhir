@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,14 @@ package com.google.android.fhir.datacapture.views
 
 import android.content.Context
 import android.text.Spanned
-import androidx.core.text.toSpanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.answerExpression
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -36,8 +33,8 @@ import org.hl7.fhir.r4.model.Type
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
  *
- * The view should use [questionnaireItem], [answers], [answerOption], [validationResult] and
- * [enabledDisplayItems] to render the data item in the UI. The view SHOULD NOT mutate the data
+ * The view should use [questionnaireItem], [answers], [enabledAnswerOptions], [validationResult]
+ * and [enabledDisplayItems] to render the data item in the UI. The view SHOULD NOT mutate the data
  * using these properties.
  *
  * The view should use the following answer APIs to update the answer(s):
@@ -52,18 +49,18 @@ import org.hl7.fhir.r4.model.Type
  *
  * @param questionnaireItem the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
  * @param questionnaireResponseItem the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
- * in the [QuestionnaireResponse]
+ *   in the [QuestionnaireResponse]
  * @param validationResult the [ValidationResult] of the answer(s) against the `questionnaireItem`
  * @param answersChangedCallback the callback to notify the view model that the answers have been
- * changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
+ *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
  * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
- * extension exists options
+ *   extension exists options
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
  * @param showOptionalText the optional text is being added to the end of the question text
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
- * in the header view.
+ *   in the header view.
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
@@ -74,24 +71,13 @@ data class QuestionnaireViewItem(
       Questionnaire.QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
-      Any?
+      Any?,
     ) -> Unit,
-  private val resolveAnswerValueSet:
-    suspend (String) -> List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
-    },
-  private val resolveAnswerExpression:
-    suspend (Questionnaire.QuestionnaireItemComponent) -> List<
-        Questionnaire.QuestionnaireItemAnswerOptionComponent> =
-    {
-      emptyList()
-    },
-  internal val draftAnswer: Any? = null,
-  internal val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
-  internal val questionViewTextConfiguration: QuestionTextConfiguration =
-    QuestionTextConfiguration(),
-  internal val contextData: List<Triple<String, Type, Boolean>>
+  val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
+    questionnaireItem.answerOption.ifEmpty { emptyList() },
+  val draftAnswer: Any? = null,
+  val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
+  val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
 ) {
 
   /**
@@ -112,7 +98,7 @@ data class QuestionnaireViewItem(
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
   fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
@@ -121,7 +107,7 @@ data class QuestionnaireViewItem(
       questionnaireItem,
       questionnaireResponseItem,
       questionnaireResponseItemAnswerComponent.toList(),
-      null
+      null,
     )
   }
 
@@ -131,9 +117,9 @@ data class QuestionnaireViewItem(
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  internal fun addAnswer(
+  fun addAnswer(
     questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
@@ -142,14 +128,14 @@ data class QuestionnaireViewItem(
       questionnaireItem,
       questionnaireResponseItem,
       answers + questionnaireResponseItemAnswerComponent,
-      null
+      null,
     )
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  internal fun removeAnswer(
-    questionnaireResponseItemAnswerComponent:
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
+  fun removeAnswer(
+    vararg questionnaireResponseItemAnswerComponent:
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
@@ -157,10 +143,10 @@ data class QuestionnaireViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      answers.toMutableList().apply {
-        removeIf { it.value.equalsDeep(questionnaireResponseItemAnswerComponent.value) }
+      answers.filterNot { ans ->
+        questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
       },
-      null
+      null,
     )
   }
 
@@ -172,49 +158,27 @@ data class QuestionnaireViewItem(
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
-  internal fun answerString(context: Context): String {
+  /**
+   * Returns a given answer (The respondent's answer(s) to the question) along with [displayString]
+   * if question is answered else 'Not Answered'
+   */
+  fun answerString(context: Context): String {
     if (!questionnaireResponseItem.hasAnswer()) return context.getString(R.string.not_answered)
     return questionnaireResponseItem.answer.joinToString { it.value.displayString(context) }
   }
 
   fun isAnswerOptionSelected(
-    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent
+    answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
   ): Boolean {
     return answers.any { it.value.equalsDeep(answerOption.value) }
   }
-
-  /**
-   * In a `choice` or `open-choice` type question, the answer options are defined in one of the
-   * three elements in the questionnaire:
-   *
-   * - `Questionnaire.item.answerOption`: a list of permitted answers to the question
-   * - `Questionnaire.item.answerValueSet`: a reference to a value set containing a list of
-   * permitted answers to the question
-   * - `Extension answer-expression`: an expression based extension which defines the x-fhir-query
-   * or fhirpath to evaluate permitted answer options
-   *
-   * This property returns the answer options defined in one of the sources above. If the answer
-   * options are defined in `Questionnaire.item.answerValueSet`, the answer value set will be
-   * expanded.
-   */
-  internal val answerOption: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>
-    get() =
-      runBlocking(Dispatchers.IO) {
-        when {
-          questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
-          !questionnaireItem.answerValueSet.isNullOrEmpty() ->
-            resolveAnswerValueSet(questionnaireItem.answerValueSet)
-          questionnaireItem.answerExpression != null -> resolveAnswerExpression(questionnaireItem)
-          else -> emptyList()
-        }
-      }
 
   /**
    * Fetches the question title that should be displayed to user. The title is first fetched from
    * [Questionnaire.QuestionnaireResponseItemComponent] (derived from cqf-expression), otherwise it
    * is derived from [localizedTextSpanned] of [QuestionnaireResponse.QuestionnaireItemComponent]
    */
-  internal val questionText: Spanned? by lazy {
+  val questionText: Spanned? by lazy {
     questionnaireResponseItem.text?.toSpanned() ?: questionnaireItem.localizedTextSpanned
   }
 

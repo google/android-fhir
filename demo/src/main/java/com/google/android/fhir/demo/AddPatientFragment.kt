@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -45,24 +43,29 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     }
     observePatientSaveAction()
     (activity as MainActivity).setDrawerEnabled(false)
-  }
 
-  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-    super.onCreateOptionsMenu(menu, inflater)
-    inflater.inflate(R.menu.add_patient_fragment_menu, menu)
+    /** Use the provided cancel|submit buttons from the sdc library */
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.SUBMIT_REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.CANCEL_REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, _ ->
+      NavHostFragment.findNavController(this).navigateUp()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
-      R.id.action_add_patient_submit -> {
-        onSubmitAction()
-        true
-      }
       android.R.id.home -> {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      else -> super.onOptionsItemSelected(item)
+      else -> false
     }
   }
 
@@ -82,8 +85,11 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,
-        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
-        QUESTIONNAIRE_FRAGMENT_TAG
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(viewModel.questionnaireJson)
+          .setShowCancelButton(true)
+          .build(),
+        QUESTIONNAIRE_FRAGMENT_TAG,
       )
     }
   }

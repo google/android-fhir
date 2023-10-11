@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,12 @@ fun Project.configureLicensee() {
     allow("Apache-2.0")
     allow("MIT")
 
+    ignoreDependencies("com.ibm.icu", "icu4j") {
+      because(
+        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+      )
+    }
+
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
     nonStandardLicenseUrls.forEach { allowUrl(it) }
 
@@ -33,6 +39,10 @@ fun Project.configureLicensee() {
     ignoreDependencies("org.jacoco", "org.jacoco.agent") {
       because("JaCoCo is used in tests only, so it is not distributed with our library")
     }
+    allowDependency("org.javassist", "javassist", "3.29.0-GA") {
+      because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
+    }
+    // Remove once Evaluator 3 migration is over
     allowDependency("org.javassist", "javassist", "3.20.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
@@ -59,6 +69,9 @@ fun Project.configureLicensee() {
     allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.0") {
       because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
     }
+    allowDependency("net.zetetic", "android-database-sqlcipher", "4.5.4") {
+      because("Custom license, essentially BSD-3. https://www.zetetic.net/sqlcipher/license/")
+    }
 
     // Jakarta XML Binding API
     allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "2.3.3") {
@@ -68,7 +81,7 @@ fun Project.configureLicensee() {
     // Jakarta Activation API 2.1 Specification
     allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
       because(
-        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php"
+        "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php",
       )
     }
 

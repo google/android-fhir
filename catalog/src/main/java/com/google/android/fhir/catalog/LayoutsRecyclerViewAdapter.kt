@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ class LayoutsRecyclerViewAdapter(private val onItemClick: (LayoutListViewModel.L
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LayoutViewHolder {
     return LayoutViewHolder(
       LandingPageItemBinding.inflate(LayoutInflater.from(parent.context), parent, false),
-      onItemClick
+      onItemClick,
     )
   }
 
@@ -39,7 +39,7 @@ class LayoutsRecyclerViewAdapter(private val onItemClick: (LayoutListViewModel.L
 
 class LayoutViewHolder(
   val binding: LandingPageItemBinding,
-  private val onItemClick: (LayoutListViewModel.Layout) -> Unit
+  private val onItemClick: (LayoutListViewModel.Layout) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
   fun bind(layout: LayoutListViewModel.Layout) {
     binding.componentLayoutIconImageview.setImageResource(layout.iconId)
@@ -52,11 +52,11 @@ class LayoutViewHolder(
 class LayoutDiffUtil : DiffUtil.ItemCallback<LayoutListViewModel.Layout>() {
   override fun areItemsTheSame(
     oldLayout: LayoutListViewModel.Layout,
-    newLayout: LayoutListViewModel.Layout
+    newLayout: LayoutListViewModel.Layout,
   ) = oldLayout === newLayout
 
   override fun areContentsTheSame(
     oldLayout: LayoutListViewModel.Layout,
-    newLayout: LayoutListViewModel.Layout
+    newLayout: LayoutListViewModel.Layout,
   ) = oldLayout == newLayout
 }

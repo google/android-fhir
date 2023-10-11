@@ -16,10 +16,8 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 
 internal val Expression.isXFhirQuery: Boolean
   get() = this.language == Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()

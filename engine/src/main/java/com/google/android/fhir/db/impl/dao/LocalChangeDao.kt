@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,21 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import ca.uhn.fhir.parser.IParser
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.fge.jsonpatch.diff.JsonDiff
+import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity.Type
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.toTimeZoneString
 import com.google.android.fhir.versionId
+import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.json.JSONArray
 import timber.log.Timber
 
 /**
@@ -46,14 +52,9 @@ internal abstract class LocalChangeDao {
   @Insert abstract suspend fun addLocalChange(localChangeEntity: LocalChangeEntity)
 
   @Transaction
-  open suspend fun addInsertAll(resources: List<Resource>) {
-    resources.forEach { resource -> addInsert(resource) }
-  }
-
-  suspend fun addInsert(resource: Resource) {
+  open suspend fun addInsert(resource: Resource, resourceUuid: UUID, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date().toTimeZoneString()
     val resourceString = iParser.encodeResourceToString(resource)
 
     addLocalChange(
@@ -61,36 +62,33 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        resourceUuid = resourceUuid,
+        timestamp = timeOfLocalChange,
         type = Type.INSERT,
         payload = resourceString,
-        versionId = resource.versionId
-      )
+        versionId = resource.versionId,
+      ),
     )
   }
 
-  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource) {
+  suspend fun addUpdate(oldEntity: ResourceEntity, resource: Resource, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val timestamp = Date().toTimeZoneString()
 
-    if (!localChangeIsEmpty(resourceId, resourceType) &&
-        lastChangeType(resourceId, resourceType)!!.equals(Type.DELETE)
+    if (
+      !localChangeIsEmpty(resourceId, resourceType) &&
+        lastChangeType(resourceId, resourceType)!! == Type.DELETE
     ) {
       throw InvalidLocalChangeException(
-        "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed."
+        "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed.",
       )
     }
     val jsonDiff =
-      LocalChangeUtils.diff(
-        iParser,
-        iParser.parseResource(oldEntity.serializedResource) as Resource,
-        resource
-      )
+      diff(iParser, iParser.parseResource(oldEntity.serializedResource) as Resource, resource)
     if (jsonDiff.length() == 0) {
       Timber.i(
         "New resource ${resource.resourceType}/${resource.id} is same as old resource. " +
-          "Not inserting UPDATE LocalChange."
+          "Not inserting UPDATE LocalChange.",
       )
       return
     }
@@ -99,26 +97,32 @@ internal abstract class LocalChangeDao {
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        resourceUuid = oldEntity.resourceUuid,
+        timestamp = timeOfLocalChange,
         type = Type.UPDATE,
         payload = jsonDiff.toString(),
-        versionId = oldEntity.versionId
-      )
+        versionId = oldEntity.versionId,
+      ),
     )
   }
 
-  suspend fun addDelete(resourceId: String, resourceType: ResourceType, remoteVersionId: String?) {
-    val timestamp = Date().toTimeZoneString()
+  suspend fun addDelete(
+    resourceId: String,
+    resourceUuid: UUID,
+    resourceType: ResourceType,
+    remoteVersionId: String?,
+  ) {
     addLocalChange(
       LocalChangeEntity(
         id = 0,
         resourceType = resourceType.name,
         resourceId = resourceId,
-        timestamp = timestamp,
+        resourceUuid = resourceUuid,
+        timestamp = Date().toInstant(),
         type = Type.DELETE,
         payload = "",
-        versionId = remoteVersionId
-      )
+        versionId = remoteVersionId,
+      ),
     )
   }
 
@@ -130,7 +134,7 @@ internal abstract class LocalChangeDao {
         AND resourceType = :resourceType 
         ORDER BY id ASC
         LIMIT 1
-    """
+    """,
   )
   abstract suspend fun lastChangeType(resourceId: String, resourceType: ResourceType): Type?
 
@@ -141,7 +145,7 @@ internal abstract class LocalChangeDao {
         WHERE resourceId = :resourceId 
         AND resourceType = :resourceType
         LIMIT 1
-    """
+    """,
   )
   abstract suspend fun countLastChange(resourceId: String, resourceType: ResourceType): Int
 
@@ -152,15 +156,23 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeEntity
-        ORDER BY LocalChangeEntity.id ASC"""
+        ORDER BY LocalChangeEntity.id ASC""",
   )
   abstract suspend fun getAllLocalChanges(): List<LocalChangeEntity>
 
   @Query(
     """
+        SELECT COUNT(*)
+        FROM LocalChangeEntity
+        """,
+  )
+  abstract suspend fun getLocalChangesCount(): Int
+
+  @Query(
+    """
         DELETE FROM LocalChangeEntity
         WHERE LocalChangeEntity.id = (:id)
-    """
+    """,
   )
   abstract suspend fun discardLocalChanges(id: Long)
 
@@ -174,7 +186,7 @@ internal abstract class LocalChangeDao {
         DELETE FROM LocalChangeEntity
         WHERE resourceId = (:resourceId)
         AND resourceType = :resourceType
-    """
+    """,
   )
   abstract suspend fun discardLocalChanges(resourceId: String, resourceType: ResourceType)
 
@@ -187,12 +199,55 @@ internal abstract class LocalChangeDao {
         SELECT *
         FROM LocalChangeEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType
-    """
+    """,
   )
   abstract suspend fun getLocalChanges(
     resourceType: ResourceType,
-    resourceId: String
+    resourceId: String,
   ): List<LocalChangeEntity>
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }
+
+/** Calculates the JSON patch between two [Resource] s. */
+internal fun diff(parser: IParser, source: Resource, target: Resource): JSONArray {
+  val objectMapper = ObjectMapper()
+  return getFilteredJSONArray(
+    JsonDiff.asJson(
+      objectMapper.readValue(parser.encodeResourceToString(source), JsonNode::class.java),
+      objectMapper.readValue(parser.encodeResourceToString(target), JsonNode::class.java),
+    ),
+  )
+}
+
+/**
+ * This function returns the json diff as a json array of operation objects. We remove the "/meta"
+ * and "/text" paths as they cause path not found issue when we update the resource. They are
+ * usually present in the downloaded resource object but are missing in the edited object as these
+ * aren't supposed to be edited. Thus, the Json diff creates a DELETE- OP for "/meta" and "/text"
+ * and causes the issue with server update.
+ *
+ * An unfiltered JSON Array for family name update looks like
+ *
+ * ```
+ * [{"op":"remove","path":"/meta"}, {"op":"remove","path":"/text"},
+ * {"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+ * ```
+ *
+ * A filtered JSON Array for family name update looks like
+ *
+ * ```
+ * [{"op":"replace","path":"/name/0/family","value":"Nucleus"}]
+ * ```
+ */
+private fun getFilteredJSONArray(jsonDiff: JsonNode) =
+  with(JSONArray(jsonDiff.toString())) {
+    val ignorePaths = setOf("/meta", "/text")
+    return@with JSONArray(
+      (0 until length())
+        .map { optJSONObject(it) }
+        .filterNot { jsonObject ->
+          ignorePaths.any { jsonObject.optString("path").startsWith(it) }
+        },
+    )
+  }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
-import com.google.android.fhir.sync.Authenticator
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
 import org.hl7.fhir.r4.model.SearchParameter
 
@@ -120,7 +120,7 @@ data class FhirEngineConfiguration(
    * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
    * in the reindexing of the resource.
    */
-  val customSearchParameters: List<SearchParameter>? = null
+  val customSearchParameters: List<SearchParameter>? = null,
 )
 
 enum class DatabaseErrorStrategy {
@@ -136,7 +136,7 @@ enum class DatabaseErrorStrategy {
    * This strategy is NOT respected when opening a previously unencrypted database with an encrypted
    * configuration or vice versa. An [IllegalStateException] is thrown instead.
    */
-  RECREATE_AT_OPEN
+  RECREATE_AT_OPEN,
 }
 
 /** A configuration to provide necessary params for network connection. */
@@ -145,13 +145,10 @@ data class ServerConfiguration(
   val baseUrl: String,
   /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
-  /**
-   * An [Authenticator] for supplying any auth token that may be necessary to communicate with the
-   * server
-   */
-  val authenticator: Authenticator? = null,
+  /** An [HttpAuthenticator] for providing HTTP authorization header. */
+  val authenticator: HttpAuthenticator? = null,
   /** Logs the communication between the engine and the remote server. */
-  val httpLogger: HttpLogger = HttpLogger.NONE
+  val httpLogger: HttpLogger = HttpLogger.NONE,
 )
 
 /** A configuration to provide the network connection parameters. */

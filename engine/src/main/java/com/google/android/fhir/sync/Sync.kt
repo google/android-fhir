@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,14 +53,15 @@ object Sync {
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
-    retryConfiguration: RetryConfiguration? = defaultRetryConfiguration
+    retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
   ): Flow<SyncJobStatus> {
-    val flow = getWorkerInfo<W>(context)
+    val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
-        W::class.java.name,
+        uniqueWorkName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest(retryConfiguration, W::class.java)
+        createOneTimeWorkRequest(retryConfiguration, W::class.java),
       )
     return flow
   }
@@ -72,28 +73,29 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
-   * mechanism
+   *   mechanism
    * @return a [Flow] of [SyncJobStatus]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
-    periodicSyncConfiguration: PeriodicSyncConfiguration
+    periodicSyncConfiguration: PeriodicSyncConfiguration,
   ): Flow<SyncJobStatus> {
-    val flow = getWorkerInfo<W>(context)
+    val uniqueWorkName = "${W::class.java.name}-periodicSync"
+    val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
-        W::class.java.name,
+        uniqueWorkName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java)
+        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java),
       )
     return flow
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
-  inline fun <reified W : FhirSyncWorker> getWorkerInfo(context: Context) =
+  fun getWorkerInfo(context: Context, workName: String) =
     WorkManager.getInstance(context)
-      .getWorkInfosForUniqueWorkLiveData(W::class.java.name)
+      .getWorkInfosForUniqueWorkLiveData(workName)
       .asFlow()
       .flatMapConcat { it.asFlow() }
       .mapNotNull { workInfo ->
@@ -106,25 +108,20 @@ object Sync {
           }
       }
 
-  /** Gets the timestamp of the last sync job. */
-  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-    return DatastoreUtil(context).readLastSyncTimestamp()
-  }
-
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(
     retryConfiguration: RetryConfiguration?,
-    clazz: Class<W>
+    clazz: Class<W>,
   ): OneTimeWorkRequest {
     val oneTimeWorkRequestBuilder = OneTimeWorkRequest.Builder(clazz)
     retryConfiguration?.let {
       oneTimeWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
-        it.backoffCriteria.timeUnit
+        it.backoffCriteria.timeUnit,
       )
       oneTimeWorkRequestBuilder.setInputData(
-        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
+        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build(),
       )
     }
     return oneTimeWorkRequestBuilder.build()
@@ -133,13 +130,13 @@ object Sync {
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createPeriodicWorkRequest(
     periodicSyncConfiguration: PeriodicSyncConfiguration,
-    clazz: Class<W>
+    clazz: Class<W>,
   ): PeriodicWorkRequest {
     val periodicWorkRequestBuilder =
       PeriodicWorkRequest.Builder(
           clazz,
           periodicSyncConfiguration.repeat.interval,
-          periodicSyncConfiguration.repeat.timeUnit
+          periodicSyncConfiguration.repeat.timeUnit,
         )
         .setConstraints(periodicSyncConfiguration.syncConstraints)
 
@@ -147,12 +144,17 @@ object Sync {
       periodicWorkRequestBuilder.setBackoffCriteria(
         it.backoffCriteria.backoffPolicy,
         it.backoffCriteria.backoffDelay,
-        it.backoffCriteria.timeUnit
+        it.backoffCriteria.timeUnit,
       )
       periodicWorkRequestBuilder.setInputData(
-        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build()
+        Data.Builder().putInt(MAX_RETRIES_ALLOWED, it.maxRetries).build(),
       )
     }
     return periodicWorkRequestBuilder.build()
+  }
+
+  /** Gets the timestamp of the last sync job. */
+  fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
+    return DatastoreUtil(context).readLastSyncTimestamp()
   }
 }

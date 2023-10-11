@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ package com.google.android.fhir.demo.data
 
 import com.google.android.fhir.demo.DemoDataStore
 import com.google.android.fhir.sync.DownloadWorkManager
-import com.google.android.fhir.sync.Request
 import com.google.android.fhir.sync.SyncDataParams
+import com.google.android.fhir.sync.download.DownloadRequest
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -36,15 +36,9 @@ import org.hl7.fhir.r4.model.ResourceType
 class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore) :
   DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls =
-    LinkedList(
-      listOf(
-        "Patient?address-city=NAIROBI&_sort=_lastUpdated",
-        "Binary?_id=android-fhir-thermometer-image"
-      )
-    )
+  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI&_sort=_lastUpdated"))
 
-  override suspend fun getNextRequest(): Request? {
+  override suspend fun getNextRequest(): DownloadRequest? {
     var url = urls.poll() ?: return null
 
     val resourceTypeToDownload =
@@ -52,7 +46,7 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
     dataStore.getLasUpdateTimestamp(resourceTypeToDownload)?.let {
       url = affixLastUpdatedTimestamp(url, it)
     }
-    return Request.of(url)
+    return DownloadRequest.of(url)
   }
 
   override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
@@ -104,14 +98,15 @@ class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore
   }
 
   private suspend fun extractAndSaveLastUpdateTimestampToFetchFutureUpdates(
-    resources: List<Resource>
+    resources: List<Resource>,
   ) {
     resources
       .groupBy { it.resourceType }
-      .entries.map { map ->
+      .entries
+      .map { map ->
         dataStore.saveLastUpdatedTimestamp(
           map.key,
-          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: ""
+          map.value.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString() ?: "",
         )
       }
   }
