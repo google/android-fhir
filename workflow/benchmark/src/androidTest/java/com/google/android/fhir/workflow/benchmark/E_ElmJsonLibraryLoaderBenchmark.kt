@@ -22,13 +22,13 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
+import org.cqframework.cql.elm.serializing.jackson.ElmJsonLibraryReader
 import java.io.InputStream
 import java.io.StringReader
 import org.hl7.fhir.r4.model.Library
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlLibraryReader
 
 @RunWith(AndroidJUnit4::class)
 @Suppress("ktlint:standard:class-naming")
@@ -51,7 +51,7 @@ class E_ElmJsonLibraryLoaderBenchmark {
 
       val jsonLib = immunityCheckLibrary.content.first { it.contentType == "application/elm+json" }
 
-      val immunityCheckCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
+      val immunityCheckCqlLibrary = ElmJsonLibraryReader().read(StringReader(String(jsonLib.data)))
 
       assertThat(immunityCheckCqlLibrary.identifier.id).isEqualTo("ImmunityCheck")
     }
@@ -68,7 +68,7 @@ class E_ElmJsonLibraryLoaderBenchmark {
 
       val jsonLib = fhirHelpersLibrary.content.first { it.contentType == "application/elm+json" }
 
-      val fhirHelpersCqlLibrary = JsonCqlLibraryReader().read(StringReader(String(jsonLib.data)))
+      val fhirHelpersCqlLibrary = ElmJsonLibraryReader().read(StringReader(String(jsonLib.data)))
 
       assertThat(fhirHelpersCqlLibrary.identifier.id).isEqualTo("FHIRHelpers")
     }
