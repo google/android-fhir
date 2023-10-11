@@ -1,0 +1,44 @@
+{
+  "resourceType": "Bundle",
+  "id": "extract-OutpatientPriorAuthorizationRequest",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "extract-OutpatientPriorAuthorizationRequest.1",
+        "name": "Test Facility"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/extract-OutpatientPriorAuthorizationRequest.1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "extract-OutpatientPriorAuthorizationRequest.2",
+        "identifier": [
+          {
+            "system": "http://hl7.org/fhir/sid/us-medicare",
+            "value": "123456789"
+          }
+        ],
+        "name": [
+          {
+            "family": "Man",
+            "given": [
+              "Test"
+            ]
+          }
+        ],
+        "birthDate": "1950-01-01",
+        "gender": "male"
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/extract-OutpatientPriorAuthorizationRequest.2"
+      }
+    }
+  ]
+}

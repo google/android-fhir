@@ -1,0 +1,954 @@
+{
+  "resourceType": "CarePlan",
+  "id": "prepopulate-errors",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "prepopulate",
+      "instantiatesCanonical": [
+        "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/prepopulate-errors"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "OPA-Patient1"
+      },
+      "action": [
+        {
+          "title": "Prepopulate!",
+          "description": "A simple recommendation to complete a prepopulated Questionnaire",
+          "resource": {
+            "reference": "Task/complete-questionnaire"
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "Questionnaire",
+      "id": "OutpatientPriorAuthorizationRequest-Errors-OPA-Patient1",
+      "meta": {
+        "source": "#Szj0RYKKLb3zYK89",
+        "profile": [
+          "http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-questionnaire-r4"
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+          "valueCanonical": "http://somewhere.org/fhir/uv/mycontentig/Library/OutpatientPriorAuthorizationPrepopulation"
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-prepopulate-subject",
+          "valueReference": {
+            "reference": "Patient/OPA-Patient1"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+          "valueReference": {
+            "reference": "#populate-outcome-OutpatientPriorAuthorizationRequest-OPA-Patient1"
+          }
+        }
+      ],
+      "url": "http://hl7.org/fhir/Questionnaire/OutpatientPriorAuthorizationRequest-Errors",
+      "name": "OutpatientPriorAuthorizationRequest",
+      "title": "Outpatient Prior Authorization Request",
+      "status": "active",
+      "subjectType": [
+        "Patient",
+        "Organization",
+        "Claim"
+      ],
+      "date": "2022-01-04T00:00:00+00:00",
+      "contact": [
+        {
+          "name": "Palmetto GBA"
+        }
+      ],
+      "description": "Testing the form",
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:3166",
+              "code": "US"
+            }
+          ]
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1",
+          "text": "Facility Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityName"
+                  }
+                }
+              ],
+              "linkId": "1.1",
+              "text": "Name",
+              "type": "string",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "Acme Clinic"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityNPI"
+                  }
+                }
+              ],
+              "linkId": "1.2",
+              "text": "NPI",
+              "type": "text",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "1407071236"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityPTAN"
+                  }
+                }
+              ],
+              "linkId": "1.3",
+              "text": "PTAN",
+              "type": "string",
+              "required": true
+            },
+            {
+              "linkId": "1.4",
+              "text": "Contract/Region",
+              "type": "choice",
+              "required": false,
+              "answerOption": [
+                {
+                  "id": "FacilityContractRegion-11501",
+                  "valueCoding": {
+                    "code": "11001",
+                    "display": "Part A South Carolina"
+                  }
+                },
+                {
+                  "id": "FacilityContractRegion-11003",
+                  "valueCoding": {
+                    "code": "11501",
+                    "display": "Part A North Carolina"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "11003",
+                    "display": "Part A Virginia/West Virginia"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "2",
+          "text": "Beneficiary Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryFirstName"
+                  }
+                }
+              ],
+              "linkId": "2.1",
+              "text": "First Name",
+              "type": "string",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "Peter"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryLastName"
+                  }
+                }
+              ],
+              "linkId": "2.2",
+              "text": "Last Name",
+              "type": "text",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "Chalmers"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryDOB"
+                  }
+                }
+              ],
+              "linkId": "2.3",
+              "text": "Date of Birth",
+              "type": "date",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueDate": "1974-12-25"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryMedicareID"
+                  }
+                }
+              ],
+              "linkId": "2.4",
+              "text": "Medicare ID",
+              "type": "string",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "525697298M"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryGender"
+                  }
+                }
+              ],
+              "linkId": "2.5",
+              "text": "Gender",
+              "type": "choice",
+              "required": true,
+              "answerOption": [
+                {
+                  "id": "unknown",
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "male",
+                    "display": "Male"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "female",
+                    "display": "Female"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "other",
+                    "display": "Other"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "unknown",
+                    "display": "Unknown"
+                  }
+                }
+              ],
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "male"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3",
+          "text": "Operating Physician Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianFirstName"
+                  }
+                }
+              ],
+              "linkId": "3.1",
+              "text": "First Name",
+              "type": "string",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "Fielding"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianLastName"
+                  }
+                }
+              ],
+              "linkId": "3.2",
+              "text": "Last Name",
+              "type": "text",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "Kathy"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianNPI"
+                  }
+                }
+              ],
+              "linkId": "3.3",
+              "text": "NPI",
+              "type": "string",
+              "required": true,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueString": "1245319599"
+                }
+              ]
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianPTAN"
+                  }
+                }
+              ],
+              "linkId": "3.4",
+              "text": "PTAN",
+              "type": "string",
+              "required": true
+            },
+            {
+              "linkId": "3.5",
+              "text": "Address",
+              "type": "group",
+              "required": true,
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddress1"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.1",
+                  "text": "Address1",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "1080 FIRST COLONIAL RD"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddress2"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.2",
+                  "text": "Address2",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressCity"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.3",
+                  "text": "City",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "Virginia Beach"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressState"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.4",
+                  "text": "State",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "VA"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressZip"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.5",
+                  "text": "Zip",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "21454-2406"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "4",
+          "text": "Attending Physician Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "AttendingPhysicianSame"
+                  }
+                }
+              ],
+              "linkId": "4.1",
+              "text": "Same as Operating Physician?",
+              "type": "boolean",
+              "required": false,
+              "initial": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                      "valueReference": {
+                        "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                      }
+                    }
+                  ],
+                  "valueBoolean": false
+                }
+              ]
+            },
+            {
+              "linkId": "4.2",
+              "text": "Attending Physician",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "4.1",
+                  "operator": "=",
+                  "answerBoolean": false
+                }
+              ],
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianFirstName"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.1",
+                  "text": "First Name",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "Ronald"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianLastName"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.2",
+                  "text": "Last Name",
+                  "type": "text",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "Bone"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianNPI"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.3",
+                  "text": "NPI",
+                  "type": "string",
+                  "required": true,
+                  "initial": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                          "valueReference": {
+                            "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                          }
+                        }
+                      ],
+                      "valueString": "9941339108"
+                    }
+                  ]
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianPTAN"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.4",
+                  "text": "PTAN",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "linkId": "4.2.5",
+                  "text": "Address",
+                  "type": "group",
+                  "required": true,
+                  "item": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddress1"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.1",
+                      "text": "Address1",
+                      "type": "string",
+                      "required": true,
+                      "initial": [
+                        {
+                          "extension": [
+                            {
+                              "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                              "valueReference": {
+                                "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                              }
+                            }
+                          ],
+                          "valueString": "1003 Healthcare Drive"
+                        }
+                      ]
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddress2"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.2",
+                      "text": "Address2",
+                      "type": "string",
+                      "required": false
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressCity"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.3",
+                      "text": "City",
+                      "type": "string",
+                      "required": true,
+                      "initial": [
+                        {
+                          "extension": [
+                            {
+                              "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                              "valueReference": {
+                                "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                              }
+                            }
+                          ],
+                          "valueString": "Amherst"
+                        }
+                      ]
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressState"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.4",
+                      "text": "State",
+                      "type": "string",
+                      "required": true,
+                      "initial": [
+                        {
+                          "extension": [
+                            {
+                              "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                              "valueReference": {
+                                "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                              }
+                            }
+                          ],
+                          "valueString": "MA"
+                        }
+                      ]
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressZip"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.5",
+                      "text": "Zip",
+                      "type": "string",
+                      "required": true,
+                      "initial": [
+                        {
+                          "extension": [
+                            {
+                              "url": "http://hl7.org/fhir/StructureDefinition/questionnaireresponse-author",
+                              "valueReference": {
+                                "reference": "http://cqframework.org/fhir/Device/clinical-quality-language"
+                              }
+                            }
+                          ],
+                          "valueString": "01002"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Task",
+      "id": "complete-questionnaire",
+      "basedOn": [
+        {
+          "reference": "#RequestGroup/prepopulate",
+          "type": "RequestGroup"
+        }
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "description": "Create a task to complete a Questionnaire.",
+      "focus": {
+        "reference": "Questionnaire/OutpatientPriorAuthorizationRequest-OPA-Patient1"
+      },
+      "for": {
+        "reference": "OPA-Patient1"
+      }
+    },
+    {
+      "resourceType": "OperationOutcome",
+      "id": "populate-outcome-OutpatientPriorAuthorizationRequest-OPA-Patient1",
+      "issue": [
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (FacilityPTAN) for item (1.3): Could not resolve expression reference 'FacilityPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianPTAN) for item (3.4): Could not resolve expression reference 'OperatingPhysicianPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianPTAN) for item (4.2.4): Could not resolve expression reference 'AttendingPhysicianPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'."
+        }
+      ]
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+      "valueReference": {
+        "reference": "#populate-outcome-OutpatientPriorAuthorizationRequest-OPA-Patient1"
+      }
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/prepopulate"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "OPA-Patient1"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/prepopulate"
+      }
+    }
+  ]
+}

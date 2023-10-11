@@ -1,0 +1,589 @@
+{
+  "resourceType": "ValueSet",
+  "id": "sickle-cell-diseases",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Conditions due to Sickle-cell that can cause painful crisis to be used as exclusions for opioid use recommendations"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Condition"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "Coditions that cause red blood cell sickling"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-exclusion-criteria",
+      "valueString": "Any sickle-cell disorder that does not result in painful crisis"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/sickle-cell-diseases",
+  "name": "sickle_cell_diseases",
+  "title": "Sickle-cell diseases",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-08-24T12:38:56-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Sickle-cell disorders that cause painful crisis",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Conditions due to Sickle-cell that can cause painful crisis to be used as exclusions for opioid use recommendations",
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "417357006"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "441482006"
+          }
+        ]
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "D57"
+          }
+        ]
+      }
+    ],
+    "exclude": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "416290001"
+          }
+        ]
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "D57.1"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "8718a540-a567-40d7-9d04-045146e90485",
+    "timestamp": "2022-08-24T12:38:56-06:00",
+    "contains": [
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "10759351000119103",
+        "display": "Sickle cell anemia in mother complicating childbirth (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "1153413001",
+        "display": "Acute sequestration of spleen due to sickle cell thalassemia with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "1153415008",
+        "display": "Acute sequestration of spleen due to sickle cell hemoglobin C disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127040003",
+        "display": "Sickle cell-hemoglobin SS disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127041004",
+        "display": "Sickle cell-beta-thalassemia (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127042006",
+        "display": "Sickle cell beta plus thalassemia (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127043001",
+        "display": "Sickle cell-beta^0^-thalassemia (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127044007",
+        "display": "Sickle cell-delta beta^0^-thalassemia (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127045008",
+        "display": "Sickle cell anemia with coexistent alpha-thalassemia (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127047000",
+        "display": "Sickle cell-hemoglobin Lepore disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "127048005",
+        "display": "Sickle cell-Hemoglobin O Arab disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "23269001",
+        "display": "Double heterozygous sickling disorder (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "234391009",
+        "display": "Sickle cell anemia with high hemoglobin F (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "25472008",
+        "display": "Sickle cell-hemoglobin D disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "35434009",
+        "display": "Sickle cell-hemoglobin C disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "36472007",
+        "display": "Sickle cell-thalassemia disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "416484003",
+        "display": "Sickle cell-hemoglobin E disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "416826005",
+        "display": "Sickle cell-thalassemia disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "417048006",
+        "display": "Sickle cell-thalassemia disease without crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "417279003",
+        "display": "Hemoglobin S sickling disorder with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "417425009",
+        "display": "Hemoglobin SS disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "417517009",
+        "display": "Sickle cell-hemoglobin C disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "417748003",
+        "display": "Sickle cell-hemoglobin D disease with crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "440206000",
+        "display": "Hemoglobin SS disease with vasoocclusive crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "441482006",
+        "display": "History of sickle cell anemia (situation)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "444108000",
+        "display": "Acute sickle cell splenic sequestration crisis (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "47024008",
+        "display": "Sickle cell-hemoglobin E disease (disorder)"
+      },
+      {
+        "system": "SNOMEDCT",
+        "version": "2022-03",
+        "code": "783254003",
+        "display": "Hereditary persistence of fetal hemoglobin with sickle cell disease syndrome (disorder)"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57",
+        "display": "Sickle-cell disorders"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.0",
+        "display": "Hb-SS disease with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.00",
+        "display": "Hb-SS disease with crisis, unspecified"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.01",
+        "display": "Hb-SS disease with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.02",
+        "display": "Hb-SS disease with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.03",
+        "display": "Hb-SS disease with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.09",
+        "display": "Hb-SS disease with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.2",
+        "display": "Sickle-cell/Hb-C disease"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.20",
+        "display": "Sickle-cell/Hb-C disease without crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.21",
+        "display": "Sickle-cell/Hb-C disease with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.211",
+        "display": "Sickle-cell/Hb-C disease with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.212",
+        "display": "Sickle-cell/Hb-C disease with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.213",
+        "display": "Sickle-cell/Hb-C disease with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.218",
+        "display": "Sickle-cell/Hb-C disease with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.219",
+        "display": "Sickle-cell/Hb-C disease with crisis, unspecified"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.3",
+        "display": "Sickle-cell trait"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.4",
+        "display": "Sickle-cell thalassemia"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.40",
+        "display": "Sickle-cell thalassemia without crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.41",
+        "display": "Sickle-cell thalassemia, unspecified, with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.411",
+        "display": "Sickle-cell thalassemia, unspecified, with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.412",
+        "display": "Sickle-cell thalassemia, unspecified, with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.413",
+        "display": "Sickle-cell thalassemia, unspecified, with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.418",
+        "display": "Sickle-cell thalassemia, unspecified, with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.419",
+        "display": "Sickle-cell thalassemia, unspecified, with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.42",
+        "display": "Sickle-cell thalassemia beta zero without crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.43",
+        "display": "Sickle-cell thalassemia beta zero with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.431",
+        "display": "Sickle-cell thalassemia beta zero with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.432",
+        "display": "Sickle-cell thalassemia beta zero with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.433",
+        "display": "Sickle-cell thalassemia beta zero with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.438",
+        "display": "Sickle-cell thalassemia beta zero with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.439",
+        "display": "Sickle-cell thalassemia beta zero with crisis, unspecified"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.44",
+        "display": "Sickle-cell thalassemia beta plus without crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.45",
+        "display": "Sickle-cell thalassemia beta plus with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.451",
+        "display": "Sickle-cell thalassemia beta plus with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.452",
+        "display": "Sickle-cell thalassemia beta plus with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.453",
+        "display": "Sickle-cell thalassemia beta plus with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.458",
+        "display": "Sickle-cell thalassemia beta plus with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.459",
+        "display": "Sickle-cell thalassemia beta plus with crisis, unspecified"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.8",
+        "display": "Other sickle-cell disorders"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.80",
+        "display": "Other sickle-cell disorders without crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.81",
+        "display": "Other sickle-cell disorders with crisis"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.811",
+        "display": "Other sickle-cell disorders with acute chest syndrome"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.812",
+        "display": "Other sickle-cell disorders with splenic sequestration"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.813",
+        "display": "Other sickle-cell disorders with cerebral vascular involvement"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.818",
+        "display": "Other sickle-cell disorders with crisis with other specified complication"
+      },
+      {
+        "system": "ICD10CM",
+        "version": "2022",
+        "code": "D57.819",
+        "display": "Other sickle-cell disorders with crisis, unspecified"
+      }
+    ]
+  }
+}
