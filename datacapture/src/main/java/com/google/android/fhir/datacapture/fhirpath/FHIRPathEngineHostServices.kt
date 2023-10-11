@@ -25,8 +25,12 @@ import org.hl7.fhir.r4.utils.FHIRPathEngine
  * Resolves constants defined in the fhir path expressions beyond those defined in the specification
  */
 internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
-  override fun resolveConstant(appContext: Any?, name: String?, beforeContext: Boolean): Base? =
-    (appContext as? Map<*, *>)?.get(name) as? Base
+  override fun resolveConstant(
+    appContext: Any?,
+    name: String?,
+    beforeContext: Boolean,
+  ): List<Base>? =
+    ((appContext as? Map<*, *>)?.get(name) as? Base)?.let { listOf(it) } ?: emptyList()
 
   override fun resolveConstantType(appContext: Any?, name: String?): TypeDetails {
     throw UnsupportedOperationException()
@@ -59,7 +63,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     throw UnsupportedOperationException()
   }
 
-  override fun resolveReference(appContext: Any?, url: String?): Base {
+  override fun resolveReference(appContext: Any?, url: String?, refContext: Base?): Base? {
     throw UnsupportedOperationException()
   }
 
@@ -67,7 +71,7 @@ internal object FHIRPathEngineHostServices : FHIRPathEngine.IEvaluationContext {
     throw UnsupportedOperationException()
   }
 
-  override fun resolveValueSet(appContext: Any?, url: String?): ValueSet {
+  override fun resolveValueSet(appContext: Any?, url: String?): ValueSet? {
     throw UnsupportedOperationException()
   }
 }

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge.db.impl
+package com.google.android.fhir.knowledge.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.google.android.fhir.knowledge.db.impl.dao.KnowledgeDao
-import com.google.android.fhir.knowledge.db.impl.entities.ImplementationGuideEntity
-import com.google.android.fhir.knowledge.db.impl.entities.ImplementationGuideResourceMetadataEntity
-import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
+import com.google.android.fhir.knowledge.db.dao.KnowledgeDao
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideEntity
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideResourceMetadataEntity
+import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
 
 /**
  * Stores knowledge artifacts metadata for implementation guides and their containing FHIR

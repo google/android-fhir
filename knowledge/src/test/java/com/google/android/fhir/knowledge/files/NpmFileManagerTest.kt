@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge.npm
+package com.google.android.fhir.knowledge.files
 
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.common.truth.Truth.assertThat
@@ -31,7 +31,7 @@ class NpmFileManagerTest {
 
   @Test
   fun getPackageFolder() {
-    val packageFolder = npmFileManager.getPackageFolder(PACKAGE_ID, VERSION)
+    val packageFolder = npmFileManager.getPackageDir(PACKAGE_ID, VERSION)
 
     assertThat(packageFolder.absolutePath)
       .isEqualTo("${testDataFolder.absolutePath}/$PACKAGE_ID#$VERSION")
@@ -39,7 +39,7 @@ class NpmFileManagerTest {
 
   @Test
   fun getPackage() = runTest {
-    val npmPackage = npmFileManager.getPackage(PACKAGE_ID, VERSION)
+    val npmPackage = npmFileManager.getLocalFhirNpmPackageMetadata(PACKAGE_ID, VERSION)
 
     assertThat(npmPackage.packageId).isEqualTo(PACKAGE_ID)
     assertThat(npmPackage.version).isEqualTo(VERSION)

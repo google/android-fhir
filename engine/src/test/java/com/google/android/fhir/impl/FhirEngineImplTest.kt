@@ -29,16 +29,19 @@ import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.SyncUploadProgress
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
@@ -238,7 +241,7 @@ class FhirEngineImplTest {
           fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
         }
       }
-    assertThat(exception.message).isEqualTo("Unknown resource typeCustomResource")
+    assertThat(exception.message).isEqualTo("Unknown resource type CustomResource")
   }
 
   @Test
@@ -312,22 +315,49 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun syncUpload_uploadLocalChange() = runBlocking {
+  fun syncUpload_uploadLocalChange_success() = runTest {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
-      flow {
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
+
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+        UploadSyncResult.Success(
+          LocalChangeToken(it.flatMap { it.token.ids }),
+          listOf(),
+        )
       }
-    }
+      .collect { emittedProgress.add(it) }
 
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {
-      assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
-      assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
-      assertThat(this.type).isEqualTo(Type.INSERT)
-      assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(resourceType).isEqualTo(ResourceType.Patient.toString())
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_1.id)
+      assertThat(type).isEqualTo(Type.INSERT)
+      assertThat(payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
     }
+
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(0, 1))
+  }
+
+  @Test
+  fun syncUpload_uploadLocalChange_failure() = runBlocking {
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
+    val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
+        UploadSyncResult.Failure(
+          uploadError,
+          LocalChangeToken(it.flatMap { it.token.ids }),
+        )
+      }
+      .collect { emittedProgress.add(it) }
+
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(1, 1, uploadError))
   }
 
   @Test
