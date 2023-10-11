@@ -57,7 +57,7 @@ interface RetrofitSHLService {
 
   class Builder(
     private val baseUrl: String,
-    private val networkConfiguration: NetworkConfiguration
+    private val networkConfiguration: NetworkConfiguration,
   ) {
 
     private var authenticator: HttpAuthenticator? = null

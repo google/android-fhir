@@ -70,7 +70,7 @@ internal class GenerateShlUtils(
   ): JSONObject {
     try {
       val contentEncrypted = encrypt(file, key)
-      val authorization = "Bearer $managementToken" // this isn't known until first POST request in generateShLink so how do I setup API service
+      val authorization = "Bearer $managementToken"
       val response = apiService.postPayload(manifestToken, contentEncrypted, authorization)
 
       return if (response.isSuccessful) {

@@ -21,16 +21,17 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 
 /**
- * Represents an International Patient Summary (IPS) document, associating it with a specific patient and
- * containing a list of titles present in the document. For detailed specifications, see
- * https://build.fhir.org/ig/HL7/fhir-ips/index.html for the Implementation Guide.
+ * Represents an International Patient Summary (IPS) document, associating it with a specific
+ * patient and containing a list of titles present in the document. For detailed specifications, see
+ * [Official IPS Implementation Guide](https://build.fhir.org/ig/HL7/fhir-ips/index.html).
  *
- * This class serves as a developer-friendly, in-memory representation of an IPS document,
- * allowing for easier manipulation and interaction with its components compared to a raw FHIR Composition resource.
+ * This class serves as a developer-friendly, in-memory representation of an IPS document, allowing
+ * for easier manipulation and interaction with its components compared to a raw FHIR Composition
+ * resource.
  *
  * @property document The FHIR Bundle itself, which contains the IPS document
- * @property titles   A list of titles of the sections present in the document.
- * @property patient  The FHIR Patient resource associated with the IPS document.
+ * @property titles A list of titles of the sections present in the document.
+ * @property patient The FHIR Patient resource associated with the IPS document.
  */
 data class IPSDocument(
   val document: Bundle,
@@ -41,15 +42,13 @@ data class IPSDocument(
 /**
  * Represents a title, which corresponds to a section present in the IPS document.
  *
- * @property name The string storing the title of the section itself.
- *                  Examples: "Allergies and Intolerances", "Immunizations", etc...
- *
- * @property dataEntries A list of FHIR resources which are present in the section.
- *                       For example, if the title is "Allergies and Intolerances", all the patient's
- *                       current allergies and/or intolerances will be listed here.
+ * @property name The string storing the title of the section itself. Examples: "Allergies and
+ *   Intolerances", "Immunizations", etc...
+ * @property dataEntries A list of FHIR resources which are present in the section. For example, if
+ *   the title is "Allergies and Intolerances", all the patient's current allergies and/or
+ *   intolerances will be listed here.
  */
 data class Title(
   val name: String,
   val dataEntries: ArrayList<Resource>,
 )
-

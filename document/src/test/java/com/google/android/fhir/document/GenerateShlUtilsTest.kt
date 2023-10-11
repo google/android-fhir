@@ -43,8 +43,7 @@ class GenerateShlUtilsTest {
 
   private lateinit var generateShlUtils: GenerateShlUtils
   private val apiService by lazy {
-    RetrofitSHLService.Builder("https://api.vaxx.link/api/shl/", NetworkConfiguration())
-      .build()
+    RetrofitSHLService.Builder("https://api.vaxx.link/api/shl/", NetworkConfiguration()).build()
   }
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val minimalBundleString =
