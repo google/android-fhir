@@ -1,0 +1,87 @@
+{
+  "resourceType": "MedicationRequest",
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/dataDateRoller",
+      "extension": [
+        {
+          "url": "dateLastUpdated",
+          "valueDateTime": "2022-04-28"
+        },
+        {
+          "url": "frequency",
+          "valueDuration": {
+            "value": 30.0,
+            "unit": "days",
+            "system": "http://unitsofmeasure.org",
+            "code": "d"
+          }
+        }
+      ]
+    }
+  ],
+  "id": "example-rec-10-patient-view-POS-Cocaine-drugs-context",
+  "status": "active",
+  "intent": "order",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/medicationrequest-category",
+          "code": "community"
+        }
+      ]
+    }
+  ],
+  "medicationCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "code": "197696",
+        "display": "72 HR Fentanyl 0.075 MG/HR Transdermal System"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/example-rec-10-patient-view-POS-Cocaine-drugs"
+  },
+  "encounter": {
+    "reference": "Encounter/example-rec-10-patient-view-POS-Cocaine-drugs-prefetch"
+  },
+  "authoredOn": "2022-04-28",
+  "dosageInstruction": [
+    {
+      "timing": {
+        "repeat": {
+          "frequency": 1,
+          "period": 12.0,
+          "periodUnit": "d"
+        }
+      },
+      "asNeededBoolean": false,
+      "doseAndRate": [
+        {
+          "doseQuantity": {
+            "value": 1.0,
+            "unit": "patch",
+            "system": "http://unitsofmeasure.org",
+            "code": "{patch}"
+          }
+        }
+      ]
+    }
+  ],
+  "dispenseRequest": {
+    "validityPeriod": {
+      "start": "2022-04-28",
+      "end": "2022-07-28"
+    },
+    "numberOfRepeatsAllowed": 3,
+    "expectedSupplyDuration": {
+      "value": 30.0,
+      "unit": "days",
+      "system": "http://unitsofmeasure.org",
+      "code": "d"
+    }
+  }
+}

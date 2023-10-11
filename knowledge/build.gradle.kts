@@ -1,4 +1,4 @@
-import Dependencies.guava
+import Dependencies.forceGuava
 import java.net.URL
 
 plugins {
@@ -71,33 +71,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(module = "xpp3_min")
-    exclude(
-      module = "hapi-fhir-structures-r4b",
-    )
-    resolutionStrategy {
-      force(Dependencies.guava)
-      force("ca.uhn.hapi.fhir:hapi-fhir-base:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-client:6.0.1")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:6.0.22")
-
-      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:6.0.1")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:6.0.22")
-      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r5:6.0.1")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.utilities:6.0.22")
-
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:6.0.22")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:6.0.22")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4:6.0.22")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4b:6.0.22")
-      force("ca.uhn.hapi.fhir:org.hl7.fhir.r5:6.0.22")
-
-      force("ca.uhn.hapi.fhir:hapi-fhir-validation:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.0.1")
-      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:6.0.1")
-    }
+    forceGuava()
   }
 }
 
@@ -109,7 +83,8 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
-  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1") { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.guavaCaching)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
@@ -120,7 +95,7 @@ dependencies {
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
   implementation(Dependencies.http)
-  implementation("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:6.0.22")
+  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
   implementation(Dependencies.apacheCommonsCompress)
 
   kapt(Dependencies.Room.compiler)

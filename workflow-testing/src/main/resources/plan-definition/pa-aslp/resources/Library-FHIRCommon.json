@@ -1,0 +1,197 @@
+{
+  "resourceType": "Library",
+  "id": "FHIRCommon",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/FHIRCommon",
+  "version": "1.1.000",
+  "name": "FHIRCommon",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers|4.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system LOINC",
+      "resource": "http://loinc.org"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system SNOMEDCT",
+      "resource": "http://snomed.info/sct"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICD10CM",
+      "resource": "http://hl7.org/fhir/sid/icd-10-cm"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system RoleCode",
+      "resource": "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system Diagnosis Role",
+      "resource": "http://terminology.hl7.org/CodeSystem/diagnosis-role"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system RequestIntent",
+      "resource": "http://terminology.hl7.org/CodeSystem/request-intent"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system MedicationRequestCategory",
+      "resource": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ConditionClinicalStatusCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/condition-clinical"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ConditionVerificationStatusCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system AllergyIntoleranceClinicalStatusCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/allergyintolerance-clinical"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system AllergyIntoleranceVerificationStatusCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/allergyintolerance-verification"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ConditionCategoryCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/condition-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ObservationCategoryCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/observation-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Active Condition",
+      "resource": "http://fhir.org/guides/cqf/common/ValueSet/active-condition"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Inactive Condition",
+      "resource": "http://fhir.org/guides/cqf/common/ValueSet/inactive-condition"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "type": "dateTime",
+      "profile": [
+        "http://hl7.org/fhir/dateTime"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "instant",
+      "profile": [
+        "http://hl7.org/fhir/instant"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "date",
+      "profile": [
+        "http://hl7.org/fhir/date"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "Quantity",
+      "profile": [
+        "http://hl7.org/fhir/Quantity"
+      ],
+      "mustSupport": [
+        "value",
+        "comparator",
+        "system",
+        "system.value",
+        "value.value",
+        "code",
+        "code.value",
+        "unit",
+        "unit.value"
+      ]
+    },
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/Patient"
+      ],
+      "mustSupport": [
+        "birthDate"
+      ]
+    },
+    {
+      "type": "Range",
+      "profile": [
+        "http://hl7.org/fhir/Range"
+      ],
+      "mustSupport": [
+        "low",
+        "high"
+      ]
+    },
+    {
+      "type": "uri",
+      "profile": [
+        "http://hl7.org/fhir/uri"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/FHIRCommon.cql"
+    }
+  ]
+}

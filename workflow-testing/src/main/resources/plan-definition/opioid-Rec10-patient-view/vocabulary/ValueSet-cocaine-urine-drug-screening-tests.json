@@ -1,0 +1,342 @@
+{
+  "resourceType": "ValueSet",
+  "id": "cocaine-urine-drug-screening-tests",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-rules-text",
+      "valueMarkdown": "Step 1. Add all codes found using the following LOINC query: cocaine (=system:Urine)"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Urine tests for cocaine and cocaine metabolites"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/cocaine-urine-drug-screening-tests",
+  "name": "cocaine_urine_drug_screening_tests",
+  "title": "Cocaine urine drug screening tests",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Urine tests for cocaine and cocaine metabolites",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Identification of urine drug tests where results can be used when considering pain management therapy",
+  "copyright": "© CDC 2016+.",
+  "expansion": {
+    "identifier": "13682c93-b63e-4e91-aabb-8e92ceaaf9ab",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "50594-1",
+        "display": "3-Hydroxybenzoylecgonine [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3394-4",
+        "display": "Benzoylecgonine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "16226-3",
+        "display": "Benzoylecgonine [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "70146-6",
+        "display": "Benzoylecgonine [Mass/volume] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3393-6",
+        "display": "Benzoylecgonine [Presence] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "14315-6",
+        "display": "Benzoylecgonine [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "8192-7",
+        "display": "Benzoylecgonine [Presence] in Urine by SAMHSA confirm method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "8193-5",
+        "display": "Benzoylecgonine [Presence] in Urine by SAMHSA screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "14314-9",
+        "display": "Benzoylecgonine [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "43984-4",
+        "display": "Benzoylecgonine [Presence] in Urine by Screen method >150 ng/mL"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "43985-1",
+        "display": "Benzoylecgonine [Presence] in Urine by Screen method >300 ng/mL"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19065-2",
+        "display": "Benzoylecgonine cutoff [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19358-1",
+        "display": "Benzoylecgonine cutoff [Mass/volume] in Urine for Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19357-3",
+        "display": "Benzoylecgonine cutoff [Mass/volume] in Urine for Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "13479-1",
+        "display": "Benzoylecgonine/Creatinine [Mass Ratio] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19408-4",
+        "display": "Cocaethylene [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "16632-2",
+        "display": "Cocaethylene [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19406-8",
+        "display": "Cocaethylene [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19405-0",
+        "display": "Cocaethylene [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19410-0",
+        "display": "Cocaethylene cutoff [Mass/volume] in Urine for Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19409-2",
+        "display": "Cocaethylene cutoff [Mass/volume] in Urine for Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "86606-1",
+        "display": "Cocaethylene/Creatinine [Mass Ratio] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3398-5",
+        "display": "Cocaine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "20519-5",
+        "display": "Cocaine [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "52953-7",
+        "display": "Cocaine [Moles/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3397-7",
+        "display": "Cocaine [Presence] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19360-7",
+        "display": "Cocaine [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19359-9",
+        "display": "Cocaine [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "16448-3",
+        "display": "Cocaine [Units/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19363-1",
+        "display": "Cocaine cutoff [Mass/volume] in Urine for Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19362-3",
+        "display": "Cocaine cutoff [Mass/volume] in Urine for Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "53743-1",
+        "display": "Cocaine metabolites.other [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "53747-2",
+        "display": "Cocaine panel - Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "47400-7",
+        "display": "Cocaine+Benzoylecgonine [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "42241-0",
+        "display": "Cocaine+Benzoylecgonine [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "82723-8",
+        "display": "Cocaine+Benzoylecgonine+Cocaethylene [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "86607-9",
+        "display": "Cocaine/Creatinine [Mass Ratio] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "5935-2",
+        "display": "Deprecated Benzoylecgonine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "5939-4",
+        "display": "Deprecated Benzoylecgonine [Presence] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19361-5",
+        "display": "Deprecated Benzoylmethylecgonine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "5937-8",
+        "display": "Deprecated Cocaine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "50592-5",
+        "display": "Ecgonine methyl ester [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "80144-9",
+        "display": "Ecgonine methyl ester [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "59295-6",
+        "display": "Levamisole [Mass/volume] in Urine"
+      }
+    ]
+  }
+}

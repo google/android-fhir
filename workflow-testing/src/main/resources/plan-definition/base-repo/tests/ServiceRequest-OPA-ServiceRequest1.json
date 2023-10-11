@@ -1,0 +1,39 @@
+{
+  "resourceType": "ServiceRequest",
+  "id": "OPA-ServiceRequest1",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-crd/R4/StructureDefinition/profile-servicerequest-r4"
+    ]
+  },
+  "status": "draft",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "99241",
+        "display": "Testing Service for Outpatient Prior Auth"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/OPA-Patient1"
+  },
+  "authoredOn": "2018-08-08",
+  "insurance": [
+    {
+      "reference": "Coverage/OPA-Coverage1"
+    }
+  ],
+  "requester": {
+    "reference": "Organization/OPA-ProviderOrganization1"
+  },
+  "performer": [
+    {
+      "reference": "Practitioner/OPA-OperatingPhysician1"
+    },
+    {
+      "reference": "Practitioner/OPA-AttendingPhysician1"
+    }
+  ]
+}
