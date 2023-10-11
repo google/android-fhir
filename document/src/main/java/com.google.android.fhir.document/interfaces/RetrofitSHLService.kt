@@ -57,7 +57,7 @@ interface RetrofitSHLService {
 
   class Builder(
     private val baseUrl: String,
-    private val networkConfiguration: NetworkConfiguration,
+    private val networkConfiguration: NetworkConfiguration
   ) {
 
     private var authenticator: HttpAuthenticator? = null
@@ -72,43 +72,56 @@ interface RetrofitSHLService {
     }
 
     fun build(): RetrofitSHLService {
-      val client = OkHttpClient.Builder()
-        .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
-        .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
-        .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS).apply {
-          if (networkConfiguration.uploadWithGzip) {
-            addInterceptor(GzipUploadInterceptor)
+      val client =
+        OkHttpClient.Builder()
+          .connectTimeout(networkConfiguration.connectionTimeOut, TimeUnit.SECONDS)
+          .readTimeout(networkConfiguration.readTimeOut, TimeUnit.SECONDS)
+          .writeTimeout(networkConfiguration.writeTimeOut, TimeUnit.SECONDS)
+          .apply {
+            if (networkConfiguration.uploadWithGzip) {
+              addInterceptor(GzipUploadInterceptor)
+            }
+            httpLoggingInterceptor?.let { addInterceptor(it) }
+            authenticator?.let {
+              addInterceptor(
+                Interceptor { chain: Interceptor.Chain ->
+                  val request =
+                    chain
+                      .request()
+                      .newBuilder()
+                      .addHeader(
+                        "Authorization",
+                        it.getAuthenticationMethod().getAuthorizationHeader(),
+                      )
+                      .build()
+                  chain.proceed(request)
+                },
+              )
+            }
           }
-          httpLoggingInterceptor?.let { addInterceptor(it) }
-          authenticator?.let {
-            addInterceptor(
-              Interceptor { chain: Interceptor.Chain ->
-                val request = chain.request().newBuilder().addHeader(
-                    "Authorization",
-                    it.getAuthenticationMethod().getAuthorizationHeader(),
-                  ).build()
-                chain.proceed(request)
-              },
-            )
-          }
-        }.build()
-      return Retrofit.Builder().baseUrl(baseUrl).client(client)
-        .addConverterFactory(GsonConverterFactory.create()).build()
+          .build()
+      return Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(client)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
         .create(RetrofitSHLService::class.java)
     }
 
     /* Maybe move these to different class */
-    private fun HttpLogger.toOkHttpLoggingInterceptor() = HttpLoggingInterceptor(log).apply {
-      level = configuration.level.toOkhttpLogLevel()
-      configuration.headersToIgnore?.forEach { this.redactHeader(it) }
-    }
+    private fun HttpLogger.toOkHttpLoggingInterceptor() =
+      HttpLoggingInterceptor(log).apply {
+        level = configuration.level.toOkhttpLogLevel()
+        configuration.headersToIgnore?.forEach { this.redactHeader(it) }
+      }
 
-    private fun HttpLogger.Level.toOkhttpLogLevel() = when (this) {
-      HttpLogger.Level.NONE -> HttpLoggingInterceptor.Level.NONE
-      HttpLogger.Level.BASIC -> HttpLoggingInterceptor.Level.BASIC
-      HttpLogger.Level.HEADERS -> HttpLoggingInterceptor.Level.HEADERS
-      HttpLogger.Level.BODY -> HttpLoggingInterceptor.Level.BODY
-    }
+    private fun HttpLogger.Level.toOkhttpLogLevel() =
+      when (this) {
+        HttpLogger.Level.NONE -> HttpLoggingInterceptor.Level.NONE
+        HttpLogger.Level.BASIC -> HttpLoggingInterceptor.Level.BASIC
+        HttpLogger.Level.HEADERS -> HttpLoggingInterceptor.Level.HEADERS
+        HttpLogger.Level.BODY -> HttpLoggingInterceptor.Level.BODY
+      }
   }
 
   companion object {

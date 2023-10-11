@@ -18,6 +18,7 @@ package com.google.android.fhir.document.dataClasses
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Resource
 
 /* A data class object which stores an IPS document, the patient it relates to, and a list of
 `  titles present in the document */
@@ -26,3 +27,10 @@ data class IPSDocument(
   val titles: ArrayList<Title>,
   val patient: Patient,
 )
+
+/* A Title contains a string storing the title itself and a list of resource associated to it */
+data class Title(
+  val name: String,
+  val dataEntries: ArrayList<Resource>,
+)
+

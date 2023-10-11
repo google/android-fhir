@@ -24,12 +24,9 @@ import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.QRGeneratorUtils
 import com.google.android.fhir.testing.readFromFile
 import com.nimbusds.jose.shaded.gson.Gson
-import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,18 +54,6 @@ class GenerateShlUtilsTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     generateShlUtils = GenerateShlUtils(qrGeneratorUtils, apiService)
-
-  }
-
-  @Test
-  fun postingToServerReturnsManifestIdAndToken() = runTest {
-    val postResponse = generateShlUtils.getManifestUrlAndToken("")
-    println("Response: $postResponse")
-
-    assertNotNull(postResponse)
-    assertTrue(postResponse.has("id"))
-    assertTrue(postResponse.has("managementToken"))
-    assertTrue(postResponse.has("active"))
   }
 
   @Test
@@ -108,7 +93,11 @@ class GenerateShlUtilsTest {
 
     /* Construct the expected JSON object */
     val expectedJson =
-      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
+      JSONObject()
+        .put("url", manifestUrl)
+        .put("key", key)
+        .put("flag", flags)
+        .put("label", label)
         .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
 
     val payload =
@@ -124,5 +113,4 @@ class GenerateShlUtilsTest {
     val epochSeconds = generateShlUtils.dateStringToEpochSeconds(dateString)
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
-
 }

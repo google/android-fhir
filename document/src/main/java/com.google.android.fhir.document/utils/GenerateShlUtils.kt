@@ -21,6 +21,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
+import android.util.Base64
 import android.util.Log
 import android.widget.ImageView
 import ca.uhn.fhir.context.FhirContext
@@ -35,8 +36,6 @@ import com.nimbusds.jose.Payload
 import com.nimbusds.jose.crypto.DirectEncrypter
 import java.lang.Exception
 import java.security.SecureRandom
-import android.util.Base64
-import com.google.android.fhir.NetworkConfiguration
 import java.text.SimpleDateFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,12 +43,10 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 internal class GenerateShlUtils(
   private val qrGeneratorUtils: QRGeneratorUtils,
-  private val apiService: RetrofitSHLService
+  private val apiService: RetrofitSHLService,
 ) {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
