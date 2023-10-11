@@ -34,22 +34,11 @@ object Dependencies {
   }
 
   object Cql {
-    const val openCdsGroup = "org.opencds.cqf.cql"
-    const val translatorGroup = "info.cqframework"
-
-    const val engine = "$openCdsGroup:engine:${Versions.Cql.engine}"
-    const val engineJackson = "$openCdsGroup:engine.jackson:${Versions.Cql.engine}"
-
-    const val evaluator = "$openCdsGroup:evaluator:${Versions.Cql.evaluator}"
-    const val evaluatorBuilder = "$openCdsGroup:evaluator.builder:${Versions.Cql.evaluator}"
-    const val evaluatorDagger = "$openCdsGroup:evaluator.dagger:${Versions.Cql.evaluator}"
-    const val evaluatorPlanDef = "$openCdsGroup:evaluator.plandefinition:${Versions.Cql.evaluator}"
-    const val translatorCqlToElm = "$translatorGroup:cql-to-elm:${Versions.Cql.translator}"
-    const val translatorElm = "$translatorGroup:elm:${Versions.Cql.translator}"
-    const val translatorModel = "$translatorGroup:model:${Versions.Cql.translator}"
-
-    const val translatorElmJackson = "$translatorGroup:elm-jackson:${Versions.Cql.translator}"
-    const val translatorModelJackson = "$translatorGroup:model-jackson:${Versions.Cql.translator}"
+    const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
+    const val evaluatorFhirJackson =
+      "org.opencds.cqf.fhir:cqf-fhir-jackson:${Versions.Cql.clinicalReasoning}"
+    const val evaluatorFhirUtilities =
+      "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
   }
 
   object Glide {
@@ -84,10 +73,6 @@ object Dependencies {
     const val fhirCoreConvertors =
       "ca.uhn.hapi.fhir:org.hl7.fhir.convertors:${Versions.hapiFhirCore}"
 
-    // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
-    // Version 3.0 uses java.lang.System.Logger, which is not available on Android
-    // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
-    const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
     const val guavaCaching = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava:${Versions.hapiFhir}"
   }
 
@@ -230,9 +215,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val engine = "2.4.0"
-      const val evaluator = "2.4.0"
-      const val translator = "2.4.0"
+      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
     }
 
     object Glide {
@@ -245,7 +228,7 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha05"
-    const val androidFhirEngine = "0.1.0-beta03"
+    const val androidFhirEngine = "0.1.0-beta04"
     const val androidFhirKnowledge = "0.1.0-alpha01"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
