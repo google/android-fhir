@@ -41,12 +41,24 @@ open class Loadable {
   }
 
   fun listFiles(assetName: String): List<String> {
-    val name = resolveName(assetName)
+    val name = resolveName(assetName)!!
 
     val list = javaClass.classLoader?.getResource(name) ?: ClassLoader.getSystemResource(name)
 
     val retList = mutableListOf<String>()
-    retList.addAll(load(list.openStream()).split("\n"))
+    if (list != null) {
+      // works on desktop
+      retList.addAll(load(list.openStream()).split("\n"))
+    } else {
+      // works on mobile
+
+      // Little hack because android does not allow looping through Resources.
+      // TODO: Turn this into a task that generates .contents.txt automatically: ls > contents.txt
+      val list =
+        javaClass.classLoader?.getResource(name + "/contents.txt")
+          ?: ClassLoader.getSystemResource(name + "/contents.txt")
+      retList.addAll(load(list.openStream()).split("\n"))
+    }
 
     return retList
   }
