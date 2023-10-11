@@ -22,7 +22,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
-import org.cqframework.cql.elm.serializing.jackson.ElmJsonLibraryReader
 import java.io.InputStream
 import java.io.StringReader
 import org.cqframework.cql.elm.serializing.jackson.ElmJsonLibraryReader
