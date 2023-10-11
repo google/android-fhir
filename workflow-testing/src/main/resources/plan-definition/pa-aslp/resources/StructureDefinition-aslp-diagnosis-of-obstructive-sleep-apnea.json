@@ -1,0 +1,73 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "aslp-diagnosis-of-obstructive-sleep-apnea",
+  "url": "http://example.org/sdh/dtr/aslp/StructureDefinition/aslp-diagnosis-of-obstructive-sleep-apnea",
+  "name": "ASLPDiagnosisofObstructiveSleepApnea",
+  "title": "ASLP Diagnosis of Obstructive Sleep Apnea",
+  "status": "draft",
+  "experimental": false,
+  "description": "ASLP Diagnosis of Obstructive Sleep Apnea",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "task",
+        "display": "Workflow Task"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://fhir.org/guides/nachc/hiv-cds/CodeSystem/activity-codes",
+            "code": "ASLP.A1",
+            "display": "Adult Sleep Studies"
+          }
+        ]
+      }
+    }
+  ],
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "ASLP"
+    }
+  ],
+  "kind": "resource",
+  "abstract": false,
+  "type": "Condition",
+  "baseDefinition": "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-condition",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Condition",
+        "path": "Condition",
+        "mustSupport": false
+      },
+      {
+        "id": "Condition.code",
+        "path": "Condition.code",
+        "short": "Diagnosis of Obstructive Sleep Apnea",
+        "definition": "Diagnosis of Obstructive Sleep Apnea",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true,
+        "binding": {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName",
+              "valueString": "Diagnosis of Obstructive Sleep Apnea Codes"
+            }
+          ],
+          "strength": "required",
+          "valueSet": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de17"
+        },
+        "mapping": [
+          {
+            "identity": "ASLP",
+            "map": "ASLP.A1.DE16"
+          }
+        ]
+      }
+    ]
+  }
+}

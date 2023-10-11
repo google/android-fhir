@@ -1,0 +1,159 @@
+{
+  "resourceType": "Library",
+  "id": "OpioidCDSCommonConfig",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSCommonConfig",
+  "version": "2022.1.0",
+  "name": "OpioidCDSCommonConfig",
+  "title": "Library - OpioidCDS Common Configuration",
+  "status": "active",
+  "experimental": true,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "parameter": [
+    {
+      "name": "Age Less than 18 Years Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "End-Stage Disease Criteria Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Sickle Cell Check Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Active Cancer Treatment Encounters Condition Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Active Cancer Treatment PractitionerRole Specialty Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Naive Prescription Condition Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Naive Report Condition Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Naive Dispense Condition Is Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Hospice Findings Exclusion Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Can the implementing EHR support queries for past medications by date range?",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Treatment Plan Verification Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Harms & Risks Discussion in Past 90 Days Criteria Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Order is to Treat Acute Pain Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Evidence of Naloxone Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "PDMP Data Not Reviewed in Past 90 Days Criteria Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opiate Urine Screening Check Enabled",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Evidence Based Treatment Criteria For Opioid Use Disorder",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/OpioidCDSCommonConfig.cql"
+    }
+  ]
+}

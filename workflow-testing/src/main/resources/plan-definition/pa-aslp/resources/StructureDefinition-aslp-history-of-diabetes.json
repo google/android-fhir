@@ -1,0 +1,83 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "aslp-history-of-diabetes",
+  "url": "http://example.org/sdh/dtr/aslp/StructureDefinition/aslp-history-of-diabetes",
+  "name": "ASLPHistoryofDiabetes",
+  "title": "ASLP History of Diabetes",
+  "status": "draft",
+  "experimental": false,
+  "description": "ASLP History of Diabetes",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "task",
+        "display": "Workflow Task"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://fhir.org/guides/nachc/hiv-cds/CodeSystem/activity-codes",
+            "code": "ASLP.A1",
+            "display": "Adult Sleep Studies"
+          }
+        ]
+      }
+    }
+  ],
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "ASLP"
+    }
+  ],
+  "kind": "resource",
+  "abstract": false,
+  "type": "Observation",
+  "baseDefinition": "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-observation",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Observation",
+        "path": "Observation",
+        "mustSupport": false
+      },
+      {
+        "id": "Observation.code",
+        "path": "Observation.code",
+        "short": "History of Diabetes",
+        "definition": "History of Diabetes",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true,
+        "mapping": [
+          {
+            "identity": "ASLP",
+            "map": "ASLP.A1.DE19"
+          }
+        ]
+      },
+      {
+        "id": "Observation.value[x]",
+        "path": "Observation.value[x]",
+        "short": "History of Diabetes",
+        "definition": "History of Diabetes",
+        "min": 1,
+        "max": "1",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ],
+        "mustSupport": true,
+        "mapping": [
+          {
+            "identity": "ASLP",
+            "map": "ASLP.A1.DE19"
+          }
+        ]
+      }
+    ]
+  }
+}
