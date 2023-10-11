@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.knowledge.db.impl.dao
+package com.google.android.fhir.knowledge.db.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -22,10 +22,10 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.google.android.fhir.knowledge.db.impl.entities.ImplementationGuideEntity
-import com.google.android.fhir.knowledge.db.impl.entities.ImplementationGuideResourceMetadataEntity
-import com.google.android.fhir.knowledge.db.impl.entities.ImplementationGuideWithResources
-import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideEntity
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideResourceMetadataEntity
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideWithResources
+import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
 import org.hl7.fhir.r4.model.ResourceType
 
 @Dao
