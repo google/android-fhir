@@ -21,14 +21,13 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.knowledge.ImplementationGuide
+import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
-import java.lang.IllegalArgumentException
 import java.util.TimeZone
 import kotlin.reflect.KSuspendFunction1
 import org.hl7.fhir.r4.model.Bundle
@@ -36,7 +35,6 @@ import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -50,7 +48,7 @@ class FhirOperatorTest {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val fhirContext = FhirContext.forR4()
   private val jsonParser = fhirContext.newJsonParser()
   private val xmlParser = fhirContext.newXmlParser()
@@ -67,18 +65,13 @@ class FhirOperatorTest {
     // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
     knowledgeManager.install(
-      ImplementationGuide(
+      FhirNpmPackage(
         "com.google.android.fhir",
         "1.0.0",
         "http://github.com/google/android-fhir",
       ),
       rootDirectory,
     )
-  }
-
-  @After
-  fun tearDown() {
-    knowledgeManager.close()
   }
 
   @Test

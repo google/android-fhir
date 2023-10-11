@@ -62,7 +62,7 @@ class FhirEngineRetrieveProviderTest : Loadable() {
           FhirEngineTerminologyProvider(
             FhirContext.forR4Cached(),
             fhirEngine,
-            KnowledgeManager.createInMemory(context),
+            KnowledgeManager.create(context, inMemory = true),
           )
         isExpandValueSets = true
       }

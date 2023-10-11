@@ -1,3 +1,4 @@
+import Dependencies.guava
 import java.net.URL
 
 plugins {
@@ -70,6 +71,33 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(module = "xpp3_min")
+    exclude(
+      module = "hapi-fhir-structures-r4b",
+    )
+    resolutionStrategy {
+      force(Dependencies.guava)
+      force("ca.uhn.hapi.fhir:hapi-fhir-base:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-client:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:6.0.22")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:6.0.22")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-structures-r5:6.0.1")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.utilities:6.0.22")
+
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:6.0.22")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:6.0.22")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4:6.0.22")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r4b:6.0.22")
+      force("ca.uhn.hapi.fhir:org.hl7.fhir.r5:6.0.22")
+
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:6.0.1")
+      force("ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:6.0.1")
+    }
   }
 }
 
@@ -81,16 +109,19 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
 
-  api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.0.1") { exclude(module = "junit") }
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+  implementation(Dependencies.http)
+  implementation("ca.uhn.hapi.fhir:org.hl7.fhir.convertors:6.0.22")
+  implementation(Dependencies.apacheCommonsCompress)
 
   kapt(Dependencies.Room.compiler)
 
@@ -100,6 +131,7 @@ dependencies {
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }
