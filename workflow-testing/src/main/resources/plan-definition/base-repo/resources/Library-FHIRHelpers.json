@@ -1,0 +1,22 @@
+{
+  "resourceType": "Library",
+  "id": "FHIRHelpers",
+  "url": "http://fhir.org/guides/cqf/common/Library/FHIRHelpers",
+  "version": "4.0.001",
+  "name": "FHIRHelpers",
+  "title": "FHIR Helpers",
+  "status": "draft",
+  "type": {
+    "coding": [
+      {
+        "code": "logic-library"
+      }
+    ]
+  },
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/FHIRHelpers.cql"
+    }
+  ]
+}

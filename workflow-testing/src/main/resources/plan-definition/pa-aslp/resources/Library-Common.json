@@ -1,0 +1,106 @@
+{
+  "resourceType": "Library",
+  "id": "Common",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/Common",
+  "version": "0.0.001",
+  "name": "Common",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers|4.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ObservationStatusCodes",
+      "resource": "http://hl7.org/fhir/observation-status"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Asserted Lookback Duration",
+      "use": "in",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ObservationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "urn:hl7-org:elm-types:r1/Code"
+      ],
+      "mustSupport": [
+        "code"
+      ]
+    },
+    {
+      "type": "string",
+      "profile": [
+        "http://hl7.org/fhir/string"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/Patient"
+      ],
+      "mustSupport": [
+        "id"
+      ]
+    },
+    {
+      "type": "Quantity",
+      "profile": [
+        "urn:hl7-org:elm-types:r1/Quantity"
+      ],
+      "mustSupport": [
+        "value",
+        "unit"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/Common.cql"
+    }
+  ]
+}

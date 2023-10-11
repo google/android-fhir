@@ -1,0 +1,329 @@
+{
+  "resourceType": "Library",
+  "id": "ANCDT17",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Library/ANCDT17",
+  "identifier": [
+    {
+      "use": "official",
+      "value": "ANC.DT.17"
+    }
+  ],
+  "name": "ANCDT17",
+  "title": "ANC.DT.17 Pre-eclampsia, severe pre-eclampsia and hypertension diagnosis",
+  "status": "active",
+  "experimental": false,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "description": "If the woman presents with any of the following symptoms and/or test results, conduct counselling and referral as needed",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/FHIRHelpers|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Config",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCConfig"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Cx",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCConcepts"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library PatientData",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCDataElements"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library ContactData",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/ANCContactDataElements"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library WC",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/WHOCommon"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Systolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Repeat systolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de20"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de27"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de29"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diastolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de19"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Repeat diastolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de21"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia - No symptoms Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de28"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de144"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 2 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de147"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 3 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de148"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 4 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de149"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 1 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de146"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de145"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de83"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Hypertension Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de96"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    },
+    {
+      "name": "Should Refer urgently to a hospital",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Should Refer urgently to a hospital 2",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Should Refer urgently to a hospital 3",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Should Conduct hypertension counselling",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "value",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de27"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "value",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de83"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de20"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de17"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de144"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de19"
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "encounter.reference",
+        "encounter",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de21"
+        }
+      ]
+    },
+    {
+      "type": "Encounter",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Encounter"
+      ]
+    },
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ANCDT17.cql"
+    }
+  ]
+}

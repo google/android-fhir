@@ -1,0 +1,16 @@
+{
+  "resourceType": "Condition",
+  "id": "OPA-Condition1",
+  "code": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "code": "G1221",
+        "display": "G1221,Amyotrophic lateral sclerosis"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/OPA-Patient1"
+  }
+}

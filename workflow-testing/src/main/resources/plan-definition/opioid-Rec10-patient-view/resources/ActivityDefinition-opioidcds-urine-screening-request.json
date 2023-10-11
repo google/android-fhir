@@ -1,0 +1,80 @@
+{
+  "resourceType": "ActivityDefinition",
+  "id": "opioidcds-urine-screening-request",
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ActivityDefinition/opioidcds-urine-screening-request",
+  "version": "2022.1.0",
+  "name": "ActivityDefinition_Urine_Screening_ServiceRequest",
+  "title": "ActivityDefinition - Urine Screening ServiceRequest",
+  "status": "draft",
+  "date": "2020-12-14",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "A ServiceRequest for Urine drug screening.",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "310627008",
+            "display": "Urine drug screening (procedure)"
+          }
+        ]
+      }
+    }
+  ],
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US",
+          "display": "United States of America"
+        }
+      ]
+    }
+  ],
+  "purpose": "Provides urine screening suggestion as part of opioid prescribing clinical decision support.",
+  "usage": "Used to create a urine screening ServiceRequest.",
+  "copyright": "© CDC 2016+.",
+  "topic": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/definition-topic",
+          "code": "assessment",
+          "display": "Assessment"
+        }
+      ],
+      "text": "Opioid Prescribing"
+    }
+  ],
+  "author": [
+    {
+      "name": "Kensaku Kawamoto, MD, PhD, MHS"
+    },
+    {
+      "name": "Bryn Rhodes"
+    },
+    {
+      "name": "Floyd Eisenberg, MD, MPH"
+    },
+    {
+      "name": "Robert McClure, MD, MPH"
+    }
+  ],
+  "kind": "ServiceRequest",
+  "code": {
+    "coding": [
+      {
+        "system": "http://snomed.info/sct",
+        "code": "310627008",
+        "display": "Urine drug screening (procedure)"
+      }
+    ]
+  }
+}

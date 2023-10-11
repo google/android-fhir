@@ -1,60 +1,59 @@
 {
   "resourceType": "CarePlan",
-  "contained": [
-    {
-      "resourceType": "RequestGroup",
-      "id": "Plan-Definition-Example",
-      "instantiatesCanonical": [
-        "http://example.com/PlanDefinition/Plan-Definition-Example"
-      ],
-      "status": "draft",
-      "intent": "proposal",
-      "subject": {
-        "reference": "Patient/Female-Patient-Example"
-      },
-      "action": [
-        {
-          "resource": {
-            "reference": "Task"
-          }
-        }
-      ]
+  "id": "Plan-Definition-Example",
+  "contained": [ {
+    "resourceType": "RequestGroup",
+    "id": "Plan-Definition-Example",
+    "instantiatesCanonical": [ "http://example.com/PlanDefinition/Plan-Definition-Example" ],
+    "status": "draft",
+    "intent": "proposal",
+    "subject": {
+      "reference": "Patient/Female-Patient-Example"
     },
-    {
-      "resourceType": "Task",
-      "id": "Task",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
-          "valueExpression": {
-            "language": "text/cql.identifier",
-            "expression": "Patient is Female"
-          }
+    "action": [ {
+      "title": "Test for Female Patient",
+      "condition": [ {
+        "kind": "applicability",
+        "expression": {
+          "language": "text/cql.identifier",
+          "expression": "Patient is Female"
         }
-      ],
-      "basedOn": [
-        {
-          "reference": "#RequestGroup/Plan-Definition-Example",
-          "type": "RequestGroup"
-        }
-      ],
-      "status": "draft",
-      "description": "Example Task"
+      } ],
+      "resource": {
+        "reference": "Task/Activity-Example"
+      }
+    } ]
+  }, {
+    "resourceType": "Task",
+    "id": "Activity-Example",
+    "extension": [ {
+      "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+      "valueExpression": {
+        "language": "text/cql.identifier",
+        "expression": "Patient is Female"
+      }
+    } ],
+    "instantiatesCanonical": "http://example.com/ActivityDefinition/Activity-Example",
+    "basedOn": [ {
+      "reference": "#RequestGroup/Plan-Definition-Example",
+      "type": "RequestGroup"
+    } ],
+    "status": "draft",
+    "intent": "proposal",
+    "description": "Example Task",
+    "for": {
+      "reference": "Patient/Female-Patient-Example"
     }
-  ],
-  "instantiatesCanonical": [
-    "http://example.com/PlanDefinition/Plan-Definition-Example"
-  ],
+  } ],
+  "instantiatesCanonical": [ "http://example.com/PlanDefinition/Plan-Definition-Example" ],
   "status": "draft",
   "intent": "proposal",
   "subject": {
     "reference": "Patient/Female-Patient-Example"
   },
-  "activity": [
-    {
-      "reference": {
-        "reference": "#Plan-Definition-Example"
-      }
+  "activity": [ {
+    "reference": {
+      "reference": "#RequestGroup/Plan-Definition-Example"
     }
-  ]
+  } ]
 }

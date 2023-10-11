@@ -1,0 +1,312 @@
+{
+  "resourceType": "Bundle",
+  "id": "extract-QRSharonDecision",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-QRSharonDecision.1.1",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "1.1"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes",
+              "code": "mpq-1038",
+              "display": "What type of HEAD pain have you had in the last 7 days?"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/sharondecision",
+          "display": "Sharon Decision"
+        },
+        "effectiveDateTime": "2021-12-28T18:10:32Z",
+        "issued": "2021-12-28T18:10:32.000+00:00",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "55145008",
+              "display": "Stabbing"
+            }
+          ]
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/QRSharonDecision"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-QRSharonDecision.1.1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-QRSharonDecision.1.6",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "1.6"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://fhir.org/guides/cqf/cds4cpm/CodeSystem/mypain-questionnaire-codes",
+              "code": "mpq-1043",
+              "display": "What type of LOWER BACK pain have you had in the last 7 days?"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/sharondecision",
+          "display": "Sharon Decision"
+        },
+        "effectiveDateTime": "2021-12-28T18:10:32Z",
+        "issued": "2021-12-28T18:10:32.000+00:00",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "162506004",
+              "display": "Prickling"
+            }
+          ]
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/QRSharonDecision"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-QRSharonDecision.1.6"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-QRSharonDecision.2.1",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "2.1"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "75262-6",
+              "display": "How intense was your pain at its worse in the past 7 days"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/sharondecision",
+          "display": "Sharon Decision"
+        },
+        "effectiveDateTime": "2021-12-28T18:10:32Z",
+        "issued": "2021-12-28T18:10:32.000+00:00",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "LA6750-9",
+              "display": "Severe"
+            }
+          ]
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/QRSharonDecision"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-QRSharonDecision.2.1"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-QRSharonDecision.2.2",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "2.2"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "75261-8",
+              "display": "How intense was your average pain in the past 7 days"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/sharondecision",
+          "display": "Sharon Decision"
+        },
+        "effectiveDateTime": "2021-12-28T18:10:32Z",
+        "issued": "2021-12-28T18:10:32.000+00:00",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "LA6750-9",
+              "display": "Severe"
+            }
+          ]
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/QRSharonDecision"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-QRSharonDecision.2.2"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-QRSharonDecision.2.3",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "2.3"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "75260-0",
+              "display": "What is your level of pain right now"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/sharondecision",
+          "display": "Sharon Decision"
+        },
+        "effectiveDateTime": "2021-12-28T18:10:32Z",
+        "issued": "2021-12-28T18:10:32.000+00:00",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "LA6750-9",
+              "display": "Severe"
+            }
+          ]
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/QRSharonDecision"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-QRSharonDecision.2.3"
+      }
+    }
+  ]
+}

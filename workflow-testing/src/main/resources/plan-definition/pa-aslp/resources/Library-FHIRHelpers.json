@@ -1,0 +1,2204 @@
+{
+  "resourceType": "Library",
+  "id": "FHIRHelpers",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers",
+  "version": "4.1.000",
+  "name": "FHIRHelpers",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Quantity",
+      "profile": [
+        "http://hl7.org/fhir/Quantity"
+      ],
+      "mustSupport": [
+        "value",
+        "comparator",
+        "system",
+        "system.value",
+        "value.value",
+        "code",
+        "code.value",
+        "unit",
+        "unit.value"
+      ]
+    },
+    {
+      "type": "base64Binary",
+      "profile": [
+        "http://hl7.org/fhir/base64Binary"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "boolean",
+      "profile": [
+        "http://hl7.org/fhir/boolean"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "canonical",
+      "profile": [
+        "http://hl7.org/fhir/canonical"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "code",
+      "profile": [
+        "http://hl7.org/fhir/code"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "date",
+      "profile": [
+        "http://hl7.org/fhir/date"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "dateTime",
+      "profile": [
+        "http://hl7.org/fhir/dateTime"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "decimal",
+      "profile": [
+        "http://hl7.org/fhir/decimal"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "id",
+      "profile": [
+        "http://hl7.org/fhir/id"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "instant",
+      "profile": [
+        "http://hl7.org/fhir/instant"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "integer",
+      "profile": [
+        "http://hl7.org/fhir/integer"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "markdown",
+      "profile": [
+        "http://hl7.org/fhir/markdown"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "oid",
+      "profile": [
+        "http://hl7.org/fhir/oid"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "positiveInt",
+      "profile": [
+        "http://hl7.org/fhir/positiveInt"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "string",
+      "profile": [
+        "http://hl7.org/fhir/string"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "time",
+      "profile": [
+        "http://hl7.org/fhir/time"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "unsignedInt",
+      "profile": [
+        "http://hl7.org/fhir/unsignedInt"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "uri",
+      "profile": [
+        "http://hl7.org/fhir/uri"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "url",
+      "profile": [
+        "http://hl7.org/fhir/url"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "uuid",
+      "profile": [
+        "http://hl7.org/fhir/uuid"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AccountStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionCardinalityBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionConditionKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionGroupingBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionParticipantType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionPrecheckBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionRelationshipType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionRequiredBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActionSelectionBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActivityDefinitionKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ActivityParticipantType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AddressType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AddressUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AdministrativeGender"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AdverseEventActuality"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AggregationMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AllergyIntoleranceCategory"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AllergyIntoleranceCriticality"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AllergyIntoleranceSeverity"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AllergyIntoleranceType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AppointmentStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AssertionDirectionType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AssertionOperatorType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AssertionResponseTypes"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AuditEventAction"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AuditEventAgentNetworkType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/AuditEventOutcome"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/BindingStrength"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/BiologicallyDerivedProductCategory"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/BiologicallyDerivedProductStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/BiologicallyDerivedProductStorageScale"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/BundleType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CapabilityStatementKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CarePlanActivityKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CarePlanActivityStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CarePlanIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CarePlanStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CareTeamStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CatalogEntryRelationType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ChargeItemDefinitionPriceComponentType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ChargeItemStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ClaimResponseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ClaimStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ClinicalImpressionStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CodeSearchSupport"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CodeSystemContentMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CodeSystemHierarchyMeaning"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CommunicationPriority"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CommunicationRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CommunicationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CompartmentCode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CompartmentType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CompositionAttestationMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CompositionStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConceptMapEquivalence"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConceptMapGroupUnmappedMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConditionalDeleteStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConditionalReadStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConsentDataMeaning"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConsentProvisionType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConsentState"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ConstraintSeverity"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ContactPointSystem"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ContactPointUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ContractPublicationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ContractStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ContributorType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CoverageStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/CurrencyCode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DayOfWeek"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DaysOfWeek"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DetectedIssueSeverity"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DetectedIssueStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceMetricCalibrationState"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceMetricCalibrationType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceMetricCategory"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceMetricColor"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceMetricOperationalStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceNameType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DeviceUseStatementStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DiagnosticReportStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DiscriminatorType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DocumentConfidentiality"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DocumentMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DocumentReferenceStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/DocumentRelationshipType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EligibilityRequestPurpose"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EligibilityRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EligibilityResponsePurpose"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EligibilityResponseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EnableWhenBehavior"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EncounterLocationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EncounterStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EndpointStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EnrollmentRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EnrollmentResponseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EpisodeOfCareStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EventCapabilityMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EventTiming"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/EvidenceVariableType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ExampleScenarioActorType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ExplanationOfBenefitStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ExposureState"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ExtensionContextType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRAllTypes"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRDefinedType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRDeviceStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRResourceType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRSubstanceStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FHIRVersion"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FamilyHistoryStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FilterOperator"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/FlagStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GoalLifecycleStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GraphCompartmentRule"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GraphCompartmentUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GroupMeasure"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GroupType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GuidanceResponseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GuidePageGeneration"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/GuideParameterCode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/HTTPVerb"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/IdentifierUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/IdentityAssuranceLevel"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ImagingStudyStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ImmunizationEvaluationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ImmunizationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/InvoicePriceComponentType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/InvoiceStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/IssueSeverity"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/IssueType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/LinkType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/LinkageType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ListMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ListStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/LocationMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/LocationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MeasureReportStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MeasureReportType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MediaStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationAdministrationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationDispenseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationKnowledgeStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationRequestIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationRequestPriority"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationStatementStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MedicationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MessageSignificanceCategory"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/Messageheader_Response_Request"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/MimeType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NameUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NamingSystemIdentifierType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NamingSystemType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NarrativeStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NoteType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NutritiionOrderIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NutritionOrderStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ObservationDataType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ObservationRangeCategory"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ObservationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/OperationKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/OperationParameterUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/OrientationType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ParameterUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ParticipantRequired"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ParticipantStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ParticipationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/PaymentNoticeStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/PaymentReconciliationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ProcedureStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/PropertyRepresentation"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/PropertyType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ProvenanceEntityRole"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/PublicationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/QualityType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/QuantityComparator"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/QuestionnaireItemOperator"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/QuestionnaireItemType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/QuestionnaireResponseStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ReferenceHandlingPolicy"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ReferenceVersionRules"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ReferredDocumentStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RelatedArtifactType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RemittanceOutcome"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RepositoryType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RequestIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RequestPriority"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResearchElementType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResearchStudyStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResearchSubjectStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResourceType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResourceVersionPolicy"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ResponseType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RestfulCapabilityMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/RiskAssessmentStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SPDXLicense"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SearchComparator"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SearchEntryMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SearchModifierCode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SearchParamType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SectionMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SequenceType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ServiceRequestIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ServiceRequestPriority"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ServiceRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SlicingRules"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SlotStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SortDirection"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SpecimenContainedPreference"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SpecimenStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/Status"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StrandType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinitionKind"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapContextType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapGroupTypeMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapInputMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapModelMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapSourceListMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapTargetListMode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/StructureMapTransform"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SubscriptionChannelType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "SubscriptionStatus",
+      "profile": [
+        "http://hl7.org/fhir/SubscriptionStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SupplyDeliveryStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SupplyRequestStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/SystemRestfulInteraction"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TaskIntent"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TaskPriority"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TaskStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TestReportActionResult"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TestReportParticipantType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TestReportResult"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TestReportStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TestScriptRequestMethodCode"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TriggerType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TypeDerivationRule"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/TypeRestfulInteraction"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/UDIEntryType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/UnitsOfTime"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/Use"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/VariableType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/VisionBase"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/VisionEyes"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/VisionStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/XPathUsageType"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "xhtml",
+      "profile": [
+        "http://hl7.org/fhir/xhtml"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/FHIRHelpers.cql"
+    }
+  ]
+}
