@@ -187,7 +187,6 @@ class FhirOperatorTest {
   }
 
   @Test
-  @Ignore("Bug on workflow incorrectly returns 2022-12-31T00:00:00 instead of 2021-12-31T23:59:59")
   fun evaluateGroupPopulationMeasure() = runBlockingOnWorkerThread {
     loadFile("/group-measure/PatientGroups-1.0.0.cql", ::installToIgManager)
     loadFile("/group-measure/PatientGroupsMeasure.json", ::installToIgManager)
@@ -215,6 +214,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Bug on workflow incorrectly returns 2022-12-31T00:00:00 instead of 2021-12-31T23:59:59")
   fun evaluateIndividualSubjectMeasure() = runBlockingOnWorkerThread {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
     loadFile(
