@@ -49,7 +49,7 @@ class UploaderTest {
         .upload(localChanges)
 
     assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-    with(result as UploadSyncResult.Success) { assertThat(resources).hasSize(1) }
+    with(result as UploadSyncResult.Success) { assertThat(responseResources).hasSize(1) }
   }
 
   @Test

@@ -259,10 +259,10 @@ internal class DatabaseImpl(
     currentResourceId: String,
     updatedResource: Resource,
   ) {
-    val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
-    val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
-    val resourceUuid = currentResourceEntity.resourceUuid
     db.withTransaction {
+      val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
+      val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+      val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
       val uuidsOfReferringResources =
@@ -280,9 +280,21 @@ internal class DatabaseImpl(
     }
   }
 
+  /**
+   * Calls the [ResourceDao] to update the [ResourceEntity] associated with this resource. The
+   * function updates the resource and resourceId of the [ResourceEntity]
+   */
   private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
     resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
 
+  /**
+   * Update the [LocalChange]s to reflect the change in the resource ID. This primarily includes
+   * modifying the [LocalChange.resourceId] for the changes of the affected resource. Also, update
+   * any references in the [LocalChange] which refer to the affected resource.
+   *
+   * The function returns a [List<[UUID]>] which corresponds to the [ResourceEntity.resourceUuid]
+   * which contain references to the affected resource.
+   */
   private suspend fun updateLocalChangeResourceIdAndReferences(
     resourceUuid: UUID,
     oldResource: Resource,
@@ -294,6 +306,12 @@ internal class DatabaseImpl(
       updatedResource = updatedResource,
     )
 
+  /**
+   * Update all [Resource] and their corresponding [ResourceEntity] which refer to the affected
+   * resource. The update of the references in the [Resource] is also expected to reflect in the
+   * [ReferenceIndex] i.e. the references used for search operations should also get updated to
+   * reflect the references with the new resource ID of the referred resource.
+   */
   private suspend fun updateReferringResources(
     referringResourcesUuids: List<UUID>,
     oldResource: Resource,

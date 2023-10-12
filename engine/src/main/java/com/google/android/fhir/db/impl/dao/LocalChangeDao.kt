@@ -186,6 +186,20 @@ internal abstract class LocalChangeDao {
   /**
    * Extract the difference in the [ResourceReferenceInfo] by getting all the references from both
    * the versions of the resource and then finding out the difference in the two sets.
+   *
+   * Two versions of a resource can vary in two ways in terms of the resources they refer:
+   * 1) A reference present in resource1 is removed and is not present in resource2. Such
+   *    differences in resource references can be extracted by subtracting the set of references in
+   *    the resource2 from the set of references in the resource1
+   * 2) A new reference is added to the resource1. This implies that the reference is present in
+   *    resource2 and not in resource1. Such differences in resource references can be extracted by
+   *    subtracting the set of references in the resource1 from the set of references in the
+   *    resource2
+   *
+   * Combining the above two types of differences would give the entire set of difference in the two
+   * versions of the resource.
+   *
+   * This method is useful to extract differences for UPDATE kind of [LocalChange]
    */
   private fun extractReferencesDiff(
     resource1: Resource,

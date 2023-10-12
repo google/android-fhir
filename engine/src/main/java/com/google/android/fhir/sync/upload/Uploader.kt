@@ -96,7 +96,7 @@ internal class Uploader(private val dataSource: DataSource) {
 sealed class UploadSyncResult {
   data class Success(
     val localChanges: List<LocalChange>,
-    val resources: List<Resource>,
+    val responseResources: List<Resource>,
   ) : UploadSyncResult()
 
   data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
