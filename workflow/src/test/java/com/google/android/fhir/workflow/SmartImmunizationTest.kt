@@ -70,7 +70,7 @@ class SmartImmunizationTest {
   }
 
   @Test
-  fun findCarePlan() = runBlockingOnWorkerThread {
+  fun testIMMZD2DTMeasles() = runBlockingOnWorkerThread {
     val planDef =
       knowledgeManager
         .loadResources(
@@ -96,7 +96,7 @@ class SmartImmunizationTest {
         patientId = "IMMZ-Patient-NoVaxeninfant-f",
       )
 
-    println(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(carePlan))
+    // println(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(carePlan))
 
     assertThat(carePlan).isNotNull()
   }
