@@ -25,6 +25,7 @@ import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.SearchParamName
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
@@ -46,6 +47,7 @@ import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.android.fhir.testing.readJsonArrayFromFile
 import com.google.android.fhir.versionId
+import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -3079,20 +3081,21 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
-            revIncluded = null,
-          ),
-          SearchResult(
-            patient02,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
-            revIncluded = null,
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
+          revIncluded = null,
+        ),
+        SearchResult(
+          patient02,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
+          revIncluded = null,
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3169,22 +3172,23 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = null,
-            revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1)),
-          ),
-          SearchResult(
-            patient02,
-            included = null,
-            revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = null,
+          revIncluded =
+            mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1)),
+        ),
+        SearchResult(
+          patient02,
+          included = null,
+          revIncluded =
+            mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3488,48 +3492,49 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            resources["pa-01"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-              "organization" to listOf(resources["org-01"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!),
-            ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          resources["pa-01"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            "organization" to listOf(resources["org-01"]!!),
           ),
-          SearchResult(
-            resources["pa-02"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-              "organization" to listOf(resources["org-02"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!),
-            ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!),
           ),
-          SearchResult(
-            resources["pa-03"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
-            ),
+        ),
+        SearchResult(
+          resources["pa-02"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            "organization" to listOf(resources["org-02"]!!),
+          ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!),
+          ),
+        ),
+        SearchResult(
+          resources["pa-03"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+          ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
           ),
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3634,20 +3639,21 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp02, gp01)),
-            revIncluded = null,
-          ),
-          SearchResult(
-            patient02,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03, gp02)),
-            revIncluded = null,
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp02, gp01)),
+          revIncluded = null,
+        ),
+        SearchResult(
+          patient02,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03, gp02)),
+          revIncluded = null,
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3807,26 +3813,26 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = null,
-            revIncluded =
-              mapOf(
-                (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
-                  listOf(enc1_4, enc1_3, enc1_1),
-              ),
-          ),
-          SearchResult(
-            patient02,
-            included = null,
-            revIncluded =
-              mapOf(
-                (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
-                  listOf(enc2_4, enc2_3, enc2_1),
-              ),
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = null,
+          revIncluded =
+            mapOf(
+              (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                listOf(enc1_4, enc1_3, enc1_1),
+            ),
+        ),
+        SearchResult(
+          patient02,
+          included = null,
+          revIncluded =
+            mapOf(
+              (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                listOf(enc2_4, enc2_3, enc2_1),
+            ),
         ),
       )
   }
@@ -3852,5 +3858,78 @@ class DatabaseImplTest {
     }
 
     @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true, false)
+
+    /**
+     * [Correspondence] to provide a custom [equalityCheck] for the [SearchResult]s. Also provides a
+     * custom diff formatting for failing cases.
+     */
+    val SearchResultCorrespondence: Correspondence<SearchResult<Resource>, SearchResult<Resource>> =
+      Correspondence.from<SearchResult<Resource>, SearchResult<Resource>>(
+          ::equalityCheck,
+          "is shallow equals (by logical id comparison) to the ",
+        )
+        .formattingDiffsUsing(::formatDiff)
+
+    private fun <R : Resource> equalityCheck(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): Boolean {
+      return equalsShallow(actual.resource, expected.resource) &&
+        equalsShallow(actual.included, expected.included) &&
+        equalsShallow(actual.revIncluded, expected.revIncluded)
+    }
+
+    private fun equalsShallow(first: Resource, second: Resource) =
+      first.resourceType == second.resourceType && first.logicalId == second.logicalId
+
+    private fun equalsShallow(first: List<Resource>, second: List<Resource>) =
+      first.size == second.size &&
+        first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
+
+    private fun equalsShallow(
+      first: Map<SearchParamName, List<Resource>>?,
+      second: Map<SearchParamName, List<Resource>>?,
+    ) =
+      if (first != null && second != null && first.size == second.size) {
+        first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+          x.key == y.key && equalsShallow(x.value, y.value)
+        }
+      } else {
+        first?.size == second?.size
+      }
+
+    @JvmName("equalsShallowRevInclude")
+    private fun equalsShallow(
+      first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+      second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+    ) =
+      if (first != null && second != null && first.size == second.size) {
+        first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+          x.key == y.key && equalsShallow(x.value, y.value)
+        }
+      } else {
+        first?.size == second?.size
+      }
+
+    /**
+     * Ideally, this functions should highlight the diff between the [actual] and [expected]. But,
+     * we are just highlighting the ids of resources contained in the [SearchResult].
+     */
+    private fun <R : Resource> formatDiff(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): String {
+      return "Expected : ${expected.asString()} \n Actual ${actual.asString()}"
+    }
+
+    private fun <R : Resource> SearchResult<R>.asString(): String {
+      return "SearchResult[ resource: " +
+        resource.logicalId +
+        ", Included : " +
+        included?.map { it.key + ": " + it.value.joinToString { it.logicalId } } +
+        ", RevIncluded : " +
+        revIncluded?.map { it.key.toString() + ": " + it.value.joinToString { it.logicalId } } +
+        "]"
+    }
   }
 }

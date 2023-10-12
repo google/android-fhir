@@ -25,6 +25,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
@@ -35,11 +36,14 @@ import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
@@ -60,7 +64,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
                 """
@@ -92,7 +96,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         LIMIT ?
@@ -115,7 +119,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         LIMIT ? OFFSET ?
@@ -146,7 +150,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -199,7 +203,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -239,7 +243,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -279,7 +283,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -314,7 +318,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -357,7 +361,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -397,7 +401,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -437,7 +441,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -477,7 +481,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -522,7 +526,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -576,7 +580,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -616,7 +620,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -656,7 +660,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -699,7 +703,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -742,7 +746,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -782,7 +786,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -822,7 +826,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -862,7 +866,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -894,7 +898,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -931,7 +935,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -968,7 +972,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1005,7 +1009,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1045,7 +1049,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1080,7 +1084,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1125,7 +1129,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1169,7 +1173,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1199,7 +1203,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1228,7 +1232,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1264,7 +1268,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1295,7 +1299,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1334,7 +1338,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1375,7 +1379,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1415,7 +1419,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1455,7 +1459,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1494,7 +1498,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1532,7 +1536,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1571,7 +1575,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1609,7 +1613,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1649,7 +1653,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1681,7 +1685,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1708,7 +1712,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -1728,7 +1732,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -1750,7 +1754,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN NumberIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -1776,7 +1780,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -1821,7 +1825,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1896,7 +1900,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1968,7 +1972,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2028,7 +2032,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2049,7 +2053,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2085,7 +2089,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2126,7 +2130,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2159,7 +2163,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2190,7 +2194,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2228,7 +2232,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2249,6 +2253,450 @@ class SearchTest {
           "http://my-code-system.org",
         ),
       )
+  }
+
+  @Test
+  fun `search include all practitioners`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply { include<Practitioner>(Patient.GENERAL_PRACTITIONER) }
+        .getIncludeQuery(
+          listOf(
+            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
+            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
+          ),
+        )
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceType||"/"||re.resourceId = rie.index_value
+          
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          )
+          """
+          .trimIndent(),
+      )
+    // TODO : Find way to check the uuids
+    assertThat(query.args)
+      .containsAtLeast("Patient", "general-practitioner", "Practitioner")
+      .inOrder()
+  }
+
+  @Test
+  fun `search include all active practitioners`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+          }
+        }
+        .getIncludeQuery(
+          listOf(
+            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
+            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
+          ),
+        )
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceType||"/"||re.resourceId = rie.index_value
+          
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          AND re.resourceUuid IN (
+          SELECT resourceUuid FROM TokenIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+          )
+          )
+          """
+          .trimIndent(),
+      )
+
+    // TODO : Find way to check the uuids
+    assertThat(query.args)
+      .containsAtLeast(
+        "Patient",
+        "general-practitioner",
+        "Practitioner",
+        "Practitioner",
+        "active",
+        "true",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search include all active practitioners and sort by given name`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            sort(Practitioner.GIVEN, Order.DESCENDING)
+          }
+        }
+        .getIncludeQuery(
+          listOf(
+            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
+            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
+          ),
+        )
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceType||"/"||re.resourceId = rie.index_value
+          LEFT JOIN StringIndexEntity b
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'given'
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          AND re.resourceUuid IN (
+          SELECT resourceUuid FROM TokenIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+          )
+          ORDER BY b.index_value DESC
+          )
+          """
+          .trimIndent(),
+      )
+
+    // TODO : Find way to check the uuids
+    assertThat(query.args)
+      .containsAtLeast(
+        "Patient",
+        "general-practitioner",
+        "Practitioner",
+        "Practitioner",
+        "active",
+        "true",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search include practitioners and organizations`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            sort(Practitioner.GIVEN, Order.DESCENDING)
+          }
+
+          include<Organization>(Patient.ORGANIZATION) {
+            filter(Organization.ACTIVE, { value = of(true) })
+            sort(Organization.NAME, Order.DESCENDING)
+          }
+        }
+        .getIncludeQuery(
+          listOf(
+            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
+            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
+          ),
+        )
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT * FROM (
+        SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceType||"/"||re.resourceId = rie.index_value
+        LEFT JOIN StringIndexEntity b
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'given'
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+        AND re.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+        )
+        ORDER BY b.index_value DESC
+        )
+        UNION ALL
+        SELECT * FROM (
+        SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceType||"/"||re.resourceId = rie.index_value
+        LEFT JOIN StringIndexEntity b
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'name'
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+        AND re.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+        )
+        ORDER BY b.index_value DESC
+        )
+        """
+          .trimIndent(),
+      )
+
+    // TODO : Find way to check the uuids
+    assertThat(query.args)
+      .containsAtLeast(
+        "Patient",
+        "general-practitioner",
+        "Practitioner",
+        "Practitioner",
+        "active",
+        "true",
+        "Patient",
+        "organization",
+        "Organization",
+        "Organization",
+        "active",
+        "true",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search revInclude all conditions for patients`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply { revInclude<Condition>(Condition.SUBJECT) }
+        .getRevIncludeQuery(listOf("pa01", "pa02"))
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceUuid = rie.resourceUuid
+          
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          )
+          """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly("Condition", "subject", "pa01", "pa02", "Condition")
+      .inOrder()
+  }
+
+  @Test
+  fun `search revInclude diabetic conditions for patients`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              {
+                value =
+                  of(
+                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
+                  )
+              },
+            )
+          }
+        }
+        .getRevIncludeQuery(listOf("pa01", "pa02"))
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT * FROM (
+        SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceUuid = rie.resourceUuid
+        
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        AND re.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+        )
+        )
+                """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "Condition",
+        "subject",
+        "pa01",
+        "pa02",
+        "Condition",
+        "Condition",
+        "code",
+        "44054006",
+        "http://snomed.info/sct",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search revInclude diabetic conditions for patients and sort by recorded date`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              {
+                value =
+                  of(
+                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
+                  )
+              },
+            )
+            sort(Condition.RECORDED_DATE, Order.DESCENDING)
+          }
+        }
+        .getRevIncludeQuery(listOf("pa01", "pa02"))
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT * FROM (
+        SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+        FROM ResourceEntity re
+        JOIN ReferenceIndexEntity rie
+        ON re.resourceUuid = rie.resourceUuid
+        LEFT JOIN DateIndexEntity b
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date'LEFT JOIN DateTimeIndexEntity c
+        ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        AND re.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+        )
+        ORDER BY b.index_from DESC, c.index_from DESC
+        )
+            """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "Condition",
+        "subject",
+        "pa01",
+        "pa02",
+        "Condition",
+        "Condition",
+        "code",
+        "44054006",
+        "http://snomed.info/sct",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search revInclude encounters and conditions filtered and sorted`() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.STATUS,
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://hl7.org/fhir/encounter-status",
+                      Encounter.EncounterStatus.ARRIVED.toCode(),
+                      "",
+                    ),
+                  )
+              },
+            )
+            sort(Encounter.DATE, Order.DESCENDING)
+          }
+
+          revInclude<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              {
+                value =
+                  of(
+                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
+                  )
+              },
+            )
+            sort(Condition.RECORDED_DATE, Order.DESCENDING)
+          }
+        }
+        .getRevIncludeQuery(listOf("pa01", "pa02"))
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceUuid = rie.resourceUuid
+          LEFT JOIN DateIndexEntity b
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'date'LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'date'
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          AND re.resourceUuid IN (
+          SELECT resourceUuid FROM TokenIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+          )
+          ORDER BY b.index_from DESC, c.index_from DESC
+          )
+          UNION ALL
+          SELECT * FROM (
+          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          FROM ResourceEntity re
+          JOIN ReferenceIndexEntity rie
+          ON re.resourceUuid = rie.resourceUuid
+          LEFT JOIN DateIndexEntity b
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date'LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          AND re.resourceUuid IN (
+          SELECT resourceUuid FROM TokenIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+          )
+          ORDER BY b.index_from DESC, c.index_from DESC
+          )
+          """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "Encounter",
+        "subject",
+        "pa01",
+        "pa02",
+        "Encounter",
+        "Encounter",
+        "status",
+        "arrived",
+        "http://hl7.org/fhir/encounter-status",
+        "Condition",
+        "subject",
+        "pa01",
+        "pa02",
+        "Condition",
+        "Condition",
+        "code",
+        "44054006",
+        "http://snomed.info/sct",
+      )
+      .inOrder()
   }
 
   private companion object {
