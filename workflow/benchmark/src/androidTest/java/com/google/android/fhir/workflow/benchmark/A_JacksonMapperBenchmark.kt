@@ -20,10 +20,10 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
+import org.cqframework.cql.elm.serializing.jackson.ElmJsonMapper
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.opencds.cqf.cql.engine.serializing.jackson.JsonCqlMapper
 
 @RunWith(AndroidJUnit4::class)
 @Suppress("ktlint:standard:class-naming")
@@ -37,6 +37,6 @@ class A_JacksonMapperBenchmark {
    */
   @Test
   fun loadJsonMapper() {
-    benchmarkRule.measureRepeated { assertThat(JsonCqlMapper.getMapper()).isNotNull() }
+    benchmarkRule.measureRepeated { assertThat(ElmJsonMapper.getMapper()).isNotNull() }
   }
 }

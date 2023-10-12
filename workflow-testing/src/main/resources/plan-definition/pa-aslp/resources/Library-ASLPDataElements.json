@@ -1,0 +1,461 @@
+{
+  "resourceType": "Library",
+  "id": "ASLPDataElements",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/ASLPDataElements",
+  "name": "ASLPDataElements",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers|4.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FC",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRCommon|1.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library SC",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/SDHCommon"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Cs",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/ASLPConcepts"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ASLP Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ConditionVerificationStatusCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/condition-ver-status"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diagnosis of Obstructive Sleep Apnea Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Active Condition",
+      "resource": "http://fhir.org/guides/cqf/common/ValueSet/active-condition"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Device Request",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "DeviceRequest"
+    },
+    {
+      "name": "Device Request Id",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "string"
+    },
+    {
+      "name": "Medication Request",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "MedicationRequest"
+    },
+    {
+      "name": "Medication Request Id",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "string"
+    },
+    {
+      "name": "Nutrition Order",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "NutritionOrder"
+    },
+    {
+      "name": "Nutrition Order Id",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "string"
+    },
+    {
+      "name": "Service Request",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "ServiceRequest"
+    },
+    {
+      "name": "Service Request Id",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "string"
+    },
+    {
+      "name": "Coverage Id",
+      "use": "in",
+      "min": 0,
+      "max": "*",
+      "type": "string"
+    },
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    },
+    {
+      "name": "BMI",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Diagnosis of Obstructive Sleep Apnea",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "CodeableConcept"
+    },
+    {
+      "name": "Height",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "History of Diabetes",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "History of Hypertension",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Neck Circumference",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Sleep Study",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "ServiceRequest"
+    },
+    {
+      "name": "Sleep Study Code",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "CodeableConcept"
+    },
+    {
+      "name": "Sleep Study Date",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "Any"
+    },
+    {
+      "name": "Weight",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "type": "Quantity",
+      "profile": [
+        "http://hl7.org/fhir/Quantity"
+      ],
+      "mustSupport": [
+        "value",
+        "comparator",
+        "system",
+        "system.value",
+        "value.value",
+        "code",
+        "code.value",
+        "unit",
+        "unit.value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/ObservationStatus"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE22",
+              "display": "BMI"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE20",
+              "display": "Body height"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "status",
+        "value"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE19",
+              "display": "History of Diabetes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE23",
+              "display": "Neck Circumference"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Observation"
+      ],
+      "mustSupport": [
+        "code",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE21",
+              "display": "Weight"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Observation",
+      "profile": [
+        "http://hl7.org/fhir/Observation"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "code",
+        "clinicalStatus",
+        "verificationStatus"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE19",
+              "display": "History of Diabetes"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "code",
+        "clinicalStatus",
+        "verificationStatus"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "valueSet": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de17"
+        }
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "code",
+        "clinicalStatus",
+        "verificationStatus"
+      ],
+      "codeFilter": [
+        {
+          "path": "code",
+          "code": [
+            {
+              "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+              "code": "ASLP.A1.DE18",
+              "display": "History of Hypertension"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/Condition"
+      ],
+      "mustSupport": [
+        "code"
+      ]
+    },
+    {
+      "type": "Quantity",
+      "profile": [
+        "urn:hl7-org:elm-types:r1/Quantity"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "string",
+      "profile": [
+        "http://hl7.org/fhir/string"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "ServiceRequest",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+      ],
+      "mustSupport": [
+        "id"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ASLPDataElements.cql"
+    }
+  ]
+}
