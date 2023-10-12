@@ -72,11 +72,23 @@ class FhirOperatorTest {
 
   @Test
   fun generateCarePlan() = runBlockingOnWorkerThread {
-    loader.loadFile("/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json", ::installToIgManager)
-    loader.loadFile("/plan-definition/rule-filters/tests-Reportable-bundle.json", ::installToIgManager)
-    loader.loadFile("/plan-definition/rule-filters/tests-NotReportable-bundle.json", ::installToIgManager)
+    loader.loadFile(
+      "/plan-definition/rule-filters/RuleFilters-1.0.0-bundle.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/plan-definition/rule-filters/tests-Reportable-bundle.json",
+      ::installToIgManager,
+    )
+    loader.loadFile(
+      "/plan-definition/rule-filters/tests-NotReportable-bundle.json",
+      ::installToIgManager,
+    )
 
-    loader.loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loader.loadFile(
+      "/first-contact/01-registration/patient-charity-otala-1.json",
+      ::importToFhirEngine,
+    )
     loader.loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
       ::importToFhirEngine,
@@ -103,7 +115,10 @@ class FhirOperatorTest {
   @Test
   fun generateCarePlanWithoutEncounter() = runBlockingOnWorkerThread {
     loader.loadFile("/plan-definition/med-request/med_request_patient.json", ::importToFhirEngine)
-    loader.loadFile("/plan-definition/med-request/med_request_plan_definition.json", ::installToIgManager)
+    loader.loadFile(
+      "/plan-definition/med-request/med_request_plan_definition.json",
+      ::installToIgManager,
+    )
 
     val carePlan =
       fhirOperator.generateCarePlan(
@@ -122,12 +137,18 @@ class FhirOperatorTest {
 
   @Test
   fun generateCarePlanWithCqlApplicabilityCondition() = runBlockingOnWorkerThread {
-    loader.loadFile("/plan-definition/cql-applicability-condition/patient.json", ::importToFhirEngine)
+    loader.loadFile(
+      "/plan-definition/cql-applicability-condition/patient.json",
+      ::importToFhirEngine,
+    )
     loader.loadFile(
       "/plan-definition/cql-applicability-condition/plan_definition.json",
       ::installToIgManager,
     )
-    loader.loadFile("/plan-definition/cql-applicability-condition/example-1.0.0.cql", ::installToIgManager)
+    loader.loadFile(
+      "/plan-definition/cql-applicability-condition/example-1.0.0.cql",
+      ::installToIgManager,
+    )
 
     val carePlan =
       fhirOperator.generateCarePlan(
@@ -147,7 +168,10 @@ class FhirOperatorTest {
   @Test
   @Ignore("Bug on workflow incorrectly returns 2022-12-31T00:00:00 instead of 2021-12-31T23:59:59")
   fun evaluatePopulationMeasure() = runBlockingOnWorkerThread {
-    loader.loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loader.loadFile(
+      "/first-contact/01-registration/patient-charity-otala-1.json",
+      ::importToFhirEngine,
+    )
     loader.loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
       ::importToFhirEngine,
@@ -210,7 +234,10 @@ class FhirOperatorTest {
   @Test
   @Ignore("Bug on workflow incorrectly returns 2022-12-31T00:00:00 instead of 2021-12-31T23:59:59")
   fun evaluateIndividualSubjectMeasure() = runBlockingOnWorkerThread {
-    loader.loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)
+    loader.loadFile(
+      "/first-contact/01-registration/patient-charity-otala-1.json",
+      ::importToFhirEngine,
+    )
     loader.loadFile(
       "/first-contact/02-enrollment/careplan-charity-otala-1-pregnancy-plan.xml",
       ::importToFhirEngine,
