@@ -26,7 +26,6 @@ import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
@@ -97,76 +96,66 @@ data class QuestionnaireViewItem(
     questionnaireResponseItem.answer.map { it.copy() }
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
-  fun setAnswer(
+  suspend fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats || questionnaireResponseItemAnswerComponent.size <= 1) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} has repeated answers."
     }
-    runBlocking {
-      answersChangedCallback(
-        questionnaireItem,
-        questionnaireResponseItem,
-        questionnaireResponseItemAnswerComponent.toList(),
-        null,
-      )
-    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      questionnaireResponseItemAnswerComponent.toList(),
+      null,
+    )
   }
 
   /** Clears existing answers and any draft answer. */
-  fun clearAnswer() {
-    runBlocking {
-      answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
-    }
+  suspend fun clearAnswer() {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  fun addAnswer(
+  suspend fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    runBlocking {
-      answersChangedCallback(
-        questionnaireItem,
-        questionnaireResponseItem,
-        answers + questionnaireResponseItemAnswerComponent,
-        null,
-      )
-    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers + questionnaireResponseItemAnswerComponent,
+      null,
+    )
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  fun removeAnswer(
+  suspend fun removeAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
-    runBlocking {
-      answersChangedCallback(
-        questionnaireItem,
-        questionnaireResponseItem,
-        answers.filterNot { ans ->
-          questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
-        },
-        null,
-      )
-    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers.filterNot { ans ->
+        questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
+      },
+      null,
+    )
   }
 
   /**
    * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
    * the question.
    */
-  fun setDraftAnswer(draftAnswer: Any? = null) {
-    runBlocking {
-      answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
-    }
+  suspend fun setDraftAnswer(draftAnswer: Any? = null) {
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 
   /**

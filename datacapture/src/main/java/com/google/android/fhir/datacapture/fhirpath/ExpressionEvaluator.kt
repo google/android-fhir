@@ -433,12 +433,7 @@ internal class ExpressionEvaluator(
 
         if (dependentVariables.contains(expression.name)) dependentVariables[expression.name]!!
 
-        val resources =
-          xFhirQueryResolver.resolve(xFhirExpressionString).map {
-            BundleEntryComponent().apply { resource = it }
-          }
-        val bundle = Bundle().apply { entry = resources }
-        bundle
+        Bundle().apply { entry = xFhirQueryResolver.resolve(xFhirExpressionString).map { BundleEntryComponent().apply { resource = it } } }
       } else if (expression.isFhirPath) {
         fhirPathEngine
           .evaluate(

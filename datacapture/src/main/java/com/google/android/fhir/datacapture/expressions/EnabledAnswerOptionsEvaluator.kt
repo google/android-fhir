@@ -201,26 +201,22 @@ internal class EnabledAnswerOptionsEvaluator(
 
     return when {
       answerExpression.isXFhirQuery -> {
-        xFhirQueryResolver?.let { xFhirQueryResolver ->
-          val variablesMap = expressionEvaluator.extractDependentVariables(answerExpression, item)
-          val xFhirExpressionString =
-            expressionEvaluator.createXFhirQueryFromExpression(
-              answerExpression,
-              variablesMap,
-            )
-          if (answerExpressionMap.containsKey(xFhirExpressionString)) {
-            answerExpressionMap[xFhirExpressionString]
-          }
-
-          val data = xFhirQueryResolver.resolve(xFhirExpressionString)
-          val options = item.extractAnswerOptions(data)
-
-          answerExpressionMap[xFhirExpressionString] = options
-          options
-        }
-          ?: error(
-            "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig.",
+        checkNotNull(xFhirQueryResolver) { "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig." }
+        val variablesMap = expressionEvaluator.extractDependentVariables(answerExpression, item)
+        val xFhirExpressionString =
+          expressionEvaluator.createXFhirQueryFromExpression(
+            answerExpression,
+            variablesMap,
           )
+        if (answerExpressionMap.containsKey(xFhirExpressionString)) {
+          answerExpressionMap[xFhirExpressionString]
+        }
+
+        val data = xFhirQueryResolver.resolve(xFhirExpressionString)
+        val options = item.extractAnswerOptions(data)
+
+        answerExpressionMap[xFhirExpressionString] = options
+        options
       }
       answerExpression.isFhirPath -> {
         val data = expressionEvaluator.evaluateExpression(item, responseItem, answerExpression)

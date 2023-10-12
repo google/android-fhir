@@ -99,28 +99,25 @@ class XFhirQueryTranslatorTest {
   @Test
   fun `translate() should add filters`() {
     val search =
-      translate(
-        "QuestionnaireResponse?patient=Patient/a481e98f-87de-443a-920a-d6e729b630cd&questionnaire=374443",
-      )
+      translate("Patient?gender=male&name=John&birthdate=2012-01-11&general-practitioner=12345")
 
+    search.stringFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("name")
+      assertThat(this.filters.first().value).isEqualTo("John")
+    }
+
+    search.tokenFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("gender")
+      assertThat(this.filters.first().value!!.tokenFilters.first().code).isEqualTo("male")
+    }
+    search.dateTimeFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("birthdate")
+      assertThat(this.filters.first().value!!.date!!.toHumanDisplay()).isEqualTo("2012-01-11")
+    }
     search.referenceFilterCriteria.first().run {
-      assertThat(this.parameter.paramName).isEqualTo("patient")
-      assertThat(this.filters.first().value)
-        .isEqualTo("Patient/a481e98f-87de-443a-920a-d6e729b630cd")
+      assertThat(this.parameter.paramName).isEqualTo("general-practitioner")
+      assertThat(this.filters.first().value).isEqualTo("12345")
     }
-
-    search.referenceFilterCriteria[1].run {
-      assertThat(this.parameter.paramName).isEqualTo("questionnaire")
-      assertThat(this.filters.first().value).isEqualTo("374443")
-    }
-    //    search.dateTimeFilterCriteria.first().run {
-    //      assertThat(this.parameter.paramName).isEqualTo("birthdate")
-    //      assertThat(this.filters.first().value!!.date!!.toHumanDisplay()).isEqualTo("2012-01-11")
-    //    }
-    //    search.referenceFilterCriteria.first().run {
-    //      assertThat(this.parameter.paramName).isEqualTo("general-practitioner")
-    //      assertThat(this.filters.first().value).isEqualTo("12345")
-    //    }
   }
 
   @Test

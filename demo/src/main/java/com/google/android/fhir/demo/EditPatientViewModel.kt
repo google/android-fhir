@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,17 +38,14 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 class EditPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
-  val fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  private val fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
-  val patientId: String = requireNotNull(state["patient_id"])
+  private val patientId: String = requireNotNull(state["patient_id"])
   val livePatientData = liveData { emit(prepareEditPatient()) }
-
-  val patient = liveData<Patient> { fhirEngine.get<Patient>(patientId) }
 
   private suspend fun prepareEditPatient(): Pair<String, String> {
     val patient = fhirEngine.get<Patient>(patientId)
     val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
-    //    val question = readFileFromAssets("dynamic-answer-expression.json").trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire =
       parser.parseResource(org.hl7.fhir.r4.model.Questionnaire::class.java, question)
