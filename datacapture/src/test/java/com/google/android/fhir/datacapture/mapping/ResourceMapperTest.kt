@@ -22,6 +22,8 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAUNCH_CONTEXT
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.common.truth.Truth.assertThat
@@ -33,24 +35,23 @@ import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Immunization
-import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
@@ -811,6 +812,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-dob"
@@ -830,7 +841,7 @@ class ResourceMapperTest {
 
       val patientId = UUID.randomUUID().toString()
       val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("mother" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
         .isEqualTo((DateType(Date())).localDate)
@@ -1187,6 +1198,25 @@ class ResourceMapperTest {
         {
           "resourceType": "Questionnaire",
           "id": "client-registration-sample",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+              "extension": [
+                {
+                  "url": "name",
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    "code": "father",
+                    "display": "Patient"
+                  }
+                },
+                {
+                  "url": "type",
+                  "valueCode": "Patient"
+                }
+              ]
+            }
+          ],
           "status": "active",
           "date": "2020-11-18T07:24:47.111Z",
           "subjectType": [
@@ -1208,7 +1238,7 @@ class ResourceMapperTest {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                           "valueExpression": {
                             "language": "text/fhirpath",
-                            "expression": "Patient.name.given",
+                            "expression": "%father.name.given",
                             "name": "patientName"
                           }
                         }
@@ -1224,7 +1254,7 @@ class ResourceMapperTest {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                           "valueExpression": {
                             "language": "text/fhirpath",
-                            "expression": "Patient.name.family",
+                            "expression": "%father.name.family",
                             "name": "patientFamily"
                           }
                         }
@@ -1242,7 +1272,7 @@ class ResourceMapperTest {
                       "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                       "valueExpression": {
                         "language": "text/fhirpath",
-                        "expression": "Patient.birthDate",
+                        "expression": "%father.birthDate",
                         "name": "patientBirthDate"
                       }
                     }
@@ -1259,7 +1289,7 @@ class ResourceMapperTest {
                       "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                       "valueExpression": {
                         "language": "text/fhirpath",
-                        "expression": "Patient.gender.value",
+                        "expression": "%father.gender.value",
                         "name": "patientGender"
                       }
                     }
@@ -1297,7 +1327,7 @@ class ResourceMapperTest {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                           "valueExpression": {
                             "language": "text/fhirpath",
-                            "expression": "Patient.telecom.value",
+                            "expression": "%father.telecom.value",
                             "name": "patientTelecom"
                           }
                         }
@@ -1320,7 +1350,7 @@ class ResourceMapperTest {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                           "valueExpression": {
                             "language": "text/fhirpath",
-                            "expression": "Patient.address.city",
+                            "expression": "%father.address.city",
                             "name": "patientCity"
                           }
                         }
@@ -1336,7 +1366,7 @@ class ResourceMapperTest {
                           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                           "valueExpression": {
                             "language": "text/fhirpath",
-                            "expression": "Patient.address.country",
+                            "expression": "%father.address.country",
                             "name": "patientCity"
                           }
                         }
@@ -1354,7 +1384,7 @@ class ResourceMapperTest {
                       "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-initialExpression",
                       "valueExpression": {
                         "language": "text/fhirpath",
-                        "expression": "Patient.active",
+                        "expression": "%father.active",
                         "name": "patientActive"
                       }
                     }
@@ -1376,7 +1406,7 @@ class ResourceMapperTest {
           as Questionnaire
 
       val patient = createPatientResource()
-      val response = ResourceMapper.populate(uriTestQuestionnaire, patient)
+      val response = ResourceMapper.populate(uriTestQuestionnaire, mapOf("father" to patient))
 
       val responseItem = response.item[0]
       assertThat(((responseItem.item[0].item[0].answer[0]).value as StringType).valueAsString)
@@ -1400,29 +1430,44 @@ class ResourceMapperTest {
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given multiple Resources`() =
     runBlocking {
-      val relatedPerson =
-        RelatedPerson().apply {
-          name =
-            listOf(
-              HumanName().apply {
-                given = listOf(StringType("John"))
-                family = "Doe"
-              },
-            )
-          birthDate = "1990-05-20".toDateFromFormatYyyyMmDd()
-        }
-
-      val observation =
-        Observation().apply {
-          value = StringType("Allergic to dairy products and proteins")
-          note = listOf(Annotation(MarkdownType("Patient Registration Comments")))
-        }
-
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension(
+                    "name",
+                    Coding(
+                      EXTENSION_LAUNCH_CONTEXT,
+                      "registration-encounter",
+                      "Registration Encounter",
+                    ),
+                  ),
+                  Extension("type", CodeType("Encounter")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "first-name"
+              linkId = "first-name-father"
               type = Questionnaire.QuestionnaireItemType.TEXT
               extension =
                 listOf(
@@ -1430,7 +1475,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.name.given"
+                      expression = "%father.name.given"
                     },
                   ),
                 )
@@ -1438,46 +1483,7 @@ class ResourceMapperTest {
           )
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "related-person-details"
-              type = Questionnaire.QuestionnaireItemType.GROUP
-              item =
-                listOf(
-                  Questionnaire.QuestionnaireItemComponent().apply {
-                    linkId = "rp-family-name"
-                    type = Questionnaire.QuestionnaireItemType.TEXT
-                    extension =
-                      listOf(
-                        Extension(
-                          ITEM_INITIAL_EXPRESSION_URL,
-                          Expression().apply {
-                            language = "text/fhirpath"
-                            expression = "RelatedPerson.name.family"
-                          },
-                        ),
-                      )
-                  },
-                )
-            },
-          )
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "related-person-dob"
-              type = Questionnaire.QuestionnaireItemType.DATE
-              extension =
-                listOf(
-                  Extension(
-                    ITEM_INITIAL_EXPRESSION_URL,
-                    Expression().apply {
-                      language = "text/fhirpath"
-                      expression = "RelatedPerson.birthDate"
-                    },
-                  ),
-                )
-            },
-          )
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "comments"
+              linkId = "first-name-mother"
               type = Questionnaire.QuestionnaireItemType.TEXT
               extension =
                 listOf(
@@ -1485,33 +1491,156 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Observation.value"
+                      expression = "%mother.name.given"
+                    },
+                  ),
+                )
+            },
+          )
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "encounter-reason"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%registration-encounter.reasonCode[0].text"
                     },
                   ),
                 )
             },
           )
 
-      val patient = createPatientResource()
+      val patientFather =
+        Patient().apply {
+          active = true
+          gender = Enumerations.AdministrativeGender.MALE
+          name = listOf(HumanName().apply { given = mutableListOf(StringType("Salman")) })
+        }
+
+      val patientMother =
+        Patient().apply {
+          active = true
+          gender = Enumerations.AdministrativeGender.FEMALE
+          name = listOf(HumanName().apply { given = mutableListOf(StringType("Fatima")) })
+        }
+
+      val encounter =
+        Encounter().apply {
+          addReasonCode().apply { addCoding().apply { text = "Registration Task" } }
+        }
+
       val questionnaireResponse =
-        ResourceMapper.populate(questionnaire, patient, relatedPerson, observation)
+        ResourceMapper.populate(
+          questionnaire,
+          mapOf(
+            "father" to patientFather,
+            "mother" to patientMother,
+            "registration-encounter" to encounter,
+          ),
+        )
 
       assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
         .isEqualTo("Salman")
-      assertThat(
-          ((questionnaireResponse.item[1].item[0].answer[0]).value as StringType).valueAsString,
-        )
-        .isEqualTo("Doe")
-      assertThat(((questionnaireResponse.item[2].answer[0]).value as DateType).valueAsString)
-        .isEqualTo("1990-05-20")
-      assertThat(((questionnaireResponse.item[3].answer[0]).value as StringType).valueAsString)
-        .isEqualTo("Allergic to dairy products and proteins")
+      assertThat(((questionnaireResponse.item[1].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Fatima")
+      assertThat(((questionnaireResponse.item[2].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Registration Task")
     }
+
+  @Test
+  fun `populate() should not fill QuestionnaireResponse with values if the intended launch context extension is not declared`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name-father"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%father.name.given"
+                  },
+                ),
+              )
+          },
+        )
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name-mother"
+            type = Questionnaire.QuestionnaireItemType.TEXT
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%mother.name.given"
+                  },
+                ),
+              )
+          },
+        )
+
+    val patientFather =
+      Patient().apply {
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        name = listOf(HumanName().apply { given = mutableListOf(StringType("Salman")) })
+      }
+
+    val patientMother =
+      Patient().apply {
+        active = true
+        gender = Enumerations.AdministrativeGender.FEMALE
+        name = listOf(HumanName().apply { given = mutableListOf(StringType("Fatima")) })
+      }
+
+    val questionnaireResponse =
+      ResourceMapper.populate(
+        questionnaire,
+        mapOf("father" to patientFather, "mother" to patientMother),
+      )
+
+    assertThat((questionnaireResponse.item[0].answer[0].value as StringType).valueAsString)
+      .isEqualTo("Salman")
+    assertFailsWith<IndexOutOfBoundsException> {
+      assertThat(((questionnaireResponse.item[1].answer[0]).value as StringType).valueAsString)
+        .isEqualTo("Fatima")
+    }
+  }
 
   @Test
   fun `populate() should correctly populate IdType value in QuestionnaireResponse`() = runBlocking {
     val questionnaire =
       Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "patient-id"
@@ -1522,7 +1651,7 @@ class ResourceMapperTest {
                   ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
-                    expression = "Patient.id"
+                    expression = "%father.id"
                   },
                 ),
               )
@@ -1531,7 +1660,7 @@ class ResourceMapperTest {
 
     val patientId = UUID.randomUUID().toString()
     val patient = Patient().apply { id = "Patient/$patientId" }
-    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("father" to patient))
 
     assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
       .isEqualTo(patientId)
@@ -1542,6 +1671,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-id"
@@ -1552,7 +1691,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.id"
+                      expression = "%father.id"
                     },
                   ),
                 )
@@ -1561,7 +1700,7 @@ class ResourceMapperTest {
 
       val patientId = UUID.randomUUID().toString()
       val patient = Patient().apply { id = "Patient/$patientId" }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("father" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as Reference).reference)
         .isEqualTo(patient.idPart)
@@ -1572,6 +1711,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-id"
@@ -1582,7 +1731,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.gender"
+                      expression = "%father.gender"
                     },
                   ),
                 )
@@ -1597,7 +1746,9 @@ class ResourceMapperTest {
         }
 
       val errorMessage =
-        assertFailsWith<FHIRException> { ResourceMapper.populate(questionnaire, patient) }
+        assertFailsWith<FHIRException> {
+            ResourceMapper.populate(questionnaire, mapOf(Pair("father", patient)))
+          }
           .localizedMessage
       assertThat(errorMessage).isEqualTo("Expression supplied does not evaluate to IdType.")
     }
@@ -1607,6 +1758,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               type = Questionnaire.QuestionnaireItemType.REFERENCE
@@ -1615,17 +1776,18 @@ class ResourceMapperTest {
                   ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
-                    expression = "Patient"
+                    expression = "%patient.id"
                   },
                 ),
               )
             },
           )
       val patient = Patient().apply { id = UUID.randomUUID().toString() }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
 
       assertThat(questionnaireResponse.itemFirstRep.answerFirstRep.valueReference.reference)
-        .isEqualTo("Patient/${patient.id}")
+        .isEqualTo(patient.id)
     }
 
   @Test
@@ -1633,6 +1795,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-id"
@@ -1643,7 +1815,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.id"
+                      expression = "%father.id"
                     },
                   ),
                 )
@@ -1652,7 +1824,7 @@ class ResourceMapperTest {
 
       val patientId = UUID.randomUUID().toString()
       val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("father" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as StringType).value)
         .isEqualTo(patientId)
@@ -1663,6 +1835,16 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-gender"
@@ -1673,7 +1855,7 @@ class ResourceMapperTest {
                     ITEM_INITIAL_EXPRESSION_URL,
                     Expression().apply {
                       language = "text/fhirpath"
-                      expression = "Patient.gender"
+                      expression = "%mother.gender"
                     },
                   ),
                 )
@@ -1696,7 +1878,7 @@ class ResourceMapperTest {
           )
 
       val patient = Patient().apply { gender = Enumerations.AdministrativeGender.FEMALE }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("mother" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
       assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
@@ -1707,6 +1889,16 @@ class ResourceMapperTest {
   fun `populate() should populate nested non-group questions`() = runBlocking {
     val questionnaire =
       Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "patient-gender"
@@ -1717,7 +1909,7 @@ class ResourceMapperTest {
                   ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
-                    expression = "Patient.gender"
+                    expression = "%mother.gender"
                   },
                 ),
               )
@@ -1747,7 +1939,7 @@ class ResourceMapperTest {
                         ITEM_INITIAL_EXPRESSION_URL,
                         Expression().apply {
                           language = "text/fhirpath"
-                          expression = "Patient.id"
+                          expression = "%mother.id"
                         },
                       ),
                     )
@@ -1762,7 +1954,7 @@ class ResourceMapperTest {
         gender = Enumerations.AdministrativeGender.FEMALE
         id = "Patient/$patientId/_history/2"
       }
-    val questionnaireResponse = ResourceMapper.populate(questionnaire, patient)
+    val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("mother" to patient))
 
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code).isEqualTo("female")
     assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
@@ -2649,6 +2841,16 @@ class ResourceMapperTest {
     Unit = runBlocking {
     val questionnaire =
       Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "patient-gender"
@@ -2659,7 +2861,7 @@ class ResourceMapperTest {
                   ITEM_INITIAL_EXPRESSION_URL,
                   Expression().apply {
                     language = "text/fhirpath"
-                    expression = "Patient.gender"
+                    expression = "%father.gender"
                   },
                 ),
               )
@@ -2669,7 +2871,9 @@ class ResourceMapperTest {
 
     val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
     val errorMessage =
-      assertFailsWith<IllegalStateException> { ResourceMapper.populate(questionnaire, patient) }
+      assertFailsWith<IllegalStateException> {
+          ResourceMapper.populate(questionnaire, mapOf("father" to patient))
+        }
         .localizedMessage
     assertThat(errorMessage)
       .isEqualTo(
