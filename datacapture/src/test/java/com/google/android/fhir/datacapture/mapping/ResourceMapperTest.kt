@@ -1702,7 +1702,7 @@ class ResourceMapperTest {
       val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("father" to patient))
 
       assertThat((questionnaireResponse.item[0].answer[0].value as Reference).reference)
-        .isEqualTo(patient.id)
+        .isEqualTo(patient.idPart)
     }
 
   @Test

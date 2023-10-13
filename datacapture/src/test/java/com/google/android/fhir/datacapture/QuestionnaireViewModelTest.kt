@@ -4400,7 +4400,7 @@ class QuestionnaireViewModelTest {
                 Extension(
                   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                   Expression().apply {
-                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.expression = "Observation?subject=Patient/{{%patient.id}}"
                     this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
                   },
                 ),
