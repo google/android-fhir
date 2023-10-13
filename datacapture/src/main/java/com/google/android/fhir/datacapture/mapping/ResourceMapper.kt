@@ -216,7 +216,7 @@ object ResourceMapper {
    * Performs
    * [Expression-based population](http://build.fhir.org/ig/HL7/sdc/populate.html#expression-based-population)
    * and returns a [QuestionnaireResponse] for the [questionnaire] that is populated from the
-   * [resources].
+   * [launchContexts].
    */
   suspend fun populate(
     questionnaire: Questionnaire,
