@@ -21,10 +21,10 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
+import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.files.NpmFileManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Library
 import org.junit.After
@@ -32,15 +32,29 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(RobolectricTestRunner::class)
 internal class KnowledgeManagerTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
+  private val fhirNpmPackage = FhirNpmPackage("anc-cds", "0.3.0", "http://url.com")
+  private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
+  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val knowledgeDb =
     Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
-  private val knowledgeManager = KnowledgeManager(knowledgeDb)
-  private val implementationGuide = ImplementationGuide("anc-cds", "0.3.0", "http://url.com")
-  private val dataFolder = File(javaClass.getResource("/anc-cds")!!.file)
+  private val npmFileManager = NpmFileManager(context.dataDir)
+  private val knowledgeManager =
+    KnowledgeManager(
+      knowledgeDb,
+      npmFileManager = npmFileManager,
+      npmPackageDownloader = { fhirPackage, _ ->
+        LocalFhirNpmPackageMetadata(
+          fhirPackage.name,
+          fhirPackage.version,
+          fhirPackage.canonical,
+          emptyList(),
+          dataFolder,
+        )
+      },
+    )
 
   @After
   fun closeDb() {
@@ -49,7 +63,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runTest {
-    knowledgeManager.install(implementationGuide, dataFolder)
+    knowledgeManager.install(fhirNpmPackage, dataFolder)
     val implementationGuideId =
       knowledgeDb.knowledgeDao().getImplementationGuide("anc-cds", "0.3.0")!!.implementationGuideId
 
@@ -67,9 +81,9 @@ internal class KnowledgeManagerTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
-    knowledgeManager.install(implementationGuide, igRoot)
+    knowledgeManager.install(fhirNpmPackage, igRoot)
 
-    knowledgeManager.delete(implementationGuide)
+    knowledgeManager.delete(fhirNpmPackage)
 
     assertThat(knowledgeDb.knowledgeDao().getImplementationGuides()).isEmpty()
     assertThat(igRoot.exists()).isFalse()
@@ -77,7 +91,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `imported entries are readable`() = runTest {
-    knowledgeManager.install(implementationGuide, dataFolder)
+    knowledgeManager.install(fhirNpmPackage, dataFolder)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()
@@ -119,7 +133,24 @@ internal class KnowledgeManagerTest {
     assertThat(resources).hasSize(2)
   }
 
-  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  fun `installing from npmPackageManager`() = runTest {
+    knowledgeManager.install(fhirNpmPackage)
+
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
+      .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon"))
+      .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Measure")).hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          resourceType = "Measure",
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+        ),
+      )
+      .isNotEmpty()
+    assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
+      .isNotNull()
+  }
 
   private fun writeToFile(library: Library): File {
     return File(context.filesDir, library.name).apply {

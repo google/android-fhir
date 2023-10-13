@@ -18,7 +18,7 @@
         }
       ],
       "linkId": "1",
-      "text": "Do you have any pre-existing health conditions?",
+      "text": "Do you have any preexisting health conditions?",
       "required": true,
       "item": [
         {

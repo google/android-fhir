@@ -42,13 +42,21 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
       addQuestionnaireFragment()
     }
     observePatientSaveAction()
+    (activity as MainActivity).setDrawerEnabled(false)
+
+    /** Use the provided cancel|submit buttons from the sdc library */
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
       viewLifecycleOwner,
     ) { _, _ ->
       onSubmitAction()
     }
-    (activity as MainActivity).setDrawerEnabled(false)
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.CANCEL_REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, _ ->
+      NavHostFragment.findNavController(this).navigateUp()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -57,7 +65,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      else -> super.onOptionsItemSelected(item)
+      else -> false
     }
   }
 
@@ -77,7 +85,10 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,
-        QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaireJson).build(),
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(viewModel.questionnaireJson)
+          .setShowCancelButton(true)
+          .build(),
         QUESTIONNAIRE_FRAGMENT_TAG,
       )
     }

@@ -1,0 +1,48 @@
+{
+  "resourceType": "ValueSet",
+  "id": "aslp-a1-de2",
+  "url": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de2",
+  "name": "HomeBasedTestingSleepStudiesCodes",
+  "title": "Home Based Testing Sleep Studies Codes",
+  "status": "draft",
+  "experimental": false,
+  "description": "Codes representing possible values for the Home Based Testing Sleep Studies element",
+  "immutable": true,
+  "compose": {
+    "include": [
+      {
+        "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+        "concept": [
+          {
+            "code": "ASLP.A1.DE2",
+            "display": "Home sleep apnea testing (HSAT)"
+          },
+          {
+            "code": "ASLP.A1.DE3",
+            "display": "Peripheral artery tonometry (PAT)"
+          },
+          {
+            "code": "ASLP.A1.DE4",
+            "display": "Actigraphy"
+          },
+          {
+            "code": "ASLP.A1.DE5",
+            "display": "Prescreening devices or procedures"
+          },
+          {
+            "code": "ASLP.A1.DE6",
+            "display": "Acoustic pharyngometry"
+          },
+          {
+            "code": "ASLP.A1.DE7",
+            "display": "Digital therapeutics"
+          },
+          {
+            "code": "ASLP.A1.DE8",
+            "display": "Home oximetry monitoring"
+          }
+        ]
+      }
+    ]
+  }
+}

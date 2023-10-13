@@ -1,0 +1,57 @@
+{
+  "resourceType": "Observation",
+  "id": "anc-b8-de20-example",
+  "meta": {
+    "profile": [
+      "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-b8-de20"
+    ]
+  },
+  "identifier": [
+    {
+      "use": "official",
+      "system": "http://example.org/fhir/NamingSystem/identifiers",
+      "value": "anc-b8-de20-example"
+    }
+  ],
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B8.DE20",
+        "display": "Repeat systolic blood pressure"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "code": "271649006",
+        "display": "Systolic blood pressure (observable entity)"
+      },
+      {
+        "system": "http://loinc.org",
+        "code": "8480-6",
+        "display": "Systolic blood pressure"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icf-nl",
+        "code": "b4209",
+        "display": "Blood pressure functions, unspecified"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/5946f880-b197-400b-9caa-a3c661d23041"
+  },
+  "encounter": {
+    "reference": "Encounter/helloworld-patient-1-encounter-1"
+  },
+  "performer": [
+    {
+      "reference": "PractitionerRole/anc-practitionerrole-example"
+    }
+  ],
+  "valueQuantity": {
+    "value": 160,
+    "system": "http://unitsofmeasure.org",
+    "code": "mm[Hg]"
+  }
+}

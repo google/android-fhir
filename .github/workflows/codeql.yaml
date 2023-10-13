@@ -1,0 +1,51 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master" ]
+  schedule:
+    - cron: '32 13 * * 2'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-22.04-64core
+    timeout-minutes: 60
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'java' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Switch to Java 17 from Eclipse Temurin distro
+      uses: actions/setup-java@v3
+      with:
+        java-version: 17
+        distribution: temurin
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+
+    # TODO: use Autobuild instead of ./gradlew after https://github.com/github/codeql-action/issues/1417 is fixed
+    # - name: Autobuild
+    #   uses: github/codeql-action/autobuild@v2
+    - name: Build with Gradle
+      run: ./gradlew --scan --full-stacktrace -Dorg.gradle.dependency.verification=off compileDebugAndroidTestSources
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{matrix.language}}"

@@ -34,22 +34,11 @@ object Dependencies {
   }
 
   object Cql {
-    const val openCdsGroup = "org.opencds.cqf.cql"
-    const val translatorGroup = "info.cqframework"
-
-    const val engine = "$openCdsGroup:engine:${Versions.Cql.engine}"
-    const val engineJackson = "$openCdsGroup:engine.jackson:${Versions.Cql.engine}"
-
-    const val evaluator = "$openCdsGroup:evaluator:${Versions.Cql.evaluator}"
-    const val evaluatorBuilder = "$openCdsGroup:evaluator.builder:${Versions.Cql.evaluator}"
-    const val evaluatorDagger = "$openCdsGroup:evaluator.dagger:${Versions.Cql.evaluator}"
-    const val evaluatorPlanDef = "$openCdsGroup:evaluator.plandefinition:${Versions.Cql.evaluator}"
-    const val translatorCqlToElm = "$translatorGroup:cql-to-elm:${Versions.Cql.translator}"
-    const val translatorElm = "$translatorGroup:elm:${Versions.Cql.translator}"
-    const val translatorModel = "$translatorGroup:model:${Versions.Cql.translator}"
-
-    const val translatorElmJackson = "$translatorGroup:elm-jackson:${Versions.Cql.translator}"
-    const val translatorModelJackson = "$translatorGroup:model-jackson:${Versions.Cql.translator}"
+    const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
+    const val evaluatorFhirJackson =
+      "org.opencds.cqf.fhir:cqf-fhir-jackson:${Versions.Cql.clinicalReasoning}"
+    const val evaluatorFhirUtilities =
+      "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
   }
 
   object Glide {
@@ -84,10 +73,7 @@ object Dependencies {
     const val fhirCoreConvertors =
       "ca.uhn.hapi.fhir:org.hl7.fhir.convertors:${Versions.hapiFhirCore}"
 
-    // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
-    // Version 3.0 uses java.lang.System.Logger, which is not available on Android
-    // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
-    const val caffeine = "com.github.ben-manes.caffeine:caffeine:${Versions.caffeine}"
+    const val guavaCaching = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava:${Versions.hapiFhir}"
   }
 
   object Jackson {
@@ -99,7 +85,7 @@ object Dependencies {
 
     const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
     const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
-    const val core = "$coreGroup:jackson-core:${Versions.jackson}"
+    const val core = "$coreGroup:jackson-core:${Versions.jacksonCore}"
     const val databind = "$coreGroup:jackson-databind:${Versions.jackson}"
     const val dataformatXml = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
     const val jaxbAnnotations = "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
@@ -158,6 +144,9 @@ object Dependencies {
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
   const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
+
+  const val apacheCommonsCompress =
+    "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
@@ -226,9 +215,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val engine = "2.4.0"
-      const val evaluator = "2.4.0"
-      const val translator = "2.4.0"
+      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
     }
 
     object Glide {
@@ -240,29 +227,28 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha04"
-    const val androidFhirEngine = "0.1.0-beta03"
+    const val androidFhirCommon = "0.1.0-alpha05"
+    const val androidFhirEngine = "0.1.0-beta04"
     const val androidFhirKnowledge = "0.1.0-alpha01"
+    const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
     const val gson = "2.9.1"
-    const val guava = "28.2-android"
+    const val guava = "32.1.2-android"
 
-    // Hapi FHIR and HL7 Core Components are interlinked.
-    // Newer versions of HapiFhir don't work on Android due to the use of Caffeine 3+
-    // Wait for this to release (6.3): https://github.com/hapifhir/hapi-fhir/pull/4196
-    const val hapiFhir = "6.0.1"
-
-    // Newer versions don't work on Android due to Apache Commons Codec:
-    // Wait for this fix: https://github.com/hapifhir/org.hl7.fhir.core/issues/1046
-    const val hapiFhirCore = "5.6.36"
+    const val hapiFhir = "6.8.0"
+    const val hapiFhirCore = "6.0.22"
 
     const val http = "4.11.0"
 
-    // Maximum version that supports Android API Level 24:
+    // Maximum Jackson libraries (excluding core) version that supports Android API Level 24:
     // https://github.com/FasterXML/jackson-databind/issues/3658
     const val jackson = "2.13.5"
+
+    // Maximum Jackson Core library version that supports Android API Level 24:
+    const val jacksonCore = "2.15.2"
+
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
     const val material = "1.9.0"
@@ -306,6 +292,19 @@ object Dependencies {
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
     exclude(group = "org.apache.httpcomponents")
+    exclude(group = "org.antlr", module = "antlr4")
+    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
+  }
+
+  fun Configuration.forceGuava() {
+    // Removes caffeine
+    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+
+    resolutionStrategy {
+      force(guava)
+      force(HapiFhir.guavaCaching)
+    }
   }
 
   fun Configuration.forceHapiVersion() {
@@ -313,8 +312,6 @@ object Dependencies {
     // Removes newer versions of hapi and keeps on 6.0.1
     // (newer versions don't work on Android)
     resolutionStrategy {
-      force(HapiFhir.caffeine)
-
       force(HapiFhir.fhirBase)
       force(HapiFhir.fhirClient)
       force(HapiFhir.fhirCoreConvertors)
