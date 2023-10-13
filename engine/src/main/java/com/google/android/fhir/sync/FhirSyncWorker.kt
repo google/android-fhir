@@ -127,13 +127,13 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
             jsonParser.parseResource(
               IOUtils.toString(
                 resourceSyncHTTPException.response()?.errorBody()?.byteStream(),
-                StandardCharsets.UTF_8
-              )
+                StandardCharsets.UTF_8,
+              ),
             ) as OperationOutcome
 
           operationOutcome.issue.forEach { operationOutcome ->
             Timber.e(
-              "SERVER ${operationOutcome.severity} - HTTP ${resourceSyncHTTPException.code()} | Code - ${operationOutcome.code} | Diagnostics - ${operationOutcome.diagnostics}"
+              "SERVER ${operationOutcome.severity} - HTTP ${resourceSyncHTTPException.code()} | Code - ${operationOutcome.code} | Diagnostics - ${operationOutcome.diagnostics}",
             )
           }
         }

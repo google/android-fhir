@@ -77,6 +77,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
     return database.getLocalChanges(type, id)
   }
+
   // FhirEngineImpl.kt
   override suspend fun getUnsyncedLocalChanges(): List<LocalChange> = database.getAllLocalChanges()
 
