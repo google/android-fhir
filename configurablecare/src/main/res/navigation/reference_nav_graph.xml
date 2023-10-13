@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/reference_nav_graph"
+    app:startDestination="@id/home_fragment"
+>
+
+  <fragment
+        android:id="@+id/patient_list"
+        android:label="Patient List"
+        android:name="com.google.android.fhir.configurablecare.PatientListFragment"
+        tools:layout="@layout/patient_list_view"
+    >
+    <action
+            android:id="@+id/navigate_to_product_detail"
+            app:destination="@id/patient_details"
+        />
+    <action
+            android:id="@+id/action_patient_list_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+  </fragment>
+
+  <fragment
+        android:id="@+id/patient_details"
+        android:label="Patient Details"
+        android:name="com.google.android.fhir.configurablecare.PatientDetailsFragment"
+        tools:layout="@layout/patient_detail"
+    >
+    <action
+            android:id="@+id/action_patient_details_to_tasksViewPagerFragment"
+            app:destination="@id/tasksViewPagerFragment"
+        />
+    <argument android:name="patient_id" app:argType="string" />
+  </fragment>
+
+  <fragment
+        android:id="@+id/addPatientFragment"
+        android:label="@string/add_patient"
+        android:name="com.google.android.fhir.configurablecare.AddPatientFragment"
+        tools:layout="@layout/add_patient_fragment"
+    />
+
+  <fragment
+        android:id="@+id/tasksViewPagerFragment"
+        android:name="com.google.android.fhir.configurablecare.screening.TasksViewPagerFragment"
+        android:label="ScreeningsViewPagerFragment"
+        tools:layout="@layout/fragment_tasks_view_pager"
+    >
+    <argument android:name="patient_id" app:argType="string" />
+    <action
+            android:id="@+id/action_patient_details_to_screenEncounterFragment"
+            app:destination="@id/screenerEncounterFragment"
+        />
+  </fragment>
+  <fragment
+        android:id="@+id/screenerEncounterFragment"
+        android:label="Screen Encounter"
+        android:name="com.google.android.fhir.configurablecare.screening.ScreenerFragment"
+        tools:layout="@layout/screener_encounter_fragment"
+    >
+    <argument android:name="patient_id" app:argType="string" />
+    <argument android:name="task_logical_id" app:argType="string" />
+    <argument android:name="questionnaire_string" app:argType="string" />
+  </fragment>
+  <fragment
+        android:id="@+id/home_fragment"
+        android:name="com.google.android.fhir.configurablecare.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home"
+    >
+    <action
+            android:id="@+id/action_home_fragment_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+    <action
+            android:id="@+id/action_home_fragment_to_patient_list"
+            app:destination="@id/patient_list"
+        />
+  </fragment>
+
+</navigation>

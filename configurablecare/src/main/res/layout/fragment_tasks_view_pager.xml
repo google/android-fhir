@@ -1,0 +1,34 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+>
+
+    <include
+        android:id="@+id/workflow_execution_status_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/status_layout"
+    />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tasks_tab_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:tabIndicatorFullWidth="false"
+        app:tabPaddingStart="25dp"
+        app:tabPaddingEnd="25dp"
+        app:tabTextAppearance="@style/CustomTextAppearanceTab"
+        app:tabIndicator="@drawable/tab_indicator_min_width"
+    />
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+    />
+
+</LinearLayout>

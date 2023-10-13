@@ -1,0 +1,122 @@
+{
+  "supportedImplementationGuides": [
+    {
+      "location": "http://hostname/fhir/ImplementationGuide/NCDScreening",
+      "carePlanPolicy": "ACCEPT_ALL",
+      "implementationGuideConfig": {
+        "implementationGuideId": "ImplementationGuide/NCDScreening",
+        "entryPoint": "PlanDefinition/NCD-Screening-Plan-Definition",
+        "requestResourceConfigurations": [
+          {
+            "resourceType": "Task",
+            "values": [
+              {
+                "field": "owner",
+                "value": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045"
+              }
+            ],
+            "maxDuration": "1",
+            "unit": "years"
+          },
+          {
+            "resourceType": "ServiceRequest",
+            "values": [
+              {
+                "field": "requester",
+                "value": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045"
+              }
+            ],
+            "maxDuration": "6",
+            "unit": "months"
+          }
+        ],
+        "supportedValueSets": []
+      }
+    },
+    {
+      "location": "http://hostname/fhir/ImplementationGuide/CancerScreening",
+      "carePlanPolicy": "ACCEPT_ALL",
+      "implementationGuideConfig": {
+        "implementationGuideId": "ImplementationGuide/CancerScreening",
+        "entryPoint": "PlanDefinition/Cancer-Screening-Plan-Definition",
+        "requestResourceConfigurations": [
+          {
+            "resourceType": "Task",
+            "values": [
+              {
+                "field": "owner",
+                "value": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045"
+              },
+              {
+                "field": "requester",
+                "value": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045"
+              }
+            ],
+            "maxDuration": "6",
+            "unit": "months"
+          },
+          {
+            "resourceType": "ServiceRequest",
+            "values": [
+              {
+                "field": "requester",
+                "value": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045"
+              }
+            ],
+            "maxDuration": "3",
+            "unit": "months"
+          }
+        ],
+        "supportedValueSets": [
+          {
+            "resourceType": "ValueSet",
+            "id": "facilities-valueset",
+            "url": "http://localhost/facilities",
+            "status": "draft",
+            "description": "List of Facilities",
+            "expansion": {
+              "contains": [
+                {
+                  "system": "http://localhost/facilities",
+                  "value": "Location/81417c6a-a6ab-453c-a26b-c08791161300",
+                  "display": "Arendelle PHC"
+                },
+                {
+                  "system": "http://localhost/facilities",
+                  "value": "Location/81417c6a-a6ab-453c-a26b-c08791161200",
+                  "display": "Townsville PHC"
+                },
+                {
+                  "system": "http://localhost/facilities",
+                  "value": "Location/81417c6a-a6ab-453c-a26b-c08791161044",
+                  "display": "Pleasantville PHC"
+                }
+              ]
+            }
+          },
+          {
+            "resourceType": "ValueSet",
+            "id": "assignees-valueset",
+            "url": "http://localhost/assignees",
+            "status": "draft",
+            "description": "List of Assignees",
+            "expansion": {
+              "contains": [
+                {
+                  "system": "http://localhost/assignees",
+                  "code": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161045",
+                  "display": "Community Health Worker"
+                },
+                {
+                  "system": "http://localhost/assignees",
+                  "code": "PractitionerRole/81417c6a-a6ab-453c-a26b-c08791161400",
+                  "display": "Auxiliary Nurse and Midwife"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

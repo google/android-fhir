@@ -51,6 +51,8 @@ include(":datacapture")
 
 include(":demo")
 
+include(":configurablecare")
+
 include(":engine")
 
 include(":knowledge")

@@ -291,6 +291,7 @@ object Dependencies {
     exclude(module = "xmlpull")
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
+    exclude(module = "commons-logging")
     exclude(group = "org.apache.httpcomponents")
     exclude(group = "org.antlr", module = "antlr4")
     exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
