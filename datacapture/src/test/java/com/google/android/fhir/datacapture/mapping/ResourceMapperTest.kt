@@ -1781,7 +1781,7 @@ class ResourceMapperTest {
               )
             },
           )
-      val patient = Patient().apply { id = "Patient/${UUID.randomUUID()}" }
+      val patient = Patient().apply { id = UUID.randomUUID().toString() }
       val questionnaireResponse =
         ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
 
