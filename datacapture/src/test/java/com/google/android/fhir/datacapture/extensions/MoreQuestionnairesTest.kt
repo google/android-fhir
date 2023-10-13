@@ -111,54 +111,6 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `validateLaunchContextExtensions should throw exception if child extensions of launch context extension is less than 2 in size`() {
-    val launchContextExtension =
-      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
-          )
-        }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension))
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}.",
-      )
-  }
-
-  @Test
-  fun `validateLaunchContextExtensions should throw exception if child extensions of launch context extension is more than 2 in size`() {
-    val launchContextExtension =
-      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
-          )
-          addExtension("type", CodeType("Patient"))
-          addExtension("waitwhat", CodeType("Patient"))
-        }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension))
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchContextExtension.extension.size}.",
-      )
-  }
-
-  @Test
   fun `validateLaunchContextExtensions should throw exception if type in type extension is not a valid resource type`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")

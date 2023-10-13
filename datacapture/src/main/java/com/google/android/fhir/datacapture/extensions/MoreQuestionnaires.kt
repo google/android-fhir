@@ -75,10 +75,6 @@ internal fun validateLaunchContextExtensions(launchContextExtensions: List<Exten
  * values.
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
-  check(launchExtension.extension.size == 2) {
-    "Expected 2 extensions (name and type) in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT but found ${launchExtension.extension.size}."
-  }
-
   val nameCoding =
     launchExtension.getExtensionByUrl("name")?.value as? Coding
       ?: error(
