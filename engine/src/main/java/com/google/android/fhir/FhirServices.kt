@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ internal data class FhirServices(
   val fhirEngine: FhirEngine,
   val parser: IParser,
   val database: Database,
-  val remoteDataSource: DataSource? = null
+  val remoteDataSource: DataSource? = null,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -77,7 +77,7 @@ internal data class FhirServices(
           context = context,
           iParser = parser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
-          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap))
+          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap)),
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
@@ -87,7 +87,7 @@ internal data class FhirServices(
               RetrofitHttpService.builder(it.baseUrl, it.networkConfiguration)
                 .setAuthenticator(it.authenticator)
                 .setHttpLogger(it.httpLogger)
-                .build()
+                .build(),
           )
         }
       return FhirServices(

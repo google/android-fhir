@@ -36,7 +36,8 @@ internal object PerResourcePatchGenerator : PatchGenerator {
   override fun generate(localChanges: List<LocalChange>): List<Patch> {
     return localChanges
       .groupBy { it.resourceType to it.resourceId }
-      .values.mapNotNull { mergeLocalChangesForSingleResource(it) }
+      .values
+      .mapNotNull { mergeLocalChangesForSingleResource(it) }
   }
 
   private fun mergeLocalChangesForSingleResource(localChanges: List<LocalChange>): Patch? {

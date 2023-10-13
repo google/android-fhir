@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.gradle.process.CommandLineArgumentProvider
 
 // https://developer.android.com/training/data-storage/room/migrating-db-versions#test
 class RoomSchemaArgProvider(
-  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File
+  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File,
 ) : CommandLineArgumentProvider {
 
   override fun asArguments() = listOf("-Aroom.schemaLocation=${schemaDir.path}")

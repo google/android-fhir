@@ -155,7 +155,7 @@ internal object DateTimePickerViewHolderFactory :
           questionnaireItemViewItemDateTimeAnswer
             ?.toLocalTime()
             ?.toLocalizedString(timeInputEditText.context)
-            ?: ""
+            ?: "",
         )
         dateInputEditText.addTextChangedListener(textWatcher)
       }
@@ -165,7 +165,7 @@ internal object DateTimePickerViewHolderFactory :
           getValidationErrorMessage(
             dateInputLayout.context,
             questionnaireViewItem,
-            validationResult
+            validationResult,
           )
       }
 
@@ -215,8 +215,8 @@ internal object DateTimePickerViewHolderFactory :
                 setQuestionnaireItemViewItemAnswer(
                   LocalDateTime.of(
                     parseDate(dateInputEditText.text.toString(), canonicalizedDatePattern),
-                    this
-                  )
+                    this,
+                  ),
                 )
                 timeInputEditText.clearFocus()
               }
@@ -237,10 +237,10 @@ internal object DateTimePickerViewHolderFactory :
                   localDateTime.dayOfMonth,
                   localDateTime.hour,
                   localDateTime.minute,
-                  localDateTime.second
-                )
-              )
-            )
+                  localDateTime.second,
+                ),
+              ),
+            ),
         )
       }
 
@@ -254,7 +254,7 @@ internal object DateTimePickerViewHolderFactory :
        */
       private fun enableOrDisableTimePicker(
         questionnaireViewItem: QuestionnaireViewItem,
-        dateToDisplay: String?
+        dateToDisplay: String?,
       ) =
         try {
           if (dateToDisplay != null) {
@@ -266,15 +266,15 @@ internal object DateTimePickerViewHolderFactory :
           timeInputLayout.isEnabled = false
           displayDateValidationError(
             Invalid(
-              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern))
-            )
+              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern)),
+            ),
           )
         } catch (e: DateTimeParseException) {
           timeInputLayout.isEnabled = false
           displayDateValidationError(
             Invalid(
-              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern))
-            )
+              listOf(invalidDateErrorText(dateInputEditText.context, canonicalizedDatePattern)),
+            ),
           )
         }
 
@@ -286,7 +286,7 @@ internal object DateTimePickerViewHolderFactory :
           charSequence: CharSequence,
           start: Int,
           count: Int,
-          after: Int
+          after: Int,
         ) {
           isDeleting = count > after
         }
@@ -295,7 +295,7 @@ internal object DateTimePickerViewHolderFactory :
           charSequence: CharSequence,
           start: Int,
           before: Int,
-          count: Int
+          count: Int,
         ) {}
 
         override fun afterTextChanged(editable: Editable) {
@@ -303,7 +303,7 @@ internal object DateTimePickerViewHolderFactory :
             editable,
             canonicalizedDatePattern,
             datePatternSeparator,
-            isDeleting
+            isDeleting,
           )
           // Always set the draft answer because time is not input yet
           questionnaireViewItem.setDraftAnswer(editable.toString())

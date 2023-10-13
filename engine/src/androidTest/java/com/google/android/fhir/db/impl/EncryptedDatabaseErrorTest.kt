@@ -67,9 +67,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -84,9 +84,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             it.search<Patient>(
@@ -96,7 +96,7 @@ class EncryptedDatabaseErrorTest {
                   count = 100
                   from = 0
                 }
-                .getQuery()
+                .getQuery(),
             )
           }
       }
@@ -114,9 +114,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -125,7 +125,7 @@ class EncryptedDatabaseErrorTest {
 
         // GIVEN the key is lost.
         val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
-        keyStore.load(/* param = */ null)
+        keyStore.load(null)
         keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
         DatabaseEncryptionKeyProvider.clearKeyCache()
 
@@ -137,9 +137,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             it.search<Patient>(
@@ -149,7 +149,7 @@ class EncryptedDatabaseErrorTest {
                   count = 100
                   from = 0
                 }
-                .getQuery()
+                .getQuery(),
             )
           }
       }
@@ -166,9 +166,9 @@ class EncryptedDatabaseErrorTest {
           DatabaseConfig(
             inMemory = false,
             enableEncryption = true,
-            databaseErrorStrategy = UNSPECIFIED
+            databaseErrorStrategy = UNSPECIFIED,
           ),
-          resourceIndexer
+          resourceIndexer,
         )
         .let {
           it.insert(TEST_PATIENT_1)
@@ -177,7 +177,7 @@ class EncryptedDatabaseErrorTest {
 
       // GIVEN the key is lost.
       val keyStore = KeyStore.getInstance(DatabaseEncryptionKeyProvider.ANDROID_KEYSTORE_NAME)
-      keyStore.load(/* param = */ null)
+      keyStore.load(null)
       keyStore.deleteEntry(DATABASE_PASSPHRASE_NAME)
       DatabaseEncryptionKeyProvider.clearKeyCache()
 
@@ -189,9 +189,9 @@ class EncryptedDatabaseErrorTest {
           DatabaseConfig(
             inMemory = false,
             enableEncryption = true,
-            databaseErrorStrategy = RECREATE_AT_OPEN
+            databaseErrorStrategy = RECREATE_AT_OPEN,
           ),
-          resourceIndexer
+          resourceIndexer,
         )
         .let {
           assertThat(
@@ -202,8 +202,8 @@ class EncryptedDatabaseErrorTest {
                     count = 100
                     from = 0
                   }
-                  .getQuery()
-              )
+                  .getQuery(),
+              ),
             )
             .isEmpty()
         }
@@ -221,9 +221,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = true,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -238,9 +238,9 @@ class EncryptedDatabaseErrorTest {
             DatabaseConfig(
               inMemory = false,
               enableEncryption = false,
-              databaseErrorStrategy = UNSPECIFIED
+              databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer
+            resourceIndexer,
           )
           .let {
             assertThat(
@@ -251,8 +251,8 @@ class EncryptedDatabaseErrorTest {
                       count = 100
                       from = 0
                     }
-                    .getQuery()
-                )
+                    .getQuery(),
+                ),
               )
               .isEmpty()
           }

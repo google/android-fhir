@@ -40,12 +40,14 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
   private var _questionnaireJson: String? = null
   val questionnaireJson: String
     get() = fetchQuestionnaireJson()
+
   val isPatientSaved = MutableLiveData<Boolean>()
 
   private val questionnaire: Questionnaire
     get() =
       FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireJson)
         as Questionnaire
+
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
   /**
@@ -55,7 +57,8 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
+      if (
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
             questionnaire,
             questionnaireResponse,
             getApplication(),

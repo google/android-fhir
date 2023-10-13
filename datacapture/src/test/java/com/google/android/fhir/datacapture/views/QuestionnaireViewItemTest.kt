@@ -49,7 +49,7 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
         },
         validationResult = NotValidated,
@@ -60,7 +60,7 @@ class QuestionnaireViewItemTest {
       assertFailsWith<IllegalStateException> {
           questionnaireViewItem.addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
         }
         .localizedMessage
@@ -81,7 +81,7 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
         },
         validationResult = NotValidated,
@@ -89,7 +89,7 @@ class QuestionnaireViewItemTest {
       )
 
     questionnaireViewItem.addAnswer(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true))
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true)),
     )
 
     assertThat(answers).hasSize(2)
@@ -103,11 +103,11 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
         },
         validationResult = NotValidated,
@@ -118,7 +118,7 @@ class QuestionnaireViewItemTest {
       assertFailsWith<IllegalStateException> {
           questionnaireViewItem.removeAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
         }
         .localizedMessage
@@ -139,15 +139,15 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true))
+              .setValue(BooleanType(true)),
           )
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(false))
+              .setValue(BooleanType(false)),
           )
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(false))
+              .setValue(BooleanType(false)),
           )
         },
         validationResult = NotValidated,
@@ -155,7 +155,7 @@ class QuestionnaireViewItemTest {
       )
 
     questionnaireViewItem.removeAnswer(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false))
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false)),
     )
 
     assertThat(answers).hasSize(1)
@@ -170,17 +170,17 @@ class QuestionnaireViewItemTest {
           linkId = "a-question"
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
+              .setValue(Coding("sample-system", "sample-code1", "Sample Code1")),
           )
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+              .setValue(Coding("sample-system", "sample-code2", "Sample Code2")),
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+              .setValue(Coding("sample-system", "sample-code2", "Sample Code2")),
           )
         },
         validationResult = NotValidated,
@@ -190,8 +190,8 @@ class QuestionnaireViewItemTest {
     assertThat(
         questionnaireViewItem.isAnswerOptionSelected(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
-            .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
-        )
+            .setValue(Coding("sample-system", "sample-code2", "Sample Code2")),
+        ),
       )
       .isTrue()
   }
@@ -205,11 +205,11 @@ class QuestionnaireViewItemTest {
           linkId = "a-question"
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(Coding("sample-system", "sample-code1", "Sample Code1"))
+              .setValue(Coding("sample-system", "sample-code1", "Sample Code1")),
           )
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent()
-              .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
+              .setValue(Coding("sample-system", "sample-code2", "Sample Code2")),
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -220,8 +220,8 @@ class QuestionnaireViewItemTest {
     assertThat(
         questionnaireViewItem.isAnswerOptionSelected(
           Questionnaire.QuestionnaireItemAnswerOptionComponent()
-            .setValue(Coding("sample-system", "sample-code2", "Sample Code2"))
-        )
+            .setValue(Coding("sample-system", "sample-code2", "Sample Code2")),
+        ),
       )
       .isFalse()
   }
@@ -235,16 +235,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             questionnaireResponseItem,
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameItem(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -258,16 +258,16 @@ class QuestionnaireViewItemTest {
             questionnaireItem,
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameItem(
             QuestionnaireViewItem(
               questionnaireItem,
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -282,16 +282,16 @@ class QuestionnaireViewItemTest {
             questionnaireItem,
             questionnaireResponseItem,
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameItem(
             QuestionnaireViewItem(
               questionnaireItem,
               questionnaireResponseItem,
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -305,20 +305,20 @@ class QuestionnaireViewItemTest {
               addAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = BooleanType(true)
-                }
+                },
               )
             },
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -330,16 +330,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -353,11 +353,11 @@ class QuestionnaireViewItemTest {
               addAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = BooleanType(true)
-                }
+                },
               )
             },
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
@@ -366,13 +366,13 @@ class QuestionnaireViewItemTest {
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = BooleanType(false)
-                  }
+                  },
                 )
               },
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -384,7 +384,7 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
           .hasTheSameResponse(
@@ -394,13 +394,13 @@ class QuestionnaireViewItemTest {
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = BooleanType(false)
-                  }
+                  },
                 )
               },
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -414,21 +414,23 @@ class QuestionnaireViewItemTest {
               addAnswer(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   value = BooleanType(true)
-                }
+                },
               )
             },
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
                 validationResult = NotValidated,
-                answersChangedCallback = { _, _, _, _ -> }
+                answersChangedCallback = { _, _, _, _ -> },
               )
-              .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
-          )
+              .apply {
+                setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+              },
+          ),
       )
       .isFalse()
   }
@@ -440,16 +442,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -461,16 +463,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent().apply { text = "Question 1?" },
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameResponse(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent().apply { text = "Question 2?" },
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -482,13 +484,13 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .apply {
             setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
           }
           .hasTheSameResponse(
@@ -496,16 +498,16 @@ class QuestionnaireViewItemTest {
                 Questionnaire.QuestionnaireItemComponent(),
                 QuestionnaireResponse.QuestionnaireResponseItemComponent(),
                 validationResult = NotValidated,
-                answersChangedCallback = { _, _, _, _ -> }
+                answersChangedCallback = { _, _, _, _ -> },
               )
               .apply {
                 setAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                     value = BooleanType(true)
-                  }
+                  },
                 )
-              }
-          )
+              },
+          ),
       )
       .isTrue()
   }
@@ -517,16 +519,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -538,16 +540,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = NotValidated,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = Valid,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -559,16 +561,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -580,16 +582,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = Valid,
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -601,16 +603,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Valid,
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = Invalid(listOf("error")),
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -622,16 +624,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Invalid(listOf("error 1")),
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = Invalid(listOf("error 2")),
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isFalse()
   }
@@ -643,16 +645,16 @@ class QuestionnaireViewItemTest {
             Questionnaire.QuestionnaireItemComponent(),
             QuestionnaireResponse.QuestionnaireResponseItemComponent(),
             validationResult = Invalid(listOf("error")),
-            answersChangedCallback = { _, _, _, _ -> }
+            answersChangedCallback = { _, _, _, _ -> },
           )
           .hasTheSameValidationResult(
             QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent(),
               validationResult = Invalid(listOf("error")),
-              answersChangedCallback = { _, _, _, _ -> }
-            )
-          )
+              answersChangedCallback = { _, _, _, _ -> },
+            ),
+          ),
       )
       .isTrue()
   }
@@ -678,7 +680,7 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType("Answer"))
+              .setValue(StringType("Answer")),
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
@@ -694,11 +696,11 @@ class QuestionnaireViewItemTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType("Answer1"))
+              .setValue(StringType("Answer1")),
           )
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(StringType("Answer2"))
+              .setValue(StringType("Answer2")),
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
@@ -747,7 +749,7 @@ class QuestionnaireViewItemTest {
 
     questionnaireViewItem.addAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        .setValue(DateType(2023, 1, 2))
+        .setValue(DateType(2023, 1, 2)),
     )
 
     assertThat(partialAnswer).isNull()
@@ -770,7 +772,7 @@ class QuestionnaireViewItemTest {
 
     questionnaireViewItem.removeAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        .setValue(DateType(2023, 1, 2))
+        .setValue(DateType(2023, 1, 2)),
     )
 
     assertThat(partialAnswer).isNull()
@@ -792,7 +794,7 @@ class QuestionnaireViewItemTest {
 
     questionnaireViewItem.setAnswer(
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-        .setValue(DateType(2023, 1, 2))
+        .setValue(DateType(2023, 1, 2)),
     )
 
     assertThat(partialAnswer).isNull()
@@ -811,8 +813,8 @@ class QuestionnaireViewItemTest {
                 Coding().apply {
                   code = "option1"
                   display = "Option 1"
-                }
-              )
+                },
+              ),
           )
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent()
@@ -820,13 +822,13 @@ class QuestionnaireViewItemTest {
                 Coding().apply {
                   code = "option2"
                   display = "Option 2"
-                }
-              )
+                },
+              ),
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
-        answersChangedCallback = { _, _, _, _ -> }
+        answersChangedCallback = { _, _, _, _ -> },
       )
 
     val enabledOptions = questionnaireViewItem.enabledAnswerOptions

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 /**
  * ItemDecoration that applies a specified margin to the items. Use this instead of manually adding
  * a margin to the item's layout.
+ *
  * @param marginVertical Int value for the desired vertical margin used as item offset
  * @param marginHorizontal Int value for the desired horizontal margin used as item offset
  */
@@ -32,7 +33,7 @@ class MarginItemDecoration(private val marginVertical: Int, private val marginHo
     outRect: Rect,
     view: View,
     parent: RecyclerView,
-    state: RecyclerView.State
+    state: RecyclerView.State,
   ) {
     outRect.apply {
       if (parent.getChildAdapterPosition(view) == 0) {

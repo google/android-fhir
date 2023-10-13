@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun submitQuestionnaire() {
-
     // 5 Replace with code from the codelab to get a questionnaire response.
 
     // 6 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.

@@ -29,6 +29,7 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.rules.ActivityScenarioRule
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
@@ -216,9 +217,9 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
     val questionnaireViewItem =
@@ -228,14 +229,15 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        enabledDisplayItems = listOf(hintItem)
+        enabledDisplayItems = listOf(hintItem),
       )
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-          .hint.toString()
+          .hint
+          .toString(),
       )
       .isEqualTo("Select code")
   }
@@ -260,6 +262,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
+  @SdkSuppress(minSdkVersion = 33) // TODO https://github.com/google/android-fhir/issues/1482 FIXME
   fun selectOther_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
@@ -271,7 +274,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         "Coding 5",
         "Coding 6",
         "Coding 7",
-        "Coding 8"
+        "Coding 8",
       )
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireViewItem =
@@ -304,7 +307,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         "Coding 5",
         "Coding 6",
         "Coding 7",
-        "Coding 8"
+        "Coding 8",
       )
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireViewItem =
@@ -326,6 +329,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
+  @SdkSuppress(minSdkVersion = 33) // TODO https://github.com/google/android-fhir/issues/1482 FIXME
   fun clickAddAnotherAnswer_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
@@ -337,7 +341,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
         "Coding 5",
         "Coding 6",
         "Coding 7",
-        "Coding 8"
+        "Coding 8",
       )
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireViewItem =
@@ -389,8 +393,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+        ),
       )
 
       assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -411,8 +415,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+        ),
       )
 
       assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -433,14 +437,15 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+        ),
       )
 
       assertThat(
           viewHolder.itemView
             .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText.toString()
+            .helperText
+            .toString(),
         )
         .isEqualTo("Required")
     }
@@ -459,14 +464,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+        ),
       )
 
       assertThat(
           viewHolder.itemView
             .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText
+            .helperText,
         )
         .isNull()
     }
@@ -481,13 +486,14 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+        ),
       )
       assertThat(
           viewHolder.itemView
             .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText.toString()
+            .helperText
+            .toString(),
         )
         .isEqualTo("Optional")
     }
@@ -502,13 +508,13 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-        )
+          questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+        ),
       )
       assertThat(
           viewHolder.itemView
             .findViewById<TextInputLayout>(R.id.multi_select_summary_holder)
-            .helperText
+            .helperText,
         )
         .isNull()
     }
@@ -529,7 +535,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     runOnUI { viewHolder.bind(questionnaireViewItem) }
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
       )
       .isNull()
   }
@@ -556,7 +562,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnText("Save")
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error
+        viewHolder.itemView.findViewById<TextInputLayout>(R.id.multi_select_summary_holder).error,
       )
       .isEqualTo("Missing answer for required field.")
   }
@@ -574,7 +580,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
   private fun assertDisplayedText(): StringSubject =
     assertThat(
-      viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString()
+      viewHolder.itemView.findViewById<TextView>(R.id.multi_select_summary).text.toString(),
     )
 
   private val openChoiceType =
@@ -586,8 +592,8 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
             Coding()
               .setCode(ItemControlTypes.OPEN_CHOICE.extensionCode)
               .setDisplay("Open Choice")
-              .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-          )
+              .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+          ),
       )
     }
 
@@ -600,7 +606,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = option }
-            }
+            },
           )
         }
       }
@@ -611,7 +617,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = Coding().apply { display = response }
-            }
+            },
           )
         }
       }

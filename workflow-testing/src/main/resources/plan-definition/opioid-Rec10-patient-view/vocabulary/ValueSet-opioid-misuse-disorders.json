@@ -1,0 +1,664 @@
+{
+  "resourceType": "ValueSet",
+  "id": "opioid-misuse-disorders",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Conditions indicating opioid misuse"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Condition"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "Conditions indicating opioid misuse"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-exclusion-criteria",
+      "valueString": "none"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/opioid-misuse-disorders",
+  "name": "opioid_misuse_disorders",
+  "title": "Opioid misuse disorders",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:03:22-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Conditions indicating opioid misuse",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Conditions that may indicate need for opioid management",
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "5602001"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "75544000"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "87132004"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "29733004"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "77721001"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "70545002"
+          }
+        ]
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "F11"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "02568df9-d9e0-4bed-ac27-6f96b53d28f6",
+    "timestamp": "2022-05-09T13:03:22-06:00",
+    "contains": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191865004",
+        "display": "Combined opioid with other drug dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191869005",
+        "display": "Combined opioid with other drug dependence in remission"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191867007",
+        "display": "Combined opioid with other drug dependence, continuous"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191868002",
+        "display": "Combined opioid with other drug dependence, episodic"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191819002",
+        "display": "Continuous opioid dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191820008",
+        "display": "Episodic opioid dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "426001001",
+        "display": "Fentanyl dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "231477003",
+        "display": "Heroin dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "231478008",
+        "display": "Methadone dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "762321000",
+        "display": "Mood disorder with depressive symptoms caused by opioid"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "762320004",
+        "display": "Mood disorder with manic symptoms caused by opioid"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "762322007",
+        "display": "Mood disorder with mixed depressive and manic symptoms caused by opioid"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "231479000",
+        "display": "Morphine dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "70545002",
+        "display": "Narcotic drug user"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "230443000",
+        "display": "Narcotic withdrawal epilepsy"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "5602001",
+        "display": "Opioid abuse"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "75544000",
+        "display": "Opioid dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "191821007",
+        "display": "Opioid dependence in remission"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "724653003",
+        "display": "Opioid dependence with current use"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "1081000119105",
+        "display": "Opioid dependence, on agonist therapy"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "77721001",
+        "display": "Opioid intoxication"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "52866005",
+        "display": "Opioid intoxication delirium"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "87132004",
+        "display": "Opioid withdrawal"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "29733004",
+        "display": "Opioid-induced mood disorder"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "288851000119106",
+        "display": "Opioid-induced mood disorder due to opioid abuse"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "288861000119108",
+        "display": "Opioid-induced mood disorder due to opioid dependence"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "231480002",
+        "display": "Opium dependence"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.10",
+        "display": "Opioid abuse, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.11",
+        "display": "Opioid abuse, in remission"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.120",
+        "display": "Opioid abuse with intoxication, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.121",
+        "display": "Opioid abuse with intoxication delirium"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.122",
+        "display": "Opioid abuse with intoxication with perceptual disturbance"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.129",
+        "display": "Opioid abuse with intoxication, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.12",
+        "display": "Opioid abuse with intoxication"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.14",
+        "display": "Opioid abuse with opioid-induced mood disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.150",
+        "display": "Opioid abuse with opioid-induced psychotic disorder with delusions"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.151",
+        "display": "Opioid abuse with opioid-induced psychotic disorder with hallucinations"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.159",
+        "display": "Opioid abuse with opioid-induced psychotic disorder, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.15",
+        "display": "Opioid abuse with opioid-induced psychotic disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.181",
+        "display": "Opioid abuse with opioid-induced sexual dysfunction"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.182",
+        "display": "Opioid abuse with opioid-induced sleep disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.188",
+        "display": "Opioid abuse with other opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.18",
+        "display": "Opioid abuse with other opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.19",
+        "display": "Opioid abuse with unspecified opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.1",
+        "display": "Opioid abuse"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.20",
+        "display": "Opioid dependence, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.21",
+        "display": "Opioid dependence, in remission"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.220",
+        "display": "Opioid dependence with intoxication, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.221",
+        "display": "Opioid dependence with intoxication delirium"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.222",
+        "display": "Opioid dependence with intoxication with perceptual disturbance"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.229",
+        "display": "Opioid dependence with intoxication, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.22",
+        "display": "Opioid dependence with intoxication"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.23",
+        "display": "Opioid dependence with withdrawal"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.24",
+        "display": "Opioid dependence with opioid-induced mood disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.250",
+        "display": "Opioid dependence with opioid-induced psychotic disorder with delusions"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.251",
+        "display": "Opioid dependence with opioid-induced psychotic disorder with hallucinations"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.259",
+        "display": "Opioid dependence with opioid-induced psychotic disorder, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.25",
+        "display": "Opioid dependence with opioid-induced psychotic disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.281",
+        "display": "Opioid dependence with opioid-induced sexual dysfunction"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.282",
+        "display": "Opioid dependence with opioid-induced sleep disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.288",
+        "display": "Opioid dependence with other opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.28",
+        "display": "Opioid dependence with other opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.29",
+        "display": "Opioid dependence with unspecified opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.2",
+        "display": "Opioid dependence"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.90",
+        "display": "Opioid use, unspecified, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.920",
+        "display": "Opioid use, unspecified with intoxication, uncomplicated"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.921",
+        "display": "Opioid use, unspecified with intoxication delirium"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.922",
+        "display": "Opioid use, unspecified with intoxication with perceptual disturbance"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.929",
+        "display": "Opioid use, unspecified with intoxication, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.92",
+        "display": "Opioid use, unspecified with intoxication"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.93",
+        "display": "Opioid use, unspecified with withdrawal"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.94",
+        "display": "Opioid use, unspecified with opioid-induced mood disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.950",
+        "display": "Opioid use, unspecified with opioid-induced psychotic disorder with delusions"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.951",
+        "display": "Opioid use, unspecified with opioid-induced psychotic disorder with hallucinations"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.959",
+        "display": "Opioid use, unspecified with opioid-induced psychotic disorder, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.95",
+        "display": "Opioid use, unspecified with opioid-induced psychotic disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.981",
+        "display": "Opioid use, unspecified with opioid-induced sexual dysfunction"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.982",
+        "display": "Opioid use, unspecified with opioid-induced sleep disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.988",
+        "display": "Opioid use, unspecified with other opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.98",
+        "display": "Opioid use, unspecified with other specified opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.99",
+        "display": "Opioid use, unspecified with unspecified opioid-induced disorder"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11.9",
+        "display": "Opioid use, unspecified"
+      },
+      {
+        "system": "http://hl7.org/fhir/sid/icd-10-cm",
+        "version": "FY2021",
+        "code": "F11",
+        "display": "Opioid related disorders"
+      }
+    ]
+  }
+}

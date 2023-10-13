@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,5 +29,5 @@ internal data class NumberIndex(
   /** The path of the number index, e.g. "RiskAssessment.prediction.probability". */
   val path: String,
   /** The value of the number index, e.g. "0.1". */
-  val value: BigDecimal
+  val value: BigDecimal,
 )

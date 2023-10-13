@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import java.net.URL
 
 plugins {
@@ -67,7 +68,7 @@ android {
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
         "META-INF/sun-jaxb.episode",
-      )
+      ),
     )
   }
   configureJacocoTestOptions()
@@ -80,6 +81,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(module = "xpp3_min")
+    forceGuava()
   }
 }
 
@@ -92,15 +94,19 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.guavaCaching)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+  implementation(Dependencies.http)
+  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
+  implementation(Dependencies.apacheCommonsCompress)
 
   kapt(Dependencies.Room.compiler)
 
@@ -110,13 +116,14 @@ dependencies {
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}")
+    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
@@ -127,7 +134,7 @@ tasks.dokkaHtml.configure {
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

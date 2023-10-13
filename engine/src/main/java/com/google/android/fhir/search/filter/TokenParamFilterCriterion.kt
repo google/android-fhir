@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
   fun of(identifier: Identifier) =
     TokenFilterValue().apply {
       tokenFilters.add(
-        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value)
+        TokenParamFilterValueInstance(uri = identifier.system, code = identifier.value),
       )
     }
 
@@ -83,7 +83,7 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
   fun of(contactPoint: ContactPoint) =
     TokenFilterValue().apply {
       tokenFilters.add(
-        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value)
+        TokenParamFilterValueInstance(uri = contactPoint.use?.toCode(), code = contactPoint.value),
       )
     }
 
@@ -91,7 +91,7 @@ data class TokenParamFilterCriterion(var parameter: TokenClientParam) : FilterCr
     value!!.tokenFilters.map {
       ConditionParam(
         "index_value = ? ${ if (it.uri.isNullOrBlank()) "" else "AND IFNULL(index_system,'') = ?" }",
-        listOfNotNull(it.code, it.uri)
+        listOfNotNull(it.code, it.uri),
       )
     }
 }
