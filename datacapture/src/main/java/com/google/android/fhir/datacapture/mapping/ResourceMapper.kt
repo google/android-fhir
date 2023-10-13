@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.extensions.toCodeType
 import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
+import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import java.lang.reflect.Field
 import java.lang.reflect.Method
@@ -222,6 +223,7 @@ object ResourceMapper {
     questionnaire: Questionnaire,
     launchContexts: Map<String, Resource>,
   ): QuestionnaireResponse {
+    validateLaunchContextExtensions(questionnaire.questionnaireLaunchContexts ?: listOf())
     val filteredLaunchContexts =
       filterByCodeInNameExtension(
         launchContexts,

@@ -37,6 +37,7 @@ import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
@@ -817,7 +818,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1437,7 +1438,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
             addExtension().apply {
@@ -1445,7 +1446,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
             addExtension().apply {
@@ -1460,7 +1461,7 @@ class ResourceMapperTest {
                       "Registration Encounter",
                     ),
                   ),
-                  Extension("type", StringType("Encounter")),
+                  Extension("type", CodeType("Encounter")),
                 )
             }
           }
@@ -1561,7 +1562,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                Extension("type", StringType("Patient")),
+                Extension("type", CodeType("Patient")),
               )
           }
         }
@@ -1636,7 +1637,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                Extension("type", StringType("Patient")),
+                Extension("type", CodeType("Patient")),
               )
           }
         }
@@ -1676,7 +1677,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1716,7 +1717,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1763,7 +1764,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1800,7 +1801,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1840,7 +1841,7 @@ class ResourceMapperTest {
               extension =
                 listOf(
                   Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
-                  Extension("type", StringType("Patient")),
+                  Extension("type", CodeType("Patient")),
                 )
             }
           }
@@ -1894,7 +1895,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
-                Extension("type", StringType("Patient")),
+                Extension("type", CodeType("Patient")),
               )
           }
         }
@@ -2846,7 +2847,7 @@ class ResourceMapperTest {
             extension =
               listOf(
                 Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
-                Extension("type", StringType("Patient")),
+                Extension("type", CodeType("Patient")),
               )
           }
         }
