@@ -59,7 +59,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? {
     super.onCreate(savedInstanceState)
     _binding = FragmentLiveBarcodeBinding.inflate(inflater, container, false)
@@ -74,7 +74,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     promptChipAnimator =
       (AnimatorInflater.loadAnimator(
           context,
-          com.google.android.fhir.datacapture.R.animator.bottom_prompt_chip_enter
+          com.google.android.fhir.datacapture.R.animator.bottom_prompt_chip_enter,
         ) as AnimatorSet)
         .apply { setTarget(promptChip) }
 
@@ -159,7 +159,8 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
     // Observes the workflow state changes, if happens, update the overlay view indicators and
     // camera preview state.
     workflowModel!!
-      .workflowState.observe(
+      .workflowState
+      .observe(
         viewLifecycleOwner,
         Observer { workflowState ->
           if (workflowState == null || Objects.equal(currentWorkflowState, workflowState)) {
@@ -188,7 +189,7 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
               stopCameraPreview()
             }
             WorkflowState.DETECTED,
-            WorkflowState.SEARCHED -> {
+            WorkflowState.SEARCHED, -> {
               promptChip?.visibility = View.GONE
               stopCameraPreview()
             }
@@ -200,24 +201,24 @@ class LiveBarcodeScanningFragment : DialogFragment(), OnClickListener {
           promptChipAnimator?.let {
             if (shouldPlayPromptChipEnteringAnimation && !it.isRunning) it.start()
           }
-        }
+        },
       )
 
     workflowModel
-      ?.detectedBarcode?.observe(
+      ?.detectedBarcode
+      ?.observe(
         viewLifecycleOwner,
         { barcode ->
           if (barcode != null) {
-
             setFragmentResult(
               RESULT_REQUEST_KEY,
               bundleOf(
                 RESULT_REQUEST_KEY to barcode.rawValue,
-              )
+              ),
             )
             dismiss()
           }
-        }
+        },
       )
   }
 

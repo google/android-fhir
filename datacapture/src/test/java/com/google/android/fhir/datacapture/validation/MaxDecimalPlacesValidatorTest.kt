@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class MaxDecimalPlacesValidatorTest {
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.00")),
-        context
+        context,
       )
 
     assertThat(validationResult.isValid).isTrue()
@@ -64,7 +64,7 @@ class MaxDecimalPlacesValidatorTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.00")),
-        context
+        context,
       )
 
     assertThat(validationResult.isValid).isTrue()
@@ -80,7 +80,7 @@ class MaxDecimalPlacesValidatorTest {
         },
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.000")),
-        context
+        context,
       )
 
     assertThat(validationResult.isValid).isFalse()

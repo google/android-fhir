@@ -20,6 +20,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.Instant
+import java.util.UUID
 
 /**
  * When a local change to a resource happens, the lastUpdated timestamp in [ResourceEntity] is
@@ -27,6 +28,7 @@ import java.time.Instant
  * type of change and can be:
  * * DELETE: The empty string, "".
  * * INSERT: The full resource in JSON form, e.g. {
+ *
  * ```
  *      "resourceType": "Patient",
  *      "id": "animal",
@@ -40,8 +42,10 @@ import java.time.Instant
  *        ],
  *      ...
  * ```
+ *
  * }
  * * UPDATE: A RFC 6902 JSON patch. e.g. a patch that changes the given name of a patient: [
+ *
  * ```
  *      {
  *      "op": "replace",
@@ -49,22 +53,31 @@ import java.time.Instant
  *      "value": "Binny"
  *      }
  * ```
+ *
  * ] For resource that is fully synced with server this table should not have any rows.
  */
-@Entity(indices = [Index(value = ["resourceType", "resourceId"])])
+@Entity(
+  indices =
+    [
+      Index(value = ["resourceType", "resourceId"]),
+      Index(value = ["resourceUuid"]),
+    ],
+)
 internal data class LocalChangeEntity(
   @PrimaryKey(autoGenerate = true) val id: Long,
   val resourceType: String,
   val resourceId: String,
+  val resourceUuid: UUID,
   val timestamp: Instant,
   val type: Type,
   val payload: String,
-  val versionId: String? = null
+  val versionId: String? = null,
 ) {
   enum class Type(val value: Int) {
     INSERT(1), // create a new resource. payload is the entire resource json.
     UPDATE(2), // patch. payload is the json patch.
-    DELETE(3); // delete. payload is empty string.
+    DELETE(3), // delete. payload is empty string.
+    ;
 
     companion object {
       fun from(input: Int): Type = values().first { it.value == input }

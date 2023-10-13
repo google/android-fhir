@@ -44,7 +44,7 @@ internal data class ResourceIndices(
   val tokenIndices: List<TokenIndex>,
   val quantityIndices: List<QuantityIndex>,
   val referenceIndices: List<ReferenceIndex>,
-  val positionIndices: List<PositionIndex>
+  val positionIndices: List<PositionIndex>,
 ) {
   class Builder(private val resourceType: ResourceType, private val resourceId: String) {
     private val stringIndices = mutableListOf<StringIndex>()
@@ -144,7 +144,7 @@ internal data class ResourceIndices(
         tokenIndices = tokenIndices.toList(),
         quantityIndices = quantityIndices.toList(),
         referenceIndices = referenceIndices.toList(),
-        positionIndices = positionIndices.toList()
+        positionIndices = positionIndices.toList(),
       )
   }
 }

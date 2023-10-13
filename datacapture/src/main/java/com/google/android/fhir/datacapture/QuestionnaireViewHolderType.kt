@@ -44,10 +44,12 @@ enum class QuestionnaireViewHolderType(val value: Int) {
   DIALOG_SELECT(14),
   SLIDER(15),
   PHONE_NUMBER(16),
-  ATTACHMENT(17);
+  ATTACHMENT(17),
+  ;
 
   companion object {
     private val VALUES = values()
+
     fun fromInt(value: Int) = VALUES[value]
   }
 }

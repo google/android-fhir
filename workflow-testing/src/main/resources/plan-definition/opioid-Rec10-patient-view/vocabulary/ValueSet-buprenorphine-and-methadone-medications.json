@@ -1,0 +1,1092 @@
+{
+  "resourceType": "ValueSet",
+  "id": "buprenorphine-and-methadone-medications",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Buprenorphine and Methadone medications"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Medication"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "All Buprenorphine and Methadone medications"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-exclusion-criteria",
+      "valueString": "None"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/buprenorphine-and-methadone-medications",
+  "name": "buprenorphine_and_methadone_medications",
+  "title": "Buprenorphine and Methadone medications",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "All Buprenorphine and Methadone medications",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Buprenorphine and Methadone medications for opioid management",
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)buprenorphine.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "SCD"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)buprenorphine.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "SBD"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)buprenorphine.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "GPCK"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)buprenorphine.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "BPCK"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)methadone.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "SCD"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)methadone.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "SBD"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)methadone.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "GPCK"
+          }
+        ]
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "filter": [
+          {
+            "property": "display",
+            "op": "regex",
+            "value": ".*(?i)methadone.*"
+          },
+          {
+            "property": "tty",
+            "op": "=",
+            "value": "BPCK"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "04be597a-9c66-4f31-b8d5-f047de4795d7",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010600",
+        "display": "Buprenorphine 2 MG / Naloxone 0.5 MG Sublingual Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010603",
+        "display": "Buprenorphine 2 MG / Naloxone 0.5 MG Sublingual Film [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010604",
+        "display": "Buprenorphine 8 MG / Naloxone 2 MG Sublingual Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010606",
+        "display": "Buprenorphine 8 MG / Naloxone 2 MG Sublingual Film [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1307056",
+        "display": "Buprenorphine 4 MG / Naloxone 1 MG Sublingual Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1307058",
+        "display": "Buprenorphine 4 MG / Naloxone 1 MG Sublingual Film [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1307061",
+        "display": "Buprenorphine 12 MG / Naloxone 3 MG Sublingual Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1307063",
+        "display": "Buprenorphine 12 MG / Naloxone 3 MG Sublingual Film [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1431076",
+        "display": "Buprenorphine 1.4 MG / Naloxone 0.36 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1431083",
+        "display": "Buprenorphine 1.4 MG / Naloxone 0.36 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1431102",
+        "display": "Buprenorphine 5.7 MG / Naloxone 1.4 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1431104",
+        "display": "Buprenorphine 5.7 MG / Naloxone 1.4 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432969",
+        "display": "168 HR Buprenorphine 0.015 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432971",
+        "display": "168 HR Buprenorphine 0.015 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542390",
+        "display": "Buprenorphine 2.1 MG / Naloxone 0.3 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542396",
+        "display": "Buprenorphine 2.1 MG / Naloxone 0.3 MG Buccal Film [Bunavail]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542997",
+        "display": "168 HR Buprenorphine 0.0075 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542999",
+        "display": "168 HR Buprenorphine 0.0075 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1544851",
+        "display": "Buprenorphine 4.2 MG / Naloxone 0.7 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1544853",
+        "display": "Buprenorphine 4.2 MG / Naloxone 0.7 MG Buccal Film [Bunavail]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1544854",
+        "display": "Buprenorphine 6.3 MG / Naloxone 1 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1544856",
+        "display": "Buprenorphine 6.3 MG / Naloxone 1 MG Buccal Film [Bunavail]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1594650",
+        "display": "Buprenorphine 1.8 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1594655",
+        "display": "Buprenorphine 1.8 MG/ML Injectable Solution [Simbadol]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1597568",
+        "display": "Buprenorphine 11.4 MG / Naloxone 2.9 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1597570",
+        "display": "Buprenorphine 11.4 MG / Naloxone 2.9 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1597573",
+        "display": "Buprenorphine 8.6 MG / Naloxone 2.1 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1597575",
+        "display": "Buprenorphine 8.6 MG / Naloxone 2.1 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1655032",
+        "display": "1 ML Buprenorphine 0.3 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1666338",
+        "display": "Buprenorphine 2.9 MG / Naloxone 0.71 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1666385",
+        "display": "Buprenorphine 2.9 MG / Naloxone 0.71 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716057",
+        "display": "Buprenorphine 0.15 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716063",
+        "display": "Buprenorphine 0.15 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716065",
+        "display": "Buprenorphine 0.3 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716067",
+        "display": "Buprenorphine 0.3 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716069",
+        "display": "Buprenorphine 0.45 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716071",
+        "display": "Buprenorphine 0.45 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716073",
+        "display": "Buprenorphine 0.6 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716075",
+        "display": "Buprenorphine 0.6 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716077",
+        "display": "Buprenorphine 0.075 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716079",
+        "display": "Buprenorphine 0.075 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716081",
+        "display": "Buprenorphine 0.75 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716083",
+        "display": "Buprenorphine 0.75 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716086",
+        "display": "Buprenorphine 0.9 MG Buccal Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1716090",
+        "display": "Buprenorphine 0.9 MG Buccal Film [Belbuca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1797650",
+        "display": "Buprenorphine 74.2 MG Drug Implant"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1797655",
+        "display": "Buprenorphine 74.2 MG Drug Implant [Probuphine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1864412",
+        "display": "Buprenorphine 0.7 MG / Naloxone 0.18 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1864414",
+        "display": "Buprenorphine 0.7 MG / Naloxone 0.18 MG Sublingual Tablet [Zubsolv]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1990745",
+        "display": "Methadone Hydrochloride 40 MG Tablet for Oral Suspension [Diskets]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996184",
+        "display": "0.5 ML Buprenorphine 200 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996189",
+        "display": "0.5 ML Buprenorphine 200 MG/ML Prefilled Syringe [Sublocade]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996192",
+        "display": "1.5 ML Buprenorphine 200 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996193",
+        "display": "1.5 ML Buprenorphine 200 MG/ML Prefilled Syringe [Sublocade]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "205533",
+        "display": "1 ML Buprenorphine 0.3 MG/ML Injection [Buprenex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "238129",
+        "display": "1 ML Buprenorphine 0.3 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "246474",
+        "display": "Buprenorphine 0.2 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "250426",
+        "display": "Buprenorphine 0.4 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "351264",
+        "display": "Buprenorphine 2 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "351265",
+        "display": "Buprenorphine 8 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "351266",
+        "display": "Buprenorphine 2 MG / Naloxone 0.5 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "351267",
+        "display": "Buprenorphine 8 MG / Naloxone 2 MG Sublingual Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864706",
+        "display": "Methadone Hydrochloride 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864708",
+        "display": "Methadone Hydrochloride 10 MG Oral Tablet [Dolophine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864712",
+        "display": "Methadone Hydrochloride 10 MG Oral Tablet [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864714",
+        "display": "Methadone Hydrochloride 10 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864718",
+        "display": "Methadone Hydrochloride 5 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864720",
+        "display": "Methadone Hydrochloride 5 MG Oral Tablet [Dolophine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864737",
+        "display": "Methadone Hydrochloride 5 MG Oral Tablet [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864761",
+        "display": "Methadone Hydrochloride 1 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864769",
+        "display": "Methadone Hydrochloride 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864978",
+        "display": "Methadone Hydrochloride 40 MG Tablet for Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864980",
+        "display": "Methadone Hydrochloride 40 MG Tablet for Oral Suspension [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864984",
+        "display": "Methadone Hydrochloride 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904870",
+        "display": "168 HR Buprenorphine 0.01 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904874",
+        "display": "168 HR Buprenorphine 0.01 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904876",
+        "display": "168 HR Buprenorphine 0.02 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904878",
+        "display": "168 HR Buprenorphine 0.02 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904880",
+        "display": "168 HR Buprenorphine 0.005 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904882",
+        "display": "168 HR Buprenorphine 0.005 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "991147",
+        "display": "Methadone Hydrochloride 10 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "991149",
+        "display": "Methadone Hydrochloride 10 MG/ML Oral Solution [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010608",
+        "display": "Buprenorphine 2 MG / Naloxone 0.5 MG Sublingual Tablet [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1010609",
+        "display": "Buprenorphine 8 MG / Naloxone 2 MG Sublingual Tablet [Suboxone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "104957",
+        "display": "Buprenorphine 0.2 MG Sublingual Tablet [Subutex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "104958",
+        "display": "Buprenorphine 0.4 MG Sublingual Tablet [Subutex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1359526",
+        "display": "Buprenorphine 0.005 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1359657",
+        "display": "Buprenorphine 0.01 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1359840",
+        "display": "Buprenorphine 0.035 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1359977",
+        "display": "Buprenorphine 0.07 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1360119",
+        "display": "Buprenorphine 0.0525 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1360440",
+        "display": "Buprenorphine 0.01 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1360458",
+        "display": "Buprenorphine 0.02 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1360504",
+        "display": "Buprenorphine 0.005 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1360516",
+        "display": "Buprenorphine 0.02 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "141950",
+        "display": "Methadone Hydrochloride 5 MG Oral Tablet [Physeptone]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432972",
+        "display": "Buprenorphine 0.015 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432973",
+        "display": "Buprenorphine 0.015 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1488634",
+        "display": "Buprenorphine hydrochloride 1.3 MG/ML Injectable Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1488639",
+        "display": "Buprenorphine hydrochloride 1.3 MG/ML Injectable Suspension [Animalgesics]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "151094",
+        "display": "Methadone Hydrochloride 1 MG/ML Oral Solution [Martindale Methadone DTF]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "152717",
+        "display": "Methadone Hydrochloride 20 MG/ML Oral Solution [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "153325",
+        "display": "Methadone Hydrochloride 1 MG/ML Oral Solution [Methex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1543000",
+        "display": "Buprenorphine 0.0075 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1543001",
+        "display": "Buprenorphine 0.0075 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1655033",
+        "display": "Buprenorphine 0.3 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1729362",
+        "display": "Buprenorphine 0.3 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1729363",
+        "display": "Buprenorphine 0.3 MG/ML Injection [Buprenex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996190",
+        "display": "Buprenorphine 200 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1996191",
+        "display": "Buprenorphine 200 MG/ML Prefilled Syringe [Sublocade]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2058257",
+        "display": "Buprenorphine 16 MG / Naloxone 4 MG Sublingual Film"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2106368",
+        "display": "Buprenorphine 16 MG / Naloxone 4 MG Sublingual Film [Cassipa]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "247423",
+        "display": "normethadone 10 MG/ML / oxilofrine 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "388506",
+        "display": "72 HR Buprenorphine 0.07 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "388507",
+        "display": "72 HR Buprenorphine 0.0525 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "388508",
+        "display": "72 HR Buprenorphine 0.035 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "404413",
+        "display": "Buprenorphine 2 MG Sublingual Tablet [Subutex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "404414",
+        "display": "Buprenorphine 8 MG Sublingual Tablet [Subutex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "414152",
+        "display": "LEVOMETHADONE 2.5 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "485090",
+        "display": "Methadone 45 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864716",
+        "display": "Methadone Hydrochloride 10 MG/ML Injectable Solution [Dolophine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864749",
+        "display": "Methadone Hydrochloride 0.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864751",
+        "display": "Methadone Hydrochloride 0.4 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864753",
+        "display": "Methadone Hydrochloride 0.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864755",
+        "display": "Methadone Hydrochloride 0.58 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864759",
+        "display": "Methadone Hydrochloride 0.75 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864763",
+        "display": "Methadone Hydrochloride 1.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864765",
+        "display": "Methadone Hydrochloride 1.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864767",
+        "display": "Methadone Hydrochloride 1.75 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864771",
+        "display": "Methadone Hydrochloride 2.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864786",
+        "display": "Methadone Hydrochloride 2.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864789",
+        "display": "Methadone Hydrochloride 2.75 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864794",
+        "display": "Methadone Hydrochloride 25 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864796",
+        "display": "Methadone Hydrochloride 3 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864799",
+        "display": "Methadone Hydrochloride 3.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864801",
+        "display": "Methadone Hydrochloride 3.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864804",
+        "display": "Methadone Hydrochloride 3.75 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864807",
+        "display": "Methadone Hydrochloride 4 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864811",
+        "display": "Methadone Hydrochloride 4.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864822",
+        "display": "Methadone Hydrochloride 4.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864824",
+        "display": "Methadone Hydrochloride 4.75 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864826",
+        "display": "Methadone Hydrochloride 5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864828",
+        "display": "Methadone Hydrochloride 50 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864830",
+        "display": "Methadone Hydrochloride 1 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864832",
+        "display": "Methadone Hydrochloride 1.33 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864834",
+        "display": "Methadone Hydrochloride 2.67 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864836",
+        "display": "Methadone Hydrochloride 25 MG Oral Tablet"
+      }
+    ]
+  }
+}

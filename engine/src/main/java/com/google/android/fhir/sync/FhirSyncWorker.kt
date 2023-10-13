@@ -35,7 +35,6 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.apache.commons.io.IOUtils
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -71,11 +70,18 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           ),
         )
 
-    val flow = MutableSharedFlow<SyncJobStatus>()
+    val synchronizer =
+      FhirSynchronizer(
+        applicationContext,
+        getFhirEngine(),
+        Uploader(dataSource),
+        DownloaderImpl(dataSource, getDownloadWorkManager()),
+        getConflictResolver(),
+      )
 
     val job =
       CoroutineScope(Dispatchers.IO).launch {
-        flow.collect {
+        synchronizer.syncState.collect {
           // now send Progress to work manager so caller app can listen
           setProgress(buildWorkData(it))
 
@@ -85,18 +91,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         }
       }
 
-    Timber.v("Subscribed to flow for progress")
-    val result =
-      FhirSynchronizer(
-          applicationContext,
-          getFhirEngine(),
-          Uploader(dataSource),
-          DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver(),
-        )
-        .apply { subscribe(flow) }
-        .synchronize()
-
+    val result = synchronizer.synchronize()
     if (result is SyncJobStatus.Failed) onFailedSyncJobResult(result)
 
     val output = buildWorkData(result)
@@ -113,15 +108,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
      * [RetryConfiguration.maxRetries] set by user.
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    return when {
-      result is SyncJobStatus.Finished -> {
-        Result.success(output)
-      }
-      retries > runAttemptCount -> {
-        Result.retry()
-      }
+    return when (result) {
+      is SyncJobStatus.Finished -> Result.success(output)
       else -> {
-        Result.failure(output)
+        if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }
     }
   }

@@ -215,7 +215,7 @@ val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
  */
 enum class ChoiceOrientationTypes(val extensionCode: String) {
   HORIZONTAL("horizontal"),
-  VERTICAL("vertical")
+  VERTICAL("vertical"),
 }
 
 /** Desired orientation to render a list of choices. */
@@ -304,7 +304,7 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
 internal enum class DisplayItemControlType(val extensionCode: String) {
   FLYOVER("flyover"),
   PAGE("page"),
-  HELP("help")
+  HELP("help"),
 }
 
 /** Item control to show instruction text */
@@ -356,7 +356,7 @@ val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spann
  * `isInstructionsCode` flag set. The instructions are separated by newlines.
  */
 fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
-  separator: String = "\n"
+  separator: String = "\n",
 ) =
   SpannableStringBuilder().apply {
     this@getLocalizedInstructionsSpanned.filter { questionnaireItem ->
@@ -476,7 +476,7 @@ enum class MimeType(val value: String) {
   AUDIO("audio"),
   DOCUMENT("application"),
   IMAGE("image"),
-  VIDEO("video")
+  VIDEO("video"),
 }
 
 /** Returns the main MIME type of a MIME type string (e.g. image/png returns image). */
@@ -515,7 +515,7 @@ private val DEFAULT_SIZE = BigDecimal(1048576)
 
 /** Returns true if given size is above maximum size allowed. */
 internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
-  size: BigDecimal
+  size: BigDecimal,
 ): Boolean {
   return size > (maxSizeInBytes ?: DEFAULT_SIZE)
 }
@@ -601,10 +601,11 @@ internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpress
           rootExtension.extension
             .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION }
             .map { it.value }
-        if (options.isEmpty())
+        if (options.isEmpty()) {
           throw IllegalArgumentException(
-            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html."
+            "Questionnaire item $linkId with extension '$EXTENSION_ANSWER_EXPRESSION_URL' requires at least one option. See http://hl7.org/fhir/uv/sdc/STU3/StructureDefinition-sdc-questionnaire-answerOptionsToggleExpression.html.",
           )
+        }
         val expression =
           rootExtension.extension
             .single { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION }
@@ -629,11 +630,10 @@ internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<
  * [Questionnaire.QuestionnaireItemComponent]
  *
  * @param variableName the [String] to match the variable
- *
  * @return an [Expression]
  */
 internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
-  variableName: String
+  variableName: String,
 ): Expression? {
   return variableExpressions.find { it.name == variableName }
 }
@@ -655,7 +655,7 @@ internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
  * `this-question` is the link ID of the current questionnaire item).
  */
 internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
-  item: Questionnaire.QuestionnaireItemComponent
+  item: Questionnaire.QuestionnaireItemComponent,
 ) =
   item.expressionBasedExtensions.any {
     it
@@ -699,7 +699,7 @@ internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceC
           forDisplay =
             nestedExtensions.any {
               it.url == "forDisplay" && it.castToBoolean(it.value).booleanValue()
-            }
+            },
         )
       }
     }
@@ -723,11 +723,11 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  * - With other types it adds the options as is
  *
  * @param dataList the source data to extract the answer option values. The data could be list of
- * resources [Resource], identifiers [Identifier] or codes [Coding]
+ *   resources [Resource], identifiers [Identifier] or codes [Coding]
  * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
  */
 internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
-  dataList: List<Base>
+  dataList: List<Base>,
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
   return when (this.type) {
     Questionnaire.QuestionnaireItemType.REFERENCE -> {
@@ -779,12 +779,12 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
   transform:
     (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent
-    ) -> T
+      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    ) -> T,
 ): List<T> {
   val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
   return mapNotNull { questionnaireItem ->
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
+    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem,
       ->
       transform(questionnaireItem, questionnaireResponseItem)
     }
@@ -799,7 +799,8 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
  * This is true for the following two cases:
  * 1. Questions with nested items
  * 2. Repeated groups with nested items (Note that this is how repeated groups are organized in the
- * [QuestionnaireViewModel], and that they will be flattened in the final [QuestionnaireResponse].)
+ *    [QuestionnaireViewModel], and that they will be flattened in the final
+ *    [QuestionnaireResponse].)
  *
  * Non-repeated groups should have child items nested directly under the group itself.
  *
@@ -832,8 +833,9 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
     answer = createQuestionnaireResponseItemAnswers()
     if (shouldHaveNestedItemsUnderAnswers && answer.isNotEmpty()) {
       this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
-    } else if (this@createQuestionnaireResponseItem.type ==
-        Questionnaire.QuestionnaireItemType.GROUP && !repeats
+    } else if (
+      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        !repeats
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
         this.addItem(it.createQuestionnaireResponseItem())
@@ -843,7 +845,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
 }
 
 /**
- * Returns a list of answers from the initial values of the questionnaire item. `null` if no intial
+ * Returns a list of answers from the initial values of the questionnaire item. `null` if no initial
  * value.
  */
 private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
@@ -859,24 +861,26 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
   // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
   // quantity given as initial without value is for unit reference purpose only. Answer conversion
   // not needed
-  if (answerOption.initialSelected.isEmpty() &&
+  if (
+    answerOption.initialSelected.isEmpty() &&
       (initial.isEmpty() ||
         (initialFirstRep.hasValueQuantity() && initialFirstRep.valueQuantity.value == null))
   ) {
     return null
   }
 
-  if (type == Questionnaire.QuestionnaireItemType.GROUP ||
+  if (
+    type == Questionnaire.QuestionnaireItemType.GROUP ||
       type == Questionnaire.QuestionnaireItemType.DISPLAY
   ) {
     throw IllegalArgumentException(
-      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      "Questionnaire item $linkId has initial value(s) and is a group or display item. See rule que-8 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
     )
   }
 
   if ((answerOption.initialSelected.size > 1 || initial.size > 1) && !repeats) {
     throw IllegalArgumentException(
-      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial."
+      "Questionnaire item $linkId can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
     )
   }
 
@@ -896,7 +900,7 @@ fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
   mutableListOf<Questionnaire.QuestionnaireItemComponent>().also { flattenInto(it) }
 
 private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
-  output: MutableList<Questionnaire.QuestionnaireItemComponent>
+  output: MutableList<Questionnaire.QuestionnaireItemComponent>,
 ) {
   forEach {
     output.add(it)

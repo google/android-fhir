@@ -48,7 +48,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val jsonParser = fhirContext.newJsonParser()
 
   private fun open(asset: String): InputStream? {
@@ -70,10 +70,10 @@ class FhirOperatorLibraryEvaluateTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator =
-      FhirOperatorBuilder(context)
-        .withFhirContext(fhirContext)
-        .withFhirEngine(fhirEngine)
-        .withIgManager(knowledgeManager)
+      FhirOperator.Builder(context)
+        .fhirContext(fhirContext)
+        .fhirEngine(fhirEngine)
+        .knowledgeManager(knowledgeManager)
         .build()
   }
 
@@ -87,7 +87,7 @@ class FhirOperatorLibraryEvaluateTest {
    * 2. load the Immunization records of that patient,
    * 3. load the CQL Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   * matches the number of required doses or if the number of required doses is null.
+   *    matches the number of required doses or if the number of required doses is null.
    *
    * ```
    * library ImmunityCheck version '1.0.0'
@@ -127,7 +127,7 @@ class FhirOperatorLibraryEvaluateTest {
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization")
+        setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()

@@ -41,11 +41,13 @@ class FhirApplication : Application() {
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
-              )
-            ) { Log.d("App-HttpLog", it) },
+                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+              ),
+            ) {
+              Log.d("App-HttpLog", it)
+            },
         ),
-      )
+      ),
     )
   }
 

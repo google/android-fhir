@@ -28,6 +28,19 @@ if (kokoroRun == true) {
   }
 }
 
+// NECESSARY force of the Jackson to run generateSearchParams in the new version of HAPI (6.8)
+buildscript {
+  dependencies {
+    classpath("com.fasterxml.jackson.core:jackson-core:2.15.2")
+    classpath("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
+    classpath("com.fasterxml.jackson.core:jackson-databind:2.15.2")
+    classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
+    classpath("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.15.2")
+    classpath("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
+    classpath("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+  }
+}
+
 include(":catalog")
 
 include(":common")

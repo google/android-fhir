@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,8 @@ class CameraLauncherFragment : DialogFragment() {
         dismiss()
       }
 
-    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+    if (
+      ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
         PackageManager.PERMISSION_DENIED
     ) {
       registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->

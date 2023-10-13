@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.StringType
  */
 internal class EditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
-    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES
+    InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
   ) {
   override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
     val input = getValue(editable.toString())
@@ -44,7 +44,7 @@ internal class EditTextStringViewHolderDelegate :
   }
 
   private fun getValue(
-    text: String
+    text: String,
   ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
     return text.let {
       if (it.isEmpty()) {

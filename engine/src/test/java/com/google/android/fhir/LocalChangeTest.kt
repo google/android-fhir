@@ -22,6 +22,7 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
+import java.util.UUID
 import junit.framework.TestCase
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
@@ -42,6 +43,7 @@ class LocalChangeTest : TestCase() {
       LocalChangeEntity(
         id = 1,
         resourceType = ResourceType.Patient.name,
+        resourceUuid = UUID.randomUUID(),
         resourceId = "Patient-001",
         type = LocalChangeEntity.Type.INSERT,
         payload =
@@ -52,11 +54,11 @@ class LocalChangeTest : TestCase() {
                 HumanName().apply {
                   addGiven("John")
                   family = "Doe"
-                }
+                },
               )
-            }
+            },
           ),
-        timestamp = Instant.now()
+        timestamp = Instant.now(),
       )
 
     val localChange = localChangeEntity.toLocalChange()

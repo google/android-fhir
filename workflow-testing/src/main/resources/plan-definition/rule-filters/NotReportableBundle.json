@@ -1,0 +1,721 @@
+{
+  "resourceType": "Bundle",
+  "id": "plandefinition-RuleFilters-1.0.0",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "plandefinition-RuleFilters-1.0.0",
+        "instantiatesCanonical": [
+          "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0|1.1.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "NotReportable"
+        },
+        "action": [
+          {
+            "id": "start",
+            "description": "This action represents the start of the reporting workflow in response to the encounter-start event",
+            "textEquivalent": "Start the reporting workflow in response to an encounter-start event",
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                    "code": "start"
+                  }
+                ]
+              }
+            ],
+            "resource": {
+              "reference": "Task/start"
+            }
+          },
+          {
+            "id": "check-reportable",
+            "description": "This action represents the check for suspected reportability of the eICR.",
+            "textEquivalent": "Check Reportable",
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                    "code": "check-reportable"
+                  }
+                ]
+              }
+            ],
+            "resource": {
+              "reference": "Task/check-reportable"
+            },
+            "action": [
+              {
+                "id": "ckr-is-encounter-reportable",
+                "resource": {
+                  "reference": "Task/ckr-is-encounter-reportable"
+                }
+              },
+              {
+                "id": "ckr-is-encounter-in-progress",
+                "resource": {
+                  "reference": "Task/ckr-is-encounter-in-progress"
+                }
+              }
+            ]
+          },
+          {
+            "id": "create-and-report-eicr",
+            "description": "This action represents the creation and reporting of the eICR.",
+            "textEquivalent": "Create and Report eICR",
+            "code": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                    "code": "create-and-report-eicr"
+                  }
+                ]
+              }
+            ],
+            "resource": {
+              "reference": "Task/create-and-report-eicr"
+            },
+            "action": [
+              {
+                "id": "car-report-eicr",
+                "resource": {
+                  "reference": "Task/car-report-eicr"
+                }
+              },
+              {
+                "id": "car-is-encounter-complete",
+                "resource": {
+                  "reference": "Task/car-is-encounter-complete"
+                }
+              },
+              {
+                "id": "car-is-encounter-in-progress",
+                "resource": {
+                  "reference": "Task/car-is-encounter-in-progress"
+                }
+              }
+            ]
+          },
+          {
+            "id": "report-eicr",
+            "description": "This action represents the reporting of the eICR.",
+            "textEquivalent": "Report eICR",
+            "action": [
+              {
+                "id": "create-eicr",
+                "description": "This action represents the creation of the eICR.",
+                "textEquivalent": "Create eICR.",
+                "code": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                        "code": "create-eicr"
+                      }
+                    ]
+                  }
+                ],
+                "resource": {
+                  "reference": "Task/create-eicr"
+                }
+              },
+              {
+                "id": "validate-eicr",
+                "description": "This action represents the validation of the eICR.",
+                "textEquivalent": "Validate eICR.",
+                "code": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                        "code": "validate-eicr"
+                      }
+                    ]
+                  }
+                ],
+                "resource": {
+                  "reference": "Task/validate-eicr"
+                }
+              },
+              {
+                "id": "route-and-send-eicr",
+                "description": "This action represents the routing and sending of the eICR.",
+                "textEquivalent": "Route and send eICR",
+                "code": [
+                  {
+                    "coding": [
+                      {
+                        "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                        "code": "route-and-send-eicr"
+                      }
+                    ]
+                  }
+                ],
+                "resource": {
+                  "reference": "Task/route-and-send-eicr"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "start",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/targetStatus",
+            "valueString": "ready"
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/offset",
+                "valueDuration": {
+                  "value": 1,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "h"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/check-reportable"
+                }
+              }
+            ]
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "ready",
+        "intent": "proposal",
+        "description": "This action represents the start of the reporting workflow in response to the encounter-start event",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "ckr-is-encounter-reportable",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/create-and-report-eicr"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+            "valueExpression": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression",
+                  "valueExpression": {
+                    "language": "text/cql-identifier",
+                    "expression": "Is Reportable",
+                    "reference": "http://aphl.org/fhir/ecr/Library/RuleFilters|1.0.0"
+                  }
+                }
+              ],
+              "language": "text/fhirpath",
+              "expression": "%conditions.exists() or %encounters.exists() or %immunizations.exists() or %procedures.exists() or %procedureOrders.exists() or %labOrders.exists() or %labTests.exists() or %labResults.exists() or %medicationAdministrations.exists() or %medicationOrders.exists() or %medicationDispenses.exists()"
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "conditions",
+              "type": "Condition",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-dxtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "encounters",
+              "type": "Encounter",
+              "codeFilter": [
+                {
+                  "path": "reasonCode",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-dxtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "immunizations",
+              "type": "Immunization",
+              "codeFilter": [
+                {
+                  "path": "vaccineCode",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-mrtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "labOrders",
+              "type": "ServiceRequest",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-lotc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "labTests",
+              "type": "Observation",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-lotc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "procedureOrders",
+              "type": "ServiceRequest",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-pctc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "procedures",
+              "type": "Procedure",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-pctc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "medicationOrders",
+              "type": "MedicationRequest",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-mrtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "medicationDispenses",
+              "type": "MedicationDispense",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-mrtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "medicationAdministrations",
+              "type": "MedicationAdministration",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-mrtc-example"
+                }
+              ]
+            }
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/input",
+            "valueDataRequirement": {
+              "id": "labResults",
+              "type": "Observation",
+              "codeFilter": [
+                {
+                  "path": "value",
+                  "valueSet": "http://hl7.org/fhir/us/ecr/ValueSet/valueset-ostc-example"
+                }
+              ]
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "Check Encounter Reportable",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "ckr-is-encounter-in-progress",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/offset",
+                "valueDuration": {
+                  "value": 6,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "h"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/check-reportable"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+            "valueExpression": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression",
+                  "valueExpression": {
+                    "language": "text/cql-identifier",
+                    "expression": "Is Encounter In Progress",
+                    "reference": "http://aphl.org/fhir/ecr/Library/RuleFilters|1.0.0"
+                  }
+                }
+              ],
+              "language": "text/fhirpath",
+              "expression": "%encounter.status = 'in-progress'"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "Check Reportable Is Encounter in progress",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "check-reportable",
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "This action represents the check for suspected reportability of the eICR.",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "car-report-eicr",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/report-eicr"
+                }
+              }
+            ]
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "Report Eicr",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "car-is-encounter-complete",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/offset",
+                "valueDuration": {
+                  "value": 24,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "h"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/report-eicr"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+            "valueExpression": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression",
+                  "valueExpression": {
+                    "language": "text/cql-identifier",
+                    "expression": "Is Encounter Complete",
+                    "reference": "http://aphl.org/fhir/ecr/Library/RuleFilters|1.0.0"
+                  }
+                }
+              ],
+              "language": "text/fhirpath",
+              "expression": "%encounter.status = 'finished'"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "Check If Encounter Complete",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "car-is-encounter-in-progress",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/offset",
+                "valueDuration": {
+                  "value": 24,
+                  "system": "http://unitsofmeasure.org",
+                  "code": "h"
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/create-and-report-eicr"
+                }
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+            "valueExpression": {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternativeExpression",
+                  "valueExpression": {
+                    "language": "text/cql-identifier",
+                    "expression": "Is Encounter In Progress",
+                    "reference": "http://aphl.org/fhir/ecr/Library/RuleFilters|1.0.0"
+                  }
+                }
+              ],
+              "language": "text/fhirpath",
+              "expression": "%encounter.status = 'in-progress'"
+            }
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "Check If Encounter In Progress",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "create-and-report-eicr",
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "This action represents the creation and reporting of the eICR.",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "create-eicr",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/validate-eicr"
+                }
+              }
+            ]
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "This action represents the creation of the eICR.",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "validate-eicr",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/aphl/StructureDefinition/next",
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/aphl/StructureDefinition/target",
+                "valueReference": {
+                  "reference": "Task/route-and-send-eicr"
+                }
+              }
+            ]
+          }
+        ],
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "This action represents the validation of the eICR.",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Task",
+        "id": "route-and-send-eicr",
+        "basedOn": [
+          {
+            "reference": "RequestGroup/plandefinition-RuleFilters-1.0.0",
+            "type": "RequestGroup"
+          }
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "description": "This action represents the routing and sending of the eICR.",
+        "for": {
+          "reference": "NotReportable"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "resourceType": "Procedure",
+  "id": "OPA-Procedure2",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Routine Appendectomy</div>"
+  },
+  "status": "preparation",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "64615",
+        "display": "CHEMODENERVATION OF MUSCLE(S); MUSCLE(S) INNERVATED BY FACIAL, TRIGEMINAL, CERVICAL SPINAL AND ACCESSORY NERVES, BILATERAL (EG, FOR CHRONIC MIGRAINE)"
+      }
+    ],
+    "text": "Botox"
+  },
+  "subject": {
+    "reference": "Patient/OPA-Patient1"
+  }
+}

@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import Dependencies.forceHapiVersion
 import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
@@ -17,21 +18,17 @@ android {
 configurations {
   all {
     removeIncompatibleDependencies()
+    forceGuava()
     forceHapiVersion()
     forceJacksonVersion()
   }
 }
 
 dependencies {
-  compileOnly(Dependencies.Cql.engine)
   compileOnly(Dependencies.Cql.evaluator)
-  compileOnly(Dependencies.Cql.evaluatorBuilder)
-  compileOnly(Dependencies.Cql.evaluatorDagger)
-  compileOnly(Dependencies.Cql.evaluatorPlanDef)
-  compileOnly(Dependencies.Cql.translatorCqlToElm)
-  compileOnly(Dependencies.Cql.translatorElm)
-  compileOnly(Dependencies.Cql.translatorModel)
-  compileOnly(Dependencies.androidFhirEngine) { exclude(module = "truth") }
+  compileOnly(Dependencies.Cql.evaluatorFhirJackson)
+  compileOnly(Dependencies.Cql.evaluatorFhirUtilities)
+  compileOnly(project(":engine")) { exclude(module = "truth") }
 
   // Forces the most recent version of jackson, ignoring what dependencies use.
   // Remove these lines when HAPI 6.4 becomes available.

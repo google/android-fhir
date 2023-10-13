@@ -55,7 +55,7 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
     (requireActivity() as MainActivity).setNavigationUp(false)
     (activity as MainActivity).setActionBar(
       getString(R.string.toolbar_text),
-      Gravity.CENTER_HORIZONTAL
+      Gravity.CENTER_HORIZONTAL,
     )
     setHasOptionsMenu(true)
   }
@@ -79,10 +79,10 @@ class LayoutListFragment : Fragment(R.layout.layout_list_fragment) {
               getQuestionnaireJsonStringFromAssets(
                 context = requireContext(),
                 backgroundContext = coroutineContext,
-                fileName = layout.questionnaireFileName
+                fileName = layout.questionnaireFileName,
               ),
-            workflow = layout.workflow
-          )
+            workflow = layout.workflow,
+          ),
         )
     }
   }

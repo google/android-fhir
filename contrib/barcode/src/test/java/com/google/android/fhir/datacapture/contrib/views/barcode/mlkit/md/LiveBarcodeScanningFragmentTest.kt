@@ -52,7 +52,7 @@ class LiveBarcodeScanningFragmentTest {
     mockUtils()
     cameraSource = mock()
     launchFragment<LiveBarcodeScanningFragment>(
-        themeResId = com.google.android.fhir.datacapture.R.style.Theme_Questionnaire
+        themeResId = com.google.android.fhir.datacapture.R.style.Theme_Questionnaire,
       )
       .onFragment {
         liveBarcodeScanningFragment = spy(it)
@@ -64,7 +64,6 @@ class LiveBarcodeScanningFragmentTest {
 
   @Test
   fun shouldVerify_allScenarios_inOnClickMethod() {
-
     val view = mock<View>()
 
     // verify close button scenario
