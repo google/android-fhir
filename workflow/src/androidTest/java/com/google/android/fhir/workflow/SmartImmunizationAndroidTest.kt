@@ -39,6 +39,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.skyscreamer.jsonassert.JSONAssert
 
 @RunWith(AndroidJUnit4::class)
 class SmartImmunizationAndroidTest {
@@ -52,12 +53,16 @@ class SmartImmunizationAndroidTest {
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
-  private fun open(asset: String): InputStream? {
-    return javaClass.getResourceAsStream(asset)
+  private fun open(asset: String): InputStream {
+    return javaClass.getResourceAsStream(asset)!!
   }
 
   private fun load(asset: String): IBaseResource {
     return jsonParser.parseResource(open(asset))
+  }
+
+  private fun loadStr(asset: String): String {
+    return open(asset).bufferedReader().use { it.readText() }
   }
 
   private fun copyResourceIntoApp(igName: String, asset: String): File {
@@ -144,8 +149,14 @@ class SmartImmunizationAndroidTest {
         patientId = patient.id,
       )
 
-    println(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(carePlan))
+    val parser = FhirContext.forR4Cached().newJsonParser()
 
     assertThat(carePlan).isNotNull()
+
+    JSONAssert.assertEquals(
+      loadStr("/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/CarePlan/CarePlan.json"),
+      parser.encodeResourceToString(carePlan),
+      true,
+    )
   }
 }

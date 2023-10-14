@@ -33,6 +33,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.skyscreamer.jsonassert.JSONAssert
 
 @RunWith(RobolectricTestRunner::class)
 class SmartImmunizationTest {
@@ -93,12 +94,20 @@ class SmartImmunizationTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "IMMZD2DTMeasles",
-        patientId = "IMMZ-Patient-NoVaxeninfant-f",
+        patientId = "Patient/IMMZ-Patient-NoVaxeninfant-f",
       )
 
-    // println(FhirContext.forR4Cached().newJsonParser().encodeResourceToString(carePlan))
+    val parser = FhirContext.forR4Cached().newJsonParser()
 
     assertThat(carePlan).isNotNull()
+
+    JSONAssert.assertEquals(
+      loader.readResourceAsString(
+        "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/CarePlan/CarePlan.json",
+      ),
+      parser.encodeResourceToString(carePlan),
+      true,
+    )
   }
 
   private suspend fun importToFhirEngine(resource: Resource) {

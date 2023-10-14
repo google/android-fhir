@@ -11,7 +11,7 @@
       "status": "draft",
       "intent": "proposal",
       "subject": {
-        "reference": "IMMZ-Patient-NoVaxeninfant-f"
+        "reference": "Patient/IMMZ-Patient-NoVaxeninfant-f"
       },
       "action": [
         {
@@ -54,7 +54,7 @@
         ]
       },
       "subject": {
-        "reference": "IMMZ-Patient-NoVaxeninfant-f"
+        "reference": "Patient/IMMZ-Patient-NoVaxeninfant-f"
       },
       "instantiatesCanonical": [
         "http://fhir.org/guides/who/smart-immunization/ActivityDefinition/IMMZD2DTMeaslesMR"
@@ -72,7 +72,7 @@
   "status": "draft",
   "intent": "proposal",
   "subject": {
-    "reference": "IMMZ-Patient-NoVaxeninfant-f"
+    "reference": "Patient/IMMZ-Patient-NoVaxeninfant-f"
   },
   "activity": [
     {
