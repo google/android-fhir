@@ -35,7 +35,7 @@ abstract class KnowledgeDao {
   internal open suspend fun insertResource(
     implementationGuideId: Long?,
     resource: ResourceMetadataEntity,
-  ) {
+  ): Long {
     val resourceMetadata =
       if (resource.url != null && resource.version != null) {
         getResourceWithUrlAndVersion(resource.url, resource.version)
@@ -48,6 +48,7 @@ abstract class KnowledgeDao {
     // exception if they are different.
     val resourceMetadataId = resourceMetadata?.resourceMetadataId ?: insert(resource)
     insert(ImplementationGuideResourceMetadataEntity(0, implementationGuideId, resourceMetadataId))
+    return resourceMetadataId
   }
 
   @Transaction
@@ -107,6 +108,14 @@ abstract class KnowledgeDao {
     resourceType: ResourceType,
     name: String?,
   ): List<ResourceMetadataEntity>
+
+  @Query(
+    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND resourceMetadataId = :id",
+  )
+  internal abstract suspend fun getResourcesWithId(
+    resourceType: ResourceType,
+    id: Long?,
+  ): ResourceMetadataEntity?
 
   @Query(
     "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND name = :name AND version = :version",

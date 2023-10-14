@@ -189,6 +189,11 @@ internal constructor(
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
 
+  @WorkerThread
+  fun generateCarePlan(planDefinition: CanonicalType, patientId: String): IBaseResource {
+    return generateCarePlan(planDefinition, patientId, encounterId = null)
+  }
+
   /**
    * Generates a [CarePlan] based on the provided inputs.
    *
@@ -204,6 +209,33 @@ internal constructor(
     return planDefinitionProcessor.apply(
       /* id = */ IdType("PlanDefinition", planDefinitionId),
       /* canonical = */ null,
+      /* planDefinition = */ null,
+      /* subject = */ patientId,
+      /* encounterId = */ encounterId,
+      /* practitionerId = */ null,
+      /* organizationId = */ null,
+      /* userType = */ null,
+      /* userLanguage = */ null,
+      /* userTaskContext = */ null,
+      /* setting = */ null,
+      /* settingContext = */ null,
+      /* parameters = */ null,
+      /* useServerData = */ null,
+      /* bundle = */ null,
+      /* prefetchData = */ null,
+      libraryProcessor,
+    ) as IBaseResource
+  }
+
+  @WorkerThread
+  fun generateCarePlan(
+    planDefinition: CanonicalType,
+    patientId: String,
+    encounterId: String?,
+  ): IBaseResource {
+    return planDefinitionProcessor.apply(
+      /* id = */ null,
+      /* canonical = */ planDefinition,
       /* planDefinition = */ null,
       /* subject = */ patientId,
       /* encounterId = */ encounterId,
