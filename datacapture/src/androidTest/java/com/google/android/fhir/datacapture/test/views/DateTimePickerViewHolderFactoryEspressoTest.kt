@@ -53,6 +53,7 @@ class DateTimePickerViewHolderFactoryEspressoTest {
 
   private lateinit var parent: FrameLayout
   private lateinit var viewHolder: QuestionnaireItemViewHolder
+
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }

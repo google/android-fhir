@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,9 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.context.FhirContext
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.search.search
-import org.hl7.fhir.r4.model.CodeSystem
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.ValueSet
-import org.opencds.cqf.cql.engine.exception.TerminologyProviderException
-import org.opencds.cqf.cql.engine.runtime.Code
-import org.opencds.cqf.cql.engine.terminology.CodeSystemInfo
-import org.opencds.cqf.cql.engine.terminology.TerminologyProvider
-import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
-import org.opencds.cqf.cql.evaluator.engine.util.ValueSetUtil
+/*
+
+TODO: These operators must be migrated to equivalent calls in the Repository classes
 
 internal class FhirEngineTerminologyProvider(
   private val fhirContext: FhirContext,
@@ -51,7 +39,7 @@ internal class FhirEngineTerminologyProvider(
     } catch (e: Exception) {
       throw TerminologyProviderException(
         "Error performing membership check of Code: $code in ValueSet: ${valueSet.id}",
-        e
+        e,
       )
     }
   }
@@ -60,13 +48,13 @@ internal class FhirEngineTerminologyProvider(
     runBlockingOrThrowMainThreadException {
       try {
         resolveValueSet(valueSetInfo).let {
-          ValueSetUtil.getCodesInExpansion(fhirContext, it)
-            ?: ValueSetUtil.getCodesInCompose(fhirContext, it)
+          ValueSets.getCodesInExpansion(fhirContext, it)
+            ?: ValueSets.getCodesInCompose(fhirContext, it)
         }
       } catch (e: Exception) {
         throw TerminologyProviderException(
           "Error performing expansion of ValueSet: ${valueSetInfo.id}",
-          e
+          e,
         )
       }
     }
@@ -80,6 +68,7 @@ internal class FhirEngineTerminologyProvider(
             filter(CodeSystem.SYSTEM, { value = codeSystem.id })
           }
           .first()
+          .resource
           .concept
           .first { it.code == code.code }
           .let {
@@ -92,7 +81,7 @@ internal class FhirEngineTerminologyProvider(
       } catch (e: Exception) {
         throw TerminologyProviderException(
           "Error performing lookup of Code: $code in CodeSystem: ${codeSystem.id}",
-          e
+          e,
         )
       }
     }
@@ -101,18 +90,21 @@ internal class FhirEngineTerminologyProvider(
     if (url == null) return emptyList()
     return knowledgeManager
       .loadResources(resourceType = ResourceType.ValueSet.name, url = url)
-      .map { it as ValueSet } + fhirEngine.search { filter(ValueSet.URL, { value = url }) }
+      .map { it as ValueSet } +
+      fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = url }) }.map { it.resource }
   }
 
   private suspend fun searchByIdentifier(identifier: String?): List<ValueSet> {
     if (identifier == null) return emptyList()
-    return fhirEngine.search { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+    return fhirEngine
+      .search<ValueSet> { filter(ValueSet.IDENTIFIER, { value = of(identifier) }) }
+      .map { it.resource }
   }
 
   private suspend fun searchById(id: String): List<ValueSet> =
     listOfNotNull(
       safeGet(fhirEngine, ResourceType.ValueSet, id.removePrefix(URN_OID).removePrefix(URN_UUID))
-        as? ValueSet
+        as? ValueSet,
     )
 
   private suspend fun safeGet(fhirEngine: FhirEngine, type: ResourceType, id: String): Resource? {
@@ -124,12 +116,13 @@ internal class FhirEngineTerminologyProvider(
   }
 
   private suspend fun resolveValueSet(valueSet: ValueSetInfo): ValueSet {
-    if (valueSet.version != null ||
+    if (
+      valueSet.version != null ||
         (valueSet.codeSystems != null && valueSet.codeSystems.isNotEmpty())
     ) {
       // Cannot do both at the same time yet.
       throw UnsupportedOperationException(
-        "Could not expand value set ${valueSet.id}; version and code system bindings are not supported at this time."
+        "Could not expand value set ${valueSet.id}; version and code system bindings are not supported at this time.",
       )
     }
 
@@ -154,3 +147,4 @@ internal class FhirEngineTerminologyProvider(
     return resolveValueSet(valueSet).idElement.idPart
   }
 }
+*/

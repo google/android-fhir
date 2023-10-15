@@ -53,14 +53,15 @@ fun getRequiredOrOptionalText(questionnaireViewItem: QuestionnaireViewItem, cont
 fun getValidationErrorMessage(
   context: Context,
   questionnaireViewItem: QuestionnaireViewItem,
-  validationResult: ValidationResult
+  validationResult: ValidationResult,
 ): String? {
   return when (validationResult) {
     is NotValidated,
-    Valid -> null
+    Valid, -> null
     is Invalid -> {
       val validationMessage = validationResult.getSingleStringValidationMessage()
-      if (questionnaireViewItem.questionnaireItem.required &&
+      if (
+        questionnaireViewItem.questionnaireItem.required &&
           questionnaireViewItem.questionViewTextConfiguration.showRequiredText
       ) {
         context.getString(R.string.required_text_and_new_line) + validationMessage

@@ -31,6 +31,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
+@Suppress("ktlint:standard:class-naming")
 class D_FhirJsonParserBenchmark {
 
   @get:Rule val benchmarkRule = BenchmarkRule()

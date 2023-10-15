@@ -36,7 +36,7 @@ class QuestionnaireResponseFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?
+    savedInstanceState: Bundle?,
   ): View? {
     return inflater.inflate(R.layout.fragment_questionnaire_response, container, false)
   }
@@ -70,7 +70,7 @@ class QuestionnaireResponseFragment : Fragment() {
     }
     (requireActivity() as MainActivity).setActionBar(
       getString(R.string.questionnaire_response_title),
-      Gravity.START
+      Gravity.START,
     )
     setHasOptionsMenu(true)
   }

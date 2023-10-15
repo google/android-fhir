@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,5 +35,5 @@ data class UriParamFilterCriterion(val parameter: UriClientParam, var value: Str
 internal data class UriFilterCriteria(
   val parameter: UriClientParam,
   override val filters: List<UriParamFilterCriterion>,
-  override val operation: Operation
+  override val operation: Operation,
 ) : FilterCriteria(filters, operation, parameter, "UriIndexEntity")

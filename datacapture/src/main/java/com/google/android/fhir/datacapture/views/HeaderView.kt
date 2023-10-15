@@ -48,15 +48,15 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpButton = findViewById(R.id.helpButton),
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
-      questionnaireItem = questionnaireViewItem.questionnaireItem
+      questionnaireItem = questionnaireViewItem.questionnaireItem,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(
-      appendAsteriskToQuestionText(question.context, questionnaireViewItem)
+      appendAsteriskToQuestionText(question.context, questionnaireViewItem),
     )
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned()
+      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.

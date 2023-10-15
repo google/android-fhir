@@ -44,9 +44,9 @@ class PatientListViewModel(application: Application) : AndroidViewModel(applicat
   fun triggerOneTimeSync() {}
 
   /*
-   Fetches patients stored locally based on the city they are in, and then updates the city field for
-   each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
-  */
+  Fetches patients stored locally based on the city they are in, and then updates the city field for
+  each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
+   */
   fun triggerUpdate() {}
 
   fun searchPatientsByName(nameQuery: String) {}

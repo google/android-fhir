@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
   val param: IParam,
-  private val entityTableName: String
+  private val entityTableName: String,
 ) {
 
   /**
@@ -60,7 +60,7 @@ internal sealed class FilterCriteria(
       SELECT resourceUuid FROM $entityTableName
       WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
       """,
-      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params }
+      listOf(type.name, param.paramName) + conditionParams.flatMap { it.params },
     )
   }
 
@@ -89,7 +89,7 @@ internal sealed class FilterCriteria(
     this.joinToString(
       separator = " ${operation.logicalOperator} ",
       prefix = if (size > 1) "(" else "",
-      postfix = if (size > 1) ")" else ""
+      postfix = if (size > 1) ")" else "",
     ) {
       if (it.params.size > 1) {
         "(${it.condition})"

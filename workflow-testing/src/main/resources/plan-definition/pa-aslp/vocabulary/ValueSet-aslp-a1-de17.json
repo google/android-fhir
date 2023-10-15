@@ -1,0 +1,24 @@
+{
+  "resourceType": "ValueSet",
+  "id": "aslp-a1-de17",
+  "url": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de17",
+  "name": "DiagnosisofObstructiveSleepApneaCodes",
+  "title": "Diagnosis of Obstructive Sleep Apnea Codes",
+  "status": "draft",
+  "experimental": false,
+  "description": "Codes representing possible values for the Diagnosis of Obstructive Sleep Apnea element",
+  "immutable": true,
+  "compose": {
+    "include": [
+      {
+        "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+        "concept": [
+          {
+            "code": "ASLP.A1.DE17",
+            "display": "Obstructive sleep apnea (OSA)"
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -126,6 +126,10 @@
         >@style/Questionnaire.SubmitButtonStyle
         </item>
         <item
+            name="questionnaireCancelButtonStyle"
+        >@style/Questionnaire.CancelButtonStyle
+        </item>
+        <item
             name="questionnaireEditButtonStyle"
         >@style/Questionnaire.EditButtonStyle
         </item>
@@ -391,7 +395,13 @@
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
     >
-        <item name="android:text">@string/submit_questionnaire</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:visibility">visible</item>
+    </style>
+    <style
+        name="Questionnaire.CancelButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
         <item name="android:textAllCaps">false</item>
         <item name="android:visibility">visible</item>
     </style>
@@ -464,5 +474,4 @@
             name="android:paddingLeft"
         >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
-
 </resources>

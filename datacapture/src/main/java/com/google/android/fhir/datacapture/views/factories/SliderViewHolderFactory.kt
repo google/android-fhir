@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
             // Responds to when slider's value is changed
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(IntegerType(newValue.toInt()))
+                .setValue(IntegerType(newValue.toInt())),
             )
           }
         }
@@ -83,7 +83,7 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         error.text =
           when (validationResult) {
             is NotValidated,
-            Valid -> null
+            Valid, -> null
             is Invalid -> validationResult.getSingleStringValidationMessage()
           }
       }

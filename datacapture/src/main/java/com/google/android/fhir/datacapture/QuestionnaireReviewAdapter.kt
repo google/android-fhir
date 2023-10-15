@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFacto
 /** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
 internal class QuestionnaireReviewAdapter :
   ListAdapter<QuestionnaireAdapterItem.Question, QuestionnaireItemViewHolder>(
-    DiffCallbacks.QUESTIONS
+    DiffCallbacks.QUESTIONS,
   ) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
     return ReviewViewHolderFactory.create(parent)

@@ -79,7 +79,10 @@
         "name": [
           {
             "family": "Everywoman",
-            "given": ["Eve", "L"]
+            "given": [
+              "Eve",
+              "L"
+            ]
           }
         ],
         "telecom": [
@@ -97,7 +100,9 @@
         "birthDate": "1974-11-24",
         "address": [
           {
-            "line": ["5101 Peachtree St NE"],
+            "line": [
+              "5101 Peachtree St NE"
+            ],
             "city": "Elko",
             "state": "NV",
             "postalCode": "89801",

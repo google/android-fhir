@@ -79,9 +79,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "cm"
                   system = "http://unitofmeasure.com"
                   display = "centimeter"
-                }
+                },
               )
-            }
+            },
           )
           addExtension(
             Extension().apply {
@@ -91,9 +91,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "[in_i]"
                   system = "http://unitofmeasure.com"
                   display = "inch"
-                }
+                },
               )
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -143,9 +143,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "cm"
                   system = "http://unitofmeasure.com"
                   display = "centimeter"
-                }
+                },
               )
-            }
+            },
           )
           addExtension(
             Extension().apply {
@@ -155,9 +155,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "[in_i]"
                   system = "http://unitofmeasure.com"
                   display = "inch"
-                }
+                },
               )
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -174,7 +174,7 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString(),
       )
       .isEqualTo("22")
 
@@ -199,9 +199,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "cm"
                   system = "http://unitofmeasure.com"
                   display = "centimeter"
-                }
+                },
               )
-            }
+            },
           )
           addExtension(
             Extension().apply {
@@ -211,9 +211,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "[in_i]"
                   system = "http://unitofmeasure.com"
                   display = "inch"
-                }
+                },
               )
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
@@ -233,7 +233,7 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
     onView(withId(R.id.text_input_edit_text)).perform(click())
     onView(withId(R.id.text_input_edit_text)).perform(typeText("22"))
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString(),
       )
       .isEqualTo("22")
 
@@ -263,9 +263,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "cm"
                   system = "http://unitofmeasure.com"
                   display = "centimeter"
-                }
+                },
               )
-            }
+            },
           )
           addExtension(
             Extension().apply {
@@ -275,9 +275,9 @@ class QuestionnaireItemQuantityViewHolderFactoryEspressoTest {
                   code = "[in_i]"
                   system = "http://unitofmeasure.com"
                   display = "inch"
-                }
+                },
               )
-            }
+            },
           )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),

@@ -119,11 +119,11 @@ internal class ExpressionEvaluator(
   ): List<Base> {
     val appContext = extractDependentVariables(expression, questionnaireItem)
     return fhirPathEngine.evaluate(
-      /* appContext= */ appContext,
-      /* focusResource= */ questionnaireResponse,
-      /* rootResource= */ null,
-      /* base= */ questionnaireResponseItem,
-      /* path= */ expression.expression,
+      appContext,
+      questionnaireResponse,
+      null,
+      questionnaireResponseItem,
+      expression.expression,
     )
   }
 
@@ -315,11 +315,11 @@ internal class ExpressionEvaluator(
             ?: expressionNode.name?.lowercase()
         val evaluatedResult =
           fhirPathEngine.evaluateToString(
-            /* appInfo= */ launchContextMap,
-            /* focusResource= */ null,
-            /* rootResource= */ null,
-            /* base= */ launchContextMap[resourceType],
-            /* node= */ expressionNode,
+            launchContextMap,
+            null,
+            null,
+            launchContextMap[resourceType],
+            expressionNode,
           )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
