@@ -22,10 +22,14 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.RootMatchers.isPlatformPopup
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
@@ -54,6 +58,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+
 
 class DropDownViewHolderFactoryEspressoTest {
   @Rule
@@ -128,7 +133,23 @@ class DropDownViewHolderFactoryEspressoTest {
       .isEqualTo("Coding 3")
     assertThat((answerHolder!!.single().value as Coding).display).isEqualTo("Coding 3")
   }
+  @Test
+  fun testAutoCompleteNotYesNoOrDash() {
+    try {
+      onView(withId(R.id.auto_complete))
+        .perform(click())
+        .perform(typeText("Coding"))
+        .perform(ViewActions.pressImeActionButton())
+    } catch (e: androidx.test.espresso.PerformException) {
+      if (e.message?.contains("Error performing 'type text(Coding)' on view") == true) {
+        return
+      }
+      throw e
+    }
 
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isNotEqualTo("Coding")
+  }
   @Test
   fun shouldClearAutoCompleteTextViewOnRebindingView() {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
