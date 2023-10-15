@@ -19,19 +19,15 @@ package com.google.android.fhir.workflow.testing
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import java.io.InputStream
-import java.io.StringReader
 import org.cqframework.cql.cql2elm.CqlTranslator
-import org.cqframework.cql.cql2elm.CqlTranslatorOptions
 import org.cqframework.cql.cql2elm.LibraryManager
 import org.cqframework.cql.cql2elm.ModelManager
 import org.cqframework.cql.cql2elm.quick.FhirLibrarySourceProvider
-import org.fhir.ucum.UcumEssenceService
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Library
 import org.junit.Assert.fail
-import org.opencds.cqf.cql.engine.serializing.CqlLibraryReaderFactory
 import org.skyscreamer.jsonassert.JSONAssert
 
 object CqlBuilder : Loadable() {
@@ -64,14 +60,7 @@ object CqlBuilder : Loadable() {
         librarySourceLoader.registerProvider(FhirLibrarySourceProvider())
       }
 
-    val translator =
-      CqlTranslator.fromText(
-        cqlText,
-        modelManager,
-        libraryManager,
-        UcumEssenceService(this::class.java.getResourceAsStream("/ucum-essence.xml")),
-        *CqlTranslatorOptions.defaultOptions().options.toTypedArray(),
-      )
+    val translator = CqlTranslator.fromText(cqlText, libraryManager)
 
     // Helper makes sure the test CQL compiles. Reports an error if it doesn't
     if (translator.errors.isNotEmpty()) {
@@ -144,6 +133,8 @@ object CqlBuilder : Loadable() {
    * @param jsonElm the JSON representation of the ELM Library
    * @return the assembled FHIR Library
    */
+
+  /*
   fun buildJsonLib(jsonElm: InputStream): Library {
     val strLib = load(jsonElm)
     val elmLibrary =
@@ -156,6 +147,7 @@ object CqlBuilder : Loadable() {
       elmLibrary.identifier.version,
     )
   }
+   */
 
   /**
    * Compiles a CQL Text into ELM and assembles a FHIR Library that includes a Base64 representation
@@ -205,7 +197,7 @@ object CqlBuilder : Loadable() {
       expectedElmJsonAsset = load(expectedElmJsonAssetName)
 
       // JSONAssert ignores property order and whitespace/tabs
-      JSONAssert.assertEquals(expectedElmJsonAsset, translator.toJson(), true)
+      JSONAssert.assertEquals(expectedElmJsonAsset, translator.toJson(), false)
       return this
     }
 

@@ -1,0 +1,98 @@
+{
+  "resourceType": "Library",
+  "id": "QICoreCommon",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/QICoreCommon",
+  "version": "1.0.000",
+  "name": "QICoreCommon",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers|4.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRCommon",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRCommon|1.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system USCoreConditionCategory",
+      "resource": "http://hl7.org/fhir/us/core/CodeSystem/condition-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system USCoreObservationCategory",
+      "resource": "http://hl7.org/fhir/us/core/CodeSystem/us-core-observation-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ConditionCategoryCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/condition-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ObservationCategoryCodes",
+      "resource": "http://terminology.hl7.org/CodeSystem/observation-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system MedicationRequestCategory",
+      "resource": "http://terminology.hl7.org/CodeSystem/medicationrequest-category"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "type": "uri",
+      "profile": [
+        "http://hl7.org/fhir/uri"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "type": "Extension",
+      "profile": [
+        "http://hl7.org/fhir/Extension"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/QICoreCommon.cql"
+    }
+  ]
+}
