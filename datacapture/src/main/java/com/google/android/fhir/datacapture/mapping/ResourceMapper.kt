@@ -252,7 +252,15 @@ object ResourceMapper {
 
     questionnaireItem.initialExpression
       ?.let {
-        fhirPathEngine.evaluate(launchContexts, null, null, null, it.expression).firstOrNull()
+        fhirPathEngine
+          .evaluate(
+            /* appContext= */ launchContexts,
+            /* focusResource= */ null,
+            /* rootResource= */ null,
+            /* base= */ null,
+            /* path= */ it.expression,
+          )
+          .firstOrNull()
       }
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
