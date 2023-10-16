@@ -1,0 +1,94 @@
+{
+  "resourceType": "Library",
+  "id": "HelloWorld",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/Library/HelloWorld",
+  "version": "1.0.0",
+  "name": "HelloWorld",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    },
+    {
+      "name": "Info",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    },
+    {
+      "name": "Warning",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    },
+    {
+      "name": "Critical",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    },
+    {
+      "name": "Main Action Condition Expression Is True",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Get Title",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    },
+    {
+      "name": "Get Description",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    },
+    {
+      "name": "Get Indicator",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "string"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/HelloWorld.cql"
+    }
+  ]
+}

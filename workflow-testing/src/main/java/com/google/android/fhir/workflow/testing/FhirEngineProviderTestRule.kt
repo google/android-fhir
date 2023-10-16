@@ -28,13 +28,13 @@ class FhirEngineProviderTestRule : TestRule {
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {
       override fun evaluate() {
-        com.google.android.fhir.FhirEngineProvider.init(
-          com.google.android.fhir.FhirEngineConfiguration(testMode = true),
+        FhirEngineProvider.init(
+          FhirEngineConfiguration(testMode = true),
         )
         try {
           base.evaluate()
         } finally {
-          com.google.android.fhir.FhirEngineProvider.cleanup()
+          FhirEngineProvider.cleanup()
         }
       }
     }

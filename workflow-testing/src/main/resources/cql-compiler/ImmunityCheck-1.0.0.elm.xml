@@ -263,6 +263,36 @@
                                 localId="16"
                                 locator="15:11-15:82"
                             >
+                <wstxns8:signature>
+                  <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                    <wstxns8:elementType wstxns8:type="ChoiceTypeSpecifier">
+                      <wstxns8:choice>
+                        <wstxns8:choice
+                                                    wstxns8:type="NamedTypeSpecifier"
+                                                    name="{urn:hl7-org:elm-types:r1}Integer"
+                                                />
+                        <wstxns8:choice
+                                                    wstxns8:type="NamedTypeSpecifier"
+                                                    name="{urn:hl7-org:elm-types:r1}String"
+                                                />
+                      </wstxns8:choice>
+                    </wstxns8:elementType>
+                  </wstxns8:signature>
+                  <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                    <wstxns8:elementType wstxns8:type="ChoiceTypeSpecifier">
+                      <wstxns8:choice>
+                        <wstxns8:choice
+                                                    wstxns8:type="NamedTypeSpecifier"
+                                                    name="{urn:hl7-org:elm-types:r1}Integer"
+                                                />
+                        <wstxns8:choice
+                                                    wstxns8:type="NamedTypeSpecifier"
+                                                    name="{urn:hl7-org:elm-types:r1}String"
+                                                />
+                      </wstxns8:choice>
+                    </wstxns8:elementType>
+                  </wstxns8:signature>
+                </wstxns8:signature>
                 <wstxns8:operand>
                   <wstxns8:operand
                                         wstxns8:type="Query"
@@ -1387,6 +1417,14 @@
                                         localId="26"
                                         locator="19:11-19:35"
                                     >
+                    <wstxns8:signature>
+                      <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                        <wstxns8:elementType
+                                                    wstxns8:type="NamedTypeSpecifier"
+                                                    name="{http://hl7.org/fhir}Immunization.ProtocolApplied"
+                                                />
+                      </wstxns8:signature>
+                    </wstxns8:signature>
                     <wstxns8:operand
                                             wstxns8:type="Property"
                                             localId="25"
@@ -1400,6 +1438,22 @@
                                         localId="31"
                                         locator="20:11-20:52"
                                     >
+                    <wstxns8:signature>
+                      <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                        <wstxns8:elementType wstxns8:type="ChoiceTypeSpecifier">
+                          <wstxns8:choice>
+                            <wstxns8:choice
+                                                            wstxns8:type="NamedTypeSpecifier"
+                                                            name="{urn:hl7-org:elm-types:r1}Integer"
+                                                        />
+                            <wstxns8:choice
+                                                            wstxns8:type="NamedTypeSpecifier"
+                                                            name="{urn:hl7-org:elm-types:r1}String"
+                                                        />
+                          </wstxns8:choice>
+                        </wstxns8:elementType>
+                      </wstxns8:signature>
+                    </wstxns8:signature>
                     <wstxns8:operand
                                             wstxns8:type="Query"
                                             localId="30"
@@ -1497,6 +1551,22 @@
                                     localId="37"
                                     locator="21:15-21:57"
                                 >
+                  <wstxns8:signature>
+                    <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                      <wstxns8:elementType wstxns8:type="ChoiceTypeSpecifier">
+                        <wstxns8:choice>
+                          <wstxns8:choice
+                                                        wstxns8:type="NamedTypeSpecifier"
+                                                        name="{urn:hl7-org:elm-types:r1}Integer"
+                                                    />
+                          <wstxns8:choice
+                                                        wstxns8:type="NamedTypeSpecifier"
+                                                        name="{urn:hl7-org:elm-types:r1}String"
+                                                    />
+                        </wstxns8:choice>
+                      </wstxns8:elementType>
+                    </wstxns8:signature>
+                  </wstxns8:signature>
                   <wstxns8:operand
                                         wstxns8:type="Query"
                                         localId="36"
@@ -2767,6 +2837,14 @@
                             localId="21"
                             locator="10:3-10:22"
                         >
+              <wstxns8:signature>
+                <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                  <wstxns8:elementType
+                                        wstxns8:type="NamedTypeSpecifier"
+                                        name="{http://hl7.org/fhir}Immunization"
+                                    />
+                </wstxns8:signature>
+              </wstxns8:signature>
               <wstxns8:operand
                                 wstxns8:type="ExpressionRef"
                                 localId="20"
@@ -2779,6 +2857,14 @@
                             localId="43"
                             locator="10:27-10:47"
                         >
+              <wstxns8:signature>
+                <wstxns8:signature wstxns8:type="ListTypeSpecifier">
+                  <wstxns8:elementType
+                                        wstxns8:type="NamedTypeSpecifier"
+                                        name="{http://hl7.org/fhir}Immunization"
+                                    />
+                </wstxns8:signature>
+              </wstxns8:signature>
               <wstxns8:operand
                                 wstxns8:type="ExpressionRef"
                                 localId="42"

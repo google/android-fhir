@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import Dependencies.forceHapiVersion
 import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
@@ -50,6 +51,7 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations {
   all {
     removeIncompatibleDependencies()
+    forceGuava()
     forceHapiVersion()
     forceJacksonVersion()
   }
