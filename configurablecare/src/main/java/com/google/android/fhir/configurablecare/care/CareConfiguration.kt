@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 
@@ -70,20 +71,6 @@ data class CareConfiguration(var supportedImplementationGuides: List<SupportedIm
 
 object ConfigurationManager {
   var careConfiguration: CareConfiguration? = null
-
-  fun getPlanDefinitionId(event: String): String {
-    val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-    for (implementationGuide in careConfiguration?.supportedImplementationGuides!!) {
-      val triggers = implementationGuide.implementationGuideConfig.triggers
-      for (trigger in triggers)
-        if (trigger.event == event)
-          return trigger.planDefinition
-      // val resource = jsonParser.parseResource(resourceJson.toString()) as Resource
-      // bundleCollection += resource
-    }
-    return ""
-  }
-
 
   fun getCareConfiguration(context: Context): CareConfiguration {
     if (careConfiguration == null) {

@@ -65,7 +65,8 @@ class CarePlanManager(
       if (resource is MetadataResource && resource.name != null) {
         resource.name
       } else {
-        resource.idElement.idPart
+        // resource.idElement.idPart
+        "${resource.fhirType()}_${resource.idElement.idPart}"
       }
     return File(context.filesDir, fileName).apply {
       writeText(jsonParser.encodeResourceToString(resource))
@@ -232,19 +233,19 @@ class CarePlanManager(
       loadCarePlanResourcesFromDb()
     }
 
-    patientId = "IMMZ-Patient-NoVaxeninfant-f"
+    // patientId = "IMMZ-Patient-NoVaxeninfant-f"
 
-    val lib =
-      knowledgeManager
-        .loadResources(
-          resourceType = "Library",
-          id = "IMMZD2DTMeasles",
-        )
-        .firstOrNull()
-
-    if (lib != null) {
-      print(jsonParser.encodeResourceToString(lib))
-    }
+    // val lib =
+    //   knowledgeManager
+    //     .loadResources(
+    //       resourceType = "Library",
+    //       id = "IMMZD2DTMeasles",
+    //     )
+    //     .firstOrNull()
+    //
+    // if (lib != null) {
+    //   print(jsonParser.encodeResourceToString(lib))
+    // }
 
 
     val carePlanProposal =

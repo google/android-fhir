@@ -75,6 +75,7 @@ class TimestampBasedDownloadWorkManagerImpl(
         "PractitionerRole",
         // Server should filter all the patients the Health Professional is assigned to
         "Patient",
+        "MedicationRequest",
         "Questionnaire",
         "ValueSet",
         "StructureDefinition",

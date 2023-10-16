@@ -151,6 +151,39 @@ class FhirOperatorTest {
   }
 
   @Test
+  fun testMultipleResourceTypesWithSameId() = runBlockingOnWorkerThread {
+    loadFile("/plan-definition/multiple-resources-same-id/patient.json", ::importToFhirEngine)
+    loadFile(
+      "/plan-definition/multiple-resources-same-id/plan_definition.json",
+      ::installToIgManager
+    )
+
+    assertThat(knowledgeManager.loadResources(resourceType = "PlanDefinition", id = "example"))
+      .isNotNull()
+
+    loadFile("/plan-definition/multiple-resources-same-id/example-1.0.0.cql", ::installToIgManager)
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", id = "example"))
+      .isNotNull()
+    // val resources = knowledgeManager.loadResources(resourceType = "Library", id = "example")
+    // for (resource in resources)
+    //   println(jsonParser.encodeResourceToString(resource))
+    assertThat(knowledgeManager.loadResources(resourceType = "PlanDefinition", id = "example"))
+      .isNotNull()
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "example",
+        patientId = "Patient/Female-Patient-Example"
+      )
+
+    // assertEquals(
+    //   readResourceAsString("/plan-definition/multiple-resources-same-id/care_plan.json"),
+    //   jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan),
+    //   true
+    // )
+  }
+
+  @Test
   fun generateImmunizationRecordCarePlan() = runBlockingOnWorkerThread {
     loadFile("/plan-definition/immunization/patient.json", ::importToFhirEngine)
     loadFile(

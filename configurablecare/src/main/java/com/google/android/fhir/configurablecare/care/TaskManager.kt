@@ -20,14 +20,18 @@ import com.google.android.fhir.get
 import com.google.android.fhir.search.Operation
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
+import java.lang.StringBuilder
 import java.time.Instant
 import java.time.Period
 import java.util.Date
 import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.PractitionerRole
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
@@ -35,6 +39,68 @@ import org.hl7.fhir.r4.model.Task.TaskStatus
 
 /** Responsible for creating and managing Task resources */
 class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<Task> {
+
+  suspend fun getMedicationRequestsForPatient(
+    patientId: String,
+    extraFilter: (Search.() -> Unit)?,
+    sort: (Search.() -> Unit)?
+  ): List<MedicationRequest> {
+    return fhirEngine.search<MedicationRequest> {
+      filter(MedicationRequest.SUBJECT, { value = "Patient/$patientId" })
+      if (extraFilter != null) {
+        extraFilter()
+      }
+      operation = Operation.AND
+      if (sort != null) {
+        sort()
+      }
+    }.map { it.resource }
+  }
+
+  suspend fun getRequestsForPatient(
+    patientId: String,
+    requestType: ResourceType,
+    status: String = "",
+    intent: String = ""
+  ): List<Resource> {
+    val requestList: MutableList<Resource> = mutableListOf()
+    if (enumValues<SupportedRequestResources>().any { it.value.toCode() == requestType.name }) {
+      val xFhirQueryBuilder = StringBuilder()
+      xFhirQueryBuilder.append("${requestType.name}?subject=Patient/$patientId")
+      if (status.isNotEmpty()) {
+        xFhirQueryBuilder.append("&status=$status")
+      }
+      if (intent.isNotEmpty()) {
+        xFhirQueryBuilder.append("&intent=$intent")
+      }
+      val searchList = fhirEngine.search(xFhirQueryBuilder.toString())
+      for (item in searchList) {
+        requestList.add(item.resource)
+      }
+    }
+    return requestList  // not a valid or supported request
+  }
+
+  suspend fun getAllRequestsForPatient(patientId: String,
+                                       status: String = "",
+                                       intent: String = ""): List<Resource> {
+    val requestList: MutableList<Resource> = mutableListOf()
+    for (requestResourceType in SupportedRequestResources.values()) {
+      val xFhirQueryBuilder = StringBuilder()
+      xFhirQueryBuilder.append("${requestResourceType.value.toCode()}?subject=Patient/$patientId")
+      if (status.isNotEmpty()) {
+        xFhirQueryBuilder.append("&status=$status")
+      }
+      if (intent.isNotEmpty()) {
+        xFhirQueryBuilder.append("&intent=$intent")
+      }
+      val searchList = fhirEngine.search(xFhirQueryBuilder.toString())
+      for (item in searchList) {
+        requestList.add(item.resource)
+      }
+    }
+    return requestList
+  }
 
   /** Update [Task] resource with application-specific configurations and add it to [FhirEngine]. */
   override suspend fun updateRequestResource(
@@ -202,6 +268,15 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
       "months" -> Date.from(Instant.now().plus(Period.ofDays(30 * maxDuration.toInt())))
       "days" -> Date.from(Instant.now().plus(Period.ofDays(maxDuration.toInt())))
       else -> Date.from(Instant.now().plus(Period.ofDays(365))) // default: 1 year
+    }
+  }
+
+  companion object {
+    enum class SupportedRequestResources(val value: Enumerations.RequestResourceType) {
+      TASK(Enumerations.RequestResourceType.TASK),
+      MEDICATIONREQUEST(Enumerations.RequestResourceType.MEDICATIONREQUEST),
+      SERVICEREQUEST(Enumerations.RequestResourceType.SERVICEREQUEST),
+      // COMMUNICATIONREQUEST(RequestResourceType.COMMUNICATIONREQUEST)
     }
   }
 }

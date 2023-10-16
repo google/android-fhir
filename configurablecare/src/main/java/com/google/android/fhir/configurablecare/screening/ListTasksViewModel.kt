@@ -25,6 +25,9 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.configurablecare.FhirApplication
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 import org.hl7.fhir.r4.model.Task.TaskStatus
 
@@ -39,13 +42,36 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   fun getTasksForPatient(patientId: String, taskStatus: String) {
     viewModelScope.launch {
       liveSearchedTasks.value =
-        taskManager
-          .getTasksForPatient(
-            patientId = patientId,
-            extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) },
-            sort = { sort(Task.MODIFIED, Order.ASCENDING) }
-          )
-          .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
+        // taskManager
+        //   .getTasksForPatient(
+        //     patientId = patientId,
+        //     extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) },
+        //     sort = { sort(Task.MODIFIED, Order.ASCENDING) }
+        //   )
+        //   .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
+      // taskManager
+      //   .getMedicationRequestsForPatient(
+      //     patientId = patientId,
+      //     extraFilter = { },
+      //     sort = { }
+      //   )
+      //   .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
+        taskManager.getAllRequestsForPatient(patientId)
+          .mapIndexed { index, fhirTask ->
+            if (fhirTask is Task) fhirTask.toTaskItem(index + 1)
+            else if (fhirTask is MedicationRequest) fhirTask.toTaskItem(index + 1)
+            else TaskItem(
+              id = (index + 1).toString(),
+              resourceId = if (fhirTask.hasIdElement()) fhirTask.idElement.idPart else "",
+              description = "",
+              status = "no status",
+              intent = "no intent",
+              dueDate = "due date",
+              completedDate = "completed date",
+              owner = "owner",
+              clickable = false
+            )
+          }
     }
   }
 
@@ -73,6 +99,23 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   ) {
     override fun toString() = description
   }
+
+  data class RequestItem(
+    val id: String,
+    // for Task/123/... this should be 123
+    val resourceType: String,
+    val resourceId: String,
+    val description: String,
+    val status: String,
+    val intent: String,
+    val dueDate: String,
+    val completedDate: String,
+    val fhirResourceId: String,  // resource to be opened
+    // for Questionnaire/456 - this should be "Questionnaire/456"
+    val clickable: Boolean
+  ) {
+    override fun toString() = description
+  }
 }
 
 internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
@@ -88,6 +131,32 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val owner = if (owner == null) "" else if (owner.hasDisplay()) owner.display else ""
   val clickable =
     focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
+
+  return ListScreeningsViewModel.TaskItem(
+    id = position.toString(),
+    resourceId = taskResourceId,
+    description = description,
+    status = taskStatus,
+    intent = taskIntent,
+    dueDate = dueDate,
+    completedDate = completedDate,
+    owner = owner,
+    clickable = clickable
+  )
+}
+
+internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
+  val taskResourceId = if (hasIdElement()) idElement.idPart else ""
+
+  val description = "Medication Request"
+  // status and intent are always present
+  val taskStatus = status.toCode()
+  val taskIntent = intent.toCode()
+  val dueDate = "Sample End Date"
+  val completedDate = dueDate
+  val owner = ""
+  val clickable = false
+    // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),
