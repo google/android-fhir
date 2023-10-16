@@ -21,11 +21,8 @@ import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.StructureMap
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * The App developers may provide the [DataCaptureConfig] for the DataCapture library by
