@@ -33,6 +33,10 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.fhir.configurablecare.R
 import com.google.android.fhir.configurablecare.care.CareWorkflowExecutionViewModel
+import com.google.android.fhir.testing.jsonParser
+import org.hl7.fhir.instance.model.api.IIdType
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Task
 
 /** A fragment class to show screener questionnaire screen. */
@@ -96,6 +100,8 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
   }
 
   private fun onSubmitAction() {
+    val questionnaireId = IdType((jsonParser.parseResource(viewModel.questionnaireString) as Questionnaire).id).idPart
+    careWorkflowExecutionViewModel.setPlanDefinitionId("Questionnaire/${questionnaireId}")
     val questionnaireFragment =
       childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
     viewModel.saveScreenerEncounter(

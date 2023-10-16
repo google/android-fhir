@@ -170,7 +170,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
           fhirEngine.create(patient)
 
           // create Immunization Review Task
-          createImmunizationReviewTask(patient)
+          // createImmunizationReviewTask(patient)
           savedPatient.value = patient
 
           flag = true

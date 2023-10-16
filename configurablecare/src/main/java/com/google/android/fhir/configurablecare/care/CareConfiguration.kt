@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 
 data class RequestResourceConfig(
@@ -35,8 +36,15 @@ class ImplementationGuideConfig(
   var implementationGuideId: String,
   var entryPoint: String,
   var requestResourceConfigurations: List<RequestResourceConfig>,
-  var supportedValueSets: JsonArray
+  var supportedValueSets: JsonArray,
+  var triggers: List<Trigger>
 )
+
+data class Trigger(
+  var event: String,
+  var planDefinition: String
+)
+
 
 data class SupportedImplementationGuide(
   var location: String,
@@ -44,10 +52,38 @@ data class SupportedImplementationGuide(
   var implementationGuideConfig: ImplementationGuideConfig,
 )
 
+// fun moveAllIGResourcesIntoFilesDir(igName: String) {
+//   val inputBaseIgDir = "/$igName/ig"
+//
+//   javaClass
+//     .getResourceAsStream("$inputBaseIgDir/contents.txt")
+//     ?.bufferedReader()
+//     ?.use { bufferReader -> bufferReader.readText() }
+//     ?.split("\n")
+//     ?.forEach { fileName ->
+//       runCatching { copyResourceIntoApp(igName, "$inputBaseIgDir/$fileName") }
+//         .onFailure { println("Ignoring $inputBaseIgDir/$fileName. Not a valid Fhir Resource") }
+//     }
+// }
+
 data class CareConfiguration(var supportedImplementationGuides: List<SupportedImplementationGuide>)
 
 object ConfigurationManager {
   var careConfiguration: CareConfiguration? = null
+
+  fun getPlanDefinitionId(event: String): String {
+    val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+    for (implementationGuide in careConfiguration?.supportedImplementationGuides!!) {
+      val triggers = implementationGuide.implementationGuideConfig.triggers
+      for (trigger in triggers)
+        if (trigger.event == event)
+          return trigger.planDefinition
+      // val resource = jsonParser.parseResource(resourceJson.toString()) as Resource
+      // bundleCollection += resource
+    }
+    return ""
+  }
+
 
   fun getCareConfiguration(context: Context): CareConfiguration {
     if (careConfiguration == null) {

@@ -26,9 +26,11 @@ import java.util.Date
 import java.util.LinkedList
 import java.util.Locale
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Reference
@@ -77,7 +79,9 @@ class TimestampBasedDownloadWorkManagerImpl(
         "ValueSet",
         "StructureDefinition",
         "StructureMap",
-        "Task"
+        "Task",
+        "ActivityDefinition",
+        "Library"
       )
     )
 
@@ -168,6 +172,8 @@ class TimestampBasedDownloadWorkManagerImpl(
       is PlanDefinition -> return extractPlanDefinitionDependentResources(resource)
       is CarePlan -> return extractCarePlanDependentResources(resource)
       is Encounter -> return addEncounterRelatedResources(resource)
+      is Library -> return carePlanManager.installKnowledgeResource(resource)
+      is ActivityDefinition -> return carePlanManager.installKnowledgeResource(resource)
     }
     return emptyList()
   }

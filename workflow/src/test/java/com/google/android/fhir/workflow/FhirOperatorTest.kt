@@ -151,6 +151,38 @@ class FhirOperatorTest {
   }
 
   @Test
+  fun generateImmunizationRecordCarePlan() = runBlockingOnWorkerThread {
+    loadFile("/plan-definition/immunization/patient.json", ::importToFhirEngine)
+    loadFile(
+      "/plan-definition/immunization/plan_definition.json",
+      ::installToIgManager,
+    )
+    // loadFile("/plan-definition/immunization/immunizationreview-1.0.0.cql", ::installToIgManager)
+
+    val carePlan =
+      // fhirOperator.generateCarePlan(
+      //   planDefinitionId = "ImmunizationReviewPlanDefinition",
+      //   patientId = "Patient/Female-Patient-Example",
+      // )
+      // fhirOperator.generateCarePlan(
+      //   planDefinitionId = "Plan-ImmunizationReview",
+      //   patientId = "Patient/Female-Patient-Example",
+      // )
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "PlanImmunizationReview",
+        patientId = "Patient/Female-Patient-Example",
+      )
+
+    println(jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan))
+
+    assertEquals(
+      readResourceAsString("/plan-definition/cql-applicability-condition/care_plan.json"),
+      jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan),
+      true,
+    )
+  }
+
+  @Test
   @Ignore("Bug on workflow incorrectly returns 2022-12-31T00:00:00 instead of 2021-12-31T23:59:59")
   fun evaluatePopulationMeasure() = runBlockingOnWorkerThread {
     loadFile("/first-contact/01-registration/patient-charity-otala-1.json", ::importToFhirEngine)

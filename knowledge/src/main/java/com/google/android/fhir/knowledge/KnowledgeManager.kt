@@ -105,6 +105,28 @@ internal constructor(
     }
   }
 
+  suspend fun install(fhirNpmPackage: FhirNpmPackage, resourceList: List<Resource>, rootDirectory: File) {
+    // TODO(ktarasenko) copy files to the safe space?
+    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
+
+    resourceList.forEach { resource ->
+      importResource(igId, resource, File("$rootDirectory/${resource.id}"))
+    }
+
+    // rootDirectory.listFiles()?.forEach { file ->
+    //   try {
+    //     val resource = jsonParser.parseResource(FileInputStream(file))
+    //     if (resource is Resource) {
+    //       importResource(igId, resource, file)
+    //     } else {
+    //       Timber.d("Unable to import file: %file")
+    //     }
+    //   } catch (exception: Exception) {
+    //     Timber.d(exception, "Unable to import file: %file")
+    //   }
+    // }
+  }
+
   /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
     importFile(null, file)

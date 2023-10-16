@@ -1,0 +1,99 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "ActivityDefinition",
+        "id": "ActivityImmunizationReview",
+        "url": "http://example.com/ActivityDefinition/ActivityImmunizationReview",
+        "library": [
+          "http://localhost/Library/immunizationreview|1.0.0"
+        ],
+        "status": "active",
+        "kind": "Task",
+        "dynamicValue": [
+          {
+            "path": "focus",
+            "expression": {
+              "language": "text/cql.identifier",
+              "expression": "Get Immunization Review Questionnaire Reference"
+            }
+          },
+          {
+            "path": "for",
+            "expression": {
+              "language": "text/cql.identifier",
+              "expression": "Get Patient Reference"
+            }
+          },
+          {
+            "path": "description",
+            "expression": {
+              "language": "text/cql.identifier",
+              "expression": "Get Immunization Review Description"
+            }
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "ActivityDefinition/ActivityImmunizationReview"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "PlanDefinition",
+        "id": "PlanImmunizationReview",
+        "url" : "http://example.com/PlanDefinition/PlanImmunizationReview",
+        "status": "active",
+        "type": "workflow-definition",
+        "library": [
+          "http://localhost/Library/immunizationreview|1.0.0"
+        ],
+        "action": [
+          {
+            "title": "Test for Female Patient",
+            "definitionCanonical": "http://example.com/ActivityDefinition/ActivityImmunizationReview"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "PlanDefinition/PlanImmunizationReview"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Library",
+        "id": "immunizationreview",
+        "extension": [],
+        "url": "http://localhost/Library/immunizationreview|1.0.0",
+        "version": "1.0.0",
+        "name": "immunizationreview",
+        "relatedArtifact": [
+          {
+            "type": "depends-on",
+            "display": "FHIR model information",
+            "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+          },
+          {
+            "type": "depends-on",
+            "display": "Library FHIRHelpers",
+            "resource": "http://aphl.org/fhir/ecr/Library/FHIRHelpers|4.0.1"
+          }
+        ],
+        "content": [
+          {
+            "contentType": "text/cql",
+            "data": "bGlicmFyeSBpbW11bml6YXRpb25yZXZpZXcgdmVyc2lvbiAnMS4wLjAnCnVzaW5nIEZISVIgdmVyc2lvbiAnNC4wLjEnCmluY2x1ZGUgRkhJUkhlbHBlcnMgdmVyc2lvbiAnNC4wLjEnCgpkZWZpbmUgIkdldCBUYXNrIERlYWRsaW5lIjogVG9EYXRlKE5vdygpICsgMSB5ZWFyKQoKY29udGV4dCBQYXRpZW50CgovLyBQYXRpZW50IE9wZXJhdGlvbnMKZGVmaW5lICJHZXQgUGF0aWVudCBSZWZlcmVuY2UiOiBSZWZlcmVuY2UgewogIHJlZmVyZW5jZTogc3RyaW5nIHsgdmFsdWU6ICdQYXRpZW50LycgKyBQYXRpZW50LmlkfQp9CgoKLy8gSW1tdW5pemF0aW9uIFJldmlldyBTY3JlZW5pbmcKZGVmaW5lICJHZXQgSW1tdW5pemF0aW9uIFJldmlldyBEZXNjcmlwdGlvbiI6ICdJbW11bml6YXRpb24gUmV2aWV3JwpkZWZpbmUgIkdldCBJbW11bml6YXRpb24gUmV2aWV3IFF1ZXN0aW9ubmFpcmUgUmVmZXJlbmNlIjogUmVmZXJlbmNlIHsKICByZWZlcmVuY2U6IHN0cmluZyB7IHZhbHVlOiAnUXVlc3Rpb25uYWlyZS9RdWVzdGlvbm5haXJlLUlNTVpEMUNsaWVudEhpc3RvcnknfQp9CmRlZmluZSAiRWxpZ2libGUgZm9yIEltbXVuaXphdGlvbiBSZXZpZXciOiB0cnVlCg=="
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Library/immunizationreview"
+      }
+    }
+  ]
+}

@@ -18,6 +18,8 @@ package com.google.android.fhir.configurablecare.care
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.configurablecare.FhirApplication
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
@@ -67,11 +69,12 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
          * exhaustion.
          */
         runBlocking {
-          // carePlanManager.applyPlanDefinitionOnPatient(
-          //   currentPlanDefinitionId,
-          //   careWorkflowExecutionRequest.patient,
-          //   getActiveRequestResourceConfiguration()
-          // )
+          // carePlanManager.smartIgTest()
+          carePlanManager.applyPlanDefinitionOnPatient(
+            currentPlanDefinitionId,
+            careWorkflowExecutionRequest.patient,
+            getActiveRequestResourceConfiguration()
+          )
         }
         patientFlowForCareWorkflowExecution.emit(
           CareWorkflowExecutionRequest(
@@ -132,5 +135,14 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
 
   fun getActiveRequestResourceConfiguration(): List<RequestResourceConfig> {
     return activeRequestResourceConfiguration
+  }
+
+  fun setPlanDefinitionId(event: String) {
+    for (implementationGuide in ConfigurationManager.careConfiguration?.supportedImplementationGuides!!) {
+      val triggers = implementationGuide.implementationGuideConfig.triggers
+      for (trigger in triggers)
+        if (trigger.event == event)
+          currentPlanDefinitionId = trigger.planDefinition
+    }
   }
 }

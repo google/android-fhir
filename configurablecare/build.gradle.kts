@@ -63,6 +63,12 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
+// sourceSets {
+//   // getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+//
+//   getByName("com.google.android.fhir.configurablecare").apply { resources.setSrcDirs(listOf("sampledata")) }
+// }
+
 configurations { all { forceGuava() } }
 
 dependencies {

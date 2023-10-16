@@ -29,6 +29,9 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.fhir.configurablecare.care.CareWorkflowExecutionViewModel
+import com.google.android.fhir.testing.jsonParser
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** A fragment class to show patient registration screen. */
@@ -118,6 +121,8 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         )
         .show()
       // workflow execution in mainActivityViewModel is necessary
+      val questionnaireId = IdType((jsonParser.parseResource(viewModel.questionnaire) as Questionnaire).id).idPart
+      careWorkflowExecutionViewModel.setPlanDefinitionId("Questionnaire/${questionnaireId}")
       careWorkflowExecutionViewModel.executeCareWorkflowForPatient(it)
       NavHostFragment.findNavController(this)
         .previousBackStackEntry

@@ -34,6 +34,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.StringType
 import org.intellij.lang.annotations.Language
 import org.junit.Before
@@ -65,6 +66,32 @@ class FhirOperatorLibraryEvaluateJavaTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
+  }
+
+  @Test
+  fun evaluateImmunizationReviewLibrary() = runBlockingOnWorkerThread {
+    // Load patient
+    val patientImmunizationHistory = load("/plan-definition/immunization/patient.json") as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
+
+    val knowledgeResources = load("/plan-definition/immunization/plan_definition.json") as Bundle
+
+    for (entry in knowledgeResources.entry) {
+      val resource = entry.resource
+      if (resource is Library)
+        knowledgeManager.install(writeToFile(resource))
+    }
+    // Evaluates a specific Patient
+    val results =
+      fhirOperator.evaluateLibrary(
+        "http://localhost/Library/immunizationreview|1.0.0",
+        "Female-Patient-Example",
+        setOf("Get Patient Reference"),
+      ) as Parameters
+
+    assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
   }
 
   /**
