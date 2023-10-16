@@ -69,6 +69,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
               dueDate = "due date",
               completedDate = "completed date",
               owner = "owner",
+              fhirResourceId = "",
               clickable = false
             )
           }
@@ -80,9 +81,10 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
    * of [runBlocking]
    */
   fun fetchQuestionnaireString(taskItem: TaskItem): String = runBlocking {
-    iParser.encodeResourceToString(
-      taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
-    )
+    // iParser.encodeResourceToString(
+    //   taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
+    // )
+    iParser.encodeResourceToString(taskManager.fetchQuestionnaire(taskItem.fhirResourceId))
   }
 
   data class TaskItem(
@@ -95,6 +97,8 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     val dueDate: String,
     val completedDate: String,
     val owner: String,
+    val fhirResourceId: String,  // resource to be opened
+    // for Questionnaire/456 - this should be "Questionnaire/456"
     val clickable: Boolean
   ) {
     override fun toString() = description
@@ -116,6 +120,58 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   ) {
     override fun toString() = description
   }
+}
+
+internal fun Task.toRequestItem(position: Int): ListScreeningsViewModel.RequestItem {
+  val taskResourceId = if (hasIdElement()) idElement.idPart else ""
+  val description = if (hasDescription()) description else "Sample Task Name"
+  // status and intent are always present
+  val taskStatus = status.toCode()
+  val taskIntent = intent.toCode()
+  val dueDate =
+    if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
+    else "unknown"
+  val completedDate = if (hasLastModified()) lastModified.toString() else dueDate
+  val clickable =
+    focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
+
+  return ListScreeningsViewModel.RequestItem(
+    id = position.toString(),
+    resourceType = resourceType.toString(),
+    resourceId = taskResourceId,
+    description = description,
+    status = taskStatus,
+    intent = taskIntent,
+    dueDate = dueDate,
+    completedDate = completedDate,
+    fhirResourceId = if (clickable) focus.reference else "",
+    clickable = clickable
+  )
+}
+
+internal fun MedicationRequest.toRequestItem(position: Int): ListScreeningsViewModel.RequestItem {
+  val medicationRequestResourceId = if (hasIdElement()) idElement.idPart else ""
+  val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [${medicationCodeableConcept.codingFirstRep.code}]" else "No description"
+  // status and intent are always present
+  val medicationRequestStatus = status.toCode()
+  val medicationRequestIntent = intent.toCode()
+  val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else "unknown"
+  val completedDate = dueDate
+  val clickable = true
+  // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
+
+  return ListScreeningsViewModel.RequestItem(
+    id = position.toString(),
+    resourceType = resourceType.toString(),
+    resourceId = medicationRequestResourceId,
+    description = description,
+    status = medicationRequestStatus,
+    intent = medicationRequestIntent,
+    dueDate = dueDate,
+    completedDate = completedDate,
+    fhirResourceId = "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
+    clickable = clickable
+  )
 }
 
 internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
@@ -141,6 +197,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
     dueDate = dueDate,
     completedDate = completedDate,
     owner = owner,
+    fhirResourceId = if (clickable) focus.reference else "",
     clickable = clickable
   )
 }
@@ -148,14 +205,14 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
 internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskResourceId = if (hasIdElement()) idElement.idPart else ""
 
-  val description = "Medication Request"
+  val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [${medicationCodeableConcept.codingFirstRep.code}]" else "No description"
   // status and intent are always present
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
-  val dueDate = "Sample End Date"
+  val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else "unknown"
   val completedDate = dueDate
   val owner = ""
-  val clickable = false
+  val clickable = true
     // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
 
   return ListScreeningsViewModel.TaskItem(
@@ -167,6 +224,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
     dueDate = dueDate,
     completedDate = completedDate,
     owner = owner,
+    fhirResourceId = "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
     clickable = clickable
   )
 }

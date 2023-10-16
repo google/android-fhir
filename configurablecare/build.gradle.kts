@@ -20,6 +20,13 @@ android {
     versionName = Releases.ConfigurableCare.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
   }
+
+  sourceSets {
+    getByName("main").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    // getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+  }
+
   buildTypes {
     release {
       isMinifyEnabled = false

@@ -182,6 +182,10 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
     return questionnaire // questionnaires.firstOrNull()
   }
 
+  suspend fun fetchQuestionnaire(questionnaireId: String): Questionnaire {
+    return fhirEngine.get(IdType(questionnaireId).idPart)
+  }
+
   /** Fetch all Tasks for a given Patient */
   suspend fun getTasksForPatient(
     patientId: String,

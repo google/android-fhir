@@ -22,11 +22,10 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
-import com.google.android.fhir.workflow.FhirOperator
 import com.google.android.fhir.workflow.FhirOperator.Builder
 import com.google.android.fhir.workflow.TestBundleLoader
 import java.io.File
-import java.io.FileInputStream
+import java.net.URL
 import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
@@ -41,6 +40,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
+
 
 /** Responsible for creating and managing CarePlans */
 class CarePlanManager(
@@ -79,48 +79,60 @@ class CarePlanManager(
 
   suspend fun smartIgTest() {
     val loader = TestBundleLoader(fhirContext)
-    // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
-    // val root = File(readFileFromAssets(context, "smart-imm/ig/"))
-    // context.assets.list("smart-imm/ig")?.forEach { knowledgeManager.install(File(it)) }
-    // val rootDirectory = File("/Users/divyaramnath/release/configurable-care/fork/divyaramnath-13/android-fhir/configurablecare/src/main/assets/smart-imm/ig")
-    // println(rootDirectory)
-    val resourceList: MutableList<Resource> = mutableListOf()
-    val pathList = context.assets.list("smart-imm/ig")
-    if (pathList != null) {
-      for (path in pathList) {
-        val text = context.assets.open("smart-imm/ig/$path").bufferedReader().use { it.readText() }
-        if (!text.contains("resourceType"))
-          continue
-        val resource = jsonParser.parseResource(text)
-        if (resource is Resource) {
-          resourceList.add(resource)
-          print(jsonParser.encodeResourceToString(resource))
-        }
-      }
-    }
-    print(resourceList)
+    val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
 
     knowledgeManager.install(
       FhirNpmPackage(
-      "who.fhir.immunization",
-      "1.0.0",
-      "https://github.com/WorldHealthOrganization/smart-immunizations",
-    ),
-      resourceList,
-      File("smart-imm/ig"))
+        "who.fhir.immunization",
+        "1.0.0",
+        "https://github.com/WorldHealthOrganization/smart-immunizations",
+      ),
+      rootDirectory,
+    )
 
 
+    // val pathList = context.assets.list("smart-imm/ig")
+    // val url = javaClass.getResource("/assets/smart-imm/ig")!!.file
+    // val pathUrls: MutableList<URL> = mutableListOf()
+    // if (pathList != null) {
+    //   for (path in pathList) {
+    //     javaClass.getResource("/assets/smart-imm/ig/$path")?.let { pathUrls.add(it) }
+    //   }
+    // val text = context.assets.open("smart-imm/ig/$path").bufferedReader().use { it.readText() }
 
-    // if (rootDirectory != null) {
-    //   knowledgeManager.install(
-    //     FhirNpmPackage(
-    //       "who.fhir.immunization",
-    //       "1.0.0",
-    //       "https://github.com/WorldHealthOrganization/smart-immunizations",
-    //     ),
-    //     rootDirectory,
-    //   )
+    // val rootDirectory = File(url.toURI())
+
+    // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
+    // val root = File(readFileFromAssets(context, "smart-imm/ig/"))
+    // context.assets.list("smart-imm/ig")?.forEach { knowledgeManager.install(File(it)) }
+    // val rootDirectory = "/Users/divyaramnath/release/configurable-care/fork/divyaramnath-13/android-fhir/configurablecare/src/main/assets/smart-imm/ig"
+    // println(rootDirectory)
+    // val resourceMap: MutableMap<String, Resource> = mutableMapOf()
+    // val pathList = context.assets.list("smart-imm/ig")
+    // if (pathList != null) {
+    //   for (path in pathList) {
+    //     val text = context.assets.open("smart-imm/ig/$path").bufferedReader().use { it.readText() }
+    //     if (!text.contains("resourceType"))
+    //       continue
+    //     val resource = jsonParser.parseResource(text)
+    //     if (resource is Resource) {
+    //       resourceMap[path] = resource
+    //       print(jsonParser.encodeResourceToString(resource))
+    //     }
+    //   }
     // }
+    // print(resourceMap)
+
+
+    // knowledgeManager.install(
+    //   FhirNpmPackage(
+    //     "who.fhir.immunization",
+    //     "1.0.0",
+    //     "https://github.com/WorldHealthOrganization/smart-immunizations",
+    //   ),
+    //   pathUrls,
+    //   url
+    // )
 
     val planDef =
       knowledgeManager
@@ -130,17 +142,17 @@ class CarePlanManager(
         )
         .firstOrNull()
 
-    jsonParser.encodeResourceToString(planDef)
-    loader.loadFile(
-      "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/Patient/Patient-IMMZ-Patient-NoVaxeninfant-f.json",
-      ::importToFhirEngine,
-    )
-    loader.loadFile(
-      "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/Observation/Observation-birthweightnormal-NoVaxeninfant-f.json",
-      ::importToFhirEngine,
-    )
+    print(jsonParser.encodeResourceToString(planDef))
+
+    val carePlan =
+      fhirOperator.generateCarePlan(
+        planDefinitionId = "IMMZD2DTMeasles",
+        patientId = "IMMZ-Patient-NoVaxeninfant-f",
+      )
+    print(jsonParser.encodeResourceToString(carePlan))
 
   }
+
 
   private suspend fun importToFhirEngine(resource: Resource) {
     fhirEngine.create(resource)
@@ -197,6 +209,9 @@ class CarePlanManager(
    * running $apply on a [PlanDefinition]
    */
   private suspend fun loadCarePlanResourcesFromDb() {
+
+    smartIgTest()
+
     // Load Library resources
     val availableCqlLibraries = fhirEngine.search<Library> {}
     val availablePlanDefinitions = fhirEngine.search<PlanDefinition> {}
@@ -225,7 +240,7 @@ class CarePlanManager(
   suspend fun applyPlanDefinitionOnPatient(
     planDefinitionId: String,
     patient: Patient,
-    requestResourceConfigs: List<RequestResourceConfig>
+    requestResourceConfigs: List<RequestResourceConfig>,
   ) {
     var patientId = IdType(patient.id).idPart
 
@@ -271,7 +286,7 @@ class CarePlanManager(
   suspend fun applyPlanDefinitionOnMultiplePatients(
     planDefinitionId: String,
     patientList: List<Patient>,
-    requestResourceConfigs: List<RequestResourceConfig>
+    requestResourceConfigs: List<RequestResourceConfig>,
   ) {
     if (cqlLibraryIdList.isEmpty()) {
       loadCarePlanResourcesFromDb()
@@ -317,7 +332,7 @@ class CarePlanManager(
   /** Link the request resources created for the [Patient] back to the [CarePlan] of record */
   private fun addRequestResourcesToCarePlanOfRecord(
     carePlan: CarePlan,
-    requestResourceList: List<Resource>
+    requestResourceList: List<Resource>,
   ) {
     for (resource in requestResourceList) {
       when (resource.fhirType()) {
@@ -339,7 +354,7 @@ class CarePlanManager(
   /** Add the [CarePlan] reference to the request resources */
   private suspend fun linkRequestResourcesToCarePlan(
     carePlan: CarePlan,
-    requestResourceList: List<Resource>
+    requestResourceList: List<Resource>,
   ) {
     for (resource in requestResourceList) {
       when (resource.fhirType()) {
@@ -366,7 +381,7 @@ class CarePlanManager(
    */
   private suspend fun createProposedRequestResources(
     resourceList: List<Resource>,
-    requestResourceConfigs: List<RequestResourceConfig>
+    requestResourceConfigs: List<RequestResourceConfig>,
   ): List<Resource> {
     val createdRequestResources = ArrayList<Resource>()
     for (resource in resourceList) {
@@ -406,7 +421,7 @@ class CarePlanManager(
   private suspend fun acceptCarePlan(
     proposedCarePlan: CarePlan,
     carePlanOfRecord: CarePlan,
-    requestResourceConfigs: List<RequestResourceConfig>
+    requestResourceConfigs: List<RequestResourceConfig>,
   ) {
     val resourceList =
       createProposedRequestResources(proposedCarePlan.contained, requestResourceConfigs)

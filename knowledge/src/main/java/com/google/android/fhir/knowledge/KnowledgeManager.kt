@@ -28,6 +28,7 @@ import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
 import com.google.android.fhir.knowledge.npm.OkHttpNpmPackageDownloader
 import java.io.File
 import java.io.FileInputStream
+import java.net.URL
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -105,27 +106,25 @@ internal constructor(
     }
   }
 
-  suspend fun install(fhirNpmPackage: FhirNpmPackage, resourceList: List<Resource>, rootDirectory: File) {
-    // TODO(ktarasenko) copy files to the safe space?
-    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
-
-    resourceList.forEach { resource ->
-      importResource(igId, resource, File("$rootDirectory/${resource.id}"))
+  suspend fun install(fhirNpmPackage: FhirNpmPackage, pathUrls: List<URL>, rootDirectory: URL) {
+    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(File(rootDirectory.toURI())))
+    for (path in pathUrls) {
+      try {
+        val file = File(path.toURI())
+        if (!path.toString().contains("json") || path.toString().contains("-2"))
+          continue
+        val resource = jsonParser.parseResource(FileInputStream(file))
+        if (resource is Resource) {
+          importResource(igId, resource, file)
+        } else {
+          Timber.d("Unable to import file: %file")
+        }
+      } catch (exception: Exception) {
+        Timber.d(exception, "Unable to import file: %file")
+      }
     }
-
-    // rootDirectory.listFiles()?.forEach { file ->
-    //   try {
-    //     val resource = jsonParser.parseResource(FileInputStream(file))
-    //     if (resource is Resource) {
-    //       importResource(igId, resource, file)
-    //     } else {
-    //       Timber.d("Unable to import file: %file")
-    //     }
-    //   } catch (exception: Exception) {
-    //     Timber.d(exception, "Unable to import file: %file")
-    //   }
-    // }
   }
+
 
   /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {

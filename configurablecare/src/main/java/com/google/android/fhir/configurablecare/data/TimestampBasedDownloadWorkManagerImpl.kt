@@ -82,7 +82,8 @@ class TimestampBasedDownloadWorkManagerImpl(
         "StructureMap",
         "Task",
         "ActivityDefinition",
-        "Library"
+        "Library",
+        "ValueSet"
       )
     )
 
