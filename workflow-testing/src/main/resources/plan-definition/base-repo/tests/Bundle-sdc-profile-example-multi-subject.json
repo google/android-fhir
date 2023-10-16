@@ -1,0 +1,337 @@
+{
+  "resourceType": "Bundle",
+  "id": "extract-sdc-profile-example-multi-subject",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.3",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "3"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/12345"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 141,
+          "system": "http://unitsofmeasure.org",
+          "code": "cm"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.3"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.4",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "4"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/12345"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 42.3,
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.4"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.5.4",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "5.4"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/123456"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 47,
+          "system": "http://unitsofmeasure.org",
+          "code": "cm"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.5.4"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.5.5",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "5.5"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/123456"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 8.7,
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.5.5"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.5.4",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "5.4"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/123456"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 109,
+          "system": "http://unitsofmeasure.org",
+          "code": "cm"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.5.4"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "extract-sdc-profile-example-multi-subject.5.5",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/derivedFromLinkId",
+            "extension": [
+              {
+                "url": "text",
+                "valueString": "5.5"
+              }
+            ]
+          }
+        ],
+        "status": "final",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/observation-category",
+                "code": "survey"
+              }
+            ]
+          }
+        ],
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "http://example.org/fhir/Patient/123456"
+        },
+        "effectiveDateTime": "2021-12-01T07:00:00Z",
+        "issued": "2021-12-01T07:00:00.000+00:00",
+        "valueQuantity": {
+          "value": 27.3,
+          "system": "http://unitsofmeasure.org",
+          "code": "kg"
+        },
+        "derivedFrom": [
+          {
+            "reference": "QuestionnaireResponse/sdc-profile-example-multi-subject"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/extract-sdc-profile-example-multi-subject.5.5"
+      }
+    }
+  ]
+}

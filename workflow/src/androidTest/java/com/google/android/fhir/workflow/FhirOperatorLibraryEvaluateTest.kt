@@ -48,7 +48,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val jsonParser = fhirContext.newJsonParser()
 
   private fun open(asset: String): InputStream? {

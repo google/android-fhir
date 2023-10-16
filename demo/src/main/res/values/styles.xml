@@ -13,29 +13,59 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
-        <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:statusBarColor">@color/colorStatusBar</item>
-        <item name="enabledMenuIconColor">@color/white</item>
-        <item name="disabledMenuIconColor">@color/disable_state</item>
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/primary_blue_40</item>
+        <item name="colorOnPrimary">@color/onPrimary_blue_100</item>
+        <item
+            name="colorPrimaryContainer"
+        >@color/primaryContainer_blue_90</item>
+        <item
+            name="colorOnPrimaryContainer"
+        >@color/onPrimaryContainer_blue_10</item>
+
+        <item name="colorSecondary">@color/secondary_blue_40</item>
+        <item name="colorOnSecondary">@color/onSecondary_blue_100</item>
+        <item
+            name="colorSecondaryContainer"
+        >@color/secondaryContainer_blue_90</item>
+        <item
+            name="colorOnSecondaryContainer"
+        >@color/onSecondaryContainer_blue_10</item>
+
+        <item name="colorTertiary">@color/tertiary_green_40</item>
+        <item name="colorOnTertiary">@color/onTertiary_green_100</item>
+        <item
+            name="colorTertiaryContainer"
+        >@color/tertiaryContainer_green_90</item>
+        <item
+            name="colorOnTertiaryContainer"
+        >@color/onTertiaryContainer_green_10</item>
+
+        <item name="colorError">@color/error_red_40</item>
+        <item name="colorErrorContainer">@color/errorContainer_red_100</item>
+        <item name="colorOnError">@color/onError_red_90</item>
+        <item name="colorOnErrorContainer">@color/onErrorContainer_red_10</item>
+
+        <item
+            name="android:colorBackground"
+        >@color/background_neutral_100</item>
+        <item name="colorOnBackground">@color/onBackground_neutral_10</item>
+
+        <item name="colorSurface">@color/surface_neutral_100</item>
+        <item name="colorOnSurface">@color/onSurface_neutral_10</item>
+
+        <item
+            name="colorSurfaceVariant"
+        >@color/surfaceVariant_neutral_variant_90</item>
+        <item
+            name="colorOnSurfaceVariant"
+        >@color/onSurfaceVariant_neutral_variant_30</item>
+
+        <item name="colorOutline">@color/outline_neutral_variant_50</item>
+
     </style>
-
-    <style name="AppTheme.NoActionBar">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-    </style>
-
-    <style
-        name="AppTheme.AppBarOverlay"
-        parent="ThemeOverlay.AppCompat.Dark.ActionBar"
-    />
-
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <style name="AppCard" parent="Widget.MaterialComponents.CardView">
         <item name="cardElevation">8dp</item>

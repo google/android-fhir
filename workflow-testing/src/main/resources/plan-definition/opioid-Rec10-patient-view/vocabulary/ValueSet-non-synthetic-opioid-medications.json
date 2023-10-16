@@ -1,0 +1,1801 @@
+{
+  "resourceType": "ValueSet",
+  "id": "non-synthetic-opioid-medications",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-rules-text",
+      "valueMarkdown": "https://mor.nlm.nih.gov/RxMix/ Script: ?Step 1 Upload to RxMix a workflow config file  named GetRelatedByType.config containing the following workflow text: <WFE><filteredOutputs>RXCUI|name|term_type</filteredOutputs><input>NOINPUT</input><FS><service>NOINPUT</service><function>getRelatedByType</function><level>0</level><paramSize>2</paramSize><param order ='0'>?</param><param order ='1'>BPCK,GPCK,SBD,SCD</param></FS></WFE> ??Step 2 Create Batch text input file (Ingredients.txt) with following RxNorm non-synthetic opioid ingredient codes representing morphine, codeine, opium as an input within the file:?2670?7052?7676??Step 3 Upload the batch text input file Ingredients.txt created in step 2. ??Step 4 Submit the batch which will run the workflow using the input codes to generate a combined set of all the concepts needed."
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/non-synthetic-opioid-medications",
+  "name": "non_synthetic_opioid_medications",
+  "title": "Non-synthetic opioid medications",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Medications derived from the opium plant that are not synthetically created . All metabolize to morphine.",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "copyright": "© CDC 2016+.",
+  "expansion": {
+    "identifier": "a5f5cd26-090e-40b6-871e-242eea85be23",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088953",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088965",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3.33 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088970",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3.75 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088977",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089023",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 4.29 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089027",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 5 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089030",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Suspension [Zodryl DEC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089057",
+        "display": "codeine phosphate 10 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 20 MG Oral Tablet [Ambifed-G CD]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089060",
+        "display": "codeine phosphate 10 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 30 MG Oral Tablet [Ambifed CD]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1190587",
+        "display": "codeine phosphate 1.2 MG/ML / dexbrompheniramine maleate 0.133 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Solution [M-End Max D]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1242558",
+        "display": "chlorcyclizine hydrochloride 2.5 MG/ML / codeine phosphate 1.8 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution [Statuss Green Reformulated Jan 2012]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1244921",
+        "display": "brompheniramine maleate 0.266 MG/ML / codeine phosphate 1.27 MG/ML / phenylephrine hydrochloride 0.666 MG/ML Oral Solution [M-End PE]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356799",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 10 MG / phenylephrine hydrochloride 10 MG Oral Tablet [Brovex PBC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356802",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 10 MG Oral Tablet [BroveX CB]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356806",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 20 MG / phenylephrine hydrochloride 10 MG Oral Tablet [Brovex PBC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356809",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 20 MG Oral Tablet [BroveX CB]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1433802",
+        "display": "acetaminophen 300 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule [Fioricet with Codeine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1547607",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution [Lortuss EX]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595214",
+        "display": "codeine phosphate 1.6 MG/ML / guaifenesin 40 MG/ML Oral Solution [Ninjacof XG]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1652093",
+        "display": "12 HR chlorpheniramine polistirex 0.8 MG/ML / codeine polistirex 4 MG/ML Extended Release Suspension [Tuzistra]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2099286",
+        "display": "12 HR chlorpheniramine maleate 8 MG / codeine phosphate 54.3 MG Extended Release Oral Tablet [Tuxarin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993837",
+        "display": "acetaminophen 300 MG / codeine phosphate 30 MG Oral Tablet [Tylenol with Codeine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993892",
+        "display": "acetaminophen 300 MG / codeine phosphate 60 MG Oral Tablet [Tylenol with Codeine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994239",
+        "display": "aspirin 325 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule [Ascomp]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994277",
+        "display": "aspirin 325 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule [Fiorinal with Codeine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994404",
+        "display": "brompheniramine maleate 0.4 MG/ML / codeine phosphate 1.5 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution [Mar-cof BP]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995043",
+        "display": "chlorpheniramine maleate 0.2 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 3 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995064",
+        "display": "chlorpheniramine maleate 0.2 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995067",
+        "display": "chlorpheniramine maleate 0.222 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 3.33 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995070",
+        "display": "chlorpheniramine maleate 0.222 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995073",
+        "display": "chlorpheniramine maleate 0.25 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995077",
+        "display": "chlorpheniramine maleate 0.25 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 0.375 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995081",
+        "display": "chlorpheniramine maleate 0.266 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995084",
+        "display": "chlorpheniramine maleate 0.267 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995088",
+        "display": "chlorpheniramine maleate 0.286 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 4.29 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995095",
+        "display": "chlorpheniramine maleate 0.286 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995110",
+        "display": "chlorpheniramine maleate 0.333 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 5 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995118",
+        "display": "chlorpheniramine maleate 0.333 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995122",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Suspension [Zodryl DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995125",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1 MG/ML Oral Suspension [Zodryl AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995132",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1.8 MG/ML Oral Solution [Z Tuss AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995440",
+        "display": "codeine phosphate 1.26 MG/ML / guaifenesin 20 MG/ML Oral Solution [M-Clear WC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995443",
+        "display": "codeine phosphate 1.5 MG/ML / guaifenesin 45 MG/ML Oral Solution [Mar-cof CG]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995872",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML Oral Solution [Cheratussin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995936",
+        "display": "codeine phosphate 10 MG / guaifenesin 300 MG Oral Tablet [Brontex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995940",
+        "display": "codeine phosphate 0.5 MG/ML / guaifenesin 15 MG/ML Oral Solution [Brontex]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995956",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML Oral Solution [Cheracol with Codeine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995985",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution [Biotussin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995993",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution [Cheratussin DAC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996481",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML Oral Solution [Mytussin AC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996584",
+        "display": "codeine phosphate 2 MG/ML / phenylephrine hydrochloride 1 MG/ML / pyrilamine maleate 1 MG/ML Oral Solution [Zotex C]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996708",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / phenylephrine hydrochloride 10 MG Oral Tablet [Maxiphen CDX]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996712",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 20 MG Oral Tablet [Ambifed-G CD]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996716",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 30 MG Oral Tablet [Ambifed CD]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996727",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG Oral Tablet [Allfen CDX]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996730",
+        "display": "codeine phosphate 20 MG / pseudoephedrine hydrochloride 60 MG Oral Capsule [Nucofed]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996738",
+        "display": "codeine phosphate 9 MG / guaifenesin 200 MG Oral Capsule [M-Clear WC]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1042693",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 2 MG/ML / phenylephrine hydrochloride 1 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088951",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088963",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3.33 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088968",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 3.75 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1088975",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089021",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 4.29 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089025",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 5 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089028",
+        "display": "codeine phosphate 1 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089055",
+        "display": "codeine phosphate 10 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 20 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1089058",
+        "display": "codeine phosphate 10 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1113417",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 2 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1114026",
+        "display": "codeine phosphate 1.6 MG/ML / guaifenesin 40 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1190580",
+        "display": "codeine phosphate 1.2 MG/ML / dexbrompheniramine maleate 0.133 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1235862",
+        "display": "chlorcyclizine hydrochloride 2.5 MG/ML / codeine phosphate 1.8 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1294356",
+        "display": "bromodiphenhydramine hydrochloride 2.5 MG/ML / codeine phosphate 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356797",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 10 MG / phenylephrine hydrochloride 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356800",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356804",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 20 MG / phenylephrine hydrochloride 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1356807",
+        "display": "brompheniramine maleate 4 MG / codeine phosphate 20 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1357402",
+        "display": "brompheniramine maleate 0.4 MG/ML / codeine phosphate 2 MG/ML / phenylpropanolamine hydrochloride 2.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1431286",
+        "display": "acetaminophen 300 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1440003",
+        "display": "codeine phosphate 1.8 MG/ML / dexchlorpheniramine maleate 0.2 MG/ML / phenylephrine hydrochloride 1 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1536457",
+        "display": "acetaminophen 500 MG / codeine phosphate 8 MG Effervescent Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1536459",
+        "display": "acetaminophen 500 MG / codeine phosphate 30 MG Effervescent Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1541630",
+        "display": "brompheniramine maleate 0.8 MG/ML / codeine phosphate 2 MG/ML / phenylephrine hydrochloride 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1652087",
+        "display": "12 HR chlorpheniramine polistirex 0.8 MG/ML / codeine polistirex 4 MG/ML Extended Release Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1661319",
+        "display": "codeine phosphate 2 MG/ML / phenylephrine hydrochloride 2 MG/ML / triprolidine hydrochloride 0.5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1664543",
+        "display": "12 HR chlorpheniramine maleate 8 MG / codeine phosphate 54.3 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1792707",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 40 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2056893",
+        "display": "chlorpheniramine maleate 0.8 MG/ML / codeine phosphate 2 MG/ML / phenylephrine hydrochloride 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "991486",
+        "display": "codeine phosphate 2 MG/ML / promethazine hydrochloride 1.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993755",
+        "display": "acetaminophen 24 MG/ML / codeine phosphate 2.4 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993770",
+        "display": "acetaminophen 300 MG / codeine phosphate 15 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993781",
+        "display": "acetaminophen 300 MG / codeine phosphate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993890",
+        "display": "acetaminophen 300 MG / codeine phosphate 60 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "993943",
+        "display": "acetaminophen 325 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994043",
+        "display": "acetaminophen 500 MG / codeine phosphate 15 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994046",
+        "display": "acetaminophen 500 MG / codeine phosphate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994226",
+        "display": "aspirin 325 MG / carisoprodol 200 MG / codeine phosphate 16 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994237",
+        "display": "aspirin 325 MG / butalbital 50 MG / caffeine 40 MG / codeine phosphate 30 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994289",
+        "display": "brompheniramine maleate 0.27 MG/ML / codeine phosphate 1.27 MG/ML / pseudoephedrine hydrochloride 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "994402",
+        "display": "brompheniramine maleate 0.4 MG/ML / codeine phosphate 1.5 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995041",
+        "display": "chlorpheniramine maleate 0.2 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 3 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995062",
+        "display": "chlorpheniramine maleate 0.2 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995065",
+        "display": "chlorpheniramine maleate 0.222 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 3.33 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995068",
+        "display": "chlorpheniramine maleate 0.222 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995071",
+        "display": "chlorpheniramine maleate 0.25 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995075",
+        "display": "chlorpheniramine maleate 0.25 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 0.375 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995079",
+        "display": "chlorpheniramine maleate 0.266 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 4 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995082",
+        "display": "chlorpheniramine maleate 0.267 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995086",
+        "display": "chlorpheniramine maleate 0.286 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 4.29 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995093",
+        "display": "chlorpheniramine maleate 0.286 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995108",
+        "display": "chlorpheniramine maleate 0.333 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 5 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995116",
+        "display": "chlorpheniramine maleate 0.333 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995120",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995123",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995128",
+        "display": "chlorpheniramine maleate 0.4 MG/ML / codeine phosphate 1.8 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995226",
+        "display": "codeine phosphate 0.5 MG/ML / guaifenesin 15 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995438",
+        "display": "codeine phosphate 1.26 MG/ML / guaifenesin 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995441",
+        "display": "codeine phosphate 1.5 MG/ML / guaifenesin 45 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995450",
+        "display": "codeine phosphate 10 MG / guaifenesin 300 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995483",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 40 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995868",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "995983",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 20 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996512",
+        "display": "codeine phosphate 2 MG/ML / guaifenesin 60 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996580",
+        "display": "codeine phosphate 2 MG/ML / phenylephrine hydrochloride 1 MG/ML / pyrilamine maleate 1 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996655",
+        "display": "codeine phosphate 2 MG/ML / pseudoephedrine hydrochloride 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996706",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / phenylephrine hydrochloride 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996710",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 20 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996714",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG / pseudoephedrine hydrochloride 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996725",
+        "display": "codeine phosphate 20 MG / guaifenesin 400 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996728",
+        "display": "codeine phosphate 20 MG / pseudoephedrine hydrochloride 60 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996734",
+        "display": "codeine phosphate 5 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996736",
+        "display": "codeine phosphate 9 MG / guaifenesin 200 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996757",
+        "display": "codeine phosphate 2 MG/ML / phenylephrine hydrochloride 1 MG/ML / promethazine hydrochloride 1.25 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996976",
+        "display": "acetaminophen 500 MG / codeine phosphate 12.8 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996978",
+        "display": "acetaminophen 500 MG / codeine phosphate 13.5 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996979",
+        "display": "acetaminophen 500 MG / codeine phosphate 30 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996981",
+        "display": "acetaminophen 500 MG / codeine phosphate 8 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996982",
+        "display": "acetaminophen 500 MG / codeine phosphate 8 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996988",
+        "display": "aspirin 300 MG / codeine phosphate 8 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996991",
+        "display": "aspirin 325 MG / codeine phosphate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996994",
+        "display": "aspirin 325 MG / codeine phosphate 60 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "996998",
+        "display": "brompheniramine maleate 0.266 MG/ML / codeine phosphate 1.27 MG/ML / phenylephrine hydrochloride 0.666 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997019",
+        "display": "codeine phosphate 1 MG/ML / kaolin 300 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997164",
+        "display": "codeine phosphate 12.5 MG / ibuprofen 200 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997165",
+        "display": "codeine phosphate 12.8 MG / ibuprofen 200 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997169",
+        "display": "codeine phosphate 15 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997170",
+        "display": "codeine sulfate 15 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997280",
+        "display": "codeine phosphate 20 MG / ibuprofen 300 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997284",
+        "display": "codeine phosphate 3 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997285",
+        "display": "codeine phosphate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997287",
+        "display": "codeine sulfate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997296",
+        "display": "codeine sulfate 60 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997301",
+        "display": "codeine phosphate 60 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997303",
+        "display": "codeine phosphate 60 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1303738",
+        "display": "morphine sulfate 40 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728784",
+        "display": "10 ML morphine sulfate 0.5 MG/ML Injection [Astramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728792",
+        "display": "2 ML morphine sulfate 0.5 MG/ML Injection [Astramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728801",
+        "display": "10 ML morphine sulfate 1 MG/ML Injection [Astramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728806",
+        "display": "2 ML morphine sulfate 1 MG/ML Injection [Astramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731999",
+        "display": "20 ML morphine sulfate 10 MG/ML Injection [Infumorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745881",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745886",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 100 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745889",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745892",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871440",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871443",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871446",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2055307",
+        "display": "20 ML morphine sulfate 10 MG/ML Injection [Mitigo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2055311",
+        "display": "20 ML morphine sulfate 25 MG/ML Injection [Mitigo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863847",
+        "display": "Abuse-Deterrent morphine sulfate 100 MG / naltrexone hydrochloride 4 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863849",
+        "display": "Abuse-Deterrent morphine sulfate 20 MG / naltrexone hydrochloride 0.8 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863851",
+        "display": "Abuse-Deterrent morphine sulfate 30 MG / naltrexone hydrochloride 1.2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863853",
+        "display": "Abuse-Deterrent morphine sulfate 50 MG / naltrexone hydrochloride 2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863855",
+        "display": "Abuse-Deterrent morphine sulfate 60 MG / naltrexone hydrochloride 2.4 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863857",
+        "display": "Abuse-Deterrent morphine sulfate 80 MG / naltrexone hydrochloride 3.2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892473",
+        "display": "10 ML morphine sulfate 0.5 MG/ML Injection [Duramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892489",
+        "display": "10 ML morphine sulfate 1 MG/ML Injection [Duramorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892496",
+        "display": "morphine sulfate 10 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892556",
+        "display": "morphine sulfate 100 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892560",
+        "display": "morphine sulfate 100 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892574",
+        "display": "morphine sulfate 15 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892598",
+        "display": "morphine sulfate 20 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892645",
+        "display": "morphine sulfate 200 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892648",
+        "display": "morphine sulfate 200 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892652",
+        "display": "20 ML morphine sulfate 25 MG/ML Injection [Infumorph]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892658",
+        "display": "morphine sulfate 30 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892660",
+        "display": "morphine sulfate 30 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894803",
+        "display": "morphine sulfate 50 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894805",
+        "display": "morphine sulfate 60 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894813",
+        "display": "morphine sulfate 60 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894816",
+        "display": "morphine sulfate 80 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1232113",
+        "display": "1 ML morphine sulfate 15 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1303736",
+        "display": "morphine sulfate 40 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1442790",
+        "display": "1 ML morphine sulfate 5 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728783",
+        "display": "10 ML morphine sulfate 0.5 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728791",
+        "display": "2 ML morphine sulfate 0.5 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728800",
+        "display": "10 ML morphine sulfate 1 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728805",
+        "display": "2 ML morphine sulfate 1 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1728999",
+        "display": "30 ML morphine sulfate 1 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1729197",
+        "display": "1 ML morphine sulfate 2 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731517",
+        "display": "10 ML morphine sulfate 25 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731520",
+        "display": "4 ML morphine sulfate 25 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731522",
+        "display": "20 ML morphine sulfate 25 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731537",
+        "display": "20 ML morphine sulfate 50 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731545",
+        "display": "50 ML morphine sulfate 50 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731990",
+        "display": "1.5 ML morphine sulfate liposomal 10 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731993",
+        "display": "1 ML morphine sulfate 10 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731995",
+        "display": "1 ML morphine sulfate 10 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1731998",
+        "display": "20 ML morphine sulfate 10 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732003",
+        "display": "1 ML morphine sulfate 8 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732006",
+        "display": "1 ML morphine sulfate 4 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732011",
+        "display": "1 ML morphine sulfate 8 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732014",
+        "display": "1 ML morphine sulfate 4 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732136",
+        "display": "1 ML morphine sulfate 5 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1732138",
+        "display": "30 ML morphine sulfate 5 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1733080",
+        "display": "1 ML morphine sulfate 15 MG/ML Cartridge"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871434",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871441",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871444",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1872234",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "2003714",
+        "display": "1 ML morphine sulfate 2 MG/ML Injection"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "250304",
+        "display": "cyclizine 50 MG/ML / morphine 10 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "250305",
+        "display": "cyclizine 50 MG/ML / morphine 15 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863845",
+        "display": "Abuse-Deterrent morphine sulfate 100 MG / naltrexone hydrochloride 4 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863848",
+        "display": "Abuse-Deterrent morphine sulfate 20 MG / naltrexone hydrochloride 0.8 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863850",
+        "display": "Abuse-Deterrent morphine sulfate 30 MG / naltrexone hydrochloride 1.2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863852",
+        "display": "Abuse-Deterrent morphine sulfate 50 MG / naltrexone hydrochloride 2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863854",
+        "display": "Abuse-Deterrent morphine sulfate 60 MG / naltrexone hydrochloride 2.4 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863856",
+        "display": "Abuse-Deterrent morphine sulfate 80 MG / naltrexone hydrochloride 3.2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891874",
+        "display": "morphine sulfate 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891881",
+        "display": "morphine sulfate 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891888",
+        "display": "morphine sulfate 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891893",
+        "display": "morphine sulfate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892297",
+        "display": "24 HR morphine sulfate 120 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892342",
+        "display": "24 HR morphine sulfate 30 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892345",
+        "display": "morphine sulfate 30 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892349",
+        "display": "24 HR morphine sulfate 60 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892352",
+        "display": "morphine sulfate 60 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892355",
+        "display": "24 HR morphine sulfate 90 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892494",
+        "display": "morphine sulfate 10 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892516",
+        "display": "morphine sulfate 10 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892531",
+        "display": "morphine sulfate 10 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892554",
+        "display": "morphine sulfate 100 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892579",
+        "display": "morphine sulfate 15 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892582",
+        "display": "morphine sulfate 15 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892589",
+        "display": "morphine sulfate 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892596",
+        "display": "morphine sulfate 20 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892603",
+        "display": "morphine sulfate 20 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892625",
+        "display": "morphine sulfate 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892643",
+        "display": "morphine sulfate 200 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892646",
+        "display": "morphine sulfate 200 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892669",
+        "display": "morphine sulfate 30 MG Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892672",
+        "display": "morphine sulfate 30 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892678",
+        "display": "morphine sulfate 30 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894780",
+        "display": "morphine sulfate 4 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894801",
+        "display": "morphine sulfate 50 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894807",
+        "display": "morphine sulfate 5 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894814",
+        "display": "morphine sulfate 80 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894911",
+        "display": "0.7 ML morphine sulfate 14.3 MG/ML Auto-Injector"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894912",
+        "display": "1 ML morphine sulfate 10 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894914",
+        "display": "1 ML morphine sulfate 8 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894942",
+        "display": "24 HR morphine sulfate 45 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894970",
+        "display": "24 HR morphine sulfate 75 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895014",
+        "display": "morphine sulfate 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895016",
+        "display": "morphine sulfate 10 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895022",
+        "display": "morphine sulfate 100 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895185",
+        "display": "morphine sulfate 15 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895194",
+        "display": "morphine sulfate 15 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895199",
+        "display": "morphine sulfate 2 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895201",
+        "display": "morphine sulfate 20 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895202",
+        "display": "morphine sulfate 20 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895206",
+        "display": "morphine sulfate 200 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895208",
+        "display": "morphine sulfate 3 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895213",
+        "display": "morphine sulfate 30 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895215",
+        "display": "morphine sulfate 35 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895217",
+        "display": "morphine sulfate 5 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895219",
+        "display": "morphine sulfate 5 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895221",
+        "display": "morphine sulfate 50 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895227",
+        "display": "morphine sulfate 50 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895238",
+        "display": "morphine sulfate 6 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895240",
+        "display": "morphine sulfate 6.67 MG/ML Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895247",
+        "display": "morphine sulfate 60 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895248",
+        "display": "morphine sulfate 75 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895975",
+        "display": "morphine sulfate liposomal 10 MG/ML Injectable Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "998212",
+        "display": "1 ML morphine sulfate 2 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "998213",
+        "display": "1 ML morphine sulfate 4 MG/ML Prefilled Syringe"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "312104",
+        "display": "belladonna alkaloids 16.2 MG / opium 30 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "312107",
+        "display": "belladonna alkaloids 16.2 MG / opium 60 MG Rectal Suppository"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "830196",
+        "display": "opium tincture 100 MG/ML Oral Solution"
+      }
+    ]
+  }
+}
