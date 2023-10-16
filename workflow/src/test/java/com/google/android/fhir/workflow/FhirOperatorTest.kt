@@ -99,7 +99,7 @@ class FhirOperatorTest {
     assertThat(
         fhirOperator.generateCarePlan(
           planDefinitionId = "plandefinition-RuleFilters-1.0.0",
-          patientId = "Reportable",
+          subject = "Patient/Reportable",
           encounterId = "reportable-encounter",
         ),
       )
@@ -114,7 +114,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "MedRequest-Example",
-        patientId = "Patient/Patient-Example",
+        subject = "Patient/Patient-Example",
       )
 
     println(jsonParser.encodeResourceToString(carePlan))
@@ -138,7 +138,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "Plan-Definition-Example",
-        patientId = "Patient/Female-Patient-Example",
+        subject = "Patient/Female-Patient-Example",
       )
 
     println(jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan))
