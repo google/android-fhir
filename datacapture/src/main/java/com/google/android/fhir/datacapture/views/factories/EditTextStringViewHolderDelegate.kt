@@ -34,7 +34,10 @@ internal class EditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
   ) {
-  override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+  override suspend fun handleInput(
+    editable: Editable,
+    questionnaireViewItem: QuestionnaireViewItem,
+  ) {
     val input = getValue(editable.toString())
     if (input != null) {
       questionnaireViewItem.setAnswer(input)

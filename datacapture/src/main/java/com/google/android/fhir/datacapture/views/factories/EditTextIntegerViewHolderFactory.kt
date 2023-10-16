@@ -37,7 +37,10 @@ internal object EditTextIntegerViewHolderFactory :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
-      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+      override suspend fun handleInput(
+        editable: Editable,
+        questionnaireViewItem: QuestionnaireViewItem,
+      ) {
         val input = editable.toString()
         if (input.isEmpty()) {
           questionnaireViewItem.clearAnswer()

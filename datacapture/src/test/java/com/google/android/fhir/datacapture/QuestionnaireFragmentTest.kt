@@ -19,7 +19,9 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
@@ -36,6 +38,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
@@ -70,15 +73,15 @@ class QuestionnaireFragmentTest {
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
+    val questionnaireFragment =
+      QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).build()
+    val appCompatActivity = Robolectric.buildActivity(AppCompatActivity::class.java).create().get()
+    startFragment(questionnaireFragment, appCompatActivity)
+    assertThat(questionnaireFragment.getQuestionnaireResponse()).isNotNull()
+    assertThat(
+        questionnaireFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
       )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      assertThat(this.getQuestionnaireResponse()).isNotNull()
-      assertThat(this.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" }).isTrue()
-    }
+      .isTrue()
   }
 
   @Test
@@ -158,17 +161,15 @@ class QuestionnaireFragmentTest {
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(questionnaireJson)
-          .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
-          .buildArgs(),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get().size).isEqualTo(1)
-    }
+    val questionnaireFragment =
+      QuestionnaireFragment.builder()
+        .setQuestionnaire(questionnaireJson)
+        .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
+        .build()
+    val appCompatActivity = Robolectric.buildActivity(AppCompatActivity::class.java).create().get()
+    startFragment(questionnaireFragment, appCompatActivity)
+    assertThat(questionnaireFragment.questionnaireItemViewHolderFactoryMatchersProvider.get().size)
+      .isEqualTo(1)
   }
 
   @Test
@@ -191,14 +192,12 @@ class QuestionnaireFragmentTest {
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).buildArgs(),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
-    }
+    val questionnaireFragment =
+      QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).build()
+    val appCompatActivity = Robolectric.buildActivity(AppCompatActivity::class.java).create().get()
+    startFragment(questionnaireFragment, appCompatActivity)
+    assertThat(questionnaireFragment.questionnaireItemViewHolderFactoryMatchersProvider.get())
+      .isEmpty()
   }
 
   @Test
@@ -218,17 +217,24 @@ class QuestionnaireFragmentTest {
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
-    val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(questionnaireJson)
-          .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
-          .buildArgs(),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    scenario.withFragment {
-      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
+    val questionnaireFragment =
+      QuestionnaireFragment.builder()
+        .setQuestionnaire(questionnaireJson)
+        .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
+        .build()
+    val appCompatActivity = Robolectric.buildActivity(AppCompatActivity::class.java).create().get()
+    startFragment(questionnaireFragment, appCompatActivity)
+    assertThat(questionnaireFragment.questionnaireItemViewHolderFactoryMatchersProvider.get())
+      .isEmpty()
+  }
+
+  private fun startFragment(fragment: Fragment, activity: AppCompatActivity) {
+    val fragmentManager = activity.supportFragmentManager
+    fragmentManager.beginTransaction().apply {
+      add(fragment, null)
+      commit()
     }
+    fragmentManager.executePendingTransactions()
   }
 
   object QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl :

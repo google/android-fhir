@@ -129,7 +129,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         selectedOptionsJob?.cancel()
       }
 
-      private fun updateAnswers(selectedOptions: SelectedOptions) {
+      private suspend fun updateAnswers(selectedOptions: SelectedOptions) {
         questionnaireViewItem.clearAnswer()
         var answers = arrayOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
         selectedOptions.options
