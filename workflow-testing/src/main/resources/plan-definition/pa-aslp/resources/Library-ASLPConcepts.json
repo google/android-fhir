@@ -1,0 +1,108 @@
+{
+  "resourceType": "Library",
+  "id": "ASLPConcepts",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/ASLPConcepts",
+  "version": "1.0.000",
+  "name": "ASLPConcepts",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "Code system ICD-10",
+      "resource": "http://hl7.org/fhir/sid/icd-10"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system SNOMED-CT",
+      "resource": "http://snomed.info/sct"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system LOINC",
+      "resource": "http://loinc.org"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system RxNorm",
+      "resource": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system CPT",
+      "resource": "http://www.ama-assn.org/go/cpt"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system HCPCS",
+      "resource": "https://www.cms.gov/Medicare/Coding/HCPCSReleaseCodeSets"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system CIEL",
+      "resource": "http://hl7.org/fhir/sid/ciel"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICD-11",
+      "resource": "http://hl7.org/fhir/sid/icd-11"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICHI",
+      "resource": "https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICF",
+      "resource": "http://hl7.org/fhir/sid/icf-nl"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system NDC",
+      "resource": "http://hl7.org/fhir/sid/ndc"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system NIDA",
+      "resource": "https://cde.drugabuse.gov"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ASLP Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Home Based Testing Sleep Studies Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Facility Based Testing Sleep Studies Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de9"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Sleep Study Codes Grouper",
+      "resource": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de1-codes-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diagnosis of Obstructive Sleep Apnea Codes",
+      "resource": "http://example.org/sdh/dtr/aslp/ValueSet/aslp-a1-de17"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ASLPConcepts.cql"
+    }
+  ]
+}

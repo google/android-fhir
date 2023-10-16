@@ -1,0 +1,61 @@
+{
+  "resourceType": "Library",
+  "id": "ANCCommon",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Library/ANCCommon",
+  "name": "ANCCommon",
+  "title": "WHO Antenatal Care Guidelines Common Logic",
+  "status": "active",
+  "experimental": false,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "description": "Common functions and logic used throughout the ANC content.",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://fhir.org/guides/who/anc-cds/Library/FHIRHelpers|4.0.1"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ANCCommon.cql"
+    }
+  ]
+}

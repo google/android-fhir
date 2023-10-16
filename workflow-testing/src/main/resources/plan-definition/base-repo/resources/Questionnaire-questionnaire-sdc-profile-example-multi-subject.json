@@ -1,0 +1,152 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "questionnaire-sdc-profile-example-multi-subject",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observationExtract",
+      "valueBoolean": true
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-observation-extract-category",
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+            "code": "vital-signs"
+          }
+        ]
+      }
+    }
+  ],
+  "url": "http://hl7.org/fhir/uv/sdc/Questionnaire/questionnaire-sdc-profile-example-multi-subject",
+  "version": "3.0.0",
+  "name": "MultiSubject",
+  "title": "Example multi-subject Questionnaire",
+  "status": "draft",
+  "experimental": true,
+  "subjectType": [
+    "Patient"
+  ],
+  "date": "2022-10-01T05:09:13+00:00",
+  "publisher": "HL7 International - FHIR Infrastructure Work Group",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://hl7.org/Special/committees/fiwg"
+        }
+      ]
+    }
+  ],
+  "description": "A sample Questionnaire that shows the use of the isSubject extension to flag a subject change within a Questionnaire.",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Mother's name",
+      "type": "string",
+      "required": true
+    },
+    {
+      "linkId": "2",
+      "text": "Mother's id",
+      "type": "string",
+      "required": true
+    },
+    {
+      "linkId": "3",
+      "code": [
+        {
+          "system": "http://loinc.org",
+          "code": "8302-2"
+        }
+      ],
+      "text": "Height",
+      "type": "quantity",
+      "required": true
+    },
+    {
+      "linkId": "4",
+      "code": [
+        {
+          "system": "http://loinc.org",
+          "code": "29463-7"
+        }
+      ],
+      "text": "Weight",
+      "type": "quantity",
+      "required": true
+    },
+    {
+      "linkId": "5",
+      "text": "Children",
+      "type": "group",
+      "required": true,
+      "repeats": true,
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-referenceResource",
+              "valueCode": "Patient"
+            },
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-isSubject",
+              "valueBoolean": true
+            }
+          ],
+          "linkId": "5.1",
+          "text": "Record",
+          "type": "reference",
+          "required": true
+        },
+        {
+          "linkId": "5.2",
+          "text": "Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "linkId": "5.3",
+          "text": "Birth date",
+          "type": "date",
+          "required": true
+        },
+        {
+          "linkId": "5.4",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "8302-2"
+            }
+          ],
+          "text": "Height",
+          "type": "quantity",
+          "required": true
+        },
+        {
+          "linkId": "5.5",
+          "code": [
+            {
+              "system": "http://loinc.org",
+              "code": "29463-7"
+            }
+          ],
+          "text": "Weight",
+          "type": "quantity",
+          "required": true
+        }
+      ]
+    }
+  ]
+}

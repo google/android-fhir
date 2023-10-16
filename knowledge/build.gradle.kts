@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import java.net.URL
 
 plugins {
@@ -70,6 +71,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(module = "xpp3_min")
+    forceGuava()
   }
 }
 
@@ -82,6 +84,7 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.guavaCaching)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 

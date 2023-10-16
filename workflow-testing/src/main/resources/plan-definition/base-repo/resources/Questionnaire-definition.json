@@ -1,0 +1,285 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "definition",
+  "meta": {
+    "versionId": "2",
+    "lastUpdated": "2022-11-21T17:34:01.764+00:00",
+    "source": "#Szj0RYKKLb3zYK89",
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-questionnaire-r4"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+      "valueCanonical": "http://somewhere.org/fhir/uv/mycontentig/Library/OutpatientPriorAuthorization-prepopulation"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+      "valueCanonical": "http://hl7.org/fhir/us/davinci-dtr/Library/BasicPatientInfo-prepopulation"
+    }
+  ],
+  "url": "http://hl7.org/fhir/Questionnaire/definition",
+  "name": "OutpatientPriorAuthorizationRequest",
+  "title": "Outpatient Prior Authorization Request",
+  "status": "active",
+  "subjectType": [
+    "Patient",
+    "Organization",
+    "Claim"
+  ],
+  "date": "2022-01-04T00:00:00+00:00",
+  "contact": [
+    {
+      "name": "Palmetto GBA"
+    }
+  ],
+  "description": "Testing the form",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueCode": "Organization"
+        }
+      ],
+      "linkId": "1",
+      "text": "Facility Information",
+      "type": "group",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "FacilityName"
+              }
+            }
+          ],
+          "linkId": "1.1",
+          "definition": "http://hl7.org/fhir/Organization#Organization.name",
+          "text": "Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "FacilityNPI"
+              }
+            }
+          ],
+          "linkId": "1.2",
+          "definition": "http://hl7.org/fhir/Organization#Organization.identifier",
+          "text": "NPI",
+          "type": "text",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "FacilityPTAN"
+              }
+            }
+          ],
+          "linkId": "1.3",
+          "definition": "http://hl7.org/fhir/Organization#Organization.identifier",
+          "text": "PTAN",
+          "type": "string",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "FacilityContractRegion"
+              }
+            }
+          ],
+          "linkId": "1.4",
+          "text": "Contract/Region",
+          "type": "choice",
+          "required": false,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "code": "11001",
+                "display": "Part A South Carolina"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "11501",
+                "display": "Part A North Carolina"
+              }
+            },
+            {
+              "valueCoding": {
+                "code": "11003",
+                "display": "Part A Virginia/West Virginia"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueCode": "Patient"
+        }
+      ],
+      "linkId": "2",
+      "text": "Beneficiary Information",
+      "type": "group",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "BeneficiaryFirstName"
+              }
+            }
+          ],
+          "linkId": "2.1",
+          "definition": "http://hl7.org/fhir/Patient#Patient.name.given",
+          "text": "First Name",
+          "type": "string",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "BeneficiaryLastName"
+              }
+            }
+          ],
+          "linkId": "2.2",
+          "definition": "http://hl7.org/fhir/Patient#Patient.name.family",
+          "text": "Last Name",
+          "type": "text",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "BeneficiaryDOB"
+              }
+            }
+          ],
+          "linkId": "2.3",
+          "definition": "http://hl7.org/fhir/Patient#Patient.birthDate",
+          "text": "Date of Birth",
+          "type": "date",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+              "valueBoolean": true
+            }
+          ],
+          "linkId": "2.4.0",
+          "definition": "http://hl7.org/fhir/Patient#Patient.identifier.system",
+          "type": "string",
+          "initial": [
+            {
+              "valueString": "http://hl7.org/fhir/sid/us-medicare"
+            }
+          ]
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "BeneficiaryMedicareID"
+              }
+            }
+          ],
+          "linkId": "2.4",
+          "definition": "http://hl7.org/fhir/Patient#Patient.identifier.value",
+          "text": "Medicare ID",
+          "type": "string",
+          "required": true
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+              "valueExpression": {
+                "language": "text/cql",
+                "expression": "BeneficiaryGender"
+              }
+            }
+          ],
+          "linkId": "2.5",
+          "definition": "http://hl7.org/fhir/Patient#Patient.gender",
+          "text": "Gender",
+          "type": "choice",
+          "required": true,
+          "answerOption": [
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                "code": "male",
+                "display": "Male"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                "code": "female",
+                "display": "Female"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                "code": "other",
+                "display": "Other"
+              }
+            },
+            {
+              "valueCoding": {
+                "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                "code": "unknown",
+                "display": "Unknown"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
