@@ -168,11 +168,11 @@ class DemoQuestionnaireFragment : Fragment() {
           R.id.container,
           QuestionnaireFragment.builder()
             .setQuestionnaire(questionnaireJsonString)
-            .setQuestionnaireLaunchContexts(
+            .setQuestionnaireLaunchContextMap(
               FhirContext.forR4Cached()
                 .newJsonParser()
                 .encodeResourceToString(Patient().apply { id = "P1" })
-                .let { listOf(it) },
+                .let { mapOf("patient" to it) },
             )
             .build(),
           QUESTIONNAIRE_FRAGMENT_TAG,
