@@ -185,14 +185,17 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
-  @Deprecated("Use generateCarePlan with the planDefinition's url instead.", ReplaceWith("this.generateCarePlan(CanonicalType, String)"))
-  fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
-    return generateCarePlan(planDefinitionId, patientId, encounterId = null)
+  @Deprecated(
+    "Use generateCarePlan with the planDefinition's url instead.",
+    ReplaceWith("this.generateCarePlan(CanonicalType, String)"),
+  )
+  fun generateCarePlan(planDefinitionId: String, subject: String): IBaseResource {
+    return generateCarePlan(planDefinitionId, subject, encounterId = null)
   }
 
   @WorkerThread
-  fun generateCarePlan(planDefinition: CanonicalType, patientId: String): IBaseResource {
-    return generateCarePlan(planDefinition, patientId, encounterId = null)
+  fun generateCarePlan(planDefinition: CanonicalType, subject: String): IBaseResource {
+    return generateCarePlan(planDefinition, subject, encounterId = null)
   }
 
   /**
@@ -202,17 +205,20 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
-  @Deprecated("Use generateCarePlan with the planDefinition's url instead.", ReplaceWith("this.generateCarePlan(CanonicalType, String, String)"))
+  @Deprecated(
+    "Use generateCarePlan with the planDefinition's url instead.",
+    ReplaceWith("this.generateCarePlan(CanonicalType, String, String)"),
+  )
   fun generateCarePlan(
     planDefinitionId: String,
-    patientId: String,
+    subject: String,
     encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       /* id = */ IdType("PlanDefinition", planDefinitionId),
       /* canonical = */ null,
       /* planDefinition = */ null,
-      /* subject = */ patientId,
+      /* subject = */ subject,
       /* encounterId = */ encounterId,
       /* practitionerId = */ null,
       /* organizationId = */ null,
@@ -232,14 +238,14 @@ internal constructor(
   @WorkerThread
   fun generateCarePlan(
     planDefinition: CanonicalType,
-    patientId: String,
+    subject: String,
     encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       /* id = */ null,
       /* canonical = */ planDefinition,
       /* planDefinition = */ null,
-      /* subject = */ patientId,
+      /* subject = */ subject,
       /* encounterId = */ encounterId,
       /* practitionerId = */ null,
       /* organizationId = */ null,

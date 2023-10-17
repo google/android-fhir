@@ -103,7 +103,7 @@ class FhirOperatorTest {
             CanonicalType(
               "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0",
             ),
-          patientId = "Reportable",
+          subject = "Patient/Reportable",
           encounterId = "reportable-encounter",
         ),
       )
@@ -118,7 +118,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinition = CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
-        patientId = "Patient/Patient-Example",
+        subject = "Patient/Patient-Example",
       )
 
     assertEquals(
@@ -140,7 +140,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinition = CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
-        patientId = "Patient/Female-Patient-Example",
+        subject = "Patient/Female-Patient-Example",
       )
 
     println(jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan))
