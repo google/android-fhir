@@ -78,15 +78,21 @@ class PerResourceLocalChangeFetcherTest {
     database.deleteUpdates(listOf(TEST_PATIENT_2))
 
     assertThat(firstSetOfChanges.size).isEqualTo(2)
-    assertThat(firstSetOfChanges[0].type).isEqualTo(LocalChange.Type.INSERT)
-    assertThat(firstSetOfChanges[0].resourceId).isEqualTo(TEST_PATIENT_1.logicalId)
+    with(firstSetOfChanges[0]) {
+      assertThat(type).isEqualTo(LocalChange.Type.INSERT)
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_1.logicalId)
+    }
 
-    assertThat(firstSetOfChanges[1].type).isEqualTo(LocalChange.Type.UPDATE)
-    assertThat(firstSetOfChanges[1].resourceId).isEqualTo(TEST_PATIENT_1.logicalId)
+    with(firstSetOfChanges[1]) {
+      assertThat(type).isEqualTo(LocalChange.Type.UPDATE)
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_1.logicalId)
+    }
 
     assertThat(secondSetOfChanges.size).isEqualTo(1)
-    assertThat(secondSetOfChanges[0].type).isEqualTo(LocalChange.Type.INSERT)
-    assertThat(secondSetOfChanges[0].resourceId).isEqualTo(TEST_PATIENT_2.logicalId)
+    with(secondSetOfChanges[0]) {
+      assertThat(type).isEqualTo(LocalChange.Type.INSERT)
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_2.logicalId)
+    }
   }
 
   companion object {

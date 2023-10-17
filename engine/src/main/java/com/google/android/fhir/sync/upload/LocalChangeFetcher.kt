@@ -84,7 +84,7 @@ internal class PerResourceLocalChangeFetcher(
   override suspend fun hasNext(): Boolean = database.getLocalChangesCount().isNotZero()
 
   override suspend fun next(): List<LocalChange> =
-    database.getAllChangesForResourceWithEarliestChange()
+    database.getAllChangesForEarliestChangedResource()
 
   override suspend fun getProgress(): SyncUploadProgress =
     SyncUploadProgress(database.getLocalChangesCount(), total)

@@ -218,7 +218,7 @@ internal abstract class LocalChangeDao {
       ORDER BY timestamp ASC
     """,
   )
-  abstract suspend fun getChangesForResourceWithEarliestChange(): List<LocalChangeEntity>
+  abstract suspend fun getAllChangesForEarliestChangedResource(): List<LocalChangeEntity>
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }
