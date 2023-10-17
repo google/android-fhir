@@ -63,6 +63,7 @@
     >
     <argument android:name="patient_id" app:argType="string" />
     <argument android:name="task_logical_id" app:argType="string" />
+<!--    <argument android:name="request_resource_type" app:argType="string" />-->
     <argument android:name="questionnaire_string" app:argType="string" />
   </fragment>
   <fragment

@@ -69,4 +69,12 @@ class TaskViewPagerViewModel(application: Application, private val state: SavedS
       else -> TaskStatus.READY
     }.toCode()
   }
+
+  fun getRequestResourceType(position: Int): String {
+    return when (position) {
+      0 -> TaskStatus.READY
+      1 -> TaskStatus.COMPLETED
+      else -> TaskStatus.READY
+    }.toCode()
+  }
 }

@@ -21,12 +21,16 @@ import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.configurablecare.FhirApplication
+import com.google.android.fhir.get
+import com.google.android.fhir.search.search
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
@@ -37,6 +41,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
+  private val taskManager = FhirApplication.taskManager(getApplication<Application>().applicationContext)
   private lateinit var activeRequestResourceConfiguration: List<RequestResourceConfig>
   lateinit var currentPlanDefinitionId: String
 
@@ -115,17 +120,57 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     updateCarePlan: Boolean,
   ) {
     viewModelScope.launch {
-      val task = fhirEngine.get(ResourceType.Task, taskLogicalId) as Task
-      val taskPatient =
-        fhirEngine.get(ResourceType.Patient, task.`for`.reference.substring("Patient/".length))
-          as Patient
-      carePlanManager.updateCarePlanActivity(
-        task,
-        taskStatus.toString(),
-        encounterReferences,
-        updateCarePlan
-      )
-      executeCareWorkflowForPatient(taskPatient)
+      // val resourceType: ResourceType = when (requestResourceType) {
+      //   "Task" -> ResourceType.Task
+      //   "MedicationRequest" -> ResourceType.MedicationRequest
+      //   "ServiceRequest" -> ResourceType.ServiceRequest
+      //   else -> ResourceType.Task
+      // }
+
+      // val request = fhirEngine.search<Task> { filter(
+      //         Task.RES_ID,
+      //         { taskLogicalId }
+      //       )}
+      val taskSearch = fhirEngine.search<Task> {
+        filter(
+          Task.RES_ID,
+          { value = of(taskLogicalId) }
+        )
+      }
+
+      val medicationRequestSearch = fhirEngine.search<MedicationRequest> {
+        filter(
+          MedicationRequest.RES_ID,
+          { value = of(taskLogicalId) }
+        )
+      }
+
+      val patient: Patient
+      if (!taskSearch.isEmpty()) {
+        val task = taskSearch.first().resource
+        patient =
+          fhirEngine.get(task.`for`.reference.substring("Patient/".length))
+        task.status = Task.TaskStatus.COMPLETED
+        fhirEngine.update(task)
+      }
+      else if (!medicationRequestSearch.isEmpty()) {
+        val medicationRequest = medicationRequestSearch.first().resource
+        patient =
+          fhirEngine.get(medicationRequest.subject.reference.substring("Patient/".length))
+        medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
+        fhirEngine.update(medicationRequest)
+      }
+      else
+        patient = Patient()
+
+      // carePlanManager.updateCarePlanActivity(
+      //   task,
+      //   taskStatus.toString(),
+      //   encounterReferences,
+      //   updateCarePlan
+      // )
+
+      executeCareWorkflowForPatient(patient)
     }
   }
 

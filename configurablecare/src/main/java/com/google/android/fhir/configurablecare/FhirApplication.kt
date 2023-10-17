@@ -30,7 +30,9 @@ import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import com.google.android.fhir.configurablecare.ReferenceUrlResolver
 import com.google.android.fhir.configurablecare.care.CarePlanManager
+import com.google.android.fhir.configurablecare.care.RequestManager
 import com.google.android.fhir.configurablecare.care.TaskManager
+import com.google.android.fhir.configurablecare.care.TestRequestHandler
 import com.google.android.fhir.configurablecare.data.FhirSyncWorker
 import com.google.android.fhir.configurablecare.external.ValueSetResolver
 import timber.log.Timber
@@ -41,6 +43,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
   private val taskManager: TaskManager by lazy { constructTaskManager() }
   private val carePlanManager: CarePlanManager by lazy { constructCarePlanManager() }
+  private val requestManager: RequestManager by lazy { constructRequestManager() }
   private var dataCaptureConfig: DataCaptureConfig? = null
 
   private val dataStore by lazy { DemoDataStore(this) }
@@ -84,6 +87,10 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     return CarePlanManager(fhirEngine, FhirContext.forR4(), this)
   }
 
+  private fun constructRequestManager(): RequestManager {
+    return RequestManager(fhirEngine, FhirContext.forR4(), TestRequestHandler())
+  }
+
   private fun constructTaskManager(): TaskManager {
     return TaskManager(fhirEngine)
   }
@@ -95,6 +102,9 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
     fun carePlanManager(context: Context) =
       (context.applicationContext as FhirApplication).carePlanManager
+
+    fun requestManager(context: Context) =
+      (context.applicationContext as FhirApplication).requestManager
 
     fun taskManager(context: Context) = (context.applicationContext as FhirApplication).taskManager
   }

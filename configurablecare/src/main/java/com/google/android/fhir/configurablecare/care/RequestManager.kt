@@ -2,12 +2,14 @@ package com.google.android.fhir.configurablecare.care
 
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.get
 import com.google.android.fhir.search.search
 import java.lang.StringBuilder
 import java.util.UUID
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestStatus
 import org.hl7.fhir.r4.model.Enumerations.RequestResourceType
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent
@@ -47,27 +49,31 @@ class RequestManager(
     serviceRequest.intent = ServiceRequestIntent.PROPOSAL
   }
 
-  private fun validateMedicationRequest(serviceRequest: ServiceRequest) {
-    serviceRequest.id = UUID.randomUUID().toString()
-    if (serviceRequest.status == null)
-      serviceRequest.status = ServiceRequestStatus.DRAFT
-    serviceRequest.intent = ServiceRequestIntent.PROPOSAL
+  private fun validateMedicationRequest(medicationRequest: MedicationRequest) {
+    medicationRequest.id = UUID.randomUUID().toString()
+    if (medicationRequest.status == null)
+      medicationRequest.status = MedicationRequestStatus.DRAFT
+    medicationRequest.intent = MedicationRequestIntent.PROPOSAL
   }
 
 
   /** Creates the request given a RequestGroup or RequestOrchestration? */
-  suspend fun createRequestFromRequestGroup(requestGroup: RequestGroup) {
+  suspend fun createRequestFromRequestGroup(requestGroup: RequestGroup): List<Resource> {
+    val resourceList: MutableList<Resource> = mutableListOf()
     for (request in requestGroup.contained) {
       when (request) {
         is Task -> validateTask(request)
-        is MedicationRequest -> TODO("Implement validateMedicationRequest()")
+        is MedicationRequest -> validateMedicationRequest(request)
         is ServiceRequest -> validateServiceRequest(request)
         is CommunicationRequest -> TODO("Implement validateCommunicationRequest()")
         else -> TODO("Not a valid request")
       }
-      if (requestHandler.acceptProposedRequest(request))
+      if (requestHandler.acceptProposedRequest(request)) {
         fhirEngine.create(request)
+        resourceList.add(request)
+      }
     }
+    return resourceList
   }
 
   // suspend fun getRequestsForPatient(patientId: String,
@@ -98,9 +104,11 @@ class RequestManager(
     return requestList  // not a valid or supported request
   }
 
-  suspend fun getAllRequestsForPatient(patientId: String,
-                                       status: String = "",
-                                       intent: String = ""): List<Resource> {
+  suspend fun getAllRequestsForPatient(
+    patientId: String,
+    status: String = "",
+    intent: String = ""
+  ): List<Resource> {
     val requestList: MutableList<Resource> = mutableListOf()
     for (requestResourceType in TaskManager.Companion.SupportedRequestResources.values()) {
       val xFhirQueryBuilder = StringBuilder()
@@ -201,12 +209,85 @@ class RequestManager(
     fhirEngine.create(newTask)
   }
 
-  private suspend fun updateMedicationRequestIntent(medicationRequest: MedicationRequest, intent: MedicationRequestIntent) {
+  /*
+  "Plan an active CommunicationRequest proposal
+
+Begin CommunicationRequest Plan [proposal -> plan]:
+Request requestApi.beginPlan(Request inputProposal)
+    check inputProposal.intent = proposal
+    check inputProposal.status = active
+    var result = new Request(copy from inputProposal)
+    set result.id = null
+    set result.intent = plan
+    set result.status = draft
+    set result.basedOn = referenceTo(inputProposal)"
+"End CommunicationRequest Plan:
+requestApi.endPlan(Request inputPlan)
+    check inputPlan.basedOn is not null
+    var basedOnProposal = engine.get(inputPlan.basedOn)
+    check basedOnProposal.intent = proposal
+    check basedOnProposal.status = active
+    check inputPlan.status in { draft | active }
+    check inputPlan.intent = plan
+    set basedOnProposal.status = completed
+    try
+        engine.save(inputPlan)
+        engine.save(basedOnProposal)
+    commit"
+
+   */
+
+  private suspend fun beginPlan(medicationRequest: MedicationRequest) {
+    if (medicationRequest.status == MedicationRequestStatus.DRAFT) {
+      medicationRequest.status = MedicationRequestStatus.ACTIVE
+    }
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+      val newMedicationRequest: MedicationRequest = medicationRequest.copy()
+      newMedicationRequest.id = UUID.randomUUID().toString()
+      newMedicationRequest.status = MedicationRequestStatus.DRAFT
+      newMedicationRequest.intent = MedicationRequestIntent.PLAN
+      newMedicationRequest.basedOn.add(Reference(medicationRequest))
+
+      fhirEngine.create(newMedicationRequest)
+    } else {
+      // do nothing
+    }
+  }
+
+  // suspend fun
+
+
+  suspend fun endPlan(medicationRequest: MedicationRequest) {
+    if (medicationRequest.basedOn.isNotEmpty()) {
+      val basedOnProposal =
+        fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.id).idPart)
+      if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PLAN) {
+        if (medicationRequest.status == MedicationRequestStatus.DRAFT)
+          medicationRequest.status = MedicationRequestStatus.ACTIVE
+        if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.PROPOSAL) {
+          basedOnProposal.status = MedicationRequestStatus.COMPLETED
+
+          fhirEngine.update(medicationRequest)
+          fhirEngine.update(basedOnProposal)
+
+        } else {
+          // do nothing
+        }
+      } else {
+        // do nothing
+      }
+    } else {
+      // do nothing
+    }
+  }
+
+  suspend fun updateMedicationRequestIntent(medicationRequest: MedicationRequest, intent: MedicationRequestIntent) {
     // a new MedicationRequest has to be created if the intent is updated
     // a new instance 'basedOn' the prior instance should be created with the new 'intent' value.
+
     val newMedicationRequest: MedicationRequest = MedicationRequest().apply {
       id = UUID.randomUUID().toString()
-      status = MedicationRequestStatus.DRAFT
+      status = MedicationRequestStatus.ACTIVE
       medicationRequest.intent = intent
       basedOn.add(Reference(medicationRequest))
     }

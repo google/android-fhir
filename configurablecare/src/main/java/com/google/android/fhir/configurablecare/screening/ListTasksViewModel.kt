@@ -38,6 +38,8 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     FhirApplication.taskManager(getApplication<Application>().applicationContext)
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
+  private val requestManager =
+    FhirApplication.requestManager(getApplication<Application>().applicationContext)
 
   val liveSearchedTasks = MutableLiveData<List<TaskItem>>()
 
@@ -64,6 +66,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
             else if (fhirTask is MedicationRequest) fhirTask.toTaskItem(index + 1)
             else TaskItem(
               id = (index + 1).toString(),
+              resourceType = "Task",
               resourceId = if (fhirTask.hasIdElement()) fhirTask.idElement.idPart else "",
               description = "",
               status = "no status",
@@ -86,15 +89,20 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     // iParser.encodeResourceToString(
     //   taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
     // )
+
     val questionnaire = taskManager.fetchQuestionnaire(taskItem.fhirResourceId)
     if (questionnaire == null) {
       carePlanManager.installKnowledgeResources()
     }
     iParser.encodeResourceToString(questionnaire)
+
+    // update request
+
   }
 
   data class TaskItem(
     val id: String,
+    val resourceType: String,
     // for Task/123/... this should be 123
     val resourceId: String,
     val description: String,
@@ -182,7 +190,7 @@ internal fun MedicationRequest.toRequestItem(position: Int): ListScreeningsViewM
 
 internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskResourceId = if (hasIdElement()) idElement.idPart else ""
-  val description = if (hasDescription()) description else "Sample Task Name"
+  val description = if (hasDescription()) "$description [$resourceType]" else ""
   // status and intent are always present
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
@@ -196,6 +204,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),
+    resourceType = resourceType.toString(),
     resourceId = taskResourceId,
     description = description,
     status = taskStatus,
@@ -210,8 +219,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
 
 internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskResourceId = if (hasIdElement()) idElement.idPart else ""
-
-  val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [${medicationCodeableConcept.codingFirstRep.code}]" else "No description"
+  val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [$resourceType]" else ""
   // status and intent are always present
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
@@ -223,6 +231,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),
+    resourceType = resourceType.toString(),
     resourceId = taskResourceId,
     description = description,
     status = taskStatus,

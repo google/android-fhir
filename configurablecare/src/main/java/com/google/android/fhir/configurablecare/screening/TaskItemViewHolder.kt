@@ -26,15 +26,17 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
   private val description: TextView = binding.taskDescription
   private val dueDate: TextView = binding.taskDueDate
   private val taskIcon: ImageView = binding.taskIcon
+  private var requestType: String = "Task"
 
   fun bindTo(
     taskItem: ListScreeningsViewModel.TaskItem,
     onItemClicked: (ListScreeningsViewModel.TaskItem) -> Unit
   ) {
+    this.requestType = taskItem.resourceType
     this.description.text = taskItem.description
     this.dueDate.text =
       if (taskItem.status != "completed")
-        "Due " + getDate(taskItem.dueDate) + " | Owner: " + taskItem.owner
+        "Due " + getDate(taskItem.dueDate)
       else "Completed " + getDate(taskItem.completedDate) // + " | Owner: " + taskItem.owner
     this.taskIcon.setImageResource(
       if (taskItem.status != "completed") R.drawable.ic_task else R.drawable.ic_task_check
@@ -47,4 +49,10 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
   private fun getDate(date: String): String {
     return date.substring(4, 10) + " " + date.substring(date.length - 4)
   }
+
+  // companion object {
+    fun getResourceType(): String {
+      return this.requestType
+    }
+  // }
 }
