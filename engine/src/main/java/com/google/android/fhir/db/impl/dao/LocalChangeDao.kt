@@ -87,13 +87,17 @@ internal abstract class LocalChangeDao {
       )
 
     val localChangeReferences =
-      extractResourceReferences(resource).map { resourceReferenceInfo ->
-        LocalChangeResourceReferenceEntity(
-          id = DEFAULT_ID_VALUE,
-          localChangeId = DEFAULT_ID_VALUE,
-          resourceReferencePath = resourceReferenceInfo.name,
-          resourceReferenceValue = resourceReferenceInfo.resourceReference.referenceElement.value,
-        )
+      extractResourceReferences(resource).mapNotNull { resourceReferenceInfo ->
+        if (resourceReferenceInfo.resourceReference.referenceElement.value != null) {
+          LocalChangeResourceReferenceEntity(
+            id = DEFAULT_ID_VALUE,
+            localChangeId = DEFAULT_ID_VALUE,
+            resourceReferencePath = resourceReferenceInfo.name,
+            resourceReferenceValue = resourceReferenceInfo.resourceReference.referenceElement.value,
+          )
+        } else {
+          null
+        }
       }
     createLocalChange(localChangeEntity, localChangeReferences)
   }
