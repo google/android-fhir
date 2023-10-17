@@ -22,20 +22,12 @@ import android.graphics.Bitmap
 import android.os.Handler
 import android.os.Looper
 import android.util.Base64
-import android.util.Log
 import android.widget.ImageView
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.SHLData
 import com.google.android.fhir.document.interfaces.RetrofitSHLService
-import com.nimbusds.jose.EncryptionMethod
-import com.nimbusds.jose.JWEAlgorithm
-import com.nimbusds.jose.JWEHeader
-import com.nimbusds.jose.JWEObject
-import com.nimbusds.jose.Payload
-import com.nimbusds.jose.crypto.DirectEncrypter
 import java.lang.Exception
-import java.security.SecureRandom
 import java.text.SimpleDateFormat
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,53 +35,44 @@ import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import timber.log.Timber
 
 internal class GenerateShlUtils(
   private val qrGeneratorUtils: QRGeneratorUtils,
   private val apiService: RetrofitSHLService,
+  private val encryptionUtility: EncryptionUtils,
 ) {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-
-  /* Encrypt a given string as a JWE token, using a given key */
-  fun encrypt(data: String, key: String): String {
-    val header = JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A256GCM)
-    val jweObj = JWEObject(header, Payload(data))
-    val decodedKey = Base64.decode(key, Base64.URL_SAFE)
-    val encrypter = DirectEncrypter(decodedKey)
-    jweObj.encrypt(encrypter)
-    return jweObj.serialize()
-  }
+  private val handler = Handler(Looper.getMainLooper())
 
   /* POST the IPS document to the manifest URL */
-  suspend fun postPayload(
+  private suspend fun postPayload(
     file: String,
     manifestToken: String,
     key: String,
     managementToken: String,
   ): JSONObject {
     try {
-      val contentEncrypted = encrypt(file, key)
+      val contentEncrypted = encryptionUtility.encrypt(file, key)
       val authorization = "Bearer $managementToken"
       val response = apiService.postPayload(manifestToken, contentEncrypted, authorization)
 
       return if (response.isSuccessful) {
-        println(response.message())
         val responseBody = response.body()?.string()
         JSONObject(responseBody)
       } else {
-        println("HTTP Error: ${response.code()}")
+        Timber.e("HTTP Error: ${response.code()}")
         JSONObject()
       }
     } catch (e: Exception) {
-      println(e)
-      Log.e(TAG, "Error while posting payload: ${e.message}", e)
+      Timber.e(TAG, "Error while posting payload: ${e.message}", e)
       throw e
     }
   }
 
   /* Converts the inputted expiry date to epoch seconds */
-  fun dateStringToEpochSeconds(dateString: String): Long {
+  fun convertDateStringToEpochSeconds(dateString: String): Long {
     val format = SimpleDateFormat("yyyy-M-d")
     val date = format.parse(dateString)
     return date?.time?.div(1000) ?: 0L
@@ -98,14 +81,6 @@ internal class GenerateShlUtils(
   /* Base64Url encodes a given string */
   private fun base64UrlEncode(data: String): String {
     return Base64.encodeToString(data.toByteArray(), Base64.URL_SAFE)
-  }
-
-  /* Generate a random SHL-specific key */
-  fun generateRandomKey(): String {
-    val random = SecureRandom()
-    val keyBytes = ByteArray(32)
-    random.nextBytes(keyBytes)
-    return Base64.encodeToString(keyBytes, Base64.URL_SAFE)
   }
 
   /* Generate an SHL */
@@ -140,11 +115,11 @@ internal class GenerateShlUtils(
     val managementToken = initialPostResponse.getString("managementToken")
     val exp =
       if (shlData.expirationTime.isNotEmpty()) {
-        dateStringToEpochSeconds(shlData.expirationTime).toString()
+        convertDateStringToEpochSeconds(shlData.expirationTime).toString()
       } else {
         ""
       }
-    val key = generateRandomKey()
+    val key = encryptionUtility.generateRandomKey()
     val shLinkPayload =
       constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
     val encodedPayload = base64UrlEncode(shLinkPayload)
@@ -167,14 +142,13 @@ internal class GenerateShlUtils(
       val responseBody = response.body()?.string()
       JSONObject(responseBody)
     } else {
-      println("HTTP Error: ${response.code()}")
+      Timber.e("HTTP Error: ${response.code()}")
       JSONObject()
     }
   }
 
   /* Set the image view to the QR code */
   private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
-    val handler = Handler(Looper.getMainLooper())
     handler.post { qrView.setImageBitmap(qrCodeBitmap) }
   }
 
@@ -205,7 +179,7 @@ internal class GenerateShlUtils(
           put("key", key)
           flags?.let { put("flag", it) }
           label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", dateStringToEpochSeconds(it)) }
+          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", convertDateStringToEpochSeconds(it)) }
         }
         .toString()
     return payloadObject

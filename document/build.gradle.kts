@@ -8,7 +8,7 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = 26
     testInstrumentationRunner = Dependencies.androidJunitRunner
     consumerProguardFiles("consumer-rules.pro")
   }
@@ -37,12 +37,14 @@ dependencies {
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
+  implementation(Dependencies.timber)
 
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.mockWebServer)
 
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)

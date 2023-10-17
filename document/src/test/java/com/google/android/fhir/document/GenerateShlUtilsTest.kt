@@ -16,15 +16,12 @@
 
 package com.google.android.fhir.document
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.interfaces.RetrofitSHLService
+import com.google.android.fhir.document.utils.EncryptionUtils
 import com.google.android.fhir.document.utils.GenerateShlUtils
 import com.google.android.fhir.document.utils.QRGeneratorUtils
-import com.google.android.fhir.testing.readFromFile
-import com.nimbusds.jose.shaded.gson.Gson
-import org.hl7.fhir.r4.model.Bundle
+import okhttp3.mockwebserver.MockWebServer
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -41,33 +38,21 @@ class GenerateShlUtilsTest {
 
   @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
 
+  @Mock private lateinit var encryptionUtility: EncryptionUtils
   private lateinit var generateShlUtils: GenerateShlUtils
+
+  private val mockWebServer = MockWebServer()
+  private val baseUrl = "/shl/"
+
   private val apiService by lazy {
-    RetrofitSHLService.Builder("https://api.vaxx.link/api/shl/", NetworkConfiguration()).build()
+    RetrofitSHLService.Builder(mockWebServer.url(baseUrl).toString(), NetworkConfiguration())
+      .build()
   }
-  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val minimalBundleString =
-    parser.encodeResourceToString(readFromFile(Bundle::class.java, "/bundleMinimal.json"))
 
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    generateShlUtils = GenerateShlUtils(qrGeneratorUtils, apiService)
-  }
-
-  @Test
-  fun randomKeysCanBeGenerated() {
-    val key = generateShlUtils.generateRandomKey()
-    assert(key.length == 45)
-  }
-
-  @Test
-  fun canConvertFilesIntoJweTokens() {
-    val encryptionKey = generateShlUtils.generateRandomKey()
-    val contentJson = Gson().toJson(minimalBundleString)
-    val contentEncrypted = generateShlUtils.encrypt(contentJson, encryptionKey)
-    println(contentEncrypted)
-    assertEquals(contentEncrypted.split('.').size, 5)
+    generateShlUtils = GenerateShlUtils(qrGeneratorUtils, apiService, encryptionUtility)
   }
 
   @Test
@@ -87,7 +72,7 @@ class GenerateShlUtilsTest {
     val manifestUrl = "https://example.com/manifest"
     val label = "My SHL"
     val flags = "P"
-    val key = generateShlUtils.generateRandomKey()
+    val key = "key"
     val expirationDate = "2023-12-31"
 
     /* Construct the expected JSON object */
@@ -97,7 +82,7 @@ class GenerateShlUtilsTest {
         .put("key", key)
         .put("flag", flags)
         .put("label", label)
-        .put("exp", generateShlUtils.dateStringToEpochSeconds(expirationDate))
+        .put("exp", generateShlUtils.convertDateStringToEpochSeconds(expirationDate))
 
     val payload =
       generateShlUtils.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
@@ -109,7 +94,7 @@ class GenerateShlUtilsTest {
   fun testDateToEpochSeconds() {
     val dateString = "2023-09-30"
     val expectedEpochSeconds = 1696032000L
-    val epochSeconds = generateShlUtils.dateStringToEpochSeconds(dateString)
+    val epochSeconds = generateShlUtils.convertDateStringToEpochSeconds(dateString)
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
 }
