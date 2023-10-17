@@ -70,11 +70,16 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
          */
         runBlocking {
           // carePlanManager.smartIgTest()
-          carePlanManager.applyPlanDefinitionOnPatient(
-            currentPlanDefinitionId,
-            careWorkflowExecutionRequest.patient,
-            getActiveRequestResourceConfiguration()
-          )
+          if (currentPlanDefinitionId != "") {
+            carePlanManager.applyPlanDefinitionOnPatient(
+              currentPlanDefinitionId,
+              careWorkflowExecutionRequest.patient,
+              getActiveRequestResourceConfiguration()
+            )
+          }
+          else {
+            // do nothing
+          }
         }
         patientFlowForCareWorkflowExecution.emit(
           CareWorkflowExecutionRequest(

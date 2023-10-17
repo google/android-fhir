@@ -105,27 +105,6 @@ internal constructor(
       }
     }
   }
-
-  suspend fun install(fhirNpmPackage: FhirNpmPackage, pathUrls: List<URL>, rootDirectory: URL) {
-    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(File(rootDirectory.toURI())))
-    for (path in pathUrls) {
-      try {
-        val file = File(path.toURI())
-        if (!path.toString().contains("json") || path.toString().contains("-2"))
-          continue
-        val resource = jsonParser.parseResource(FileInputStream(file))
-        if (resource is Resource) {
-          importResource(igId, resource, file)
-        } else {
-          Timber.d("Unable to import file: %file")
-        }
-      } catch (exception: Exception) {
-        Timber.d(exception, "Unable to import file: %file")
-      }
-    }
-  }
-
-
   /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
     importFile(null, file)
@@ -145,7 +124,8 @@ internal constructor(
         url != null && version != null ->
           listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
-        id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
+        // id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
+        id != null -> knowledgeDao.getResourceWithUrlLike(resType, "%/$id")
         name != null && version != null ->
           listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> knowledgeDao.getResourcesWithName(resType, name)

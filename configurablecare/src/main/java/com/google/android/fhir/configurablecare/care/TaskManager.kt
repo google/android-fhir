@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
 import org.hl7.fhir.r4.model.Task.TaskStatus
+import timber.log.Timber
 
 /** Responsible for creating and managing Task resources */
 class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<Task> {
@@ -183,7 +184,12 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
   }
 
   suspend fun fetchQuestionnaire(questionnaireId: String): Questionnaire {
-    return fhirEngine.get(IdType(questionnaireId).idPart)
+    // try {
+      val questionnaire = fhirEngine.get<Questionnaire>(IdType(questionnaireId).idPart)
+    return questionnaire
+    // } catch (e: Exception) {
+    //   Timber.w("Need to load Knowledge resources")
+    // }
   }
 
   /** Fetch all Tasks for a given Patient */
@@ -233,7 +239,7 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
 
   /** Compute the number of Tasks for a given Patient */
   suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)?): Int {
-    return extraFilter?.let { getTasksForPatient(patientId, it, null).count() } ?: 0
+    return extraFilter?.let { getAllRequestsForPatient(patientId).count() } ?: 0
   }
 
   /** Create a new [Task] that can track the progress of a [ServiceRequest] */

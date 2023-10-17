@@ -36,6 +36,8 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val taskManager =
     FhirApplication.taskManager(getApplication<Application>().applicationContext)
+  private val carePlanManager =
+    FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
 
   val liveSearchedTasks = MutableLiveData<List<TaskItem>>()
 
@@ -84,7 +86,11 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     // iParser.encodeResourceToString(
     //   taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
     // )
-    iParser.encodeResourceToString(taskManager.fetchQuestionnaire(taskItem.fhirResourceId))
+    val questionnaire = taskManager.fetchQuestionnaire(taskItem.fhirResourceId)
+    if (questionnaire == null) {
+      carePlanManager.installKnowledgeResources()
+    }
+    iParser.encodeResourceToString(questionnaire)
   }
 
   data class TaskItem(

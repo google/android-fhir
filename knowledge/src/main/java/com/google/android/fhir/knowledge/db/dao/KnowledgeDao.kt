@@ -95,10 +95,14 @@ abstract class KnowledgeDao {
   ): ResourceMetadataEntity?
 
   // Remove after https://github.com/google/android-fhir/issues/1920
-  @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
+  // @Query("SELECT * from ResourceMetadataEntity WHERE url LIKE :urlPart")
+  @Query(
+    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND url LIKE :urlPart",
+  )
   internal abstract suspend fun getResourceWithUrlLike(
+    resourceType: ResourceType,
     urlPart: String,
-  ): ResourceMetadataEntity?
+  ): List<ResourceMetadataEntity>
 
   @Query(
     "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name",

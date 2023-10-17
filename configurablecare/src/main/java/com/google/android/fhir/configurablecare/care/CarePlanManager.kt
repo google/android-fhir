@@ -25,6 +25,7 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.workflow.FhirOperator.Builder
 import com.google.android.fhir.workflow.TestBundleLoader
 import java.io.File
+import java.io.FileInputStream
 import java.net.URL
 import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
@@ -37,9 +38,11 @@ import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.RequestGroup
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
+import timber.log.Timber
 
 
 /** Responsible for creating and managing CarePlans */
@@ -57,6 +60,7 @@ class CarePlanManager(
       .build()
 
   private var taskManager: RequestResourceManager<Task> = TaskManager(fhirEngine)
+  private var requestManager: RequestManager = RequestManager(fhirEngine, fhirContext, TestRequestHandler())
   private var cqlLibraryIdList = ArrayList<String>()
   private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
@@ -105,7 +109,7 @@ class CarePlanManager(
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "PlanDefinition/IMMZD2DTMeasles",
-        patientId = "a35912d7-3e7e-414b-a4eb-ae10e9cfc0dd",// "IMMZ-Patient-NoVaxeninfant-f",
+        subject = "IMMZ-Patient-NoVaxeninfant-f",
       )
     print(jsonParser.encodeResourceToString(carePlan))
 
@@ -162,13 +166,41 @@ class CarePlanManager(
     return bundleCollection
   }
 
+  suspend fun installKnowledgeResources() {
+    val rootDirectory = File(context.filesDir, "smart-imm/ig")
+
+    rootDirectory.listFiles()?.forEach { file ->
+      try {
+        val resource = jsonParser.parseResource(FileInputStream(file))
+        if (resource is Resource) {
+          if (!(resource is PlanDefinition || resource is ActivityDefinition || resource is Library)) {
+            fhirEngine.create(resource)
+          }
+        } else {
+          Timber.d("Unable to import file: %file")
+        }
+      } catch (exception: Exception) {
+        Timber.d(exception, "Unable to import file: %file")
+      }
+    }
+
+    knowledgeManager.install(
+      FhirNpmPackage(
+        "who.fhir.immunization",
+        "1.0.0",
+        "https://github.com/WorldHealthOrganization/smart-immunizations",
+      ),
+      rootDirectory,
+    )
+  }
+
   /**
    * Knowledge resources are loaded from [FhirEngine] and installed so that they may be used when
    * running $apply on a [PlanDefinition]
    */
   private suspend fun loadCarePlanResourcesFromDb() {
 
-    smartIgTest()
+    installKnowledgeResources()
 
     // Load Library resources
     val availableCqlLibraries = fhirEngine.search<Library> {}
@@ -200,30 +232,22 @@ class CarePlanManager(
     patient: Patient,
     requestResourceConfigs: List<RequestResourceConfig>,
   ) {
+    // smartIgTest()
+
     var patientId = IdType(patient.id).idPart
 
     if (cqlLibraryIdList.isEmpty()) {
       loadCarePlanResourcesFromDb()
     }
-
-    // patientId = "IMMZ-Patient-NoVaxeninfant-f"
-
-    // val lib =
-    //   knowledgeManager
-    //     .loadResources(
-    //       resourceType = "Library",
-    //       id = "IMMZD2DTMeasles",
-    //     )
-    //     .firstOrNull()
-    //
-    // if (lib != null) {
-    //   print(jsonParser.encodeResourceToString(lib))
-    // }
-
-
     val carePlanProposal =
-      fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, patientId = "Patient/$patientId")
+      fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
         as CarePlan
+
+    for (request in carePlanProposal.contained) {
+      if (request is RequestGroup) {
+        requestManager.createRequestFromRequestGroup(request)
+      }
+    }
 
     // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
     val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
@@ -254,7 +278,7 @@ class CarePlanManager(
       val patientId = IdType(patient.id).idPart
 
       val carePlanProposal =
-        fhirOperator.generateCarePlan(planDefinitionId = planDefinitionId, patientId = patientId)
+        fhirOperator.generateCarePlan(planDefinitionId = planDefinitionId, subject = patientId)
           as CarePlan
 
       // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
@@ -450,4 +474,5 @@ class CarePlanManager(
       else -> TODO("Not a valid request resource")
     }
   }
+
 }

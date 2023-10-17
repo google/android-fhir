@@ -75,6 +75,7 @@ class TimestampBasedDownloadWorkManagerImpl(
         "PractitionerRole",
         // Server should filter all the patients the Health Professional is assigned to
         "Patient",
+        "Observation",
         "MedicationRequest",
         "Questionnaire",
         "ValueSet",
@@ -86,6 +87,8 @@ class TimestampBasedDownloadWorkManagerImpl(
         "ValueSet"
       )
     )
+
+  private val downloadFlag = false
 
   override suspend fun getNextRequest(): DownloadRequest? {
     var url = urls.poll()

@@ -13,6 +13,10 @@
           {
             "event": "Questionnaire/Questionnaire-IMMZD1ClientHistory",
             "planDefinition":"PlanDefinition/IMMZD2DTMeasles"
+          },
+          {
+            "event": "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
+            "planDefinition": ""
           }
         ],
         "entryPoint": "PlanDefinition/PlanImmunizationReview",
