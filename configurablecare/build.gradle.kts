@@ -22,7 +22,7 @@ android {
   }
 
   sourceSets {
-    getByName("main").apply { resources.setSrcDirs(listOf("sampledata")) }
+    getByName("debug").apply { resources.setSrcDirs(listOf("res", "main/res", "src/main/res")) }
 
     // getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
   }

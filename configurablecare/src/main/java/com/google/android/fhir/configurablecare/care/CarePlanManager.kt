@@ -79,7 +79,9 @@ class CarePlanManager(
 
   suspend fun smartIgTest() {
     val loader = TestBundleLoader(fhirContext)
-    val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
+    // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
+
+    val rootDirectory = File(context.filesDir, "smart-imm/ig")
 
     knowledgeManager.install(
       FhirNpmPackage(
@@ -89,50 +91,6 @@ class CarePlanManager(
       ),
       rootDirectory,
     )
-
-
-    // val pathList = context.assets.list("smart-imm/ig")
-    // val url = javaClass.getResource("/assets/smart-imm/ig")!!.file
-    // val pathUrls: MutableList<URL> = mutableListOf()
-    // if (pathList != null) {
-    //   for (path in pathList) {
-    //     javaClass.getResource("/assets/smart-imm/ig/$path")?.let { pathUrls.add(it) }
-    //   }
-    // val text = context.assets.open("smart-imm/ig/$path").bufferedReader().use { it.readText() }
-
-    // val rootDirectory = File(url.toURI())
-
-    // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
-    // val root = File(readFileFromAssets(context, "smart-imm/ig/"))
-    // context.assets.list("smart-imm/ig")?.forEach { knowledgeManager.install(File(it)) }
-    // val rootDirectory = "/Users/divyaramnath/release/configurable-care/fork/divyaramnath-13/android-fhir/configurablecare/src/main/assets/smart-imm/ig"
-    // println(rootDirectory)
-    // val resourceMap: MutableMap<String, Resource> = mutableMapOf()
-    // val pathList = context.assets.list("smart-imm/ig")
-    // if (pathList != null) {
-    //   for (path in pathList) {
-    //     val text = context.assets.open("smart-imm/ig/$path").bufferedReader().use { it.readText() }
-    //     if (!text.contains("resourceType"))
-    //       continue
-    //     val resource = jsonParser.parseResource(text)
-    //     if (resource is Resource) {
-    //       resourceMap[path] = resource
-    //       print(jsonParser.encodeResourceToString(resource))
-    //     }
-    //   }
-    // }
-    // print(resourceMap)
-
-
-    // knowledgeManager.install(
-    //   FhirNpmPackage(
-    //     "who.fhir.immunization",
-    //     "1.0.0",
-    //     "https://github.com/WorldHealthOrganization/smart-immunizations",
-    //   ),
-    //   pathUrls,
-    //   url
-    // )
 
     val planDef =
       knowledgeManager
@@ -146,8 +104,8 @@ class CarePlanManager(
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinitionId = "IMMZD2DTMeasles",
-        patientId = "IMMZ-Patient-NoVaxeninfant-f",
+        planDefinitionId = "PlanDefinition/IMMZD2DTMeasles",
+        patientId = "a35912d7-3e7e-414b-a4eb-ae10e9cfc0dd",// "IMMZ-Patient-NoVaxeninfant-f",
       )
     print(jsonParser.encodeResourceToString(carePlan))
 

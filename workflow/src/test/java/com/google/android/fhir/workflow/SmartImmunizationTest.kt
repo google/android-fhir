@@ -108,7 +108,7 @@ class SmartImmunizationTest {
     val planDef =
       knowledgeManager
         .loadResources(
-          resourceType = "PlanDefinition",
+          resourceType = "Library",
           id = "IMMZD2DTMeasles",
         )
         .firstOrNull()

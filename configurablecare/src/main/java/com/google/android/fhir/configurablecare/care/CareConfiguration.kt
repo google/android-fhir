@@ -16,10 +16,12 @@
 package com.google.android.fhir.configurablecare.care
 
 import android.content.Context
+import android.os.Environment
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.gson.Gson
 import com.google.gson.JsonArray
+import java.io.File
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
@@ -76,6 +78,9 @@ object ConfigurationManager {
     if (careConfiguration == null) {
       val gson = Gson()
       val careConfig = readFileFromAssets(context, "care-config.json").trimIndent()
+      // val rootDirPath = "/storage/emulated/0/Documents/configurablecare/smart-imm/ig"
+      // val fileDirectory = File(Environment.DIRECTORY_DOCUMENTS + "/configurablecare/smart-imm/ig")
+      // // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
       careConfiguration = gson.fromJson(careConfig, CareConfiguration::class.java)
     }
     return careConfiguration!!
