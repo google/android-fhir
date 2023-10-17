@@ -185,6 +185,7 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
+  @Deprecated("Use generateCarePlan with the planDefinition's url instead.", ReplaceWith("this.generateCarePlan(CanonicalType, String)"))
   fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
     return generateCarePlan(planDefinitionId, patientId, encounterId = null)
   }
@@ -201,6 +202,7 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
+  @Deprecated("Use generateCarePlan with the planDefinition's url instead.", ReplaceWith("this.generateCarePlan(CanonicalType, String, String)"))
   fun generateCarePlan(
     planDefinitionId: String,
     patientId: String,
