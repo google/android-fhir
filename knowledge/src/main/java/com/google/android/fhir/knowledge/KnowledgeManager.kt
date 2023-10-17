@@ -97,7 +97,7 @@ internal constructor(
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
         if (resource is Resource) {
-          val newId = importResource(igId, resource, file)
+          val newId = indexResourceFile(igId, resource, file)
           resource.setId(IdType(resource.resourceType.name, newId))
 
           // Overrides the Id in the file
@@ -163,7 +163,7 @@ internal constructor(
       }
     when (resource) {
       is Resource -> {
-        val newId = importResource(igId, resource, file)
+        val newId = indexResourceFile(igId, resource, file)
         resource.setId(IdType(resource.resourceType.name, newId))
 
         // Overrides the Id in the file
@@ -174,7 +174,7 @@ internal constructor(
     }
   }
 
-  private suspend fun importResource(igId: Long?, resource: Resource, file: File): Long {
+  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
     val metadataResource = resource as? MetadataResource
     val res =
       ResourceMetadataEntity(
