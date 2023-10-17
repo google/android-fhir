@@ -146,19 +146,19 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
       }
 
       val patient: Patient
-      if (!taskSearch.isEmpty()) {
+      if (taskSearch.isNotEmpty()) {
         val task = taskSearch.first().resource
         patient =
           fhirEngine.get(task.`for`.reference.substring("Patient/".length))
-        task.status = Task.TaskStatus.COMPLETED
-        fhirEngine.update(task)
+        // task.status = Task.TaskStatus.COMPLETED
+        // fhirEngine.update(task)
       }
-      else if (!medicationRequestSearch.isEmpty()) {
+      else if (medicationRequestSearch.isNotEmpty()) {
         val medicationRequest = medicationRequestSearch.first().resource
         patient =
           fhirEngine.get(medicationRequest.subject.reference.substring("Patient/".length))
-        medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
-        fhirEngine.update(medicationRequest)
+        // medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
+        // fhirEngine.update(medicationRequest)
       }
       else
         patient = Patient()

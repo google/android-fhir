@@ -65,8 +65,8 @@ class RequestManager(
         is Task -> validateTask(request)
         is MedicationRequest -> validateMedicationRequest(request)
         is ServiceRequest -> validateServiceRequest(request)
-        is CommunicationRequest -> TODO("Implement validateCommunicationRequest()")
-        else -> TODO("Not a valid request")
+        is CommunicationRequest -> { }
+        else -> { }
       }
       if (requestHandler.acceptProposedRequest(request)) {
         fhirEngine.create(request)
@@ -249,18 +249,35 @@ requestApi.endPlan(Request inputPlan)
       newMedicationRequest.basedOn.add(Reference(medicationRequest))
 
       fhirEngine.create(newMedicationRequest)
+      fhirEngine.update(medicationRequest)
     } else {
       // do nothing
     }
   }
 
-  // suspend fun
+  suspend fun updateIntent(resourceId: String, resourceType: String) {
+    val request = when (resourceType) {
+      "MedicationRequest" -> fhirEngine.get<MedicationRequest>(resourceId)
+      "Task" -> fhirEngine.get<Task>(resourceId)
+      "ServiceRequest" -> fhirEngine.get<ServiceRequest>(resourceId)
+      else -> fhirEngine.get<Task>(resourceId)
+    }
+
+    if (request is MedicationRequest) {
+      if (request.intent == MedicationRequestIntent.PROPOSAL) {
+        beginPlan(request)
+      }
+      else if (request.intent == MedicationRequestIntent.PLAN) {
+        endPlan(request)
+      }
+    }
+  }
 
 
   suspend fun endPlan(medicationRequest: MedicationRequest) {
     if (medicationRequest.basedOn.isNotEmpty()) {
       val basedOnProposal =
-        fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.id).idPart)
+        fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.reference).idPart)
       if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PLAN) {
         if (medicationRequest.status == MedicationRequestStatus.DRAFT)
           medicationRequest.status = MedicationRequestStatus.ACTIVE

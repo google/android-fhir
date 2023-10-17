@@ -177,10 +177,10 @@ class CarePlanManager(
             fhirEngine.create(resource)
           }
         } else {
-          Timber.d("Unable to import file: %file")
+          // Timber.d("Unable to import file: %file")
         }
       } catch (exception: Exception) {
-        Timber.d(exception, "Unable to import file: %file")
+        // Timber.d(exception, "Unable to import file: %file")
       }
     }
 

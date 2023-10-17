@@ -94,10 +94,9 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     if (questionnaire == null) {
       carePlanManager.installKnowledgeResources()
     }
-    iParser.encodeResourceToString(questionnaire)
-
     // update request
-
+    requestManager.updateIntent(taskItem.resourceId, taskItem.resourceType)
+    iParser.encodeResourceToString(questionnaire)
   }
 
   data class TaskItem(
