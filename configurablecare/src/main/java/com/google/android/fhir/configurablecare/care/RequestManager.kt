@@ -278,10 +278,10 @@ requestApi.endPlan(Request inputPlan)
     if (medicationRequest.basedOn.isNotEmpty()) {
       val basedOnProposal =
         fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.reference).idPart)
-      if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PLAN) {
+      if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PROPOSAL) {
         if (medicationRequest.status == MedicationRequestStatus.DRAFT)
           medicationRequest.status = MedicationRequestStatus.ACTIVE
-        if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.PROPOSAL) {
+        if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.PLAN) {
           basedOnProposal.status = MedicationRequestStatus.COMPLETED
 
           fhirEngine.update(medicationRequest)
