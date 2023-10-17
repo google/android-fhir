@@ -1,0 +1,89 @@
+{
+  "resourceType": "ValueSet",
+  "id": "active-condition",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-publishablevalueset"
+    ]
+  },
+  "text": {
+    "status": "extensions",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html\"><code>http://terminology.hl7.org/CodeSystem/condition-clinical</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-active\">active</a></td><td>Active</td><td>The subject is currently experiencing the condition or situation, there is evidence of the condition or situation, or considered to be a significant risk.</td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-recurrence\">recurrence</a></td><td>Recurrence</td><td>The subject is experiencing a reoccurence or repeating of a previously resolved condition or situation, e.g. urinary tract infection, food insecurity.</td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-relapse\">relapse</a></td><td>Relapse</td><td>The subject is experiencing a return of a condition or situation after a period of improvement or remission, e.g. relapse of cancer, alcoholism.</td></tr></table></li></ul></div>"
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "shareable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "publishable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "Bryn Rhodes"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/cqf/common/ValueSet/active-condition",
+  "version": "4.0.1",
+  "name": "CQFActiveCondition",
+  "title": "CQF Active Condition",
+  "status": "active",
+  "experimental": false,
+  "date": "2019-07-21",
+  "publisher": "Alphora",
+  "contact": [
+    {
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://alphora.com"
+        }
+      ]
+    }
+  ],
+  "description": "Active condition clinical status codes",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "purpose": "Used to specify the set of clinical status codes that are considered active",
+  "copyright": "Â© Alphora 2019+",
+  "compose": {
+    "include": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+        "concept": [
+          {
+            "code": "active",
+            "display": "Active"
+          },
+          {
+            "code": "recurrence",
+            "display": "Recurrence"
+          },
+          {
+            "code": "relapse",
+            "display": "Relapse"
+          }
+        ]
+      }
+    ]
+  }
+}

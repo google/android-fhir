@@ -1,0 +1,35 @@
+{
+  "resourceType": "Coverage",
+  "id": "helloworld-patient-1-coverage-1",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-coverage"
+    ]
+  },
+  "status": "active",
+  "type": {
+    "coding": [
+      {
+        "system": "https://nahdo.org/sopt",
+        "version": "9.2",
+        "code": "31",
+        "display": "Department of Defense"
+      }
+    ]
+  },
+  "policyHolder": {
+    "reference": "Patient/helloworld-patient-1"
+  },
+  "beneficiary": {
+    "reference": "Patient/helloworld-patient-1"
+  },
+  "period": {
+    "start": "2020-01-01T00:00:00-07:00",
+    "end": "2021-01-01T00:00:00-07:00"
+  },
+  "payor": [
+    {
+      "reference": "Patient/helloworld-patient-1"
+    }
+  ]
+}

@@ -51,7 +51,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   private lateinit var fhirOperator: FhirOperator
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 

@@ -1,0 +1,146 @@
+{
+  "resourceType": "Library",
+  "id": "ANCConfig",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Library/ANCConfig",
+  "name": "ANCConfig",
+  "title": "ANC Configuration",
+  "status": "active",
+  "experimental": false,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "description": "The ANC Configuration library defines population and site level configuration values used by decision support and indicator logic.",
+  "parameter": [
+    {
+      "name": "Population prevalence of undernourishment",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population prevalence of anaemia",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population with low dietary calcium intake",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Population prevalence of tuberculosis (TB)",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "integer"
+    },
+    {
+      "name": "Population with vitamin A deficiency",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Population prevalence of soil-transmitted helminth infection",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population incidence of HIV in the absence of PrEP",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population prevalence of HIV in key populations (men who have sex with men, people in prison or other closed settings, people who inject drugs, sex workers and transgender people) ",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Population prevalence of HIV in pregnant women",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Malaria-endemic setting",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Population prevalence of syphilis in pregnant women",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population prevalence of hepatitis B",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Population prevalence of hepatitis C",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    },
+    {
+      "name": "Minimum requirements for IPV assessment",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Ultrasound available at the health-care facility",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Prevalence of HIV in pregnant women in the catchment area",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Quantity"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ANCConfig.cql"
+    }
+  ]
+}

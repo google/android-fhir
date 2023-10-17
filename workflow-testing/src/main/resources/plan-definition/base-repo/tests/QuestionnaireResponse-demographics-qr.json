@@ -1,0 +1,118 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "demographics-qr",
+  "questionnaire": "http://hl7.org/fhir/uv/sdc/Questionnaire/demographics",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Patient?_id={{%25patient.id}}"
+      }
+    }
+  ],
+  "status": "completed",
+  "subject": {
+    "reference": ""
+  },
+  "authored": "2021-12-01",
+  "item": [
+    {
+      "linkId": "patient.id",
+      "definition": "Patient.id",
+      "text": "(internal use)",
+      "answer": []
+    },
+    {
+      "linkId": "patient.birthDate",
+      "definition": "Patient.birthDate",
+      "text": "Date of birth",
+      "answer": []
+    },
+    {
+      "linkId": "patient.name",
+      "definition": "Patient.name",
+      "text": "Name(s)",
+      "item": [
+        {
+          "linkId": "patient.name.family",
+          "definition": "Patient.name.family",
+          "text": "Family name",
+          "answer": []
+        },
+        {
+          "linkId": "patient.name.given",
+          "definition": "Patient.name.given",
+          "text": "Given name(s)",
+          "answer": []
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext",
+          "valueExpression": {
+            "name": "relative",
+            "language": "application/x-fhir-query",
+            "expression": "RelatedPerson?patient={{%patient.id}}"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "RelatedPerson?patient={{%patient.id}}"
+          }
+        }
+      ],
+      "linkId": "relative",
+      "text": "Relatives, caregivers and other personal relationships",
+      "type": "group",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "relative.id",
+          "definition": "RelatedPerson.id",
+          "text": "(internal use)",
+          "answer": []
+        },
+        {
+          "linkId": "relative.relationship",
+          "definition": "RelatedPerson.relationship",
+          "text": "Name(s)",
+          "answer": []
+        },
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemPopulationContext",
+              "valueExpression": {
+                "name": "relativeName",
+                "language": "text/fhirpath",
+                "expression": "%relative.name"
+              }
+            }
+          ],
+          "linkId": "relative.name",
+          "definition": "RelatedPerson.name",
+          "text": "Name(s)",
+          "item": [
+            {
+              "linkId": "relative.name.family",
+              "definition": "RelatedPerson.name.family",
+              "text": "Family name",
+              "answer": []
+            },
+            {
+              "linkId": "relative.name.given",
+              "definition": "RelatedPerson.name.given",
+              "text": "Given name(s)",
+              "answer": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

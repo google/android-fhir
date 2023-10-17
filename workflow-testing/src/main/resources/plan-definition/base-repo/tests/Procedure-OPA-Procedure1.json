@@ -1,0 +1,22 @@
+{
+  "resourceType": "Procedure",
+  "id": "OPA-Procedure1",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Routine Appendectomy</div>"
+  },
+  "status": "preparation",
+  "code": {
+    "coding": [
+      {
+        "system": "http://www.ama-assn.org/go/cpt",
+        "code": "64612",
+        "display": "CHEMODENERVATION OF MUSCLE(S); MUSCLE(S) INNERVATED BY FACIAL NERVE, UNILATERAL (EG, FOR BLEPHAROSPASM, HEMIFACIAL SPASM)"
+      }
+    ],
+    "text": "Botox"
+  },
+  "subject": {
+    "reference": "Patient/OPA-Patient1"
+  }
+}
