@@ -110,10 +110,9 @@ abstract class KnowledgeDao {
   ): List<ResourceMetadataEntity>
 
   @Query(
-    "SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND resourceMetadataId = :id",
+    "SELECT * from ResourceMetadataEntity WHERE resourceMetadataId = :id",
   )
   internal abstract suspend fun getResourcesWithId(
-    resourceType: ResourceType,
     id: Long?,
   ): ResourceMetadataEntity?
 

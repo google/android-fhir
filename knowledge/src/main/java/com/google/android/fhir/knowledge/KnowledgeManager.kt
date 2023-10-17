@@ -132,7 +132,7 @@ internal constructor(
         url != null && version != null ->
           listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
-        id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(resType, id.toLong()))
+        id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
         name != null && version != null ->
           listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> knowledgeDao.getResourcesWithName(resType, name)
