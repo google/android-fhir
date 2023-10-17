@@ -67,6 +67,7 @@ internal abstract class ResourceDao {
           serializedResource = iParser.encodeResourceToString(resource),
           lastUpdatedLocal = timeOfLocalChange,
           lastUpdatedRemote = lastUpdatedRemote?.toInstant() ?: it.lastUpdatedRemote,
+          versionId = resource.versionId ?: it.versionId,
         )
       // The foreign key in Index entity tables is set with cascade delete constraint and
       // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
