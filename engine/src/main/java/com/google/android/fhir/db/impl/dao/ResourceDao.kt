@@ -94,7 +94,6 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  // WARNING : This is a private function and shouldn't be called directly.
   private suspend fun updateChanges(entity: ResourceEntity, resource: Resource) {
     // The foreign key in Index entity tables is set with cascade delete constraint and
     // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
