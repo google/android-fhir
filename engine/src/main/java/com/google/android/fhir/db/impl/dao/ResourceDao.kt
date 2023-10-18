@@ -59,7 +59,7 @@ internal abstract class ResourceDao {
   lateinit var resourceIndexer: ResourceIndexer
 
   /**
-   * Updates the resource in the [ResourceEntity] and adds indexes.
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of changes made on device.
    *
    * @param [resource] the resource with local (on device) updates
    * @param [timeOfLocalChange] time when the local change was made
