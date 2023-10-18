@@ -2246,7 +2246,7 @@ class ResourceMapperTest {
       ResourceMapper.extract(
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(context = context) { _, worker ->
+        StructureMapExtractionContext { _, worker ->
           StructureMapUtilities(worker).parse(mapping, "")
         },
       )
@@ -2337,7 +2337,7 @@ class ResourceMapperTest {
         ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
-          StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+          StructureMapExtractionContext(transformSupportServices) { _, worker ->
             StructureMapUtilities(worker).parse(mapping, "")
           },
         )

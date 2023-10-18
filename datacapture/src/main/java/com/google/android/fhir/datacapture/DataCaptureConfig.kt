@@ -21,11 +21,8 @@ import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.StructureMap
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * The App developers may provide the [DataCaptureConfig] for the DataCapture library by
@@ -41,15 +38,6 @@ data class DataCaptureConfig(
    * `choice` and `open-choice` type questions.
    */
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null,
-
-  /**
-   * A [NpmPackage] may be set by the client for Structure-Map based Resource Extraction.
-   *
-   * The loading and extraction of a [NpmPackage] may take multiple seconds, so the client app
-   * should try to include the smallest [NpmPackage] possible that contains only the resources
-   * needed by [StructureMap]s used by the client app.
-   */
-  var npmPackage: NpmPackage? = null,
 
   /**
    * A [XFhirQueryResolver] may be set by the client to resolve x-fhir-query for the library. See
@@ -69,10 +57,6 @@ data class DataCaptureConfig(
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
 ) {
-
-  internal val simpleWorkerContext: SimpleWorkerContext by lazy {
-    if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
-  }
 
   /**
    * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do

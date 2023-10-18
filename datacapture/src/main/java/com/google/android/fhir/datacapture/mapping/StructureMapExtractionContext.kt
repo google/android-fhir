@@ -16,15 +16,13 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.content.Context
 import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /** Data used during StructureMap-based extraction. */
 data class StructureMapExtractionContext(
-  /** The application context. */
-  val context: Context,
   /**
    * Optionally pass a custom version of [StructureMapUtilities.ITransformerServices] to support
    * specific use cases.
@@ -40,5 +38,11 @@ data class StructureMapExtractionContext(
    * @param IWorkerContext May be used with other HAPI FHIR classes, like using
    *   [StructureMapUtilities.parse] to parse content in the FHIR Mapping Language.
    */
+  /**
+   * Optionally pass a custom version of [IWorkerContext].
+   *
+   * @default [SimpleWorkerContext]
+   */
+  val workerContext: IWorkerContext = SimpleWorkerContext(),
   val structureMapProvider: (suspend (String, IWorkerContext) -> StructureMap?),
 )
