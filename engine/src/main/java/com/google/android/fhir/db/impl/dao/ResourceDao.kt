@@ -119,7 +119,7 @@ internal abstract class ResourceDao {
     updateIndicesForResource(index, resource.resourceType, entity.resourceUuid)
   }
 
-  open suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
+ suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
     return resources.map { resource -> insertRemoteResource(resource) }
   }
 
