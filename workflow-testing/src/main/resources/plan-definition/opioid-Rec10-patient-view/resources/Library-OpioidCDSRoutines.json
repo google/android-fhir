@@ -1,0 +1,409 @@
+{
+  "resourceType": "Library",
+  "id": "OpioidCDSRoutines",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSRoutines",
+  "version": "2022.1.0",
+  "name": "OpioidCDSRoutines",
+  "title": "Library - OpioidCDS Routines",
+  "status": "active",
+  "experimental": true,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/FHIRHelpers|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Common",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSCommon|2022.1.0"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library Config",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSCommonConfig|2022.1.0"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Encounter Diagnosis Condition Category",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-encounter-diagnosis-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Problem List Condition Category",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-problem-list-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set US Core Health Concern Condition Category",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-us-core-health-concern-category"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Limited life expectancy conditions",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/limited-life-expectancy-conditions"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Active Condition",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-clinical-status-active"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Therapies indicating end of life care",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/therapies-indicating-end-of-life-care"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set CDC malignant cancer conditions",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/cdc-malignant-cancer-conditions"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oncology specialty designations (NUCC)",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/oncology-specialty-designations"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Office Visit",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/office-visit"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Opioid analgesics with ambulatory misuse potential",
+      "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/opioid-analgesics-with-ambulatory-misuse-potential"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    },
+    {
+      "name": "Palliative Care Lookback Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Period"
+    },
+    {
+      "name": "Patient Age Less Than 18",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Condition Positive for Sickle Cell",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Conditions Indicating End Of Life Present",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Order For Palliative Care In Past 90 Days",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Encounter Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Period"
+    },
+    {
+      "name": "Active Cancer Diagnoses",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "Condition"
+    },
+    {
+      "name": "Oncologist Practitioner Roles",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "PractitionerRole"
+    },
+    {
+      "name": "Encounters with Cancer Diagnosis During Encounter Period",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "Encounter"
+    },
+    {
+      "name": "Number of Enounters with Cancer Diagnosis During Encounter Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "integer"
+    },
+    {
+      "name": "Has Two or More Encounters with Cancer Diagnosis During Encounter Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Is Active Cancer Treatment?",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Conditions Including Cancer To Exclude Opioid Management Indicating End-Stage Disease Present",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Is Opioid Review Useful?",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Prescription/Dispense Inclusion Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Period"
+    },
+    {
+      "name": "Report Inclusion Period",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Period"
+    },
+    {
+      "name": "Opioid RX with Ambulatory Abuse Potential In Past 90 Days",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "MedicationRequest"
+    },
+    {
+      "name": "Has Opioid RX with Ambulatory Abuse Potential In Past 90 Days",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Opioid Dispense with Ambulatory Abuse Potential In Past 90 Days",
+      "use": "out",
+      "min": 0,
+      "max": "*",
+      "type": "MedicationDispense"
+    },
+    {
+      "name": "Has Opioid Dispense with Ambulatory Abuse Potential In Past 90 Days",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    },
+    {
+      "name": "Is Opioid Naive?",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "boolean"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "category"
+      ],
+      "codeFilter": [
+        {
+          "path": "category",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-encounter-diagnosis-category"
+        }
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "category"
+      ],
+      "codeFilter": [
+        {
+          "path": "category",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-problem-list-category"
+        }
+      ]
+    },
+    {
+      "type": "Condition",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Condition"
+      ],
+      "mustSupport": [
+        "category"
+      ],
+      "codeFilter": [
+        {
+          "path": "category",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-us-core-health-concern-category"
+        }
+      ]
+    },
+    {
+      "type": "ServiceRequest",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+      ]
+    },
+    {
+      "type": "ServiceRequest",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+      ],
+      "mustSupport": [
+        "status",
+        "intent",
+        "authoredOn",
+        "code"
+      ]
+    },
+    {
+      "type": "PractitionerRole",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/PractitionerRole"
+      ],
+      "mustSupport": [
+        "specialty"
+      ],
+      "codeFilter": [
+        {
+          "path": "specialty",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/oncology-specialty-designations"
+        }
+      ]
+    },
+    {
+      "type": "Encounter",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Encounter"
+      ],
+      "mustSupport": [
+        "type",
+        "period",
+        "period.start",
+        "period.start.value",
+        "diagnosis",
+        "participant"
+      ],
+      "codeFilter": [
+        {
+          "path": "type",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/office-visit"
+        }
+      ]
+    },
+    {
+      "type": "MedicationDispense",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/MedicationDispense"
+      ],
+      "mustSupport": [
+        "medication",
+        "whenHandedOver",
+        "status"
+      ],
+      "codeFilter": [
+        {
+          "path": "medication",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/opioid-analgesics-with-ambulatory-misuse-potential"
+        }
+      ]
+    },
+    {
+      "type": "Encounter",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Encounter"
+      ],
+      "mustSupport": [
+        "type",
+        "period",
+        "period.start",
+        "period.start.value",
+        "diagnosis",
+        "participant"
+      ],
+      "codeFilter": [
+        {
+          "path": "type",
+          "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/office-visit"
+        }
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/OpioidCDSRoutines.cql"
+    }
+  ]
+}

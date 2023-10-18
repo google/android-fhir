@@ -58,43 +58,69 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
   lateinit var resourceIndexer: ResourceIndexer
 
-  open suspend fun update(resource: Resource, timeOfLocalChange: Instant?) {
+  /**
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of changes made on
+   * device.
+   *
+   * @param [resource] the resource with local (on device) updates
+   * @param [timeOfLocalChange] time when the local change was made
+   */
+  suspend fun applyLocalUpdate(resource: Resource, timeOfLocalChange: Instant?) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      // In case the resource has lastUpdated meta data, use it, otherwise use the old value.
-      val lastUpdatedRemote: Date? = resource.meta.lastUpdated
       val entity =
         it.copy(
           serializedResource = iParser.encodeResourceToString(resource),
           lastUpdatedLocal = timeOfLocalChange,
-          lastUpdatedRemote = lastUpdatedRemote?.toInstant() ?: it.lastUpdatedRemote,
         )
-      // The foreign key in Index entity tables is set with cascade delete constraint and
-      // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
-      // resource, it deletes old resource and corresponding index entities (based on foreign key
-      // constrain) before inserting the new resource.
-      insertResource(entity)
-      val index =
-        ResourceIndices.Builder(resourceIndexer.index(resource))
-          .apply {
-            timeOfLocalChange?.let {
-              addDateTimeIndex(
-                createLocalLastUpdatedIndex(
-                  resource.resourceType,
-                  InstantType(Date.from(timeOfLocalChange)),
-                ),
-              )
-            }
-            lastUpdatedRemote?.let { date ->
-              addDateTimeIndex(createLastUpdatedIndex(resource.resourceType, InstantType(date)))
-            }
-          }
-          .build()
-      updateIndicesForResource(index, resource.resourceType, it.resourceUuid)
+      updateChanges(entity, resource)
     }
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
+  /**
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of downloading the
+   * resource from server.
+   *
+   * @param [resource] the resource with the remote(server) updates
+   */
+  private suspend fun applyRemoteUpdate(resource: Resource) {
+    getResourceEntity(resource.logicalId, resource.resourceType)?.let {
+      val entity =
+        it.copy(
+          serializedResource = iParser.encodeResourceToString(resource),
+          lastUpdatedRemote = resource.meta.lastUpdated?.toInstant(),
+          versionId = resource.versionId,
+        )
+      updateChanges(entity, resource)
+    }
+      ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
+  }
+
+  private suspend fun updateChanges(entity: ResourceEntity, resource: Resource) {
+    // The foreign key in Index entity tables is set with cascade delete constraint and
+    // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
+    // resource, it deletes old resource and corresponding index entities (based on foreign key
+    // constrain) before inserting the new resource.
+    insertResource(entity)
+    val index =
+      ResourceIndices.Builder(resourceIndexer.index(resource))
+        .apply {
+          entity.lastUpdatedLocal?.let { instant ->
+            addDateTimeIndex(
+              createLocalLastUpdatedIndex(resource.resourceType, InstantType(Date.from(instant))),
+            )
+          }
+          entity.lastUpdatedRemote?.let { instant ->
+            addDateTimeIndex(
+              createLastUpdatedIndex(resource.resourceType, InstantType(Date.from(instant))),
+            )
+          }
+        }
+        .build()
+    updateIndicesForResource(index, resource.resourceType, entity.resourceUuid)
+  }
+
+  suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
     return resources.map { resource -> insertRemoteResource(resource) }
   }
 
@@ -189,7 +215,7 @@ internal abstract class ResourceDao {
   private suspend fun insertRemoteResource(resource: Resource): UUID {
     val existingResourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
     if (existingResourceEntity != null) {
-      update(resource, existingResourceEntity.lastUpdatedLocal)
+      applyRemoteUpdate(resource)
       return existingResourceEntity.resourceUuid
     }
     return insertResource(resource, null)

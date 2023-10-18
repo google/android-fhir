@@ -1,0 +1,1332 @@
+{
+  "resourceType": "ValueSet",
+  "id": "extended-release-opioid-with-ambulatory-misuse-potential",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-rules-text",
+      "valueMarkdown": "Step 1:?Expand the value set \"Opioids with Opioid analgesic with ambulatory misuse potential\" and then remove concepts that are long acting:??Step 2:?Filter the result to only select concepts that are a drug with Methadone Ingredient, or have one of the following dose forms: 316943 Extended Release Oral Capsule, 316945 Extended Release Oral Tablet, 316946 Extended Release Oral Tablet, 316987 Transdermal System. To do this filter the list by only including descriptions that have one of the following strings: \"Extended Release\" OR \"Transdermal\" OR \"Methadone\"."
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "All opioid clinical drugs except those restricted to surgical use only, and that are in an extended release dose form code"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Medication"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "All opioid clinical drugs except those used in anti-tussives or antispasmodics, or are restricted to surgical use only."
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-exclusion-criteria",
+      "valueString": "For any drug other than methadone, any mediation that is not using a long acting formulation."
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/extended-release-opioid-with-ambulatory-misuse-potential",
+  "name": "extended_release_opioid_with_ambulatory_misuse_potential",
+  "title": "Extended release opioid with ambulatory misuse potential",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "All opioid clinical drugs except those restricted to surgical use only, and that are in an extended release dose form code",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Identify medication orders for long-acting opioids",
+  "copyright": "© CDC 2016+.",
+  "expansion": {
+    "identifier": "5726ab61-d902-4519-870b-5012db6284af",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "849561",
+        "display": "12 HR tramadol hydrochloride 150 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148482",
+        "display": "24 HR tramadol hydrochloride 100 MG Extended Release Oral Capsule [ConZip]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148478",
+        "display": "24 HR tramadol hydrochloride 100 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "833709",
+        "display": "24 HR tramadol hydrochloride 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1248115",
+        "display": "24 HR tramadol hydrochloride 150 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148487",
+        "display": "24 HR tramadol hydrochloride 200 MG Extended Release Oral Capsule [ConZip]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148485",
+        "display": "24 HR tramadol hydrochloride 200 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "845315",
+        "display": "24 HR tramadol hydrochloride 200 MG Extended Release Oral Tablet [Ultram]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "833711",
+        "display": "24 HR tramadol hydrochloride 200 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148491",
+        "display": "24 HR tramadol hydrochloride 300 MG Extended Release Oral Capsule [ConZip]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148489",
+        "display": "24 HR tramadol hydrochloride 300 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "845316",
+        "display": "24 HR tramadol hydrochloride 300 MG Extended Release Oral Tablet [Ultram]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "833713",
+        "display": "24 HR tramadol hydrochloride 300 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1946529",
+        "display": "Matrix Delivery 24 HR tramadol hydrochloride 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1946527",
+        "display": "Matrix Delivery 24 HR tramadol hydrochloride 200 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1946525",
+        "display": "Matrix Delivery 24 HR tramadol hydrochloride 300 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "849903",
+        "display": "tramadol hydrochloride 50 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "849331",
+        "display": "tramadol hydrochloride 75 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904882",
+        "display": "168 HR buprenorphine 0.005 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904880",
+        "display": "168 HR buprenorphine 0.005 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542999",
+        "display": "168 HR buprenorphine 0.0075 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1542997",
+        "display": "168 HR buprenorphine 0.0075 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904874",
+        "display": "168 HR buprenorphine 0.01 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904870",
+        "display": "168 HR buprenorphine 0.01 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432971",
+        "display": "168 HR buprenorphine 0.015 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1432969",
+        "display": "168 HR buprenorphine 0.015 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904878",
+        "display": "168 HR buprenorphine 0.02 MG/HR Transdermal System [BuTrans]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "904876",
+        "display": "168 HR buprenorphine 0.02 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1236179",
+        "display": "dihydrocodeine bitartrate 120 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1236188",
+        "display": "dihydrocodeine bitartrate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1236190",
+        "display": "dihydrocodeine bitartrate 90 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "997280",
+        "display": "codeine phosphate 20 MG / ibuprofen 300 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "898611",
+        "display": "12 HR hydromorphone hydrochloride 2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "898614",
+        "display": "12 HR hydromorphone hydrochloride 4 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "898618",
+        "display": "12 HR hydromorphone hydrochloride 8 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902733",
+        "display": "24 HR hydromorphone hydrochloride 12 MG Extended Release Oral Tablet [Exalgo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902729",
+        "display": "24 HR hydromorphone hydrochloride 12 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902738",
+        "display": "24 HR hydromorphone hydrochloride 16 MG Extended Release Oral Tablet [Exalgo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902736",
+        "display": "24 HR hydromorphone hydrochloride 16 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1306900",
+        "display": "24 HR hydromorphone hydrochloride 32 MG Extended Release Oral Tablet [Exalgo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1306898",
+        "display": "24 HR hydromorphone hydrochloride 32 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902743",
+        "display": "24 HR hydromorphone hydrochloride 8 MG Extended Release Oral Tablet [Exalgo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "902741",
+        "display": "24 HR hydromorphone hydrochloride 8 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "583490",
+        "display": "72 HR fentanyl 0.012 MG/HR Transdermal System [Duragesic]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "577057",
+        "display": "72 HR fentanyl 0.012 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "261184",
+        "display": "72 HR fentanyl 0.025 MG/HR Transdermal System [Duragesic]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "245134",
+        "display": "72 HR fentanyl 0.025 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1603495",
+        "display": "72 HR fentanyl 0.0375 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "261185",
+        "display": "72 HR fentanyl 0.05 MG/HR Transdermal System [Duragesic]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "245135",
+        "display": "72 HR fentanyl 0.05 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1603498",
+        "display": "72 HR fentanyl 0.0625 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "261186",
+        "display": "72 HR fentanyl 0.075 MG/HR Transdermal System [Duragesic]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "197696",
+        "display": "72 HR fentanyl 0.075 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1603501",
+        "display": "72 HR fentanyl 0.0875 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "262071",
+        "display": "72 HR fentanyl 0.1 MG/HR Transdermal System [Duragesic]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "245136",
+        "display": "72 HR fentanyl 0.1 MG/HR Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1666837",
+        "display": "80 ACTUAT fentanyl 0.04 MG/ACTUAT Transdermal System [Ionsys]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1666831",
+        "display": "80 ACTUAT fentanyl 0.04 MG/ACTUAT Transdermal System"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860492",
+        "display": "12 HR hydrocodone bitartrate 10 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860491",
+        "display": "12 HR hydrocodone bitartrate 10 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860494",
+        "display": "12 HR hydrocodone bitartrate 15 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860493",
+        "display": "12 HR hydrocodone bitartrate 15 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860496",
+        "display": "12 HR hydrocodone bitartrate 20 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860495",
+        "display": "12 HR hydrocodone bitartrate 20 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860498",
+        "display": "12 HR hydrocodone bitartrate 30 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860497",
+        "display": "12 HR hydrocodone bitartrate 30 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860500",
+        "display": "12 HR hydrocodone bitartrate 40 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860499",
+        "display": "12 HR hydrocodone bitartrate 40 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860502",
+        "display": "12 HR hydrocodone bitartrate 50 MG Extended Release Oral Capsule [Zohydro]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860501",
+        "display": "12 HR hydrocodone bitartrate 50 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595766",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 100 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595764",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595772",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 120 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595770",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 120 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595736",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 20 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595730",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 20 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595742",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 30 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595740",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595748",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 40 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595746",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 40 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595754",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 60 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595752",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595760",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 80 MG Extended Release Oral Tablet [Hysingla]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1595758",
+        "display": "Abuse-Deterrent 24 HR hydrocodone bitartrate 80 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864761",
+        "display": "methadone hydrochloride 1 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864708",
+        "display": "methadone hydrochloride 10 MG Oral Tablet [Dolophine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864712",
+        "display": "methadone hydrochloride 10 MG Oral Tablet [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864706",
+        "display": "methadone hydrochloride 10 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "991149",
+        "display": "methadone hydrochloride 10 MG/ML Oral Solution [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "991147",
+        "display": "methadone hydrochloride 10 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864769",
+        "display": "methadone hydrochloride 2 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864984",
+        "display": "methadone hydrochloride 20 MG/ML Oral Solution"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1990745",
+        "display": "methadone hydrochloride 40 MG Tablet for Oral Suspension [Diskets]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864980",
+        "display": "methadone hydrochloride 40 MG Tablet for Oral Suspension [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864978",
+        "display": "methadone hydrochloride 40 MG Tablet for Oral Suspension"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864720",
+        "display": "methadone hydrochloride 5 MG Oral Tablet [Dolophine]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864737",
+        "display": "methadone hydrochloride 5 MG Oral Tablet [Methadose]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "864718",
+        "display": "methadone hydrochloride 5 MG Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892297",
+        "display": "24 HR morphine sulfate 120 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892342",
+        "display": "24 HR morphine sulfate 30 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894942",
+        "display": "24 HR morphine sulfate 45 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892349",
+        "display": "24 HR morphine sulfate 60 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894970",
+        "display": "24 HR morphine sulfate 75 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892355",
+        "display": "24 HR morphine sulfate 90 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745886",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 100 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1872234",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871440",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745881",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871434",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871443",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745889",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871441",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871446",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet [Arymo]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1745892",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet [Morphabond]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1871444",
+        "display": "Abuse-Deterrent 12 HR morphine sulfate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863847",
+        "display": "Abuse-Deterrent morphine sulfate 100 MG / naltrexone hydrochloride 4 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863845",
+        "display": "Abuse-Deterrent morphine sulfate 100 MG / naltrexone hydrochloride 4 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863849",
+        "display": "Abuse-Deterrent morphine sulfate 20 MG / naltrexone hydrochloride 0.8 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863848",
+        "display": "Abuse-Deterrent morphine sulfate 20 MG / naltrexone hydrochloride 0.8 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863851",
+        "display": "Abuse-Deterrent morphine sulfate 30 MG / naltrexone hydrochloride 1.2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863850",
+        "display": "Abuse-Deterrent morphine sulfate 30 MG / naltrexone hydrochloride 1.2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863853",
+        "display": "Abuse-Deterrent morphine sulfate 50 MG / naltrexone hydrochloride 2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863852",
+        "display": "Abuse-Deterrent morphine sulfate 50 MG / naltrexone hydrochloride 2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863855",
+        "display": "Abuse-Deterrent morphine sulfate 60 MG / naltrexone hydrochloride 2.4 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863854",
+        "display": "Abuse-Deterrent morphine sulfate 60 MG / naltrexone hydrochloride 2.4 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863857",
+        "display": "Abuse-Deterrent morphine sulfate 80 MG / naltrexone hydrochloride 3.2 MG Extended Release Oral Capsule [Embeda]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "863856",
+        "display": "Abuse-Deterrent morphine sulfate 80 MG / naltrexone hydrochloride 3.2 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892496",
+        "display": "morphine sulfate 10 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892494",
+        "display": "morphine sulfate 10 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892556",
+        "display": "morphine sulfate 100 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892554",
+        "display": "morphine sulfate 100 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892560",
+        "display": "morphine sulfate 100 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891874",
+        "display": "morphine sulfate 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892574",
+        "display": "morphine sulfate 15 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891881",
+        "display": "morphine sulfate 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892598",
+        "display": "morphine sulfate 20 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892596",
+        "display": "morphine sulfate 20 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892645",
+        "display": "morphine sulfate 200 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892643",
+        "display": "morphine sulfate 200 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892648",
+        "display": "morphine sulfate 200 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892646",
+        "display": "morphine sulfate 200 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892658",
+        "display": "morphine sulfate 30 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892345",
+        "display": "morphine sulfate 30 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892660",
+        "display": "morphine sulfate 30 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891888",
+        "display": "morphine sulfate 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1303738",
+        "display": "morphine sulfate 40 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1303736",
+        "display": "morphine sulfate 40 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "895217",
+        "display": "morphine sulfate 5 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894803",
+        "display": "morphine sulfate 50 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894801",
+        "display": "morphine sulfate 50 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894805",
+        "display": "morphine sulfate 60 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "892352",
+        "display": "morphine sulfate 60 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894813",
+        "display": "morphine sulfate 60 MG Extended Release Oral Tablet [MS Contin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "891893",
+        "display": "morphine sulfate 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894816",
+        "display": "morphine sulfate 80 MG Extended Release Oral Capsule [Kadian]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "894814",
+        "display": "morphine sulfate 80 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1806707",
+        "display": "12 HR naltrexone hydrochloride 1.2 MG / oxycodone hydrochloride 10 MG Extended Release Oral Capsule [Troxyca]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1806701",
+        "display": "12 HR naltrexone hydrochloride 1.2 MG / oxycodone hydrochloride 10 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049502",
+        "display": "12 HR oxycodone hydrochloride 10 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049543",
+        "display": "12 HR oxycodone hydrochloride 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049563",
+        "display": "12 HR oxycodone hydrochloride 20 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049574",
+        "display": "12 HR oxycodone hydrochloride 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049584",
+        "display": "12 HR oxycodone hydrochloride 40 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049593",
+        "display": "12 HR oxycodone hydrochloride 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049599",
+        "display": "12 HR oxycodone hydrochloride 80 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791560",
+        "display": "Abuse-Deterrent 12 HR oxycodone 13.5 MG Extended Release Oral Capsule [Xtampza]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791558",
+        "display": "Abuse-Deterrent 12 HR oxycodone 13.5 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791569",
+        "display": "Abuse-Deterrent 12 HR oxycodone 18 MG Extended Release Oral Capsule [Xtampza]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791567",
+        "display": "Abuse-Deterrent 12 HR oxycodone 18 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791576",
+        "display": "Abuse-Deterrent 12 HR oxycodone 27 MG Extended Release Oral Capsule [Xtampza]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791574",
+        "display": "Abuse-Deterrent 12 HR oxycodone 27 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791582",
+        "display": "Abuse-Deterrent 12 HR oxycodone 36 MG Extended Release Oral Capsule [Xtampza]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1791580",
+        "display": "Abuse-Deterrent 12 HR oxycodone 36 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1790533",
+        "display": "Abuse-Deterrent 12 HR oxycodone 9 MG Extended Release Oral Capsule [Xtampza]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1790527",
+        "display": "Abuse-Deterrent 12 HR oxycodone 9 MG Extended Release Oral Capsule"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049504",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 10 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860157",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 10 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049545",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 15 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860154",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049565",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 20 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860129",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 20 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049576",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 30 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860151",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049586",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 40 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860137",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 40 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049595",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 60 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860127",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 60 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049601",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 80 MG Extended Release Oral Tablet [Oxycontin]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1860148",
+        "display": "Abuse-Deterrent 12 HR oxycodone hydrochloride 80 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1049727",
+        "display": "oxycodone hydrochloride 5 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977874",
+        "display": "12 HR oxymorphone hydrochloride 10 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977894",
+        "display": "12 HR oxymorphone hydrochloride 15 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977902",
+        "display": "12 HR oxymorphone hydrochloride 20 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977909",
+        "display": "12 HR oxymorphone hydrochloride 30 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977915",
+        "display": "12 HR oxymorphone hydrochloride 40 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977923",
+        "display": "12 HR oxymorphone hydrochloride 5 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "977929",
+        "display": "12 HR oxymorphone hydrochloride 7.5 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1149367",
+        "display": "12 HR tapentadol 100 MG Extended Release Oral Tablet [Nucynta]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148797",
+        "display": "12 HR tapentadol 100 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1149370",
+        "display": "12 HR tapentadol 150 MG Extended Release Oral Tablet [Nucynta]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148800",
+        "display": "12 HR tapentadol 150 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1149373",
+        "display": "12 HR tapentadol 200 MG Extended Release Oral Tablet [Nucynta]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148803",
+        "display": "12 HR tapentadol 200 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1149376",
+        "display": "12 HR tapentadol 250 MG Extended Release Oral Tablet [Nucynta]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148807",
+        "display": "12 HR tapentadol 250 MG Extended Release Oral Tablet"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1149378",
+        "display": "12 HR tapentadol 50 MG Extended Release Oral Tablet [Nucynta]"
+      },
+      {
+        "system": "http://www.nlm.nih.gov/research/umls/rxnorm",
+        "version": "04-Apr-2022",
+        "code": "1148809",
+        "display": "12 HR tapentadol 50 MG Extended Release Oral Tablet"
+      }
+    ]
+  }
+}

@@ -1,0 +1,594 @@
+{
+	"resourceType": "Bundle",
+	"id": "ANCDT17-terminology-bundle",
+	"type": "transaction",
+	"entry": [{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b8-de17",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de17",
+				"name": "Systolicbloodpressure",
+				"title": "Systolic blood pressure",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Systolic blood pressure element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B8.DE17",
+							"display": "Systolic blood pressure"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE17",
+						"display": "Systolic blood pressure"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b8-de19",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de19",
+				  "name": "Diastolicbloodpressure",
+				  "title": "Diastolic blood pressure",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Diastolic blood pressure element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B8.DE19",
+				        "display": "Diastolic blood pressure"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B8.DE19",
+				      "display": "Diastolic blood pressure"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b8-de20",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de20",
+				"name": "Repeatsystolicbloodpressure",
+				"title": "Repeat systolic blood pressure",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Repeat systolic blood pressure element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B8.DE20",
+							"display": "Repeat systolic blood pressure"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE20",
+						"display": "Repeat systolic blood pressure"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b8-de21",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de21",
+				  "name": "Repeatdiastolicbloodpressure",
+				  "title": "Repeat diastolic blood pressure",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Repeat diastolic blood pressure element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B8.DE21",
+				        "display": "Repeat diastolic blood pressure"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B8.DE21",
+				      "display": "Repeat diastolic blood pressure"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b8-de27",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de27",
+				"name": "Symptomsofseverepreeclampsia",
+				"title": "Symptoms of severe pre-eclampsia",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Symptoms of severe pre-eclampsia element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B8.DE27",
+							"display": "Symptoms of severe pre-eclampsia"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE27",
+						"display": "Symptoms of severe pre-eclampsia"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b8-de28",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de28",
+				  "name": "SymptomsofseverepreeclampsiaNosymptomsChoices",
+				  "title": "Symptoms of severe pre-eclampsia - No symptoms Choices",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Symptoms of severe pre-eclampsia - No symptoms Choices element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B8.DE28",
+				        "display": "No symptoms of severe pre-eclampsia"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B8.DE28",
+				      "display": "No symptoms of severe pre-eclampsia"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b8-de29",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de29",
+				"name": "SymptomsofseverepreeclampsiaChoices",
+				"title": "Symptoms of severe pre-eclampsia Choices",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Symptoms of severe pre-eclampsia Choices element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B8.DE29",
+							"display": "Severe headache"
+						}, {
+							"code": "ANC.B8.DE30",
+							"display": "Visual disturbance"
+						}, {
+							"code": "ANC.B8.DE31",
+							"display": "Epigastric pain"
+						}, {
+							"code": "ANC.B8.DE32",
+							"display": "Dizziness"
+						}, {
+							"code": "ANC.B8.DE33",
+							"display": "Vomiting"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE29",
+						"display": "Severe headache"
+					}, {
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE30",
+						"display": "Visual disturbance"
+					}, {
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE31",
+						"display": "Epigastric pain"
+					}, {
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE32",
+						"display": "Dizziness"
+					}, {
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B8.DE33",
+						"display": "Vomiting"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b9-de144",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de144",
+				"name": "Urinedipstickresultprotein",
+				"title": "Urine dipstick result - protein",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Urine dipstick result - protein element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B9.DE144",
+							"display": "Urine dipstick result - protein"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B9.DE144",
+						"display": "Urine dipstick result - protein"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				"id": "anc-b9-de146",
+				"meta": {
+					"profile": ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"]
+				},
+				"extension": [{
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+					"valueString": "executable"
+				}, {
+					"url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+					"valueString": "executable"
+				}],
+				"url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de146",
+				"name": "Urinedipstickresultprotein1plusChoices",
+				"title": "Urine dipstick result - protein - 1 plus Choices",
+				"status": "draft",
+				"experimental": false,
+				"description": "Codes representing possible values for the Urine dipstick result - protein - 1 plus Choices element",
+				"immutable": true,
+				"compose": {
+					"include": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"concept": [{
+							"code": "ANC.B9.DE146",
+							"display": "+"
+						}]
+					}]
+				},
+				"expansion": {
+					"timestamp": "2021-11-30T07:11:23-07:00",
+					"contains": [{
+						"system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+						"code": "ANC.B9.DE146",
+						"display": "+"
+					}]
+				}
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b9-de147",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de147",
+				  "name": "Urinedipstickresultprotein2plusChoices",
+				  "title": "Urine dipstick result - protein - 2 plus Choices",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Urine dipstick result - protein - 2 plus Choices element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B9.DE147",
+				        "display": "++"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B9.DE147",
+				      "display": "++"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b9-de148",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de148",
+				  "name": "Urinedipstickresultprotein3plusChoices",
+				  "title": "Urine dipstick result - protein - 3 plus Choices",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Urine dipstick result - protein - 3 plus Choices element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B9.DE148",
+				        "display": "+++"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B9.DE148",
+				      "display": "+++"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b9-de149",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de149",
+				  "name": "Urinedipstickresultprotein4plusChoices",
+				  "title": "Urine dipstick result - protein - 4 plus Choices",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Urine dipstick result - protein - 4 plus Choices element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B9.DE149",
+				        "display": "++++"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B9.DE149",
+				      "display": "++++"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b9-de145",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de145",
+				  "name": "UrinedipstickresultproteinNoneChoices",
+				  "title": "Urine dipstick result - protein - None Choices",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Urine dipstick result - protein - None Choices element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B9.DE145",
+				        "display": "None"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B9.DE145",
+				      "display": "None"
+				    } ]
+				  }
+			}
+		},
+		{
+			"resource": {
+				"resourceType": "ValueSet",
+				  "id": "anc-b6-de83",
+				  "meta": {
+				    "profile": [ "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset" ]
+				  },
+				  "extension": [ {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+				    "valueString": "executable"
+				  }, {
+				    "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+				    "valueString": "executable"
+				  } ],
+				  "url": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de83",
+				  "name": "Existingchronichealthconditions",
+				  "title": "Existing chronic health conditions",
+				  "status": "draft",
+				  "experimental": false,
+				  "description": "Codes representing possible values for the Existing chronic health conditions element",
+				  "immutable": true,
+				  "compose": {
+				    "include": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "concept": [ {
+				        "code": "ANC.B6.DE83",
+				        "display": "Existing chronic health conditions"
+				      } ]
+				    } ]
+				  },
+				  "expansion": {
+				    "timestamp": "2021-11-30T07:11:23-07:00",
+				    "contains": [ {
+				      "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+				      "code": "ANC.B6.DE83",
+				      "display": "Existing chronic health conditions"
+				    } ]
+				  }
+			}
+		}
+	]
+}

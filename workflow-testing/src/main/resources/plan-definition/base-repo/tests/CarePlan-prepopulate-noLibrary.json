@@ -1,0 +1,788 @@
+{
+  "resourceType": "CarePlan",
+  "id": "prepopulate-noLibrary",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "prepopulate-noLibrary",
+      "instantiatesCanonical": [
+        "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/prepopulate-noLibrary"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "OPA-Patient1"
+      },
+      "action": [
+        {
+          "title": "Prepopulate!",
+          "description": "A simple recommendation to complete a prepopulated Questionnaire",
+          "resource": {
+            "reference": "Task/complete-questionnaire"
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "Questionnaire",
+      "id": "OutpatientPriorAuthorizationRequest-noLibrary-OPA-Patient1",
+      "meta": {
+        "source": "#Szj0RYKKLb3zYK89",
+        "profile": [
+          "http://hl7.org/fhir/us/davinci-dtr/StructureDefinition/dtr-questionnaire-r4"
+        ]
+      },
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/cqf-library",
+          "valueCanonical": "http://somewhere.org/fhir/uv/mycontentig/Library/noLibrary"
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-prepopulate-subject",
+          "valueReference": {
+            "reference": "Patient/OPA-Patient1"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+          "valueReference": {
+            "reference": "#populate-outcome-OutpatientPriorAuthorizationRequest-noLibrary-OPA-Patient1"
+          }
+        }
+      ],
+      "url": "http://hl7.org/fhir/Questionnaire/OutpatientPriorAuthorizationRequest-noLibrary",
+      "name": "OutpatientPriorAuthorizationRequest",
+      "title": "Outpatient Prior Authorization Request",
+      "status": "active",
+      "subjectType": [
+        "Patient",
+        "Organization",
+        "Claim"
+      ],
+      "date": "2022-01-04T00:00:00+00:00",
+      "contact": [
+        {
+          "name": "Palmetto GBA"
+        }
+      ],
+      "description": "Testing the form",
+      "jurisdiction": [
+        {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:3166",
+              "code": "US"
+            }
+          ]
+        }
+      ],
+      "item": [
+        {
+          "linkId": "1",
+          "text": "Facility Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityName"
+                  }
+                }
+              ],
+              "linkId": "1.1",
+              "text": "Name",
+              "type": "string",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityNPI"
+                  }
+                }
+              ],
+              "linkId": "1.2",
+              "text": "NPI",
+              "type": "text",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "FacilityPTAN"
+                  }
+                }
+              ],
+              "linkId": "1.3",
+              "text": "PTAN",
+              "type": "string",
+              "required": true
+            },
+            {
+              "linkId": "1.4",
+              "text": "Contract/Region",
+              "type": "choice",
+              "required": false,
+              "answerOption": [
+                {
+                  "id": "FacilityContractRegion-11501",
+                  "valueCoding": {
+                    "code": "11001",
+                    "display": "Part A South Carolina"
+                  }
+                },
+                {
+                  "id": "FacilityContractRegion-11003",
+                  "valueCoding": {
+                    "code": "11501",
+                    "display": "Part A North Carolina"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "code": "11003",
+                    "display": "Part A Virginia/West Virginia"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "2",
+          "text": "Beneficiary Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryFirstName"
+                  }
+                }
+              ],
+              "linkId": "2.1",
+              "text": "First Name",
+              "type": "string",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryLastName"
+                  }
+                }
+              ],
+              "linkId": "2.2",
+              "text": "Last Name",
+              "type": "text",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryDOB"
+                  }
+                }
+              ],
+              "linkId": "2.3",
+              "text": "Date of Birth",
+              "type": "date",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryMedicareID"
+                  }
+                }
+              ],
+              "linkId": "2.4",
+              "text": "Medicare ID",
+              "type": "string",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "BeneficiaryGender"
+                  }
+                }
+              ],
+              "linkId": "2.5",
+              "text": "Gender",
+              "type": "choice",
+              "required": true,
+              "answerOption": [
+                {
+                  "id": "unknown",
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "male",
+                    "display": "Male"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "female",
+                    "display": "Female"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "other",
+                    "display": "Other"
+                  }
+                },
+                {
+                  "valueCoding": {
+                    "system": "http://hl7.org/fhir/ValueSet/administrative-gender",
+                    "code": "unknown",
+                    "display": "Unknown"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "3",
+          "text": "Operating Physician Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianFirstName"
+                  }
+                }
+              ],
+              "linkId": "3.1",
+              "text": "First Name",
+              "type": "string",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianLastName"
+                  }
+                }
+              ],
+              "linkId": "3.2",
+              "text": "Last Name",
+              "type": "text",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianNPI"
+                  }
+                }
+              ],
+              "linkId": "3.3",
+              "text": "NPI",
+              "type": "string",
+              "required": true
+            },
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "OperatingPhysicianPTAN"
+                  }
+                }
+              ],
+              "linkId": "3.4",
+              "text": "PTAN",
+              "type": "string",
+              "required": true
+            },
+            {
+              "linkId": "3.5",
+              "text": "Address",
+              "type": "group",
+              "required": true,
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddress1"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.1",
+                  "text": "Address1",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddress2"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.2",
+                  "text": "Address2",
+                  "type": "string",
+                  "required": false
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressCity"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.3",
+                  "text": "City",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressState"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.4",
+                  "text": "State",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "OperatingPhysicianAddressZip"
+                      }
+                    }
+                  ],
+                  "linkId": "3.5.5",
+                  "text": "Zip",
+                  "type": "string",
+                  "required": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "linkId": "4",
+          "text": "Attending Physician Information",
+          "type": "group",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                  "valueExpression": {
+                    "language": "text/cql.identifier",
+                    "expression": "AttendingPhysicianSame"
+                  }
+                }
+              ],
+              "linkId": "4.1",
+              "text": "Same as Operating Physician?",
+              "type": "boolean",
+              "required": false
+            },
+            {
+              "linkId": "4.2",
+              "text": "Attending Physician",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "4.1",
+                  "operator": "=",
+                  "answerBoolean": false
+                }
+              ],
+              "item": [
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianFirstName"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.1",
+                  "text": "First Name",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianLastName"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.2",
+                  "text": "Last Name",
+                  "type": "text",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianNPI"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.3",
+                  "text": "NPI",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "extension": [
+                    {
+                      "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                      "valueExpression": {
+                        "language": "text/cql.identifier",
+                        "expression": "AttendingPhysicianPTAN"
+                      }
+                    }
+                  ],
+                  "linkId": "4.2.4",
+                  "text": "PTAN",
+                  "type": "string",
+                  "required": true
+                },
+                {
+                  "linkId": "4.2.5",
+                  "text": "Address",
+                  "type": "group",
+                  "required": true,
+                  "item": [
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddress1"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.1",
+                      "text": "Address1",
+                      "type": "string",
+                      "required": true
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddress2"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.2",
+                      "text": "Address2",
+                      "type": "string",
+                      "required": false
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressCity"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.3",
+                      "text": "City",
+                      "type": "string",
+                      "required": true
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressState"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.4",
+                      "text": "State",
+                      "type": "string",
+                      "required": true
+                    },
+                    {
+                      "extension": [
+                        {
+                          "url": "http://hl7.org/fhir/StructureDefinition/cqf-expression",
+                          "valueExpression": {
+                            "language": "text/cql.identifier",
+                            "expression": "AttendingPhysicianAddressZip"
+                          }
+                        }
+                      ],
+                      "linkId": "4.2.5.5",
+                      "text": "Zip",
+                      "type": "string",
+                      "required": true
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "Task",
+      "id": "complete-questionnaire",
+      "basedOn": [
+        {
+          "reference": "#RequestGroup/prepopulate-noLibrary",
+          "type": "RequestGroup"
+        }
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "description": "Create a task to complete a Questionnaire.",
+      "focus": {
+        "reference": "Questionnaire/OutpatientPriorAuthorizationRequest-noLibrary-OPA-Patient1"
+      },
+      "for": {
+        "reference": "OPA-Patient1"
+      }
+    },
+    {
+      "resourceType": "OperationOutcome",
+      "id": "populate-outcome-OutpatientPriorAuthorizationRequest-noLibrary-OPA-Patient1",
+      "issue": [
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (FacilityName) for item (1.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (FacilityNPI) for item (1.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (FacilityPTAN) for item (1.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (BeneficiaryFirstName) for item (2.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (BeneficiaryLastName) for item (2.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (BeneficiaryDOB) for item (2.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (BeneficiaryMedicareID) for item (2.4): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (BeneficiaryGender) for item (2.5): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianFirstName) for item (3.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianLastName) for item (3.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianNPI) for item (3.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianPTAN) for item (3.4): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianAddress1) for item (3.5.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianAddress2) for item (3.5.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianAddressCity) for item (3.5.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianAddressState) for item (3.5.4): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (OperatingPhysicianAddressZip) for item (3.5.5): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianSame) for item (4.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianFirstName) for item (4.2.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianLastName) for item (4.2.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianNPI) for item (4.2.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianPTAN) for item (4.2.4): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianAddress1) for item (4.2.5.1): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianAddress2) for item (4.2.5.2): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianAddressCity) for item (4.2.5.3): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianAddressState) for item (4.2.5.4): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        },
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "Error encountered evaluating expression (AttendingPhysicianAddressZip) for item (4.2.5.5): Unable to resolve library (OutpatientPriorAuthorizationPrepopulation-noLibrary): Could not load source for library OutpatientPriorAuthorizationPrepopulation-noLibrary, version null."
+        }
+      ]
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+      "valueReference": {
+        "reference": "#populate-outcome-OutpatientPriorAuthorizationRequest-noLibrary-OPA-Patient1"
+      }
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/prepopulate-noLibrary"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "OPA-Patient1"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/prepopulate-noLibrary"
+      }
+    }
+  ]
+}
