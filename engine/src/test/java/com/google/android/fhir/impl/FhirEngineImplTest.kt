@@ -616,7 +616,7 @@ class FhirEngineImplTest {
       // First sync
       fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
 
-      val remoteChange =
+      val updatedPatient =
         originalPatient.copy().apply {
           meta =
             Meta().apply {
@@ -627,11 +627,11 @@ class FhirEngineImplTest {
         }
 
       // Sync to get updates from server
-      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
 
       val result = services.database.selectEntity(ResourceType.Patient, "original-002")
-      assertThat(result.versionId).isEqualTo(remoteChange.versionId)
-      assertThat(result.lastUpdatedRemote).isEqualTo(remoteChange.lastUpdated)
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
+      assertThat(result.lastUpdatedRemote).isEqualTo(updatedPatient.lastUpdated)
     }
 
   @Test
@@ -659,7 +659,7 @@ class FhirEngineImplTest {
         originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
       fhirEngine.update(localChange)
 
-      val remoteChange =
+      val updatedPatient =
         originalPatient.copy().apply {
           meta =
             Meta().apply {
@@ -670,10 +670,10 @@ class FhirEngineImplTest {
         }
 
       // Sync to get updates from server
-      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(remoteChange))) }
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
 
       val result = fhirEngine.getLocalChanges(ResourceType.Patient, "original-002").first()
-      assertThat(result.versionId).isEqualTo(remoteChange.versionId)
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
     }
 
   @Test

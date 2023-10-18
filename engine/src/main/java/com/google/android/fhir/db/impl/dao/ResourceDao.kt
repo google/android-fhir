@@ -58,7 +58,13 @@ internal abstract class ResourceDao {
   lateinit var iParser: IParser
   lateinit var resourceIndexer: ResourceIndexer
 
-  open suspend fun updateLocalChange(resource: Resource, timeOfLocalChange: Instant?) {
+  /**
+   * Updates the resource in the [ResourceEntity] and adds indexes.
+   *
+   * @param [resource] The resource with local (on device) updates.
+   * @param [timeOfLocalChange] Time when the local change was made.
+   */
+  suspend fun applyLocalUpdate(resource: Resource, timeOfLocalChange: Instant?) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
       val entity =
         it.copy(
@@ -70,13 +76,17 @@ internal abstract class ResourceDao {
       ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
   }
 
-  open suspend fun updateRemoteChange(resource: Resource) {
+  /**
+   * Updates the resource in the [ResourceEntity] and adds indexes.
+   *
+   * @param [resource] The resource with the remote(server) updates.
+   */
+  private suspend fun applyRemoteUpdate(resource: Resource) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
-      val lastUpdatedRemote: Date? = resource.meta.lastUpdated
       val entity =
         it.copy(
           serializedResource = iParser.encodeResourceToString(resource),
-          lastUpdatedRemote = lastUpdatedRemote?.toInstant(),
+          lastUpdatedRemote = resource.meta.lastUpdated?.toInstant(),
           versionId = resource.versionId,
         )
       updateChanges(entity, resource)
@@ -85,7 +95,7 @@ internal abstract class ResourceDao {
   }
 
   // WARNING : This is a private function and shouldn't be called directly.
-  open suspend fun updateChanges(entity: ResourceEntity, resource: Resource) {
+  private suspend fun updateChanges(entity: ResourceEntity, resource: Resource) {
     // The foreign key in Index entity tables is set with cascade delete constraint and
     // insertResource has REPLACE conflict resolution. So, when we do an insert to update the
     // resource, it deletes old resource and corresponding index entities (based on foreign key
@@ -204,7 +214,7 @@ internal abstract class ResourceDao {
   private suspend fun insertRemoteResource(resource: Resource): UUID {
     val existingResourceEntity = getResourceEntity(resource.logicalId, resource.resourceType)
     if (existingResourceEntity != null) {
-      updateRemoteChange(resource)
+      applyRemoteUpdate(resource)
       return existingResourceEntity.resourceUuid
     }
     return insertResource(resource, null)
