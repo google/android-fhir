@@ -79,7 +79,7 @@ internal abstract class ResourceDao {
   /**
    * Updates the resource in the [ResourceEntity] and adds indexes.
    *
-   * @param [resource] The resource with the remote(server) updates.
+   * @param [resource] the resource with the remote(server) updates
    */
   private suspend fun applyRemoteUpdate(resource: Resource) {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
