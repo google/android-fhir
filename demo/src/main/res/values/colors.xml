@@ -73,8 +73,8 @@
     <color name="onTertiaryContainer_green_90">#C4EED0</color>
 
     <color name="error_red_80">#F2B8B5</color>
-    <color name="errorContainer_red_20">#601410</color>
     <color name="onError_red_30">#8C1D18</color>
+    <color name="errorContainer_red_20">#601410</color>
     <color name="onErrorContainer_red_90">#F9DEDC</color>
 
     <color name="background_neutral_10">#1F1F1F</color>
