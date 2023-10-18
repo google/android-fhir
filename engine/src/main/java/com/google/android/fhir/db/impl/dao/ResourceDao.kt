@@ -61,7 +61,7 @@ internal abstract class ResourceDao {
   /**
    * Updates the resource in the [ResourceEntity] and adds indexes.
    *
-   * @param [resource] The resource with local (on device) updates.
+   * @param [resource] the resource with local (on device) updates
    * @param [timeOfLocalChange] Time when the local change was made.
    */
   suspend fun applyLocalUpdate(resource: Resource, timeOfLocalChange: Instant?) {
