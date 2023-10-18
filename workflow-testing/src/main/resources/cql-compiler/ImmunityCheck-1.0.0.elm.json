@@ -188,6 +188,31 @@
               "locator" : "14:11-14:35"
             }, {
               "type" : "Equal",
+              "signature" : [ {
+                "type" : "ListTypeSpecifier",
+                "elementType" : {
+                  "type" : "ChoiceTypeSpecifier",
+                  "choice" : [ {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                  }, {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}String"
+                  } ]
+                }
+              }, {
+                "type" : "ListTypeSpecifier",
+                "elementType" : {
+                  "type" : "ChoiceTypeSpecifier",
+                  "choice" : [ {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                  }, {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{urn:hl7-org:elm-types:r1}String"
+                  } ]
+                }
+              } ],
               "operand" : [ {
                 "type" : "Query",
                 "source" : [ {
@@ -952,6 +977,13 @@
               "type" : "And",
               "operand" : [ {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "NamedTypeSpecifier",
+                    "name" : "{http://hl7.org/fhir}Immunization.ProtocolApplied"
+                  }
+                } ],
                 "operand" : {
                   "type" : "Property",
                   "localId" : "25",
@@ -963,6 +995,19 @@
                 "locator" : "19:11-19:35"
               }, {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "ChoiceTypeSpecifier",
+                    "choice" : [ {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                    }, {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}String"
+                    } ]
+                  }
+                } ],
                 "operand" : {
                   "type" : "Query",
                   "source" : [ {
@@ -1049,6 +1094,19 @@
               "type" : "Not",
               "operand" : {
                 "type" : "Exists",
+                "signature" : [ {
+                  "type" : "ListTypeSpecifier",
+                  "elementType" : {
+                    "type" : "ChoiceTypeSpecifier",
+                    "choice" : [ {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}Integer"
+                    }, {
+                      "type" : "NamedTypeSpecifier",
+                      "name" : "{urn:hl7-org:elm-types:r1}String"
+                    } ]
+                  }
+                } ],
                 "operand" : {
                   "type" : "Query",
                   "source" : [ {
@@ -1847,6 +1905,13 @@
           "type" : "Or",
           "operand" : [ {
             "type" : "Exists",
+            "signature" : [ {
+              "type" : "ListTypeSpecifier",
+              "elementType" : {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Immunization"
+              }
+            } ],
             "operand" : {
               "type" : "ExpressionRef",
               "localId" : "20",
@@ -1857,6 +1922,13 @@
             "locator" : "10:3-10:22"
           }, {
             "type" : "Exists",
+            "signature" : [ {
+              "type" : "ListTypeSpecifier",
+              "elementType" : {
+                "type" : "NamedTypeSpecifier",
+                "name" : "{http://hl7.org/fhir}Immunization"
+              }
+            } ],
             "operand" : {
               "type" : "ExpressionRef",
               "localId" : "42",

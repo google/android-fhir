@@ -1,0 +1,59 @@
+{
+  "resourceType": "Library",
+  "id": "ANCBaseConcepts",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Library/ANCBaseConcepts",
+  "name": "ANCBaseConcepts",
+  "title": "ANC Base Concepts",
+  "status": "active",
+  "experimental": false,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "description": "Base concepts used throughout the ANC content, including decision support and indicator logic.",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "Value set Antenatal care case",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-case"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Antenatal care contact",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/antenatal-care-contact"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pregnancy condition",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/pregnancy-condition"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Iron supplement",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/iron-supplement"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Folic acid supplement",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/folic-acid-supplement"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ANCBaseConcepts.cql"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "resourceType": "ValueSet",
+  "id": "phencyclidine-urine-drug-screening-tests",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-rules-text",
+      "valueMarkdown": "Step 1. Add all codes found using the following LOINC query: Phencyclidine (=system:Urine)"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Urine tests for phencyclidine"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Urine test"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "Codes"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/phencyclidine-urine-drug-screening-tests",
+  "name": "phencyclidine_urine_drug_screening_tests",
+  "title": "Phencyclidine urine drug screening tests",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Urine tests for phencyclidine",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Identification of urine drug tests where results can be used when considering pain management therapy",
+  "copyright": "© CDC 2016+.",
+  "expansion": {
+    "identifier": "f25f5e40-a769-41b7-94a4-c2593a6fa148",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3937-0",
+        "display": "Phencyclidine [Mass/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "16254-5",
+        "display": "Phencyclidine [Mass/volume] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "72825-3",
+        "display": "Phencyclidine [Mass/volume] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "52951-1",
+        "display": "Phencyclidine [Moles/volume] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "3936-2",
+        "display": "Phencyclidine [Presence] in Urine"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "14311-5",
+        "display": "Phencyclidine [Presence] in Urine by Confirm method >20 ng/mL"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "18392-1",
+        "display": "Phencyclidine [Presence] in Urine by Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "8237-0",
+        "display": "Phencyclidine [Presence] in Urine by SAMHSA confirm method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "8238-8",
+        "display": "Phencyclidine [Presence] in Urine by SAMHSA screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19659-2",
+        "display": "Phencyclidine [Presence] in Urine by Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "14310-7",
+        "display": "Phencyclidine [Presence] in Urine by Screen method >25 ng/mL"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19661-8",
+        "display": "Phencyclidine cutoff [Mass/volume] in Urine for Confirmatory method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "19660-0",
+        "display": "Phencyclidine cutoff [Mass/volume] in Urine for Screen method"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.72",
+        "code": "58397-1",
+        "display": "Phencyclidine/Creatinine [Mass Ratio] in Urine"
+      }
+    ]
+  }
+}

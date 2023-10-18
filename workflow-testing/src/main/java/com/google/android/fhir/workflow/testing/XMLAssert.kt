@@ -27,7 +27,7 @@ object XMLAssert {
     val diff =
       DiffBuilder.compare(expected)
         .withTest(actual)
-        .withNodeMatcher(DefaultNodeMatcher(ElementSelectors.byName))
+        .withNodeMatcher(DefaultNodeMatcher(ElementSelectors.byNameAndAllAttributes))
         .withDocumentBuilderFactory(
           DocumentBuilderFactoryImpl(), // Overrides the incomplete default DocumentBuilderFactory
         )

@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import Dependencies.forceHapiVersion
 import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
@@ -78,12 +79,14 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations {
   all {
     removeIncompatibleDependencies()
+    forceGuava()
     forceHapiVersion()
     forceJacksonVersion()
   }
 }
 
 dependencies {
+  testImplementation(project(mapOf("path" to ":knowledge")))
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -98,43 +101,22 @@ dependencies {
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.guavaCaching)
 
   implementation(Dependencies.Androidx.coreKtx)
 
-  implementation(Dependencies.Cql.engine)
-  implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
   implementation(Dependencies.Cql.evaluator)
-  implementation(Dependencies.Cql.evaluatorBuilder)
-  implementation(Dependencies.Cql.evaluatorDagger)
-  implementation(Dependencies.Cql.evaluatorPlanDef)
-  implementation(Dependencies.Cql.translatorCqlToElm) // Overrides HAPI's old versions
-  implementation(Dependencies.Cql.translatorElm) // Overrides HAPI's old versions
-  implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
-  implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
-  implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+  implementation(Dependencies.Cql.evaluatorFhirJackson)
   implementation(Dependencies.timber)
 
-  // Forces the most recent version of jackson, ignoring what dependencies use.
-  // Remove these lines when HAPI 6.4 becomes available.
-  implementation(Dependencies.Jackson.annotations)
-  implementation(Dependencies.Jackson.bom)
-  implementation(Dependencies.Jackson.core)
-  implementation(Dependencies.Jackson.databind)
-  implementation(Dependencies.Jackson.dataformatXml)
-  implementation(Dependencies.Jackson.jaxbAnnotations)
-  implementation(Dependencies.Jackson.jsr310)
-
-  // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
-  // Version 3.0 uses java.lang.System.Logger, which is not available on Android
-  // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
-  implementation(Dependencies.HapiFhir.caffeine)
+  implementation(Dependencies.HapiFhir.guavaCaching)
 
   implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.xerces)
-  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
-  implementation(Dependencies.androidFhirKnowledge)
+  implementation(project(":engine")) { exclude(module = "truth") }
+  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)

@@ -1,0 +1,51 @@
+{
+  "resourceType": "Bundle",
+  "id": "CdsHooksMultipleActions-PlanDefinition-1.0.0",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "CdsHooksMultipleActions-PlanDefinition-1.0.0",
+        "instantiatesCanonical": [
+          "http://example.com/PlanDefinition/CdsHooksMultipleActions-PlanDefinition-1.0.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "patient-CdsHooksMultipleActions"
+        },
+        "action": [
+          {
+            "title": "Summary",
+            "description": "Detail",
+            "priority": "routine",
+            "condition": [
+              {
+                "kind": "applicability",
+                "expression": {
+                  "language": "text/cql.identifier",
+                  "expression": "Is Action Applicable?"
+                }
+              }
+            ],
+            "type": {
+              "coding": [
+                {
+                  "code": "clinical-protocol",
+                  "display": "Clinical Protocol"
+                }
+              ]
+            },
+            "action": [
+              {
+                "title": "Summary 1",
+                "description": "Detail 1"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

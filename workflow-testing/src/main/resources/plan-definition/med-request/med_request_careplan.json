@@ -1,32 +1,44 @@
 {
   "resourceType": "CarePlan",
-  "contained": [ {
-    "resourceType": "RequestGroup",
-    "id": "MedRequest-Example",
-    "instantiatesCanonical":[
-      "http://localhost/PlanDefinition/MedRequest-Example"
-    ],
-    "status": "draft",
-    "intent": "proposal",
-    "subject": {
-      "reference": "Patient/Patient-Example"
+  "id": "MedRequest-Example",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "MedRequest-Example",
+      "instantiatesCanonical": [
+        "http://localhost/PlanDefinition/MedRequest-Example"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "Patient/Patient-Example"
+      },
+      "action": [
+        {
+          "id": "medication-action-1",
+          "title": "Administer Medication 1",
+          "resource": {
+            "reference": "MedicationRequest/MedicationRequest-1"
+          }
+        }
+      ]
     },
-    "action": [ {
-      "resource": {
-        "reference": "MedicationRequest/MedicationRequest-1"
-      }
-    } ]
-  }, {
-    "resourceType": "MedicationRequest",
-    "id": "MedicationRequest-1",
-    "intent": "order",
-    "medicationCodeableConcept": {
-      "text": "Medication 1"
-    },
-    "subject": {
-      "reference": "Patient/Patient-Example"
+    {
+      "resourceType": "MedicationRequest",
+      "id": "MedicationRequest-1",
+      "status": "draft",
+      "intent": "order",
+      "medicationCodeableConcept": {
+        "text": "Medication 1"
+      },
+      "subject": {
+        "reference": "Patient/Patient-Example"
+      },
+      "instantiatesCanonical": [
+        "http://localhost/ActivityDefinition/MedicationRequest-1"
+      ]
     }
-  } ],
+  ],
   "instantiatesCanonical": [
     "http://localhost/PlanDefinition/MedRequest-Example"
   ],
@@ -35,9 +47,11 @@
   "subject": {
     "reference": "Patient/Patient-Example"
   },
-  "activity": [ {
-    "reference": {
-      "reference": "#MedRequest-Example"
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/MedRequest-Example"
+      }
     }
-  } ]
+  ]
 }

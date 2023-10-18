@@ -1,0 +1,49 @@
+{
+  "resourceType": "Observation",
+  "id": "Height",
+  "meta": {
+    "profile": [
+      "http://example.org/sdh/dtr/aslp/StructureDefinition/aslp-height",
+      "http://hl7.org/fhir/us/core/StructureDefinition/us-core-body-height",
+      "http://hl7.org/fhir/us/qicore/StructureDefinition/qicore-observation"
+    ]
+  },
+  "status": "final",
+  "category": [
+    {
+      "coding": [
+        {
+          "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+          "code": "vital-signs",
+          "display": "Vital Signs"
+        }
+      ],
+      "text": "Vital Signs"
+    }
+  ],
+  "code": {
+    "coding": [
+      {
+        "system": "http://loinc.org",
+        "code": "8302-2",
+        "display": "Body height"
+      },
+      {
+        "system": "http://example.org/sdh/dtr/aslp/CodeSystem/aslp-codes",
+        "code": "ASLP.A1.DE20",
+        "display": "Body height"
+      }
+    ],
+    "text": "height"
+  },
+  "subject": {
+    "reference": "Patient/positive"
+  },
+  "effectiveDateTime": "2023-04-04",
+  "valueQuantity": {
+    "value": 69,
+    "unit": "in",
+    "system": "http://unitsofmeasure.org",
+    "code": "[in_i]"
+  }
+}
