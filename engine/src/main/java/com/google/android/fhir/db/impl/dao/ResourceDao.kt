@@ -77,7 +77,7 @@ internal abstract class ResourceDao {
   }
 
   /**
-   * Updates the resource in the [ResourceEntity] and adds indexes.
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of downloading the resource from server.
    *
    * @param [resource] the resource with the remote(server) updates
    */
