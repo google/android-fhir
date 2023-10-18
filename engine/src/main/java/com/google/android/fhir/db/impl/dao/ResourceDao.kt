@@ -59,7 +59,8 @@ internal abstract class ResourceDao {
   lateinit var resourceIndexer: ResourceIndexer
 
   /**
-   * Updates the resource in the [ResourceEntity] and adds indexes as a result of changes made on device.
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of changes made on
+   * device.
    *
    * @param [resource] the resource with local (on device) updates
    * @param [timeOfLocalChange] time when the local change was made
@@ -77,7 +78,8 @@ internal abstract class ResourceDao {
   }
 
   /**
-   * Updates the resource in the [ResourceEntity] and adds indexes as a result of downloading the resource from server.
+   * Updates the resource in the [ResourceEntity] and adds indexes as a result of downloading the
+   * resource from server.
    *
    * @param [resource] the resource with the remote(server) updates
    */
@@ -118,7 +120,7 @@ internal abstract class ResourceDao {
     updateIndicesForResource(index, resource.resourceType, entity.resourceUuid)
   }
 
- suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
+  suspend fun insertAllRemote(resources: List<Resource>): List<UUID> {
     return resources.map { resource -> insertRemoteResource(resource) }
   }
 
