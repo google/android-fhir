@@ -37,6 +37,7 @@ data class RequestResourceConfig(
 
 class ImplementationGuideConfig(
   var implementationGuideId: String,
+  var patientRegistrationQuestionnaire: String,
   var entryPoint: String,
   var requestResourceConfigurations: List<RequestResourceConfig>,
   var supportedValueSets: JsonArray,
@@ -78,9 +79,6 @@ object ConfigurationManager {
     if (careConfiguration == null) {
       val gson = Gson()
       val careConfig = readFileFromAssets(context, "care-config.json").trimIndent()
-      // val rootDirPath = "/storage/emulated/0/Documents/configurablecare/smart-imm/ig"
-      // val fileDirectory = File(Environment.DIRECTORY_DOCUMENTS + "/configurablecare/smart-imm/ig")
-      // // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
       careConfiguration = gson.fromJson(careConfig, CareConfiguration::class.java)
     }
     return careConfiguration!!

@@ -5,18 +5,19 @@
       "carePlanPolicy": "ACCEPT_ALL",
       "implementationGuideConfig": {
         "implementationGuideId": "ImplementationGuide/ImmunizationReview",
+        "patientRegistrationQuestionnaire": "Questionnaire/IMMZCRegisterClient",
         "triggers": [
           {
-            "event": "Questionnaire/client-registration-sample",
+            "event": "Questionnaire/IMMZCRegisterClient",
             "planDefinition":"PlanDefinition/PlanImmunizationReview"
           },
           {
-            "event": "Questionnaire/Questionnaire-IMMZD1ClientHistory",
+            "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
             "planDefinition":"PlanDefinition/IMMZD2DTMeasles"
           },
           {
-            "event": "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
-            "planDefinition": ""
+            "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
+            "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI"
           }
         ],
         "entryPoint": "PlanDefinition/PlanImmunizationReview",

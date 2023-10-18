@@ -192,7 +192,7 @@ object ResourceMapper {
    * See http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction for more on
    * StructureMap-based extraction.
    */
-  private suspend fun extractByStructureMap(
+  suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext,

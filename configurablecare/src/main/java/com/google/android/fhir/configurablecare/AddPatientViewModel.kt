@@ -24,13 +24,17 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.datacapture.mapping.StructureMapExtractionContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
+import com.google.android.fhir.get
+import com.google.android.fhir.search.search
 import java.time.Instant
 import java.time.Period
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Coding
@@ -39,26 +43,41 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceFactory
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StructureDefinition
+import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.model.Task
 import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 class TransformSupportServices(private val outputs: MutableList<Base>) :
   StructureMapUtilities.ITransformerServices {
+
+  lateinit var fhirEngine: FhirEngine
+
   override fun log(message: String) {}
 
   fun getContext(): org.hl7.fhir.r4.context.SimpleWorkerContext {
     return org.hl7.fhir.r4.context.SimpleWorkerContext()
   }
 
+  fun setFhirEngine(engine: FhirEngine) {
+    fhirEngine = engine
+  }
+
   @Throws(FHIRException::class)
   override fun createType(appInfo: Any, name: String): Base {
-    return when (name) {
-      "Immunization_Reaction" -> Immunization.ImmunizationReactionComponent()
-      else -> StructureDefinition() // ResourceFactory.createResourceOrType(name)
+     // when (name) {
+      // "Immunization_Reaction" -> Immunization.ImmunizationReactionComponent()
+      // else -> ResourceFactory.createResourceOrType(name)
+        /*val structureMaps =*/
+    var structureMap: StructureMap
+    runBlocking {
+      structureMap = fhirEngine.search<StructureMap> { filter(StructureMap.URL, { value = name }) }.first().resource
     }
+    return structureMap
   }
 
   override fun createResource(appInfo: Any, res: Base, atRootofTransform: Boolean): Base {
@@ -83,12 +102,13 @@ class TransformSupportServices(private val outputs: MutableList<Base>) :
   }
 }
 
+
 /** ViewModel for patient registration screen {@link AddPatientFragment}. */
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  val questionnaire: String
-    get() = getQuestionnaireJson()
+  var questionnaire: String = ""
+    // get() = getQuestionnaireJson()
   val savedPatient = MutableLiveData<Patient?>()
   val context = application.applicationContext
 
@@ -97,7 +117,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
       FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
         as Questionnaire
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
-  private var questionnaireJson: String? = null
+  // private var questionnaireJson: String? = null
 
   /**
    * Saves patient registration questionnaire response into the application database.
@@ -118,49 +138,49 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         savedPatient.value = null
         return@launch
       }
-      // val mappingResource = fhirEngine.get<StructureMap>("IMMZCQRToPatient")
-      // mappingResource.
-      // val mapping = jsonParser.encodeResourceToString(mappingResource)
 
-    //   val questionnaireResponseStr = """
-    //   {"resourceType":"QuestionnaireResponse","questionnaire":"http://worldhealthorganization.github.io/smart-immunizations-measles/Questionnaire/Questionnaire-IMMZCRegisterClient","item":[{"linkId":"uniqueId","text":"Unique identifier for the client","answer":[{"valueString":"asda"}]},{"linkId":"name","text":"Client name","item":[{"linkId":"fullName","text":"Full name of the client","answer":[{"valueString":"sadasd"}]},{"linkId":"firstName","text":"First or given name","answer":[{"valueString":"wdas"}]},{"linkId":"familyName","text":"Family name","answer":[{"valueString":"asdasd"}]}]},{"linkId":"sex","text":"Sex","answer":[{"valueCoding":{"code":"DE7","display":"Female"}}]},{"linkId":"birthDate","text":"Birth Date","answer":[{"valueDate":"1991-11-11"}]},{"linkId":"caregiver","text":"Care giver name","item":[{"linkId":"cgfullName","text":"Full name of the care giver","answer":[{"valueString":"qwe"}]},{"linkId":"cgfirstName","text":"First or given name","answer":[{"valueString":"wedqw"}]},{"linkId":"cgfamilyName","text":"Family name","answer":[{"valueString":"we"}]}]},{"linkId":"phone","text":"Client Phone number","answer":[{"valueString":"23123"}]},{"linkId":"administrativeArea","text":"Administrative area"},{"linkId":"healthWorker","text":"Health Worker","answer":[{"valueBoolean":true}]}]}
-    // """.trimIndent()
-    //   val questionnaireResponse = jsonParser.parseResource(questionnaireResponseStr) as QuestionnaireResponse
-    //
-    //
-    //   val mapping = """
-    //     map "http://fhir.org/guides/who/smart-immunization/StructureMap/IMMZCQRToPatient" = "IMMZCQRToPatient"
-    //
-    //     uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse" alias QResp as source
-    //     uses "http://fhir.org/guides/who/smart-immunization/StructureDefinition/IMMZCRegisterClient" alias IMMZC as source
-    //     uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
-    //
-    //     imports "http://fhir.org/guides/who/smart-immunization/StructureMap/IMMZCQRToLM"
-    //     imports "http://fhir.org/guides/who/smart-immunization/StructureMap/IMMZCLMToPatient"
-    //
-    //     group QRestToIMMZC(source qr : QResp, target patient : Patient) {
-    //       qr -> create('http://fhir.org/guides/who/smart-immunization/StructureDefinition/IMMZCRegisterClient') as model then {
-    //         qr -> model then QRespToIMMZC(qr, model) "QRtoLM";
-    //         qr -> patient then IMMZCToPatient(model, patient) "LMtoPatient";
-    //       } "QRtoPatient";
-    //     }
-    //
-    //   """.trimIndent()
-    //   // val bundle = ResourceMapper.extract(questionnaireResource,
-    //   //                                     questionnaireResponse,
-    //   //                                     StructureMapExtractionContext(context = context)
-    //   //                                     { _, worker ->
-    //   //                                       StructureMapUtilities(worker).parse(mapping, "")
-    //   // })
-    //   val transformSupportServices = TransformSupportServices(mutableListOf())
-    //   val bundle =
-    //     ResourceMapper.extract(
-    //       questionnaireResource,
-    //       questionnaireResponse,
-    //       StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
-    //         StructureMapUtilities(worker).parse(mapping, "")})
+      val transformSupportServices = TransformSupportServices(mutableListOf())
+      transformSupportServices.setFhirEngine(fhirEngine)
+      val structureMap = fhirEngine.get<StructureMap>("IMMZCQRToPatient")
+      val smUrl = "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZCQRToPatient"
+      val smId = "IMMZCQRToPatient"
+      val map = """
+        map "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToPatient" = "IMMZCQRToPatient"
 
-      val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
+        uses "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse" alias QResp as source
+        uses "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient" alias IMMZC as source
+        uses "http://hl7.org/fhir/StructureDefinition/Patient" alias Patient as target
+
+        imports "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToLM"
+        imports "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCLMToPatient"
+
+        group QRestToIMMZC(source qr : QResp, target patient : Patient) {
+          qr -> create('http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient') as model then {
+            qr -> model then QRespToIMMZC(qr, model) "QRtoLM";
+            qr -> patient then IMMZCToPatient(model, patient) "LMtoPatient";
+          } "QRtoPatient";
+        }
+      """.trimIndent()
+      val bundle =
+        ResourceMapper.extractByStructureMap(
+          questionnaireResource,
+          questionnaireResponse,
+          StructureMapExtractionContext(context, transformSupportServices) { _, _ ->
+            // StructureMapUtilities(worker).parse(map, "")
+            fhirEngine.get<StructureMap>(smId)
+          },
+        )
+
+      // questionnaireResource.targetStructureMap = "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZCQRToPatient"
+      // ResourceMapper.extract(
+      //   questionnaireResource,
+      //   questionnaireResponse,
+      //   StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+      //     StructureMapUtilities(worker).parse(map, "")
+      //   },
+      // )
+
+      // val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
       var flag = false
       var patient: Patient
       for (entry in bundle.entry) {
@@ -186,36 +206,37 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     }
   }
 
-  private suspend fun createImmunizationReviewTask(patient: Patient) {
-    val task = Task()
-    task.id = UUID.randomUUID().toString()
-    task.`for` = Reference(patient)
-    task.status = Task.TaskStatus.READY
-    task.intent = Task.TaskIntent.PROPOSAL
-    task.description = "Immunization Recommendation for ${patient.name.first().given} ${patient.name.first().family}"
-    task.lastModified = Date.from(Instant.now())
-    task.restriction.period.end = Date.from(Instant.now().plus(Period.ofDays(30 * 6)))  // 6 months
-    // Get CKD Questionnaire
-    task.focus = Reference(fhirEngine.get(ResourceType.Questionnaire, "Questionnaire-IMMZD1ClientHistory"))
+  // private suspend fun createImmunizationReviewTask(patient: Patient) {
+  //   val task = Task()
+  //   task.id = UUID.randomUUID().toString()
+  //   task.`for` = Reference(patient)
+  //   task.status = Task.TaskStatus.READY
+  //   task.intent = Task.TaskIntent.PROPOSAL
+  //   task.description = "Immunization Recommendation for ${patient.name.first().given} ${patient.name.first().family}"
+  //   task.lastModified = Date.from(Instant.now())
+  //   task.restriction.period.end = Date.from(Instant.now().plus(Period.ofDays(30 * 6)))  // 6 months
+  //   // Get CKD Questionnaire
+  //   task.focus = Reference(fhirEngine.get(ResourceType.Questionnaire, "Questionnaire-IMMZD1ClientHistory"))
+  //
+  //   print("About to create task")
+  //   fhirEngine.create(task)
+  //   print("Task created")
+  // }
 
-    print("About to create task")
-    fhirEngine.create(task)
-    print("Task created")
-  }
+  // private fun getQuestionnaireJson(): String {
+  //   questionnaireJson?.let {
+  //     return it
+  //   }
+  //   // questionnaireJson = care
+  //     // readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+  //   return questionnaireJson!!
+  // }
 
-  private fun getQuestionnaireJson(): String {
-    questionnaireJson?.let {
-      return it
-    }
-    questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return questionnaireJson!!
-  }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
-  }
+  // private fun readFileFromAssets(filename: String): String {
+  //   return getApplication<Application>().assets.open(filename).bufferedReader().use {
+  //     it.readText()
+  //   }
+  // }
 
   private fun generateUuid(): String {
     return UUID.randomUUID().toString()

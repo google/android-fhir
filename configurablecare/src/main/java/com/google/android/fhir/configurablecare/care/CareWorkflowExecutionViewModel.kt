@@ -23,11 +23,13 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.configurablecare.FhirApplication
 import com.google.android.fhir.get
 import com.google.android.fhir.search.search
+import com.google.android.fhir.testing.jsonParser
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -185,6 +187,16 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
 
   fun getActiveRequestResourceConfiguration(): List<RequestResourceConfig> {
     return activeRequestResourceConfiguration
+  }
+
+  suspend fun getActivePatientRegistrationQuestionnaire(): String {
+    val questionnaireId = ConfigurationManager.careConfiguration
+      ?.supportedImplementationGuides
+      ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(currentPlanDefinitionId) }
+      ?.implementationGuideConfig
+      ?.patientRegistrationQuestionnaire
+    val questionnaire = fhirEngine.get<Questionnaire>(IdType(questionnaireId).idPart)
+    return jsonParser.encodeResourceToString(questionnaire)
   }
 
   fun setPlanDefinitionId(event: String) {

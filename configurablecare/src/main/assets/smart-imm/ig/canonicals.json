@@ -1,0 +1,693 @@
+[
+  {
+    "id" : "active-condition",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/cqf/common/ValueSet/active-condition",
+    "version" : "0.1.0",
+    "name" : "CQFActiveCondition"
+  },
+  {
+    "id" : "inactive-condition",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/cqf/common/ValueSet/inactive-condition",
+    "version" : "0.1.0",
+    "name" : "CQFInactiveCondition"
+  },
+  {
+    "id" : "anc-b9-de45",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de45",
+    "version" : "0.1.0",
+    "name" : "HIVstatus"
+  },
+  {
+    "id" : "anc-b9-de46",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de46",
+    "version" : "0.1.0",
+    "name" : "HIVstatusHIVpositiveChoices"
+  },
+  {
+    "id" : "anc-b9-de47",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de47",
+    "version" : "0.1.0",
+    "name" : "HIVstatusHIVnegativeChoices"
+  },
+  {
+    "id" : "consenttocontact",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/consenttocontact",
+    "version" : "0.1.0",
+    "name" : "consentToContact"
+  },
+  {
+    "id" : "educationlevel",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/educationlevel",
+    "version" : "0.1.0",
+    "name" : "educationLevel"
+  },
+  {
+    "id" : "estimatedage",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/estimatedage",
+    "version" : "0.1.0",
+    "name" : "estimatedAge"
+  },
+  {
+    "id" : "insurance",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/insurance",
+    "version" : "0.1.0",
+    "name" : "insurance"
+  },
+  {
+    "id" : "method",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/method",
+    "version" : "0.1.0",
+    "name" : "method"
+  },
+  {
+    "id" : "occupation",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/occupation",
+    "version" : "0.1.0",
+    "name" : "Occupation"
+  },
+  {
+    "id" : "reminder",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/reminder",
+    "version" : "0.1.0",
+    "name" : "reminder"
+  },
+  {
+    "id" : "requestertype",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/requestertype",
+    "version" : "0.1.0",
+    "name" : "requesterType"
+  },
+  {
+    "id" : "stage",
+    "type" : "StructureDefinition",
+    "url" : "http://fhir.org/guides/who/core/StructureDefinition/stage",
+    "version" : "0.1.0",
+    "name" : "stage"
+  },
+  {
+    "id" : "careplanbirthcontrolmethods-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/careplanbirthcontrolmethods-values",
+    "version" : "0.1.0",
+    "name" : "careplanbirthcontrolmethods-values"
+  },
+  {
+    "id" : "current-medications-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/current-medications-values",
+    "version" : "0.1.0",
+    "name" : "current-medications-values"
+  },
+  {
+    "id" : "devicebirthcontrolmethods-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/devicebirthcontrolmethods-values",
+    "version" : "0.1.0",
+    "name" : "devicebirthcontrolmethods-values"
+  },
+  {
+    "id" : "drug-allergies-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/drug-allergies-values",
+    "version" : "0.1.0",
+    "name" : "drug-allergies-values"
+  },
+  {
+    "id" : "gender-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/gender-values",
+    "version" : "0.1.0",
+    "name" : "gender-values"
+  },
+  {
+    "id" : "highest-level-of-education-achieved-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/highest-level-of-education-achieved-values",
+    "version" : "0.1.0",
+    "name" : "highest-level-of-education-achieved-values"
+  },
+  {
+    "id" : "hiv-stage-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/hiv-stage-values",
+    "version" : "0.1.0",
+    "name" : "hiv-stage-values"
+  },
+  {
+    "id" : "hiv-test-result-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/hiv-test-result-values",
+    "version" : "0.1.0",
+    "name" : "hiv-test-result-values"
+  },
+  {
+    "id" : "marital-status-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/marital-status-values",
+    "version" : "0.1.0",
+    "name" : "marital-status-values"
+  },
+  {
+    "id" : "medicationbirthcontrolmethods-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/medicationbirthcontrolmethods-values",
+    "version" : "0.1.0",
+    "name" : "medicationbirthcontrolmethods-values"
+  },
+  {
+    "id" : "miscarriage-or-abortion-stage-of-pregnancy-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/miscarriage-or-abortion-stage-of-pregnancy-values",
+    "version" : "0.1.0",
+    "name" : "miscarriage-or-abortion-stage-of-pregnancy-values"
+  },
+  {
+    "id" : "miscarriage-or-abortion-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/miscarriage-or-abortion-values",
+    "version" : "0.1.0",
+    "name" : "miscarriage-or-abortion-values"
+  },
+  {
+    "id" : "nobirthcontrolmethod-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/nobirthcontrolmethod-values",
+    "version" : "0.1.0",
+    "name" : "nobirthcontrolmethod-values"
+  },
+  {
+    "id" : "occupation-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/occupation-values",
+    "version" : "0.1.0",
+    "name" : "occupation-values"
+  },
+  {
+    "id" : "payment-method-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/payment-method-values",
+    "version" : "0.1.0",
+    "name" : "payment-method-values"
+  },
+  {
+    "id" : "pregnancystatus-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
+    "version" : "0.1.0",
+    "name" : "pregnancystatus-values"
+  },
+  {
+    "id" : "pregnancystatuspregnant-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
+    "version" : "0.1.0",
+    "name" : "pregnancystatuspregnant-values"
+  },
+  {
+    "id" : "procedurebirthcontrolmethods-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/procedurebirthcontrolmethods-values",
+    "version" : "0.1.0",
+    "name" : "procedurebirthcontrolmethods-values"
+  },
+  {
+    "id" : "reason-for-referral-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/reason-for-referral-values",
+    "version" : "0.1.0",
+    "name" : "reason-for-referral-values"
+  },
+  {
+    "id" : "referred-by-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/referred-by-values",
+    "version" : "0.1.0",
+    "name" : "referred-by-values"
+  },
+  {
+    "id" : "sti-risk-assessment-factors-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/sti-risk-assessment-factors-values",
+    "version" : "0.1.0",
+    "name" : "sti-risk-assessment-factors-values"
+  },
+  {
+    "id" : "visit-type-values",
+    "type" : "ValueSet",
+    "url" : "http://fhir.org/guides/who/core/ValueSet/visit-type-values",
+    "version" : "0.1.0",
+    "name" : "visit-type-values"
+  },
+  {
+    "id" : "FHIRHelpers",
+    "type" : "Library",
+    "url" : "http://hl7.org/fhir/Library/FHIRHelpers",
+    "version" : "0.1.0",
+    "name" : "FHIRHelpers"
+  },
+  {
+    "id" : "adverse-event-type",
+    "type" : "ValueSet",
+    "url" : "http://hl7.org/fhir/ValueSet/adverse-event-type",
+    "version" : "0.1.0",
+    "name" : "SNOMEDCTClinicalFindings",
+    "oids" : ["2.16.840.1.113883.4.642.3.835"]
+  },
+  {
+    "id" : "whoatc-uv-ips",
+    "type" : "ValueSet",
+    "url" : "http://hl7.org/fhir/uv/ips/ValueSet/whoatc-uv-ips",
+    "version" : "0.1.0",
+    "name" : "WhoAtcUvIps"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesCIMR",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ActivityDefinition/IMMZD2DTMeaslesCIMR",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindication"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesEval",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ActivityDefinition/IMMZD2DTMeaslesEval",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindicationEvaluation"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesMR",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ActivityDefinition/IMMZD2DTMeaslesMR",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesMedicationRequest"
+  },
+  {
+    "id" : "IMMZ.C",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C"
+  },
+  {
+    "id" : "IMMZ.D1",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1"
+  },
+  {
+    "id" : "IMMZ.D4",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4"
+  },
+  {
+    "id" : "IMMZ.C.ConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ConceptMap/IMMZ.C.ConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_ConceptMap"
+  },
+  {
+    "id" : "IMMZ.C.SexToAdministrativeGender",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ConceptMap/IMMZ.C.SexToAdministrativeGender",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_SexToAdministrativeGender"
+  },
+  {
+    "id" : "IMMZ.D1.ConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ConceptMap/IMMZ.D1.ConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_ConceptMap"
+  },
+  {
+    "id" : "IMMZ.D4.ConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ConceptMap/IMMZ.D4.ConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_ConceptMap"
+  },
+  {
+    "id" : "who.fhir.immunization",
+    "type" : "ImplementationGuide",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ImplementationGuide/fhir.who.immunization",
+    "version" : "0.1.0",
+    "name" : "Immunization"
+  },
+  {
+    "id" : "FHIRCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/FHIRCommon",
+    "version" : "0.1.0",
+    "name" : "FHIRCommon"
+  },
+  {
+    "id" : "IMMZCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZCommon",
+    "version" : "0.1.0",
+    "name" : "IMMZCommon"
+  },
+  {
+    "id" : "IMMZCommonIzDataElements",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZCommonIzDataElements",
+    "version" : "0.1.0",
+    "name" : "IMMZCommonIzDataElements"
+  },
+  {
+    "id" : "IMMZConcepts",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZConcepts",
+    "version" : "0.1.0",
+    "name" : "IMMZConcepts"
+  },
+  {
+    "id" : "IMMZConfig",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZConfig",
+    "version" : "0.1.0",
+    "name" : "IMMZConfig"
+  },
+  {
+    "id" : "IMMZD2DTMeasles",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZD2DTMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeasles"
+  },
+  {
+    "id" : "IMMZINDMeasles",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZINDMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZINDMeasles"
+  },
+  {
+    "id" : "IMMZIndicatorCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZIndicatorCommon",
+    "version" : "0.1.0",
+    "name" : "IMMZIndicatorCommon"
+  },
+  {
+    "id" : "IMMZVaccineLibrary",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/IMMZVaccineLibrary",
+    "version" : "0.1.0",
+    "name" : "IMMZVaccineLibrary"
+  },
+  {
+    "id" : "WHOCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/WHOCommon",
+    "version" : "0.1.0",
+    "name" : "WHOCommon"
+  },
+  {
+    "id" : "WHOConcepts",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Library/WHOConcepts",
+    "version" : "0.1.0",
+    "name" : "WHOConcepts"
+  },
+  {
+    "id" : "IMMZIND05",
+    "type" : "Measure",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Measure/IMMZIND05",
+    "version" : "0.1.0",
+    "name" : "IMMZIND05"
+  },
+  {
+    "id" : "IMMZIND40",
+    "type" : "Measure",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Measure/IMMZIND40",
+    "version" : "0.1.0",
+    "name" : "IMMZIND40"
+  },
+  {
+    "id" : "IMMZD2DTMeasles",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeasles"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesCI",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeaslesCI",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindication"
+  },
+  {
+    "id" : "IMMZDTUmbrella",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZDTUmbrella",
+    "version" : "0.1.0",
+    "name" : "IMMZDTUmbrella"
+  },
+  {
+    "id" : "IMMZCRegisterClient",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZCRegisterClient",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "IMMZD1ClientHistoryMeasles",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZD1ClientHistoryMeasles",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "IMMZD4CheckContraindicationsMeasles",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZD4CheckContraindicationsMeasles",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "IMMZCRegisterClient",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureDefinition/IMMZCRegisterClient",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_Register_Client"
+  },
+  {
+    "id" : "IMMZD1ClientHistoryMeasles",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureDefinition/IMMZD1ClientHistoryMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_Client_History_Measles"
+  },
+  {
+    "id" : "IMMZD4CheckContraindicationsMeasles",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureDefinition/IMMZD4CheckContraindicationsMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_Check_Contraindications_Measles"
+  },
+  {
+    "id" : "IMMZCLMToPatient",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZCLMToPatient",
+    "version" : "0.1.0",
+    "name" : "IMMZCLMToPatient"
+  },
+  {
+    "id" : "IMMZCQRToLM",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZCQRToLM",
+    "version" : "0.1.0",
+    "name" : "IMMZCQRToLM"
+  },
+  {
+    "id" : "IMMZCQRToPatient",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZCQRToPatient",
+    "version" : "0.1.0",
+    "name" : "IMMZCQRToPatient"
+  },
+  {
+    "id" : "IMMZD4LMToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZD4LMToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD4LMToResources"
+  },
+  {
+    "id" : "IMMZD4QRToLM",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZD4QRToLM",
+    "version" : "0.1.0",
+    "name" : "IMMZD4QRToLM"
+  },
+  {
+    "id" : "IMMZD4QRToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations/StructureMap/IMMZD4QRToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD4QRToResources"
+  },
+  {
+    "id" : "ARVDrugs-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/ARVDrugs-values",
+    "version" : "0.1.0",
+    "name" : "ARVDrugsvalues"
+  },
+  {
+    "id" : "Birthweight-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/Birthweight-values",
+    "version" : "0.1.0",
+    "name" : "Birthweightvalues"
+  },
+  {
+    "id" : "HIVstatus-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/HIVstatus-values",
+    "version" : "0.1.0",
+    "name" : "HIVstatusvalues"
+  },
+  {
+    "id" : "IMMZ.A1.DE9",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.A1.DE9",
+    "version" : "0.1.0",
+    "name" : "Measles"
+  },
+  {
+    "id" : "IMMZ.C.DE5",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.C.DE5",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_DE5"
+  },
+  {
+    "id" : "IMMZ.D1.DE10",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE10",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE10"
+  },
+  {
+    "id" : "IMMZ.D1.DE35",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE35",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE35"
+  },
+  {
+    "id" : "IMMZ.D1.DE52",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE52",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE52"
+  },
+  {
+    "id" : "IMMZ.D1.DE56",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE56",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE56"
+  },
+  {
+    "id" : "IMMZ.D1.DE61",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE61",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE61"
+  },
+  {
+    "id" : "IMMZ.D1.DE65",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE65",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE65"
+  },
+  {
+    "id" : "IMMZ.D1.DE68",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE68",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE68"
+  },
+  {
+    "id" : "IMMZ.D1.DE73",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE73",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE73"
+  },
+  {
+    "id" : "IMMZ.D1.DE84",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE84",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE84"
+  },
+  {
+    "id" : "IMMZ.D1.DE87",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D1.DE87",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE87"
+  },
+  {
+    "id" : "IMMZ.D4.DE161",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.D4.DE161",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_DE161"
+  },
+  {
+    "id" : "Immunocompromised-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/Immunocompromised-values",
+    "version" : "0.1.0",
+    "name" : "Immunocompromisedvalues"
+  },
+  {
+    "id" : "LiveAttenuatedVaccines",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/LiveAttenuatedVaccines",
+    "version" : "0.1.0",
+    "name" : "LiveAttenuatedVaccines"
+  },
+  {
+    "id" : "Negativetestresult-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/Negativetestresult-values",
+    "version" : "0.1.0",
+    "name" : "Negativetestresultvalues"
+  },
+  {
+    "id" : "PositiveTestResult-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/PositiveTestResult-values",
+    "version" : "0.1.0",
+    "name" : "PositiveTestResultvalues"
+  },
+  {
+    "id" : "extended-content-codes",
+    "type" : "CodeSystem",
+    "url" : "http://who.int/cg/CodeSystem/extended-content-codes",
+    "version" : "0.1.0",
+    "name" : "extended-content_codes"
+  }
+]

@@ -238,7 +238,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
     dueDate = dueDate,
     completedDate = completedDate,
     owner = owner,
-    fhirResourceId = "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
+    fhirResourceId = "Questionnaire/IMMZD4CheckContraindicationsMeasles",
     clickable = clickable
   )
 }

@@ -29,7 +29,9 @@ import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.fhir.configurablecare.care.CareWorkflowExecutionViewModel
+import com.google.android.fhir.configurablecare.care.ConfigurationManager
 import com.google.android.fhir.testing.jsonParser
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -84,6 +86,10 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun addQuestionnaireFragment() {
+    runBlocking {
+      viewModel.questionnaire =
+        careWorkflowExecutionViewModel.getActivePatientRegistrationQuestionnaire()
+    }
     childFragmentManager.commit {
       add(
         R.id.add_patient_container,

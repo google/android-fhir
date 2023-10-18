@@ -41,14 +41,27 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
       else {
         val valueSetList = ArrayList<Coding>()
         for (valueSet in valueSets) {
-          for (item in valueSet.resource.expansion.contains) {
-            valueSetList.add(
-              Coding().apply {
-                system = item.system
-                code = item.code
-                display = item.display
-              }
-            )
+          if (valueSet.resource.expansion.hasContains()) {
+            for (item in valueSet.resource.expansion.contains) {
+              valueSetList.add(
+                Coding().apply {
+                  system = item.system
+                  code = item.code
+                  display = item.display
+                }
+              )
+            }
+          } else if (valueSet.resource.compose.hasInclude()) {
+            val sys = valueSet.resource.compose.includeFirstRep.system
+            for (item in valueSet.resource.compose.includeFirstRep.concept) {
+              valueSetList.add(
+                Coding().apply {
+                  system = sys
+                  code = item.code
+                  display = item.display
+                }
+              )
+            }
           }
         }
         return valueSetList
