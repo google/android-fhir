@@ -30,6 +30,7 @@ import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
+import java.lang.RuntimeException
 import java.util.TimeZone
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -37,13 +38,11 @@ import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.skyscreamer.jsonassert.JSONAssert
-import java.lang.RuntimeException
 
 @RunWith(AndroidJUnit4::class)
 class SmartImmunizationAndroidTest {
@@ -84,12 +83,13 @@ class SmartImmunizationAndroidTest {
     val inputBaseIgDir = "/$igName/ig"
 
     // cleans up
-    val outputDir = File(context.filesDir, igName).apply {
-      if (!deleteRecursively()) {
-        throw RuntimeException("Failed to clean up directory")
+    val outputDir =
+      File(context.filesDir, igName).apply {
+        if (!deleteRecursively()) {
+          throw RuntimeException("Failed to clean up directory")
+        }
+        mkdirs()
       }
-      mkdirs()
-    }
 
     javaClass
       .getResourceAsStream("$inputBaseIgDir/contents.txt")
