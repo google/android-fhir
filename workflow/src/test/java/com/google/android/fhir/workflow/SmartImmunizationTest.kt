@@ -27,6 +27,7 @@ import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.util.TimeZone
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Resource
 import org.junit.Before
 import org.junit.Rule
@@ -55,10 +56,8 @@ class SmartImmunizationTest {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
 
-    // Installing ANC CDS to the IGManager
+    // Installing SmartImmunizations IG into the IGManager
     val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
-
-    println(rootDirectory)
 
     knowledgeManager.install(
       FhirNpmPackage(
@@ -76,7 +75,7 @@ class SmartImmunizationTest {
       knowledgeManager
         .loadResources(
           resourceType = "PlanDefinition",
-          id = "IMMZD2DTMeasles",
+          url = "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
         )
         .firstOrNull()
 
@@ -93,8 +92,11 @@ class SmartImmunizationTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinitionId = "IMMZD2DTMeasles",
-        patientId = "Patient/IMMZ-Patient-NoVaxeninfant-f",
+        planDefinition =
+          CanonicalType(
+            "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
+          ),
+        subject = "Patient/IMMZ-Patient-NoVaxeninfant-f",
       )
 
     val parser = FhirContext.forR4Cached().newJsonParser()
