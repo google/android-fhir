@@ -3,11 +3,11 @@
   "name" : "Immunization",
   "package-id" : "who.fhir.immunization",
   "ig-ver" : "0.1.0",
-  "date" : "Tue, 17 Oct, 2023 16:53:04 +0000",
-  "errs" : 208,
-  "warnings" : 303,
+  "date" : "Thu, 19 Oct, 2023 03:40:32 +0000",
+  "errs" : 178,
+  "warnings" : 234,
   "hints" : 11,
   "version" : "4.0.1",
   "tool" : "5.0.0 (3)",
-  "maxMemory" : 3979558448
+  "maxMemory" : 4497215976
 }

@@ -52,7 +52,10 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     setHasOptionsMenu(true)
     onBackPressed()
     setViewModelQuestionnaire()
-    viewModel.requestResourceConfiguration =
+    careWorkflowExecutionViewModel.currentQuestionnaireId = IdType((jsonParser.parseResource(viewModel.questionnaireString) as Questionnaire).id).idPart
+    careWorkflowExecutionViewModel.setCurrentStructureMap()
+    viewModel.structureMapId = careWorkflowExecutionViewModel.currentStructureMapId
+      viewModel.requestResourceConfiguration =
       careWorkflowExecutionViewModel.getActiveRequestResourceConfiguration()
     observeResourcesSaveAction()
     if (savedInstanceState == null) {

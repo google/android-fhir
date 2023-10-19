@@ -28,17 +28,27 @@ import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.configurablecare.FhirApplication
 import com.google.android.fhir.configurablecare.care.TaskManager
 import com.google.android.fhir.configurablecare.care.RequestResourceConfig
+import com.google.android.fhir.configurablecare.util.TransformSupportServicesMatchBox
+import com.google.android.fhir.get
+import com.google.android.fhir.testing.jsonParser
+import java.io.File
 import java.util.UUID
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StructureMap
+import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 data class ScreenerState(
   val isResourceSaved: Boolean = false,
@@ -53,6 +63,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
     get() =
       FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireString)
         as Questionnaire
+  var structureMapId: String = ""
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private val taskManager: TaskManager = FhirApplication.taskManager(application.applicationContext)
   private val _screenerState = MutableLiveData(ScreenerState())
@@ -67,19 +78,126 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
    */
   fun saveScreenerEncounter(questionnaireResponse: QuestionnaireResponse, patientId: String) {
     viewModelScope.launch {
-      val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
-      val subjectReference = Reference("Patient/$patientId")
-      val encounterId = generateUuid()
-      if (isRequiredFieldMissing(bundle)) {
-        _screenerState.value = ScreenerState(false, encountersCreated = emptyList())
-        return@launch
-      }
-      saveResources(bundle, subjectReference, encounterId)
-      _screenerState.value =
-        ScreenerState(
-          isResourceSaved = true,
-          encountersCreated = listOf(Reference("Encounter/$encounterId"))
+      // val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
+      // val subjectReference = Reference("Patient/$patientId")
+      // val encounterId = generateUuid()
+      // if (isRequiredFieldMissing(bundle)) {
+      //   _screenerState.value = ScreenerState(false, encountersCreated = emptyList())
+      //   return@launch
+      // }
+      // saveResources(bundle, subjectReference, encounterId)
+      // _screenerState.value =
+      //   ScreenerState(
+      //     isResourceSaved = true,
+      //     encountersCreated = listOf(Reference("Encounter/$encounterId"))
+      //   )
+
+      if (structureMapId.isEmpty()) { // no structure map needed
+        println(" Structure map is empty")
+
+        val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
+        val subjectReference = Reference("Patient/$patientId")
+        val encounterId = generateUuid()
+        if (isRequiredFieldMissing(bundle)) {
+          _screenerState.value = ScreenerState(false, encountersCreated = emptyList())
+          return@launch
+        }
+        saveResources(bundle, subjectReference, encounterId)
+        _screenerState.value =
+          ScreenerState(
+            isResourceSaved = true,
+            encountersCreated = listOf(Reference("Encounter/$encounterId"))
+          )
+
+      } else {
+        println(" Structure map is: $structureMapId")
+        val outputFile =
+          File(getApplication<Application>().externalCacheDir, "questionnaireResponse.json")
+        outputFile.writeText(
+          FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+            .encodeResourceToString(questionnaireResponse)
         )
+
+        val contextR4 =
+          FhirApplication.contextR4(getApplication<FhirApplication>().applicationContext)
+        if (contextR4 == null) {
+          _screenerState.value = null
+          println("**** contextR4 not created yet")
+          return@launch
+        }
+
+        val outputs = mutableListOf<Base>()
+        val transformSupportServices =
+          TransformSupportServicesMatchBox(
+            contextR4,
+            outputs
+          )
+        val structureMapUtilities = StructureMapUtilities(contextR4, transformSupportServices)
+
+        val structureMap = fhirEngine.get<StructureMap>(IdType(structureMapId).idPart)
+        val targetResource = Bundle()
+
+        val baseElement =
+          jsonParser.parseResource(
+            QuestionnaireResponse::class.java, jsonParser.encodeResourceToString(questionnaireResponse))
+
+        println("QR: ${jsonParser.encodeResourceToString(baseElement)}")
+
+        structureMapUtilities.transform(contextR4, baseElement, structureMap, targetResource)
+
+        if (targetResource is Bundle) {
+          if (!targetResource.hasEntry()) {
+            _screenerState.value = null
+            return@launch
+          }
+        }
+
+        if (targetResource is Bundle) {
+          val outputFil1e = File(getApplication<Application>().externalCacheDir, "bundle.json")
+          outputFil1e.writeText(
+            FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+              .encodeResourceToString(targetResource)
+          )
+
+          var flag = false
+          var savedReference = Reference()
+          targetResource.entry.forEach { bundleEntryComponent ->
+            val resource = bundleEntryComponent.resource
+            if (resource is Observation && resource.effective is DateType) {
+              resource.effective = null
+            }
+            fhirEngine.create(resource)
+            flag = true
+            savedReference = Reference("${resource.resourceType}/${IdType(resource.id).idPart}")
+          }
+          if (flag) {
+            _screenerState.value =
+              ScreenerState(
+                isResourceSaved = true,
+                encountersCreated = listOf(savedReference)
+              )
+          }
+          else {
+            _screenerState.value = null
+          }
+        } else if (targetResource is Resource) {
+          targetResource.id = UUID.randomUUID().toString()
+          println("Resource: ${jsonParser.encodeResourceToString(targetResource)}")
+          fhirEngine.create(targetResource)
+
+          questionnaireResponse.id = UUID.randomUUID().toString()
+          questionnaireResponse.subject = Reference("${targetResource.resourceType}/${IdType(targetResource.id).idPart}")
+          println("QR: ${jsonParser.encodeResourceToString(questionnaireResponse)}")
+          fhirEngine.create(questionnaireResponse)
+
+          _screenerState.value =
+            ScreenerState(
+              isResourceSaved = true,
+              encountersCreated = listOf(Reference("${targetResource.resourceType}/${IdType(targetResource.id).idPart}"))
+            )
+        }
+      }
+
     }
   }
 

@@ -51,7 +51,8 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   init {
     viewModelScope.launch {
-      carePlanManager.installKnowledgeResources()
+      // carePlanManager.installKnowledgeResources()
+      carePlanManager.initializeKnowledgeManager()
       Sync.periodicSync<FhirSyncWorker>(
           application.applicationContext,
           PeriodicSyncConfiguration(

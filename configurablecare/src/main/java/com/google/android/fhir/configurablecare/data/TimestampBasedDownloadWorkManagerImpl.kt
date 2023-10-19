@@ -75,16 +75,16 @@ class TimestampBasedDownloadWorkManagerImpl(
         "PractitionerRole",
         // Server should filter all the patients the Health Professional is assigned to
         "Patient",
-        "Observation",
+        // "Observation",
         "MedicationRequest",
         "Questionnaire",
-        "ValueSet",
-        "StructureDefinition",
-        "StructureMap",
+        // "ValueSet",
+        // "StructureDefinition",
+        // "StructureMap",
         "Task",
         "ActivityDefinition",
         "Library",
-        "ValueSet"
+        // "ValueSet"
       )
     )
 
@@ -177,8 +177,8 @@ class TimestampBasedDownloadWorkManagerImpl(
       is PlanDefinition -> return extractPlanDefinitionDependentResources(resource)
       is CarePlan -> return extractCarePlanDependentResources(resource)
       is Encounter -> return addEncounterRelatedResources(resource)
-      is Library -> return carePlanManager.installKnowledgeResource(resource)
-      is ActivityDefinition -> return carePlanManager.installKnowledgeResource(resource)
+      // is Library -> return carePlanManager.installKnowledgeResource(resource)
+      // is ActivityDefinition -> return carePlanManager.installKnowledgeResource(resource)
     }
     return emptyList()
   }

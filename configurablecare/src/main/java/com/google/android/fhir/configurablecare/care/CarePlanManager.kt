@@ -166,24 +166,8 @@ class CarePlanManager(
     return bundleCollection
   }
 
-  suspend fun installKnowledgeResources() {
+  suspend fun initializeKnowledgeManager() {
     val rootDirectory = File(context.filesDir, "smart-imm/ig")
-
-    rootDirectory.listFiles()?.forEach { file ->
-      try {
-        val resource = jsonParser.parseResource(FileInputStream(file))
-        if (resource is Resource) {
-          if (!(resource is PlanDefinition || resource is ActivityDefinition || resource is Library)) {
-            fhirEngine.create(resource)
-          }
-        } else {
-          // Timber.d("Unable to import file: %file")
-        }
-      } catch (exception: Exception) {
-        // Timber.d(exception, "Unable to import file: %file")
-      }
-    }
-
     knowledgeManager.install(
       FhirNpmPackage(
         "who.fhir.immunization",
@@ -192,6 +176,41 @@ class CarePlanManager(
       ),
       rootDirectory,
     )
+    println("KM installed")
+  }
+
+  suspend fun installKnowledgeResources() {
+    val rootDirectory = File(context.filesDir, "smart-imm/ig")
+
+    rootDirectory.listFiles()?.forEach { file ->
+      try {
+        val resource = jsonParser.parseResource(FileInputStream(file))
+        if (resource is Resource) {
+          //   if (!(resource is PlanDefinition || resource is ActivityDefinition || resource is Library)) {
+          //     fhirEngine.create(resource)
+          //     println("Saved to engine: ${resource.id}")
+          //   }
+          // } else {
+          //   // Timber.d("Unable to import file: %file")
+          // }
+          fhirEngine.create(resource)
+          // println("Saved to engine: ${resource.id}")
+        }
+      } catch (exception: Exception) {
+        // Timber.d(exception, "Unable to import file: %file")
+      }
+    }
+
+    // initializeKnowledgeManager()
+    // knowledgeManager.install(
+    //   FhirNpmPackage(
+    //     "who.fhir.immunization",
+    //     "1.0.0",
+    //     "https://github.com/WorldHealthOrganization/smart-immunizations",
+    //   ),
+    //   rootDirectory,
+    // )
+    // println("KM installed")
   }
 
   /**
@@ -200,7 +219,7 @@ class CarePlanManager(
    */
   private suspend fun loadCarePlanResourcesFromDb() {
 
-    installKnowledgeResources()
+    // installKnowledgeResources()
 
     // Load Library resources
     val availableCqlLibraries = fhirEngine.search<Library> {}
@@ -209,12 +228,15 @@ class CarePlanManager(
     for (cqlLibrary in availableCqlLibraries) {
       knowledgeManager.install(writeToFile(cqlLibrary.resource))
       cqlLibraryIdList.add(IdType(cqlLibrary.resource.id).idPart)
+      println(jsonParser.encodeResourceToString(cqlLibrary.resource))
     }
     for (planDefinition in availablePlanDefinitions) {
       knowledgeManager.install(writeToFile(planDefinition.resource))
+      println(jsonParser.encodeResourceToString(planDefinition.resource))
     }
     for (activityDefinition in availableActivityDefinitions) {
       knowledgeManager.install(writeToFile(activityDefinition.resource))
+      println(jsonParser.encodeResourceToString(activityDefinition.resource))
     }
   }
 
@@ -234,11 +256,14 @@ class CarePlanManager(
   ) {
     // smartIgTest()
 
-    var patientId = IdType(patient.id).idPart
+    val patientId = IdType(patient.id).idPart
+    // loadCarePlanResourcesFromDb()
+    // if (cqlLibraryIdList.isEmpty()) {
+    //   loadCarePlanResourcesFromDb()
+    // }
 
-    if (cqlLibraryIdList.isEmpty()) {
-      loadCarePlanResourcesFromDb()
-    }
+    initializeKnowledgeManager()
+
     val carePlanProposal =
       fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
         as CarePlan

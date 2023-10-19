@@ -3,7 +3,7 @@
   "id" : "IMMZ.D1",
   "text" : {
     "status" : "generated",
-    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This case-insensitive code system <code>http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1</code> defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\">DE80<a name=\"IMMZ.D1-DE80\"> </a></td><td>Dose 0 administered</td><td>Indicates if the client has received a birth dose and/or supplementary dose</td></tr><tr><td style=\"white-space:nowrap\">DE8<a name=\"IMMZ.D1-DE8\"> </a></td><td>Completed the primary vaccination series</td><td>Indicates if the client has completed the primary vaccination series of a product/antigen. If the client has not yet completed their primary series, it means they may be expected to receive more doses to complete their vaccination regimen for the respective product/antigen.</td></tr><tr><td style=\"white-space:nowrap\">DE81<a name=\"IMMZ.D1-DE81\"> </a></td><td>Date when primary vaccination series was completed</td><td>The date when the client completed the primary vaccination series (per product/antigen)</td></tr><tr><td style=\"white-space:nowrap\">DE10<a name=\"IMMZ.D1-DE10\"> </a></td><td>HIV status</td><td>The current human immunodeficiency virus (HIV) status of the client</td></tr><tr><td style=\"white-space:nowrap\">DE11<a name=\"IMMZ.D1-DE11\"> </a></td><td>HIV-positive</td><td>The client is known to be HIV positive</td></tr><tr><td style=\"white-space:nowrap\">DE12<a name=\"IMMZ.D1-DE12\"> </a></td><td>HIV-negative</td><td>The client is known to be HIV negative</td></tr><tr><td style=\"white-space:nowrap\">DE13<a name=\"IMMZ.D1-DE13\"> </a></td><td>Unknown</td><td>The client's HIV status is unknown</td></tr><tr><td style=\"white-space:nowrap\">DE16<a name=\"IMMZ.D1-DE16\"> </a></td><td>Immunocompromised</td><td>The client is known to be immunocompromised or immunosuppressed. This means the client has a weakened immune system and having a reduced ability to fight infections and other diseases</td></tr><tr><td style=\"white-space:nowrap\">DE17<a name=\"IMMZ.D1-DE17\"> </a></td><td>Currently on ART</td><td>The client is currently receiving antiretroviral therapy (ART)</td></tr><tr><td style=\"white-space:nowrap\">DE84<a name=\"IMMZ.D1-DE84\"> </a></td><td>Type of TB infection test performed</td><td>The type of TB infection test performed</td></tr><tr><td style=\"white-space:nowrap\">DE85<a name=\"IMMZ.D1-DE85\"> </a></td><td>IGRA</td><td>Interferon-gamma release assay (IGRA)</td></tr><tr><td style=\"white-space:nowrap\">DE86<a name=\"IMMZ.D1-DE86\"> </a></td><td>TST</td><td>Tuberculin skin test (TST) </td></tr><tr><td style=\"white-space:nowrap\">DE87<a name=\"IMMZ.D1-DE87\"> </a></td><td>TB infection test result</td><td>Records the result of the TB infection test</td></tr><tr><td style=\"white-space:nowrap\">DE88<a name=\"IMMZ.D1-DE88\"> </a></td><td>Positive</td><td>Test result was positive</td></tr><tr><td style=\"white-space:nowrap\">DE89<a name=\"IMMZ.D1-DE89\"> </a></td><td>Negative</td><td>Test result was negative</td></tr><tr><td style=\"white-space:nowrap\">DE90<a name=\"IMMZ.D1-DE90\"> </a></td><td>HIV-exposed infant</td><td>The infant is  known to be exposed to HIV (i.e. born to an HIV-infected woman)</td></tr><tr><td style=\"white-space:nowrap\">DE29<a name=\"IMMZ.D1-DE29\"> </a></td><td>Birth weight in grams</td><td>Represents the client's birth weight value measures in grams</td></tr><tr><td style=\"white-space:nowrap\">DE35<a name=\"IMMZ.D1-DE35\"> </a></td><td>Type of polio dose</td><td>The type of the polio vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE36<a name=\"IMMZ.D1-DE36\"> </a></td><td>IPV</td><td>Inactivated poliovirus vaccine (IPV)</td></tr><tr><td style=\"white-space:nowrap\">DE37<a name=\"IMMZ.D1-DE37\"> </a></td><td>bOPV</td><td>Bivalent oral poliovirus vaccine (bOPV)</td></tr><tr><td style=\"white-space:nowrap\">DE38<a name=\"IMMZ.D1-DE38\"> </a></td><td>Age in years when client received first DTP dose</td><td>The client's age in years when they received their first diphtheria-tetanus-pertussis (DTP) dose</td></tr><tr><td style=\"white-space:nowrap\">DE39<a name=\"IMMZ.D1-DE39\"> </a></td><td>Age in months when client received first Hib dose</td><td>The client's age in months when they received their first Haemophilus influenzae type b (Hib) dose</td></tr><tr><td style=\"white-space:nowrap\">DE40<a name=\"IMMZ.D1-DE40\"> </a></td><td>Sickle-cell disease</td><td>The client is known to have a sickle-cell disease</td></tr><tr><td style=\"white-space:nowrap\">DE41<a name=\"IMMZ.D1-DE41\"> </a></td><td>Age in months when client received third pneumococcal dose</td><td>The client's age in months when they received their third pneumococcal dose</td></tr><tr><td style=\"white-space:nowrap\">DE42<a name=\"IMMZ.D1-DE42\"> </a></td><td>No history of intussusception</td><td>The client is known to have no history of intussusception</td></tr><tr><td style=\"white-space:nowrap\">DE43<a name=\"IMMZ.D1-DE43\"> </a></td><td>Previous rotavirus doses given were the same product</td><td>Indicates whether or not all of the client's previous rotavirus doses were the same product</td></tr><tr><td style=\"white-space:nowrap\">DE46<a name=\"IMMZ.D1-DE46\"> </a></td><td>Immune reconstitution was achieved</td><td>The client is known to have achieved immune reconstitution</td></tr><tr><td style=\"white-space:nowrap\">DE92<a name=\"IMMZ.D1-DE92\"> </a></td><td>Severely immunosuppressed</td><td>The client is known to be severely immunocompromised or immunosuppressed</td></tr><tr><td style=\"white-space:nowrap\">DE49<a name=\"IMMZ.D1-DE49\"> </a></td><td>ART start date</td><td>The date on which the client started or restarted antiretroviral therapy (ART)</td></tr><tr><td style=\"white-space:nowrap\">DE52<a name=\"IMMZ.D1-DE52\"> </a></td><td>Type of last JE dose</td><td>The type of the last Japanese encephalitis (JE) vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE53<a name=\"IMMZ.D1-DE53\"> </a></td><td>Inactivated Vero cell-derived vaccine</td><td>Inactivated Vero cell-derived Japanese encephalitis (JE) vaccine type</td></tr><tr><td style=\"white-space:nowrap\">DE54<a name=\"IMMZ.D1-DE54\"> </a></td><td>Live attenuated vaccine</td><td>Live attenuated Japanese encephalitis (JE) vaccine type</td></tr><tr><td style=\"white-space:nowrap\">DE55<a name=\"IMMZ.D1-DE55\"> </a></td><td>Live recombinant vaccine</td><td>Live recombinant Japanese encephalitis (JE) vaccine type</td></tr><tr><td style=\"white-space:nowrap\">DE56<a name=\"IMMZ.D1-DE56\"> </a></td><td>Type of last TBE dose</td><td>The type of the last tick-borne encephalitis (TBE) vaccine dose administered</td></tr><tr><td style=\"white-space:nowrap\">DE57<a name=\"IMMZ.D1-DE57\"> </a></td><td>FSME-Immun</td><td>FSME-Immun vaccine product, which is an inactivated whole-virus vaccine for tick-borne encephalitis (TBE)</td></tr><tr><td style=\"white-space:nowrap\">DE58<a name=\"IMMZ.D1-DE58\"> </a></td><td>Encepur</td><td>Encepur vaccine product, which is an inactivated viral vaccine for tick-borne encephalitis (TBE)</td></tr><tr><td style=\"white-space:nowrap\">DE59<a name=\"IMMZ.D1-DE59\"> </a></td><td>TBE-Moscow</td><td>TBE-Moscow vaccine product, which is a vaccine for tick-borne encephalitis (TBE)</td></tr><tr><td style=\"white-space:nowrap\">DE60<a name=\"IMMZ.D1-DE60\"> </a></td><td>EnceVir</td><td>EnceVir vaccine product, which is a vaccine for tick-borne encephalitis (TBE)</td></tr><tr><td style=\"white-space:nowrap\">DE61<a name=\"IMMZ.D1-DE61\"> </a></td><td>Type of last typhoid dose</td><td>The type of the last typhoid vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE62<a name=\"IMMZ.D1-DE62\"> </a></td><td>Typbar-TCV</td><td>Typbar-TCV vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE63<a name=\"IMMZ.D1-DE63\"> </a></td><td>ViPS</td><td>Vi polysaccharide (ViPS) vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE64<a name=\"IMMZ.D1-DE64\"> </a></td><td>Ty21a</td><td>Ty21a vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE65<a name=\"IMMZ.D1-DE65\"> </a></td><td>Type of last cholera dose</td><td>The type of the last cholera vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE66<a name=\"IMMZ.D1-DE66\"> </a></td><td>WC vaccine</td><td>Killed whole cell (WC) only cholera vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE67<a name=\"IMMZ.D1-DE67\"> </a></td><td>WC-rBS vaccine</td><td>Vaccine contains a mixture of the recombinant B subunit (rBS) of cholera toxin plus killed whole cell (WC)</td></tr><tr><td style=\"white-space:nowrap\">DE68<a name=\"IMMZ.D1-DE68\"> </a></td><td>Type of last meningococcal dose</td><td>The type of the last meningococcal vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE69<a name=\"IMMZ.D1-DE69\"> </a></td><td>MenA conjugate vaccine (5µg)</td><td>Monovalent serogroup A (MenA) conjugate vaccine (5µg) vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE70<a name=\"IMMZ.D1-DE70\"> </a></td><td>Monovalent MenC conjugate</td><td>Monovalent MenC conjugate vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE71<a name=\"IMMZ.D1-DE71\"> </a></td><td>Quadrivalent conjugate</td><td>Quadrivalent conjugate (A,C,W135,Y-D and A,C,W135,Y-CRM) vaccines</td></tr><tr><td style=\"white-space:nowrap\">DE72<a name=\"IMMZ.D1-DE72\"> </a></td><td>Age in months when client received first meningococcal dose</td><td>The age in months when client received their first meningococcal dose</td></tr><tr><td style=\"white-space:nowrap\">DE73<a name=\"IMMZ.D1-DE73\"> </a></td><td>Type of last hepatitis A dose</td><td>The type of the last hepatitis A vaccine dose administered to the client</td></tr><tr><td style=\"white-space:nowrap\">DE74<a name=\"IMMZ.D1-DE74\"> </a></td><td>Live attenuated hepatitis A vaccine</td><td>Live attenuated hepatitis A vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE75<a name=\"IMMZ.D1-DE75\"> </a></td><td>Inactivated hepatitis A vaccine</td><td>Inactivated hepatitis A vaccine</td></tr><tr><td style=\"white-space:nowrap\">DE76<a name=\"IMMZ.D1-DE76\"> </a></td><td>VNA level</td><td>Vaccine-induced neutralizing (VNA) antibody level. It is a measured as a serum antibody concentration amount observed from the result of the concentrated, purified cell culture and embryonated egg-based rabies vaccines (CCEEV)</td></tr><tr><td style=\"white-space:nowrap\">DE77<a name=\"IMMZ.D1-DE77\"> </a></td><td>Seronegative for dengue</td><td>The client is known to be seronegative for dengue</td></tr></table></div>"
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This case-insensitive code system <code>http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1</code> defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\">DE80<a name=\"IMMZ.D1-DE80\"> </a></td><td>Dose 0 administered</td><td>Indicates if the client has received a birth dose and/or supplementary dose</td></tr><tr><td style=\"white-space:nowrap\">DE8<a name=\"IMMZ.D1-DE8\"> </a></td><td>Completed the primary vaccination series</td><td>Indicates if the client has completed the primary vaccination series of a product/antigen. If the client has not yet completed their primary series, it means they may be expected to receive more doses to complete their vaccination regimen for the respective product/antigen.</td></tr><tr><td style=\"white-space:nowrap\">DE81<a name=\"IMMZ.D1-DE81\"> </a></td><td>Date when primary vaccination series was completed</td><td>The date when the client completed the primary vaccination series (per product/antigen)</td></tr><tr><td style=\"white-space:nowrap\">DE10<a name=\"IMMZ.D1-DE10\"> </a></td><td>HIV status</td><td>The current human immunodeficiency virus (HIV) status of the client</td></tr><tr><td style=\"white-space:nowrap\">DE11<a name=\"IMMZ.D1-DE11\"> </a></td><td>HIV-positive</td><td>The client is known to be HIV positive</td></tr><tr><td style=\"white-space:nowrap\">DE12<a name=\"IMMZ.D1-DE12\"> </a></td><td>HIV-negative</td><td>The client is known to be HIV negative</td></tr><tr><td style=\"white-space:nowrap\">DE13<a name=\"IMMZ.D1-DE13\"> </a></td><td>Unknown</td><td>The client's HIV status is unknown</td></tr><tr><td style=\"white-space:nowrap\">DE15<a name=\"IMMZ.D1-DE15\"> </a></td><td>Preterm birth</td><td>The infant was preterm; the mother gave birth to the infant when gestational age was less than 37 weeks</td></tr><tr><td style=\"white-space:nowrap\">DE92<a name=\"IMMZ.D1-DE92\"> </a></td><td>Severely immunosuppressed</td><td>The client is known to be severely immunocompromised or immunosuppressed</td></tr><tr><td style=\"white-space:nowrap\">DE49<a name=\"IMMZ.D1-DE49\"> </a></td><td>ART start date</td><td>The date on which the client started or restarted antiretroviral therapy (ART)</td></tr><tr><td style=\"white-space:nowrap\">DE19<a name=\"IMMZ.D1-DE19\"> </a></td><td>Vaccine type</td><td>Vaccine type/category that was administered or was to be administered. Any vaccine code available in the IMMZ.Z Vaccine Library list of codes applies in this data element</td></tr><tr><td style=\"white-space:nowrap\">DE20<a name=\"IMMZ.D1-DE20\"> </a></td><td>Date and time of vaccination</td><td>Represents the visit/encounter date, which is the date and time when the vaccine was administered to the client</td></tr></table></div>"
   },
   "url" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1",
   "version" : "0.1.0",
@@ -11,7 +11,7 @@
   "title" : "IMMZ.D1 CodeSystem for Data Elements",
   "status" : "draft",
   "experimental" : false,
-  "date" : "2023-10-17T16:53:04+00:00",
+  "date" : "2023-10-19T03:40:32+00:00",
   "publisher" : "World Health Organization (WHO)",
   "contact" : [{
     "name" : "World Health Organization (WHO)",
@@ -29,7 +29,7 @@
   }],
   "caseSensitive" : false,
   "content" : "complete",
-  "count" : 55,
+  "count" : 12,
   "concept" : [{
     "code" : "DE80",
     "display" : "Dose 0 administered",
@@ -66,104 +66,9 @@
     "definition" : "The client's HIV status is unknown"
   },
   {
-    "code" : "DE16",
-    "display" : "Immunocompromised",
-    "definition" : "The client is known to be immunocompromised or immunosuppressed. This means the client has a weakened immune system and having a reduced ability to fight infections and other diseases"
-  },
-  {
-    "code" : "DE17",
-    "display" : "Currently on ART",
-    "definition" : "The client is currently receiving antiretroviral therapy (ART)"
-  },
-  {
-    "code" : "DE84",
-    "display" : "Type of TB infection test performed",
-    "definition" : "The type of TB infection test performed"
-  },
-  {
-    "code" : "DE85",
-    "display" : "IGRA",
-    "definition" : "Interferon-gamma release assay (IGRA)"
-  },
-  {
-    "code" : "DE86",
-    "display" : "TST",
-    "definition" : "Tuberculin skin test (TST) "
-  },
-  {
-    "code" : "DE87",
-    "display" : "TB infection test result",
-    "definition" : "Records the result of the TB infection test"
-  },
-  {
-    "code" : "DE88",
-    "display" : "Positive",
-    "definition" : "Test result was positive"
-  },
-  {
-    "code" : "DE89",
-    "display" : "Negative",
-    "definition" : "Test result was negative"
-  },
-  {
-    "code" : "DE90",
-    "display" : "HIV-exposed infant",
-    "definition" : "The infant is  known to be exposed to HIV (i.e. born to an HIV-infected woman)"
-  },
-  {
-    "code" : "DE29",
-    "display" : "Birth weight in grams",
-    "definition" : "Represents the client's birth weight value measures in grams"
-  },
-  {
-    "code" : "DE35",
-    "display" : "Type of polio dose",
-    "definition" : "The type of the polio vaccine dose administered to the client"
-  },
-  {
-    "code" : "DE36",
-    "display" : "IPV",
-    "definition" : "Inactivated poliovirus vaccine (IPV)"
-  },
-  {
-    "code" : "DE37",
-    "display" : "bOPV",
-    "definition" : "Bivalent oral poliovirus vaccine (bOPV)"
-  },
-  {
-    "code" : "DE38",
-    "display" : "Age in years when client received first DTP dose",
-    "definition" : "The client's age in years when they received their first diphtheria-tetanus-pertussis (DTP) dose"
-  },
-  {
-    "code" : "DE39",
-    "display" : "Age in months when client received first Hib dose",
-    "definition" : "The client's age in months when they received their first Haemophilus influenzae type b (Hib) dose"
-  },
-  {
-    "code" : "DE40",
-    "display" : "Sickle-cell disease",
-    "definition" : "The client is known to have a sickle-cell disease"
-  },
-  {
-    "code" : "DE41",
-    "display" : "Age in months when client received third pneumococcal dose",
-    "definition" : "The client's age in months when they received their third pneumococcal dose"
-  },
-  {
-    "code" : "DE42",
-    "display" : "No history of intussusception",
-    "definition" : "The client is known to have no history of intussusception"
-  },
-  {
-    "code" : "DE43",
-    "display" : "Previous rotavirus doses given were the same product",
-    "definition" : "Indicates whether or not all of the client's previous rotavirus doses were the same product"
-  },
-  {
-    "code" : "DE46",
-    "display" : "Immune reconstitution was achieved",
-    "definition" : "The client is known to have achieved immune reconstitution"
+    "code" : "DE15",
+    "display" : "Preterm birth",
+    "definition" : "The infant was preterm; the mother gave birth to the infant when gestational age was less than 37 weeks"
   },
   {
     "code" : "DE92",
@@ -176,133 +81,13 @@
     "definition" : "The date on which the client started or restarted antiretroviral therapy (ART)"
   },
   {
-    "code" : "DE52",
-    "display" : "Type of last JE dose",
-    "definition" : "The type of the last Japanese encephalitis (JE) vaccine dose administered to the client"
+    "code" : "DE19",
+    "display" : "Vaccine type",
+    "definition" : "Vaccine type/category that was administered or was to be administered. Any vaccine code available in the IMMZ.Z Vaccine Library list of codes applies in this data element"
   },
   {
-    "code" : "DE53",
-    "display" : "Inactivated Vero cell-derived vaccine",
-    "definition" : "Inactivated Vero cell-derived Japanese encephalitis (JE) vaccine type"
-  },
-  {
-    "code" : "DE54",
-    "display" : "Live attenuated vaccine",
-    "definition" : "Live attenuated Japanese encephalitis (JE) vaccine type"
-  },
-  {
-    "code" : "DE55",
-    "display" : "Live recombinant vaccine",
-    "definition" : "Live recombinant Japanese encephalitis (JE) vaccine type"
-  },
-  {
-    "code" : "DE56",
-    "display" : "Type of last TBE dose",
-    "definition" : "The type of the last tick-borne encephalitis (TBE) vaccine dose administered"
-  },
-  {
-    "code" : "DE57",
-    "display" : "FSME-Immun",
-    "definition" : "FSME-Immun vaccine product, which is an inactivated whole-virus vaccine for tick-borne encephalitis (TBE)"
-  },
-  {
-    "code" : "DE58",
-    "display" : "Encepur",
-    "definition" : "Encepur vaccine product, which is an inactivated viral vaccine for tick-borne encephalitis (TBE)"
-  },
-  {
-    "code" : "DE59",
-    "display" : "TBE-Moscow",
-    "definition" : "TBE-Moscow vaccine product, which is a vaccine for tick-borne encephalitis (TBE)"
-  },
-  {
-    "code" : "DE60",
-    "display" : "EnceVir",
-    "definition" : "EnceVir vaccine product, which is a vaccine for tick-borne encephalitis (TBE)"
-  },
-  {
-    "code" : "DE61",
-    "display" : "Type of last typhoid dose",
-    "definition" : "The type of the last typhoid vaccine dose administered to the client"
-  },
-  {
-    "code" : "DE62",
-    "display" : "Typbar-TCV",
-    "definition" : "Typbar-TCV vaccine"
-  },
-  {
-    "code" : "DE63",
-    "display" : "ViPS",
-    "definition" : "Vi polysaccharide (ViPS) vaccine"
-  },
-  {
-    "code" : "DE64",
-    "display" : "Ty21a",
-    "definition" : "Ty21a vaccine"
-  },
-  {
-    "code" : "DE65",
-    "display" : "Type of last cholera dose",
-    "definition" : "The type of the last cholera vaccine dose administered to the client"
-  },
-  {
-    "code" : "DE66",
-    "display" : "WC vaccine",
-    "definition" : "Killed whole cell (WC) only cholera vaccine"
-  },
-  {
-    "code" : "DE67",
-    "display" : "WC-rBS vaccine",
-    "definition" : "Vaccine contains a mixture of the recombinant B subunit (rBS) of cholera toxin plus killed whole cell (WC)"
-  },
-  {
-    "code" : "DE68",
-    "display" : "Type of last meningococcal dose",
-    "definition" : "The type of the last meningococcal vaccine dose administered to the client"
-  },
-  {
-    "code" : "DE69",
-    "display" : "MenA conjugate vaccine (5µg)",
-    "definition" : "Monovalent serogroup A (MenA) conjugate vaccine (5µg) vaccine"
-  },
-  {
-    "code" : "DE70",
-    "display" : "Monovalent MenC conjugate",
-    "definition" : "Monovalent MenC conjugate vaccine"
-  },
-  {
-    "code" : "DE71",
-    "display" : "Quadrivalent conjugate",
-    "definition" : "Quadrivalent conjugate (A,C,W135,Y-D and A,C,W135,Y-CRM) vaccines"
-  },
-  {
-    "code" : "DE72",
-    "display" : "Age in months when client received first meningococcal dose",
-    "definition" : "The age in months when client received their first meningococcal dose"
-  },
-  {
-    "code" : "DE73",
-    "display" : "Type of last hepatitis A dose",
-    "definition" : "The type of the last hepatitis A vaccine dose administered to the client"
-  },
-  {
-    "code" : "DE74",
-    "display" : "Live attenuated hepatitis A vaccine",
-    "definition" : "Live attenuated hepatitis A vaccine"
-  },
-  {
-    "code" : "DE75",
-    "display" : "Inactivated hepatitis A vaccine",
-    "definition" : "Inactivated hepatitis A vaccine"
-  },
-  {
-    "code" : "DE76",
-    "display" : "VNA level",
-    "definition" : "Vaccine-induced neutralizing (VNA) antibody level. It is a measured as a serum antibody concentration amount observed from the result of the concentrated, purified cell culture and embryonated egg-based rabies vaccines (CCEEV)"
-  },
-  {
-    "code" : "DE77",
-    "display" : "Seronegative for dengue",
-    "definition" : "The client is known to be seronegative for dengue"
+    "code" : "DE20",
+    "display" : "Date and time of vaccination",
+    "definition" : "Represents the visit/encounter date, which is the date and time when the vaccine was administered to the client"
   }]
 }

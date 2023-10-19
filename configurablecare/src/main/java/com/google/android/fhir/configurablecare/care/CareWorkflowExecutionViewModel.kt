@@ -18,8 +18,6 @@ package com.google.android.fhir.configurablecare.care
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.configurablecare.FhirApplication
 import com.google.android.fhir.get
 import com.google.android.fhir.search.search
@@ -34,7 +32,6 @@ import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 
 /** TODO(mjajoo@): Explore if applying PlanDefinition could be done in background. */
@@ -46,6 +43,8 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
   private val taskManager = FhirApplication.taskManager(getApplication<Application>().applicationContext)
   private lateinit var activeRequestResourceConfiguration: List<RequestResourceConfig>
   lateinit var currentPlanDefinitionId: String
+  var currentStructureMapId: String = ""
+  lateinit var currentQuestionnaireId: String
 
   /**
    * Shared flow of [CareWorkflowExecutionRequest]. For each collected patient the execution shall
@@ -189,14 +188,30 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     return activeRequestResourceConfiguration
   }
 
+  private fun readFileFromAssets(filename: String): String {
+    return getApplication<Application>().assets.open(filename).bufferedReader().use {
+      it.readText()
+    }
+  }
+
   suspend fun getActivePatientRegistrationQuestionnaire(): String {
-    val questionnaireId = ConfigurationManager.careConfiguration
+    currentQuestionnaireId = ConfigurationManager.careConfiguration
       ?.supportedImplementationGuides
       ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(currentPlanDefinitionId) }
       ?.implementationGuideConfig
-      ?.patientRegistrationQuestionnaire
-    val questionnaire = fhirEngine.get<Questionnaire>(IdType(questionnaireId).idPart)
+      ?.patientRegistrationQuestionnaire!!
+    val questionnaire = fhirEngine.get<Questionnaire>(IdType(currentQuestionnaireId).idPart)
     return jsonParser.encodeResourceToString(questionnaire)
+    // return readFileFromAssets("Questionnaire-Questionnaire-SOTMeasles.json")
+  }
+
+  fun setCurrentStructureMap() {
+    for (implementationGuide in ConfigurationManager.careConfiguration?.supportedImplementationGuides!!) {
+      val triggers = implementationGuide.implementationGuideConfig.triggers
+      for (trigger in triggers)
+        if (trigger.event == currentQuestionnaireId)
+          currentStructureMapId = trigger.structureMap
+    }
   }
 
   fun setPlanDefinitionId(event: String) {

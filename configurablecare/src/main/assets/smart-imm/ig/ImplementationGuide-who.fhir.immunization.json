@@ -690,18 +690,6 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/consenttocontact"
-      },
-      "name" : "Communication consent",
-      "description" : "Indication that client gave consent to be contacted",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "ConceptMap"
       }],
       "reference" : {
@@ -821,14 +809,13 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
+        "valueString" : "QuestionnaireResponse"
       }],
       "reference" : {
-        "reference" : "StructureDefinition/estimatedage"
+        "reference" : "QuestionnaireResponse/Example.IMMZ.C.QuestionnaireResponse.1"
       },
-      "name" : "Estimated age",
-      "description" : "If DOB is unknown, enter the client's age. Note displaying the client's age in years.",
-      "exampleBoolean" : false
+      "name" : "Example.IMMZ.C.QuestionnaireResponse.1",
+      "exampleBoolean" : true
     },
     {
       "extension" : [{
@@ -836,9 +823,31 @@
         "valueString" : "QuestionnaireResponse"
       }],
       "reference" : {
-        "reference" : "QuestionnaireResponse/Example.IMMZ.C.QuestionnaireResponse.1"
+        "reference" : "QuestionnaireResponse/Example.IMMZ.D1.QuestionnaireResponse.1"
       },
-      "name" : "Example.IMMZ.C.QuestionnaireResponse.1",
+      "name" : "Example.IMMZ.D1.QuestionnaireResponse.1",
+      "exampleBoolean" : true
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "QuestionnaireResponse"
+      }],
+      "reference" : {
+        "reference" : "QuestionnaireResponse/Example.IMMZ.D1.QuestionnaireResponse.2"
+      },
+      "name" : "Example.IMMZ.D1.QuestionnaireResponse.2",
+      "exampleBoolean" : true
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "QuestionnaireResponse"
+      }],
+      "reference" : {
+        "reference" : "QuestionnaireResponse/Example.IMMZ.D1.QuestionnaireResponse.3"
+      },
+      "name" : "Example.IMMZ.D1.QuestionnaireResponse.3",
       "exampleBoolean" : true
     },
     {
@@ -917,18 +926,6 @@
       },
       "name" : "Gender values",
       "description" : "Codes representing possible values for the Gender element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/educationlevel"
-      },
-      "name" : "Highest level of education achieved",
-      "description" : "The highest level of school the client has reached.",
       "exampleBoolean" : false
     },
     {
@@ -1102,114 +1099,6 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE35"
-      },
-      "name" : "IMMZ.D1.DE35 ValueSet for Type of polio dose",
-      "description" : "ValueSet for Type of polio dose for IMMZ.D1.DE35.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE52"
-      },
-      "name" : "IMMZ.D1.DE52 ValueSet for Type of last JE dose",
-      "description" : "ValueSet for Type of last JE dose for IMMZ.D1.DE52.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE56"
-      },
-      "name" : "IMMZ.D1.DE56 ValueSet for Type of last TBE dose",
-      "description" : "ValueSet for Type of last TBE dose for IMMZ.D1.DE56.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE61"
-      },
-      "name" : "IMMZ.D1.DE61 ValueSet for Type of last typhoid dose",
-      "description" : "ValueSet for Type of last typhoid dose for IMMZ.D1.DE61.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE65"
-      },
-      "name" : "IMMZ.D1.DE65 ValueSet for Type of last cholera dose",
-      "description" : "ValueSet for Type of last cholera dose for IMMZ.D1.DE65.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE68"
-      },
-      "name" : "IMMZ.D1.DE68 ValueSet for Type of last meningococcal dose",
-      "description" : "ValueSet for Type of last meningococcal dose for IMMZ.D1.DE68.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE73"
-      },
-      "name" : "IMMZ.D1.DE73 ValueSet for Type of last hepatitis A dose",
-      "description" : "ValueSet for Type of last hepatitis A dose for IMMZ.D1.DE73.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE84"
-      },
-      "name" : "IMMZ.D1.DE84 ValueSet for Type of TB infection test performed",
-      "description" : "ValueSet for Type of TB infection test performed for IMMZ.D1.DE84.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/IMMZ.D1.DE87"
-      },
-      "name" : "IMMZ.D1.DE87 ValueSet for TB infection test result",
-      "description" : "ValueSet for TB infection test result for IMMZ.D1.DE87.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "PlanDefinition"
       }],
       "reference" : {
@@ -1314,6 +1203,18 @@
       },
       "name" : "IMMZ.DT.Umbrella",
       "description" : "If the child or patient has not been given MCV1 (at 9 months) and MCV2 (between 15-18 months) vaccination",
+      "exampleBoolean" : false
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "ValueSet"
+      }],
+      "reference" : {
+        "reference" : "ValueSet/IMMZ.Z.DE9"
+      },
+      "name" : "IMMZ.Z.DE10 ValueSet for Measles Vaccines",
+      "description" : "ValueSet for Measles Vaccines for IMMZ.Z.DE9.",
       "exampleBoolean" : false
     },
     {
@@ -1431,18 +1332,6 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/insurance"
-      },
-      "name" : "Insurance coverage",
-      "description" : "Does the client have insurance coverage?",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "ValueSet"
       }],
       "reference" : {
@@ -1458,33 +1347,10 @@
         "valueString" : "ValueSet"
       }],
       "reference" : {
-        "reference" : "ValueSet/IMMZ.A1.DE9"
-      },
-      "name" : "Measles",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
         "reference" : "ValueSet/medicationbirthcontrolmethods-values"
       },
       "name" : "Medication-based Birth control method reported at intake values",
       "description" : "Codes representing possible values for the Medication-based Birth control method reported at intake element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/stage"
-      },
-      "name" : "Miscarriage or abortion stage of pregnancy",
-      "description" : "If the woman recently had a miscarriage or abortion, when in the pregnancy the abortion took place.",
       "exampleBoolean" : false
     },
     {
@@ -1526,17 +1392,6 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/occupation"
-      },
-      "name" : "Occupation",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "ValueSet"
       }],
       "reference" : {
@@ -1560,13 +1415,13 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
+        "valueString" : "Patient"
       }],
       "reference" : {
-        "reference" : "StructureDefinition/method"
+        "reference" : "Patient/P654321"
       },
-      "name" : "Payment method",
-      "exampleBoolean" : false
+      "name" : "patient654321",
+      "exampleBoolean" : true
     },
     {
       "extension" : [{
@@ -1667,18 +1522,6 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/requestertype"
-      },
-      "name" : "Referred by",
-      "description" : "How the client was referred",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "ValueSet"
       }],
       "reference" : {
@@ -1686,18 +1529,6 @@
       },
       "name" : "Referred by values",
       "description" : "Codes representing possible values for the Referred by element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "StructureDefinition:extension"
-      }],
-      "reference" : {
-        "reference" : "StructureDefinition/reminder"
-      },
-      "name" : "Reminder messages",
-      "description" : "Whether client wants to receive text or other messages as follow-up for family planning",
       "exampleBoolean" : false
     },
     {
@@ -1819,6 +1650,33 @@
       }],
       "reference" : {
         "reference" : "StructureMap/IMMZCQRToPatient"
+      }
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "StructureMap"
+      }],
+      "reference" : {
+        "reference" : "StructureMap/IMMZD1LMToResources"
+      }
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "StructureMap"
+      }],
+      "reference" : {
+        "reference" : "StructureMap/IMMZD1QRToLM"
+      }
+    },
+    {
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
+        "valueString" : "StructureMap"
+      }],
+      "reference" : {
+        "reference" : "StructureMap/IMMZD1QRToResources"
       }
     },
     {

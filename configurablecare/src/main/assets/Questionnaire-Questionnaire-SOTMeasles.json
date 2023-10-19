@@ -1,0 +1,1075 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "Questionnaire-SOTMeasles",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-extr-smap"
+    ]
+  },
+  "language": "en",
+  "contained": [
+    {
+      "resourceType": "ValueSet",
+      "id": "InitDiag",
+      "url": "http://worldhealthorganization.github.io/smart-ot/ValueSet/InitDiag",
+      "version": "0.2.1",
+      "name": "InitDiag",
+      "title": "SOT Measles Initial Diagnosis",
+      "status": "draft",
+      "description": "SOT Measles Initial Diagnosis",
+      "expansion": {
+        "identifier": "urn:uuid:c060c134-871f-43be-b1ee-5dfface2c18f",
+        "timestamp": "2023-05-02T20:23:35+05:30",
+        "total": 6,
+        "parameter": [
+          {
+            "name": "excludeNested",
+            "valueBoolean": false
+          },
+          {
+            "name": "version",
+            "valueUri": "http://worldhealthorganization.github.io/smart-ot/InitDiag|0.2.1"
+          }
+        ],
+        "contains": [
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "1",
+            "display": "Measles"
+          },
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "2",
+            "display": "Rubella"
+          },
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "3",
+            "display": "Dengue"
+          },
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "4",
+            "display": "Other Rash illness"
+          },
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "8",
+            "display": "Other Non-Rash illness"
+          },
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/InitDiag",
+            "code": "99",
+            "display": "Unknown"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "YesNoUnknown",
+      "url": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown",
+      "name": "YesNoUnknown",
+      "title": "Yes No Unknown",
+      "status": "draft",
+      "description": "Yes No Unknown",
+      "compose": {
+        "include": [
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown"
+          }
+        ]
+      }
+    },
+    {
+      "resourceType": "ValueSet",
+      "id": "RashType",
+      "url": "http://worldhealthorganization.github.io/smart-ot/ValueSet/RashType",
+      "name": "RashType",
+      "title": "Rash Type",
+      "status": "draft",
+      "description": "Rash Type",
+      "compose": {
+        "include": [
+          {
+            "system": "http://worldhealthorganization.github.io/smart-ot/RashType"
+          }
+        ]
+      }
+    }
+  ],
+  "url": "http://worldhealthorganization.github.io/smart-ot/Questionnaire/Questionnaire-SOTMeasles",
+  "version": "0.2.1",
+  "name": "Questionnaire-SOTMeasles",
+  "title": "Measles Case Investigation Questionnaire",
+  "status": "draft",
+  "subjectType": ["Patient"],
+  "date": "2023-10-16T20:44:02+05:30",
+  "publisher": "WHO",
+  "contact": [
+    {
+      "name": "WHO",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://who.int"
+        }
+      ]
+    }
+  ],
+  "description": "Measles Case Investigation Questionnaire",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "item": [
+    {
+      "linkId": "investigationForm",
+      "text": "Investigation Form for Measles/Rubella",
+      "type": "group",
+      "repeats": false,
+      "item": [
+        {
+          "linkId": "description",
+          "text": "Complete this form for: Any person in whom a health care worker suspects measles or rubella infection or a patient with fever and rash. The health worker should attempt to collect epidemiological and clinical data , as well as a blood sample , on the first contact with the patient. This contact with the patient might be the only one.",
+          "type": "display",
+          "repeats": false
+        },
+        {
+          "linkId": "reportingSource",
+          "text": "Section I: Identification of the Reporting Institution",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "initialDiagnosis",
+              "text": "Initial Diagnosis",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/InitDiag"
+            },
+            {
+              "linkId": "caseID",
+              "text": "Case Number",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "reportingInstitution",
+              "text": "Reporting Institution",
+              "type": "group",
+              "repeats": false,
+              "item": [
+                {
+                  "linkId": "reportingFacility",
+                  "text": "Health Service Name",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "telephone",
+                  "text": "Health Service Telephone",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "country",
+                  "text": "Country",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "municipality",
+                  "text": "Municipality",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "state",
+                  "text": "Province/State",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "locality",
+                  "text": "Locality/Neighborhood",
+                  "type": "string",
+                  "repeats": false
+                }
+              ]
+            },
+            {
+              "linkId": "reportedBy",
+              "text": "Reported By",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "DateOfConsultation",
+              "text": "Date Of Consultation",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "DateOfHomeVisit",
+              "text": "Date Of Home Visit",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "dateReported",
+              "text": "Date Reported - Local",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "DateReportedNational",
+              "text": "Date Reported - National",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "DetectedBy",
+              "text": "Detected By",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/DetectedBy"
+            },
+            {
+              "linkId": "TypeOfProviderReporting",
+              "text": "Type Of Provider Reporting",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/ProvType"
+            },
+            {
+              "linkId": "specifyother",
+              "text": "Specify",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "TypeOfProviderReporting",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/ProvType",
+                    "code": "88"
+                  }
+                }
+              ],
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "demographics",
+          "text": "Section II: Patient Information",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "name",
+              "text": "Patient’s first and last names",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "guardian",
+              "text": "Name of the mother or guardian",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "address",
+              "text": "Address",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "telephone",
+              "text": "Telephone",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "landmark",
+              "text": "Landmarks to locate the house",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "occupation",
+              "text": "Patient’s Occupation",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "localityType",
+              "text": "Type of locality",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/LocType"
+            },
+            {
+              "linkId": "workAddress",
+              "text": "Work or school address",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "sex",
+              "text": "Patient’s sex",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/BiologicalSex"
+            },
+            {
+              "linkId": "DoB",
+              "text": "Patient’s Date of Birth",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "ageOnset",
+              "text": "If date of birth is unknown, age",
+              "type": "integer",
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "vaccinationStatus",
+          "text": "Section III: Vaccination History",
+          "type": "group",
+          "repeats": true,
+          "item": [
+            {
+              "linkId": "vaccineType",
+              "text": "Type of Vaccine*",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/VaccineType"
+            },
+            {
+              "linkId": "noOfDoses",
+              "text": "Number of doses**",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/NoOfDoses"
+            },
+            {
+              "linkId": "lastDoseDate",
+              "text": "Date of last dose",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "sourceOfInformation",
+              "text": "Source of vaccination Information †",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/VaccineInfoSource"
+            }
+          ]
+        },
+        {
+          "linkId": "clinical",
+          "text": "Section IV: Clinical Data; Follow-up & Treatment",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "fever",
+              "text": "Fever?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "temperature",
+              "text": "If Yes, temperature (°)",
+              "type": "decimal",
+              "enableWhen": [
+                {
+                  "question": "fever",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "dateOfFeverOnset",
+              "text": "Date of fever onset",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "fever",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "rash",
+              "text": "Rash?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "rashDuration",
+              "text": "If Yes, duration of the rash(in days)",
+              "type": "integer",
+              "enableWhen": [
+                {
+                  "question": "rash",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "rashOnsetDate",
+              "text": "Date of rash onset",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "rash",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "rashType",
+              "text": "Type of rash",
+              "type": "choice",
+              "enableWhen": [
+                {
+                  "question": "rash",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/RashType"
+            },
+            {
+              "linkId": "cough",
+              "text": "Cough?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "conjunctivitis",
+              "text": "Conjunctivitis?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "coryza",
+              "text": "Coryza?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "koplikSpots",
+              "text": "Koplik Spots?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "lymphadenopathy",
+              "text": "Lymphadenopathy?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "jointPain",
+              "text": "Arthralgia?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "pregnancy",
+              "text": "Is the patient pregnant?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "monthsPregnant",
+              "text": "Weeks of pregnancy (01-42)",
+              "type": "integer",
+              "enableWhen": [
+                {
+                  "question": "pregnancy",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "placeOfBirth",
+              "text": "If Yes, Place where birth will likely take place",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "pregnancy",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "admitted",
+              "text": "Hospitalized?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "admittedHCFName",
+              "text": "Hospital name",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "admitted",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "admissionDate",
+              "text": "If Yes, Date of admission",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "admitted",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "hospitalRecordNumber",
+              "text": "Hospital record number",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "admitted",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "outcome",
+              "text": "Death?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/PatientOutcome"
+            },
+            {
+              "linkId": "outcomeDate",
+              "text": "If Yes, Date of death",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "outcome",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/PatientOutcome",
+                    "code": "Death"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "primaryCauseOfDeath",
+              "text": "Primary cause of death",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "outcome",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/PatientOutcome",
+                    "code": "Death"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "diseaseAdditionalInfo",
+              "text": "Comments",
+              "type": "string",
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "laboratoryResults",
+          "text": "Section V: Specimens & Laboratory Testing",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "specimenNumber",
+              "text": "Specimen number*",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/SpecimenNumber"
+            },
+            {
+              "linkId": "sampleType",
+              "text": "Type of specimen**",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/SampleType"
+            },
+            {
+              "linkId": "collectionDate",
+              "text": "Date specimen obtained",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "labName",
+              "text": "Laboratory Name",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "specimenSentDate",
+              "text": "Date specimen was sent to lab",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "specimenReceivedDate",
+              "text": "Date Received",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "sampleId",
+              "text": "# specimen ID in lab.",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "testPerformed",
+              "text": "Type of test",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/TestPerformed"
+            },
+            {
+              "linkId": "antigen",
+              "text": "Antigen",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/Antigen"
+            },
+            {
+              "linkId": "result",
+              "text": "Result",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/Result"
+            },
+            {
+              "linkId": "resultDate",
+              "text": "Date of Results",
+              "type": "date",
+              "repeats": false
+            },
+            {
+              "linkId": "specifyVirus",
+              "text": "If virus was detected, specify viral genotype: (Measles: A, B1, B2, B3, C1, C2, D1, D2, D3, D4, D5, D6, D7, D8, D9, D10, E, F, G1, G2, G3, H1, H2. Rubella: 1a, 1B, 1C,\r\n1D, 1E, 1F, 1g, 2A, 2B, 2c)",
+              "type": "string",
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "contactTracing",
+          "text": "Section VI: Investigation",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "caseSearchConducted",
+              "text": "Were active case-searches conducted?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "noOfsuspectCases",
+              "text": "If Yes, Number of suspect cases detected during active case-search",
+              "type": "integer",
+              "enableWhen": [
+                {
+                  "question": "caseSearchConducted",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "pregnantContact",
+              "text": "Was the patient in contact with any pregnant woman?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "pregnantContactNames",
+              "text": "If Yes, Name(s)",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "pregnantContact",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "localCasesPresent",
+              "text": "Are there other cases present in the case’s municipality of residence?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/LocalCasesPresent"
+            },
+            {
+              "linkId": "travelledOutside",
+              "text": "Did the patient travel outside his/her province/state of residence 7-23 days before rash onset?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "travelDetails",
+              "text": "If Yes,:",
+              "type": "group",
+              "enableWhen": [
+                {
+                  "question": "travelledOutside",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": true,
+              "item": [
+                {
+                  "linkId": "placeOfTravel",
+                  "text": "Cities/Countries",
+                  "type": "string",
+                  "repeats": false
+                },
+                {
+                  "linkId": "arrivalDate",
+                  "text": "Date of arrival",
+                  "type": "date",
+                  "repeats": false
+                },
+                {
+                  "linkId": "departureDate",
+                  "text": "Date of departure",
+                  "type": "date",
+                  "repeats": false
+                }
+              ]
+            },
+            {
+              "linkId": "infectionSetting",
+              "text": "Setting where infected?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/InfectionSetting"
+            },
+            {
+              "linkId": "specifyInfectionSetting",
+              "text": "Specify",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "infectionSetting",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/InfectionSetting",
+                    "code": "88"
+                  }
+                }
+              ],
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "epiData",
+          "text": "Section VII: Response Measures",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "ringVaccination",
+              "text": "Ring vaccination?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "dateStarted",
+              "text": "Date started",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "ringVaccination",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "dateEnded",
+              "text": "Date Ended",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "ringVaccination",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "noOfDosesRingVaccination",
+              "text": "Number of doses given during ring vaccination",
+              "type": "integer",
+              "enableWhen": [
+                {
+                  "question": "ringVaccination",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "rapidCoverageMonitioring",
+              "text": "Was rapid coverage monitoring done",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "percentVaccinated",
+              "text": "If yes, what % of vaccinated persons was found?",
+              "type": "integer",
+              "enableWhen": [
+                {
+                  "question": "rapidCoverageMonitioring",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "contactTracingDone",
+              "text": "Were the contacts followed for up to 30 days after the date of the rash onset of the case?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "lastFollowUp",
+              "text": "If yes, date of the last day of contact follow-up",
+              "type": "date",
+              "enableWhen": [
+                {
+                  "question": "contactTracingDone",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            }
+          ]
+        },
+        {
+          "linkId": "classification",
+          "text": "Section VIII: Classification",
+          "type": "group",
+          "repeats": false,
+          "item": [
+            {
+              "linkId": "finalClassification",
+              "text": "Final Classification",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/FinalClassification"
+            },
+            {
+              "linkId": "confirmationBasis",
+              "text": "Basis for confirmation",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/ConfirmationBasis"
+            },
+            {
+              "linkId": "countryImportation",
+              "text": "If Imported or Import-related, Country of importation",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "confirmationBasis",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/ConfirmationBasis",
+                    "code": "1"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "discardingBasis",
+              "text": "Basis for discarding",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/DiscardingBasis"
+            },
+            {
+              "linkId": "sourceOfInfection",
+              "text": "For confirmed cases, Source of infection",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/SourceOfInfection"
+            },
+            {
+              "linkId": "contact",
+              "text": "Contact of another case?",
+              "type": "choice",
+              "repeats": false,
+              "answerValueSet": "http://worldhealthorganization.github.io/smart-ot/ValueSet/YesNoUnknown"
+            },
+            {
+              "linkId": "contactCaseNo",
+              "text": "Contact of (or epidemiologically-linked to) case number",
+              "type": "string",
+              "enableWhen": [
+                {
+                  "question": "contact",
+                  "operator": "=",
+                  "answerCoding": {
+                    "system": "http://worldhealthorganization.github.io/smart-ot/YesNoUnknown",
+                    "code": "Yes"
+                  }
+                }
+              ],
+              "repeats": false
+            },
+            {
+              "linkId": "classifiedBy",
+              "text": "Classified by",
+              "type": "string",
+              "repeats": false
+            },
+            {
+              "linkId": "classificationDate",
+              "text": "Date of final classification",
+              "type": "date",
+              "repeats": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -9,15 +9,18 @@
         "triggers": [
           {
             "event": "Questionnaire/IMMZCRegisterClient",
-            "planDefinition":"PlanDefinition/PlanImmunizationReview"
+            "planDefinition":"",
+            "structureMap": "StructureMap/IMMZCQRToPatient"
           },
           {
             "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
-            "planDefinition":"PlanDefinition/IMMZD2DTMeasles"
+            "planDefinition":"PlanDefinition/IMMZD2DTMeasles",
+            "structureMap": "StructureMap/IMMZD1QRToResources"
           },
           {
             "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
-            "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI"
+            "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI",
+            "structureMap": "StructureMap/IMMZD4QRToResources"
           }
         ],
         "entryPoint": "PlanDefinition/PlanImmunizationReview",

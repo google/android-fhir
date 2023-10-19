@@ -25,6 +25,7 @@ import java.io.File
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.StructureMap
 
 data class RequestResourceConfig(
   var resourceType: String,
@@ -46,7 +47,8 @@ class ImplementationGuideConfig(
 
 data class Trigger(
   var event: String,
-  var planDefinition: String
+  var planDefinition: String,
+  var structureMap: String
 )
 
 
