@@ -105,11 +105,3 @@ ValueSet-referred-by-values.json
 ValueSet-sti-risk-assessment-factors-values.json
 ValueSet-visit-type-values.json
 ValueSet-whoatc-uv-ips.json
-canonicals.json
-contents.txt
-expansions.json
-package.manifest.json
-package.r4.manifest.json
-package.r4b.manifest.json
-sub-package-list.json
-usage-stats.json

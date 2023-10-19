@@ -23,6 +23,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.get
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
@@ -32,14 +33,17 @@ import java.io.InputStream
 import java.util.TimeZone
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.skyscreamer.jsonassert.JSONAssert
+import java.lang.RuntimeException
 
 @RunWith(AndroidJUnit4::class)
 class SmartImmunizationAndroidTest {
@@ -65,13 +69,11 @@ class SmartImmunizationAndroidTest {
     return open(asset).bufferedReader().use { it.readText() }
   }
 
-  private fun copyResourceIntoApp(igName: String, asset: String): File {
-    val resourceJson = open(asset)!!.bufferedReader().use { it.readText() }
+  private fun copyResourceIntoApp(outputDir: File, asset: String): File {
+    val resourceJson = open(asset).bufferedReader().use { it.readText() }
     val resource = load(asset) as Resource
 
-    val dir = File(context.filesDir, igName).apply { mkdirs() }
-
-    return File(dir, "${resource.resourceType.name}-${resource.idPart}.json").apply {
+    return File(outputDir, "${resource.resourceType.name}-${resource.idPart}.json").apply {
       delete()
       createNewFile()
       writeText(resourceJson)
@@ -81,13 +83,21 @@ class SmartImmunizationAndroidTest {
   fun moveAllIGResourcesIntoFilesDir(igName: String) {
     val inputBaseIgDir = "/$igName/ig"
 
+    // cleans up
+    val outputDir = File(context.filesDir, igName).apply {
+      if (!deleteRecursively()) {
+        throw RuntimeException("Failed to clean up directory")
+      }
+      mkdirs()
+    }
+
     javaClass
       .getResourceAsStream("$inputBaseIgDir/contents.txt")
       ?.bufferedReader()
       ?.use { bufferReader -> bufferReader.readText() }
       ?.split("\n")
       ?.forEach { fileName ->
-        runCatching { copyResourceIntoApp(igName, "$inputBaseIgDir/$fileName") }
+        runCatching { copyResourceIntoApp(outputDir, "$inputBaseIgDir/$fileName") }
           .onFailure { println("Ignoring $inputBaseIgDir/$fileName. Not a valid Fhir Resource") }
       }
   }
@@ -97,6 +107,7 @@ class SmartImmunizationAndroidTest {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
 
     knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
+
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator =
       FhirOperator.Builder(context)
@@ -123,11 +134,11 @@ class SmartImmunizationAndroidTest {
       knowledgeManager
         .loadResources(
           resourceType = "PlanDefinition",
-          id = "IMMZD2DTMeasles",
+          url = "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
         )
         .single()
 
-    assertThat(planDef).isNotNull()
+    assertThat(planDef.idElement.idPart).isEqualTo("26")
 
     val patient =
       load(
@@ -143,10 +154,16 @@ class SmartImmunizationAndroidTest {
     fhirEngine.create(patient)
     fhirEngine.create(observation)
 
+    assertThat(patient.id).isEqualTo("Patient/IMMZ-Patient-NoVaxeninfant-f")
+    assertThat(observation.id).isEqualTo("Observation/birthweightnormal-NoVaxeninfant-f")
+
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinitionId = "IMMZD2DTMeasles",
-        patientId = patient.id,
+        planDefinition =
+          CanonicalType(
+            "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
+          ),
+        subject = "Patient/IMMZ-Patient-NoVaxeninfant-f",
       )
 
     val parser = FhirContext.forR4Cached().newJsonParser()

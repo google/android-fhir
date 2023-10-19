@@ -93,7 +93,7 @@ internal constructor(
   suspend fun install(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
     val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
-    rootDirectory.listFiles()?.forEach { file ->
+    rootDirectory.listFiles().sorted()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
         if (resource is Resource) {

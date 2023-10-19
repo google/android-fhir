@@ -20,15 +20,24 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.get
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
+import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.search.search
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -53,6 +62,7 @@ class SmartImmunizationTest {
   @Before
   fun setUp() = runBlockingOnWorkerThread {
     TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
+
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
 
@@ -79,6 +89,8 @@ class SmartImmunizationTest {
         )
         .firstOrNull()
 
+    assertThat(planDef?.idElement?.idPart).isEqualTo("26")
+
     loader.loadFile(
       "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/Patient/Patient-IMMZ-Patient-NoVaxeninfant-f.json",
       ::importToFhirEngine,
@@ -88,7 +100,8 @@ class SmartImmunizationTest {
       ::importToFhirEngine,
     )
 
-    assertThat(planDef).isNotNull()
+    assertThat(fhirEngine.get<Patient>("IMMZ-Patient-NoVaxeninfant-f").id).isNotNull()
+    assertThat(fhirEngine.get<Observation>("birthweightnormal-NoVaxeninfant-f").id).isNotNull()
 
     val carePlan =
       fhirOperator.generateCarePlan(
