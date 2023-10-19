@@ -19,7 +19,6 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.sync.upload.patch.PatchGeneratorMode
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Strategy to define how to upload the [LocalChange]s to the FHIR server.
@@ -35,33 +34,33 @@ private constructor(
   internal val patchGeneratorMode: PatchGeneratorMode,
   internal val requestGeneratorMode: UploadRequestGeneratorMode,
 ) {
-  object SingleChangePut :
-    UploadStrategy(
-      LocalChangesFetchMode.EarliestChange,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
-    )
+  //  object SingleChangePut :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.EarliestChange,
+  //      PatchGeneratorMode.PerChange,
+  //      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+  //    )
 
-  object SingleChangePost :
-    UploadStrategy(
-      LocalChangesFetchMode.EarliestChange,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
-    )
+  //  object SingleChangePost :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.EarliestChange,
+  //      PatchGeneratorMode.PerChange,
+  //      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+  //    )
 
-  object SingleResourcePut :
-    UploadStrategy(
-      LocalChangesFetchMode.PerResource,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
-    )
+  //  object SingleResourcePut :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.PerResource,
+  //      PatchGeneratorMode.PerResource,
+  //      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+  //    )
 
-  object SingleResourcePost :
-    UploadStrategy(
-      LocalChangesFetchMode.PerResource,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
-    )
+  //  object SingleResourcePost :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.PerResource,
+  //      PatchGeneratorMode.PerResource,
+  //      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+  //    )
 
   object AllChangesBundlePut :
     UploadStrategy(
@@ -70,12 +69,12 @@ private constructor(
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
     )
 
-  object AllChangesBundlePost :
-    UploadStrategy(
-      LocalChangesFetchMode.AllChanges,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
-    )
+  //  object AllChangesBundlePost :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.AllChanges,
+  //      PatchGeneratorMode.PerChange,
+  //      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
+  //    )
 
   object AllChangesSquashedBundlePut :
     UploadStrategy(
@@ -84,10 +83,10 @@ private constructor(
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
     )
 
-  object AllChangesSquashedBundlePost :
-    UploadStrategy(
-      LocalChangesFetchMode.AllChanges,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
-    )
+  //  object AllChangesSquashedBundlePost :
+  //    UploadStrategy(
+  //      LocalChangesFetchMode.AllChanges,
+  //      PatchGeneratorMode.PerResource,
+  //      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
+  //    )
 }

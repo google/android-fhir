@@ -33,11 +33,18 @@ import org.json.JSONObject
  */
 internal object PerResourcePatchGenerator : PatchGenerator {
 
-  override fun generate(localChanges: List<LocalChange>): List<Patch> {
+  override fun generate(localChanges: List<LocalChange>): List<PatchGeneratorOutput> {
     return localChanges
       .groupBy { it.resourceType to it.resourceId }
       .values
-      .mapNotNull { mergeLocalChangesForSingleResource(it) }
+      .mapNotNull { resourceLocalChanges ->
+        mergeLocalChangesForSingleResource(resourceLocalChanges)?.let { patch ->
+          PatchGeneratorOutput(
+            localChanges = resourceLocalChanges,
+            generatedPatch = patch,
+          )
+        }
+      }
   }
 
   private fun mergeLocalChangesForSingleResource(localChanges: List<LocalChange>): Patch? {

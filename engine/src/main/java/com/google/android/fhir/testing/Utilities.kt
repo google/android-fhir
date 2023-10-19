@@ -110,7 +110,12 @@ object TestDataSourceImpl : DataSource {
     }
 
   override suspend fun upload(request: UploadRequest): Resource {
-    return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
+    return Bundle().apply {
+      type = Bundle.BundleType.TRANSACTIONRESPONSE
+      addEntry(
+        Bundle.BundleEntryComponent().apply { resource = Patient().apply { id = "123" } },
+      )
+    }
   }
 }
 
@@ -183,7 +188,7 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
+        payload = "{ 'resourceType' : '$type', 'id' : '$id' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now(),

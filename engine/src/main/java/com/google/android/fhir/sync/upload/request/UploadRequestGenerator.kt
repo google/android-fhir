@@ -16,14 +16,23 @@
 
 package com.google.android.fhir.sync.upload.request
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
-/** Generator that generates [UploadRequest]s from the [Patch]es */
+/**
+ * Generator that generates [UploadRequest]s from the [Patch]es present in the
+ * [List<[PatchGeneratorOutput]>]. Any implementation of this generator is expected to output
+ * [List<[UploadRequestGeneratorOutput]>] which maps [UploadRequest] to the corresponding
+ * [LocalChange]s it was generated from.
+ */
 internal interface UploadRequestGenerator {
-  /** Generates a list of [UploadRequest] from the [Patch]es */
-  fun generateUploadRequests(patches: List<Patch>): List<UploadRequest>
+  /** Generates a list of [UploadRequestGeneratorOutput] from the [PatchGeneratorOutput]s */
+  fun generateUploadRequests(
+    patches: List<PatchGeneratorOutput>,
+  ): List<UploadRequestGeneratorOutput>
 }
 
 /** Mode to decide the type of [UploadRequest] that needs to be generated */
@@ -53,3 +62,17 @@ internal object UploadRequestGeneratorFactory {
         )
     }
 }
+
+internal sealed class UploadRequestGeneratorOutput(
+  open val generatedRequest: UploadRequest,
+)
+
+internal data class UrlUploadRequestGeneratorOutput(
+  val localChanges: List<LocalChange>,
+  override val generatedRequest: UrlUploadRequest,
+) : UploadRequestGeneratorOutput(generatedRequest)
+
+internal data class BundleUploadRequestGeneratorOutput(
+  val splitLocalChanges: List<List<LocalChange>>,
+  override val generatedRequest: BundleUploadRequest,
+) : UploadRequestGeneratorOutput(generatedRequest)

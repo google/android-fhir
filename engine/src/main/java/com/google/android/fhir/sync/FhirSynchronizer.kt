@@ -44,13 +44,21 @@ private sealed class SyncResult {
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
+internal data class UploadConfiguration(
+  val uploader: Uploader,
+)
+
+internal class DownloadConfiguration(
+  val downloader: Downloader,
+  val conflictResolver: ConflictResolver,
+)
+
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
   context: Context,
   private val fhirEngine: FhirEngine,
-  private val uploader: Uploader,
-  private val downloader: Downloader,
-  private val conflictResolver: ConflictResolver,
+  private val uploadConfiguration: UploadConfiguration,
+  private val downloadConfiguration: DownloadConfiguration,
 ) {
 
   private val _syncState = MutableSharedFlow<SyncJobStatus>()
@@ -91,9 +99,9 @@ internal class FhirSynchronizer(
 
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver) {
+    fhirEngine.syncDownload(downloadConfiguration.conflictResolver) {
       flow {
-        downloader.download().collect {
+        downloadConfiguration.downloader.download().collect {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
@@ -119,7 +127,8 @@ internal class FhirSynchronizer(
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
-    fhirEngine.syncUpload(localChangesFetchMode, uploader::upload).collect { progress ->
+    fhirEngine.syncUpload(localChangesFetchMode, uploadConfiguration.uploader::upload).collect {
+      progress ->
       progress.uploadError?.let { exceptions.add(it) }
         ?: setSyncState(
           SyncJobStatus.InProgress(

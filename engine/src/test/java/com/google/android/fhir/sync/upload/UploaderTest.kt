@@ -20,6 +20,10 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.sync.upload.patch.PatchGeneratorFactory
+import com.google.android.fhir.sync.upload.patch.PatchGeneratorMode
+import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorFactory
+import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
 import com.google.android.fhir.testing.BundleDataSource
 import com.google.android.fhir.toLocalChange
 import com.google.common.truth.Truth.assertThat
@@ -41,19 +45,47 @@ import org.robolectric.RobolectricTestRunner
 class UploaderTest {
 
   @Test
-  fun `upload should succeed if response is transaction response`() = runTest {
+  fun `bundle upload should succeed if response is transaction response with correct size`() =
+    runTest {
+      val result =
+        Uploader(
+            BundleDataSource {
+              Bundle().apply {
+                type = Bundle.BundleType.TRANSACTIONRESPONSE
+                addEntry(
+                  Bundle.BundleEntryComponent().apply { resource = patient },
+                )
+              }
+            },
+            perResourcePatchGenerator,
+            bundleUploadRequestGenerator,
+          )
+          .upload(localChanges)
+
+      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
+      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(1) }
+      with(result.uploadResponses[0]) {
+        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(localChanges).hasSize(1)
+        assertThat(output).isInstanceOf(Patient::class.java)
+      }
+    }
+
+  @Test
+  fun `bundle upload should fail if bundle response has incorrect size`() = runTest {
     val result =
       Uploader(
           BundleDataSource { Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE } },
+          perResourcePatchGenerator,
+          bundleUploadRequestGenerator,
         )
         .upload(localChanges)
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-    with(result as UploadSyncResult.Success) { assertThat(resources).hasSize(1) }
+    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
 
   @Test
-  fun `upload should fail if response is operation outcome with issue`() = runBlocking {
+  fun `bundle upload should fail if response is operation outcome with issue`() = runBlocking {
     val result =
       Uploader(
           BundleDataSource {
@@ -67,6 +99,8 @@ class UploaderTest {
               )
             }
           },
+          perResourcePatchGenerator,
+          bundleUploadRequestGenerator,
         )
         .upload(localChanges)
 
@@ -74,10 +108,12 @@ class UploaderTest {
   }
 
   @Test
-  fun `upload should fail if response is empty operation outcome`() = runBlocking {
+  fun `bundle upload should fail if response is empty operation outcome`() = runBlocking {
     val result =
       Uploader(
           BundleDataSource { OperationOutcome() },
+          perResourcePatchGenerator,
+          bundleUploadRequestGenerator,
         )
         .upload(localChanges)
 
@@ -85,11 +121,13 @@ class UploaderTest {
   }
 
   @Test
-  fun `upload should fail if response is neither transaction response nor operation outcome`() =
+  fun `bundle upload should fail if response is neither transaction response nor operation outcome`() =
     runBlocking {
       val result =
         Uploader(
             BundleDataSource { Bundle().apply { type = Bundle.BundleType.SEARCHSET } },
+            perResourcePatchGenerator,
+            bundleUploadRequestGenerator,
           )
           .upload(localChanges)
 
@@ -97,10 +135,12 @@ class UploaderTest {
     }
 
   @Test
-  fun `upload should fail if there is connection exception`() = runBlocking {
+  fun `bundle upload should fail if there is connection exception`() = runBlocking {
     val result =
       Uploader(
           BundleDataSource { throw ConnectException("Failed to connect to server.") },
+          perResourcePatchGenerator,
+          bundleUploadRequestGenerator,
         )
         .upload(localChanges)
 
@@ -108,6 +148,22 @@ class UploaderTest {
   }
 
   companion object {
+    private val perResourcePatchGenerator =
+      PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource)
+    private val bundleUploadRequestGenerator =
+      UploadRequestGeneratorFactory.byMode(
+        UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
+      )
+    val patient =
+      Patient().apply {
+        id = "Patient-001"
+        addName(
+          HumanName().apply {
+            addGiven("John")
+            family = "Doe"
+          },
+        )
+      }
     val localChanges =
       listOf(
         LocalChangeEntity(
@@ -119,17 +175,7 @@ class UploaderTest {
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
                 .newJsonParser()
-                .encodeResourceToString(
-                  Patient().apply {
-                    id = "Patient-001"
-                    addName(
-                      HumanName().apply {
-                        addGiven("John")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                ),
+                .encodeResourceToString(patient),
             timestamp = Instant.now(),
           )
           .toLocalChange()
