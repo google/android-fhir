@@ -36,6 +36,7 @@ import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.sync.upload.request.BundleUploadRequest
 import com.google.android.fhir.sync.upload.request.UploadRequest
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.Instant
@@ -226,4 +227,15 @@ class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSou
 
   override suspend fun upload(request: UploadRequest) =
     onPostBundle((request as BundleUploadRequest).resource)
+}
+
+class UrlRequestDataSource(val onUrlRequestSend: suspend (UrlUploadRequest) -> Resource) :
+  DataSource {
+
+  override suspend fun download(downloadRequest: DownloadRequest): Resource {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun upload(request: UploadRequest) =
+    onUrlRequestSend((request as UrlUploadRequest))
 }

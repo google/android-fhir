@@ -28,6 +28,7 @@ import com.google.android.fhir.sync.upload.request.UrlUploadRequestGeneratorOutp
 import java.lang.IllegalStateException
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
+import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -117,7 +118,8 @@ internal class Uploader(
               FHIRException(response.issueFirstRep.diagnostics),
             ),
           )
-        response is DomainResource || response is Bundle ->
+        (response is DomainResource || response is Bundle) &&
+          (response !is IBaseOperationOutcome) ->
           handleUploadResponse(mappedUploadRequest, response)
         else ->
           UploadRequestResult.Failure(
