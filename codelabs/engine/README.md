@@ -190,7 +190,7 @@ outlined below will guide you through the process.
       accessible from the Android emulator. Learn
       [more](https://developer.android.com/studio/run/emulator-networking).
 
-1.  In the FhirApplication class, add the following line to lazily instantiate
+1.  In the `FhirApplication` class, add the following line to lazily instantiate
     the FHIR Engine: `kotlin private val fhirEngine: FhirEngine by lazy {
     FhirEngineProvider.getInstance(this) }` This ensures the FhirEngine instance
     is only created when it's accessed for the first time, not immediately when
