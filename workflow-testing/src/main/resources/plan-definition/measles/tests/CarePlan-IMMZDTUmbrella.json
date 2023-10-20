@@ -1,7 +1,56 @@
 {
   "resourceType": "CarePlan",
-  "id": "IMMZD2DTMeasles",
+  "id": "IMMZDTUmbrella",
   "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "IMMZDTUmbrella",
+      "instantiatesCanonical": [
+        "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZDTUmbrella|0.1.0"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "IMMZ-Patient-enadult-m"
+      },
+      "action": [
+        {
+          "title": "Check Immunizations",
+          "description": "Check immunization plan definitions to see what is required.",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/uv/cpg/CodeSystem/cpg-common-process-cs",
+                  "code": "dispense-medications"
+                }
+              ]
+            }
+          ],
+          "selectionBehavior": "all",
+          "action": [
+            {
+              "title": "Immunize patient for Measles",
+              "description": "Provide measles immunization",
+              "code": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/uv/cpg/CodeSystem/cpg-common-process-cs",
+                      "code": "dispense-medications"
+                    }
+                  ]
+                }
+              ],
+              "selectionBehavior": "all",
+              "resource": {
+                "reference": "RequestGroup/IMMZD2DTMeasles"
+              }
+            }
+          ]
+        }
+      ]
+    },
     {
       "resourceType": "RequestGroup",
       "id": "IMMZD2DTMeasles",
@@ -62,7 +111,7 @@
     }
   ],
   "instantiatesCanonical": [
-    "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles|0.1.0"
+    "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZDTUmbrella|0.1.0"
   ],
   "status": "draft",
   "intent": "proposal",
@@ -72,7 +121,7 @@
   "activity": [
     {
       "reference": {
-        "reference": "#RequestGroup/IMMZD2DTMeasles"
+        "reference": "#RequestGroup/IMMZDTUmbrella"
       }
     }
   ]

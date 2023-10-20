@@ -57,7 +57,10 @@ open class Loadable {
       val list =
         javaClass.classLoader?.getResource(name + "/contents.txt")
           ?: ClassLoader.getSystemResource(name + "/contents.txt")
-      retList.addAll(load(list.openStream()).split("\n"))
+      if (list != null) {
+          retList.addAll(load(list.openStream()).split("\n"))
+      }
+
     }
 
     return retList
