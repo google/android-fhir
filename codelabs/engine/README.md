@@ -301,7 +301,7 @@ based on specific criteria and uploading the updated data to your FHIR server.
 Specifically, we will swap the address cities for patients residing in
 `Wakefield` and `Taunton`.
 
-### **Step 1**: Set Up the Modification Logic in PatientListViewModel
+### **Step 1**: Set Up the modification logic in PatientListViewModel
 
 The code in this section is added to the `triggerUpdate` function in
 `PatientListViewModel`
