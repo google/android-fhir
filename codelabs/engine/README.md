@@ -426,7 +426,7 @@ To filter the results based on the provided name query, incorporate the
 following conditional code block:
 
 ```kotlin
-    viewModelScope.launch {
+viewModelScope.launch {
   val fhirEngine = FhirApplication.fhirEngine(getApplication())
   if (nameQuery.isNotEmpty()) {
     fhirEngine.search<Patient> {
