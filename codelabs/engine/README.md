@@ -390,7 +390,6 @@ The code in this section is added to the `triggerUpdate` function in
 
     ```kotlin
     triggerOneTimeSync()
-    }
     ```
 
     The closing brace `}` signifies the end of the coroutine launched at the
