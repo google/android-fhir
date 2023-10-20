@@ -32,6 +32,7 @@ import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 
 /** TODO(mjajoo@): Explore if applying PlanDefinition could be done in background. */
@@ -40,7 +41,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
-  private val taskManager = FhirApplication.taskManager(getApplication<Application>().applicationContext)
+  private val requestManager = FhirApplication.requestManager(getApplication<Application>().applicationContext)
   private lateinit var activeRequestResourceConfiguration: List<RequestResourceConfig>
   lateinit var currentPlanDefinitionId: String
   var currentStructureMapId: String = ""
@@ -121,6 +122,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     updateCarePlan: Boolean,
   ) {
     viewModelScope.launch {
+
       // val resourceType: ResourceType = when (requestResourceType) {
       //   "Task" -> ResourceType.Task
       //   "MedicationRequest" -> ResourceType.MedicationRequest
@@ -151,13 +153,18 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
         val task = taskSearch.first().resource
         patient =
           fhirEngine.get(task.`for`.reference.substring("Patient/".length))
-        // task.status = Task.TaskStatus.COMPLETED
-        // fhirEngine.update(task)
+        executeCareWorkflowForPatient(patient)
+
+        task.status = Task.TaskStatus.COMPLETED
+        fhirEngine.update(task)
       }
       else if (medicationRequestSearch.isNotEmpty()) {
         val medicationRequest = medicationRequestSearch.first().resource
         patient =
           fhirEngine.get(medicationRequest.subject.reference.substring("Patient/".length))
+        executeCareWorkflowForPatient(patient)
+
+        requestManager.updateIntent(IdType(medicationRequest.id).idPart, ResourceType.MedicationRequest.toString())
         // medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
         // fhirEngine.update(medicationRequest)
       }
@@ -171,7 +178,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
       //   updateCarePlan
       // )
 
-      executeCareWorkflowForPatient(patient)
+      // executeCareWorkflowForPatient(patient)
     }
   }
 
@@ -209,7 +216,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     for (implementationGuide in ConfigurationManager.careConfiguration?.supportedImplementationGuides!!) {
       val triggers = implementationGuide.implementationGuideConfig.triggers
       for (trigger in triggers)
-        if (trigger.event == currentQuestionnaireId)
+        if (trigger.event.contains(currentQuestionnaireId))
           currentStructureMapId = trigger.structureMap
     }
   }

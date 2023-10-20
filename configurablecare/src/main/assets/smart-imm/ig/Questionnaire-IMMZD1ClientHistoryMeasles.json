@@ -17,23 +17,6 @@
     "title" : "IMMZ.D1.DE10 ValueSet for HIV Status",
     "status" : "active",
     "description" : "ValueSet for HIV Status for IMMZ.D1.DE10.",
-    "expansion": {
-      "contains": [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE11",
-        "display" : "HIV-positive"
-      },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1",
-          "code" : "DE12",
-          "display" : "HIV-negative"
-        },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1",
-          "code" : "DE13",
-          "display" : "Unknown"
-        }]
-    },
     "compose" : {
       "include" : [{
         "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D1",
@@ -61,7 +44,7 @@
   "title" : "Capture Client History Questionnaire",
   "status" : "draft",
   "subjectType" : ["Patient"],
-  "date" : "2023-10-19T03:40:32+00:00",
+  "date" : "2023-10-19T17:13:41+00:00",
   "publisher" : "World Health Organization (WHO)",
   "contact" : [{
     "name" : "World Health Organization (WHO)",

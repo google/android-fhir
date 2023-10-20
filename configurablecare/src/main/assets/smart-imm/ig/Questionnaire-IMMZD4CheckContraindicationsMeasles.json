@@ -17,35 +17,6 @@
     "title" : "IMMZ.D4.DE161 ValueSet for Potential Contraindications",
     "status" : "active",
     "description" : "ValueSet for Potential Contraindications for IMMZ.D4.DE161.",
-    "expansion": {
-      "contains": [
-        {
-          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
-          "code": "DE162",
-          "display": "Currently pregnant"
-        },
-        {
-          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
-          "code": "DE165",
-          "display": "Severely immunosuppressed"
-        },
-        {
-          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
-          "code": "DE166",
-          "display": "History of anaphylactic reactions"
-        },
-        {
-          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
-          "code": "DE167",
-          "display": "Severe allergic reactions"
-        },
-        {
-          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
-          "code": "DE168",
-          "display": "Symptomatic HIV infection"
-        }
-      ]
-    },
     "compose" : {
       "include" : [{
         "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.D4",
@@ -81,7 +52,7 @@
   "title" : "Check Contraindications Questionnaire",
   "status" : "draft",
   "subjectType" : ["Patient"],
-  "date" : "2023-10-19T03:40:32+00:00",
+  "date" : "2023-10-19T17:13:41+00:00",
   "publisher" : "World Health Organization (WHO)",
   "contact" : [{
     "name" : "World Health Organization (WHO)",

@@ -108,6 +108,7 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     val measlesIg =
       async {
       NpmPackage.fromPackage(
+        // assets.open("smart-imm/ig/package.r4.tgz")
         assets.open("smart-imm/ig/package.r4.tgz")
       )
     }

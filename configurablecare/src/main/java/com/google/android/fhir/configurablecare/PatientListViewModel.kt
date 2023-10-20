@@ -41,8 +41,8 @@ import org.hl7.fhir.r4.model.Task
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
 
-  private val taskManager =
-    FhirApplication.taskManager(getApplication<Application>().applicationContext)
+  private val requestManager =
+    FhirApplication.requestManager(getApplication<Application>().applicationContext)
 
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
@@ -108,9 +108,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       .mapIndexed { index, fhirPatient ->
         fhirPatient.resource.toPatientItem(index + 1).apply {
           pendingTasksCount =
-            taskManager.getTasksCount(resourceId) {
-              filter(Task.STATUS, { value = of(getTaskStatus(0)) })
-            }!!
+            requestManager.getRequestsCount(resourceId, status = "draft")
         }
       }
       .sortedByDescending { it.pendingTasksCount }

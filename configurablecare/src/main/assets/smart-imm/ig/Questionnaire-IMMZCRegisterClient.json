@@ -37,28 +37,6 @@
           "display" : "Intersex"
         }]
       }]
-    },
-    "expansion": {
-      "contains": [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE6",
-        "display" : "Male"
-      },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE7",
-          "display" : "Female"
-        },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE8",
-          "display" : "Biological sex not specified"
-        },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE9",
-          "display" : "Intersex"
-        }]
     }
   }],
   "extension" : [{
@@ -70,7 +48,7 @@
   "title" : "Client Registration Questionnaire",
   "status" : "draft",
   "subjectType" : ["Patient"],
-  "date" : "2023-10-19T03:40:32+00:00",
+  "date" : "2023-10-19T17:13:41+00:00",
   "publisher" : "World Health Organization (WHO)",
   "contact" : [{
     "name" : "World Health Organization (WHO)",

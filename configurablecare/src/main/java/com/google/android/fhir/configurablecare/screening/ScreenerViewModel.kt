@@ -121,8 +121,8 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         val contextR4 =
           FhirApplication.contextR4(getApplication<FhirApplication>().applicationContext)
         if (contextR4 == null) {
-          _screenerState.value = null
           println("**** contextR4 not created yet")
+          _screenerState.value = null
           return@launch
         }
 
@@ -137,27 +137,32 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         val structureMap = fhirEngine.get<StructureMap>(IdType(structureMapId).idPart)
         val targetResource = Bundle()
 
+        questionnaireResponse.id = UUID.randomUUID().toString()
+        questionnaireResponse.subject = Reference("Patient/${IdType(patientId).idPart}")
+        println("QR before SM extraction: ${jsonParser.encodeResourceToString(questionnaireResponse)}")
+
+
+        val qr = readFileFromAssets("smart-imm/ig/QuestionnaireResponse-Example.IMMZ.D1.QuestionnaireResponse.1.json")
+
         val baseElement =
           jsonParser.parseResource(
-            QuestionnaireResponse::class.java, jsonParser.encodeResourceToString(questionnaireResponse))
-
-        println("QR: ${jsonParser.encodeResourceToString(baseElement)}")
+            QuestionnaireResponse::class.java, qr) // questionnaireResponse))
 
         structureMapUtilities.transform(contextR4, baseElement, structureMap, targetResource)
 
-        if (targetResource is Bundle) {
-          if (!targetResource.hasEntry()) {
-            _screenerState.value = null
-            return@launch
-          }
-        }
+        // if (targetResource is Bundle) {
+        //   if (!targetResource.hasEntry()) {
+        //     _screenerState.value = null
+        //     return@launch
+        //   }
+        // }
 
         if (targetResource is Bundle) {
-          val outputFil1e = File(getApplication<Application>().externalCacheDir, "bundle.json")
-          outputFil1e.writeText(
-            FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-              .encodeResourceToString(targetResource)
-          )
+          // val outputFile = File(getApplication<Application>().externalCacheDir, "bundle.json")
+          // outputFile.writeText(
+          //   FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+          //     .encodeResourceToString(targetResource)
+          // )
 
           var flag = false
           var savedReference = Reference()
@@ -170,14 +175,15 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             flag = true
             savedReference = Reference("${resource.resourceType}/${IdType(resource.id).idPart}")
           }
-          if (flag) {
+          if (true /*flag*/) {
+            fhirEngine.create(questionnaireResponse)
+
             _screenerState.value =
               ScreenerState(
                 isResourceSaved = true,
                 encountersCreated = listOf(savedReference)
               )
-          }
-          else {
+          } else {
             _screenerState.value = null
           }
         } else if (targetResource is Resource) {
@@ -186,7 +192,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
           fhirEngine.create(targetResource)
 
           questionnaireResponse.id = UUID.randomUUID().toString()
-          questionnaireResponse.subject = Reference("${targetResource.resourceType}/${IdType(targetResource.id).idPart}")
+          questionnaireResponse.subject = Reference("Patient/${IdType(patientId).idPart}")
           println("QR: ${jsonParser.encodeResourceToString(questionnaireResponse)}")
           fhirEngine.create(questionnaireResponse)
 
@@ -198,6 +204,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         }
       }
 
+    }
+  }
+
+  private fun readFileFromAssets(filename: String): String {
+    return getApplication<Application>().assets.open(filename).bufferedReader().use {
+      it.readText()
     }
   }
 

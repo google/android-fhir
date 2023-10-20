@@ -20,7 +20,7 @@
           {
             "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
             "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI",
-            "structureMap": "StructureMap/IMMZD4QRToResources"
+            "structureMap": ""
           }
         ],
         "entryPoint": "PlanDefinition/PlanImmunizationReview",

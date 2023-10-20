@@ -60,7 +60,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
       //     sort = { }
       //   )
       //   .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
-        taskManager.getAllRequestsForPatient(patientId)
+        requestManager.getAllRequestsForPatient(patientId, taskStatus)
           .mapIndexed { index, fhirTask ->
             if (fhirTask is Task) fhirTask.toTaskItem(index + 1)
             else if (fhirTask is MedicationRequest) fhirTask.toTaskItem(index + 1)
@@ -91,11 +91,9 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     // )
 
     val questionnaire = taskManager.fetchQuestionnaire(taskItem.fhirResourceId)
-    if (questionnaire == null) {
-      carePlanManager.installKnowledgeResources()
-    }
+
     // update request
-    requestManager.updateIntent(taskItem.resourceId, taskItem.resourceType)
+    // requestManager.updateIntent(taskItem.resourceId, taskItem.resourceType)
     iParser.encodeResourceToString(questionnaire)
   }
 

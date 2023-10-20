@@ -238,9 +238,9 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
   }
 
   /** Compute the number of Tasks for a given Patient */
-  suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)?): Int {
-    return extraFilter?.let { getAllRequestsForPatient(patientId).count() } ?: 0
-  }
+  // suspend fun getTasksCount(patientId: String, extraFilter: (Search.() -> Unit)?): Int {
+  //   return extraFilter?.let { getAllRequestsForPatient(patientId).count() } ?: 0
+  // }
 
   /** Create a new [Task] that can track the progress of a [ServiceRequest] */
   fun createTrackingTaskForServiceRequest(

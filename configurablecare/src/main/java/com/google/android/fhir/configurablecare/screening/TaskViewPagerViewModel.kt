@@ -33,21 +33,17 @@ class TaskViewPagerViewModel(application: Application, private val state: SavedS
   val liveCompletedTasksCount = MutableLiveData<Int>()
   val patientName = MutableLiveData<String>()
 
-  private val taskManager =
-    FhirApplication.taskManager(getApplication<Application>().applicationContext)
+  private val requestManager =
+    FhirApplication.requestManager(getApplication<Application>().applicationContext)
   private val fhirEngine =
     FhirApplication.fhirEngine(getApplication<Application>().applicationContext)
 
   fun getTasksCount(patientId: String) {
     viewModelScope.launch {
       livePendingTasksCount.value =
-        taskManager.getTasksCount(patientId) {
-          filter(Task.STATUS, { value = of(getTaskStatus(0)) })
-        }!!
+        requestManager.getRequestsCount(patientId, status = "draft")
       liveCompletedTasksCount.value =
-        taskManager.getTasksCount(patientId) {
-          filter(Task.STATUS, { value = of(getTaskStatus(1)) })
-        }!!
+        requestManager.getRequestsCount(patientId, status = "completed")
     }
   }
 

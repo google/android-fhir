@@ -1,0 +1,33 @@
+{
+  "version" : "0.1.0",
+  "tools-version" : 3,
+  "type" : "IG",
+  "date" : "20231019033906",
+  "license" : "CC0-1.0",
+  "canonical" : "http://smart.who.int/ig/smart-immunizations",
+  "notForPublication" : true,
+  "url" : "file:///usr/local/google/home/divyaramnath/smart-immunizations/output",
+  "title" : "WHO Immunization Implementation Guide",
+  "description" : "WHO Immunization Implementation Guide. (built Thu, Oct 19, 2023 03:39+0000+00:00)",
+  "fhirVersions" : ["4.0.1"],
+  "dependencies" : {
+    "hl7.fhir.r4.core" : "4.0.1",
+    "hl7.terminology.r4" : "5.3.0",
+    "hl7.fhir.uv.extensions.r4" : "1.0.0",
+    "hl7.fhir.uv.sdc" : "3.0.0",
+    "hl7.fhir.uv.cpg" : "current",
+    "hl7.fhir.us.cqfmeasures" : "current"
+  },
+  "author" : "World Health Organization (WHO)",
+  "maintainers" : [
+    {
+      "name" : "World Health Organization (WHO)",
+      "url" : "https://www.who.int"
+    }
+  ],
+  "directories" : {
+    "lib" : "package",
+    "example" : "example"
+  },
+  "name" : "who.fhir.immunization.r4"
+}

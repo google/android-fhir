@@ -3,6 +3,7 @@ package com.google.android.fhir.configurablecare.care
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.get
+import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
 import java.lang.StringBuilder
 import java.util.UUID
@@ -70,6 +71,7 @@ class RequestManager(
       }
       if (requestHandler.acceptProposedRequest(request)) {
         fhirEngine.create(request)
+        println(jsonParser.encodeResourceToString(request))
         resourceList.add(request)
       }
     }
@@ -104,21 +106,57 @@ class RequestManager(
     return requestList  // not a valid or supported request
   }
 
+  fun getMappedStatus(status: String, resourceType: SupportedRequestResources): String {
+    when (resourceType) {
+      SupportedRequestResources.TASK -> {
+        return when (status) {
+          "draft" -> TaskStatus.DRAFT.toCode().lowercase()
+          "active" -> TaskStatus.INPROGRESS.toCode().lowercase()
+          "completed" -> TaskStatus.COMPLETED.toCode().lowercase()
+          else -> ""
+        }
+      }
+
+      SupportedRequestResources.MEDICATIONREQUEST -> {
+        return when (status) {
+          "draft" -> MedicationRequestStatus.DRAFT.toCode().lowercase()
+          "active" -> MedicationRequestStatus.ACTIVE.toCode().lowercase()
+          "completed" -> MedicationRequestStatus.COMPLETED.toCode().lowercase()
+          else -> ""
+        }
+      }
+
+      SupportedRequestResources.SERVICEREQUEST -> {
+        return when (status) {
+          "draft" -> ServiceRequestStatus.DRAFT.toCode().lowercase()
+          "active" -> ServiceRequestStatus.ACTIVE.toCode().lowercase()
+          "completed" -> ServiceRequestStatus.COMPLETED.toCode().lowercase()
+          else -> ""
+        }
+      }
+      else -> return ""
+    }
+  }
+
   suspend fun getAllRequestsForPatient(
     patientId: String,
     status: String = "",
     intent: String = ""
   ): List<Resource> {
     val requestList: MutableList<Resource> = mutableListOf()
-    for (requestResourceType in TaskManager.Companion.SupportedRequestResources.values()) {
+    for (requestResourceType in SupportedRequestResources.values()) {
       val xFhirQueryBuilder = StringBuilder()
       xFhirQueryBuilder.append("${requestResourceType.value.toCode()}?subject=Patient/$patientId")
       if (status.isNotEmpty()) {
-        xFhirQueryBuilder.append("&status=$status")
+        val mappedStatus = getMappedStatus(status, requestResourceType)
+        if (mappedStatus.isNotEmpty()) {
+          xFhirQueryBuilder.append("&status=$status")
+        }
       }
       if (intent.isNotEmpty()) {
         xFhirQueryBuilder.append("&intent=$intent")
       }
+      println("get all requests: $xFhirQueryBuilder")
       val searchList = fhirEngine.search(xFhirQueryBuilder.toString())
       for (item in searchList) {
         requestList.add(item.resource)
@@ -255,6 +293,10 @@ requestApi.endPlan(Request inputPlan)
     }
   }
 
+  suspend fun getRequestsCount(patientId: String, status: String = "", intent: String = ""): Int {
+    return let { getAllRequestsForPatient(patientId, status = status, intent = intent).count() }
+  }
+
   suspend fun updateIntent(resourceId: String, resourceType: String) {
     val request = when (resourceType) {
       "MedicationRequest" -> fhirEngine.get<MedicationRequest>(resourceId)
@@ -270,6 +312,11 @@ requestApi.endPlan(Request inputPlan)
       else if (request.intent == MedicationRequestIntent.PLAN) {
         endPlan(request)
       }
+    }
+
+    if (request is Task) {
+      request.status = TaskStatus.COMPLETED
+      fhirEngine.update(request)
     }
   }
 
