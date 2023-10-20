@@ -1,0 +1,1369 @@
+{
+  "resourceType": "PlanDefinition",
+  "id": "opioidcds-10-patient-view",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-recommendationdefinition",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-publishableplandefinition"
+    ]
+  },
+  "contained": [
+    {
+      "resourceType": "Library",
+      "id": "effective-data-requirements",
+      "status": "active",
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/library-type",
+            "code": "module-definition"
+          }
+        ]
+      },
+      "relatedArtifact": [
+        {
+          "type": "depends-on",
+          "display": "Library Common",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSCommon|2022.1.0"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library Routines",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSRoutines|2022.1.0"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library Rec10Common",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSREC10Common|2022.1.0"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library Routines",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSRoutines|2022.1.0"
+        },
+        {
+          "type": "depends-on",
+          "display": "Library FHIRHelpers",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/Library/FHIRHelpers|4.0.1"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Encounter Diagnosis Condition Category",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-encounter-diagnosis-category"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Problem List Condition Category",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-problem-list-category"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set US Core Health Concern Condition Category",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-us-core-health-concern-category"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Limited life expectancy conditions",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/limited-life-expectancy-conditions"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Active Condition",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-clinical-status-active"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Therapies indicating end of life care",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/therapies-indicating-end-of-life-care"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Observation Category Laboratory",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Non-opioid drug urine screening",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/non-opioid-drug-urine-screening"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Cocaine Urine Tests",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/cocaine-urine-drug-screening-tests"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set PCP Urine Tests",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/phencyclidine-urine-drug-screening-tests"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Conditions likely terminal for opioid prescribing",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/conditions-likely-terminal-for-opioid-prescribing"
+        },
+        {
+          "type": "depends-on",
+          "display": "Value set Hospice Procedure Codes",
+          "resource": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/hospice-procedure"
+        }
+      ],
+      "parameter": [
+        {
+          "name": "Is Perform Drug Screen Recommendation Applicable?",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "boolean"
+        },
+        {
+          "name": "Summary",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "Detail",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "Indicator",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "string"
+        },
+        {
+          "name": "Applicable Because of Positive Cocaine or PCP or Opiates",
+          "use": "out",
+          "min": 0,
+          "max": "1",
+          "type": "boolean"
+        }
+      ],
+      "dataRequirement": [
+        {
+          "type": "Condition",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Condition"
+          ],
+          "mustSupport": [
+            "category"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-encounter-diagnosis-category"
+            }
+          ]
+        },
+        {
+          "type": "Condition",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Condition"
+          ],
+          "mustSupport": [
+            "category"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-problem-list-category"
+            }
+          ]
+        },
+        {
+          "type": "Condition",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Condition"
+          ],
+          "mustSupport": [
+            "category"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/condition-us-core-health-concern-category"
+            }
+          ]
+        },
+        {
+          "type": "ServiceRequest",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+          ]
+        },
+        {
+          "type": "ServiceRequest",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+          ],
+          "mustSupport": [
+            "status",
+            "intent",
+            "authoredOn",
+            "code"
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Procedure",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Procedure"
+          ],
+          "mustSupport": [
+            "code",
+            "status",
+            "status.value"
+          ],
+          "codeFilter": [
+            {
+              "path": "code",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/hospice-procedure"
+            }
+          ]
+        },
+        {
+          "type": "ServiceRequest",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+          ],
+          "mustSupport": [
+            "code",
+            "status",
+            "status.value"
+          ]
+        },
+        {
+          "type": "Encounter",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Encounter"
+          ],
+          "mustSupport": [
+            "period",
+            "period.start",
+            "status",
+            "status.value"
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        },
+        {
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/Observation"
+          ],
+          "mustSupport": [
+            "category",
+            "code"
+          ],
+          "codeFilter": [
+            {
+              "path": "category",
+              "valueSet": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/observation-category-laboratory"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "shareable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "publishable"
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "Active Ambulatory Opioid Rx"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Active Ambulatory Opioid Rx\":\n    if Config.\"Can the implementing EHR support queries for past medications by date range?\" then\n      (\n        \"Get MedicationRequest Medication as Code\"(\"Get Active Ambulatory Medication Requests\"([MedicationRequest]))\n      ) Rx\n        where date from Rx.authoredOn 2 years or less on or before Today()\n          and Rx.medication in \"Opioid analgesics with ambulatory misuse potential\"\n    else\n        List<FHIR.MedicationRequest>{}"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 0
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Chronic Pain Opioid Analgesic with Ambulatory Misuse Potential Prescriptions"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Chronic Pain Opioid Analgesic with Ambulatory Misuse Potential Prescriptions\":\n  Common.\"Active Ambulatory Opioid Rx\" AmbulatoryOpioidPrescription\n    where Routines.\"Is Subacute or Chronic Pain Prescription?\"(AmbulatoryOpioidPrescription)"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 1
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Patient Is Being Prescribed Opioid Analgesic with Ambulatory Misuse Potential"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Patient Is Being Prescribed Opioid Analgesic with Ambulatory Misuse Potential\":\n  exists (\"Chronic Pain Opioid Analgesic with Ambulatory Misuse Potential Prescriptions\")"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 2
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Patient Age Less Than 18"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Patient Age Less Than 18\":\n  if (Config.\"Age Less than 18 Years Is Enabled\") then\n    AgeInYearsAt(Today()) < 18\n  else\n    false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 3
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Condition Positive for Sickle Cell"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Condition Positive for Sickle Cell\":\n      if (Config.\"Sickle Cell Check Enabled\") then\n        exists(\n            Common.\"Positive Sickle Cell Condition\"\n        )  else\n        false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 4
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "US Core-Categorized Conditions"
+        },
+        {
+          "url": "statement",
+          "valueString": "// 3. Medications indicating end of life\n    /* or exists (\n      \"Medications Indicating End of Life\"\n    ) */\ndefine \"US Core-Categorized Conditions\":\n  [Condition: category in \"Encounter Diagnosis Condition Category\"]\n    union [Condition: category in \"Problem List Condition Category\"]\n    union [Condition: category in \"US Core Health Concern Condition Category\"]"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 5
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Conditions Indicating End Of Life Present"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Conditions Indicating End Of Life Present\":\n  exists (\n    Common.\"US Core-Categorized Conditions\" LLEC\n      where LLEC.code in Common.\"Limited life expectancy conditions\"\n        and LLEC.clinicalStatus in Common.\"Active Condition\"\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 6
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "Service Requests"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Service Requests\":\n   [ServiceRequest] SR\n    return SR"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 7
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Palliative Care Lookback Period"
+        },
+        {
+          "url": "statement",
+          "valueString": "/*\n**  Routine #1\n**  Opioid Review Useful Routine\n**\n**  Definition              | Answer to Proceed   | Details                                      | Data (Terminology) Requirement\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Age < 18 years?         | No                  | Calculate age from date of birth; exclude    | Date of birth\n**                          |                     | patients with age less than 18 years at the  |\n**                          |                     | time of the prescription                     |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Evidence of             | No                  | Look for documented findings consistent      | Sickle cell disease conditions\n**  sickle cell disease?    |                     | with those listed in the sickle cell         |\n**                          |                     | value set                                    |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Limited life            | No                  | Look for documented findings consistent      | Limited life expectancy conditions\n**  expectancy conditions   |                     | with those listed in the limited life        |\n**  present?                |                     | expectancy value set (terminal illness, bad  |\n**                          |                     | prognosis, pre-terminal)                     |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Order for therapies     | No                  | Look for patients with an existing order for | Therapies indicating end of life care\n**  indicating end of life  |                     | therapies indicating end of life care        |\n**  care in past 90 days?   |                     | written within past 90 days                  |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Active cancer           | No                  | See sub-routine 3                            | See sub-routine 3\n**  treatment?              |                     |                                              |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**  Conditions Likely       | No                  | Look for patients with active conditions in  | Conditions likely terminal for opioid\n**  Terminal for opioid     |                     | the value set end-of-life-conditions         | prescribing\n**  prescribing present?    |                     |                                              |\n**  ------------------------------------------------------------------------------------------------------------------------------------\n**\n*/\ndefine \"Palliative Care Lookback Period\":\n  Interval[Today() - 90 days, Today()]"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 8
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Order For Palliative Care In Past 90 Days"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Order For Palliative Care In Past 90 Days\":\n  exists (\n    Common.\"Service Requests\" SR\n    where SR.status in { 'active', 'completed'}\n      and SR.intent in {'proposal', 'plan,', 'directive', 'order', 'original-order', 'reflex-order', 'filler-order', 'instance-order'}\n      and FHIRHelpers.ToDateTime(SR.authoredOn) during day of \"Palliative Care Lookback Period\"\n      and SR.code in Common.\"Therapies indicating end of life care\"\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 9
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Is Active Cancer Treatment?"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Is Active Cancer Treatment?\":\n  if (Config.\"Active Cancer Treatment Encounters Condition Is Enabled\") then\n      \"Has Two or More Encounters with Cancer Diagnosis During Encounter Period\"\n    else\n      false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 10
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Conditions Including Cancer To Exclude Opioid Management Indicating End-Stage Disease Present"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Conditions Including Cancer To Exclude Opioid Management Indicating End-Stage Disease Present\":\n  if (Config.\"End-Stage Disease Criteria Enabled\") then\n    exists (\n      Common.\"US Core-Categorized Conditions\" EOLC\n        where EOLC.code in Common.\"Conditions likely terminal for opioid prescribing\"\n          and EOLC.clinicalStatus in Common.\"Active Condition\"\n    )\n  else\n    false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 11
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSRoutines"
+        },
+        {
+          "url": "name",
+          "valueString": "Is Opioid Review Useful?"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Is Opioid Review Useful?\":\n  not \"Patient Age Less Than 18\"\n    and not \"Condition Positive for Sickle Cell\"\n    and not \"Conditions Indicating End Of Life Present\"\n    and not \"Order For Palliative Care In Past 90 Days\"\n    and not \"Is Active Cancer Treatment?\"\n    and not \"Conditions Including Cancer To Exclude Opioid Management Indicating End-Stage Disease Present\""
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 12
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Lookback Year"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Lookback Year\":\n  Interval[Today() - 12 months - 1 days, Today() - 1 day]"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 13
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Laboratory Observations"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Laboratory Observations\":\n  [Observation: \"category\" in Common.\"Observation Category Laboratory\"]"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 14
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Non-opioid Screenings"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Non-opioid Screenings\":\n  GetRelevantScreenings(\"Laboratory Observations\" LabObservations\n    where (LabObservations.code in Common.\"Non-opioid drug urine screening\")\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 15
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Cocaine Screenings"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Cocaine Screenings\":\n  GetRelevantScreenings(\"Laboratory Observations\" LabObservations\n    where (LabObservations.code in Common.\"Cocaine Urine Tests\")\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 16
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "PCP Screenings"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"PCP Screenings\":\n  GetRelevantScreenings(\"Laboratory Observations\" LabObservations\n    where (LabObservations.code in Common.\"PCP Urine Tests\")\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 17
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Patient had Urine Screening in Last 12 Months"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Patient had Urine Screening in Last 12 Months\":\n  (\n    exists (\"Non-opioid Screenings\")\n    or exists (\"Cocaine Screenings\")\n    or exists (\"PCP Screenings\")\n  )\n  or\n    if Config.\"Opiate Urine Screening Check Enabled\" then\n      exists (\"Opiate Screenings\")\n    else\n      false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 18
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Inclusion Criteria"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Inclusion Criteria\":\n  Routines.\"Is Opioid Review Useful?\"\n  and (not \"Patient had Urine Screening in Last 12 Months\")"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 19
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "Conditions Indicating End of Life or With Limited Life Expectancy"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Conditions Indicating End of Life or With Limited Life Expectancy\":\n  (\n    \"US Core-Categorized Conditions\" C\n      where C.code in \"Conditions likely terminal for opioid prescribing\"\n        and C.clinicalStatus in \"Active Condition\"\n  )\n  union\n  (\n    \"US Core-Categorized Conditions\" C\n      where C.code in \"Limited life expectancy conditions\"\n        and C.clinicalStatus in \"Active Condition\"\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 20
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "Admitted/Referred/Discharged to Hospice Care"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Admitted/Referred/Discharged to Hospice Care\":\n  (\n    [Procedure: code in \"Hospice Procedure Codes\"] P\n      where P.status.value in { 'in-progress', 'completed' }\n  )\n  union\n  (\n    \"Service Requests\" SR\n      where SR.code in \"Hospice Procedure Codes\"\n        and SR.status.value in { 'active', 'completed' }\n  )\n  union\n  (\n    if (Config.\"Hospice Findings Exclusion Enabled\") then\n      [Observation: code in \"Hospice Finding Codes\"] O\n        where not (O.status.value in { 'unknown', 'entered-in-error', 'cancelled' })\n    else\n      {}\n  )\n  union\n  (\n    [Encounter] E\n      where date from E.period.start 1 year or less on or before Today()\n        and (\n          if E.hospitalization.dischargeDisposition.coding is null\n              or not exists (E.hospitalization.dischargeDisposition.coding)\n            then false\n          else E.hospitalization.dischargeDisposition in \"Hospice Disposition\"\n        )\n        and E.status.value in { 'planned', 'arrived', 'in-progress', 'finished', 'onleave' }\n  )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 21
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSCommon"
+        },
+        {
+          "url": "name",
+          "valueString": "End of Life Assessment"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"End of Life Assessment\":\n    // 1. Conditions indicating end of life or with limited life expectancy\n    exists (\n      \"Conditions Indicating End of Life or With Limited Life Expectancy\"\n    )\n    // 2. Admitted/referred/discharged to hospice care\n    or exists (\n      \"Admitted/Referred/Discharged to Hospice Care\"\n    )"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 22
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Exclusion Criteria"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Exclusion Criteria\":\n  Common.\"End of Life Assessment\""
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 23
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Is Perform Drug Screen Recommendation Applicable?"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Is Perform Drug Screen Recommendation Applicable?\":\n  \"Patient Is Being Prescribed Opioid Analgesic with Ambulatory Misuse Potential\"\n    and Rec10Common.\"Inclusion Criteria\"\n    and not Rec10Common.\"Exclusion Criteria\""
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 24
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Summary"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Summary\":\n  Rec10Common.\"Get Summary\" (\"Is Perform Drug Screen Recommendation Applicable?\")"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 25
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Detail"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Detail\":\n  Rec10Common.\"Get Detail\" (\"Is Perform Drug Screen Recommendation Applicable?\")"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 26
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Indicator"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Indicator\":\n  'warning'"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 27
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Indicator"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Indicator\":\n  Rec10Common.\"Indicator\""
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 28
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10Common"
+        },
+        {
+          "url": "name",
+          "valueString": "Applicable Because of Positive Cocaine or PCP or Opiates"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Applicable Because of Positive Cocaine or PCP or Opiates\":\n  if exists (Common.\"Opioid Other Than Synthetic Ordered In Last 12 Months\") then\n    \"Has Positive Screening for Cocaine in Last 12 Months\"\n    or \"Has Positive Screening for PCP in Last 12 Months\"\n  else\n    \"Has Positive Screening for Cocaine in Last 12 Months\"\n      or \"Has Positive Screening for PCP in Last 12 Months\"\n      or\n        if Config.\"Opiate Urine Screening Check Enabled\" then\n          \"Has Positive Screening for Opiates in Last 12 Months\"\n        else false"
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 29
+        }
+      ]
+    },
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-logicDefinition",
+      "extension": [
+        {
+          "url": "libraryName",
+          "valueString": "OpioidCDSREC10PatientView"
+        },
+        {
+          "url": "name",
+          "valueString": "Applicable Because of Positive Cocaine or PCP or Opiates"
+        },
+        {
+          "url": "statement",
+          "valueString": "define \"Applicable Because of Positive Cocaine or PCP or Opiates\":\n  Rec10Common.\"Applicable Because of Positive Cocaine or PCP or Opiates\""
+        },
+        {
+          "url": "displaySequence",
+          "valueInteger": 30
+        }
+      ]
+    },
+    {
+      "id": "effective-data-requirements",
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-effectiveDataRequirements",
+      "valueReference": {
+        "reference": "#effective-data-requirements"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/opioidcds-10-patient-view",
+  "identifier": [
+    {
+      "use": "official",
+      "value": "cdc-opioid-guidance"
+    }
+  ],
+  "version": "2022.1.0",
+  "name": "PlanDefinition_Recommendation_10_Patient_View",
+  "title": "PlanDefinition - CDC Opioid Prescribing Guideline Recommendation #10 (patient-view)",
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/plan-definition-type",
+        "code": "eca-rule",
+        "display": "ECA Rule"
+      }
+    ]
+  },
+  "status": "draft",
+  "experimental": true,
+  "date": "2022-11-28",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "When prescribing opioids for subacute or chronic pain, providers should use urine drug testing before starting opioid therapy and consider urine drug testing at least annually to assess for prescribed medications as well as other controlled prescription drugs and illicit drugs.",
+  "useContext": [
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "182888003",
+            "display": "Medication requested (situation)"
+          }
+        ]
+      }
+    },
+    {
+      "code": {
+        "system": "http://terminology.hl7.org/CodeSystem/usage-context-type",
+        "code": "focus",
+        "display": "Clinical Focus"
+      },
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "82423001",
+            "display": "Chronic pain (finding)"
+          }
+        ]
+      }
+    }
+  ],
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US",
+          "display": "United States of America"
+        }
+      ]
+    }
+  ],
+  "purpose": "CDC's Guideline for Prescribing Opioids for Subacute or Chronic Pain is intended to improve communication between providers and patients about the risks and benefits of opioid therapy for chronic pain, improve the safety and effectiveness of pain treatment, and reduce the risks associated with long-term opioid therapy, including opioid use disorder and overdose. The Guideline is not intended for patients who are in active cancer treatment, palliative care, or end-of-life care.",
+  "usage": "Providers should be aware if patients are taking other prescription drugs or illicit drugs that might increase their risk of an overdose.",
+  "copyright": "© CDC 2016+.",
+  "topic": [
+    {
+      "text": "Opioid Prescribing"
+    }
+  ],
+  "author": [
+    {
+      "name": "Kensaku Kawamoto, MD, PhD, MHS"
+    },
+    {
+      "name": "Bryn Rhodes"
+    },
+    {
+      "name": "Floyd Eisenberg, MD, MPH"
+    },
+    {
+      "name": "Robert McClure, MD, MPH"
+    }
+  ],
+  "library": [
+    "http://fhir.org/guides/cdc/opioid-cds/Library/OpioidCDSREC10PatientView"
+  ],
+  "action": [
+    {
+      "prefix": "Order Urine Screening",
+      "title": "Annual Urine Screening Check",
+      "description": "Patient has not had a urine screening in the past 12 months",
+      "documentation": [
+        {
+          "type": "documentation",
+          "display": "CDC guideline for prescribing opioids for chronic pain",
+          "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids",
+          "document": {
+            "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids"
+          }
+        },
+        {
+          "type": "documentation",
+          "document": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/cqf-strengthOfRecommendation",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/recommendation-strength",
+                      "code": "weak",
+                      "display": "Weak"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/evidence-quality",
+                      "code": "very-low",
+                      "display": "Very Low quality"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "trigger": [
+        {
+          "type": "named-event",
+          "name": "patient-view"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "description": "Patient has not had a urine screening in the past 12 months",
+            "language": "text/cql.identifier",
+            "expression": "Is Perform Drug Screen Recommendation Applicable?"
+          }
+        }
+      ],
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/action-type",
+            "code": "create",
+            "display": "Create"
+          }
+        ]
+      },
+      "definitionCanonical": "http://fhir.org/guides/cdc/opioid-cds/ActivityDefinition/opioidcds-urine-screening-request",
+      "dynamicValue": [
+        {
+          "path": "action.description",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Detail"
+          }
+        },
+        {
+          "path": "action.title",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Summary"
+          }
+        },
+        {
+          "path": "action.extension",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Indicator"
+          }
+        },
+        {
+          "path": "priority",
+          "expression": {
+            "language": "text/cql.expression",
+            "expression": "RequestPriority { value: 'urgent' }"
+          }
+        }
+      ],
+      "action": [
+        {
+          "description": "Will perform urine screening"
+        },
+        {
+          "description": "Not for chronic pain management. Snooze 3 months"
+        },
+        {
+          "description": "N/A - see comment, snooze 3 months"
+        }
+      ]
+    },
+    {
+      "prefix": "1.",
+      "title": "Tested Positive for Cocaine, Opiates, or PCP",
+      "description": "Urine screening showed positive for cocaine, opiates or PCP",
+      "documentation": [
+        {
+          "type": "documentation",
+          "display": "CDC guideline for prescribing opioids for chronic pain",
+          "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids",
+          "document": {
+            "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids"
+          }
+        },
+        {
+          "type": "documentation",
+          "document": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/cqf-strengthOfRecommendation",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/recommendation-strength",
+                      "code": "weak",
+                      "display": "Weak"
+                    }
+                  ]
+                }
+              },
+              {
+                "url": "http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence",
+                "valueCodeableConcept": {
+                  "coding": [
+                    {
+                      "system": "http://terminology.hl7.org/CodeSystem/evidence-quality",
+                      "code": "very-low",
+                      "display": "Very Low quality"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "trigger": [
+        {
+          "type": "named-event",
+          "name": "patient-view"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "description": "Urine screening tested positive for cocaine, opiates or PCP",
+            "language": "text/cql.identifier",
+            "expression": "Applicable Because of Positive Cocaine or PCP or Opiates"
+          }
+        }
+      ],
+      "type": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/action-type",
+            "code": "create",
+            "display": "Create"
+          }
+        ]
+      },
+      "definitionCanonical": "http://fhir.org/guides/cdc/opioid-cds/ActivityDefinition/opioidcds-urine-screening-request",
+      "dynamicValue": [
+        {
+          "path": "action.description",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Detail"
+          }
+        },
+        {
+          "path": "action.title",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Summary"
+          }
+        },
+        {
+          "path": "action.extension",
+          "expression": {
+            "language": "text/cql.identifier",
+            "expression": "Indicator"
+          }
+        },
+        {
+          "path": "priority",
+          "expression": {
+            "language": "text/cql.expression",
+            "expression": "RequestPriority { value: 'urgent' }"
+          }
+        }
+      ],
+      "action": [
+        {
+          "description": "Will repeat urine drug screen more frequently"
+        },
+        {
+          "description": "Will assess patient for substance abuse disorder"
+        },
+        {
+          "description": "Will access CDS quality improvement and care coordination for prescribing opioids for chronic pain https://www.cdc.gov/drugoverdose/pdf/prescribing/CDC-DUIP-QualityImprovementAndCareCoordination-508.pdf"
+        }
+      ]
+    }
+  ]
+}

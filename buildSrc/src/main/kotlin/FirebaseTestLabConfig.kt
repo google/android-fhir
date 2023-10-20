@@ -33,7 +33,6 @@ fun Project.configureFirebaseTestLabForLibraries() {
         "clearPackageData" to "true",
       ),
     )
-    flakyTestAttempts.set(3)
     devices.set(
       listOf(
         mapOf(
@@ -43,7 +42,7 @@ fun Project.configureFirebaseTestLabForLibraries() {
           "locale" to "en_US",
         ),
         mapOf(
-          "model" to "panther",
+          "model" to "MediumPhone.arm",
           "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
           "locale" to "en_US",
         ),
@@ -64,8 +63,6 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
         "clearPackageData" to "true",
       ),
     )
-    // some of the benchmark tests get timed-out in the default 15m
-    testTimeout.set("45m")
     devices.set(
       listOf(
         mapOf(
@@ -86,7 +83,9 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
     },
   )
   useOrchestrator.set(true)
-  maxTestShards.set(20)
+  flakyTestAttempts.set(1)
+  maxTestShards.set(10)
+  testTimeout.set("45m")
   directoriesToPull.set(listOf("/sdcard/Download"))
   resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(

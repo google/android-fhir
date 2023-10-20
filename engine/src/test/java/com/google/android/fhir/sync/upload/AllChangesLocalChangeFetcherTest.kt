@@ -64,18 +64,18 @@ class AllChangesLocalChangeFetcherTest {
   @Test
   fun `getProgress when all local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1, TEST_PATIENT_2))
-    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(0, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(SyncUploadProgress(0, 2))
   }
 
   @Test
   fun `getProgress when half the local changes are removed`() = runTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
-    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(1, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(SyncUploadProgress(1, 2))
   }
 
   @Test
   fun `getProgress when none of the local changes are removed`() = runTest {
-    assertThat(fetcher.getProgress()).isEqualTo(FetchProgress(2, 2))
+    assertThat(fetcher.getProgress()).isEqualTo(SyncUploadProgress(2, 2))
   }
 
   companion object {

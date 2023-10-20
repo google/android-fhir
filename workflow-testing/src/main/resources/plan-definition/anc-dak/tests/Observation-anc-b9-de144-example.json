@@ -1,0 +1,46 @@
+{
+  "resourceType": "Observation",
+  "id": "anc-b9-de144-example",
+  "meta": {
+    "profile": [
+      "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-b9-de144"
+    ]
+  },
+  "identifier": [
+    {
+      "use": "official",
+      "system": "http://example.org/fhir/NamingSystem/identifiers",
+      "value": "anc-b9-de144-example"
+    }
+  ],
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B9.DE144",
+        "display": "Urine dipstick result - protein"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/5946f880-b197-400b-9caa-a3c661d23041"
+  },
+  "encounter": {
+    "reference": "Encounter/helloworld-patient-1-encounter-1"
+  },
+  "performer": [
+    {
+      "reference": "PractitionerRole/anc-practitionerrole-example"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B9.DE146",
+        "display": "+"
+      }
+    ]
+  }
+}

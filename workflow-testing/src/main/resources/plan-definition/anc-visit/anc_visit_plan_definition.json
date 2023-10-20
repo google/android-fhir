@@ -1,0 +1,110 @@
+{
+  "resourceType": "Bundle",
+  "type": "transaction",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "PlanDefinition",
+        "id": "AncVisit-PlanDefinition",
+        "url": "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/AncVisit-PlanDefinition",
+        "contained": [
+          {
+            "resourceType": "ActivityDefinition",
+            "id": "careplan-activity",
+            "url": "ActivityDefinition/careplan-activity",
+            "title": "ANC Follow Up Plan",
+            "status": "active",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://example.org/CodeSystem/encounter-type",
+                  "code": "pregnant_monthly_visit",
+                  "display": "Pregnant (ANC) Monthly Routine visit"
+                }
+              ],
+              "text": "Pregnant (ANC) Monthly Routine visit"
+            },
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/targetStatus",
+                "valueString": "ready"
+              }
+            ],
+            "description": "This action will performed every month for a pregnant woman",
+            "kind": "Task",
+            "timingTiming": {
+              "repeat": {
+                "countMax": 8,
+                "duration": 2,
+                "durationMax": 4,
+                "durationUnit": "h",
+                "frequency": 1,
+                "frequencyMax": 1,
+                "period": 1,
+                "periodMax": 1,
+                "periodUnit": "mo"
+              }
+            }
+          }
+        ],
+        "name": "ANC Follow Up Plan",
+        "title": "ANC Follow Up Plan",
+        "status": "active",
+        "description": "This defines the schedule of care for pregnant women",
+        "goal": [
+          {
+            "category": {
+              "coding": [
+                {
+                  "system": "https://www.hl7.org/fhir/codesystem-goal-category.html",
+                  "code": "nursing",
+                  "display": "Nursing"
+                }
+              ]
+            },
+            "priority": {
+              "coding": [
+                {
+                  "system": "https://www.hl7.org/fhir/codesystem-goal-priority.html",
+                  "code": "high-priority",
+                  "display": "High Priority"
+                }
+              ]
+            },
+            "start": {
+              "coding": [
+                {
+                  "system": "http://www.snomed.org/",
+                  "code": "32485007",
+                  "display": "Admission to hospital"
+                }
+              ]
+            }
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "code": "clinical-protocol",
+              "system": "http://hl7.org/fhir/ValueSet/plan-definition-type"
+            }
+          ]
+        },
+        "action": [
+          {
+            "priority": "routine",
+            "type": {
+              "coding": [
+                {
+                  "code": "clinical-protocol",
+                  "display": "Clinical Protocol"
+                }
+              ]
+            },
+            "definitionCanonical": "#careplan-activity"
+          }
+        ]
+      }
+    }
+  ]
+}
