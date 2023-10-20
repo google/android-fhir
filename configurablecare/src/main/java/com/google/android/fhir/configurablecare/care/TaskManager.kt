@@ -247,7 +247,7 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
     serviceRequest: ServiceRequest,
     subjectReference: Reference,
     description: String?,
-    requestResourceConfig: RequestResourceConfig
+    requestConfiguration: RequestConfiguration
   ): Task {
     val task = Task()
     task.owner = serviceRequest.requester
@@ -258,8 +258,8 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
     task.intent = Task.TaskIntent.ORDER
     task.lastModified = Date.from(Instant.now())
 
-    task.restriction.period.end =
-      setDeadline(requestResourceConfig.maxDuration, requestResourceConfig.unit)
+    // task.restriction.period.end =
+    //   setDeadline(requestResourceConfig.maxDuration, requestResourceConfig.unit)
 
     return task
   }

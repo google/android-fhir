@@ -7,6 +7,8 @@ import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
 import java.lang.StringBuilder
 import java.util.UUID
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestStatus
 import org.hl7.fhir.r4.model.Enumerations.RequestResourceType
@@ -274,8 +276,40 @@ requestApi.endPlan(Request inputPlan)
     commit"
 
    */
+  suspend fun beginProposal(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>) {
+    if (medicationRequest.status == MedicationRequestStatus.DRAFT) {
+      medicationRequest.status = MedicationRequestStatus.ACTIVE
 
-  private suspend fun beginPlan(medicationRequest: MedicationRequest) {
+      val intentConfig = CarePlanManager.getNextActionForMedicationRequest(
+        medicationRequest,
+        requestConfiguration
+      )
+
+      if (intentConfig != null) {
+        if (intentConfig.action == "begin-plan") {
+          if (intentConfig.condition != "automatic") {
+            medicationRequest.addSupportingInformation(Reference(intentConfig.condition))
+          } else { // automatic transition from proposal to plan
+            beginPlan(medicationRequest, requestConfiguration, "Auto-acceptance of proposal")
+          }
+        } else {
+          // do nothing
+        }
+      }
+      fhirEngine.update(medicationRequest)
+    }
+  }
+
+  suspend fun endProposal(medicationRequest: MedicationRequest, status: MedicationRequestStatus, reason: String = "") {
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+      medicationRequest.status = status
+      medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      fhirEngine.update(medicationRequest)
+    }
+  }
+
+
+  suspend fun beginPlan(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>, endProposalMessage: String = "") {
     if (medicationRequest.status == MedicationRequestStatus.DRAFT) {
       medicationRequest.status = MedicationRequestStatus.ACTIVE
     }
@@ -286,49 +320,162 @@ requestApi.endPlan(Request inputPlan)
       newMedicationRequest.intent = MedicationRequestIntent.PLAN
       newMedicationRequest.basedOn.add(Reference(medicationRequest))
 
+      endProposal(
+        medicationRequest,
+        MedicationRequestStatus.COMPLETED,
+        endProposalMessage
+      )
+
+      val intentConfig = CarePlanManager.getNextActionForMedicationRequest(
+        newMedicationRequest,
+        requestConfiguration
+      )
+
+      if (intentConfig != null) {
+        if (intentConfig.action == "begin-order") {
+          if (intentConfig.condition != "automatic") {
+            newMedicationRequest.addSupportingInformation(Reference(intentConfig.condition))
+          } else { // automatic transition from plan to order
+            beginOrder(
+              newMedicationRequest,
+              requestConfiguration,
+              "Auto-acceptance of proposal"
+            )
+          }
+        } else {
+          // do nothing
+        }
+      } else {
+        // do nothing
+      }
       fhirEngine.create(newMedicationRequest)
       fhirEngine.update(medicationRequest)
-    } else {
-      // do nothing
     }
   }
 
-  suspend fun getRequestsCount(patientId: String, status: String = "", intent: String = ""): Int {
-    return let { getAllRequestsForPatient(patientId, status = status, intent = intent).count() }
+  suspend fun endPlan(medicationRequest: MedicationRequest, status: MedicationRequestStatus, reason: String = "") {
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+      medicationRequest.status = status
+      medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      fhirEngine.update(medicationRequest)
+    }
   }
 
-  suspend fun updateIntent(resourceId: String, resourceType: String) {
-    val request = when (resourceType) {
-      "MedicationRequest" -> fhirEngine.get<MedicationRequest>(resourceId)
-      "Task" -> fhirEngine.get<Task>(resourceId)
-      "ServiceRequest" -> fhirEngine.get<ServiceRequest>(resourceId)
-      else -> fhirEngine.get<Task>(resourceId)
+  suspend fun beginOrder(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>, endPlanMessage: String = "") {
+    if (medicationRequest.status == MedicationRequestStatus.DRAFT) {
+      medicationRequest.status = MedicationRequestStatus.ACTIVE
     }
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+      val newMedicationRequest: MedicationRequest = medicationRequest.copy()
+      newMedicationRequest.id = UUID.randomUUID().toString()
+      newMedicationRequest.status = MedicationRequestStatus.DRAFT
+      newMedicationRequest.intent = MedicationRequestIntent.ORDER
+      newMedicationRequest.basedOn.add(Reference(medicationRequest))
 
-    if (request is MedicationRequest) {
-      if (request.intent == MedicationRequestIntent.PROPOSAL) {
-        beginPlan(request)
+      endPlan(
+        medicationRequest,
+        MedicationRequestStatus.COMPLETED,
+        endPlanMessage
+      )
+
+      val intentConfig = CarePlanManager.getNextActionForMedicationRequest(
+        newMedicationRequest,
+        requestConfiguration
+      )
+
+      if (intentConfig != null) {
+        if (intentConfig.action == "complete-order") {
+          if (intentConfig.condition != "automatic") {
+            newMedicationRequest.addSupportingInformation(Reference(intentConfig.condition))
+          } else { // automatic completion of order
+            endOrder(
+              newMedicationRequest,
+              MedicationRequestStatus.COMPLETED,
+              "Auto-completion of order"
+            )
+          }
+        } else {
+          // do nothing
+        }
+      } else {
+        // do nothing
       }
-      else if (request.intent == MedicationRequestIntent.PLAN) {
-        endPlan(request)
-      }
-    }
-
-    if (request is Task) {
-      request.status = TaskStatus.COMPLETED
-      fhirEngine.update(request)
+      fhirEngine.create(newMedicationRequest)
+      fhirEngine.update(medicationRequest)
     }
   }
 
+  suspend fun endOrder(medicationRequest: MedicationRequest, status: MedicationRequestStatus, reason: String = "") {
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+      medicationRequest.status = status
+      medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      fhirEngine.update(medicationRequest)
+    }
+  }
 
-  suspend fun endPlan(medicationRequest: MedicationRequest) {
+  // suspend fun endPlan(medicationRequest: MedicationRequest, status: MedicationRequestStatus, reason: String = "") {
+  //   if (medicationRequest.basedOn.isNotEmpty()) {
+  //     val basedOnProposal =
+  //       fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.reference).idPart)
+  //     if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PROPOSAL) {
+  //       if (medicationRequest.status == MedicationRequestStatus.DRAFT)
+  //         medicationRequest.status = MedicationRequestStatus.ACTIVE
+  //       if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.PLAN) {
+  //         basedOnProposal.status = MedicationRequestStatus.COMPLETED
+  //
+  //         fhirEngine.update(medicationRequest)
+  //         fhirEngine.update(basedOnProposal)
+  //
+  //       } else {
+  //         // do nothing
+  //       }
+  //     } else {
+  //       // do nothing
+  //     }
+  //   } else {
+  //     // do nothing
+  //   }
+  // }
+
+
+  // suspend fun beginOrder(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>) {
+  //   if (medicationRequest.status == MedicationRequestStatus.DRAFT) {
+  //     medicationRequest.status = MedicationRequestStatus.ACTIVE
+  //   }
+  //   if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+  //     val newMedicationRequest: MedicationRequest = medicationRequest.copy()
+  //     newMedicationRequest.id = UUID.randomUUID().toString()
+  //     newMedicationRequest.status = MedicationRequestStatus.DRAFT
+  //     newMedicationRequest.intent = MedicationRequestIntent.ORDER
+  //     newMedicationRequest.basedOn.add(Reference(medicationRequest))
+  //
+  //     fhirEngine.create(newMedicationRequest)
+  //     fhirEngine.update(medicationRequest)
+  //
+  //     val action = CarePlanManager.getNextActionForMedicationRequest(newMedicationRequest, requestConfiguration)
+  //     println("beginOrder :: action: $action")
+  //     if (action.isEmpty()) {
+  //       updateIntent(IdType(newMedicationRequest.id).idPart, "MedicationRequest", requestConfiguration)
+  //     }
+  //     else {
+  //       newMedicationRequest.addSupportingInformation(Reference(action))
+  //       println("beginOrder :: ${jsonParser.encodeResourceToString(newMedicationRequest)}")
+  //     }
+  //     fhirEngine.create(newMedicationRequest)
+  //
+  //   } else {
+  //     // do nothing
+  //   }
+  // }
+
+  suspend fun endOrder(medicationRequest: MedicationRequest) {
     if (medicationRequest.basedOn.isNotEmpty()) {
       val basedOnProposal =
         fhirEngine.get<MedicationRequest>(IdType(medicationRequest.basedOnFirstRep.reference).idPart)
-      if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PROPOSAL) {
+      if (basedOnProposal.status == MedicationRequestStatus.ACTIVE && basedOnProposal.intent == MedicationRequestIntent.PLAN) {
         if (medicationRequest.status == MedicationRequestStatus.DRAFT)
           medicationRequest.status = MedicationRequestStatus.ACTIVE
-        if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.PLAN) {
+        if (medicationRequest.status == MedicationRequestStatus.ACTIVE && medicationRequest.intent == MedicationRequestIntent.ORDER) {
           basedOnProposal.status = MedicationRequestStatus.COMPLETED
 
           fhirEngine.update(medicationRequest)
@@ -344,6 +491,41 @@ requestApi.endPlan(Request inputPlan)
       // do nothing
     }
   }
+
+
+  suspend fun getRequestsCount(patientId: String, status: String = "", intent: String = ""): Int {
+    return let { getAllRequestsForPatient(patientId, status = status, intent = intent).count() }
+  }
+
+  // suspend fun updateIntent(resourceId: String, resourceType: String, requestConfiguration: List<RequestConfiguration>,) {
+  //   val request = when (resourceType) {
+  //     "MedicationRequest" -> fhirEngine.get<MedicationRequest>(resourceId)
+  //     "Task" -> fhirEngine.get<Task>(resourceId)
+  //     "ServiceRequest" -> fhirEngine.get<ServiceRequest>(resourceId)
+  //     else -> fhirEngine.get<Task>(resourceId)
+  //   }
+  //
+  //   if (request is MedicationRequest) {
+  //     println("begin plan")
+  //     if (request.intent == MedicationRequestIntent.PROPOSAL) {
+  //       beginPlan(request, requestConfiguration)
+  //     }
+  //     else if (request.intent == MedicationRequestIntent.PLAN) {
+  //       println("end plan")
+  //       endPlan(request)
+  //     }
+  //     else if (request.intent == MedicationRequestIntent.ORDER) {
+  //       println("begin order")
+  //
+  //       beginOrder(request, requestConfiguration)
+  //     }
+  //   }
+  //
+  //   if (request is Task) {
+  //     request.status = TaskStatus.COMPLETED
+  //     fhirEngine.update(request)
+  //   }
+  // }
 
   suspend fun updateMedicationRequestIntent(medicationRequest: MedicationRequest, intent: MedicationRequestIntent) {
     // a new MedicationRequest has to be created if the intent is updated

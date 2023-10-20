@@ -17,6 +17,30 @@
     "title" : "IMMZ.C.DE5 ValueSet for Sex",
     "status" : "active",
     "description" : "ValueSet for Sex for IMMZ.C.DE5.",
+    "expansion": {
+      "contains": [
+        {
+          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+          "code": "DE6",
+          "display": "Male"
+        },
+        {
+          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+          "code": "DE7",
+          "display": "Female"
+        },
+        {
+          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+          "code": "DE8",
+          "display": "Biological sex not specified"
+        },
+        {
+          "system": "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+          "code": "DE9",
+          "display": "Intersex"
+        }
+      ]
+    },
     "compose" : {
       "include" : [{
         "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",

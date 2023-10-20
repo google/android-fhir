@@ -26,6 +26,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.configurablecare.FhirApplication
+import com.google.android.fhir.configurablecare.care.RequestConfiguration
 import com.google.android.fhir.configurablecare.care.TaskManager
 import com.google.android.fhir.configurablecare.care.RequestResourceConfig
 import com.google.android.fhir.configurablecare.util.TransformSupportServicesMatchBox
@@ -67,7 +68,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
   private val taskManager: TaskManager = FhirApplication.taskManager(application.applicationContext)
   private val _screenerState = MutableLiveData(ScreenerState())
-  lateinit var requestResourceConfiguration: List<RequestResourceConfig>
+  lateinit var requestConfiguration: List<RequestConfiguration>
   val screenerState: LiveData<ScreenerState>
     get() = _screenerState
 
@@ -263,7 +264,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
                 resource,
                 subjectReference,
                 questionnaireResource.description,
-                requestResourceConfiguration.firstOrNull { it.resourceType == "ServiceRequest" }!!
+                requestConfiguration.firstOrNull { it.requestType == "ServiceRequest" }!!
               )
             saveResourceToDatabase(task)
           }

@@ -63,31 +63,50 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
       }
     }
 
-    private fun fetchValuesSetFromWorkerContext(uri: String): List<Coding> {
-      val systemUrl = workerContext.fetchResource(
-        ValueSet::class.java,
-        uri
-      )?.compose?.include?.firstOrNull()?.system
+    private suspend fun fetchValuesSetFromWorkerContext(uri: String): List<Coding> {
+      val valueSets = fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = uri }) }
 
-      val list = workerContext.fetchCodeSystem(systemUrl)?.concept?.map {
-        Coding().apply {
-          code = it.code
-          display = it.display
-          system = systemUrl
-        }
-      } ?: emptyList()
+      if (valueSets.isEmpty()) {
+        val systemUrl = workerContext.fetchResource(
+          ValueSet::class.java,
+          uri
+        )?.compose?.include?.firstOrNull()?.system
 
-      if (list.isNotEmpty()) return list
-
-      return workerContext
-        .fetchResource(ValueSet::class.java, uri)
-        .expansion?.contains?.map {
+        val list = workerContext.fetchCodeSystem(systemUrl)?.concept?.map {
           Coding().apply {
             code = it.code
             display = it.display
-            system = uri
+            system = systemUrl
           }
         } ?: emptyList()
+
+        if (list.isNotEmpty()) return list
+
+        return workerContext
+          .fetchResource(ValueSet::class.java, uri)
+          .expansion?.contains?.map {
+            Coding().apply {
+              code = it.code
+              display = it.display
+              system = uri
+            }
+          } ?: emptyList()
+      }
+      else {
+        val valueSetList = ArrayList<Coding>()
+        for (valueSet in valueSets) {
+          for (item in valueSet.resource.expansion.contains) {
+            valueSetList.add(
+              Coding().apply {
+                system = item.system
+                code = item.code
+                display = item.display
+              }
+            )
+          }
+        }
+        return valueSetList
+      }
     }
   }
 

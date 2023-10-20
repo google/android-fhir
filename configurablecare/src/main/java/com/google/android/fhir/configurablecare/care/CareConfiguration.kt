@@ -15,6 +15,7 @@
  */
 package com.google.android.fhir.configurablecare.care
 
+import android.app.Application
 import android.content.Context
 import android.os.Environment
 import ca.uhn.fhir.context.FhirContext
@@ -36,11 +37,20 @@ data class RequestResourceConfig(
   data class Value(var field: String, var value: String)
 }
 
+data class RequestConfiguration(
+  var requestType: String,
+  var intentConditions: List<IntentCondition>
+) {
+  data class IntentCondition(var intent: String, var action: String, var condition: String)
+}
+
+
 class ImplementationGuideConfig(
   var implementationGuideId: String,
   var patientRegistrationQuestionnaire: String,
   var entryPoint: String,
   var requestResourceConfigurations: List<RequestResourceConfig>,
+  var requestConfigurations: List<RequestConfiguration>,
   var supportedValueSets: JsonArray,
   var triggers: List<Trigger>
 )

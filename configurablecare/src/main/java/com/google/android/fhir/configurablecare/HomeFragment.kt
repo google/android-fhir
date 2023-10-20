@@ -75,7 +75,7 @@ class HomeFragment : Fragment() {
         override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
           if (p0 != null) {
             workflowExecutionViewModel.currentPlanDefinitionId = p0.getItemAtPosition(p2) as String
-            workflowExecutionViewModel.setActiveRequestResourceConfiguration(
+            workflowExecutionViewModel.setActiveRequestConfiguration(
               workflowExecutionViewModel.currentPlanDefinitionId
             )
           }

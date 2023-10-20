@@ -60,7 +60,7 @@ class TaskViewPagerViewModel(application: Application, private val state: SavedS
    */
   fun getTaskStatus(position: Int): String {
     return when (position) {
-      0 -> TaskStatus.READY
+      0 -> TaskStatus.DRAFT
       1 -> TaskStatus.COMPLETED
       else -> TaskStatus.READY
     }.toCode()

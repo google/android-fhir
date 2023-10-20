@@ -22,6 +22,8 @@ import com.google.android.fhir.configurablecare.FhirApplication
 import com.google.android.fhir.get
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.jsonParser
+import java.time.Instant
+import java.util.Date
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -42,7 +44,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
   private val carePlanManager =
     FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
   private val requestManager = FhirApplication.requestManager(getApplication<Application>().applicationContext)
-  private lateinit var activeRequestResourceConfiguration: List<RequestResourceConfig>
+  private lateinit var activeRequestConfiguration: List<RequestConfiguration>
   lateinit var currentPlanDefinitionId: String
   var currentStructureMapId: String = ""
   lateinit var currentQuestionnaireId: String
@@ -78,10 +80,11 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
         runBlocking {
           // carePlanManager.smartIgTest()
           if (currentPlanDefinitionId != "") {
+            println("About to apply $currentPlanDefinitionId")
             carePlanManager.applyPlanDefinitionOnPatient(
               currentPlanDefinitionId,
               careWorkflowExecutionRequest.patient,
-              getActiveRequestResourceConfiguration()
+              getActiveRequestConfiguration()
             )
           }
           else {
@@ -155,7 +158,8 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
           fhirEngine.get(task.`for`.reference.substring("Patient/".length))
         executeCareWorkflowForPatient(patient)
 
-        task.status = Task.TaskStatus.COMPLETED
+        // task.status = Task.TaskStatus.COMPLETED
+        task.lastModified = Date.from(Instant.now())
         fhirEngine.update(task)
       }
       else if (medicationRequestSearch.isNotEmpty()) {
@@ -164,7 +168,15 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
           fhirEngine.get(medicationRequest.subject.reference.substring("Patient/".length))
         executeCareWorkflowForPatient(patient)
 
-        requestManager.updateIntent(IdType(medicationRequest.id).idPart, ResourceType.MedicationRequest.toString())
+        // val nextAction = getNextActionForMedicationRequest(medicationRequest.intent.toCode())
+        // println("intent: ${medicationRequest.intent} nextAction: $nextAction")
+        // if (nextAction.isEmpty()) {
+        //   requestManager.updateIntent(IdType(medicationRequest.id).idPart, ResourceType.MedicationRequest.toString())
+        // }
+        // else {
+        //   medicationRequest.addSupportingInformation(Reference(nextAction))
+        // }
+
         // medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
         // fhirEngine.update(medicationRequest)
       }
@@ -182,17 +194,41 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     }
   }
 
-  fun setActiveRequestResourceConfiguration(planDefinitionId: String) {
-    activeRequestResourceConfiguration =
+  fun getNextActionForMedicationRequest(intent: String): String {
+    val mrConfig = activeRequestConfiguration.firstOrNull {
+      it.requestType == "MedicationRequest"
+    }?.intentConditions?.firstOrNull {
+      it.intent == intent
+    }
+    return if (mrConfig != null) {
+      if (mrConfig.condition == "automatic")
+        ""
+      else
+        mrConfig.action
+    } else
+      ""
+  }
+
+  fun setActiveConfiguration(planDefinitionId: String) {
+    activeRequestConfiguration =
       ConfigurationManager.careConfiguration
         ?.supportedImplementationGuides
         ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(planDefinitionId) }
         ?.implementationGuideConfig
-        ?.requestResourceConfigurations!!
+        ?.requestConfigurations!!
   }
 
-  fun getActiveRequestResourceConfiguration(): List<RequestResourceConfig> {
-    return activeRequestResourceConfiguration
+  fun setActiveRequestConfiguration(planDefinitionId: String) {
+    activeRequestConfiguration =
+      ConfigurationManager.careConfiguration
+        ?.supportedImplementationGuides
+        ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(planDefinitionId) }
+        ?.implementationGuideConfig
+        ?.requestConfigurations!!
+  }
+
+  fun getActiveRequestConfiguration(): List<RequestConfiguration> {
+    return activeRequestConfiguration
   }
 
   private fun readFileFromAssets(filename: String): String {

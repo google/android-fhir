@@ -26,14 +26,16 @@ import com.google.android.fhir.workflow.FhirOperator.Builder
 import com.google.android.fhir.workflow.TestBundleLoader
 import java.io.File
 import java.io.FileInputStream
-import java.net.URL
+import java.io.FileOutputStream
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CarePlan
-import org.hl7.fhir.r4.model.CarePlan.CarePlanActivityStatus
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.PlanDefinition
@@ -42,7 +44,6 @@ import org.hl7.fhir.r4.model.RequestGroup
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
-import timber.log.Timber
 
 
 /** Responsible for creating and managing CarePlans */
@@ -81,40 +82,37 @@ class CarePlanManager(
     return context.assets.open(filename).bufferedReader().use { it.readText() }
   }
 
-  suspend fun smartIgTest() {
-    val loader = TestBundleLoader(fhirContext)
-    // val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
-
+  suspend fun saveKnowledgeResources() {
     val rootDirectory = File(context.filesDir, "smart-imm/ig")
+    if (rootDirectory.exists()) {
+      initializeKnowledgeManager(rootDirectory)
+      return
+    }
+    rootDirectory.mkdirs()
 
-    knowledgeManager.install(
-      FhirNpmPackage(
-        "who.fhir.immunization",
-        "1.0.0",
-        "https://github.com/WorldHealthOrganization/smart-immunizations",
-      ),
-      rootDirectory,
-    )
+    val fileList = context.assets.list("smart-imm/ig")
+    if (fileList != null) {
+      for (filename in fileList) {
+        if (filename.contains(".json")) {
+          val contents = readFileFromAssets(context, "smart-imm/ig/$filename")
+          try {
+            val resource = jsonParser.parseResource(contents)
+            if (resource is Resource) {
+              fhirEngine.create(resource)
 
-    val planDef =
-      knowledgeManager
-        .loadResources(
-          resourceType = "PlanDefinition",
-          id = "IMMZD2DTMeasles",
-        )
-        .firstOrNull()
-
-    print(jsonParser.encodeResourceToString(planDef))
-
-    val carePlan =
-      fhirOperator.generateCarePlan(
-        planDefinitionId = "PlanDefinition/IMMZD2DTMeasles",
-        subject = "IMMZ-Patient-NoVaxeninfant-f",
-      )
-    print(jsonParser.encodeResourceToString(carePlan))
-
+              withContext(Dispatchers.IO) {
+                val fis = FileOutputStream(File(context.filesDir, "smart-imm/ig/$filename"))
+                fis.write(contents.toByteArray())
+                println("Saved: ${context.filesDir}/smart-imm/ig/$filename")
+              }
+            }
+          } catch (exception: Exception) {
+            // do nothing
+          }
+        }
+      }
+    }
   }
-
 
   private suspend fun importToFhirEngine(resource: Resource) {
     fhirEngine.create(resource)
@@ -166,8 +164,8 @@ class CarePlanManager(
     return bundleCollection
   }
 
-  suspend fun initializeKnowledgeManager() {
-    val rootDirectory = File(context.filesDir, "smart-imm/ig")
+  suspend fun initializeKnowledgeManager(rootDirectory: File) {
+    // val rootDirectory = File(context.filesDir, "smart-imm/ig")
     knowledgeManager.install(
       FhirNpmPackage(
         "who.fhir.immunization",
@@ -252,7 +250,7 @@ class CarePlanManager(
   suspend fun applyPlanDefinitionOnPatient(
     planDefinitionId: String,
     patient: Patient,
-    requestResourceConfigs: List<RequestResourceConfig>,
+    requestConfiguration: List<RequestConfiguration>,
   ) {
     // smartIgTest()
 
@@ -262,18 +260,29 @@ class CarePlanManager(
     //   loadCarePlanResourcesFromDb()
     // }
 
-    initializeKnowledgeManager()
+    // initializeKnowledgeManager(File(context.filesDir, "smart-imm/ig"))
 
     val carePlanProposal =
       fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
         as CarePlan
 
+    println(jsonParser.encodeResourceToString(carePlanProposal))
+
     // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
     // val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
 
     // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
-    acceptCarePlan(carePlanProposal)
+    val resourceList = acceptCarePlan(carePlanProposal, requestConfiguration)
+
+    if (resourceList.isEmpty() && planDefinitionId.contains("IMMZD2DTMeaslesCI")) {
+      // begin order and end plan
+      val medicationRequestPlans = requestManager.getRequestsForPatient(patientId, ResourceType.MedicationRequest, intent = "plan")
+      println("moving to order for ${jsonParser.encodeResourceToString(medicationRequestPlans.first())}")
+      requestManager.beginOrder(medicationRequestPlans.first() as MedicationRequest, requestConfiguration, "No Contraindications detected so proceeding with order")
+    }
   }
+
+
 
   /**
    * Executes $apply on a [PlanDefinition] for a list of patients and creates the request resources
@@ -442,13 +451,46 @@ class CarePlanManager(
   // }
 
   private suspend fun acceptCarePlan(
-    proposedCarePlan: CarePlan
-  ) {
+    proposedCarePlan: CarePlan,
+    requestConfiguration: List<RequestConfiguration>,
+  ): List<Resource>  {
     // modify this and use:
     val resourceList: MutableList<Resource> = mutableListOf()
     for (request in proposedCarePlan.contained) {
       if (request is RequestGroup) {
         resourceList.addAll(requestManager.createRequestFromRequestGroup(request))
+      }
+    }
+
+    for (resource in resourceList) {
+      if (resource is MedicationRequest) {
+        if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
+          requestManager.beginProposal(resource, requestConfiguration)
+        }
+        // val intentCondition = getNextActionForMedicationRequest(resource, requestConfiguration)
+        // if (intentCondition != null) {
+        //   if (intentCondition.condition == "automatic") {  // transition to the next intent level
+        //     if (intentCondition.action == "transition-to-plan") {  // intent = proposal
+        //       requestManager.beginPlan(resource, requestConfiguration)
+        //       requestManager.endPlan(resource)
+        //     } else if (intentCondition.action == "transition-to-order") {  // intent = plan
+        //       requestManager.beginOrder(resource, requestConfiguration)
+        //       requestManager.endOrder(resource)
+        //     }
+        //   } else {
+        //     if (intentCondition.action == "transition-to-plan") {  // intent = proposal
+        //       requestManager.beginPlan(resource, requestConfiguration)
+        //     } else if (intentCondition.action == "transition-to-order") {  // intent = plan
+        //       requestManager.endPlan(resource)
+        //       requestManager.beginOrder(resource, requestConfiguration)
+        //     }
+        //
+        //     requestManager.updateIntent(IdType(resource.id).idPart, "MedicationRequest", requestConfiguration)
+        //   } else {
+        //     resource.addSupportingInformation(Reference(condition))
+        //     fhirEngine.update(resource)
+        //   }
+        // }
       }
     }
 
@@ -459,6 +501,7 @@ class CarePlanManager(
     //
     // fhirEngine.update(carePlanOfRecord)
     // linkRequestResourcesToCarePlan(carePlanOfRecord, resourceList)
+    return resourceList
   }
 
   /** Update status of a [CarePlan] activity */
@@ -521,5 +564,23 @@ class CarePlanManager(
   //     else -> TODO("Not a valid request resource")
   //   }
   // }
+
+  companion object {
+    fun getNextActionForMedicationRequest(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>): RequestConfiguration.IntentCondition? {
+      val mrConfig = requestConfiguration.firstOrNull {
+        it.requestType == "MedicationRequest"
+      }?.intentConditions?.firstOrNull {
+        it.intent == medicationRequest.intent.toCode()
+      }
+      return mrConfig
+      // return if (mrConfig != null) {
+      //   if (mrConfig.condition == "automatic")
+      //     ""
+      //   else
+      //     mrConfig.condition
+      // } else
+      //   ""
+    }
+  }
 
 }

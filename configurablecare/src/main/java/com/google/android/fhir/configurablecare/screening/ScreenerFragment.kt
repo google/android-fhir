@@ -55,8 +55,8 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     careWorkflowExecutionViewModel.currentQuestionnaireId = IdType((jsonParser.parseResource(viewModel.questionnaireString) as Questionnaire).id).idPart
     careWorkflowExecutionViewModel.setCurrentStructureMap()
     viewModel.structureMapId = careWorkflowExecutionViewModel.currentStructureMapId
-      viewModel.requestResourceConfiguration =
-      careWorkflowExecutionViewModel.getActiveRequestResourceConfiguration()
+      viewModel.requestConfiguration =
+      careWorkflowExecutionViewModel.getActiveRequestConfiguration()
     observeResourcesSaveAction()
     if (savedInstanceState == null) {
       addQuestionnaireFragment()

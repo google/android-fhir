@@ -46,21 +46,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   fun getTasksForPatient(patientId: String, taskStatus: String) {
     viewModelScope.launch {
       liveSearchedTasks.value =
-        // taskManager
-        //   .getTasksForPatient(
-        //     patientId = patientId,
-        //     extraFilter = { filter(Task.STATUS, { value = of(taskStatus) }) },
-        //     sort = { sort(Task.MODIFIED, Order.ASCENDING) }
-        //   )
-        //   .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
-      // taskManager
-      //   .getMedicationRequestsForPatient(
-      //     patientId = patientId,
-      //     extraFilter = { },
-      //     sort = { }
-      //   )
-      //   .mapIndexed { index, fhirTask -> fhirTask.toTaskItem(index + 1) }
-        requestManager.getAllRequestsForPatient(patientId, taskStatus)
+        requestManager.getAllRequestsForPatient(patientId)//, taskStatus)
           .mapIndexed { index, fhirTask ->
             if (fhirTask is Task) fhirTask.toTaskItem(index + 1)
             else if (fhirTask is MedicationRequest) fhirTask.toTaskItem(index + 1)
@@ -224,6 +210,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
   val completedDate = dueDate
   val owner = ""
   val clickable = true
+  val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else "Questionnaire/IMMZD4CheckContraindicationsMeasles"
     // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
 
   return ListScreeningsViewModel.TaskItem(
@@ -236,7 +223,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
     dueDate = dueDate,
     completedDate = completedDate,
     owner = owner,
-    fhirResourceId = "Questionnaire/IMMZD4CheckContraindicationsMeasles",
+    fhirResourceId = fhirResourceId,
     clickable = clickable
   )
 }
