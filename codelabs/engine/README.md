@@ -261,10 +261,10 @@ outlined below will guide you through the process.
 
     ```kotlin
     viewModelScope.launch {
-          Sync.oneTimeSync<AppFhirSyncWorker>(getApplication())
-            .shareIn(this, SharingStarted.Eagerly, 10)
-            .collect { _pollState.emit(it) }
-        }
+      Sync.oneTimeSync<AppFhirSyncWorker>(getApplication())
+        .shareIn(this, SharingStarted.Eagerly, 10)
+        .collect { _pollState.emit(it) }
+    }
     ```
 
     This coroutine initiates a one-time sync with the FHIR server using the
