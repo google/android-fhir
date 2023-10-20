@@ -257,7 +257,7 @@ outlined below will guide you through the process.
     engine instance to use for syncing.
 
 1.  In your ViewModel, `PatientListViewModel.kt`, you'll set up a one-time sync
-    mechanism. locate and add this code to the `triggerOneTimeSync()` function:
+    mechanism. Locate and add this code to the `triggerOneTimeSync()` function:
 
     ```kotlin
     viewModelScope.launch {
