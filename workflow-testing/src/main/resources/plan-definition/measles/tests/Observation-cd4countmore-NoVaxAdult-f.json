@@ -1,0 +1,24 @@
+{
+  "resourceType": "Observation",
+  "id": "cd4countmore-NoVaxAdult-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "116745007",
+        "system": "http://snomed.info/sct",
+        "display": "Cell positive for CD4 antigen (cell)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxAdult-f"
+  },
+  "effectiveDateTime": "2020-05-27",
+  "valueQuantity": {
+    "value": 205,
+    "code": "116745007",
+    "system": "http://snomed.info/sct",
+    "unit": "Cell positive for CD4 antigen (cell)"
+  }
+}

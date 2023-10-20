@@ -1,0 +1,23 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-eninfant-f",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "hassiuminfant-f",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "2022-04-28",
+  "gender": "female"
+}

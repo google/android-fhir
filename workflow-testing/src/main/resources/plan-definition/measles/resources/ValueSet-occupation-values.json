@@ -1,0 +1,51 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "occupation-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/73438004\">73438004</a></td><td>Unemployed</td></tr><tr><td><a href=\"http://snomed.info/id/224363007\">224363007</a></td><td>Formal employment</td></tr></table></li><li>Include these codes as defined in <code>http://who.int/cg/CodeSystem/extended-content</code><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>Other</td><td>Other (specify)</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/occupation-values",
+  "version" : "0.1.0",
+  "name" : "occupation-values",
+  "title" : "Occupation values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Occupation element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "73438004",
+        "display" : "Unemployed"
+      },
+      {
+        "code" : "224363007",
+        "display" : "Formal employment"
+      }]
+    },
+    {
+      "system" : "http://who.int/cg/CodeSystem/extended-content",
+      "concept" : [{
+        "code" : "Other",
+        "display" : "Other (specify)"
+      }]
+    }]
+  }
+}

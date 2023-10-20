@@ -1,0 +1,23 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-NoVaxenteen-m",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "NoVaxenteen-protactiniumteen-m",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "2009-11-05",
+  "gender": "male"
+}

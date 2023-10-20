@@ -1,0 +1,24 @@
+{
+  "resourceType": "Observation",
+  "id": "birthweightnormal-eninfant-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "276610007",
+        "system": "http://snomed.info/sct",
+        "display": "Birthweight"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-eninfant-f"
+  },
+  "effectiveDateTime": "2022-04-28",
+  "valueQuantity": {
+    "value": 6855,
+    "code": "g",
+    "system": "http://unitsofmeasure.org",
+    "unit": "gram"
+  }
+}

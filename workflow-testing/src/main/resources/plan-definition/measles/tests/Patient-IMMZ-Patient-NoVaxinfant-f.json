@@ -1,0 +1,23 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-NoVaxinfant-f",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "NoVaxinfant-hassiuminfant-f",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "2022-03-28",
+  "gender": "female"
+}

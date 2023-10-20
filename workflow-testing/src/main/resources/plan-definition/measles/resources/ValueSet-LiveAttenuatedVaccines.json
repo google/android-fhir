@@ -1,0 +1,96 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "LiveAttenuatedVaccines",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <code>http://hl7.org/fhir/sid/icd-11</code><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>XM8142</td><td/></tr><tr><td>XM72A0</td><td/></tr><tr><td>XM47S0</td><td/></tr><tr><td>XM8L15</td><td/></tr><tr><td>XM8TF3</td><td/></tr><tr><td>XM21H2</td><td/></tr><tr><td>XM4AJ8</td><td/></tr><tr><td>XM9439</td><td/></tr><tr><td>XM2340</td><td/></tr><tr><td>XM79H3</td><td/></tr><tr><td>XM0VX8</td><td/></tr><tr><td>XM0KZ1</td><td/></tr><tr><td>XM4GV0</td><td/></tr><tr><td>XM9PS9</td><td/></tr><tr><td>XM3B09</td><td/></tr><tr><td>XM5V64</td><td/></tr><tr><td>XM33K4</td><td/></tr><tr><td>XM0NS8</td><td/></tr><tr><td>XM3418</td><td/></tr><tr><td>XM5DF6</td><td/></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/LiveAttenuatedVaccines",
+  "version" : "0.1.0",
+  "name" : "LiveAttenuatedVaccines",
+  "title" : "Set of live attenuated vaccines",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing live attenuated vaccines",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11",
+      "concept" : [{
+        "code" : "XM8142"
+      },
+      {
+        "code" : "XM72A0"
+      },
+      {
+        "code" : "XM47S0"
+      },
+      {
+        "code" : "XM8L15"
+      },
+      {
+        "code" : "XM8TF3"
+      },
+      {
+        "code" : "XM21H2"
+      },
+      {
+        "code" : "XM4AJ8"
+      },
+      {
+        "code" : "XM9439"
+      },
+      {
+        "code" : "XM2340"
+      },
+      {
+        "code" : "XM79H3"
+      },
+      {
+        "code" : "XM0VX8"
+      },
+      {
+        "code" : "XM0KZ1"
+      },
+      {
+        "code" : "XM4GV0"
+      },
+      {
+        "code" : "XM9PS9"
+      },
+      {
+        "code" : "XM3B09"
+      },
+      {
+        "code" : "XM5V64"
+      },
+      {
+        "code" : "XM33K4"
+      },
+      {
+        "code" : "XM0NS8"
+      },
+      {
+        "code" : "XM3418"
+      },
+      {
+        "code" : "XM5DF6"
+      }]
+    }]
+  }
+}

@@ -241,4 +241,23 @@ class PlanDefinitionProcessorJavaTest {
       .packagePlanDefinition()
       .hasEntry(20)
   }
+
+  @Test
+  fun testMeasle()  {
+    val planDefinitionID = "IMMZD2DTMeasles"
+    val patientID = "IMMZ-Patient-enadult-m"
+    val repository =
+      TestRepositoryFactory.createRepository(
+        fhirContext,
+        "/plan-definition/measles",
+      )
+    var careplan = PlanDefinition.Assert.that(planDefinitionID, patientID, null, null)
+      .withRepository(repository)
+      .withExpectedCarePlanId(IdType("CarePlan", "IMMZD2DTMeasles"))
+      .apply()
+
+
+    return  careplan.equalsToExpected()
+
+  }
 }

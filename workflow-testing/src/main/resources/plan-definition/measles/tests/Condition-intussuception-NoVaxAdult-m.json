@@ -1,0 +1,24 @@
+{
+  "resourceType": "Condition",
+  "id": "intussuception-NoVaxAdult-m",
+  "clinicalStatus": {
+    "coding": [
+      {
+        "code": "active"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "code": "41444002",
+        "system": "http://snomed.info/sct",
+        "display": "Invagination (morphologic abnormality)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxAdult-m"
+  },
+  "recordedDate": "2022-03-01"
+}

@@ -1,0 +1,44 @@
+{
+  "resourceType": "Immunization",
+  "id": "IMMZ-Immunization-Measles-enadult-m",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Immunization-uv-ips"
+    ]
+  },
+  "status": "completed",
+  "vaccineCode": {
+    "coding": [
+      {
+        "code": "386012008",
+        "system": "http://snomed.info/sct",
+        "display": "Measles vaccine (product)"
+      }
+    ]
+  },
+  "expirationDate": "2024-06-30",
+  "lotNumber": "123",
+  "patient": {
+    "reference": "Patient/IMMZ-Patient-enadult-m"
+  },
+  "location": {
+    "display": "Vaccination Site"
+  },
+  "occurrenceDateTime": "2019-07-14",
+  "performer": [
+    {
+      "actor": {
+        "reference": "Organization/IMMZ-Organization-enadult-m"
+      }
+    }
+  ],
+  "protocolApplied": [
+    {
+      "authority": {
+        "reference": "Organization/IMMZ-Organization-enadult-m"
+      },
+      "doseNumberPositiveInt": 1,
+      "seriesDosesPositiveInt": 2
+    }
+  ]
+}

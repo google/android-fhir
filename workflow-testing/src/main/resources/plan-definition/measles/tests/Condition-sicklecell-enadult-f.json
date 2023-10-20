@@ -1,0 +1,24 @@
+{
+  "resourceType": "Condition",
+  "id": "sicklecell-enadult-f",
+  "clinicalStatus": {
+    "coding": [
+      {
+        "code": "active"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "code": "127040003",
+        "system": "http://snomed.info/sct",
+        "display": "Sickle cell-hemoglobin SS disease (disorder)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-enadult-f"
+  },
+  "recordedDate": "2022-02-02"
+}

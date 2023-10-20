@@ -1,0 +1,52 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "hiv-stage-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/103415007\">103415007</a></td><td>1</td></tr><tr><td><a href=\"http://snomed.info/id/103416008\">103416008</a></td><td>2</td></tr><tr><td><a href=\"http://snomed.info/id/103417004\">103417004</a></td><td>3</td></tr><tr><td><a href=\"http://snomed.info/id/103418009\">103418009</a></td><td>4</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/hiv-stage-values",
+  "version" : "0.1.0",
+  "name" : "hiv-stage-values",
+  "title" : "HIV Stage values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the HIV Stage element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "103415007",
+        "display" : "1"
+      },
+      {
+        "code" : "103416008",
+        "display" : "2"
+      },
+      {
+        "code" : "103417004",
+        "display" : "3"
+      },
+      {
+        "code" : "103418009",
+        "display" : "4"
+      }]
+    }]
+  }
+}

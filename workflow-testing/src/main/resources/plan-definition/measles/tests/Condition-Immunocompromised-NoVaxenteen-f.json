@@ -1,0 +1,24 @@
+{
+  "resourceType": "Condition",
+  "id": "Immunocompromised-NoVaxenteen-f",
+  "clinicalStatus": {
+    "coding": [
+      {
+        "code": "active"
+      }
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "code": "370388006",
+        "system": "http://snomed.info/sct",
+        "display": "Patient immunocompromised (finding)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxenteen-f"
+  },
+  "recordedDate": "2021-02-03"
+}

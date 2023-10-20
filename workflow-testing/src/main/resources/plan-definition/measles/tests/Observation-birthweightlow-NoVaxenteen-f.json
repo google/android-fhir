@@ -1,0 +1,24 @@
+{
+  "resourceType": "Observation",
+  "id": "birthweightlow-NoVaxenteen-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "276610007",
+        "system": "http://snomed.info/sct",
+        "display": "Birthweight"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxenteen-f"
+  },
+  "effectiveDateTime": "2009-10-16",
+  "valueQuantity": {
+    "value": 1877,
+    "code": "g",
+    "system": "http://unitsofmeasure.org",
+    "unit": "gram"
+  }
+}

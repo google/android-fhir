@@ -1,0 +1,75 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "careplanbirthcontrolmethods-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/169450001\">169450001</a></td><td>No CarePlan-based method</td></tr><tr><td><a href=\"http://snomed.info/id/169513000\">169513000</a></td><td>Withdrawal</td></tr><tr><td><a href=\"http://snomed.info/id/455501000124105\">455501000124105</a></td><td>Fertility awareness-based methods (FAB)</td></tr><tr><td><a href=\"http://snomed.info/id/454441000124107\">454441000124107</a></td><td>Lactational amenorrhea method (LAM)</td></tr><tr><td><a href=\"http://snomed.info/id/455491000124102\">455491000124102</a></td><td>Male relying on female method</td></tr></table></li><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/LA14549-2/\">LA14549-2</a></td><td>Withdrawal</td></tr><tr><td><a href=\"https://loinc.org/LA27918-4/\">LA27918-4</a></td><td>Fertility awareness-based methods (FAB)</td></tr><tr><td><a href=\"https://loinc.org/LA27919-2/\">LA27919-2</a></td><td>Lactational amenorrhea method (LAM)</td></tr><tr><td><a href=\"https://loinc.org/LA27920-0/\">LA27920-0</a></td><td>Male relying on female method</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/careplanbirthcontrolmethods-values",
+  "version" : "0.1.0",
+  "name" : "careplanbirthcontrolmethods-values",
+  "title" : "Prior contraceptive methods used - CarePlan-based values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Prior contraceptive methods used - CarePlan-based element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "169450001",
+        "display" : "No CarePlan-based method"
+      },
+      {
+        "code" : "169513000",
+        "display" : "Withdrawal"
+      },
+      {
+        "code" : "455501000124105",
+        "display" : "Fertility awareness-based methods (FAB)"
+      },
+      {
+        "code" : "454441000124107",
+        "display" : "Lactational amenorrhea method (LAM)"
+      },
+      {
+        "code" : "455491000124102",
+        "display" : "Male relying on female method"
+      }]
+    },
+    {
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "LA14549-2",
+        "display" : "Withdrawal"
+      },
+      {
+        "code" : "LA27918-4",
+        "display" : "Fertility awareness-based methods (FAB)"
+      },
+      {
+        "code" : "LA27919-2",
+        "display" : "Lactational amenorrhea method (LAM)"
+      },
+      {
+        "code" : "LA27920-0",
+        "display" : "Male relying on female method"
+      }]
+    }]
+  }
+}
