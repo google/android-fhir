@@ -183,7 +183,7 @@ outlined below will guide you through the process.
     Notes:
     * `enableEncryptionIfSupported`: Enables data encryption if the device
       supports it.
-    * RECREATE_AT_OPEN: Determines the database error strategy. In
+    * `RECREATE_AT_OPEN`: Determines the database error strategy. In
       this case, it recreates the database if an error occurs upon opening.
     * baseUrl in ServerConfiguration: This is the FHIR server's base URL. The
       provided IP address `10.0.2.2` is specially reserved for localhost,
