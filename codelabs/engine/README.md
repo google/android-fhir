@@ -196,7 +196,7 @@ outlined below will guide you through the process.
     is only created when it's accessed for the first time, not immediately when
     the app starts.
 
-1.  Add the following convenience methods in the `FhirApplication` class for
+1.  Add the following convenience method in the `FhirApplication` class for
     easier access throughout your application:
 
     ```kotlin
