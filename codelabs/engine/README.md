@@ -276,11 +276,11 @@ outlined below will guide you through the process.
 
     ```kotlin
     when (syncJobStatus) {
-        is SyncJobStatus.Finished -> {
-            Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
-            viewModel.searchPatientsByName("")
-        }
-        else -> {}
+      is SyncJobStatus.Finished -> {
+        Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
+        viewModel.searchPatientsByName("")
+      }
+      else -> {}
     }
     ```
 
