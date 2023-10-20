@@ -243,7 +243,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  fun testMeasle()  {
+  fun testMeasles()  {
     val planDefinitionID = "IMMZD2DTMeasles"
     val patientID = "IMMZ-Patient-enadult-m"
     val repository =
