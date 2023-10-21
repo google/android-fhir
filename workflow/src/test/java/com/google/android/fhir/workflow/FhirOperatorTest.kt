@@ -173,7 +173,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "example",
-        patientId = "Patient/Female-Patient-Example"
+        subject = "Patient/Female-Patient-Example"
       )
 
     // assertEquals(
@@ -203,7 +203,7 @@ class FhirOperatorTest {
       // )
       fhirOperator.generateCarePlan(
         planDefinitionId = "PlanImmunizationReview",
-        patientId = "Patient/Female-Patient-Example",
+        subject = "Patient/Female-Patient-Example",
       )
 
     println(jsonParser.setPrettyPrint(true).encodeResourceToString(carePlan))
