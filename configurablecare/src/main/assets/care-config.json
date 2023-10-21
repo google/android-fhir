@@ -15,12 +15,12 @@
           },
           {
             "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
-            "planDefinition":"PlanDefinition/IMMZD2DTMeasles",
+            "planDefinition":"http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles",
             "structureMap": ""
           },
           {
             "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
-            "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI",
+            "planDefinition": "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeaslesCI",
             "structureMap": ""
           },
           {

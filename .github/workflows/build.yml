@@ -38,13 +38,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.7.0
+        uses: styfle/cancel-workflow-action@0.12.0
         with:
           access_token: ${{ github.token }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Fetch origin/master for spotless ratchet to work
           # https://github.com/diffplug/spotless/issues/1242
@@ -64,7 +64,7 @@ jobs:
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
       - name: Upload maven repo
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: maven-repository
           path: build/ci-repo
@@ -76,7 +76,7 @@ jobs:
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: build
           path: build.zip

@@ -262,8 +262,12 @@ class CarePlanManager(
 
     // initializeKnowledgeManager(File(context.filesDir, "smart-imm/ig"))
 
+    // val carePlanProposal =
+    //   fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
+    //     as CarePlan
+    println("PD: ${CanonicalType(planDefinitionId)}")
     val carePlanProposal =
-      fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
+      fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionId), subject = "Patient/$patientId")
         as CarePlan
 
     println(jsonParser.encodeResourceToString(carePlanProposal))
