@@ -22,6 +22,11 @@
             "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
             "planDefinition": "PlanDefinition/IMMZD2DTMeaslesCI",
             "structureMap": ""
+          },
+          {
+            "event": "Questionnaire/AdministerVaccine",
+            "planDefinition": "PlanDefinition/CreateImmunizationRecord",
+            "structureMap": ""
           }
         ],
         "requestConfigurations": [
@@ -42,6 +47,11 @@
                 "intent": "order",
                 "action": "complete-order",
                 "condition": "Questionnaire/AdministerVaccine"
+              },
+              {
+                "intent": "order",
+                "action": "conclude-vaccination",
+                "condition": "create-immunization"
               }
             ]
           }

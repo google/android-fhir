@@ -24,12 +24,15 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.jsonParser
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
@@ -80,12 +83,42 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
         runBlocking {
           // carePlanManager.smartIgTest()
           if (currentPlanDefinitionId != "") {
-            println("About to apply $currentPlanDefinitionId")
-            carePlanManager.applyPlanDefinitionOnPatient(
-              currentPlanDefinitionId,
-              careWorkflowExecutionRequest.patient,
-              getActiveRequestConfiguration()
-            )
+            if (currentPlanDefinitionId.contains("CreateImmunizationRecord")) {
+              println("About to create Immunization record")
+              val patientId = IdType(careWorkflowExecutionRequest.patient.id).idPart
+              val medicationRequest = requestManager.getRequestsForPatient(
+                patientId,
+                ResourceType.MedicationRequest,
+                status = "draft", // "active",
+                intent = "order"
+              ).first() as MedicationRequest
+              requestManager.endOrder(medicationRequest, MedicationRequest.MedicationRequestStatus.COMPLETED, "Completed successfully")
+
+              var vaccineCoding: Coding? = null
+              if (medicationRequest.hasMedicationCodeableConcept() && medicationRequest.medicationCodeableConcept.hasCoding()) {
+                vaccineCoding = medicationRequest.medicationCodeableConcept.codingFirstRep
+              }
+              val immunization = Immunization().apply {
+                id = UUID.randomUUID().toString()
+                vaccineCode.addCoding(vaccineCoding)
+                patient = Reference("Patient/$patientId")
+                status = Immunization.ImmunizationStatus.COMPLETED
+              }
+
+              fhirEngine.create(immunization)
+              fhirEngine.update(medicationRequest)
+
+              println(jsonParser.encodeResourceToString(immunization))
+              println(jsonParser.encodeResourceToString(medicationRequest))
+            }
+            else {
+              println("About to apply $currentPlanDefinitionId")
+              carePlanManager.applyPlanDefinitionOnPatient(
+                currentPlanDefinitionId,
+                careWorkflowExecutionRequest.patient,
+                getActiveRequestConfiguration()
+              )
+            }
           }
           else {
             // do nothing

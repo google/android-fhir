@@ -128,14 +128,14 @@ class RequestManager(
         }
       }
 
-      SupportedRequestResources.SERVICEREQUEST -> {
-        return when (status) {
-          "draft" -> ServiceRequestStatus.DRAFT.toCode().lowercase()
-          "active" -> ServiceRequestStatus.ACTIVE.toCode().lowercase()
-          "completed" -> ServiceRequestStatus.COMPLETED.toCode().lowercase()
-          else -> ""
-        }
-      }
+      // SupportedRequestResources.SERVICEREQUEST -> {
+      //   return when (status) {
+      //     "draft" -> ServiceRequestStatus.DRAFT.toCode().lowercase()
+      //     "active" -> ServiceRequestStatus.ACTIVE.toCode().lowercase()
+      //     "completed" -> ServiceRequestStatus.COMPLETED.toCode().lowercase()
+      //     else -> ""
+      //   }
+      // }
       else -> return ""
     }
   }
@@ -319,6 +319,7 @@ requestApi.endPlan(Request inputPlan)
       newMedicationRequest.status = MedicationRequestStatus.DRAFT
       newMedicationRequest.intent = MedicationRequestIntent.PLAN
       newMedicationRequest.basedOn.add(Reference(medicationRequest))
+      newMedicationRequest.supportingInformation = null
 
       endProposal(
         medicationRequest,
@@ -371,6 +372,7 @@ requestApi.endPlan(Request inputPlan)
       newMedicationRequest.status = MedicationRequestStatus.DRAFT
       newMedicationRequest.intent = MedicationRequestIntent.ORDER
       newMedicationRequest.basedOn.add(Reference(medicationRequest))
+      newMedicationRequest.supportingInformation = null
 
       endPlan(
         medicationRequest,
@@ -406,7 +408,8 @@ requestApi.endPlan(Request inputPlan)
   }
 
   suspend fun endOrder(medicationRequest: MedicationRequest, status: MedicationRequestStatus, reason: String = "") {
-    if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
+    if (medicationRequest.status == MedicationRequestStatus.ACTIVE ||
+      medicationRequest.status == MedicationRequestStatus.DRAFT) {
       medicationRequest.status = status
       medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
       fhirEngine.update(medicationRequest)
@@ -702,7 +705,7 @@ requestApi.endPlan(Request inputPlan)
     enum class SupportedRequestResources(val value: RequestResourceType) {
       TASK(RequestResourceType.TASK),
       MEDICATIONREQUEST(RequestResourceType.MEDICATIONREQUEST),
-      SERVICEREQUEST(RequestResourceType.SERVICEREQUEST),
+      // SERVICEREQUEST(RequestResourceType.SERVICEREQUEST),
       // COMMUNICATIONREQUEST(RequestResourceType.COMMUNICATIONREQUEST)
     }
   }
