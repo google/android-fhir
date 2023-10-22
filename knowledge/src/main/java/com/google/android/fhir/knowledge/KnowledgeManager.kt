@@ -28,9 +28,11 @@ import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
 import com.google.android.fhir.knowledge.npm.OkHttpNpmPackageDownloader
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -95,7 +97,13 @@ internal constructor(
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
         if (resource is Resource) {
-          importResource(igId, resource, file)
+          val newId = indexResourceFile(igId, resource, file)
+          resource.setId(IdType(resource.resourceType.name, newId))
+
+          // Overrides the Id in the file
+          FileOutputStream(file).use {
+            it.write(jsonParser.encodeResourceToString(resource).toByteArray())
+          }
         } else {
           Timber.d("Unable to import file: %file")
         }
@@ -124,7 +132,7 @@ internal constructor(
         url != null && version != null ->
           listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
-        id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
+        id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
         name != null && version != null ->
           listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> knowledgeDao.getResourcesWithName(resType, name)
@@ -154,11 +162,19 @@ internal constructor(
         }
       }
     when (resource) {
-      is Resource -> importResource(igId, resource, file)
+      is Resource -> {
+        val newId = indexResourceFile(igId, resource, file)
+        resource.setId(IdType(resource.resourceType.name, newId))
+
+        // Overrides the Id in the file
+        FileOutputStream(file).use {
+          it.write(jsonParser.encodeResourceToString(resource).toByteArray())
+        }
+      }
     }
   }
 
-  private suspend fun importResource(igId: Long?, resource: Resource, file: File) {
+  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
     val metadataResource = resource as? MetadataResource
     val res =
       ResourceMetadataEntity(
@@ -169,7 +185,8 @@ internal constructor(
         metadataResource?.version,
         file,
       )
-    knowledgeDao.insertResource(igId, res)
+
+    return knowledgeDao.insertResource(igId, res)
   }
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {

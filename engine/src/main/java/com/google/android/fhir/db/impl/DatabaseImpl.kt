@@ -140,7 +140,7 @@ internal class DatabaseImpl(
       resources.forEach {
         val timeOfLocalChange = Instant.now()
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, timeOfLocalChange)
+        resourceDao.applyLocalUpdate(it, timeOfLocalChange)
         localChangeDao.addUpdate(oldResourceEntity, it, timeOfLocalChange)
       }
     }
