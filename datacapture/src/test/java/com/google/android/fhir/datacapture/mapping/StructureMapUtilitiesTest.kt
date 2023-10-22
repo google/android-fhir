@@ -35,9 +35,9 @@ class StructureMapUtilitiesTest {
 
   /*
    * This test case checks if :
-   *   1. Checks if multiple packages can be loaded into the context
-   *   2. Checks if we are able to retrieve Structure Definitions from the packages loaded for custom resources
-   *   3. Checks if a structure
+   *   1. Multiple packages can be loaded into the context
+   *   2. We're able to retrieve a structure definition that's referenced by
+   *      the structure map from one of the packages loaded into the context
    * */
   @Test()
   fun `perform extraction for out-break toolkit`() {
