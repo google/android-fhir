@@ -191,7 +191,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
           fhirEngine.get(task.`for`.reference.substring("Patient/".length))
         executeCareWorkflowForPatient(patient)
 
-        // task.status = Task.TaskStatus.COMPLETED
+        task.status = Task.TaskStatus.COMPLETED
         task.lastModified = Date.from(Instant.now())
         fhirEngine.update(task)
       }

@@ -17,28 +17,6 @@
     "title" : "IMMZ.C.DE5 ValueSet for Sex",
     "status" : "active",
     "description" : "ValueSet for Sex for IMMZ.C.DE5.",
-    "expansion": {
-      "contains": [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE6",
-        "display" : "Male"
-      },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE7",
-          "display" : "Female"
-        },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE8",
-          "display" : "Biological sex not specified"
-        },
-        {
-          "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-          "code" : "DE9",
-          "display" : "Intersex"
-        }]
-    },
     "compose" : {
       "include" : [{
         "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
@@ -70,7 +48,7 @@
   "title" : "Client Registration Questionnaire",
   "status" : "draft",
   "subjectType" : ["Patient"],
-  "date" : "2023-10-22T13:50:41+00:00",
+  "date" : "2023-10-22T16:38:20+00:00",
   "publisher" : "World Health Organization (WHO)",
   "contact" : [{
     "name" : "World Health Organization (WHO)",

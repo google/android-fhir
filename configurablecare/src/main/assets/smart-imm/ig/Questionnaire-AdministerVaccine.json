@@ -1,0 +1,45 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "AdministerVaccine",
+  "title": "Administer Vaccine",
+  "status": "active",
+  "item": [
+    {
+      "type": "boolean",
+      "linkId": "3888885591343",
+      "text": "Was consent given?",
+      "required": true,
+      "repeats": false,
+      "readOnly": false
+    },
+    {
+      "type": "boolean",
+      "linkId": "894262034915",
+      "text": "Is stock available?",
+      "required": true,
+      "repeats": false,
+      "readOnly": false
+    },
+    {
+      "type": "display",
+      "linkId": "8599813785588",
+      "text": "Administer Vaccine",
+      "enableWhen": [
+        {
+          "question": "3888885591343",
+          "operator": "=",
+          "answerBoolean": true
+        },
+        {
+          "question": "894262034915",
+          "operator": "=",
+          "answerBoolean": true
+        }
+      ],
+      "enableBehavior": "all",
+      "required": false,
+      "repeats": false,
+      "readOnly": true
+    }
+  ]
+}

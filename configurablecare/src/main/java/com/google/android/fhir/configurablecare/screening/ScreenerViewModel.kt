@@ -157,6 +157,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         // }
 
         if (targetResource is Bundle) {
+          println("Target bundle: ${jsonParser.encodeResourceToString(targetResource)}")
           // val outputFile = File(getApplication<Application>().externalCacheDir, "bundle.json")
           // outputFile.writeText(
           //   FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()

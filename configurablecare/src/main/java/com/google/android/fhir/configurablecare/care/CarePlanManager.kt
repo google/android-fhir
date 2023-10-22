@@ -111,6 +111,7 @@ class CarePlanManager(
         }
       }
     }
+    initializeKnowledgeManager(rootDirectory)
   }
 
   private suspend fun importToFhirEngine(resource: Resource) {
