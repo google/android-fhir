@@ -25,7 +25,7 @@ import org.hl7.fhir.utilities.CanonicalPair
 class ConceptMapEngine(private val context: IWorkerContext) {
   @Throws(FHIRException::class)
   fun translate(source: Coding, url: String): Coding? {
-    val cm =
+    val conceptMap =
       context.fetchResource(
         ConceptMap::class.java,
         url,
@@ -33,59 +33,50 @@ class ConceptMapEngine(private val context: IWorkerContext) {
         ?: throw FHIRException("Unable to find ConceptMap '$url'")
     return if (source.hasSystem()) {
       translateBySystem(
-        cm,
+        conceptMap,
         source.system,
         source.code,
       )
     } else {
-      translateByJustCode(cm, source.code)
+      translateByJustCode(conceptMap, source.code)
     }
   }
 
   @Throws(FHIRException::class)
-  private fun translateByJustCode(cm: ConceptMap, code: String): Coding? {
-    var ct: ConceptMap.SourceElementComponent? = null
-    var cg: ConceptMap.ConceptMapGroupComponent? = null
-    for (g in cm.group) {
-      for (e in g.element) {
-        if (code == e!!.code) {
-          if (e != null) {
+  private fun translateByJustCode(conceptMap: ConceptMap, code: String): Coding? {
+    var sourceElementComponent: ConceptMap.SourceElementComponent? = null
+    var conceptMapGroupComponent: ConceptMap.ConceptMapGroupComponent? = null
+    for (group in conceptMap.group) {
+      for (element in group.element) {
+        if (element != null) {
+          if (code == element.code) {
             throw FHIRException(
               "Unable to process translate " +
                 code +
                 " because multiple candidate matches were found in concept map " +
-                cm.url,
+                conceptMap.url,
             )
           }
-          ct = e
-          cg = g
+          sourceElementComponent = element
+          conceptMapGroupComponent = group
         }
       }
     }
-    if (ct == null) return null
-    var tt: ConceptMap.TargetElementComponent? = null
-    for (t in ct.target) {
-      if (!t.hasDependsOn() && !t.hasProduct()) {
-        if (tt != null) {
-          throw FHIRException(
-            "Unable to process translate " +
-              code +
-              " because multiple targets were found in concept map " +
-              cm.url,
-          )
-        }
-        tt = t
-      }
-    }
-    if (tt == null) return null
-    val cp = CanonicalPair(cg!!.target)
-    return Coding().setSystem(cp.url).setVersion(cp.version).setCode(tt.code).setDisplay(tt.display)
+    sourceElementComponent ?: return null
+    var targetElementComponent: ConceptMap.TargetElementComponent? = null
+    sourceElementComponent.target
+      .singleOrNull { !it.hasDependsOn() && !it.hasProduct() }
+      ?.let { targetElementComponent = it }
+    targetElementComponent ?: return null
+    val canonicalPair = CanonicalPair(conceptMapGroupComponent!!.target)
+    return Coding()
+      .setSystem(canonicalPair.url)
+      .setVersion(canonicalPair.version)
+      .setCode(targetElementComponent?.code)
+      .setDisplay(targetElementComponent?.display)
   }
 
-  //    private boolean isOkRelationship(ConceptMapRelationship relationship) {
-  //        return relationship != null && relationship != ConceptMapRelationship.NOTRELATEDTO;
-  //    }
-  private fun translateBySystem(cm: ConceptMap, system: String, code: String): Coding {
+  private fun translateBySystem(conceptMap: ConceptMap, system: String, code: String): Coding {
     throw Error("Not done yet")
   }
 }

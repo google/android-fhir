@@ -22,8 +22,10 @@ import org.hl7.fhir.utilities.npm.NpmPackage
 
 class ComplexWorkerContext : SimpleWorkerContext() {
   @Throws(IOException::class)
-  fun loadFromMultiplePackages(packages: ArrayList<NpmPackage>, allowDuplicates: Boolean?): ComplexWorkerContext {
-    this.isAllowLoadingDuplicates = allowDuplicates!!
+  fun loadFromMultiplePackages(
+    packages: ArrayList<NpmPackage>,
+  ): ComplexWorkerContext {
+    this.isAllowLoadingDuplicates = true
     for (i in packages.indices) {
       loadFromPackage(packages[i], null)
     }

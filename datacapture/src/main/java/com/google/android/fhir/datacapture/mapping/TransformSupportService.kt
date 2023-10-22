@@ -64,8 +64,8 @@ open class TransformSupportService(
   }
 
   override fun translate(appInfo: Any, source: Coding, conceptMapUrl: String): Coding? {
-    val cme = ConceptMapEngine(iWorkerContext)
-    return cme.translate(source, conceptMapUrl)
+    val conceptMapEngine = ConceptMapEngine(iWorkerContext)
+    return conceptMapEngine.translate(source, conceptMapUrl)
   }
 
   override fun resolveReference(
