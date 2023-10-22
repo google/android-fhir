@@ -192,7 +192,7 @@ class PatientDetailsViewModel(
 
       return PatientListViewModel.ObservationItem(
         observation.logicalId,
-        observationCode,
+        if (observationCode.isNullOrEmpty()) "" else observationCode,
         dateTimeString,
         valueString
       )

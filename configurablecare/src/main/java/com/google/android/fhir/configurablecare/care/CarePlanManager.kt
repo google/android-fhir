@@ -23,7 +23,6 @@ import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
 import com.google.android.fhir.workflow.FhirOperator.Builder
-import com.google.android.fhir.workflow.TestBundleLoader
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -248,26 +247,15 @@ class CarePlanManager(
    * resources as a result of the proposed [CarePlan]
    */
   suspend fun applyPlanDefinitionOnPatient(
-    planDefinitionId: String,
+    planDefinitionUri: String,
     patient: Patient,
     requestConfiguration: List<RequestConfiguration>,
   ) {
-    // smartIgTest()
-
     val patientId = IdType(patient.id).idPart
-    // loadCarePlanResourcesFromDb()
-    // if (cqlLibraryIdList.isEmpty()) {
-    //   loadCarePlanResourcesFromDb()
-    // }
 
-    // initializeKnowledgeManager(File(context.filesDir, "smart-imm/ig"))
-
-    // val carePlanProposal =
-    //   fhirOperator.generateCarePlan(planDefinitionId = IdType(planDefinitionId).idPart, subject = "Patient/$patientId")
-    //     as CarePlan
-    println("PD: ${CanonicalType(planDefinitionId)}")
+    println("PD: ${CanonicalType(planDefinitionUri)}")
     val carePlanProposal =
-      fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionId), subject = "Patient/$patientId")
+      fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionUri), subject = "Patient/$patientId")
         as CarePlan
 
     println(jsonParser.encodeResourceToString(carePlanProposal))
@@ -278,7 +266,8 @@ class CarePlanManager(
     // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
     val resourceList = acceptCarePlan(carePlanProposal, requestConfiguration)
 
-    if (resourceList.isEmpty() && planDefinitionId.contains("IMMZD2DTMeaslesCI")) {
+    // NOTE: This is a workaround until the CI PD works (dependent on SM extraction for CI Questionnaire)
+    if (resourceList.isEmpty() && planDefinitionUri.contains("IMMZD2DTMeaslesCI")) {
       // begin order and end plan
       val medicationRequestPlans = requestManager.getRequestsForPatient(patientId, ResourceType.MedicationRequest, intent = "plan")
       println("moving to order for ${jsonParser.encodeResourceToString(medicationRequestPlans.first())}")
@@ -297,29 +286,29 @@ class CarePlanManager(
    * @param requestResourceConfigs List of configurations that need to be applied to the request
    * resources as a result of the proposed [CarePlan]
    */
-  // suspend fun applyPlanDefinitionOnMultiplePatients(
-  //   planDefinitionId: String,
-  //   patientList: List<Patient>,
-  //   requestResourceConfigs: List<RequestResourceConfig>,
-  // ) {
-  //   if (cqlLibraryIdList.isEmpty()) {
-  //     loadCarePlanResourcesFromDb()
-  //   }
-  //
-  //   for (patient in patientList) {
-  //     val patientId = IdType(patient.id).idPart
-  //
-  //     val carePlanProposal =
-  //       fhirOperator.generateCarePlan(planDefinitionId = planDefinitionId, subject = patientId)
-  //         as CarePlan
-  //
-  //     // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
-  //     val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
-  //
-  //     // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
-  //     acceptCarePlan(carePlanProposal, carePlanOfRecord, requestResourceConfigs)
-  //   }
-  // }
+  suspend fun applyPlanDefinitionOnMultiplePatients(
+    planDefinitionUrl: String,
+    patientList: List<Patient>,
+    requestConfiguration: List<RequestConfiguration>,
+  ) {
+    if (cqlLibraryIdList.isEmpty()) {
+      loadCarePlanResourcesFromDb()
+    }
+
+    for (patient in patientList) {
+      val patientId = IdType(patient.id).idPart
+
+      val carePlanProposal =
+        fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionUrl), subject = patientId)
+          as CarePlan
+
+      // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
+      // val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
+
+      // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
+      acceptCarePlan(carePlanProposal, requestConfiguration)
+    }
+  }
 
   /** Fetch the [CarePlan] of record for a given [Patient], if it exists, otherwise create it */
   private suspend fun getCarePlanOfRecordForPatient(patient: Patient): CarePlan {
@@ -385,43 +374,6 @@ class CarePlanManager(
     }
   }
 
-  // /**
-  //  * Invokes the respective [RequestResourceManager] to create new request resources as per the
-  //  * proposed [CarePlan]
-  //  *
-  //  * @param resourceList List of request resources to be created
-  //  * @param requestResourceConfigs Application-specific configurations to be applied on the created
-  //  * request resources
-  //  */
-  // private suspend fun createProposedRequestResources(
-  //   resourceList: List<Resource>,
-  //   requestResourceConfigs: List<RequestResourceConfig>,
-  // ): List<Resource> {
-  //   val createdRequestResources = ArrayList<Resource>()
-  //   for (resource in resourceList) {
-  //     when (resource.fhirType()) {
-  //       "Task" -> {
-  //         val task =
-  //           taskManager.updateRequestResource(
-  //             resource as Task,
-  //             requestResourceConfigs.firstOrNull { it.resourceType == "Task" }!!
-  //           )
-  //         createdRequestResources.add(task)
-  //       }
-  //       "ServiceRequest" -> TODO("Not supported yet")
-  //       "MedicationRequest" -> TODO("Not supported yet")
-  //       "SupplyRequest" -> TODO("Not supported yet")
-  //       "Procedure" -> TODO("Not supported yet")
-  //       "DiagnosticReport" -> TODO("Not supported yet")
-  //       "Communication" -> TODO("Not supported yet")
-  //       "CommunicationRequest" -> TODO("Not supported yet")
-  //       "RequestGroup" -> {}
-  //       else -> fhirEngine.create(resource) // TODO("Not a valid request resource")
-  //     }
-  //   }
-  //   return createdRequestResources
-  // }
-
   /**
    * Accept the proposed [CarePlan] and create the proposed request resources as per the
    * configurations
@@ -466,35 +418,12 @@ class CarePlanManager(
       }
     }
 
+    // Workaround until we figure out how to handle sequential events
     for (resource in resourceList) {
       if (resource is MedicationRequest) {
         if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
           requestManager.beginProposal(resource, requestConfiguration)
         }
-        // val intentCondition = getNextActionForMedicationRequest(resource, requestConfiguration)
-        // if (intentCondition != null) {
-        //   if (intentCondition.condition == "automatic") {  // transition to the next intent level
-        //     if (intentCondition.action == "transition-to-plan") {  // intent = proposal
-        //       requestManager.beginPlan(resource, requestConfiguration)
-        //       requestManager.endPlan(resource)
-        //     } else if (intentCondition.action == "transition-to-order") {  // intent = plan
-        //       requestManager.beginOrder(resource, requestConfiguration)
-        //       requestManager.endOrder(resource)
-        //     }
-        //   } else {
-        //     if (intentCondition.action == "transition-to-plan") {  // intent = proposal
-        //       requestManager.beginPlan(resource, requestConfiguration)
-        //     } else if (intentCondition.action == "transition-to-order") {  // intent = plan
-        //       requestManager.endPlan(resource)
-        //       requestManager.beginOrder(resource, requestConfiguration)
-        //     }
-        //
-        //     requestManager.updateIntent(IdType(resource.id).idPart, "MedicationRequest", requestConfiguration)
-        //   } else {
-        //     resource.addSupportingInformation(Reference(condition))
-        //     fhirEngine.update(resource)
-        //   }
-        // }
       }
     }
 
@@ -569,6 +498,7 @@ class CarePlanManager(
   //   }
   // }
 
+  // This should be in the RequestManager
   companion object {
     fun getNextActionForMedicationRequest(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>): RequestConfiguration.IntentCondition? {
       val mrConfig = requestConfiguration.firstOrNull {
@@ -577,13 +507,6 @@ class CarePlanManager(
         it.intent == medicationRequest.intent.toCode()
       }
       return mrConfig
-      // return if (mrConfig != null) {
-      //   if (mrConfig.condition == "automatic")
-      //     ""
-      //   else
-      //     mrConfig.condition
-      // } else
-      //   ""
     }
   }
 

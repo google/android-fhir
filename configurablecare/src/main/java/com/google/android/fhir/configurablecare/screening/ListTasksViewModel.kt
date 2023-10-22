@@ -210,7 +210,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
   val completedDate = dueDate
   val owner = ""
   val clickable = true
-  val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else "Questionnaire/IMMZD4CheckContraindicationsMeasles"
+  val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else "Questionnaire/QIMMZD4CheckContraindicationsMeasles"
     // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
 
   return ListScreeningsViewModel.TaskItem(

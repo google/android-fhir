@@ -5,23 +5,26 @@
       "carePlanPolicy": "ACCEPT_ALL",
       "implementationGuideConfig": {
         "implementationGuideId": "ImplementationGuide/ImmunizationReview",
-        "patientRegistrationQuestionnaire": "Questionnaire/IMMZCRegisterClient",
+        "patientRegistrationQuestionnaire": "Questionnaire/QIMMZCRegisterClient",
         "entryPoint": "PlanDefinition/PlanImmunizationReview",
         "triggers": [
           {
-            "event": "Questionnaire/IMMZCRegisterClient",
+            "event": "Questionnaire/QIMMZCRegisterClient",
             "planDefinition":"",
-            "structureMap": "StructureMap/IMMZCQRToPatient"
+            "structureMap": "StructureMap/IMMZCQRToPatient",
+            "targetResource": "Patient"
           },
           {
             "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
             "planDefinition":"http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles",
-            "structureMap": ""
+            "structureMap": "StructureMap/IMMZD1QRToResources",
+            "targetResource": "Bundle"
           },
           {
-            "event": "Questionnaire/IMMZD4CheckContraindicationsMeasles",
+            "event": "Questionnaire/QIMMZD4CheckContraindicationsMeasles",
             "planDefinition": "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeaslesCI",
-            "structureMap": ""
+            "structureMap": "StructureMap/IMMZD4QRToResources",
+            "targetResource": "Bundle"
           },
           {
             "event": "Questionnaire/AdministerVaccine",
@@ -41,7 +44,7 @@
               {
                 "intent": "plan",
                 "action": "begin-order",
-                "condition": "Questionnaire/IMMZD4CheckContraindicationsMeasles"
+                "condition": "Questionnaire/QIMMZD4CheckContraindicationsMeasles"
               },
               {
                 "intent": "order",

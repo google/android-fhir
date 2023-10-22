@@ -12,18 +12,6 @@
     "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type": [
       "StructureDefinition.snapshot.element.type"
     ],
-    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm": [
-      "ValueSet"
-    ],
-    "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status": [
-      "ValueSet"
-    ],
-    "http://hl7.org/fhir/StructureDefinition/structuredefinition-wg": [
-      "ValueSet"
-    ],
-    "http://hl7.org/fhir/StructureDefinition/valueset-author": [
-      "ValueSet"
-    ],
     "http://hl7.org/fhir/tools/StructureDefinition/ig-internal-dependency": [
       "ImplementationGuide.definition"
     ],
@@ -55,11 +43,7 @@
     ],
     "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability": [
       "ActivityDefinition",
-      "PlanDefinition",
-      "ValueSet"
-    ],
-    "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel": [
-      "ValueSet"
+      "PlanDefinition"
     ],
     "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap": [
       "Questionnaire"

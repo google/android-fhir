@@ -1,214 +1,10 @@
 [
   {
-    "id" : "active-condition",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/cqf/common/ValueSet/active-condition",
-    "version" : "0.1.0",
-    "name" : "CQFActiveCondition"
-  },
-  {
-    "id" : "inactive-condition",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/cqf/common/ValueSet/inactive-condition",
-    "version" : "0.1.0",
-    "name" : "CQFInactiveCondition"
-  },
-  {
-    "id" : "anc-b9-de45",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de45",
-    "version" : "0.1.0",
-    "name" : "HIVstatus"
-  },
-  {
-    "id" : "anc-b9-de46",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de46",
-    "version" : "0.1.0",
-    "name" : "HIVstatusHIVpositiveChoices"
-  },
-  {
-    "id" : "anc-b9-de47",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de47",
-    "version" : "0.1.0",
-    "name" : "HIVstatusHIVnegativeChoices"
-  },
-  {
-    "id" : "careplanbirthcontrolmethods-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/careplanbirthcontrolmethods-values",
-    "version" : "0.1.0",
-    "name" : "careplanbirthcontrolmethods-values"
-  },
-  {
-    "id" : "current-medications-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/current-medications-values",
-    "version" : "0.1.0",
-    "name" : "current-medications-values"
-  },
-  {
-    "id" : "devicebirthcontrolmethods-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/devicebirthcontrolmethods-values",
-    "version" : "0.1.0",
-    "name" : "devicebirthcontrolmethods-values"
-  },
-  {
-    "id" : "drug-allergies-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/drug-allergies-values",
-    "version" : "0.1.0",
-    "name" : "drug-allergies-values"
-  },
-  {
-    "id" : "gender-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/gender-values",
-    "version" : "0.1.0",
-    "name" : "gender-values"
-  },
-  {
-    "id" : "highest-level-of-education-achieved-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/highest-level-of-education-achieved-values",
-    "version" : "0.1.0",
-    "name" : "highest-level-of-education-achieved-values"
-  },
-  {
-    "id" : "hiv-stage-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/hiv-stage-values",
-    "version" : "0.1.0",
-    "name" : "hiv-stage-values"
-  },
-  {
-    "id" : "hiv-test-result-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/hiv-test-result-values",
-    "version" : "0.1.0",
-    "name" : "hiv-test-result-values"
-  },
-  {
-    "id" : "marital-status-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/marital-status-values",
-    "version" : "0.1.0",
-    "name" : "marital-status-values"
-  },
-  {
-    "id" : "medicationbirthcontrolmethods-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/medicationbirthcontrolmethods-values",
-    "version" : "0.1.0",
-    "name" : "medicationbirthcontrolmethods-values"
-  },
-  {
-    "id" : "miscarriage-or-abortion-stage-of-pregnancy-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/miscarriage-or-abortion-stage-of-pregnancy-values",
-    "version" : "0.1.0",
-    "name" : "miscarriage-or-abortion-stage-of-pregnancy-values"
-  },
-  {
-    "id" : "miscarriage-or-abortion-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/miscarriage-or-abortion-values",
-    "version" : "0.1.0",
-    "name" : "miscarriage-or-abortion-values"
-  },
-  {
-    "id" : "nobirthcontrolmethod-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/nobirthcontrolmethod-values",
-    "version" : "0.1.0",
-    "name" : "nobirthcontrolmethod-values"
-  },
-  {
-    "id" : "occupation-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/occupation-values",
-    "version" : "0.1.0",
-    "name" : "occupation-values"
-  },
-  {
-    "id" : "payment-method-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/payment-method-values",
-    "version" : "0.1.0",
-    "name" : "payment-method-values"
-  },
-  {
-    "id" : "pregnancystatus-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
-    "version" : "0.1.0",
-    "name" : "pregnancystatus-values"
-  },
-  {
-    "id" : "pregnancystatuspregnant-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
-    "version" : "0.1.0",
-    "name" : "pregnancystatuspregnant-values"
-  },
-  {
-    "id" : "procedurebirthcontrolmethods-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/procedurebirthcontrolmethods-values",
-    "version" : "0.1.0",
-    "name" : "procedurebirthcontrolmethods-values"
-  },
-  {
-    "id" : "reason-for-referral-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/reason-for-referral-values",
-    "version" : "0.1.0",
-    "name" : "reason-for-referral-values"
-  },
-  {
-    "id" : "referred-by-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/referred-by-values",
-    "version" : "0.1.0",
-    "name" : "referred-by-values"
-  },
-  {
-    "id" : "sti-risk-assessment-factors-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/sti-risk-assessment-factors-values",
-    "version" : "0.1.0",
-    "name" : "sti-risk-assessment-factors-values"
-  },
-  {
-    "id" : "visit-type-values",
-    "type" : "ValueSet",
-    "url" : "http://fhir.org/guides/who/core/ValueSet/visit-type-values",
-    "version" : "0.1.0",
-    "name" : "visit-type-values"
-  },
-  {
     "id" : "FHIRHelpers",
     "type" : "Library",
     "url" : "http://hl7.org/fhir/Library/FHIRHelpers",
     "version" : "0.1.0",
     "name" : "FHIRHelpers"
-  },
-  {
-    "id" : "adverse-event-type",
-    "type" : "ValueSet",
-    "url" : "http://hl7.org/fhir/ValueSet/adverse-event-type",
-    "version" : "0.1.0",
-    "name" : "SNOMEDCTClinicalFindings",
-    "oids" : ["2.16.840.1.113883.4.642.3.835"]
-  },
-  {
-    "id" : "whoatc-uv-ips",
-    "type" : "ValueSet",
-    "url" : "http://hl7.org/fhir/uv/ips/ValueSet/whoatc-uv-ips",
-    "version" : "0.1.0",
-    "name" : "WhoAtcUvIps"
   },
   {
     "id" : "IMMZD2DTMeaslesCIMR",
@@ -400,21 +196,21 @@
     "name" : "IMMZDTUmbrella"
   },
   {
-    "id" : "IMMZCRegisterClient",
-    "type" : "Questionnaire",
-    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZCRegisterClient",
-    "version" : "0.1.0"
-  },
-  {
     "id" : "IMMZD1ClientHistoryMeasles",
     "type" : "Questionnaire",
     "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZD1ClientHistoryMeasles",
     "version" : "0.1.0"
   },
   {
-    "id" : "IMMZD4CheckContraindicationsMeasles",
+    "id" : "QIMMZCRegisterClient",
     "type" : "Questionnaire",
-    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/IMMZD4CheckContraindicationsMeasles",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/QIMMZCRegisterClient",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "QIMMZD4CheckContraindicationsMeasles",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations/Questionnaire/QIMMZD4CheckContraindicationsMeasles",
     "version" : "0.1.0"
   },
   {
@@ -577,12 +373,5 @@
     "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/PositiveTestResult-values",
     "version" : "0.1.0",
     "name" : "PositiveTestResultvalues"
-  },
-  {
-    "id" : "extended-content-codes",
-    "type" : "CodeSystem",
-    "url" : "http://who.int/cg/CodeSystem/extended-content-codes",
-    "version" : "0.1.0",
-    "name" : "extended-content_codes"
   }
 ]

@@ -669,7 +669,7 @@
         "valueString" : "Questionnaire"
       }],
       "reference" : {
-        "reference" : "Questionnaire/IMMZD4CheckContraindicationsMeasles"
+        "reference" : "Questionnaire/QIMMZD4CheckContraindicationsMeasles"
       },
       "name" : "Check Contraindications Questionnaire",
       "description" : "Immunization - Check Contraindications Questionnaire",
@@ -681,7 +681,7 @@
         "valueString" : "Questionnaire"
       }],
       "reference" : {
-        "reference" : "Questionnaire/IMMZCRegisterClient"
+        "reference" : "Questionnaire/QIMMZCRegisterClient"
       },
       "name" : "Client Registration Questionnaire",
       "description" : "Immunization - Client Registration Questionnaire",
@@ -738,72 +738,12 @@
     {
       "extension" : [{
         "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/devicebirthcontrolmethods-values"
-      },
-      "name" : "Contraceptive history - Device-based values",
-      "description" : "Codes representing possible values for the Contraceptive history - Device-based element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/active-condition"
-      },
-      "name" : "CQF Active Condition",
-      "description" : "Active condition clinical status codes",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/inactive-condition"
-      },
-      "name" : "CQF Inactive Condition",
-      "description" : "Inactive condition clinical status codes",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
         "valueString" : "Device"
       }],
       "reference" : {
         "reference" : "Device/cqf-tooling"
       },
       "name" : "cqf-tooling",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/current-medications-values"
-      },
-      "name" : "Current medications values",
-      "description" : "Codes representing possible values for the Current medications element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/drug-allergies-values"
-      },
-      "name" : "Drug allergies values",
-      "description" : "Codes representing possible values for the Drug allergies element",
       "exampleBoolean" : false
     },
     {
@@ -922,94 +862,10 @@
         "valueString" : "ValueSet"
       }],
       "reference" : {
-        "reference" : "ValueSet/gender-values"
-      },
-      "name" : "Gender values",
-      "description" : "Codes representing possible values for the Gender element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/highest-level-of-education-achieved-values"
-      },
-      "name" : "Highest level of education achieved values",
-      "description" : "Codes representing possible values for the Highest level of education achieved element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/hiv-stage-values"
-      },
-      "name" : "HIV Stage values",
-      "description" : "Codes representing possible values for the HIV Stage element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/anc-b9-de45"
-      },
-      "name" : "HIV status",
-      "description" : "Codes representing possible values for the HIV status element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/anc-b9-de47"
-      },
-      "name" : "HIV status - HIV negative Choices",
-      "description" : "Codes representing possible values for the HIV status - HIV negative Choices element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/anc-b9-de46"
-      },
-      "name" : "HIV status - HIV positive Choices",
-      "description" : "Codes representing possible values for the HIV status - HIV positive Choices element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
         "reference" : "ValueSet/HIVstatus-values"
       },
       "name" : "HIV status values",
       "description" : "Codes representing HIV status values",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/hiv-test-result-values"
-      },
-      "name" : "HIV Test Result values",
-      "description" : "Codes representing possible values for the HIV Test Result element",
       "exampleBoolean" : false
     },
     {
@@ -1335,70 +1191,10 @@
         "valueString" : "ValueSet"
       }],
       "reference" : {
-        "reference" : "ValueSet/marital-status-values"
-      },
-      "name" : "Marital Status values",
-      "description" : "Codes representing possible values for the Marital Status element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/medicationbirthcontrolmethods-values"
-      },
-      "name" : "Medication-based Birth control method reported at intake values",
-      "description" : "Codes representing possible values for the Medication-based Birth control method reported at intake element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/miscarriage-or-abortion-stage-of-pregnancy-values"
-      },
-      "name" : "Miscarriage or abortion stage of pregnancy values",
-      "description" : "Codes representing possible values for the Miscarriage or abortion stage of pregnancy element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/miscarriage-or-abortion-values"
-      },
-      "name" : "Miscarriage or Abortion values",
-      "description" : "Codes representing possible values for the Miscarriage or Abortion element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
         "reference" : "ValueSet/Negativetestresult-values"
       },
       "name" : "Negative Test Results",
       "description" : "Codes representing negative test result values",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/occupation-values"
-      },
-      "name" : "Occupation values",
-      "description" : "Codes representing possible values for the Occupation element",
       "exampleBoolean" : false
     },
     {
@@ -1429,18 +1225,6 @@
         "valueString" : "ValueSet"
       }],
       "reference" : {
-        "reference" : "ValueSet/payment-method-values"
-      },
-      "name" : "Payment method values",
-      "description" : "Codes representing possible values for the Payment method element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
         "reference" : "ValueSet/PositiveTestResult-values"
       },
       "name" : "Positive Test Result valuest",
@@ -1453,154 +1237,10 @@
         "valueString" : "ValueSet"
       }],
       "reference" : {
-        "reference" : "ValueSet/pregnancystatuspregnant-values"
-      },
-      "name" : "Pregnancy status pregnant values",
-      "description" : "Codes representing possible values for the Pregnancy status as pregnant",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/pregnancystatus-values"
-      },
-      "name" : "Pregnancy status values",
-      "description" : "Codes representing possible values for the Pregnancy status element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/careplanbirthcontrolmethods-values"
-      },
-      "name" : "Prior contraceptive methods used - CarePlan-based values",
-      "description" : "Codes representing possible values for the Prior contraceptive methods used - CarePlan-based element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/procedurebirthcontrolmethods-values"
-      },
-      "name" : "Prior contraceptive methods used - Procedure-based values",
-      "description" : "Codes representing possible values for the Prior contraceptive methods used - Procedure-based element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/nobirthcontrolmethod-values"
-      },
-      "name" : "Reason for no contraceptive method - Reported at intake values",
-      "description" : "Codes representing possible values for the Reason for no contraceptive method - Reported at intake element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/reason-for-referral-values"
-      },
-      "name" : "Reason for referral values",
-      "description" : "Codes representing possible values for the Reason for referral element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/referred-by-values"
-      },
-      "name" : "Referred by values",
-      "description" : "Codes representing possible values for the Referred by element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
         "reference" : "ValueSet/LiveAttenuatedVaccines"
       },
       "name" : "Set of live attenuated vaccines",
       "description" : "Codes representing live attenuated vaccines",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/adverse-event-type"
-      },
-      "name" : "SNOMED CT Clinical Findings",
-      "description" : "This value set includes all SNOMED CT Clinical Findings.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/sti-risk-assessment-factors-values"
-      },
-      "name" : "STI risk assessment factors values",
-      "description" : "Codes representing possible values for the STI risk assessment factors element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/visit-type-values"
-      },
-      "name" : "Visit type values",
-      "description" : "Codes representing possible values for the Visit type element",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "ValueSet"
-      }],
-      "reference" : {
-        "reference" : "ValueSet/whoatc-uv-ips"
-      },
-      "name" : "WHO ATC - IPS",
-      "description" : "World Health Organization Anatomical Therapeutic Chemical (ATC) classification system.  Note: The currently implemented code system and the value set expansion contain only a set of example ATC codes, not the complete code system content.",
-      "exampleBoolean" : false
-    },
-    {
-      "extension" : [{
-        "url" : "http://hl7.org/fhir/tools/StructureDefinition/resource-information",
-        "valueString" : "CodeSystem"
-      }],
-      "reference" : {
-        "reference" : "CodeSystem/extended-content-codes"
-      },
-      "name" : "WHO Extended Codes CodeSystem codes",
-      "description" : "Set of codes identified as being needed but not found in existing Code Systems",
       "exampleBoolean" : false
     },
     {

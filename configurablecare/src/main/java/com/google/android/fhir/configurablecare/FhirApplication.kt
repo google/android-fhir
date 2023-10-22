@@ -42,7 +42,7 @@ import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
-  private val BASE_URL = "http://10.0.2.2:8080/fhir/"
+  private val BASE_URL = "https://192.168.1.100:8080/fhir/" // "http://127.0.0.1:8080/fhir"  // "http://10.0.2.2:8080/fhir/"
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
   private val taskManager: TaskManager by lazy { constructTaskManager() }
@@ -108,7 +108,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     val measlesIg =
       async {
       NpmPackage.fromPackage(
-        // assets.open("smart-imm/ig/package.r4.tgz")
         assets.open("smart-imm/ig/package.r4.tgz")
       )
     }

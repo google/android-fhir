@@ -58,7 +58,8 @@ class ImplementationGuideConfig(
 data class Trigger(
   var event: String,
   var planDefinition: String,
-  var structureMap: String
+  var structureMap: String,
+  var targetResource: String
 )
 
 

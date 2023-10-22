@@ -28,7 +28,6 @@ import com.google.android.fhir.datacapture.mapping.ResourceMapper
 import com.google.android.fhir.configurablecare.FhirApplication
 import com.google.android.fhir.configurablecare.care.RequestConfiguration
 import com.google.android.fhir.configurablecare.care.TaskManager
-import com.google.android.fhir.configurablecare.care.RequestResourceConfig
 import com.google.android.fhir.configurablecare.util.TransformSupportServicesMatchBox
 import com.google.android.fhir.get
 import com.google.android.fhir.testing.jsonParser
@@ -42,7 +41,6 @@ import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
@@ -143,11 +141,11 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         println("QR before SM extraction: ${jsonParser.encodeResourceToString(questionnaireResponse)}")
 
 
-        val qr = readFileFromAssets("smart-imm/ig/QuestionnaireResponse-Example.IMMZ.D1.QuestionnaireResponse.1.json")
+        // val qr = readFileFromAssets("smart-imm/ig/QuestionnaireResponse-Example.IMMZ.D1.QuestionnaireResponse.1.json")
 
         val baseElement =
           jsonParser.parseResource(
-            QuestionnaireResponse::class.java, qr) // questionnaireResponse))
+            QuestionnaireResponse::class.java, jsonParser.encodeResourceToString(questionnaireResponse))
 
         structureMapUtilities.transform(contextR4, baseElement, structureMap, targetResource)
 
