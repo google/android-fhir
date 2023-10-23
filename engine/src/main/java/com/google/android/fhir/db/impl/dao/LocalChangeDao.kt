@@ -206,6 +206,20 @@ internal abstract class LocalChangeDao {
     resourceId: String,
   ): List<LocalChangeEntity>
 
+  @Query(
+    """
+      SELECT * 
+      FROM LocalChangeEntity 
+      WHERE resourceUuid = (
+        SELECT resourceUuid 
+        FROM LocalChangeEntity 
+        ORDER BY timestamp ASC 
+        LIMIT 1)
+      ORDER BY timestamp ASC
+    """,
+  )
+  abstract suspend fun getAllChangesForEarliestChangedResource(): List<LocalChangeEntity>
+
   class InvalidLocalChangeException(message: String?) : Exception(message)
 }
 

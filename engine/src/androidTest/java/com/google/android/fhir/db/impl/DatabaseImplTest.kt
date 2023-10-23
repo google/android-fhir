@@ -234,6 +234,23 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun getAllChangesForEarliestChangedResource_withMultipleChanges_shouldReturnFirstChange() =
+    runBlocking {
+      val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
+      database.insert(patient)
+      database.insert(TEST_PATIENT_2)
+      database.update(
+        TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE },
+      )
+      assertThat(
+          database.getAllChangesForEarliestChangedResource().all {
+            it.resourceId.equals(TEST_PATIENT_1.logicalId)
+          },
+        )
+        .isTrue()
+    }
+
+  @Test
   fun clearDatabase_shouldClearAllTablesData() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
