@@ -28,6 +28,7 @@ import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
 import com.google.android.fhir.sync.remote.RetrofitHttpService
 import org.hl7.fhir.r4.model.SearchParameter
@@ -38,6 +39,7 @@ internal data class FhirServices(
   val parser: IParser,
   val database: Database,
   val remoteDataSource: DataSource? = null,
+  val fhirDataStore: FhirDataStore,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -95,6 +97,7 @@ internal data class FhirServices(
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource,
+        fhirDataStore = FhirDataStore(context),
       )
     }
   }

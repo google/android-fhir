@@ -62,11 +62,14 @@ object FhirEngineProvider {
     return getOrCreateFhirService(context).remoteDataSource
   }
 
+  @PublishedApi
+  @Synchronized
+  internal fun getFhirDataStore(context: Context): FhirDataStore {
+    return getOrCreateFhirService(context).fhirDataStore
+  }
+
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
-    if (fhirDataStore == null) {
-      fhirDataStore = FhirDataStore(context)
-    }
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
       val configuration = checkNotNull(fhirEngineConfiguration)
@@ -85,8 +88,6 @@ object FhirEngineProvider {
     }
     return checkNotNull(fhirServices)
   }
-
-  @PublishedApi @Synchronized internal fun getFhirDataStore() = fhirDataStore
 
   @Synchronized
   fun cleanup() {

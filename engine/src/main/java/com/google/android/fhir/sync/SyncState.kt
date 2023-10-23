@@ -16,21 +16,30 @@
 
 package com.google.android.fhir.sync
 
-sealed class OneTimeSyncState {
-  class Enqueued : OneTimeSyncState()
+import java.time.OffsetDateTime
 
-  data class Running(val currentJob: SyncJobStatus) : OneTimeSyncState()
+sealed class SyncState {
+  object Enqueued : SyncState()
 
-  class Succeeded(val succeededJob: SyncJobStatus) : OneTimeSyncState()
+  data class Running(val currentJob: SyncJobStatus) : SyncState()
 
-  data class Failed(val failedJob: SyncJobStatus) : OneTimeSyncState()
+  class Succeeded(val succeededJob: SyncJobStatus) : SyncState()
 
-  class Cancelled : OneTimeSyncState()
+  data class Failed(val failedJob: SyncJobStatus) : SyncState()
 
-  class Unknown : OneTimeSyncState()
+  object Cancelled : SyncState()
+
+  object Unknown : SyncState()
 }
 
 data class PeriodicSyncState(
-  val lastJobState: OneTimeSyncState? = null,
-  val currentJobState: OneTimeSyncState? = null,
+  val lastJobState: Result? = null,
+  val currentJobState: SyncState? = null,
 )
+
+sealed class Result(val timestamp: OffsetDateTime) {
+  class Succeeded(timestamp: OffsetDateTime) : Result(timestamp)
+
+  class Failed(val exceptions: List<ResourceSyncException>, timestamp: OffsetDateTime) :
+    Result(timestamp)
+}

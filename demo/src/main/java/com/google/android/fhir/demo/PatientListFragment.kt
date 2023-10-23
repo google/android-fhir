@@ -44,8 +44,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.OneTimeSyncState
 import com.google.android.fhir.sync.SyncJobStatus
+import com.google.android.fhir.sync.SyncState
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -106,6 +106,7 @@ class PatientListFragment : Fragment() {
 
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
+    topBanner.visibility = View.GONE
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
     syncPercent = binding.syncStatusContainer.tvSyncingPercent
     syncProgress = binding.syncStatusContainer.progressSyncing
@@ -156,17 +157,17 @@ class PatientListFragment : Fragment() {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
-          is OneTimeSyncState.Running -> {
+          is SyncState.Running -> {
             Timber.i("Sync: ${it::class.java.simpleName} with data ${it.currentJob}")
             fadeInTopBanner(it)
           }
-          is OneTimeSyncState.Succeeded -> {
+          is SyncState.Succeeded -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.succeededJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is OneTimeSyncState.Failed -> {
+          is SyncState.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.failedJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
@@ -210,7 +211,7 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
-  private fun fadeInTopBanner(state: OneTimeSyncState) {
+  private fun fadeInTopBanner(state: SyncState) {
     if (topBanner.visibility != View.VISIBLE) {
       syncStatus.text = resources.getString(R.string.syncing).uppercase()
       syncPercent.text = ""
@@ -219,7 +220,7 @@ class PatientListFragment : Fragment() {
       topBanner.visibility = View.VISIBLE
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
-    } else if (state is OneTimeSyncState.Running && state.currentJob is SyncJobStatus.InProgress) {
+    } else if (state is SyncState.Running && state.currentJob is SyncJobStatus.InProgress) {
       val inProgressState = state.currentJob as? SyncJobStatus.InProgress
       val progress =
         inProgressState
@@ -233,8 +234,8 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun fadeOutTopBanner(state: OneTimeSyncState) {
-    if (state is OneTimeSyncState.Succeeded) syncPercent.text = ""
+  private fun fadeOutTopBanner(state: SyncState) {
+    if (state is SyncState.Succeeded) syncPercent.text = ""
     syncProgress.visibility = View.GONE
 
     if (topBanner.visibility == View.VISIBLE) {

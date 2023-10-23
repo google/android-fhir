@@ -30,7 +30,7 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.map
 
 @PublishedApi
 internal class FhirDataStore(context: Context) {
@@ -45,7 +45,6 @@ internal class FhirDataStore(context: Context) {
       .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
       .create()
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
-  private val previousSyncJobStatusMap = mutableMapOf<String, SyncJobStatus?>()
 
   /**
    * Utilizes a flow from the DataStore to collect and transform data. It catches potential
@@ -56,7 +55,7 @@ internal class FhirDataStore(context: Context) {
    * @return A flow that emits the [FhirSyncWorkStatus].
    */
   @PublishedApi
-  internal fun getSyncJobStatusPreferencesFlow(key: String): Flow<SyncJobStatus?> =
+  internal fun observeSyncJobTerminalState(key: String): Flow<SyncJobStatus?> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
         .catch { exception ->
@@ -66,13 +65,15 @@ internal class FhirDataStore(context: Context) {
             throw exception
           }
         }
-        .mapNotNull { preferences -> preferences[stringPreferencesKey(key)] }
-        .mapNotNull { statusData -> gson.fromJson(statusData, Data::class.java) }
-        .mapNotNull { data ->
-          val stateType = data.getString(STATE_TYPE)
-          val stateData = data.getString(STATE)
-          stateType?.let { type ->
-            stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
+        .map { preferences -> preferences[stringPreferencesKey(key)] }
+        .map { statusData -> gson.fromJson(statusData, Data::class.java) }
+        .map { data ->
+          data?.let {
+            val stateType = data.getString(STATE_TYPE)
+            val stateData = data.getString(STATE)
+            stateType?.let { type ->
+              stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
+            }
           }
         }
     }
@@ -85,27 +86,60 @@ internal class FhirDataStore(context: Context) {
    * @param syncJobStatus The synchronization job status to be stored.
    * @param key The key associated with the data to edit.
    */
-  internal suspend fun updateSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
-    dataStore.edit { preferences ->
-      val data =
-        workDataOf(
-          STATE_TYPE to syncJobStatus::class.java.name,
-          STATE to gson.toJson(syncJobStatus),
+  internal suspend fun updateSyncJobTerminalState(
+    key: String,
+    syncJobStatus: SyncJobStatus? = null,
+  ) {
+    updateJobStatus(key, syncJobStatus)
+  }
+
+  /**
+   * Updates the last sync job status for the specified key.
+   *
+   * @param key The key associated with the sync job status.
+   * @param syncJobStatus The sync job status to be updated.
+   * @throws IllegalArgumentException if the provided syncJobStatus is an intermediate state.
+   */
+  internal suspend fun updateLastSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
+    when (syncJobStatus) {
+      is SyncJobStatus.Finished,
+      is SyncJobStatus.Failed, -> {
+        updateJobStatus(key + LAST_JOB_TERMINAL_STATE, syncJobStatus)
+      }
+      else -> {
+        throw IllegalArgumentException(
+          "Intermediate state $syncJobStatus is not supported.",
         )
-      preferences[stringPreferencesKey(key)] = gson.toJson(data)
+      }
     }
   }
 
-  internal suspend fun updateLastJobState(key: String) {
-    val value = getSyncJobStatusPreferencesFlow(key).first()
-    previousSyncJobStatusMap[key] = value
-  }
+  /**
+   * Retrieves the last sync job status for the specified key.
+   *
+   * @param key The key associated with the sync job status.
+   * @return The last sync job status.
+   */
+  internal suspend fun getLastSyncJobStatus(key: String) =
+    observeSyncJobTerminalState(key + LAST_JOB_TERMINAL_STATE).first()
 
-  internal fun getLastSyncJobStatus(key: String) = previousSyncJobStatusMap[key]
+  private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus?) {
+    dataStore.edit { preferences ->
+      val data =
+        syncJobStatus?.let {
+          workDataOf(
+            STATE_TYPE to it::class.java.name,
+            STATE to gson.toJson(it),
+          )
+        }
+      preferences[stringPreferencesKey(key)] = gson.toJson(data)
+    }
+  }
 
   companion object {
     private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
     private const val STATE_TYPE = "StateType"
     private const val STATE = "State"
+    private const val LAST_JOB_TERMINAL_STATE = "lastJobTerminalState"
   }
 }

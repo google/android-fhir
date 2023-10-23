@@ -34,7 +34,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -77,18 +76,20 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val job =
       CoroutineScope(Dispatchers.IO).launch {
-        val fhirDataStore = FhirEngineProvider.getFhirDataStore()
-        val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
-        synchronizer.syncState.collect {
-          fhirDataStore?.updateSyncJobStatus(
-            uniqueWorkerName,
-            it,
-          )
-          // now send Progress to work manager so caller app can listen
-          setProgress(buildWorkData(it))
-
-          if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
-            this@launch.cancel()
+        val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
+        synchronizer.syncState.collect { syncJobStatus ->
+          val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
+          when (syncJobStatus) {
+            is SyncJobStatus.Finished,
+            is SyncJobStatus.Failed, -> {
+              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName, syncJobStatus)
+              fhirDataStore.updateLastSyncJobStatus(uniqueWorkerName, syncJobStatus)
+              cancel()
+            }
+            else -> {
+              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName)
+              setProgress(buildWorkData(syncJobStatus))
+            }
           }
         }
       }
@@ -99,15 +100,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     // await/join is needed to collect states completely
     kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    setProgress(output)
+    //    setProgress(output)
 
     Timber.d("Received result from worker $result and sending output $output")
-
-    withContext(CoroutineScope(Dispatchers.IO).coroutineContext) {
-      val fhirDataStore = FhirEngineProvider.getFhirDataStore()
-      val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
-      fhirDataStore?.updateLastJobState(uniqueWorkerName) // previous syncJobStatus
-    }
 
     /**
      * In case of failure, we can check if its worth retrying and do retry based on

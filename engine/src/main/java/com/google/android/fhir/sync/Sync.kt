@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -35,12 +34,12 @@ import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
-import com.google.android.fhir.sync.OneTimeSyncState.Cancelled
-import com.google.android.fhir.sync.OneTimeSyncState.Enqueued
-import com.google.android.fhir.sync.OneTimeSyncState.Failed
-import com.google.android.fhir.sync.OneTimeSyncState.Running
-import com.google.android.fhir.sync.OneTimeSyncState.Succeeded
-import com.google.android.fhir.sync.OneTimeSyncState.Unknown
+import com.google.android.fhir.sync.SyncState.Cancelled
+import com.google.android.fhir.sync.SyncState.Enqueued
+import com.google.android.fhir.sync.SyncState.Failed
+import com.google.android.fhir.sync.SyncState.Running
+import com.google.android.fhir.sync.SyncState.Succeeded
+import com.google.android.fhir.sync.SyncState.Unknown
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
@@ -49,7 +48,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 object Sync {
@@ -70,7 +68,7 @@ object Sync {
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
-  ): Flow<OneTimeSyncState> {
+  ): Flow<SyncState> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     val flow = getWorkerInfo(context, uniqueWorkName)
     WorkManager.getInstance(context)
@@ -79,7 +77,7 @@ object Sync {
         ExistingWorkPolicy.KEEP,
         createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName),
       )
-    return combineSyncJobStatusAndWorkInfoStateForOnetimeSync(context, uniqueWorkName)
+    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow)
   }
 
   /**
@@ -105,7 +103,7 @@ object Sync {
         ExistingPeriodicWorkPolicy.KEEP,
         createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName),
       )
-    return createPeriodicSyncState(context, uniqueWorkName)
+    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
@@ -125,46 +123,48 @@ object Sync {
       }
 
   @PublishedApi
-  internal fun createPeriodicSyncState(
+  internal fun combineSyncStateForPeriodicSync(
     context: Context,
     workName: String,
+    syncJobProgressStateFlow: Flow<SyncJobStatus>,
   ): Flow<PeriodicSyncState> {
     val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
-    val syncJobStatusFlow: Flow<SyncJobStatus?>? =
-      FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(workName)
+    val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
+      FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
+    val syncJobFlow =
+      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) { inprogress, terminal,
+        ->
+        terminal ?: inprogress
+      }
 
-    return if (syncJobStatusFlow != null) {
-      workStateFlow.combine(syncJobStatusFlow) { workState, syncStatus ->
-        val lastSyncJobStatus =
-          FhirEngineProvider.getFhirDataStore()?.getLastSyncJobStatus(workName)
-        PeriodicSyncState(
-          lastJobState = lastSyncJobStatus?.let { createLastJobState(it) },
-          currentJobState = syncStatus?.let { createCurrentJobState(it, workState) },
-        )
-      }
-    } else {
-      workStateFlow.map { workState ->
-        Log.d("demo1", "work state : $workState")
-        PeriodicSyncState()
-      }
+    return combine(workStateFlow, syncJobFlow) { workInfoState, syncJobIntermediateState ->
+      val lastSyncJobStatus =
+        FhirEngineProvider.getFhirDataStore(context).getLastSyncJobStatus(workName)
+      val currentJobState =
+        syncJobIntermediateState?.let { createCurrentJobState(it, workInfoState) }
+      PeriodicSyncState(
+        lastJobState = lastSyncJobStatus?.let { mapSyncJobStatusToResult(it) },
+        currentJobState = currentJobState,
+      )
     }
   }
 
   @PublishedApi
-  internal fun combineSyncJobStatusAndWorkInfoStateForOnetimeSync(
+  internal fun combineSyncStateForOneTimeSync(
     context: Context,
     workName: String,
-  ): Flow<OneTimeSyncState> {
+    syncJobProgressStateFlow: Flow<SyncJobStatus>,
+  ): Flow<SyncState> {
     val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
-    val syncJobStatusFlow: Flow<SyncJobStatus?>? =
-      FhirEngineProvider.getFhirDataStore()?.getSyncJobStatusPreferencesFlow(workName)
+    val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
+      FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
 
-    return if (syncJobStatusFlow != null) {
-      workStateFlow.combine(syncJobStatusFlow) { workState, syncStatus ->
-        createOneTimeSyncState(syncStatus, workState)
-      }
-    } else {
-      workStateFlow.map { workState -> createOneTimeSyncState(schedulingStatus = workState) }
+    return combine(workStateFlow, syncJobProgressStateFlow, syncJobTerminalStateFlow) {
+      workInfoState,
+      syncJobIntermediateState,
+      syncJobTerminalState,
+      ->
+      createSyncState(syncJobIntermediateState, workInfoState, syncJobTerminalState)
     }
   }
 
@@ -218,10 +218,12 @@ object Sync {
         it.backoffCriteria.backoffDelay,
         it.backoffCriteria.timeUnit,
       )
-      Data.Builder()
-        .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-        .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
-        .build()
+      periodicWorkRequestBuilder.setInputData(
+        Data.Builder()
+          .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
+          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+          .build(),
+      )
     }
     return periodicWorkRequestBuilder.build()
   }
@@ -231,41 +233,42 @@ object Sync {
     return DatastoreUtil(context).readLastSyncTimestamp()
   }
 
-  private fun createOneTimeSyncState(
-    syncJobStatus: SyncJobStatus? = null,
-    schedulingStatus: WorkInfo.State,
-  ): OneTimeSyncState {
-    return when (schedulingStatus) {
+  private fun createSyncState(
+    syncJobIntermediateState: SyncJobStatus,
+    workInfoState: WorkInfo.State,
+    syncJobTerminalState: SyncJobStatus?,
+  ): SyncState {
+    return when (workInfoState) {
       ENQUEUED -> {
-        Enqueued()
+        Enqueued
       }
       RUNNING -> {
-        Running(syncJobStatus!!)
+        Running(syncJobIntermediateState)
       }
       SUCCEEDED -> {
-        Succeeded(syncJobStatus!!)
+        Succeeded(syncJobTerminalState!!)
       }
       FAILED -> {
-        Failed(syncJobStatus!!)
+        Failed(syncJobTerminalState!!)
       }
       CANCELLED -> {
-        Cancelled()
+        Cancelled
       }
       else -> {
-        Unknown()
+        Unknown
       }
     }
   }
 
-  private fun createLastJobState(
+  private fun mapSyncJobStatusToResult(
     lastSyncJobStatus: SyncJobStatus,
   ) =
     when (lastSyncJobStatus) {
       is SyncJobStatus.Finished -> {
-        createOneTimeSyncState(lastSyncJobStatus, SUCCEEDED)
+        Result.Succeeded(lastSyncJobStatus.timestamp)
       }
-      is SyncJobStatus.Failed, -> {
-        createOneTimeSyncState(lastSyncJobStatus, FAILED)
+      is SyncJobStatus.Failed -> {
+        Result.Failed(lastSyncJobStatus.exceptions, lastSyncJobStatus.timestamp)
       }
       else -> {
         null
@@ -286,10 +289,13 @@ object Sync {
           is SyncJobStatus.Finished -> {
             Succeeded(currentSyncJobStatus)
           }
-          is SyncJobStatus.Failed, -> {
+          is SyncJobStatus.Failed -> {
             Failed(currentSyncJobStatus)
           }
         }
+      }
+      ENQUEUED -> {
+        Enqueued
       }
       else -> {
         null

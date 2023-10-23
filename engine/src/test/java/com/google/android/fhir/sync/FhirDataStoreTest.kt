@@ -17,12 +17,10 @@
 package com.google.android.fhir.sync
 
 import androidx.test.core.app.ApplicationProvider
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -35,27 +33,25 @@ class FhirDataStoreTest {
   private val fhirDataStore = FhirDataStore(ApplicationProvider.getApplicationContext())
 
   @Test
-  fun updateSyncJobStatus() = runBlocking {
+  fun observeSyncJobTerminalState() = runBlocking {
     val key = "key"
     val collectedValues = mutableListOf<SyncJobStatus>()
-    val syncJobStatusList =
-      listOf(
-        SyncJobStatus.Started(),
-        SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, 256, 20),
-        SyncJobStatus.Finished(),
-      )
-    val editJob = launch {
-      syncJobStatusList.forEach { fhirDataStore.updateSyncJobStatus(key, it) }
-    }
+    val editJob = launch { fhirDataStore.updateSyncJobTerminalState(key, SyncJobStatus.Finished) }
     val collectJob = launch {
-      fhirDataStore.getSyncJobStatusPreferencesFlow(key).take(3).collect { syncJobStatus ->
-        collectedValues.add(syncJobStatus)
-      }
+      collectedValues.add(fhirDataStore.observeSyncJobTerminalState(key).filterNotNull().first())
     }
     collectJob.join()
     editJob.join()
-    assertTrue(syncJobStatusList.first() is SyncJobStatus.Started)
-    assertEquals(syncJobStatusList[1], collectedValues[1])
-    assertTrue(syncJobStatusList[2] is SyncJobStatus.Finished)
+    assertTrue(collectedValues[0] is SyncJobStatus.Finished)
+  }
+
+  @Test
+  fun getLastSyncJobStatus() = runBlocking {
+    val key = "key"
+    val collectedValues = mutableListOf<SyncJobStatus?>()
+    val editJob = launch { fhirDataStore.updateLastSyncJobStatus(key, SyncJobStatus.Finished) }
+    collectedValues.add(fhirDataStore.getLastSyncJobStatus(key))
+    editJob.join()
+    assertTrue(fhirDataStore.getLastSyncJobStatus(key) is SyncJobStatus.Finished)
   }
 }
