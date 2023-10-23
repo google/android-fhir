@@ -19,10 +19,9 @@ package com.google.android.fhir.knowledge
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackageMetadata
-import com.google.android.fhir.knowledge.npm.NpmFileManager
-import com.google.android.fhir.knowledge.npm.PackageDownloader
+import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.files.NpmFileManager
+import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
@@ -37,8 +36,8 @@ import org.robolectric.RobolectricTestRunner
 class KnowledgeManagerNpmTest {
 
   private val downloadedDependencies = mutableSetOf<FhirNpmPackage>()
-  private val fakePackageDownloader: PackageDownloader =
-    PackageDownloader { fhirNpmPackage: FhirNpmPackage, _ ->
+  private val fakeNpmPackageDownloader: NpmPackageDownloader =
+    NpmPackageDownloader { fhirNpmPackage: FhirNpmPackage, _ ->
       downloadedDependencies.add(fhirNpmPackage)
       NPM_CACHE_MAP.getValue(fhirNpmPackage)
     }
@@ -51,14 +50,19 @@ class KnowledgeManagerNpmTest {
   private val knowledgeManager =
     KnowledgeManager(
       knowledgeDb,
-      context.dataDir,
       npmFileManager = mockNpmFileManager,
-      packageDownloader = fakePackageDownloader,
+      npmPackageDownloader = fakeNpmPackageDownloader,
     )
 
   @Test
   fun install_withDependencies() = runTest {
     whenever(mockNpmFileManager.containsPackage(any(), any())).thenReturn(false)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP1.name, DEP1.version))
+      .thenReturn(NPM1)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP2.name, DEP2.version))
+      .thenReturn(NPM2)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP3.name, DEP3.version))
+      .thenReturn(NPM3)
 
     knowledgeManager.install(DEP1)
 
@@ -68,9 +72,12 @@ class KnowledgeManagerNpmTest {
   @Test
   fun install_alreadyCached() = runTest {
     whenever(mockNpmFileManager.containsPackage(any(), any())).thenReturn(true)
-    whenever(mockNpmFileManager.getPackage(DEP1.name, DEP1.version)).thenReturn(NPM1)
-    whenever(mockNpmFileManager.getPackage(DEP2.name, DEP2.version)).thenReturn(NPM2)
-    whenever(mockNpmFileManager.getPackage(DEP3.name, DEP3.version)).thenReturn(NPM3)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP1.name, DEP1.version))
+      .thenReturn(NPM1)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP2.name, DEP2.version))
+      .thenReturn(NPM2)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP3.name, DEP3.version))
+      .thenReturn(NPM3)
 
     knowledgeManager.install(DEP1)
 
@@ -82,8 +89,12 @@ class KnowledgeManagerNpmTest {
     whenever(mockNpmFileManager.containsPackage(DEP1.name, DEP1.version)).thenReturn(false)
     whenever(mockNpmFileManager.containsPackage(DEP2.name, DEP2.version)).thenReturn(true)
     whenever(mockNpmFileManager.containsPackage(DEP3.name, DEP3.version)).thenReturn(true)
-    whenever(mockNpmFileManager.getPackage(DEP2.name, DEP2.version)).thenReturn(NPM2)
-    whenever(mockNpmFileManager.getPackage(DEP3.name, DEP3.version)).thenReturn(NPM3)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP1.name, DEP1.version))
+      .thenReturn(NPM1)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP2.name, DEP2.version))
+      .thenReturn(NPM2)
+    whenever(mockNpmFileManager.getLocalFhirNpmPackageMetadata(DEP3.name, DEP3.version))
+      .thenReturn(NPM3)
 
     knowledgeManager.install(DEP1, DEP2)
 

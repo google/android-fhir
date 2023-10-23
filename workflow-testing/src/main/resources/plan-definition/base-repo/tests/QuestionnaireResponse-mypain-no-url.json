@@ -1,0 +1,128 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "id": "mypain-no-url",
+  "reference": "Patient/d68463ce-3cad-4309-a271-e2860694ede7",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2020-07-13T19:15:58.761+00:00",
+    "profile": [
+      "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire|2.7"
+    ],
+    "tag": [
+      {
+        "code": "lformsVersion: 23.0.0"
+      }
+    ]
+  },
+  "title": "MyPain Questionnaire",
+  "status": "completed",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Please describe the location(s) of any pain you have had in the past 7 days (e.g., lower back and left hip):",
+      "type": "text"
+    },
+    {
+      "linkId": "2",
+      "text": "In the  past 7 days -  How intense was your pain at its worst?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1005",
+            "display": "Moderate"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "3",
+      "text": "How intense was your average pain?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1005",
+            "display": "Moderate"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "4",
+      "text": "What is your level of pain right now?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1005",
+            "display": "Moderate"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "5",
+      "prefix": "In the past 7 days:",
+      "text": "How much did pain interfere with your day to day activities?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1011",
+            "display": "Quite a bit"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "6",
+      "prefix": "In the past 7 days:",
+      "text": "How much did pain interfere with your work?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1010",
+            "display": "Somewhat"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "7",
+      "prefix": "In the past 7 days:",
+      "text": "How much did pain interfere with your ability to participate in social activities?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1010",
+            "display": "Somewhat"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "8",
+      "prefix": "In the past 7 days:",
+      "text": "How much did pain interfere with your household chores?",
+      "type": "choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://rti.com/fhir/rti/CodeSystem/mypain-questionnaireResponse",
+            "code": "mpqr-1010",
+            "display": "Somewhat"
+          }
+        }
+      ]
+    }
+  ]
+}

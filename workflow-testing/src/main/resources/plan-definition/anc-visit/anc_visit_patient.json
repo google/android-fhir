@@ -1,0 +1,27 @@
+{
+  "resourceType": "Bundle",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "Patient/TEST_PATIENT",
+        "active": true,
+        "name": [
+          {
+            "family": "Hadi",
+            "given": [
+              "Bareera"
+            ]
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1999-01-14",
+        "generalPractitioner": [
+          {
+            "reference": "Practitioner/TEST_PRACTITIONER"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,183 @@
+{
+  "resourceType": "ValueSet",
+  "id": "hospice-procedure",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Procedure codes for referral, admission, or transfer to a hospice"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Procedure"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/hospice-procedure",
+  "name": "hospice_procedure",
+  "title": "Hospice Procedure",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Procedure codes for referral, admission, or transfer to a hospice",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "306205009"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "305336008"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "183919006"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "428371000124100"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "183920000"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "183921001"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "5a4f2ef8-4891-42bb-986a-11cab203d0ce",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "306205009",
+        "display": "Referral to hospice (procedure)"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "305336008",
+        "display": "Admission to hospice (procedure)"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "183919006",
+        "display": "Urgent admission to hospice (procedure)"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "428371000124100",
+        "display": "Discharge to healthcare facility for hospice care"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "183920000",
+        "display": "Routine admission to hospice"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "183921001",
+        "display": "Admission to hospice for respite"
+      }
+    ]
+  }
+}

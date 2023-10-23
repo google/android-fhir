@@ -1,0 +1,2455 @@
+{
+  "resourceType": "ValueSet",
+  "id": "opioid-drug-urine-screening",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/opioid-drug-urine-screening",
+  "name": "opioid_drug_urine_screening",
+  "title": "Opioid drug urine screening",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:29-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Individual tests and panels of tests of urine for opioids",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Identification of opioid urine drug tests where rusults can be used when considering opioid therapy",
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP18149-2"
+          },
+          {
+            "property": "system",
+            "op": "=",
+            "value": "Urine"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP29683-7"
+          },
+          {
+            "property": "concept",
+            "op": "=",
+            "value": "*opioid*"
+          },
+          {
+            "property": "system",
+            "op": "=",
+            "value": "Urine"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP29683-7"
+          },
+          {
+            "property": "concept",
+            "op": "=",
+            "value": "*opiates*"
+          },
+          {
+            "property": "system",
+            "op": "=",
+            "value": "Urine"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP392077-6"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP419316-7"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP419317-5"
+          }
+        ]
+      },
+      {
+        "system": "http://loinc.org",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "LP417172-6"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "022a6413-35c5-48df-bedf-626d72846d90",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "10975-1",
+        "display": "6-Monoacetylmorphine (6-MAM) (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "10976-9",
+        "display": "6-Monoacetylmorphine (6-MAM) Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "10998-3",
+        "display": "oxyCODONE Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "11073-4",
+        "display": "Despropionylfentanyl (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "11075-9",
+        "display": "Norfentanyl (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "11235-9",
+        "display": "fentaNYL Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "11246-6",
+        "display": "oxyCODONE (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "11247-4",
+        "display": "oxyMORphone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "12308-3",
+        "display": "HYDROcodone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "12309-1",
+        "display": "Naltrexone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "12333-1",
+        "display": "Butorphanol Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "12395-0",
+        "display": "Butorphanol (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "12554-2",
+        "display": "Narcotics and opioids Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "13641-6",
+        "display": "Codeine SAMHSA confirm method Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "13648-1",
+        "display": "Morphine SAMHSA confirm method Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "14066-5",
+        "display": "Dihydrocodeine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16196-8",
+        "display": "Morphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16197-6",
+        "display": "Codeine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16198-4",
+        "display": "Diamorphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16199-2",
+        "display": "Methadone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16200-8",
+        "display": "Propoxyphene Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16207-3",
+        "display": "Meperidine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16208-1",
+        "display": "Buprenorphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16211-5",
+        "display": "Dihydrocodeine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16213-1",
+        "display": "Levorphanol Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16218-0",
+        "display": "Nalbuphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16242-0",
+        "display": "Propoxyphene Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16246-1",
+        "display": "Methadone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16249-5",
+        "display": "oxyCODONE Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16250-3",
+        "display": "Codeine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16251-1",
+        "display": "Morphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16252-9",
+        "display": "HYDROcodone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16253-7",
+        "display": "Meperidine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16334-5",
+        "display": "Alfentanil (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16496-2",
+        "display": "Buprenorphine Qn (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16499-6",
+        "display": "Butorphanol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16749-4",
+        "display": "Propoxyphene+Norpropoxyphene Qn (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16755-1",
+        "display": "Diamorphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16851-8",
+        "display": "Ethylmorphine Qn (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "16998-7",
+        "display": "HYDROmorphone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "17376-5",
+        "display": "Norpropoxyphene Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "17377-3",
+        "display": "Norpropoxyphene Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "17384-9",
+        "display": "Opiates Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "17395-5",
+        "display": "oxyMORphone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18325-1",
+        "display": "oxyMORphone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18334-3",
+        "display": "Naltrexone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18383-0",
+        "display": "Alfentanil Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18390-5",
+        "display": "Opiates Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18435-8",
+        "display": "SUFentanil Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "18473-9",
+        "display": "HYDROmorphone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19138-7",
+        "display": "Opiates cutoff (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19141-1",
+        "display": "Propoxyphene Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19295-5",
+        "display": "Opiates Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19296-3",
+        "display": "Opiates tested Screen Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19297-1",
+        "display": "Opiates tested Screen Nar (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19298-9",
+        "display": "Opiates positive Confirm Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19299-7",
+        "display": "Opiates cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19300-3",
+        "display": "Opiates cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19301-1",
+        "display": "Opiates screen method Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19302-9",
+        "display": "Opiates confirm method Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19321-9",
+        "display": "6-Monoacetylmorphine (6-MAM) Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19322-7",
+        "display": "6-Monoacetylmorphine (6-MAM) Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19323-5",
+        "display": "6-Monoacetylmorphine (6-MAM) cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19324-3",
+        "display": "6-Monoacetylmorphine (6-MAM) cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19377-1",
+        "display": "Butorphanol Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19378-9",
+        "display": "Butorphanol Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19379-7",
+        "display": "Butorphanol cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19380-5",
+        "display": "Butorphanol cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19411-8",
+        "display": "Codeine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19413-4",
+        "display": "Codeine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19414-2",
+        "display": "Codeine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19429-0",
+        "display": "Propoxyphene Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19431-6",
+        "display": "Propoxyphene cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19432-4",
+        "display": "Propoxyphene cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19433-2",
+        "display": "Propoxyphene+Norpropoxyphene Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19434-0",
+        "display": "Propoxyphene+Norpropoxyphene Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19435-7",
+        "display": "Propoxyphene+Norpropoxyphene Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19436-5",
+        "display": "Propoxyphene+Norpropoxyphene (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19437-3",
+        "display": "Propoxyphene+Norpropoxyphene cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19438-1",
+        "display": "Propoxyphene+Norpropoxyphene cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19439-9",
+        "display": "Diamorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19441-5",
+        "display": "Diamorphine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19442-3",
+        "display": "Diamorphine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19446-4",
+        "display": "Dihydrocodeine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19448-0",
+        "display": "Dihydrocodeine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19449-8",
+        "display": "Dihydrocodeine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19450-6",
+        "display": "Dihydrocodeine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19451-4",
+        "display": "Dihydrocodeine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19462-1",
+        "display": "Ethylmorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19463-9",
+        "display": "Ethylmorphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19464-7",
+        "display": "Ethylmorphine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19465-4",
+        "display": "Ethylmorphine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19482-9",
+        "display": "HYDROcodone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19483-7",
+        "display": "HYDROcodone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19484-5",
+        "display": "HYDROcodone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19485-2",
+        "display": "HYDROcodone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19486-0",
+        "display": "HYDROmorphone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19487-8",
+        "display": "HYDROmorphone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19488-6",
+        "display": "HYDROmorphone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19516-4",
+        "display": "Levorphanol Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19518-0",
+        "display": "Levorphanol cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19519-8",
+        "display": "Levorphanol cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19532-1",
+        "display": "Meperidine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19534-7",
+        "display": "Meperidine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19535-4",
+        "display": "Meperidine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19550-3",
+        "display": "Methadone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19552-9",
+        "display": "Methadone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19553-7",
+        "display": "Methadone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19593-3",
+        "display": "6-Monoacetylmorphine (6-MAM) Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19597-4",
+        "display": "Morphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19599-0",
+        "display": "Morphine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19600-6",
+        "display": "Morphine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19601-4",
+        "display": "Morphine Free Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19602-2",
+        "display": "Morphine Free Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19603-0",
+        "display": "Morphine Free cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19604-8",
+        "display": "Morphine Free cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19605-5",
+        "display": "Nalbuphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19607-1",
+        "display": "Nalbuphine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19608-9",
+        "display": "Nalbuphine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19609-7",
+        "display": "Naltrexone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19610-5",
+        "display": "Naltrexone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19611-3",
+        "display": "Naltrexone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19612-1",
+        "display": "Naltrexone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19613-9",
+        "display": "Naltrexone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19632-9",
+        "display": "Norpropoxyphene Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19635-2",
+        "display": "Norpropoxyphene (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19636-0",
+        "display": "Norpropoxyphene cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19637-8",
+        "display": "Norpropoxyphene cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19642-8",
+        "display": "oxyCODONE Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19643-6",
+        "display": "oxyCODONE Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19644-4",
+        "display": "oxyCODONE cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19645-1",
+        "display": "oxyCODONE cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19646-9",
+        "display": "oxyMORphone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19648-5",
+        "display": "oxyMORphone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19649-3",
+        "display": "oxyMORphone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "19650-1",
+        "display": "oxyMORphone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "20527-8",
+        "display": "Ethylmorphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "20540-1",
+        "display": "Levorphanol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "20550-0",
+        "display": "Morphine Free Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "20551-8",
+        "display": "Nalbuphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "21431-2",
+        "display": "Opiates Screen method >2000 ng/mL Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "26867-2",
+        "display": "fentaNYL Qn (24H U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "27920-8",
+        "display": "Normeperidine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3309-2",
+        "display": "Alphaprodine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3310-0",
+        "display": "Alphaprodine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3311-8",
+        "display": "Alphaprodine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "33527-3",
+        "display": "Methadone.long acting metabolite (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3357-1",
+        "display": "Anileridine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3359-7",
+        "display": "Anileridine (24H U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3414-0",
+        "display": "Buprenorphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3415-7",
+        "display": "Buprenorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3416-5",
+        "display": "Buprenorphine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3507-1",
+        "display": "Codeine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3508-9",
+        "display": "Codeine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3540-2",
+        "display": "Dextromoramide Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3541-0",
+        "display": "Dextromoramide (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3545-1",
+        "display": "Propoxyphene (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3546-9",
+        "display": "Diamorphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3547-7",
+        "display": "Diamorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3573-3",
+        "display": "Dipipanone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3574-1",
+        "display": "Dipipanone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3575-8",
+        "display": "Dipipanone (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3618-6",
+        "display": "Ethylmorphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3619-4",
+        "display": "Ethylmorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3637-6",
+        "display": "fentaNYL (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3681-4",
+        "display": "HYDROcodone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3711-9",
+        "display": "Levorphanol Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3712-7",
+        "display": "Levorphanol (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3713-5",
+        "display": "Levorphanol (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3746-5",
+        "display": "Meperidine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3747-3",
+        "display": "Meperidine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3748-1",
+        "display": "Meperidine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3773-9",
+        "display": "Methadone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3774-7",
+        "display": "Methadone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3775-4",
+        "display": "Methadone (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3828-1",
+        "display": "Morphine Free Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3829-9",
+        "display": "Morphine Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3830-7",
+        "display": "Morphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3831-5",
+        "display": "Morphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3832-3",
+        "display": "Morphine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "38373-7",
+        "display": "Buprenorphine+Norbuprenorphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3839-8",
+        "display": "Nalbuphine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3840-6",
+        "display": "Nalbuphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3841-4",
+        "display": "Nalbuphine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3842-2",
+        "display": "Nalorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3851-3",
+        "display": "Nicomorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3869-5",
+        "display": "Normeperidine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3871-1",
+        "display": "Norpropoxyphene Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "3879-4",
+        "display": "Opiates Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "4075-8",
+        "display": "Trimeperidine Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "4076-6",
+        "display": "Trimeperidine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "4077-4",
+        "display": "Trimeperidine (24H U) [Mass/Time]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "40839-3",
+        "display": "fentaNYL Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "41465-6",
+        "display": "Opiates/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "41466-4",
+        "display": "Methadone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "41858-2",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "42251-9",
+        "display": "Methadone+Metabolite Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "42618-9",
+        "display": "Naloxone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "43199-9",
+        "display": "Norfentanyl Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "43200-5",
+        "display": "Norfentanyl Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "46971-8",
+        "display": "HYDROmorphone Free Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "46973-4",
+        "display": "oxyCODONE Free Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "46975-9",
+        "display": "oxyMORphone Free Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "47004-7",
+        "display": "6-monoacetylmorphine free Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "49751-1",
+        "display": "Norbuprenorphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "49752-9",
+        "display": "Buprenorphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "49753-7",
+        "display": "Norbuprenorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "49829-5",
+        "display": "Norcodeine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "49831-1",
+        "display": "Normorphine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "50542-0",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51448-9",
+        "display": "Dihydrocodeine+Hydrocodol (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51736-7",
+        "display": "oxyMORphone Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51737-5",
+        "display": "HYDROmorphone Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51738-3",
+        "display": "HYDROcodone Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51739-1",
+        "display": "Codeine Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51740-9",
+        "display": "6-monoacetylmorphine free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51954-6",
+        "display": "oxyCODONE Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "51955-3",
+        "display": "Dihydrocodeine Free+Hydrocodol Free (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "52952-9",
+        "display": "Opiates (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "52958-6",
+        "display": "Methadone (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "55520-1",
+        "display": "6-Monoacetylmorphine (6-MAM) (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "5706-7",
+        "display": "Opiates Nom (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58359-1",
+        "display": "Buprenorphine+Norbuprenorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58360-9",
+        "display": "Buprenorphine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58362-5",
+        "display": "Norbuprenorphine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58379-9",
+        "display": "fentaNYL+Norfentanyl Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58380-7",
+        "display": "fentaNYL/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58381-5",
+        "display": "fentaNYL Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58382-3",
+        "display": "Norfentanyl/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58383-1",
+        "display": "Norfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58384-9",
+        "display": "6-Monoacetylmorphine (6-MAM)/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58385-6",
+        "display": "Meperidine+Normeperidine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58386-4",
+        "display": "Meperidine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58387-2",
+        "display": "Normeperidine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58388-0",
+        "display": "Normeperidine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58389-8",
+        "display": "Normeperidine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58390-6",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP)/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58391-4",
+        "display": "Codeine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58392-2",
+        "display": "Morphine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58393-0",
+        "display": "HYDROcodone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58394-8",
+        "display": "HYDROmorphone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58395-5",
+        "display": "oxyCODONE/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58396-3",
+        "display": "oxyMORphone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58398-9",
+        "display": "Propoxyphene/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58399-7",
+        "display": "Norpropoxyphene/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58401-1",
+        "display": "Tapentadol Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58402-9",
+        "display": "Tapentadol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58428-4",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58429-2",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "58430-0",
+        "display": "oxyCODONE+oxyMORphone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "59673-4",
+        "display": "fentaNYL Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "59960-5",
+        "display": "Propoxyphene (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "60126-0",
+        "display": "Papaverine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "60276-3",
+        "display": "oxyCODONE+oxyMORphone cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "60514-7",
+        "display": "6-Acetylcodeine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61197-0",
+        "display": "oxyCODONE+oxyMORphone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61420-6",
+        "display": "Norhydrocodone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61421-4",
+        "display": "Norhydrocodone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61422-2",
+        "display": "Norhydrocodone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61423-0",
+        "display": "Noroxycodone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61424-8",
+        "display": "Noroxycodone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61425-5",
+        "display": "Noroxycodone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "61429-7",
+        "display": "Tapentadol/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "64131-6",
+        "display": "Dihydrocodeine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "65807-0",
+        "display": "Tapentadol (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "65808-8",
+        "display": "Nortapentadol (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "66129-8",
+        "display": "fentaNYL+Norfentanyl Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "67822-7",
+        "display": "fentaNYL and Norfentanyl panel (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70147-4",
+        "display": "Methadone Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70148-2",
+        "display": "Methadone Screen method >150 ng/mL Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70149-0",
+        "display": "Methadone Screen method >300 ng/mL Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70150-8",
+        "display": "Opiates Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70151-6",
+        "display": "Opiates Screen method >300 ng/mL Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70197-9",
+        "display": "6-Monoacetylmorphine (6-MAM) Confirm (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70206-8",
+        "display": "Codeine Confirm (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70210-0",
+        "display": "Morphine Confirm (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "70215-9",
+        "display": "oxyCODONE Confirm (U) [Moles/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72384-1",
+        "display": "Meperidine+Normeperidine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72485-6",
+        "display": "Tapentadol Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72729-7",
+        "display": "7-Hydroxymitragynine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72730-5",
+        "display": "Mitragynine/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72731-3",
+        "display": "7-Hydroxymitragynine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72732-1",
+        "display": "Mitragynine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "72789-1",
+        "display": "Naltrexone/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "73995-3",
+        "display": "Mitragynine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "74372-4",
+        "display": "Acetyl fentaNYL (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "74810-3",
+        "display": "Acetyl fentaNYL Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "74817-8",
+        "display": "Desomorphine Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "74818-6",
+        "display": "Desomorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "75362-4",
+        "display": "Tapentadol glucuronide Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "75643-7",
+        "display": "7-Hydroxymitragynine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "75649-4",
+        "display": "Mitragynine+7-Hydroxymitragynine Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77207-9",
+        "display": "Naloxone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77752-4",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77754-0",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77764-9",
+        "display": "Buprenorphine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77775-5",
+        "display": "Norfentanyl cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77777-1",
+        "display": "Normeperidine cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77779-7",
+        "display": "Noroxycodone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77787-0",
+        "display": "Buprenorphine cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "77879-5",
+        "display": "Tapentadol cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78765-5",
+        "display": "oxyMORphone adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78766-3",
+        "display": "fentaNYL adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78767-1",
+        "display": "oxyCODONE adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78768-9",
+        "display": "Morphine adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78769-7",
+        "display": "HYDROcodone adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78770-5",
+        "display": "Methadone adjusted for lean body mass+urine creatinine (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78828-1",
+        "display": "fentaNYL (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78830-7",
+        "display": "HYDROcodone (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78857-0",
+        "display": "Methadone (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78861-2",
+        "display": "Morphine (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78862-0",
+        "display": "Naloxol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78863-8",
+        "display": "Naloxol cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78864-6",
+        "display": "Naloxone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78865-3",
+        "display": "Naltrexol cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78868-7",
+        "display": "Norhydrocodone cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78873-7",
+        "display": "oxyCODONE (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "78874-5",
+        "display": "oxyMORphone (U) [Z-score]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "79240-8",
+        "display": "Tapentadol cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "79259-8",
+        "display": "fentaNYL cutoff Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "79260-6",
+        "display": "fentaNYL cutoff Screen (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "79377-8",
+        "display": "Naltrexol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "81754-4",
+        "display": "Nortapentadol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "8220-6",
+        "display": "Opiates (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "8221-4",
+        "display": "Opiates SAMHSA confirm method Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "8222-2",
+        "display": "Opiates SAMHSA screen method Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "82371-6",
+        "display": "Norbuprenorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "82524-0",
+        "display": "6-Beta naltrexol Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "82527-3",
+        "display": "6-Beta naltrexol/Creatinine (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86193-0",
+        "display": "Pentedrone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86197-1",
+        "display": "Pentylone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86604-6",
+        "display": "Alfentanil/Creatinine Confirm (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86608-7",
+        "display": "Norcodeine/Creatinine Confirm (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86609-5",
+        "display": "Noroxymorphone/Creatinine Confirm (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "86610-3",
+        "display": "SUFentanil/Creatinine Confirm (U) [Mass ratio]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89300-8",
+        "display": "Tapentadol glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89301-6",
+        "display": "oxyMORphone-3-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89302-4",
+        "display": "Noroxymorphone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89303-2",
+        "display": "Noroxycodone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89304-0",
+        "display": "Norhydrocodone Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89305-7",
+        "display": "Norbuprenorphine-3-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89306-5",
+        "display": "Nortapentadol Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89307-3",
+        "display": "Naloxone-3-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89308-1",
+        "display": "Morphine-6-Glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89309-9",
+        "display": "HYDROmorphone-3-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "89310-7",
+        "display": "Codeine-6-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "90894-7",
+        "display": "Noroxymorphone Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "91027-3",
+        "display": "Buprenorphine-3-glucuronide Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "92649-3",
+        "display": "Naloxone Confirm Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93451-3",
+        "display": "Nor-W-18+Nor-W-15 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93452-1",
+        "display": "W-19 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93453-9",
+        "display": "W-15 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93454-7",
+        "display": "W-18 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93455-4",
+        "display": "IC-26 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93456-2",
+        "display": "MT-45 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93457-0",
+        "display": "AH-8529 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93458-8",
+        "display": "AH-8533 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93459-6",
+        "display": "U-47700 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93460-4",
+        "display": "AH-7921 Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93461-2",
+        "display": "4-Methoxybutyrylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93462-0",
+        "display": "Norcarfentanil Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93463-8",
+        "display": "Ocfentanil Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93464-6",
+        "display": "4-Fluorofentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93465-3",
+        "display": "3-Methylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93466-1",
+        "display": "Valerylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93467-9",
+        "display": "Butyrylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93468-7",
+        "display": "Acrylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93469-5",
+        "display": "4-Fluorobutyrylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93470-3",
+        "display": "Furanylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93471-1",
+        "display": "Acetyl norfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93472-9",
+        "display": "4-Methylphenethylacetylfentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93473-7",
+        "display": "Beta hydroxythiofentanyl Confirm (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93474-5",
+        "display": "Synthetic opioids panel Confirm (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93494-3",
+        "display": "Buprenorphine Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "93495-0",
+        "display": "2-Ethylidene-1,5-Dimethyl-3,3-Diphenylpyrrolidine (EDDP) Screen Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "9396-3",
+        "display": "SUFentanil (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "94304-3",
+        "display": "OxyCODONE and metabolites panel Confirm (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "94305-0",
+        "display": "OxyMORphone and Noroxymorphone panel Confirm (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "95135-0",
+        "display": "Noroxycodone (U) [Mass/Vol]"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "9834-3",
+        "display": "HYDROmorphone Ql (U)"
+      },
+      {
+        "system": "http://loinc.org",
+        "version": "2.68",
+        "code": "9835-0",
+        "display": "HYDROmorphone (U) [Mass/Vol]"
+      }
+    ]
+  }
+}

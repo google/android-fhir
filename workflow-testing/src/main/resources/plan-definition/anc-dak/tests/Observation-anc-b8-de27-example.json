@@ -1,0 +1,46 @@
+{
+  "resourceType": "Observation",
+  "id": "anc-b8-de27-example",
+  "meta": {
+    "profile": [
+      "http://fhir.org/guides/who/anc-cds/StructureDefinition/anc-b8-de27"
+    ]
+  },
+  "identifier": [
+    {
+      "use": "official",
+      "system": "http://example.org/fhir/NamingSystem/identifiers",
+      "value": "anc-b8-de27-example"
+    }
+  ],
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B8.DE27",
+        "display": "Symptoms of severe pre-eclampsia"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/5946f880-b197-400b-9caa-a3c661d23041"
+  },
+  "encounter": {
+    "reference": "Encounter/helloworld-patient-1-encounter-1"
+  },
+  "performer": [
+    {
+      "reference": "PractitionerRole/anc-practitionerrole-example"
+    }
+  ],
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+        "code": "ANC.B8.DE29",
+        "display": "Vomiting"
+      }
+    ]
+  }
+}
