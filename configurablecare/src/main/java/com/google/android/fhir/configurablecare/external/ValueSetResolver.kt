@@ -20,6 +20,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.ExternalAnswerValueSetResolver
 import com.google.android.fhir.search.search
 import com.google.android.fhir.configurablecare.FhirApplication
+import com.google.android.fhir.testing.jsonParser
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ValueSet
@@ -65,7 +66,7 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
 
     private suspend fun fetchValuesSetFromWorkerContext(uri: String): List<Coding> {
       val valueSets = fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = uri }) }
-      println("Valuesets found: ${valueSets.size}")
+      println("ValueSets found: ${jsonParser.encodeResourceToString(valueSets.first().resource)}")
 
       val systemUrl = workerContext.fetchResource(
         ValueSet::class.java,
@@ -82,6 +83,8 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
 
       if (list.isNotEmpty()) return list
 
+      println("${workerContext
+        .fetchResource(ValueSet::class.java, uri).expansion}")
       return workerContext
         .fetchResource(ValueSet::class.java, uri)
         .expansion?.contains?.map {

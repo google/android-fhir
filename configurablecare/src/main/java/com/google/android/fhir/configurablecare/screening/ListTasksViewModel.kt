@@ -206,7 +206,7 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
   // status and intent are always present
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
-  val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else "unknown"
+  val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else if (doNotPerform) "Do Not Perform" else "unknown"
   val completedDate = dueDate
   val owner = ""
   val clickable = true

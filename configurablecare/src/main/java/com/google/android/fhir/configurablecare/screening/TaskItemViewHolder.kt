@@ -34,9 +34,11 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
   ) {
     this.requestType = taskItem.resourceType
     this.description.text = taskItem.description
+
+    val dueDate = if (taskItem.dueDate == "unknown" || taskItem.dueDate == "Do Not Perform") taskItem.dueDate else "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
     this.dueDate.text =
       if (taskItem.status != "completed")
-        "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
+        dueDate
       else "Completed " + getDate(taskItem.completedDate) + " | " + taskItem.intent
     this.taskIcon.setImageResource(
       if (taskItem.status != "completed") R.drawable.ic_task else R.drawable.ic_task_check

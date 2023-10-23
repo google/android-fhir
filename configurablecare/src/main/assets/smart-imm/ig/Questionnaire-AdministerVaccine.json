@@ -40,6 +40,29 @@
       "required": false,
       "repeats": false,
       "readOnly": true
+    },
+    {
+      "linkId": "product-code",
+      "text": "Product Code",
+      "type": "choice",
+      "required": true,
+      "repeats": false,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "system": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
+            "code": "XM8L15",
+            "display": "Serum Institute of India Measles vaccine"
+          }
+        },
+        {
+          "valueCoding": {
+            "system": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
+            "code": "XM8TF3",
+            "display": "M-M-RvaxPRO"
+          }
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,77 @@
+{
+  "resourceType": "ValueSet",
+  "id": "pregnancystatus-values",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/LA15173-0/\">LA15173-0</a></td><td>Pregnant</td></tr><tr><td><a href=\"https://loinc.org/LA26683-5/\">LA26683-5</a></td><td>Not pregnant</td></tr><tr><td><a href=\"https://loinc.org/LA4489-6/\">LA4489-6</a></td><td>Unknown</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/77386006\">77386006</a></td><td>Pregnant</td></tr><tr><td><a href=\"http://snomed.info/id/60001007\">60001007</a></td><td>Not pregnant</td></tr><tr><td><a href=\"http://snomed.info/id/261665006\">261665006</a></td><td>Unknown</td></tr></table></li></ul></div>"
+  },
+  "url": "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
+  "version": "0.1.0",
+  "name": "pregnancystatus-values",
+  "title": "Pregnancy status values",
+  "status": "draft",
+  "experimental": false,
+  "date": "2023-10-12T09:43:25-04:00",
+  "publisher": "World Health Organization (WHO)",
+  "contact": [
+    {
+      "name": "World Health Organization (WHO)",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "https://www.who.int"
+        }
+      ]
+    }
+  ],
+  "description": "Codes representing possible values for the Pregnancy status element",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "code": "001"
+        }
+      ]
+    }
+  ],
+  "immutable": true,
+  "compose": {
+    "include": [
+      {
+        "system": "http://loinc.org",
+        "concept": [
+          {
+            "code": "LA15173-0",
+            "display": "Pregnant"
+          },
+          {
+            "code": "LA26683-5",
+            "display": "Not pregnant"
+          },
+          {
+            "code": "LA4489-6",
+            "display": "Unknown"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "concept": [
+          {
+            "code": "77386006",
+            "display": "Pregnant"
+          },
+          {
+            "code": "60001007",
+            "display": "Not pregnant"
+          },
+          {
+            "code": "261665006",
+            "display": "Unknown"
+          }
+        ]
+      }
+    ]
+  }
+}

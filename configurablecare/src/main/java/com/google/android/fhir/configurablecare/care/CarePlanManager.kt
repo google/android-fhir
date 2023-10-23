@@ -422,6 +422,7 @@ class CarePlanManager(
     // Workaround until we figure out how to handle sequential events
     for (resource in resourceList) {
       if (resource is MedicationRequest) {
+        if (resource.doNotPerform) continue
         if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
           requestManager.beginProposal(resource, requestConfiguration)
         }
