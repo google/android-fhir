@@ -112,6 +112,7 @@ class RequestManager(
           "active" -> TaskStatus.INPROGRESS.toCode().lowercase()
           "completed" -> TaskStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> TaskStatus.CANCELLED.toCode().lowercase()
+          "stopped" -> TaskStatus.REJECTED.toCode().lowercase()
           else -> ""
         }
       }
@@ -122,6 +123,7 @@ class RequestManager(
           "active" -> MedicationRequestStatus.ACTIVE.toCode().lowercase()
           "completed" -> MedicationRequestStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> MedicationRequestStatus.CANCELLED.toCode().lowercase()
+          "stopped" -> MedicationRequestStatus.STOPPED.toCode().lowercase()
           else -> ""
         }
       }
@@ -132,6 +134,7 @@ class RequestManager(
           "active" -> ServiceRequestStatus.ACTIVE.toCode().lowercase()
           "completed" -> ServiceRequestStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> ServiceRequestStatus.REVOKED.toCode().lowercase()
+          "stopped" -> ServiceRequestStatus.REVOKED.toCode().lowercase()
           else -> ""
         }
       }

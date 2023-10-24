@@ -50,7 +50,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
       if (taskStatus == "draft") {
         requests = requestManager.getAllRequestsForPatient(patientId, "draft") + requestManager.getAllRequestsForPatient(patientId, "active")
       } else if (taskStatus == "completed") {
-        requests = requestManager.getAllRequestsForPatient(patientId, "completed") + requestManager.getAllRequestsForPatient(patientId, "cancelled")
+        requests = requestManager.getAllRequestsForPatient(patientId, "completed") + requestManager.getAllRequestsForPatient(patientId, "cancelled") + requestManager.getAllRequestsForPatient(patientId, "stopped")
       }
       liveSearchedTasks.value =
         requests // requestManager.getAllRequestsForPatient(patientId) //, taskStatus)

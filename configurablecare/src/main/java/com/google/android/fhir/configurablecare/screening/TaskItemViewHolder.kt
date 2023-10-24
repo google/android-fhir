@@ -45,6 +45,9 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
     } else if (taskItem.status == "cancelled") {
       statusStr = "Cancelled" + " | " + taskItem.intent
       this.taskIcon.setImageResource(R.drawable.ic_task)
+    } else if (taskItem.status == "stopped") {
+      statusStr = "Stopped" + " | " + taskItem.intent
+      this.taskIcon.setImageResource(R.drawable.ic_task)
     } else {
       statusStr = "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
       this.taskIcon.setImageResource(R.drawable.ic_task)
