@@ -21,7 +21,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.fhir.SearchResult
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.SyncJobStatus
@@ -36,7 +35,7 @@ class PatientListViewModel(application: Application) : AndroidViewModel(applicat
   val pollState: Flow<SyncJobStatus>
     get() = _pollState
 
-  val liveSearchedPatients = MutableLiveData<List<SearchResult<Patient>>>()
+  val liveSearchedPatients = MutableLiveData<List<Patient>>()
 
   init {
     updatePatientList { getSearchResults() }
@@ -64,16 +63,16 @@ class PatientListViewModel(application: Application) : AndroidViewModel(applicat
    * client every time search query changes or data-sync is completed.
    */
   private fun updatePatientList(
-    search: suspend () -> List<SearchResult<Patient>>,
+    search: suspend () -> List<Patient>,
   ) {
     viewModelScope.launch { liveSearchedPatients.value = search() }
   }
 
-  private suspend fun getSearchResults(): List<SearchResult<Patient>> {
-    val patients: MutableList<SearchResult<Patient>> = mutableListOf()
+  private suspend fun getSearchResults(): List<Patient> {
+    val patients: MutableList<Patient> = mutableListOf()
     FhirApplication.fhirEngine(this.getApplication())
       .search<Patient> { sort(Patient.GIVEN, Order.ASCENDING) }
-      .let { patients.addAll(it) }
+      .let { patients.addAll(it.map { it.resource }) }
     return patients
   }
 }
