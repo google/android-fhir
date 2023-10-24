@@ -71,6 +71,25 @@ internal class AllChangesLocalChangeFetcher(
     SyncUploadProgress(database.getLocalChangesCount(), total)
 }
 
+internal class PerResourceLocalChangeFetcher(
+  private val database: Database,
+) : LocalChangeFetcher {
+
+  override var total by Delegates.notNull<Int>()
+
+  suspend fun initTotalCount() {
+    total = database.getLocalChangesCount()
+  }
+
+  override suspend fun hasNext(): Boolean = database.getLocalChangesCount().isNotZero()
+
+  override suspend fun next(): List<LocalChange> =
+    database.getAllChangesForEarliestChangedResource()
+
+  override suspend fun getProgress(): SyncUploadProgress =
+    SyncUploadProgress(database.getLocalChangesCount(), total)
+}
+
 /** Represents the mode in which local changes should be fetched. */
 sealed class LocalChangesFetchMode {
   object AllChanges : LocalChangesFetchMode()
@@ -88,6 +107,8 @@ internal object LocalChangeFetcherFactory {
     when (mode) {
       is LocalChangesFetchMode.AllChanges ->
         AllChangesLocalChangeFetcher(database).apply { initTotalCount() }
+      is LocalChangesFetchMode.PerResource ->
+        PerResourceLocalChangeFetcher(database).apply { initTotalCount() }
       else -> throw NotImplementedError("$mode is not implemented yet.")
     }
 }
