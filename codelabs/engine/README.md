@@ -125,7 +125,7 @@ file of your project:
 dependencies {
     // ...
 
-    implementation("com.google.android.fhir:engine:0.1.0-beta05")
+    implementation("com.google.android.fhir:engine:0.1.0-beta04")
 }
 ```
 
@@ -185,23 +185,29 @@ outlined below will guide you through the process.
       supports it.
     * `RECREATE_AT_OPEN`: Determines the database error strategy. In
       this case, it recreates the database if an error occurs upon opening.
-    * `baseUrl` in ServerConfiguration: This is the FHIR server's base URL. The
-      provided IP address `10.0.2.2` is specially reserved for localhost,
+    * `baseUrl` in `ServerConfiguration`: This is the FHIR server's base URL.
+      The provided IP address `10.0.2.2` is specially reserved for localhost,
       accessible from the Android emulator. Learn
       [more](https://developer.android.com/studio/run/emulator-networking).
 
 1.  In the `FhirApplication` class, add the following line to lazily instantiate
-    the FHIR Engine: `kotlin private val fhirEngine: FhirEngine by lazy {
-    FhirEngineProvider.getInstance(this) }` This ensures the FhirEngine instance
+    the FHIR Engine:
+    ```kotlin
+      private val fhirEngine: FhirEngine by 
+          lazy { FhirEngineProvider.getInstance(this) }
+    ```
+
+    This ensures the FhirEngine instance
     is only created when it's accessed for the first time, not immediately when
     the app starts.
 
-1.  Add the following convenience method in the `FhirApplication` class for
+1.  Add the following convenience methods in the `FhirApplication` class for
     easier access throughout your application:
 
     ```kotlin
     companion object {
-        fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
+        fun fhirEngine(context: Context) =
+            (context.applicationContext as FhirApplication).fhirEngine
     }
     ```
 
@@ -257,7 +263,7 @@ outlined below will guide you through the process.
     engine instance to use for syncing.
 
 1.  In your ViewModel, `PatientListViewModel.kt`, you'll set up a one-time sync
-    mechanism. Locate and add this code to the `triggerOneTimeSync()` function:
+    mechanism. locate and add this code to the `triggerOneTimeSync()` function:
 
     ```kotlin
     viewModelScope.launch {
@@ -301,7 +307,7 @@ based on specific criteria and uploading the updated data to your FHIR server.
 Specifically, we will swap the address cities for patients residing in
 `Wakefield` and `Taunton`.
 
-### **Step 1**: Set Up the modification logic in PatientListViewModel
+### **Step 1**: Set Up the Modification Logic in PatientListViewModel
 
 The code in this section is added to the `triggerUpdate` function in
 `PatientListViewModel`
@@ -390,6 +396,7 @@ The code in this section is added to the `triggerUpdate` function in
 
     ```kotlin
     triggerOneTimeSync()
+    }
     ```
 
     The closing brace `}` signifies the end of the coroutine launched at the
@@ -426,20 +433,20 @@ To filter the results based on the provided name query, incorporate the
 following conditional code block:
 
 ```kotlin
-viewModelScope.launch {
-  val fhirEngine = FhirApplication.fhirEngine(getApplication())
-  if (nameQuery.isNotEmpty()) {
-    fhirEngine.search<Patient> {
-      filter(
-        Patient.NAME,
-        {
-          modifier = StringFilterModifier.CONTAINS
-          value = nameQuery
-        },
-      )
+    viewModelScope.launch {
+      val fhirEngine = FhirApplication.fhirEngine(getApplication())
+      if (nameQuery.isNotEmpty()) {
+        fhirEngine.search<Patient> {
+          filter(
+            Patient.NAME,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              value = nameQuery
+            },
+          )
+        }
+      }
     }
-  }
-}
 ```
 
 Here, if the `nameQuery` is not empty, the search function will filter the
