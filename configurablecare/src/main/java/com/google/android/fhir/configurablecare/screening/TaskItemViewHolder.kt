@@ -35,14 +35,22 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
     this.requestType = taskItem.resourceType
     this.description.text = taskItem.description
 
-    val dueDate = if (taskItem.dueDate == "unknown" || taskItem.dueDate == "Do Not Perform") taskItem.dueDate else "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
-    this.dueDate.text =
-      if (taskItem.status != "completed")
-        dueDate
-      else "Completed " + getDate(taskItem.completedDate) + " | " + taskItem.intent
-    this.taskIcon.setImageResource(
-      if (taskItem.status != "completed") R.drawable.ic_task else R.drawable.ic_task_check
-    )
+    var statusStr = ""
+    if (taskItem.dueDate == "Do Not Perform") {
+      statusStr = "Do Not Perform" + " | " + taskItem.intent
+      this.taskIcon.setImageResource(R.drawable.ic_task)
+    } else if (taskItem.status == "completed") {
+      statusStr = "Completed" + " | " + taskItem.intent
+      this.taskIcon.setImageResource(R.drawable.ic_task_check)
+    } else if (taskItem.status == "cancelled") {
+      statusStr = "Cancelled" + " | " + taskItem.intent
+      this.taskIcon.setImageResource(R.drawable.ic_task)
+    } else {
+      statusStr = "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
+      this.taskIcon.setImageResource(R.drawable.ic_task)
+    }
+
+    this.dueDate.text = statusStr
     if (taskItem.clickable) {
       this.itemView.setOnClickListener { onItemClicked(taskItem) }
     }

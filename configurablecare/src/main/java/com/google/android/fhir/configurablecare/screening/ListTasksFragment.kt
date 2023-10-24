@@ -86,6 +86,7 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
   }
 
   private fun onTaskItemClicked(taskItem: ListScreeningsViewModel.TaskItem) {
+    careWorkflowExecutionViewModel.selectedRequestItem = taskItem
     navigateToQuestionnaireCallback(
       taskItem.resourceId,
       viewModel.fetchQuestionnaireString(taskItem)
@@ -95,6 +96,5 @@ class ListTasksFragment(private val navigateToQuestionnaireCallback: (String, St
   companion object {
     const val PATIENT_ID_KEY = "patient_id"
     const val TASK_STATUS = "task_status"
-    const val REQUEST_RESOURCE_TYPE = "request_resource_type"
   }
 }

@@ -19,25 +19,22 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.configurablecare.FhirApplication
+import com.google.android.fhir.configurablecare.screening.ListScreeningsViewModel
 import com.google.android.fhir.get
 import com.google.android.fhir.search.search
 import com.google.android.fhir.testing.jsonParser
 import java.time.Instant
 import java.util.Date
-import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.Task
 
 /** TODO(mjajoo@): Explore if applying PlanDefinition could be done in background. */
@@ -49,8 +46,11 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
   private val requestManager = FhirApplication.requestManager(getApplication<Application>().applicationContext)
   private lateinit var activeRequestConfiguration: List<RequestConfiguration>
   lateinit var currentPlanDefinitionId: String
+  lateinit var currentIg: String
   var currentStructureMapId: String = ""
+  var currentTargetResourceType: String = ""
   lateinit var currentQuestionnaireId: String
+  lateinit var selectedRequestItem: ListScreeningsViewModel.TaskItem
 
   /**
    * Shared flow of [CareWorkflowExecutionRequest]. For each collected patient the execution shall
@@ -84,32 +84,32 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
           // carePlanManager.smartIgTest()
           if (currentPlanDefinitionId != "") {
             if (currentPlanDefinitionId.contains("CreateImmunizationRecord")) {
-              println("About to create Immunization record")
-              val patientId = IdType(careWorkflowExecutionRequest.patient.id).idPart
-              val medicationRequest = requestManager.getRequestsForPatient(
-                patientId,
-                ResourceType.MedicationRequest,
-                status = "draft", // "active",
-                intent = "order"
-              ).first() as MedicationRequest
-              requestManager.endOrder(medicationRequest, MedicationRequest.MedicationRequestStatus.COMPLETED, "Completed successfully")
+              // println("About to create Immunization record")
+              // val patientId = IdType(careWorkflowExecutionRequest.patient.id).idPart
+              // val medicationRequest = requestManager.getRequestsForPatient(
+              //   patientId,
+              //   ResourceType.MedicationRequest,
+              //   status = "draft", // "active",
+              //   intent = "order"
+              // ).first() as MedicationRequest
+              // requestManager.endOrder(medicationRequest, MedicationRequest.MedicationRequestStatus.COMPLETED, "Completed successfully")
 
-              var vaccineCoding: Coding? = null
-              if (medicationRequest.hasMedicationCodeableConcept() && medicationRequest.medicationCodeableConcept.hasCoding()) {
-                vaccineCoding = medicationRequest.medicationCodeableConcept.codingFirstRep
-              }
-              val immunization = Immunization().apply {
-                id = UUID.randomUUID().toString()
-                vaccineCode.addCoding(vaccineCoding)
-                patient = Reference("Patient/$patientId")
-                status = Immunization.ImmunizationStatus.COMPLETED
-              }
+              // var vaccineCoding: Coding? = null
+              // if (medicationRequest.hasMedicationCodeableConcept() && medicationRequest.medicationCodeableConcept.hasCoding()) {
+              //   vaccineCoding = medicationRequest.medicationCodeableConcept.codingFirstRep
+              // }
+              // val immunization = Immunization().apply {
+              //   id = UUID.randomUUID().toString()
+              //   vaccineCode.addCoding(vaccineCoding)
+              //   patient = Reference("Patient/$patientId")
+              //   status = Immunization.ImmunizationStatus.COMPLETED
+              // }
+              //
+              // fhirEngine.create(immunization)
+              // fhirEngine.update(medicationRequest)
 
-              fhirEngine.create(immunization)
-              fhirEngine.update(medicationRequest)
-
-              println(jsonParser.encodeResourceToString(immunization))
-              println(jsonParser.encodeResourceToString(medicationRequest))
+              // println(jsonParser.encodeResourceToString(immunization))
+              // println(jsonParser.encodeResourceToString(medicationRequest))
             }
             else {
               println("About to apply $currentPlanDefinitionId")
@@ -227,30 +227,6 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     }
   }
 
-  fun getNextActionForMedicationRequest(intent: String): String {
-    val mrConfig = activeRequestConfiguration.firstOrNull {
-      it.requestType == "MedicationRequest"
-    }?.intentConditions?.firstOrNull {
-      it.intent == intent
-    }
-    return if (mrConfig != null) {
-      if (mrConfig.condition == "automatic")
-        ""
-      else
-        mrConfig.action
-    } else
-      ""
-  }
-
-  fun setActiveConfiguration(planDefinitionId: String) {
-    activeRequestConfiguration =
-      ConfigurationManager.careConfiguration
-        ?.supportedImplementationGuides
-        ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(planDefinitionId) }
-        ?.implementationGuideConfig
-        ?.requestConfigurations!!
-  }
-
   fun setActiveRequestConfiguration(planDefinitionId: String) {
     activeRequestConfiguration =
       ConfigurationManager.careConfiguration
@@ -264,29 +240,25 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     return activeRequestConfiguration
   }
 
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
-  }
-
   suspend fun getActivePatientRegistrationQuestionnaire(): String {
     currentQuestionnaireId = ConfigurationManager.careConfiguration
       ?.supportedImplementationGuides
-      ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(currentPlanDefinitionId) }
+      ?.firstOrNull { it.implementationGuideConfig.entryPoint.contains(currentIg) }
       ?.implementationGuideConfig
       ?.patientRegistrationQuestionnaire!!
     val questionnaire = fhirEngine.get<Questionnaire>(IdType(currentQuestionnaireId).idPart)
     return jsonParser.encodeResourceToString(questionnaire)
-    // return readFileFromAssets("Questionnaire-Questionnaire-SOTMeasles.json")
   }
 
   fun setCurrentStructureMap() {
     for (implementationGuide in ConfigurationManager.careConfiguration?.supportedImplementationGuides!!) {
       val triggers = implementationGuide.implementationGuideConfig.triggers
       for (trigger in triggers)
-        if (trigger.event.contains(currentQuestionnaireId))
+        if (trigger.event.contains(currentQuestionnaireId)) {
           currentStructureMapId = trigger.structureMap
+          currentTargetResourceType = trigger.targetResourceType
+          println("StructureMap: $currentStructureMapId :: Target resource type: $currentTargetResourceType")
+        }
     }
   }
 

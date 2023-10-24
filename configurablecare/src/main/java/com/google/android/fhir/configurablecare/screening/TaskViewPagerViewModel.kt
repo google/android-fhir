@@ -41,7 +41,7 @@ class TaskViewPagerViewModel(application: Application, private val state: SavedS
   fun getTasksCount(patientId: String) {
     viewModelScope.launch {
       livePendingTasksCount.value =
-        requestManager.getRequestsCount(patientId, status = "draft")
+        requestManager.getRequestsCount(patientId, status = "draft") + requestManager.getRequestsCount(patientId, status = "active")
       liveCompletedTasksCount.value =
         requestManager.getRequestsCount(patientId, status = "completed")
     }

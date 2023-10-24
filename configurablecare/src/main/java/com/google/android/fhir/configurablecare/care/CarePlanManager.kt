@@ -48,7 +48,7 @@ import org.hl7.fhir.r4.model.Task
 /** Responsible for creating and managing CarePlans */
 class CarePlanManager(
   private var fhirEngine: FhirEngine,
-  private val fhirContext: FhirContext,
+  fhirContext: FhirContext,
   private val context: Context,
 ) {
   private var knowledgeManager = KnowledgeManager.create(context, inMemory = true)
@@ -69,7 +69,6 @@ class CarePlanManager(
       if (resource is MetadataResource && resource.name != null) {
         resource.name
       } else {
-        // resource.idElement.idPart
         "${resource.fhirType()}_${resource.idElement.idPart}"
       }
     return File(context.filesDir, fileName).apply {
@@ -113,26 +112,6 @@ class CarePlanManager(
     }
     initializeKnowledgeManager(rootDirectory)
   }
-
-  private suspend fun importToFhirEngine(resource: Resource) {
-    fhirEngine.create(resource)
-  }
-
-  suspend fun installKnowledgeResource(
-    resource: Resource,
-  ): Collection<Resource> {
-    var bundleCollection: Collection<Resource> = mutableListOf()
-
-    if (resource is Library) {
-      cqlLibraryIdList.add(IdType(resource.id).idPart)
-      knowledgeManager.install(writeToFile(resource))
-    }
-    knowledgeManager.install(writeToFile(resource))
-    bundleCollection += resource
-
-    return bundleCollection
-  }
-
 
   /**
    * Extracts resources present in PlanDefinition.contained field
@@ -254,7 +233,7 @@ class CarePlanManager(
   ) {
     val patientId = IdType(patient.id).idPart
 
-    println("PD: ${CanonicalType(planDefinitionUri)}")
+    println("PlanDefinition: ${CanonicalType(planDefinitionUri)}")
     val carePlanProposal =
       fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionUri), subject = "Patient/$patientId")
         as CarePlan
@@ -262,7 +241,7 @@ class CarePlanManager(
     println(jsonParser.encodeResourceToString(carePlanProposal))
 
     // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
-    // val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
+    val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
 
     // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
     val resourceList = acceptCarePlan(carePlanProposal, requestConfiguration)
@@ -273,41 +252,6 @@ class CarePlanManager(
       val medicationRequestPlans = requestManager.getRequestsForPatient(patientId, ResourceType.MedicationRequest, intent = "plan")
       println("moving to order for ${jsonParser.encodeResourceToString(medicationRequestPlans.first())}")
       requestManager.beginOrder(medicationRequestPlans.first() as MedicationRequest, requestConfiguration, "No Contraindications detected so proceeding with order")
-    }
-  }
-
-
-
-  /**
-   * Executes $apply on a [PlanDefinition] for a list of patients and creates the request resources
-   * as per the proposed CarePlans
-   *
-   * @param planDefinitionId PlanDefinition resource ID for which $apply is run
-   * @param patientList List of Patient resources for which the [PlanDefinition] $apply is run
-   * @param requestResourceConfigs List of configurations that need to be applied to the request
-   * resources as a result of the proposed [CarePlan]
-   */
-  suspend fun applyPlanDefinitionOnMultiplePatients(
-    planDefinitionUrl: String,
-    patientList: List<Patient>,
-    requestConfiguration: List<RequestConfiguration>,
-  ) {
-    if (cqlLibraryIdList.isEmpty()) {
-      loadCarePlanResourcesFromDb()
-    }
-
-    for (patient in patientList) {
-      val patientId = IdType(patient.id).idPart
-
-      val carePlanProposal =
-        fhirOperator.generateCarePlan(planDefinition = CanonicalType(planDefinitionUrl), subject = patientId)
-          as CarePlan
-
-      // Fetch existing CarePlan of record for the Patient or create a new one if it does not exist
-      // val carePlanOfRecord = getCarePlanOfRecordForPatient(patient)
-
-      // Accept the proposed (transient) CarePlan by default and add tasks to the CarePlan of record
-      acceptCarePlan(carePlanProposal, requestConfiguration)
     }
   }
 
@@ -419,15 +363,16 @@ class CarePlanManager(
       }
     }
 
+    requestManager.evaluateNextStage(resourceList, requestConfiguration)
     // Workaround until we figure out how to handle sequential events
-    for (resource in resourceList) {
-      if (resource is MedicationRequest) {
-        if (resource.doNotPerform) continue
-        if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
-          requestManager.beginProposal(resource, requestConfiguration)
-        }
-      }
-    }
+    // for (resource in resourceList) {
+    //   if (resource is MedicationRequest) {
+    //     if (resource.doNotPerform) continue
+    //     if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
+    //       requestManager.beginProposal(resource, requestConfiguration)
+    //     }
+    //   }
+    // }
 
     // val resourceList =
     //   createProposedRequestResources(proposedCarePlan.contained, requestResourceConfigs)
@@ -501,15 +446,15 @@ class CarePlanManager(
   // }
 
   // This should be in the RequestManager
-  companion object {
-    fun getNextActionForMedicationRequest(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>): RequestConfiguration.IntentCondition? {
-      val mrConfig = requestConfiguration.firstOrNull {
-        it.requestType == "MedicationRequest"
-      }?.intentConditions?.firstOrNull {
-        it.intent == medicationRequest.intent.toCode()
-      }
-      return mrConfig
-    }
-  }
+  // companion object {
+  //   fun getNextActionForMedicationRequest(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>): RequestConfiguration.IntentCondition? {
+  //     val mrConfig = requestConfiguration.firstOrNull {
+  //       it.requestType == "MedicationRequest"
+  //     }?.intentConditions?.firstOrNull {
+  //       it.intent == medicationRequest.intent.toCode()
+  //     }
+  //     return mrConfig
+  //   }
+  // }
 
 }

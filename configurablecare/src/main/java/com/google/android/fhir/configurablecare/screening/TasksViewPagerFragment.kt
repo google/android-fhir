@@ -92,16 +92,16 @@ class TasksViewPagerFragment : Fragment() {
         setDisplayHomeAsUpEnabled(true)
       }
     }
-    val tasksTabHeadings = listOf("Tasks", "Completed Tasks")
+    val tasksTabHeadings = listOf("Pending Activities", "Completed Activities")
     TabLayoutMediator(binding.tasksTabLayout, binding.viewPager) { tab, position ->
         tab.text = tasksTabHeadings[position]
       }
       .attach()
     taskViewPagerViewModel.livePendingTasksCount.observe(viewLifecycleOwner) {
-      binding.tasksTabLayout.getTabAt(0)?.text = "Tasks ($it)"
+      binding.tasksTabLayout.getTabAt(0)?.text = "Pending Activities ($it)"
     }
     taskViewPagerViewModel.liveCompletedTasksCount.observe(viewLifecycleOwner) {
-      binding.tasksTabLayout.getTabAt(1)?.text = "Completed Tasks ($it)"
+      binding.tasksTabLayout.getTabAt(1)?.text = "Completed Activities ($it)"
     }
     taskViewPagerViewModel.getTasksCount(args.patientId)
     taskViewPagerViewModel.getPatientName(args.patientId)

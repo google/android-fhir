@@ -37,7 +37,7 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   ) {
     this.nameView.text = patientItem.name
     this.ageView.text = getFormattedAge(patientItem, ageView.context.resources)
-    this.tasksCount.text = "${patientItem.pendingTasksCount} Tasks"
+    this.tasksCount.text = "${patientItem.pendingTasksCount} Activities"
     this.tasksCount.setTextColor(Color.BLACK)
     this.tasksCount.background =
       PatientDetailsRecyclerViewAdapter.allCornersRounded().apply {

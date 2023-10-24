@@ -4,32 +4,39 @@
       "location": "http://hostname/fhir/ImplementationGuide/ImmunizationReview",
       "carePlanPolicy": "ACCEPT_ALL",
       "implementationGuideConfig": {
-        "implementationGuideId": "ImplementationGuide/ImmunizationReview",
+        "implementationGuideId": "ImplementationGuide/who.fhir.immunization",
         "patientRegistrationQuestionnaire": "Questionnaire/QIMMZCRegisterClient",
-        "entryPoint": "PlanDefinition/PlanImmunizationReview",
+        "entryPoint": "Smart Immunization",
         "triggers": [
           {
             "event": "Questionnaire/QIMMZCRegisterClient",
             "planDefinition":"",
             "structureMap": "StructureMap/IMMZCQRToPatient",
-            "targetResource": "Patient"
+            "targetResourceType": "Patient"
           },
           {
             "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
             "planDefinition":"http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles",
             "structureMap": "StructureMap/IMMZD1QRToResources",
-            "targetResource": "Bundle"
+            "targetResourceType": "Bundle"
           },
           {
             "event": "Questionnaire/QIMMZD4CheckContraindicationsMeasles",
             "planDefinition": "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeaslesCI",
             "structureMap": "StructureMap/IMMZD4QRToResources",
-            "targetResource": "Bundle"
+            "targetResourceType": "Bundle"
           },
           {
             "event": "Questionnaire/AdministerVaccine",
             "planDefinition": "PlanDefinition/CreateImmunizationRecord",
-            "structureMap": ""
+            "structureMap": "",
+            "targetResourceType": ""
+          },
+          {
+            "event": "Questionnaire/ProposalApproval",
+            "planDefinition": "",
+            "structureMap": "",
+            "targetResourceType": ""
           }
         ],
         "requestConfigurations": [
@@ -39,7 +46,7 @@
               {
                 "intent": "proposal",
                 "action": "begin-plan",
-                "condition": "automatic"
+                "condition": "Questionnaire/ProposalApproval"
               },
               {
                 "intent": "plan",
@@ -50,11 +57,6 @@
                 "intent": "order",
                 "action": "complete-order",
                 "condition": "Questionnaire/AdministerVaccine"
-              },
-              {
-                "intent": "order",
-                "action": "conclude-vaccination",
-                "condition": "create-immunization"
               }
             ]
           }

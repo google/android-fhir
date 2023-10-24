@@ -90,6 +90,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         careWorkflowExecutionViewModel.getActivePatientRegistrationQuestionnaire()
       careWorkflowExecutionViewModel.setCurrentStructureMap()
       viewModel.structureMapId = careWorkflowExecutionViewModel.currentStructureMapId
+      viewModel.currentTargetResourceType = careWorkflowExecutionViewModel.currentTargetResourceType
     }
     childFragmentManager.commit {
       add(
@@ -127,7 +128,7 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
           Snackbar.LENGTH_SHORT
         )
         .show()
-      // workflow execution in mainActivityViewModel is necessary
+
       val questionnaireId = IdType((jsonParser.parseResource(viewModel.questionnaire) as Questionnaire).id).idPart
       careWorkflowExecutionViewModel.setPlanDefinitionId("Questionnaire/${questionnaireId}")
       careWorkflowExecutionViewModel.executeCareWorkflowForPatient(it)

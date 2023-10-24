@@ -3,6 +3,34 @@
   "id": "AdministerVaccine",
   "title": "Administer Vaccine",
   "status": "active",
+  "contained": [
+    {
+      "resourceType": "ValueSet",
+      "id": "VSMeaslesVaccineProducts",
+      "status": "draft",
+      "name": "VSMeaslesVaccineProducts",
+      "title": "MeaslesVaccine Products ValueSet",
+      "description": "Vaccine Product Codes - representing the codes of the products currently available.",
+      "url": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
+      "compose": {
+        "include": [
+          {
+            "system": "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts"
+          }
+        ]
+      }
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+      "valueExpression": {
+        "language": "application/x-fhir-query",
+        "expression": "Encounter",
+        "name": "encounter"
+      }
+    }
+  ],
   "item": [
     {
       "type": "boolean",
@@ -42,25 +70,26 @@
       "readOnly": true
     },
     {
-      "linkId": "product-code",
-      "text": "Product Code",
-      "type": "choice",
-      "required": true,
-      "repeats": false,
-      "answerOption": [
+      "linkId": "product-code-group",
+      "type": "group",
+      "extension": [
         {
-          "valueCoding": {
-            "system": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
-            "code": "XM8L15",
-            "display": "Serum Institute of India Measles vaccine"
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Immunization",
+            "name": "imm"
           }
-        },
+        }
+      ],
+      "item": [
         {
-          "valueCoding": {
-            "system": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
-            "code": "XM8TF3",
-            "display": "M-M-RvaxPRO"
-          }
+          "linkId": "product-code",
+          "text": "Product Code",
+          "type": "choice",
+          "required": true,
+          "repeats": false,
+          "answerValueSet": "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts"
         }
       ]
     }

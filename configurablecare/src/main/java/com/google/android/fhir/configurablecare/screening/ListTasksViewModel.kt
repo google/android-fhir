@@ -28,6 +28,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
 import org.hl7.fhir.r4.model.Task.TaskStatus
 
@@ -45,21 +46,28 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
 
   fun getTasksForPatient(patientId: String, taskStatus: String) {
     viewModelScope.launch {
+      var requests: List<Resource> = mutableListOf()
+      if (taskStatus == "draft") {
+        requests = requestManager.getAllRequestsForPatient(patientId, "draft") + requestManager.getAllRequestsForPatient(patientId, "active")
+      } else if (taskStatus == "completed") {
+        requests = requestManager.getAllRequestsForPatient(patientId, "completed") + requestManager.getAllRequestsForPatient(patientId, "cancelled")
+      }
       liveSearchedTasks.value =
-        requestManager.getAllRequestsForPatient(patientId)//, taskStatus)
+        requests // requestManager.getAllRequestsForPatient(patientId) //, taskStatus)
           .mapIndexed { index, fhirTask ->
             if (fhirTask is Task) fhirTask.toTaskItem(index + 1)
             else if (fhirTask is MedicationRequest) fhirTask.toTaskItem(index + 1)
+            else if (fhirTask is ServiceRequest) fhirTask.toTaskItem(index + 1)
             else TaskItem(
               id = (index + 1).toString(),
-              resourceType = "Task",
+              resourceType = "null",
               resourceId = if (fhirTask.hasIdElement()) fhirTask.idElement.idPart else "",
               description = "",
               status = "no status",
               intent = "no intent",
               dueDate = "due date",
               completedDate = "completed date",
-              owner = "owner",
+              owner = "null",
               fhirResourceId = "",
               clickable = false
             )
@@ -72,14 +80,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
    * of [runBlocking]
    */
   fun fetchQuestionnaireString(taskItem: TaskItem): String = runBlocking {
-    // iParser.encodeResourceToString(
-    //   taskManager.fetchQuestionnaireFromTaskLogicalId(taskItem.resourceId)
-    // )
-
     val questionnaire = taskManager.fetchQuestionnaire(taskItem.fhirResourceId)
-
-    // update request
-    // requestManager.updateIntent(taskItem.resourceId, taskItem.resourceType)
     iParser.encodeResourceToString(questionnaire)
   }
 
@@ -100,75 +101,6 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   ) {
     override fun toString() = description
   }
-
-  data class RequestItem(
-    val id: String,
-    // for Task/123/... this should be 123
-    val resourceType: String,
-    val resourceId: String,
-    val description: String,
-    val status: String,
-    val intent: String,
-    val dueDate: String,
-    val completedDate: String,
-    val fhirResourceId: String,  // resource to be opened
-    // for Questionnaire/456 - this should be "Questionnaire/456"
-    val clickable: Boolean
-  ) {
-    override fun toString() = description
-  }
-}
-
-internal fun Task.toRequestItem(position: Int): ListScreeningsViewModel.RequestItem {
-  val taskResourceId = if (hasIdElement()) idElement.idPart else ""
-  val description = if (hasDescription()) description else "Sample Task Name"
-  // status and intent are always present
-  val taskStatus = status.toCode()
-  val taskIntent = intent.toCode()
-  val dueDate =
-    if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
-    else "unknown"
-  val completedDate = if (hasLastModified()) lastModified.toString() else dueDate
-  val clickable =
-    focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
-
-  return ListScreeningsViewModel.RequestItem(
-    id = position.toString(),
-    resourceType = resourceType.toString(),
-    resourceId = taskResourceId,
-    description = description,
-    status = taskStatus,
-    intent = taskIntent,
-    dueDate = dueDate,
-    completedDate = completedDate,
-    fhirResourceId = if (clickable) focus.reference else "",
-    clickable = clickable
-  )
-}
-
-internal fun MedicationRequest.toRequestItem(position: Int): ListScreeningsViewModel.RequestItem {
-  val medicationRequestResourceId = if (hasIdElement()) idElement.idPart else ""
-  val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [${medicationCodeableConcept.codingFirstRep.code}]" else "No description"
-  // status and intent are always present
-  val medicationRequestStatus = status.toCode()
-  val medicationRequestIntent = intent.toCode()
-  val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else "unknown"
-  val completedDate = dueDate
-  val clickable = true
-  // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
-
-  return ListScreeningsViewModel.RequestItem(
-    id = position.toString(),
-    resourceType = resourceType.toString(),
-    resourceId = medicationRequestResourceId,
-    description = description,
-    status = medicationRequestStatus,
-    intent = medicationRequestIntent,
-    dueDate = dueDate,
-    completedDate = completedDate,
-    fhirResourceId = "Questionnaire/Questionnaire-IMMZD4CheckContraindications",
-    clickable = clickable
-  )
 }
 
 internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
@@ -179,7 +111,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskIntent = intent.toCode()
   val dueDate =
     if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
-    else "Sample End Date"
+    else "unknown"
   val completedDate = if (hasLastModified()) lastModified.toString() else dueDate
   val owner = if (owner == null) "" else if (owner.hasDisplay()) owner.display else ""
   val clickable =
@@ -200,6 +132,32 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   )
 }
 
+internal fun ServiceRequest.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
+  val taskResourceId = if (hasIdElement()) idElement.idPart else ""
+  val description = "Referral for further review [$resourceType]"
+  // status and intent are always present
+  val taskStatus = status.toCode()
+  val taskIntent = intent.toCode()
+  val dueDate = "unknown"
+  val completedDate = "unknown"
+  val owner = "unknown"
+  val clickable = false
+
+  return ListScreeningsViewModel.TaskItem(
+    id = position.toString(),
+    resourceType = resourceType.toString(),
+    resourceId = taskResourceId,
+    description = description,
+    status = taskStatus,
+    intent = taskIntent,
+    dueDate = dueDate,
+    completedDate = completedDate,
+    owner = owner,
+    fhirResourceId = "",
+    clickable = clickable
+  )
+}
+
 internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val taskResourceId = if (hasIdElement()) idElement.idPart else ""
   val description = if (hasMedicationCodeableConcept() && medicationCodeableConcept.hasCoding()) "${medicationCodeableConcept.codingFirstRep.display} [$resourceType]" else ""
@@ -209,9 +167,9 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
   val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else if (doNotPerform) "Do Not Perform" else "unknown"
   val completedDate = dueDate
   val owner = ""
-  val clickable = true
-  val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else "Questionnaire/QIMMZD4CheckContraindicationsMeasles"
-    // focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
+  val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else ""
+  val clickable = !(fhirResourceId == "" || taskStatus == "completed" || taskStatus == "cancelled")
+
 
   return ListScreeningsViewModel.TaskItem(
     id = position.toString(),

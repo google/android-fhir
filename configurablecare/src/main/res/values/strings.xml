@@ -60,7 +60,7 @@
     <string name="header_conditions">Conditions</string>
     <string name="message_no_datetime">No effective DateTime</string>
     <string name="complete_survey">Complete Survey</string>
-    <string name="tasks_due">Go To Tasks</string>
+    <string name="tasks_due">Go To Activities</string>
     <string name="risk_status">Current status: </string>
     <string name="unknown">UNKNOWN</string>
     <string name="none">none</string>
@@ -70,8 +70,8 @@
     <string name="sync_menu">Sync</string>
     <string name="last_sync">Last sync</string>
     <string name="syncing">Syncing</string>
-    <string name="tasks_updated">Tasks Updated</string>
-    <string name="updating_tasks">Updating Tasks</string>
+    <string name="tasks_updated">Activities Updated</string>
+    <string name="updating_tasks">Updating Activities</string>
     <string name="sync">Sync</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

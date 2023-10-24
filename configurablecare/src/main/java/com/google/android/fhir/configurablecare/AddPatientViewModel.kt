@@ -70,6 +70,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     // get() = getQuestionnaireJson()
     var savedPatient = MutableLiveData<Patient?>()
   var structureMapId: String = ""
+  var currentTargetResourceType: String = ""
   val context = application.applicationContext
 
   private val questionnaireResource: Questionnaire
@@ -99,7 +100,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         return@launch
       }
 
-      if (structureMapId.isEmpty()) { // no structure map needed
+      if (structureMapId.isEmpty()) {  // no structure map needed
         println(" Structure map is empty")
         val bundle = ResourceMapper.extract(questionnaireResource, questionnaireResponse)
         var flag = false
@@ -120,6 +121,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
       } else {
         println(" Structure map is: $structureMapId")
+        println(" Target resource: $currentTargetResourceType")
         val outputFile =
           File(getApplication<Application>().externalCacheDir, "questionnaireResponse.json")
         outputFile.writeText(
@@ -144,7 +146,11 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         val structureMapUtilities = StructureMapUtilities(contextR4, transformSupportServices)
 
         val structureMap = fhirEngine.get<StructureMap>(IdType(structureMapId).idPart)
-        val targetResource = Patient() // Bundle()
+        val targetResource: Base =
+          if (currentTargetResourceType == "Patient")
+            Patient()
+          else
+            Bundle()
 
         val baseElement =
           jsonParser.parseResource(
@@ -163,7 +169,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
 
         if (targetResource is Bundle) {
           var flag = false
-          var patient: Patient = Patient()
+          var patient = Patient()
           val outputFil1e = File(getApplication<Application>().externalCacheDir, "bundle.json")
           outputFil1e.writeText(
             FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()

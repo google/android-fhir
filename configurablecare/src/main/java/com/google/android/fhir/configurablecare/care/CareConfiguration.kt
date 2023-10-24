@@ -59,7 +59,7 @@ data class Trigger(
   var event: String,
   var planDefinition: String,
   var structureMap: String,
-  var targetResource: String
+  var targetResourceType: String
 )
 
 
@@ -68,20 +68,6 @@ data class SupportedImplementationGuide(
   var carePlanPolicy: String,
   var implementationGuideConfig: ImplementationGuideConfig,
 )
-
-// fun moveAllIGResourcesIntoFilesDir(igName: String) {
-//   val inputBaseIgDir = "/$igName/ig"
-//
-//   javaClass
-//     .getResourceAsStream("$inputBaseIgDir/contents.txt")
-//     ?.bufferedReader()
-//     ?.use { bufferReader -> bufferReader.readText() }
-//     ?.split("\n")
-//     ?.forEach { fileName ->
-//       runCatching { copyResourceIntoApp(igName, "$inputBaseIgDir/$fileName") }
-//         .onFailure { println("Ignoring $inputBaseIgDir/$fileName. Not a valid Fhir Resource") }
-//     }
-// }
 
 data class CareConfiguration(var supportedImplementationGuides: List<SupportedImplementationGuide>)
 
