@@ -228,8 +228,8 @@ object Dependencies {
     }
 
     const val androidFhirCommon = "0.1.0-alpha05"
-    const val androidFhirEngine = "0.1.0-beta04"
-    const val androidFhirKnowledge = "0.1.0-alpha01"
+    const val androidFhirEngine = "0.1.0-beta05"
+    const val androidFhirKnowledge = "0.1.0-alpha03"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
