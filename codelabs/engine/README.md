@@ -193,7 +193,7 @@ outlined below will guide you through the process.
 1.  In the `FhirApplication` class, add the following line to lazily instantiate
     the FHIR Engine:
     ```kotlin
-      private val fhirEngine: FhirEngine by 
+      private val fhirEngine: FhirEngine by
           lazy { FhirEngineProvider.getInstance(this) }
     ```
 
@@ -201,7 +201,7 @@ outlined below will guide you through the process.
     is only created when it's accessed for the first time, not immediately when
     the app starts.
 
-1.  Add the following convenience methods in the `FhirApplication` class for
+1.  Add the following convenience method in the `FhirApplication` class for
     easier access throughout your application:
 
     ```kotlin
@@ -220,24 +220,24 @@ outlined below will guide you through the process.
     define how the application fetches the next resource from the list to
     download.:
     ```kotlin
-    class DownloadWorkManagerImpl : DownloadWorkManager {
-      private val urls = LinkedList(listOf("Patient"))
+      class DownloadWorkManagerImpl : DownloadWorkManager {
+        private val urls = LinkedList(listOf("Patient"))
 
-      override suspend fun getNextRequest(): DownloadRequest? {
-        val url = urls.poll() ?: return null
-        return DownloadRequest.of(url)
-      }
-
-      override suspend fun getSummaryRequestUrls() = mapOf<ResourceType, String>()
-
-      override suspend fun processResponse(response: Resource): Collection<Resource> {
-        var bundleCollection: Collection<Resource> = mutableListOf()
-        if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
-          bundleCollection = response.entry.map { it.resource }
+        override suspend fun getNextRequest(): DownloadRequest? {
+          val url = urls.poll() ?: return null
+          return DownloadRequest.of(url)
         }
-        return bundleCollection
+
+        override suspend fun getSummaryRequestUrls() = mapOf<ResourceType, String>()
+
+        override suspend fun processResponse(response: Resource): Collection<Resource> {
+          var bundleCollection: Collection<Resource> = mutableListOf()
+          if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+            bundleCollection = response.entry.map { it.resource }
+          }
+          return bundleCollection
+        }
       }
-    }
     ```
 
     This class has a queue of resource types it wants to download. It processes
@@ -263,14 +263,14 @@ outlined below will guide you through the process.
     engine instance to use for syncing.
 
 1.  In your ViewModel, `PatientListViewModel.kt`, you'll set up a one-time sync
-    mechanism. locate and add this code to the `triggerOneTimeSync()` function:
+    mechanism. Locate and add this code to the `triggerOneTimeSync()` function:
 
     ```kotlin
     viewModelScope.launch {
-      Sync.oneTimeSync<AppFhirSyncWorker>(getApplication())
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
+          Sync.oneTimeSync<AppFhirSyncWorker>(getApplication())
+            .shareIn(this, SharingStarted.Eagerly, 10)
+            .collect { _pollState.emit(it) }
+        }
     ```
 
     This coroutine initiates a one-time sync with the FHIR server using the
@@ -282,11 +282,11 @@ outlined below will guide you through the process.
 
     ```kotlin
     when (syncJobStatus) {
-      is SyncJobStatus.Finished -> {
-        Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
-        viewModel.searchPatientsByName("")
-      }
-      else -> {}
+        is SyncJobStatus.Finished -> {
+            Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
+            viewModel.searchPatientsByName("")
+        }
+        else -> {}
     }
     ```
 
@@ -429,24 +429,25 @@ this feature in your application.
 Navigate to your `PatientListViewModel.kt` file and find the function named
 `searchPatientsByName`. We will be adding code into this function.
 
-To filter the results based on the provided name query, incorporate the
-following conditional code block:
+To filter the results based on the provided name query, and emit the results for
+the UI to update, incorporate the following conditional code block:
 
 ```kotlin
     viewModelScope.launch {
-      val fhirEngine = FhirApplication.fhirEngine(getApplication())
-      if (nameQuery.isNotEmpty()) {
-        fhirEngine.search<Patient> {
-          filter(
-            Patient.NAME,
-            {
-              modifier = StringFilterModifier.CONTAINS
-              value = nameQuery
-            },
-          )
-        }
-      }
+  val fhirEngine = FhirApplication.fhirEngine(getApplication())
+  if (nameQuery.isNotEmpty()) {
+    val searchResult = fhirEngine.search<Patient> {
+      filter(
+        Patient.NAME,
+        {
+          modifier = StringFilterModifier.CONTAINS
+          value = nameQuery
+        },
+      )
     }
+    liveSearchedPatients.value  =  searchResult.map { it.resource }
+  }
+}
 ```
 
 Here, if the `nameQuery` is not empty, the search function will filter the
