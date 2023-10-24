@@ -6,6 +6,8 @@ import com.google.android.fhir.get
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.search
 import java.lang.StringBuilder
+import java.time.Instant
+import java.util.Date
 import java.util.UUID
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -16,6 +18,7 @@ import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestStatus
 import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestIntent
+import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RequestGroup
 import org.hl7.fhir.r4.model.RequestGroup.RequestIntent
@@ -110,6 +113,7 @@ class RequestManager(
         return when (status) {
           "draft" -> TaskStatus.DRAFT.toCode().lowercase()
           "active" -> TaskStatus.INPROGRESS.toCode().lowercase()
+          "on-hold" -> TaskStatus.ONHOLD.toCode().lowercase()
           "completed" -> TaskStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> TaskStatus.CANCELLED.toCode().lowercase()
           "stopped" -> TaskStatus.REJECTED.toCode().lowercase()
@@ -124,6 +128,7 @@ class RequestManager(
           "completed" -> MedicationRequestStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> MedicationRequestStatus.CANCELLED.toCode().lowercase()
           "stopped" -> MedicationRequestStatus.STOPPED.toCode().lowercase()
+          "on-hold" -> MedicationRequestStatus.ONHOLD.toCode().lowercase()
           else -> ""
         }
       }
@@ -135,6 +140,7 @@ class RequestManager(
           "completed" -> ServiceRequestStatus.COMPLETED.toCode().lowercase()
           "cancelled" -> ServiceRequestStatus.REVOKED.toCode().lowercase()
           "stopped" -> ServiceRequestStatus.REVOKED.toCode().lowercase()
+          "on-hold" -> ServiceRequestStatus.ONHOLD.toCode().lowercase()
           else -> ""
         }
       }
@@ -200,6 +206,7 @@ class RequestManager(
       )
     ) {
       task.status = status
+      task.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.update(task)
     }
     // else do nothing
@@ -251,6 +258,14 @@ class RequestManager(
             beginProposal(request, requestConfiguration)
           }
         }
+        is ServiceRequest -> {
+          val patientReference = request.subject.reference
+          val medicationRequestPlan = fhirEngine.search("MedicationRequest?subject=$patientReference&intent=plan").first().resource as MedicationRequest
+          medicationRequestPlan.status = MedicationRequestStatus.ONHOLD
+          println(jsonParser.encodeResourceToString(medicationRequestPlan))
+          request.meta.lastUpdated = Date.from(Instant.now())
+          fhirEngine.update(medicationRequestPlan)
+        }
         else -> {  }
       }
     }
@@ -278,6 +293,7 @@ class RequestManager(
           }
         }
       }
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.update(medicationRequest)
     }
   }
@@ -286,6 +302,7 @@ class RequestManager(
     if (medicationRequest.status == MedicationRequestStatus.ACTIVE) {
       medicationRequest.status = status
       medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.update(medicationRequest)
     }
   }
@@ -334,6 +351,9 @@ class RequestManager(
         }
       }
 
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
+      newMedicationRequest.meta.lastUpdated = Date.from(Instant.now())
+
       fhirEngine.create(newMedicationRequest)
       fhirEngine.update(medicationRequest)
 
@@ -347,6 +367,7 @@ class RequestManager(
       medicationRequest.status == MedicationRequestStatus.DRAFT) {
       medicationRequest.status = status
       medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.update(medicationRequest)
     }
   }
@@ -393,6 +414,9 @@ class RequestManager(
           // do nothing
         }
       }
+
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
+      newMedicationRequest.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.create(newMedicationRequest)
       fhirEngine.update(medicationRequest)
 
@@ -406,12 +430,17 @@ class RequestManager(
       medicationRequest.status == MedicationRequestStatus.DRAFT) {
       medicationRequest.status = status
       medicationRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
+      medicationRequest.meta.lastUpdated = Date.from(Instant.now())
       fhirEngine.update(medicationRequest)
     }
   }
 
   suspend fun getRequestsCount(patientId: String, status: String = "", intent: String = ""): Int {
     return let { getAllRequestsForPatient(patientId, status = status, intent = intent).count() }
+  }
+
+  suspend fun fetchQuestionnaire(questionnaireId: String): Questionnaire {
+    return fhirEngine.get(IdType(questionnaireId).idPart)
   }
 
 

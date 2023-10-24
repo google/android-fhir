@@ -46,13 +46,30 @@
                 android:ellipsize="end"
                 android:maxLines="1"
             />
+              <TextView
+                  android:id="@+id/task_id"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textStyle="italic"
+                  android:textSize="16sp"
+                  android:textAppearance="?textAppearanceTitleLarge"
+                  />
                 <TextView
-                android:id="@+id/task_due_date"
+                android:id="@+id/task_status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textAppearance="?textAppearanceTitleLarge"
             />
+              <TextView
+                  android:id="@+id/last_updated"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:textStyle="italic"
+                  android:textColor="@color/grey"
+                  android:textSize="16sp"
+                  android:textAppearance="?textAppearanceTitleLarge"
+                  />
             </LinearLayout>
         </LinearLayout>
 

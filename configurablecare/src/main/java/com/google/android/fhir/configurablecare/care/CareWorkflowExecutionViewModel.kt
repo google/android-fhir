@@ -193,6 +193,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
 
         task.status = Task.TaskStatus.COMPLETED
         task.lastModified = Date.from(Instant.now())
+        task.meta.lastUpdated = Date.from(Instant.now())
         fhirEngine.update(task)
       }
       else if (medicationRequestSearch.isNotEmpty()) {

@@ -15,6 +15,7 @@
  */
 package com.google.android.fhir.configurablecare.screening
 
+import android.graphics.Color
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -24,9 +25,11 @@ import com.google.android.fhir.configurablecare.databinding.ItemTaskViewBinding
 
 class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder(binding.root) {
   private val description: TextView = binding.taskDescription
-  private val dueDate: TextView = binding.taskDueDate
+  private val taskStatus: TextView = binding.taskStatus
   private val taskIcon: ImageView = binding.taskIcon
+  private val taskId: TextView = binding.taskId
   private var requestType: String = "Task"
+  private var lastUpdated: TextView = binding.lastUpdated
 
   fun bindTo(
     taskItem: ListScreeningsViewModel.TaskItem,
@@ -34,26 +37,47 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
   ) {
     this.requestType = taskItem.resourceType
     this.description.text = taskItem.description
+    this.taskId.text = "id: ${taskItem.resourceId.substring(9) + "..."}"
 
     var statusStr = ""
+
+    var lastUpdated = ""
+    if (taskItem.completedDate != "") {
+      lastUpdated = "Last updated: " + taskItem.completedDate
+      this.lastUpdated.text = lastUpdated
+    }
+
     if (taskItem.dueDate == "Do Not Perform") {
-      statusStr = "Do Not Perform" + " | " + taskItem.intent
-      this.taskIcon.setImageResource(R.drawable.ic_task)
+      statusStr =  getTransition(taskItem) + "Do Not Perform"
+      this.taskStatus.setTextColor(Color.rgb(204,0,0))
+      this.taskIcon.setImageResource(R.drawable.gm_remove_circle_outline_24)
     } else if (taskItem.status == "completed") {
-      statusStr = "Completed" + " | " + taskItem.intent
+      statusStr =  getTransition(taskItem) + taskItem.status
+      this.taskStatus.setTextColor(Color.rgb(20, 108, 46))
       this.taskIcon.setImageResource(R.drawable.ic_task_check)
     } else if (taskItem.status == "cancelled") {
-      statusStr = "Cancelled" + " | " + taskItem.intent
-      this.taskIcon.setImageResource(R.drawable.ic_task)
+      statusStr =  getTransition(taskItem) + taskItem.status
+      this.taskStatus.setTextColor(Color.rgb(204,0,0))
+      this.taskIcon.setImageResource(R.drawable.gm_remove_circle_outline_24)
+    } else if (taskItem.status == "on-hold") {
+      statusStr =  getTransition(taskItem) + taskItem.status
+      this.taskStatus.setTextColor(Color.rgb(204,0,0))
+      this.taskIcon.setImageResource(R.drawable.gm_remove_circle_outline_24)
     } else if (taskItem.status == "stopped") {
-      statusStr = "Stopped" + " | " + taskItem.intent
-      this.taskIcon.setImageResource(R.drawable.ic_task)
+      this.taskStatus.setTextColor(Color.rgb(204,0,0))
+      statusStr =  getTransition(taskItem) + taskItem.status
+      this.taskIcon.setImageResource(R.drawable.gm_remove_circle_outline_24)
+    } else if (taskItem.resourceType == "ServiceRequest") {
+      statusStr = "Active"
+      this.taskStatus.setTextColor(Color.rgb(255,187,51))
+      this.taskIcon.setImageResource(R.drawable.ic_error_48px)
     } else {
+      this.taskStatus.setTextColor(Color.rgb(11,87,208))
       statusStr = "Due " + getDate(taskItem.dueDate) + " | " + taskItem.intent
       this.taskIcon.setImageResource(R.drawable.ic_task)
     }
 
-    this.dueDate.text = statusStr
+    this.taskStatus.text = statusStr
     if (taskItem.clickable) {
       this.itemView.setOnClickListener { onItemClicked(taskItem) }
     }
@@ -63,4 +87,15 @@ class TaskItemViewHolder(binding: ItemTaskViewBinding) : RecyclerView.ViewHolder
     return date.substring(4, 10) + " " + date.substring(date.length - 4)
   }
 
+  private fun getTransition(taskItem: ListScreeningsViewModel.TaskItem): String {
+    var transition = ""
+    if (taskItem.intent == "order") {
+      transition = "proposal -> plan -> order -> "
+    } else if (taskItem.intent == "plan") {
+      transition = "proposal -> plan -> "
+    } else if (taskItem.intent == "proposal") {
+      transition = "proposal -> "
+    }
+    return transition
+  }
 }

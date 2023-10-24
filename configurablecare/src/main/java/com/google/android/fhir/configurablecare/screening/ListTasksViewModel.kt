@@ -37,8 +37,6 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
   private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val taskManager =
     FhirApplication.taskManager(getApplication<Application>().applicationContext)
-  private val carePlanManager =
-    FhirApplication.carePlanManager(getApplication<Application>().applicationContext)
   private val requestManager =
     FhirApplication.requestManager(getApplication<Application>().applicationContext)
 
@@ -48,9 +46,38 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
     viewModelScope.launch {
       var requests: List<Resource> = mutableListOf()
       if (taskStatus == "draft") {
-        requests = requestManager.getAllRequestsForPatient(patientId, "draft") + requestManager.getAllRequestsForPatient(patientId, "active")
+        requests = requestManager.getAllRequestsForPatient(patientId, "draft") + requestManager.getAllRequestsForPatient(patientId, "active") + requestManager.getAllRequestsForPatient(patientId, "on-hold")
       } else if (taskStatus == "completed") {
-        requests = requestManager.getAllRequestsForPatient(patientId, "completed") + requestManager.getAllRequestsForPatient(patientId, "cancelled") + requestManager.getAllRequestsForPatient(patientId, "stopped")
+        val allRequests = requestManager.getAllRequestsForPatient(patientId, "completed") + requestManager.getAllRequestsForPatient(patientId, "cancelled") + requestManager.getAllRequestsForPatient(patientId, "stopped")
+
+        val orders: MutableList<Resource> = mutableListOf()
+        val plans: MutableList<Resource> = mutableListOf()
+        val proposals: MutableList<Resource> = mutableListOf()
+        val miscRequests: MutableList<Resource> = mutableListOf()
+        for (request in allRequests) {
+          if (request is ServiceRequest || request is Task) {
+            miscRequests.add(request)
+          } else if (request is MedicationRequest) {
+            if (request.intent == MedicationRequest.MedicationRequestIntent.ORDER) {
+              orders.add(request)
+            }
+          }
+        }
+        for (request in allRequests) {
+          if (request is MedicationRequest) {
+            if (request.intent == MedicationRequest.MedicationRequestIntent.PLAN && (request.status != MedicationRequest.MedicationRequestStatus.COMPLETED || orders.size == 0)) {
+              plans.add(request)
+            }
+          }
+        }
+        for (request in allRequests) {
+          if (request is MedicationRequest) {
+            if (request.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL && (request.status != MedicationRequest.MedicationRequestStatus.COMPLETED || (orders.size == 0 && plans.size == 0))) {
+              proposals.add(request)
+            }
+          }
+        }
+        requests = orders + proposals + plans + miscRequests
       }
       liveSearchedTasks.value =
         requests // requestManager.getAllRequestsForPatient(patientId) //, taskStatus)
@@ -80,7 +107,7 @@ class ListScreeningsViewModel(application: Application) : AndroidViewModel(appli
    * of [runBlocking]
    */
   fun fetchQuestionnaireString(taskItem: TaskItem): String = runBlocking {
-    val questionnaire = taskManager.fetchQuestionnaire(taskItem.fhirResourceId)
+    val questionnaire = requestManager.fetchQuestionnaire(taskItem.fhirResourceId)
     iParser.encodeResourceToString(questionnaire)
   }
 
@@ -112,7 +139,7 @@ internal fun Task.toTaskItem(position: Int): ListScreeningsViewModel.TaskItem {
   val dueDate =
     if (hasRestriction() && restriction.hasPeriod()) restriction.period.end.toString()
     else "unknown"
-  val completedDate = if (hasLastModified()) lastModified.toString() else dueDate
+  val completedDate = if (hasMeta() && meta.hasLastUpdated()) meta.lastUpdated.toString() else ""
   val owner = if (owner == null) "" else if (owner.hasDisplay()) owner.display else ""
   val clickable =
     focus.reference.contains("Questionnaire") && taskStatus != TaskStatus.COMPLETED.toCode()
@@ -139,7 +166,7 @@ internal fun ServiceRequest.toTaskItem(position: Int): ListScreeningsViewModel.T
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
   val dueDate = "unknown"
-  val completedDate = "unknown"
+  val completedDate = if (hasMeta() && meta.hasLastUpdated()) meta.lastUpdated.toString() else ""
   val owner = "unknown"
   val clickable = false
 
@@ -165,10 +192,10 @@ internal fun MedicationRequest.toTaskItem(position: Int): ListScreeningsViewMode
   val taskStatus = status.toCode()
   val taskIntent = intent.toCode()
   val dueDate = if (hasDispenseRequest() && dispenseRequest.hasValidityPeriod()) dispenseRequest.validityPeriod.start.toString() else if (doNotPerform) "Do Not Perform" else "unknown"
-  val completedDate = dueDate
+  val completedDate = if (hasMeta() && meta.hasLastUpdated()) meta.lastUpdated.toString() else ""
   val owner = ""
   val fhirResourceId = if (hasSupportingInformation()) supportingInformation.first().reference else ""
-  val clickable = !(fhirResourceId == "" || taskStatus == "completed" || taskStatus == "cancelled")
+  val clickable = !(fhirResourceId == "" || taskStatus == "completed" || taskStatus == "cancelled" || taskStatus == "on-hold")
 
 
   return ListScreeningsViewModel.TaskItem(

@@ -34,6 +34,8 @@ import com.google.android.fhir.configurablecare.util.TransformSupportServicesMat
 import com.google.android.fhir.get
 import com.google.android.fhir.testing.jsonParser
 import java.io.File
+import java.time.Instant
+import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Base
@@ -293,6 +295,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             patient = subjectReference
             status = Immunization.ImmunizationStatus.COMPLETED
             encounter = encounterReference
+            meta.lastUpdated = Date.from(Instant.now())
           }
 
           println(jsonParser.encodeResourceToString(immunization))

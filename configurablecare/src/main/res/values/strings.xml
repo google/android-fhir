@@ -56,11 +56,11 @@
     <string name="html_text">Current status: <font
             color="#ddd"
         >UNKNOWN</font></string>
-    <string name="header_observation">Observations</string>
-    <string name="header_conditions">Conditions</string>
+    <string name="header_observation">Immunization Records</string>
+    <string name="header_conditions">Alerts</string>
     <string name="message_no_datetime">No effective DateTime</string>
     <string name="complete_survey">Complete Survey</string>
-    <string name="tasks_due">Go To Activities</string>
+    <string name="tasks_due">Careplan Activities</string>
     <string name="risk_status">Current status: </string>
     <string name="unknown">UNKNOWN</string>
     <string name="none">none</string>

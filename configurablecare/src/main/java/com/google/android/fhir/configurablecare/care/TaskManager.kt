@@ -36,7 +36,6 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
 import org.hl7.fhir.r4.model.Task.TaskStatus
-import timber.log.Timber
 
 /** Responsible for creating and managing Task resources */
 class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<Task> {
@@ -183,14 +182,9 @@ class TaskManager(private var fhirEngine: FhirEngine) : RequestResourceManager<T
     return questionnaire // questionnaires.firstOrNull()
   }
 
-  suspend fun fetchQuestionnaire(questionnaireId: String): Questionnaire {
-    // try {
-      val questionnaire = fhirEngine.get<Questionnaire>(IdType(questionnaireId).idPart)
-    return questionnaire
-    // } catch (e: Exception) {
-    //   Timber.w("Need to load Knowledge resources")
-    // }
-  }
+  // suspend fun fetchQuestionnaire(questionnaireId: String): Questionnaire {
+  //   return fhirEngine.get(IdType(questionnaireId).idPart)
+  // }
 
   /** Fetch all Tasks for a given Patient */
   suspend fun getTasksForPatient(

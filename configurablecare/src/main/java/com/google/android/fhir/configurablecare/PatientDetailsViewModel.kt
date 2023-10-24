@@ -36,6 +36,8 @@ import java.util.Date
 import java.util.Locale
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 
@@ -61,23 +63,32 @@ class PatientDetailsViewModel(
   }
 
   private suspend fun getPatientObservations(): List<PatientListViewModel.ObservationItem> {
-    val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
+    val immunizations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
     fhirEngine
-      .search<Observation> { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) }
+      .search<Immunization> { filter(Immunization.PATIENT, { value = "Patient/$patientId" }) }
       .take(MAX_RESOURCE_COUNT)
       .map { createObservationItem(it.resource, getApplication<Application>().resources) }
-      .let { observations.addAll(it) }
-    return observations
+      .let { immunizations.addAll(it) }
+    return immunizations
+
+    // val observations: MutableList<PatientListViewModel.ObservationItem> = mutableListOf()
+    // fhirEngine
+    //   .search<Observation> { filter(Observation.SUBJECT, { value = "Patient/$patientId" }) }
+    //   .take(MAX_RESOURCE_COUNT)
+    //   .map { createObservationItem(it.resource, getApplication<Application>().resources) }
+    //   .let { observations.addAll(it) }
+    // return observations
   }
 
   private suspend fun getPatientConditions(): List<PatientListViewModel.ConditionItem> {
-    val conditions: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
+    val medicationRequests: MutableList<PatientListViewModel.ConditionItem> = mutableListOf()
     fhirEngine
-      .search<Condition> { filter(Condition.SUBJECT, { value = "Patient/$patientId" }) }
-      .take(MAX_RESOURCE_COUNT)
+      .search<MedicationRequest> { filter(MedicationRequest.SUBJECT, { value = "Patient/$patientId" }) }
+      .take(1)
+      .filter { it.resource.doNotPerform }
       .map { createConditionItem(it.resource, getApplication<Application>().resources) }
-      .let { conditions.addAll(it) }
-    return conditions
+      .let { medicationRequests.addAll(it) }
+    return medicationRequests
   }
 
   private suspend fun getPatientDetailDataModel(): List<PatientDetailData> {
@@ -162,67 +173,36 @@ class PatientDetailsViewModel(
      * Creates ObservationItem objects with displayable values from the Fhir Observation objects.
      */
     private fun createObservationItem(
-      observation: Observation,
+      immunization: Immunization,
       resources: Resources
     ): PatientListViewModel.ObservationItem {
-      val observationCode = observation.code.text ?: observation.code.codingFirstRep.display
-
-      // Show nothing if no values available for datetime and value quantity.
-      val dateTimeString =
-        if (observation.hasEffectiveDateTimeType()) {
-          observation.effectiveDateTimeType.asStringValue()
-        } else {
-          resources.getText(R.string.message_no_datetime).toString()
-        }
-      val value =
-        if (observation.hasValueQuantity()) {
-          observation.valueQuantity.value.toString()
-        } else if (observation.hasValueCodeableConcept()) {
-          observation.valueCodeableConcept.coding.firstOrNull()?.display ?: ""
-        } else {
-          ""
-        }
-      val valueUnit =
-        if (observation.hasValueQuantity()) {
-          observation.valueQuantity.unit ?: observation.valueQuantity.code
-        } else {
-          ""
-        }
-      val valueString = "$value $valueUnit"
+      val immunizationCode = immunization.vaccineCode.codingFirstRep.code
+      val immunizationDisplay = immunization.vaccineCode.codingFirstRep.display
 
       return PatientListViewModel.ObservationItem(
-        observation.logicalId,
-        if (observationCode.isNullOrEmpty()) "" else observationCode,
-        dateTimeString,
-        valueString
+        immunization.logicalId,
+        "Immunization: $immunizationDisplay [$immunizationCode]",
+        immunizationDisplay,
+        "${immunization.meta.lastUpdated}"
       )
     }
 
     /** Creates ConditionItem objects with displayable values from the Fhir Condition objects. */
     private fun createConditionItem(
-      condition: Condition,
+      medicationRequest: MedicationRequest,
       resources: Resources
     ): PatientListViewModel.ConditionItem {
-      val observationCode = condition.code.text ?: condition.code.codingFirstRep.display ?: ""
+      val code = medicationRequest.medicationCodeableConcept.codingFirstRep.code
+      val display = medicationRequest.medicationCodeableConcept.codingFirstRep.display
 
       // Show nothing if no values available for datetime and value quantity.
-      val dateTimeString =
-        if (condition.hasOnsetDateTimeType()) {
-          condition.onsetDateTimeType.asStringValue()
-        } else {
-          resources.getText(R.string.message_no_datetime).toString()
-        }
-      val value =
-        if (condition.hasVerificationStatus()) {
-          condition.verificationStatus.codingFirstRep.code
-        } else {
-          ""
-        }
+      val medicationRequestDisplay = "$display [$code]: DO NOT PERFORM"
+
       return PatientListViewModel.ConditionItem(
-        condition.logicalId,
-        observationCode,
-        dateTimeString,
-        value
+        medicationRequest.logicalId,
+        medicationRequestDisplay,
+        "",
+        "${medicationRequest.meta.lastUpdated}"
       )
     }
   }
