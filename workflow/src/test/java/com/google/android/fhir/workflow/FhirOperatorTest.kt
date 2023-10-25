@@ -32,6 +32,7 @@ import java.lang.IllegalArgumentException
 import java.util.TimeZone
 import kotlin.reflect.KSuspendFunction1
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
@@ -98,7 +99,10 @@ class FhirOperatorTest {
 
     assertThat(
         fhirOperator.generateCarePlan(
-          planDefinitionId = "plandefinition-RuleFilters-1.0.0",
+          planDefinition =
+            CanonicalType(
+              "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0",
+            ),
           subject = "Patient/Reportable",
           encounterId = "reportable-encounter",
         ),
@@ -113,11 +117,9 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinitionId = "MedRequest-Example",
+        planDefinition = CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
         subject = "Patient/Patient-Example",
       )
-
-    println(jsonParser.encodeResourceToString(carePlan))
 
     assertEquals(
       readResourceAsString("/plan-definition/med-request/med_request_careplan.json"),
@@ -137,7 +139,7 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinitionId = "Plan-Definition-Example",
+        planDefinition = CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
         subject = "Patient/Female-Patient-Example",
       )
 
@@ -287,11 +289,16 @@ class FhirOperatorTest {
   private fun writeToFile(resource: Resource): File {
     val fileName =
       if (resource is MetadataResource && resource.name != null) {
-        resource.name
+        if (resource.version != null) {
+          resource.name + "-" + resource.version
+        } else {
+          resource.name
+        }
       } else {
-        resource.idElement.idPart
+        resource.idElement.toString()
       }
     return File(context.filesDir, fileName).apply {
+      this.parentFile.mkdirs()
       writeText(jsonParser.encodeResourceToString(resource))
     }
   }
