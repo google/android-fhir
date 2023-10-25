@@ -1,0 +1,51 @@
+{
+  "resourceType" : "PlanDefinition",
+  "id" : "IMMZD2DTMeasles",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-recommendationdefinition"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: PlanDefinition</b><a name=\"IMMZD2DTMeasles\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource PlanDefinition &quot;IMMZD2DTMeasles&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"https://build.fhir.org/ig/HL7/cqf-recommendations//StructureDefinition-cpg-recommendationdefinition.html\">CPG Recommendation Definition</a></p></div><p><b>CPG Knowledge Capability Extension</b>: computable</p><p><b>url</b>: <code>http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles</code></p><p><b>version</b>: 0.1.0</p><p><b>name</b>: IMMZD2DTMeasles</p><p><b>title</b>: IMMZ.D2.DT.Measles</p><p><b>type</b>: ECA Rule <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-plan-definition-type.html\">PlanDefinitionType</a>#eca-rule)</span></p><p><b>status</b>: draft</p><p><b>experimental</b>: false</p><p><b>date</b>: 2023-10-25 07:53:33+0000</p><p><b>publisher</b>: WHO</p><p><b>contact</b>: WHO: <a href=\"http://who.int\">http://who.int</a></p><p><b>description</b>: If the child or patient has not been given MCV1 (at 9 months) and MCV2 (between 15-18 months) vaccination</p><p><b>library</b>: <a href=\"Library-IMMZD2DTMeasles.html\">IMMZD2DTMeasles</a></p><blockquote><p><b>action</b></p><p><b>title</b>: Immunize patient for Measles</p><p><b>description</b>: Provide measles immunization</p><blockquote><p><b>condition</b></p><p><b>kind</b>: applicability</p><h3>Expressions</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Description</b></td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>Provision of the MCV dose</td><td>text/cql-identifier</td><td>Provision of the MCV dose</td></tr></table></blockquote><p><b>definition</b>: <a href=\"ActivityDefinition-IMMZD2DTMeaslesMR.html\">IMMZ.D2.DT.Measles.MR</a></p></blockquote></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueCode" : "computable"
+  }],
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
+  "version" : "0.1.0",
+  "name" : "IMMZD2DTMeasles",
+  "title" : "IMMZ.D2.DT.Measles",
+  "type" : {
+    "coding" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/plan-definition-type",
+      "code" : "eca-rule"
+    }]
+  },
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "If the child or patient has not been given MCV1 (at 9 months) and MCV2 (between 15-18 months) vaccination",
+  "library" : ["http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZD2DTMeasles"],
+  "action" : [{
+    "title" : "Immunize patient for Measles",
+    "description" : "Provide measles immunization",
+    "condition" : [{
+      "kind" : "applicability",
+      "expression" : {
+        "description" : "Provision of the MCV dose",
+        "language" : "text/cql-identifier",
+        "expression" : "Provision of the MCV dose"
+      }
+    }],
+    "definitionCanonical" : "http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesMR"
+  }]
+}

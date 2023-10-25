@@ -1,0 +1,167 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZD4LMToResources",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4LMToResources<span style=\"color: navy\">&quot; = &quot;</span>IMMZD4LMToResources<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZD4CheckContraindicationsMeasles.html\" title=\"IMMZ.D4 Check Contraindications for Measles\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZD4 <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/bundle.html\" title=\"Bundle\">http://hl7.org/fhir/StructureDefinition/Bundle</a><span style=\"color: navy\">&quot; </span><b>alias </b>Bundle <b>as </b><b>target</b>\r\n\r\n<b>group </b>IMMZD4ToBundle<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">immz</span><span style=\"color: navy\"> : </span>IMMZD4, <b>target</b> <span style=\"color: maroon\">bundle</span><span style=\"color: navy\"> : </span>Bundle<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  immz<span style=\"color: navy\"><b> -&gt; </b></span>bundle.type = <span style=\"color: blue\">'collection'</span> <i>&quot;SetCollection&quot;</i><span style=\"color: navy\">;</span>\r\n  immz.patient<b> as </b><span style=\"color: maroon\">patient</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    immz.contraindications<b> as </b><span style=\"color: maroon\">ci</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Condition'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">condition</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>condition.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      ci<span style=\"color: navy\"><b> -&gt; </b></span> condition.clinicalStatus = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">cc</span><span style=\"color: navy\">, </span> cc.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">c</span><span style=\"color: navy\">, </span> c.system = <span style=\"color: blue\">'http://hl7.org/fhir/ValueSet/condition-clinical'</span><span style=\"color: navy\">, </span> c.code = <span style=\"color: blue\">'active'</span> <i>&quot;SetClinicalStatus&quot;</i><span style=\"color: navy\">;</span>\r\n      ci<span style=\"color: navy\"><b> -&gt; </b></span>condition.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span> <i>&quot;SetCode&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetCondition&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;GetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4LMToResources",
+  "version" : "0.1.0",
+  "name" : "IMMZD4LMToResources",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles",
+    "mode" : "source",
+    "alias" : "IMMZD4"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/Bundle",
+    "mode" : "target",
+    "alias" : "Bundle"
+  }],
+  "group" : [{
+    "name" : "IMMZD4ToBundle",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "immz",
+      "type" : "IMMZD4",
+      "mode" : "source"
+    },
+    {
+      "name" : "bundle",
+      "type" : "Bundle",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetCollection",
+      "source" : [{
+        "context" : "immz"
+      }],
+      "target" : [{
+        "context" : "bundle",
+        "contextType" : "variable",
+        "element" : "type",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueString" : "collection"
+        }]
+      }]
+    },
+    {
+      "name" : "GetPatient",
+      "source" : [{
+        "context" : "immz",
+        "element" : "patient",
+        "variable" : "patient"
+      }],
+      "rule" : [{
+        "name" : "SetCondition",
+        "source" : [{
+          "context" : "immz",
+          "element" : "contraindications",
+          "variable" : "ci"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "condition",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Condition"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "condition",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetClinicalStatus",
+          "source" : [{
+            "context" : "ci"
+          }],
+          "target" : [{
+            "context" : "condition",
+            "contextType" : "variable",
+            "element" : "clinicalStatus",
+            "variable" : "cc",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          },
+          {
+            "context" : "cc",
+            "contextType" : "variable",
+            "element" : "coding",
+            "variable" : "c",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "Coding"
+            }]
+          },
+          {
+            "context" : "c",
+            "contextType" : "variable",
+            "element" : "system",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueString" : "http://hl7.org/fhir/ValueSet/condition-clinical"
+            }]
+          },
+          {
+            "context" : "c",
+            "contextType" : "variable",
+            "element" : "code",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueString" : "active"
+            }]
+          }]
+        },
+        {
+          "name" : "SetCode",
+          "source" : [{
+            "context" : "ci"
+          }],
+          "target" : [{
+            "context" : "condition",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }]
+        }]
+      }]
+    }]
+  }]
+}

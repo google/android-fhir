@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/care_workflow_execution_status_layout"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/workflow_finished"
+    android:gravity="center_horizontal"
+>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/care_workflow_execution_status_image"
+        android:src="@drawable/ic_check"
+        android:layout_gravity="center"
+    />
+    <TextView
+        android:id="@+id/care_workflow_execution_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="@string/tasks_updated"
+        android:textColor="@color/primary_dark_material_dark"
+        android:textSize="14sp"
+        android:paddingVertical="1dp"
+        android:textAlignment="center"
+    />
+</LinearLayout>

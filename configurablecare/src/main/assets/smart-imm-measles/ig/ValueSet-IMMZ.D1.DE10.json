@@ -1,0 +1,40 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "IMMZ.D1.DE10",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"CodeSystem-IMMZ.D1.html\"><code>http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.html#IMMZ.D1-DE11\">DE11</a></td><td>HIV-positive</td><td>The client is known to be HIV positive</td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.html#IMMZ.D1-DE12\">DE12</a></td><td>HIV-negative</td><td>The client is known to be HIV negative</td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.html#IMMZ.D1-DE13\">DE13</a></td><td>Unknown</td><td>The client's HIV status is unknown</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D1.DE10",
+  "version" : "0.1.0",
+  "name" : "IMMZ_D1_DE10",
+  "title" : "IMMZ.D1.DE10 ValueSet for HIV Status",
+  "status" : "active",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "ValueSet for HIV Status for IMMZ.D1.DE10.",
+  "compose" : {
+    "include" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1",
+      "concept" : [{
+        "code" : "DE11",
+        "display" : "HIV-positive"
+      },
+      {
+        "code" : "DE12",
+        "display" : "HIV-negative"
+      },
+      {
+        "code" : "DE13",
+        "display" : "Unknown"
+      }]
+    }]
+  }
+}

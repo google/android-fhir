@@ -1,0 +1,22 @@
+{
+  "resourceType" : "MedicationRequest",
+  "id" : "VaccineProposal1",
+  "meta" : {
+    "profile" : ["http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProposal"]
+  },
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: MedicationRequest</b><a name=\"VaccineProposal1\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource MedicationRequest &quot;VaccineProposal1&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-SGVaccineProposal.html\">SGVaccineProposal</a></p></div><p><b>status</b>: active</p><p><b>intent</b>: proposal</p><p><b>medication</b>: Measles vaccines <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM28X5)</span></p><p><b>subject</b>: <a href=\"Patient-P123456.html\">Patient/P123456</a> &quot; PATIENT&quot;</p></div>"
+  },
+  "status" : "active",
+  "intent" : "proposal",
+  "medicationCodeableConcept" : {
+    "coding" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "code" : "XM28X5"
+    }]
+  },
+  "subject" : {
+    "reference" : "Patient/P123456"
+  }
+}

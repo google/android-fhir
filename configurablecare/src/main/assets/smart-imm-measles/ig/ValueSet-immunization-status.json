@@ -1,0 +1,70 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "immunization-status",
+  "meta" : {
+    "lastUpdated" : "2023-03-26T15:21:02.749+11:00",
+    "profile" : ["http://hl7.org/fhir/StructureDefinition/shareablevalueset"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://hl7.org/fhir/R4/codesystem-event-status.html\"><code>http://hl7.org/fhir/event-status</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td><td><b><a href=\"http://hl7.org/fhir/R4/valueset-resource-status.html\">Canonical Mapping for &quot;Immunization Status Codes&quot;</a></b></td></tr><tr><td><a href=\"http://hl7.org/fhir/R4/codesystem-event-status.html#event-status-completed\">completed</a></td><td style=\"color: #cccccc\">Completed</td><td>The event has now concluded.</td><td><span title=\"EQUIVALENT\">~</span><a href=\"http://hl7.org/fhir/R4/codesystem-resource-status.html#resource-status-complete\">complete</a></td></tr><tr><td><a href=\"http://hl7.org/fhir/R4/codesystem-event-status.html#event-status-entered-in-error\">entered-in-error</a></td><td style=\"color: #cccccc\">Entered in Error</td><td>This electronic record should never have existed, though it is possible that real-world decisions were based on it.  (If real-world activity has occurred, the status should be &quot;stopped&quot; rather than &quot;entered-in-error&quot;.).</td><td><span title=\"EQUIVALENT\">~</span><a href=\"http://hl7.org/fhir/R4/codesystem-resource-status.html#resource-status-error\">error</a></td></tr><tr><td><a href=\"http://hl7.org/fhir/R4/codesystem-event-status.html#event-status-not-done\">not-done</a></td><td style=\"color: #cccccc\">Not Done</td><td>The event was terminated prior to any activity beyond preparation.  I.e. The 'main' activity has not yet begun.  The boundary between preparatory and the 'main' activity is context-specific.</td><td><span title=\"EQUIVALENT\">~</span><a href=\"http://hl7.org/fhir/R4/codesystem-resource-status.html#resource-status-abandoned\">abandoned</a></td></tr></table></li></ul></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/StructureDefinition/structuredefinition-wg",
+    "valueCode" : "pher"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status",
+    "valueCode" : "trial-use"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm",
+    "valueInteger" : 5
+  }],
+  "url" : "http://hl7.org/fhir/ValueSet/immunization-status",
+  "identifier" : [{
+    "system" : "urn:ietf:rfc:3986",
+    "value" : "urn:oid:2.16.840.1.113883.4.642.3.295"
+  },
+  {
+    "use" : "old",
+    "system" : "urn:ietf:rfc:3986",
+    "value" : "urn:oid:2.16.840.1.113883.4.642.3.292"
+  }],
+  "version" : "0.1.0",
+  "name" : "ImmunizationStatusCodes",
+  "title" : "Immunization Status Codes",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "The value set to instantiate this attribute should be drawn from a terminologically robust code system that consists of or contains concepts to support describing the current status of the administered dose of vaccine.",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001",
+      "display" : "World"
+    }]
+  }],
+  "compose" : {
+    "include" : [{
+      "system" : "http://hl7.org/fhir/event-status",
+      "concept" : [{
+        "code" : "completed"
+      },
+      {
+        "code" : "entered-in-error"
+      },
+      {
+        "code" : "not-done"
+      }]
+    }]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "resourceType" : "Medication",
+  "id" : "Vaccine-SIIMeasles",
+  "meta" : {
+    "profile" : ["http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProduct"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Medication</b><a name=\"Vaccine-SIIMeasles\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Medication &quot;Vaccine-SIIMeasles&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-SGVaccineProduct.html\">SGVaccineProduct</a></p></div><p><b>SGMedicationClassification</b>: Measles, live attenuated <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM8L15)</span></p><p><b>code</b>: Serum Institute of India Measles vaccine <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-VaccineProducts.html\">Vaccine Product codes CodeSet</a>#20009060/2)</span></p></div>"
+  },
+  "extension" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification",
+    "valueCodeableConcept" : {
+      "coding" : [{
+        "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+        "code" : "XM8L15"
+      }]
+    }
+  }],
+  "code" : {
+    "coding" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts",
+      "code" : "20009060/2"
+    }]
+  }
+}

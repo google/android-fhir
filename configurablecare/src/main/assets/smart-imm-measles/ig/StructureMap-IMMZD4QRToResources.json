@@ -1,0 +1,102 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZD4QRToResources",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToResources<span style=\"color: navy\">&quot; = &quot;</span>IMMZD4QRToResources<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/questionnaireresponse.html\" title=\"QuestionnaireResponse\">http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse</a><span style=\"color: navy\">&quot; </span><b>alias </b>QResp <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZD4CheckContraindicationsMeasles.html\" title=\"IMMZ.D4 Check Contraindications for Measles\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZD4 <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/bundle.html\" title=\"Bundle\">http://hl7.org/fhir/StructureDefinition/Bundle</a><span style=\"color: navy\">&quot; </span><b>alias </b>Bundle <b>as </b><b>target</b>\r\n\r\n<b>imports</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureMap-IMMZD4QRToLM.html\" title=\"IMMZD4QRToLM\">http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToLM</a><span style=\"color: navy\">&quot;\r\n</span><b>imports</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureMap-IMMZD4LMToResources.html\" title=\"IMMZD4LMToResources\">http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4LMToResources</a><span style=\"color: navy\">&quot;\r\n</span>\r\n<b>group </b>QRespToBundle<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">qr</span><span style=\"color: navy\"> : </span>QResp, <b>target</b> <span style=\"color: maroon\">bundle</span><span style=\"color: navy\"> : </span>Bundle<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  qr<span style=\"color: navy\"><b> -&gt; </b></span><b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">model</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    qr<span style=\"color: navy\"><b> -&gt; </b></span><span style=\"color: maroon\">model</span><b> then </b>QRespToIMMZD4<span style=\"color: navy\">(</span><span style=\"color: maroon\">qr</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">model</span><span style=\"color: navy\">)</span> <i>&quot;QRtoLM&quot;</i><span style=\"color: navy\">;</span>\r\n    qr<span style=\"color: navy\"><b> -&gt; </b></span><span style=\"color: maroon\">bundle</span><b> then </b>IMMZD4ToBundle<span style=\"color: navy\">(</span><span style=\"color: maroon\">model</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">bundle</span><span style=\"color: navy\">)</span> <i>&quot;LMtoBundle&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;QRtoBundle&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToResources",
+  "version" : "0.1.0",
+  "name" : "IMMZD4QRToResources",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse",
+    "mode" : "source",
+    "alias" : "QResp"
+  },
+  {
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles",
+    "mode" : "source",
+    "alias" : "IMMZD4"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/Bundle",
+    "mode" : "target",
+    "alias" : "Bundle"
+  }],
+  "import" : ["http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToLM",
+  "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4LMToResources"],
+  "group" : [{
+    "name" : "QRespToBundle",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "qr",
+      "type" : "QResp",
+      "mode" : "source"
+    },
+    {
+      "name" : "bundle",
+      "type" : "Bundle",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "QRtoBundle",
+      "source" : [{
+        "context" : "qr"
+      }],
+      "target" : [{
+        "contextType" : "variable",
+        "variable" : "model",
+        "transform" : "create",
+        "parameter" : [{
+          "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles"
+        }]
+      }],
+      "rule" : [{
+        "name" : "QRtoLM",
+        "source" : [{
+          "context" : "qr"
+        }],
+        "target" : [{
+          "contextType" : "variable",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueId" : "model"
+          }]
+        }],
+        "dependent" : [{
+          "name" : "QRespToIMMZD4",
+          "variable" : ["qr",
+          "model"]
+        }]
+      },
+      {
+        "name" : "LMtoBundle",
+        "source" : [{
+          "context" : "qr"
+        }],
+        "target" : [{
+          "contextType" : "variable",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueId" : "bundle"
+          }]
+        }],
+        "dependent" : [{
+          "name" : "IMMZD4ToBundle",
+          "variable" : ["model",
+          "bundle"]
+        }]
+      }]
+    }]
+  }]
+}

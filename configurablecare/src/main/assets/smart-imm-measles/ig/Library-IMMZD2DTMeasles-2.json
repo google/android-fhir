@@ -1,0 +1,3158 @@
+{
+   "library" : {
+      "annotation" : [ {
+         "translatorVersion" : "2.9.0",
+         "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion",
+         "type" : "CqlToElmInfo"
+      }, {
+         "type" : "Annotation",
+         "s" : {
+            "r" : "242",
+            "s" : [ {
+               "value" : [ "/*\n * Library: IMMZD2DTMeasles (IMMZ.D2.DT.Measles)\n * Rule: If the child or patient has not been given MCV1 (at 9 months) and MCV2 (between 15-18 months) vaccination \n * Trigger: Patient has never received measles vaccination\n */\n","library IMMZD2DTMeasles" ]
+            } ]
+         }
+      } ],
+      "identifier" : {
+         "id" : "IMMZD2DTMeasles",
+         "system" : "http://smart.who.int/ig/smart-immunizations-measles"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         }, {
+            "localId" : "1",
+            "locator" : "8:1-8:26",
+            "localIdentifier" : "FHIR",
+            "uri" : "http://hl7.org/fhir",
+            "version" : "4.0.1",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "1",
+                  "s" : [ {
+                     "value" : [ "// Start Skeleton CQL\n","using " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIR" ]
+                     } ]
+                  }, {
+                     "value" : [ " version ","'4.0.1'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "includes" : {
+         "def" : [ {
+            "localId" : "2",
+            "locator" : "9:1-9:35",
+            "localIdentifier" : "FHIRHelpers",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/FHIRHelpers",
+            "version" : "4.0.1",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "2",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIRHelpers" ]
+                     } ]
+                  }, {
+                     "value" : [ " version ","'4.0.1'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "3",
+            "locator" : "10:1-10:33",
+            "localIdentifier" : "IMMZCom",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZCommon",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "3",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZCommon" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZCom" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "4",
+            "locator" : "11:1-11:33",
+            "localIdentifier" : "IMMZc",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZConcepts",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "4",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZConcepts" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZc" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "5",
+            "locator" : "12:1-12:33",
+            "localIdentifier" : "IMMZCon",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZConfig",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "5",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZConfig" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZCon" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "6",
+            "locator" : "13:1-13:40",
+            "localIdentifier" : "IMMZvl",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZVaccineLibrary",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "6",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZVaccineLibrary" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZvl" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "7",
+            "locator" : "14:1-14:28",
+            "localIdentifier" : "FC",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/FHIRCommon",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "7",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIRCommon" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","FC" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "parameters" : {
+         "def" : [ {
+            "localId" : "10",
+            "locator" : "16:1-16:83",
+            "name" : "Individual is at high risk of contracting measles",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "10",
+                  "s" : [ {
+                     "value" : [ "","parameter ","\"Individual is at high risk of contracting measles\""," " ]
+                  }, {
+                     "r" : "9",
+                     "s" : [ {
+                        "value" : [ "Boolean" ]
+                     } ]
+                  }, {
+                     "r" : "8",
+                     "value" : [ " default ","false" ]
+                  } ]
+               }
+            } ],
+            "default" : {
+               "localId" : "8",
+               "locator" : "16:79-16:83",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            },
+            "parameterTypeSpecifier" : {
+               "localId" : "9",
+               "locator" : "16:63-16:69",
+               "name" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "type" : "NamedTypeSpecifier"
+            }
+         }, {
+            "localId" : "13",
+            "locator" : "17:1-17:102",
+            "name" : "Individual is travelling to a country experiencing measles outbreaks",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "13",
+                  "s" : [ {
+                     "value" : [ "","parameter ","\"Individual is travelling to a country experiencing measles outbreaks\""," " ]
+                  }, {
+                     "r" : "12",
+                     "s" : [ {
+                        "value" : [ "Boolean" ]
+                     } ]
+                  }, {
+                     "r" : "11",
+                     "value" : [ " default ","false" ]
+                  } ]
+               }
+            } ],
+            "default" : {
+               "localId" : "11",
+               "locator" : "17:98-17:102",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            },
+            "parameterTypeSpecifier" : {
+               "localId" : "12",
+               "locator" : "17:82-17:88",
+               "name" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "type" : "NamedTypeSpecifier"
+            }
+         }, {
+            "localId" : "16",
+            "locator" : "18:1-18:83",
+            "name" : "Individual is known to be HIV-infected or exposed",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "16",
+                  "s" : [ {
+                     "value" : [ "","parameter ","\"Individual is known to be HIV-infected or exposed\""," " ]
+                  }, {
+                     "r" : "15",
+                     "s" : [ {
+                        "value" : [ "Boolean" ]
+                     } ]
+                  }, {
+                     "r" : "14",
+                     "value" : [ " default ","false" ]
+                  } ]
+               }
+            } ],
+            "default" : {
+               "localId" : "14",
+               "locator" : "18:79-18:83",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            },
+            "parameterTypeSpecifier" : {
+               "localId" : "15",
+               "locator" : "18:63-18:69",
+               "name" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "type" : "NamedTypeSpecifier"
+            }
+         }, {
+            "localId" : "19",
+            "locator" : "19:1-19:68",
+            "name" : "Immune reconstitution was achieved",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "19",
+                  "s" : [ {
+                     "value" : [ "","parameter ","\"Immune reconstitution was achieved\""," " ]
+                  }, {
+                     "r" : "18",
+                     "s" : [ {
+                        "value" : [ "Boolean" ]
+                     } ]
+                  }, {
+                     "r" : "17",
+                     "value" : [ " default ","false" ]
+                  } ]
+               }
+            } ],
+            "default" : {
+               "localId" : "17",
+               "locator" : "19:64-19:68",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            },
+            "parameterTypeSpecifier" : {
+               "localId" : "18",
+               "locator" : "19:48-19:54",
+               "name" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "type" : "NamedTypeSpecifier"
+            }
+         } ]
+      },
+      "statements" : {
+         "def" : [ {
+            "locator" : "22:1-22:15",
+            "name" : "Patient",
+            "context" : "Patient",
+            "expression" : {
+               "type" : "SingletonFrom",
+               "operand" : {
+                  "locator" : "22:1-22:15",
+                  "dataType" : "{http://hl7.org/fhir}Patient",
+                  "templateId" : "http://hl7.org/fhir/StructureDefinition/Patient",
+                  "type" : "Retrieve"
+               }
+            }
+         }, {
+            "localId" : "38",
+            "locator" : "114:1-117:40",
+            "name" : "MCV Doses Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "38",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement MCV containing Doses Administered to Patient\n */\n","define ","\"MCV Doses Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "37",
+                     "s" : [ {
+                        "s" : [ {
+                           "r" : "31",
+                           "s" : [ {
+                              "r" : "30",
+                              "s" : [ {
+                                 "s" : [ {
+                                    "value" : [ "IMMZCom",".","\"Doses Administered to Patient\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " ","I" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n  " ]
+                     }, {
+                        "r" : "36",
+                        "s" : [ {
+                           "value" : [ "where\n    " ]
+                        }, {
+                           "r" : "36",
+                           "s" : [ {
+                              "r" : "33",
+                              "s" : [ {
+                                 "r" : "32",
+                                 "s" : [ {
+                                    "value" : [ "I" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "33",
+                                 "s" : [ {
+                                    "value" : [ "vaccineCode" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " in " ]
+                           }, {
+                              "r" : "35",
+                              "s" : [ {
+                                 "r" : "34",
+                                 "s" : [ {
+                                    "value" : [ "IMMZc" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "35",
+                                 "s" : [ {
+                                    "value" : [ "\"MCV Vaccine\"" ]
+                                 } ]
+                              } ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "37",
+               "locator" : "115:3-117:40",
+               "type" : "Query",
+               "source" : [ {
+                  "localId" : "31",
+                  "locator" : "115:3-115:43",
+                  "alias" : "I",
+                  "expression" : {
+                     "localId" : "30",
+                     "locator" : "115:3-115:41",
+                     "name" : "Doses Administered to Patient",
+                     "libraryName" : "IMMZCom",
+                     "type" : "ExpressionRef"
+                  }
+               } ],
+               "relationship" : [ ],
+               "where" : {
+                  "localId" : "36",
+                  "locator" : "116:3-117:40",
+                  "type" : "InValueSet",
+                  "code" : {
+                     "name" : "ToConcept",
+                     "libraryName" : "FHIRHelpers",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "localId" : "33",
+                        "locator" : "117:5-117:17",
+                        "path" : "vaccineCode",
+                        "scope" : "I",
+                        "type" : "Property"
+                     } ]
+                  },
+                  "valueset" : {
+                     "localId" : "35",
+                     "locator" : "117:22-117:40",
+                     "name" : "MCV Vaccine",
+                     "libraryName" : "IMMZc"
+                  }
+               }
+            }
+         }, {
+            "localId" : "57",
+            "locator" : "138:1-146:2",
+            "name" : "High Transmission Setting",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "57",
+                  "s" : [ {
+                     "value" : [ "","define ","\"High Transmission Setting\"",":\n\t" ]
+                  }, {
+                     "r" : "56",
+                     "s" : [ {
+                        "value" : [ "(\n\t\t" ]
+                     }, {
+                        "r" : "56",
+                        "s" : [ {
+                           "r" : "54",
+                           "s" : [ {
+                              "r" : "52",
+                              "s" : [ {
+                                 "r" : "50",
+                                 "s" : [ {
+                                    "r" : "47",
+                                    "s" : [ {
+                                       "r" : "44",
+                                       "s" : [ {
+                                          "r" : "43",
+                                          "s" : [ {
+                                             "value" : [ "IMMZCon" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "44",
+                                          "s" : [ {
+                                             "value" : [ "\"Country currently has a measles outbreak\"" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " or\n\t\t" ]
+                                    }, {
+                                       "r" : "46",
+                                       "s" : [ {
+                                          "r" : "45",
+                                          "s" : [ {
+                                             "value" : [ "IMMZCon" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "46",
+                                          "s" : [ {
+                                             "value" : [ "\"In a setting where the risk of measles among infants < 9 months of age remains high\"" ]
+                                          } ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "value" : [ " or\n\t\t" ]
+                                 }, {
+                                    "r" : "49",
+                                    "s" : [ {
+                                       "r" : "48",
+                                       "s" : [ {
+                                          "value" : [ "IMMZCon" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "49",
+                                       "s" : [ {
+                                          "value" : [ "\"Population is in conflict zones internally displaced populations and refugees\"" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " or \n\t\t" ]
+                              }, {
+                                 "r" : "51",
+                                 "s" : [ {
+                                    "value" : [ "\"Individual is at high risk of contracting measles\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " or\n\t\t" ]
+                           }, {
+                              "r" : "53",
+                              "s" : [ {
+                                 "value" : [ "\"Individual is travelling to a country experiencing measles outbreaks\"" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ " or\n\t\t" ]
+                        }, {
+                           "r" : "55",
+                           "s" : [ {
+                              "value" : [ "\"Individual is known to be HIV-infected or exposed\"" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\t)" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "56",
+               "locator" : "139:2-146:2",
+               "type" : "Or",
+               "operand" : [ {
+                  "localId" : "54",
+                  "locator" : "140:3-144:72",
+                  "type" : "Or",
+                  "operand" : [ {
+                     "localId" : "52",
+                     "locator" : "140:3-143:53",
+                     "type" : "Or",
+                     "operand" : [ {
+                        "localId" : "50",
+                        "locator" : "140:3-142:89",
+                        "type" : "Or",
+                        "operand" : [ {
+                           "localId" : "47",
+                           "locator" : "140:3-141:95",
+                           "type" : "Or",
+                           "operand" : [ {
+                              "localId" : "44",
+                              "locator" : "140:3-140:52",
+                              "name" : "Country currently has a measles outbreak",
+                              "libraryName" : "IMMZCon",
+                              "type" : "ExpressionRef"
+                           }, {
+                              "localId" : "46",
+                              "locator" : "141:3-141:95",
+                              "name" : "In a setting where the risk of measles among infants < 9 months of age remains high",
+                              "libraryName" : "IMMZCon",
+                              "type" : "ExpressionRef"
+                           } ]
+                        }, {
+                           "localId" : "49",
+                           "locator" : "142:3-142:89",
+                           "name" : "Population is in conflict zones internally displaced populations and refugees",
+                           "libraryName" : "IMMZCon",
+                           "type" : "ExpressionRef"
+                        } ]
+                     }, {
+                        "localId" : "51",
+                        "locator" : "143:3-143:53",
+                        "name" : "Individual is at high risk of contracting measles",
+                        "type" : "ParameterRef"
+                     } ]
+                  }, {
+                     "localId" : "53",
+                     "locator" : "144:3-144:72",
+                     "name" : "Individual is travelling to a country experiencing measles outbreaks",
+                     "type" : "ParameterRef"
+                  } ]
+               }, {
+                  "localId" : "55",
+                  "locator" : "145:3-145:53",
+                  "name" : "Individual is known to be HIV-infected or exposed",
+                  "type" : "ParameterRef"
+               } ]
+            }
+         }, {
+            "localId" : "82",
+            "locator" : "193:1-196:104",
+            "name" : "First MCV Dose Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "82",
+                  "s" : [ {
+                     "value" : [ "/*\ndefine \"Needs Zero MCV Dose\":\n\t\"No MCV Doses Administered to Patient\" \n\t  and (\n\t\t\tif \"High Transmission Setting\" \n\t\t\tthen IMMZCom.\"Current Patient Age In Months\" between 6 and 9 \n\t\t\telse IMMZCom.\"Current Patient Age In Months\" between 6 and 12\n\t\t)\n\t\tand IMMZCom.\"Date of Latest Live Attenuated Vaccine\" +4 weeks <= Now()\n\t\tand \n\t\t\t(\n\t\t\t\t(\n\t\t\t\t\tIMMZCom.\"HIV Status\" in IMMZc.\"HIV status - HIV positive Choices\" \n\t\t\t\t\t  and (\n\t\t\t\t\t    not(IMMZCom.\"Patient is receiving HAART\")\n\t\t\t\t\t\t\tor \"Immune reconstitution was achieved\"\n\t\t\t\t\t\t)\n\t\t\t\t)\n\t\t\t\tor \"Individual is known to be HIV-infected or exposed\"\n\t\t\t)\n\ndefine \"Needs Supplementary MCV Dose\":\n\tIMMZCom.\"HIV Status\" in IMMZc.\"HIV status - HIV positive Choices\" \n\tand IMMZCom.\"Current Patient Age In Years\" < 15\n\tand IMMZCom.\"Patient is receiving HAART\"\n\tand \"Immune reconstitution was achieved\" \n\tand \"Supplementary MCV Dose Administered to Patient\" is null\n\tand IMMZCom.\"Date of Latest Live Attenuated Vaccine\" +4 weeks <= Now()\n*/\n\n/**\n * @dataElement Zero MCV dose given to Patient\n */\n//define \"Zero MCV Dose Administered to Patient\":\n//\tLast(\"MCV Doses Administered to Patient\" I where I.occurrence between Patient.birthDate + 6 months and Patient.birthDate + 9 months)\n\n/**\n * @dataElement Date Zero MCV dose administered\n */\n//define \"Date Zero MCV Dose Administered to Patient\":\n//  date from (\"Zero MCV Dose Administered to Patient\".occurrence as FHIR.dateTime)\n\n/**\n * @dataElement First MCV dose given to Patient\n */\n","define ","\"First MCV Dose Administered to Patient\"",":\n\t" ]
+                  }, {
+                     "r" : "81",
+                     "s" : [ {
+                        "value" : [ "if " ]
+                     }, {
+                        "r" : "58",
+                        "s" : [ {
+                           "value" : [ "\"High Transmission Setting\"" ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\tthen " ]
+                     }, {
+                        "r" : "69",
+                        "s" : [ {
+                           "value" : [ "Last","(" ]
+                        }, {
+                           "r" : "68",
+                           "s" : [ {
+                              "s" : [ {
+                                 "r" : "60",
+                                 "s" : [ {
+                                    "r" : "59",
+                                    "s" : [ {
+                                       "s" : [ {
+                                          "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "value" : [ " ","I" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " " ]
+                           }, {
+                              "r" : "67",
+                              "s" : [ {
+                                 "value" : [ "where " ]
+                              }, {
+                                 "r" : "67",
+                                 "s" : [ {
+                                    "r" : "62",
+                                    "s" : [ {
+                                       "r" : "61",
+                                       "s" : [ {
+                                          "value" : [ "I" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "62",
+                                       "s" : [ {
+                                          "value" : [ "occurrence" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "r" : "67",
+                                    "value" : [ " ","after"," " ]
+                                 }, {
+                                    "r" : "66",
+                                    "s" : [ {
+                                       "r" : "64",
+                                       "s" : [ {
+                                          "r" : "63",
+                                          "s" : [ {
+                                             "value" : [ "Patient" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "64",
+                                          "s" : [ {
+                                             "value" : [ "birthDate" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " + " ]
+                                    }, {
+                                       "r" : "65",
+                                       "s" : [ {
+                                          "value" : [ "9 ","months" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\telse " ]
+                     }, {
+                        "r" : "80",
+                        "s" : [ {
+                           "value" : [ "Last","(" ]
+                        }, {
+                           "r" : "79",
+                           "s" : [ {
+                              "s" : [ {
+                                 "r" : "71",
+                                 "s" : [ {
+                                    "r" : "70",
+                                    "s" : [ {
+                                       "s" : [ {
+                                          "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "value" : [ " ","I" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " " ]
+                           }, {
+                              "r" : "78",
+                              "s" : [ {
+                                 "value" : [ "where " ]
+                              }, {
+                                 "r" : "78",
+                                 "s" : [ {
+                                    "r" : "73",
+                                    "s" : [ {
+                                       "r" : "72",
+                                       "s" : [ {
+                                          "value" : [ "I" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "73",
+                                       "s" : [ {
+                                          "value" : [ "occurrence" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "r" : "78",
+                                    "value" : [ " ","after"," " ]
+                                 }, {
+                                    "r" : "77",
+                                    "s" : [ {
+                                       "r" : "75",
+                                       "s" : [ {
+                                          "r" : "74",
+                                          "s" : [ {
+                                             "value" : [ "Patient" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "75",
+                                          "s" : [ {
+                                             "value" : [ "birthDate" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " + " ]
+                                    }, {
+                                       "r" : "76",
+                                       "s" : [ {
+                                          "value" : [ "12 ","months" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "81",
+               "locator" : "194:2-196:104",
+               "type" : "If",
+               "condition" : {
+                  "localId" : "58",
+                  "locator" : "194:5-194:31",
+                  "name" : "High Transmission Setting",
+                  "type" : "ExpressionRef"
+               },
+               "then" : {
+                  "localId" : "69",
+                  "locator" : "195:7-195:103",
+                  "type" : "Last",
+                  "source" : {
+                     "localId" : "68",
+                     "locator" : "195:12-195:102",
+                     "type" : "Query",
+                     "source" : [ {
+                        "localId" : "60",
+                        "locator" : "195:12-195:48",
+                        "alias" : "I",
+                        "expression" : {
+                           "localId" : "59",
+                           "locator" : "195:12-195:46",
+                           "name" : "MCV Doses Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     } ],
+                     "relationship" : [ ],
+                     "where" : {
+                        "localId" : "67",
+                        "locator" : "195:50-195:102",
+                        "type" : "After",
+                        "operand" : [ {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "asType" : "{http://hl7.org/fhir}dateTime",
+                              "type" : "As",
+                              "operand" : {
+                                 "localId" : "62",
+                                 "locator" : "195:56-195:67",
+                                 "path" : "occurrence",
+                                 "scope" : "I",
+                                 "type" : "Property"
+                              }
+                           } ]
+                        }, {
+                           "type" : "ToDateTime",
+                           "operand" : {
+                              "localId" : "66",
+                              "locator" : "195:75-195:102",
+                              "type" : "Add",
+                              "operand" : [ {
+                                 "name" : "ToDate",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "localId" : "64",
+                                    "locator" : "195:75-195:91",
+                                    "path" : "birthDate",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "localId" : "63",
+                                       "locator" : "195:75-195:81",
+                                       "name" : "Patient",
+                                       "type" : "ExpressionRef"
+                                    }
+                                 } ]
+                              }, {
+                                 "localId" : "65",
+                                 "locator" : "195:95-195:102",
+                                 "value" : 9,
+                                 "unit" : "months",
+                                 "type" : "Quantity"
+                              } ]
+                           }
+                        } ]
+                     }
+                  }
+               },
+               "else" : {
+                  "localId" : "80",
+                  "locator" : "196:7-196:104",
+                  "type" : "Last",
+                  "source" : {
+                     "localId" : "79",
+                     "locator" : "196:12-196:103",
+                     "type" : "Query",
+                     "source" : [ {
+                        "localId" : "71",
+                        "locator" : "196:12-196:48",
+                        "alias" : "I",
+                        "expression" : {
+                           "localId" : "70",
+                           "locator" : "196:12-196:46",
+                           "name" : "MCV Doses Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     } ],
+                     "relationship" : [ ],
+                     "where" : {
+                        "localId" : "78",
+                        "locator" : "196:50-196:103",
+                        "type" : "After",
+                        "operand" : [ {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "asType" : "{http://hl7.org/fhir}dateTime",
+                              "type" : "As",
+                              "operand" : {
+                                 "localId" : "73",
+                                 "locator" : "196:56-196:67",
+                                 "path" : "occurrence",
+                                 "scope" : "I",
+                                 "type" : "Property"
+                              }
+                           } ]
+                        }, {
+                           "type" : "ToDateTime",
+                           "operand" : {
+                              "localId" : "77",
+                              "locator" : "196:75-196:103",
+                              "type" : "Add",
+                              "operand" : [ {
+                                 "name" : "ToDate",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "localId" : "75",
+                                    "locator" : "196:75-196:91",
+                                    "path" : "birthDate",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "localId" : "74",
+                                       "locator" : "196:75-196:81",
+                                       "name" : "Patient",
+                                       "type" : "ExpressionRef"
+                                    }
+                                 } ]
+                              }, {
+                                 "localId" : "76",
+                                 "locator" : "196:95-196:103",
+                                 "value" : 12,
+                                 "unit" : "months",
+                                 "type" : "Quantity"
+                              } ]
+                           }
+                        } ]
+                     }
+                  }
+               }
+            }
+         }, {
+            "localId" : "88",
+            "locator" : "200:1-201:82",
+            "name" : "Date First MCV Dose Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "88",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement Date first MCV dose administered\n */\n","define ","\"Date First MCV Dose Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "87",
+                     "s" : [ {
+                        "value" : [ "date from " ]
+                     }, {
+                        "r" : "86",
+                        "s" : [ {
+                           "value" : [ "(" ]
+                        }, {
+                           "r" : "86",
+                           "s" : [ {
+                              "r" : "84",
+                              "s" : [ {
+                                 "r" : "83",
+                                 "s" : [ {
+                                    "value" : [ "\"First MCV Dose Administered to Patient\"" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "84",
+                                 "s" : [ {
+                                    "value" : [ "occurrence" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " as " ]
+                           }, {
+                              "r" : "85",
+                              "s" : [ {
+                                 "value" : [ "FHIR",".","dateTime" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "87",
+               "locator" : "201:3-201:82",
+               "type" : "DateFrom",
+               "operand" : {
+                  "name" : "ToDateTime",
+                  "libraryName" : "FHIRHelpers",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "localId" : "86",
+                     "locator" : "201:13-201:82",
+                     "strict" : false,
+                     "type" : "As",
+                     "operand" : {
+                        "localId" : "84",
+                        "locator" : "201:14-201:64",
+                        "path" : "occurrence",
+                        "type" : "Property",
+                        "source" : {
+                           "localId" : "83",
+                           "locator" : "201:14-201:53",
+                           "name" : "First MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     },
+                     "asTypeSpecifier" : {
+                        "localId" : "85",
+                        "locator" : "201:69-201:81",
+                        "name" : "{http://hl7.org/fhir}dateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "103",
+            "locator" : "207:1-210:56",
+            "name" : "Second MCV Dose Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "103",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement \"Second MCV Dose Administered to Patient\"\n * only valid if 4 weeks after first dose\n */\n","define ","\"Second MCV Dose Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "102",
+                     "s" : [ {
+                        "value" : [ "Last","(" ]
+                     }, {
+                        "r" : "101",
+                        "s" : [ {
+                           "s" : [ {
+                              "r" : "40",
+                              "s" : [ {
+                                 "r" : "39",
+                                 "s" : [ {
+                                    "s" : [ {
+                                       "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " ","I" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ " \n\t\t" ]
+                        }, {
+                           "r" : "100",
+                           "s" : [ {
+                              "value" : [ "where " ]
+                           }, {
+                              "r" : "100",
+                              "s" : [ {
+                                 "r" : "92",
+                                 "s" : [ {
+                                    "r" : "42",
+                                    "s" : [ {
+                                       "r" : "41",
+                                       "s" : [ {
+                                          "value" : [ "I" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "42",
+                                       "s" : [ {
+                                          "value" : [ "occurrence" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "r" : "92",
+                                    "value" : [ " ","after"," " ]
+                                 }, {
+                                    "r" : "91",
+                                    "s" : [ {
+                                       "r" : "89",
+                                       "s" : [ {
+                                          "value" : [ "\"Date First MCV Dose Administered to Patient\"" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " + " ]
+                                    }, {
+                                       "r" : "90",
+                                       "s" : [ {
+                                          "value" : [ "4 ","weeks" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " \n\t\t\tand " ]
+                              }, {
+                                 "r" : "99",
+                                 "s" : [ {
+                                    "r" : "94",
+                                    "s" : [ {
+                                       "r" : "93",
+                                       "s" : [ {
+                                          "value" : [ "I" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "94",
+                                       "s" : [ {
+                                          "value" : [ "occurrence" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "r" : "99",
+                                    "value" : [ " ","after"," " ]
+                                 }, {
+                                    "r" : "98",
+                                    "s" : [ {
+                                       "r" : "96",
+                                       "s" : [ {
+                                          "r" : "95",
+                                          "s" : [ {
+                                             "value" : [ "Patient" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "96",
+                                          "s" : [ {
+                                             "value" : [ "birthDate" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " + " ]
+                                    }, {
+                                       "r" : "97",
+                                       "s" : [ {
+                                          "value" : [ "15 ","months" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              } ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ ")" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "102",
+               "locator" : "208:3-210:56",
+               "type" : "Last",
+               "source" : {
+                  "localId" : "101",
+                  "locator" : "208:8-210:55",
+                  "type" : "Query",
+                  "source" : [ {
+                     "localId" : "40",
+                     "locator" : "208:8-208:44",
+                     "alias" : "I",
+                     "expression" : {
+                        "localId" : "39",
+                        "locator" : "208:8-208:42",
+                        "name" : "MCV Doses Administered to Patient",
+                        "type" : "ExpressionRef"
+                     }
+                  } ],
+                  "relationship" : [ ],
+                  "where" : {
+                     "localId" : "100",
+                     "locator" : "209:3-210:55",
+                     "type" : "And",
+                     "operand" : [ {
+                        "localId" : "92",
+                        "locator" : "209:9-209:82",
+                        "type" : "After",
+                        "operand" : [ {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "asType" : "{http://hl7.org/fhir}dateTime",
+                              "type" : "As",
+                              "operand" : {
+                                 "localId" : "42",
+                                 "locator" : "209:9-209:20",
+                                 "path" : "occurrence",
+                                 "scope" : "I",
+                                 "type" : "Property"
+                              }
+                           } ]
+                        }, {
+                           "type" : "ToDateTime",
+                           "operand" : {
+                              "localId" : "91",
+                              "locator" : "209:28-209:82",
+                              "type" : "Add",
+                              "operand" : [ {
+                                 "localId" : "89",
+                                 "locator" : "209:28-209:72",
+                                 "name" : "Date First MCV Dose Administered to Patient",
+                                 "type" : "ExpressionRef"
+                              }, {
+                                 "localId" : "90",
+                                 "locator" : "209:76-209:82",
+                                 "value" : 4,
+                                 "unit" : "weeks",
+                                 "type" : "Quantity"
+                              } ]
+                           }
+                        } ]
+                     }, {
+                        "localId" : "99",
+                        "locator" : "210:8-210:55",
+                        "type" : "After",
+                        "operand" : [ {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "asType" : "{http://hl7.org/fhir}dateTime",
+                              "type" : "As",
+                              "operand" : {
+                                 "localId" : "94",
+                                 "locator" : "210:8-210:19",
+                                 "path" : "occurrence",
+                                 "scope" : "I",
+                                 "type" : "Property"
+                              }
+                           } ]
+                        }, {
+                           "type" : "ToDateTime",
+                           "operand" : {
+                              "localId" : "98",
+                              "locator" : "210:27-210:55",
+                              "type" : "Add",
+                              "operand" : [ {
+                                 "name" : "ToDate",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "localId" : "96",
+                                    "locator" : "210:27-210:43",
+                                    "path" : "birthDate",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "localId" : "95",
+                                       "locator" : "210:27-210:33",
+                                       "name" : "Patient",
+                                       "type" : "ExpressionRef"
+                                    }
+                                 } ]
+                              }, {
+                                 "localId" : "97",
+                                 "locator" : "210:47-210:55",
+                                 "value" : 15,
+                                 "unit" : "months",
+                                 "type" : "Quantity"
+                              } ]
+                           }
+                        } ]
+                     } ]
+                  }
+               }
+            }
+         }, {
+            "localId" : "108",
+            "locator" : "28:1-36:2",
+            "name" : "Provision of the MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "108",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement Should provision MCV Dose\n */\n","define ","\"Provision of the MCV dose\"",":\n\t//not(\"MCV Dose Contraindicated\") and \n  " ]
+                  }, {
+                     "r" : "107",
+                     "s" : [ {
+                        "value" : [ "if " ]
+                     }, {
+                        "r" : "22",
+                        "s" : [ {
+                           "value" : [ "exists" ]
+                        }, {
+                           "r" : "21",
+                           "s" : [ {
+                              "value" : [ "(" ]
+                           }, {
+                              "r" : "21",
+                              "s" : [ {
+                                 "r" : "20",
+                                 "s" : [ {
+                                    "value" : [ "IMMZCom" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "21",
+                                 "s" : [ {
+                                    "value" : [ "\"Live Attenuated Vaccines\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " then " ]
+                     }, {
+                        "r" : "28",
+                        "s" : [ {
+                           "r" : "26",
+                           "s" : [ {
+                              "r" : "24",
+                              "s" : [ {
+                                 "r" : "23",
+                                 "s" : [ {
+                                    "value" : [ "IMMZCom" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "24",
+                                 "s" : [ {
+                                    "value" : [ "\"Date of Latest Live Attenuated Vaccine\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " + " ]
+                           }, {
+                              "r" : "25",
+                              "s" : [ {
+                                 "value" : [ "4 ","weeks" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ " ","<="," " ]
+                        }, {
+                           "r" : "27",
+                           "s" : [ {
+                              "value" : [ "Now","()" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " else " ]
+                     }, {
+                        "r" : "106",
+                        "s" : [ {
+                           "r" : "29",
+                           "value" : [ "true","\n\tand " ]
+                        }, {
+                           "r" : "105",
+                           "s" : [ {
+                              "value" : [ "(\n\t\t" ]
+                           }, {
+                              "r" : "105",
+                              "s" : [ {
+                                 "r" : "104",
+                                 "s" : [ {
+                                    "value" : [ "\"Second MCV Dose Administered to Patient\"" ]
+                                 } ]
+                              }, {
+                                 "value" : [ " is null" ]
+                              } ]
+                           }, {
+                              "value" : [ " \n\t\t//or (\n\t\t//\t\"Needs Supplementary MCV Dose\" and \"Supplementary MCV Dose Administered to Patient\" is null\n\t\t//)\n\t)" ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "107",
+               "locator" : "30:3-36:2",
+               "type" : "If",
+               "condition" : {
+                  "localId" : "22",
+                  "locator" : "30:6-30:47",
+                  "type" : "Exists",
+                  "operand" : {
+                     "localId" : "21",
+                     "locator" : "30:12-30:47",
+                     "name" : "Live Attenuated Vaccines",
+                     "libraryName" : "IMMZCom",
+                     "type" : "ExpressionRef"
+                  }
+               },
+               "then" : {
+                  "localId" : "28",
+                  "locator" : "30:54-30:120",
+                  "type" : "LessOrEqual",
+                  "operand" : [ {
+                     "localId" : "26",
+                     "locator" : "30:54-30:111",
+                     "type" : "Add",
+                     "operand" : [ {
+                        "name" : "ToDateTime",
+                        "libraryName" : "FHIRHelpers",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "localId" : "24",
+                           "locator" : "30:54-30:101",
+                           "name" : "Date of Latest Live Attenuated Vaccine",
+                           "libraryName" : "IMMZCom",
+                           "type" : "ExpressionRef"
+                        } ]
+                     }, {
+                        "localId" : "25",
+                        "locator" : "30:105-30:111",
+                        "value" : 4,
+                        "unit" : "weeks",
+                        "type" : "Quantity"
+                     } ]
+                  }, {
+                     "localId" : "27",
+                     "locator" : "30:116-30:120",
+                     "type" : "Now"
+                  } ]
+               },
+               "else" : {
+                  "localId" : "106",
+                  "locator" : "30:127-36:2",
+                  "type" : "And",
+                  "operand" : [ {
+                     "localId" : "29",
+                     "locator" : "30:127-30:130",
+                     "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+                     "value" : "true",
+                     "type" : "Literal"
+                  }, {
+                     "localId" : "105",
+                     "locator" : "31:6-36:2",
+                     "type" : "IsNull",
+                     "operand" : {
+                        "localId" : "104",
+                        "locator" : "32:3-32:43",
+                        "name" : "Second MCV Dose Administered to Patient",
+                        "type" : "ExpressionRef"
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "115",
+            "locator" : "122:1-123:49",
+            "name" : "No MCV Doses Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "115",
+                  "s" : [ {
+                     "value" : [ "/**\n * @define The patient has no MCV doses administered\n */\n","define ","\"No MCV Doses Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "114",
+                     "s" : [ {
+                        "value" : [ "not " ]
+                     }, {
+                        "r" : "113",
+                        "s" : [ {
+                           "value" : [ "exists" ]
+                        }, {
+                           "r" : "112",
+                           "s" : [ {
+                              "value" : [ "(" ]
+                           }, {
+                              "r" : "112",
+                              "s" : [ {
+                                 "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "114",
+               "locator" : "123:3-123:49",
+               "type" : "Not",
+               "operand" : {
+                  "localId" : "113",
+                  "locator" : "123:7-123:49",
+                  "type" : "Exists",
+                  "operand" : {
+                     "localId" : "112",
+                     "locator" : "123:13-123:49",
+                     "name" : "MCV Doses Administered to Patient",
+                     "type" : "ExpressionRef"
+                  }
+               }
+            }
+         }, {
+            "localId" : "137",
+            "locator" : "44:1-55:4",
+            "name" : "Expected Due Date for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "137",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Expected Due Date for MCV dose\"",":\n\t" ]
+                  }, {
+                     "r" : "136",
+                     "s" : [ {
+                        "value" : [ "case \n\t//when \"Needs Zero MCV Dose\"\n\t//\tthen Patient.birthDate + 6 months\n\t" ]
+                     }, {
+                        "r" : "127",
+                        "s" : [ {
+                           "value" : [ "when " ]
+                        }, {
+                           "r" : "116",
+                           "s" : [ {
+                              "value" : [ "\"No MCV Doses Administered to Patient\"" ]
+                           } ]
+                        }, {
+                           "value" : [ "\n\t\tthen " ]
+                        }, {
+                           "r" : "126",
+                           "s" : [ {
+                              "value" : [ "if " ]
+                           }, {
+                              "r" : "117",
+                              "s" : [ {
+                                 "value" : [ "\"High Transmission Setting\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " then " ]
+                           }, {
+                              "r" : "121",
+                              "s" : [ {
+                                 "r" : "119",
+                                 "s" : [ {
+                                    "r" : "118",
+                                    "s" : [ {
+                                       "value" : [ "Patient" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "119",
+                                    "s" : [ {
+                                       "value" : [ "birthDate" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " + " ]
+                              }, {
+                                 "r" : "120",
+                                 "s" : [ {
+                                    "value" : [ "9 ","months" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " else " ]
+                           }, {
+                              "r" : "125",
+                              "s" : [ {
+                                 "r" : "123",
+                                 "s" : [ {
+                                    "r" : "122",
+                                    "s" : [ {
+                                       "value" : [ "Patient" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "123",
+                                    "s" : [ {
+                                       "value" : [ "birthDate" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " + " ]
+                              }, {
+                                 "r" : "124",
+                                 "s" : [ {
+                                    "value" : [ "12 ","months" ]
+                                 } ]
+                              } ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\t//when \"Second MCV Dose Administered to Patient\" is not null and \"Needs Supplementary MCV Dose\"\n\t//\tthen \"Date Second MCV Dose Administered to Patient\" + 4 weeks\n\t" ]
+                     }, {
+                        "r" : "134",
+                        "s" : [ {
+                           "value" : [ "when " ]
+                        }, {
+                           "r" : "129",
+                           "s" : [ {
+                              "r" : "128",
+                              "s" : [ {
+                                 "value" : [ "\"First MCV Dose Administered to Patient\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " is not null" ]
+                           } ]
+                        }, {
+                           "value" : [ "\n\t\tthen " ]
+                        }, {
+                           "r" : "133",
+                           "s" : [ {
+                              "r" : "131",
+                              "s" : [ {
+                                 "r" : "130",
+                                 "s" : [ {
+                                    "value" : [ "Patient" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "131",
+                                 "s" : [ {
+                                    "value" : [ "birthDate" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " + " ]
+                           }, {
+                              "r" : "132",
+                              "s" : [ {
+                                 "value" : [ "15 ","months" ]
+                              } ]
+                           } ]
+                        } ]
+                     }, {
+                        "r" : "135",
+                        "value" : [ "\n\telse ","null","\n\tend" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "136",
+               "locator" : "45:2-55:4",
+               "type" : "Case",
+               "caseItem" : [ {
+                  "localId" : "127",
+                  "locator" : "48:2-49:106",
+                  "when" : {
+                     "localId" : "116",
+                     "locator" : "48:7-48:44",
+                     "name" : "No MCV Doses Administered to Patient",
+                     "type" : "ExpressionRef"
+                  },
+                  "then" : {
+                     "localId" : "126",
+                     "locator" : "49:8-49:106",
+                     "type" : "If",
+                     "condition" : {
+                        "localId" : "117",
+                        "locator" : "49:11-49:37",
+                        "name" : "High Transmission Setting",
+                        "type" : "ExpressionRef"
+                     },
+                     "then" : {
+                        "localId" : "121",
+                        "locator" : "49:44-49:71",
+                        "type" : "Add",
+                        "operand" : [ {
+                           "name" : "ToDate",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "localId" : "119",
+                              "locator" : "49:44-49:60",
+                              "path" : "birthDate",
+                              "type" : "Property",
+                              "source" : {
+                                 "localId" : "118",
+                                 "locator" : "49:44-49:50",
+                                 "name" : "Patient",
+                                 "type" : "ExpressionRef"
+                              }
+                           } ]
+                        }, {
+                           "localId" : "120",
+                           "locator" : "49:64-49:71",
+                           "value" : 9,
+                           "unit" : "months",
+                           "type" : "Quantity"
+                        } ]
+                     },
+                     "else" : {
+                        "localId" : "125",
+                        "locator" : "49:78-49:106",
+                        "type" : "Add",
+                        "operand" : [ {
+                           "name" : "ToDate",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "localId" : "123",
+                              "locator" : "49:78-49:94",
+                              "path" : "birthDate",
+                              "type" : "Property",
+                              "source" : {
+                                 "localId" : "122",
+                                 "locator" : "49:78-49:84",
+                                 "name" : "Patient",
+                                 "type" : "ExpressionRef"
+                              }
+                           } ]
+                        }, {
+                           "localId" : "124",
+                           "locator" : "49:98-49:106",
+                           "value" : 12,
+                           "unit" : "months",
+                           "type" : "Quantity"
+                        } ]
+                     }
+                  }
+               }, {
+                  "localId" : "134",
+                  "locator" : "52:2-53:36",
+                  "when" : {
+                     "localId" : "129",
+                     "locator" : "52:7-52:58",
+                     "type" : "Not",
+                     "operand" : {
+                        "locator" : "52:7-52:58",
+                        "type" : "IsNull",
+                        "operand" : {
+                           "localId" : "128",
+                           "locator" : "52:7-52:46",
+                           "name" : "First MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "localId" : "133",
+                     "locator" : "53:8-53:36",
+                     "type" : "Add",
+                     "operand" : [ {
+                        "name" : "ToDate",
+                        "libraryName" : "FHIRHelpers",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "localId" : "131",
+                           "locator" : "53:8-53:24",
+                           "path" : "birthDate",
+                           "type" : "Property",
+                           "source" : {
+                              "localId" : "130",
+                              "locator" : "53:8-53:14",
+                              "name" : "Patient",
+                              "type" : "ExpressionRef"
+                           }
+                        } ]
+                     }, {
+                        "localId" : "132",
+                        "locator" : "53:28-53:36",
+                        "value" : 15,
+                        "unit" : "months",
+                        "type" : "Quantity"
+                     } ]
+                  }
+               } ],
+               "else" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Date",
+                  "type" : "As",
+                  "operand" : {
+                     "localId" : "135",
+                     "locator" : "54:7-54:10",
+                     "type" : "Null"
+                  }
+               }
+            }
+         }, {
+            "localId" : "151",
+            "locator" : "39:1-42:64",
+            "name" : "Schedule Due Date for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "151",
+                  "s" : [ {
+                     "value" : [ "//and IMMZCom.\"Current Patient Age In Years\" < 15\n","define ","\"Schedule Due Date for MCV dose\"",":\n\t" ]
+                  }, {
+                     "r" : "150",
+                     "s" : [ {
+                        "value" : [ "if " ]
+                     }, {
+                        "r" : "144",
+                        "s" : [ {
+                           "r" : "111",
+                           "s" : [ {
+                              "r" : "110",
+                              "s" : [ {
+                                 "r" : "109",
+                                 "s" : [ {
+                                    "value" : [ "IMMZCom" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "110",
+                                 "s" : [ {
+                                    "value" : [ "\"Date of Latest Live Attenuated Vaccine\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " is null" ]
+                           } ]
+                        }, {
+                           "value" : [ " or " ]
+                        }, {
+                           "r" : "143",
+                           "s" : [ {
+                              "r" : "138",
+                              "s" : [ {
+                                 "value" : [ "\"Expected Due Date for MCV dose\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " ",">"," " ]
+                           }, {
+                              "r" : "142",
+                              "s" : [ {
+                                 "r" : "140",
+                                 "s" : [ {
+                                    "r" : "139",
+                                    "s" : [ {
+                                       "value" : [ "IMMZCom" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "140",
+                                    "s" : [ {
+                                       "value" : [ "\"Date of Latest Live Attenuated Vaccine\"" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " + " ]
+                              }, {
+                                 "r" : "141",
+                                 "s" : [ {
+                                    "value" : [ "4 ","weeks" ]
+                                 } ]
+                              } ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\tthen " ]
+                     }, {
+                        "r" : "145",
+                        "s" : [ {
+                           "value" : [ "\"Expected Due Date for MCV dose\"" ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\telse " ]
+                     }, {
+                        "r" : "149",
+                        "s" : [ {
+                           "r" : "147",
+                           "s" : [ {
+                              "r" : "146",
+                              "s" : [ {
+                                 "value" : [ "IMMZCom" ]
+                              } ]
+                           }, {
+                              "value" : [ "." ]
+                           }, {
+                              "r" : "147",
+                              "s" : [ {
+                                 "value" : [ "\"Date of Latest Live Attenuated Vaccine\"" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ " + " ]
+                        }, {
+                           "r" : "148",
+                           "s" : [ {
+                              "value" : [ "4 ","weeks" ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "150",
+               "locator" : "40:2-42:64",
+               "type" : "If",
+               "condition" : {
+                  "localId" : "144",
+                  "locator" : "40:5-40:157",
+                  "type" : "Or",
+                  "operand" : [ {
+                     "localId" : "111",
+                     "locator" : "40:5-40:60",
+                     "type" : "IsNull",
+                     "operand" : {
+                        "localId" : "110",
+                        "locator" : "40:5-40:52",
+                        "name" : "Date of Latest Live Attenuated Vaccine",
+                        "libraryName" : "IMMZCom",
+                        "type" : "ExpressionRef"
+                     }
+                  }, {
+                     "localId" : "143",
+                     "locator" : "40:65-40:157",
+                     "type" : "Greater",
+                     "operand" : [ {
+                        "type" : "ToDateTime",
+                        "operand" : {
+                           "localId" : "138",
+                           "locator" : "40:65-40:96",
+                           "name" : "Expected Due Date for MCV dose",
+                           "type" : "ExpressionRef"
+                        }
+                     }, {
+                        "localId" : "142",
+                        "locator" : "40:100-40:157",
+                        "type" : "Add",
+                        "operand" : [ {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "localId" : "140",
+                              "locator" : "40:100-40:147",
+                              "name" : "Date of Latest Live Attenuated Vaccine",
+                              "libraryName" : "IMMZCom",
+                              "type" : "ExpressionRef"
+                           } ]
+                        }, {
+                           "localId" : "141",
+                           "locator" : "40:151-40:157",
+                           "value" : 4,
+                           "unit" : "weeks",
+                           "type" : "Quantity"
+                        } ]
+                     } ]
+                  } ]
+               },
+               "then" : {
+                  "type" : "ToDateTime",
+                  "operand" : {
+                     "localId" : "145",
+                     "locator" : "41:7-41:38",
+                     "name" : "Expected Due Date for MCV dose",
+                     "type" : "ExpressionRef"
+                  }
+               },
+               "else" : {
+                  "localId" : "149",
+                  "locator" : "42:7-42:64",
+                  "type" : "Add",
+                  "operand" : [ {
+                     "name" : "ToDateTime",
+                     "libraryName" : "FHIRHelpers",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "localId" : "147",
+                        "locator" : "42:7-42:54",
+                        "name" : "Date of Latest Live Attenuated Vaccine",
+                        "libraryName" : "IMMZCom",
+                        "type" : "ExpressionRef"
+                     } ]
+                  }, {
+                     "localId" : "148",
+                     "locator" : "42:58-42:64",
+                     "value" : 4,
+                     "unit" : "weeks",
+                     "type" : "Quantity"
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "158",
+            "locator" : "58:1-72:5",
+            "name" : "MCV Next Dose Number",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "158",
+                  "s" : [ {
+                     "value" : [ "","define ","\"MCV Next Dose Number\"",":\n\t//if \"Needs Zero MCV Dose\" or \"Zero MCV Dose Administered to Patient\" is not null\n\t//then \n\t//\tcase \n\t//\twhen \"Second MCV Dose Administered to Patient\" is not null and \"Needs Supplementary MCV Dose\" then 'booster'\n\t//\twhen \"First MCV Dose Administered to Patient\" is not null then 2\n\t//\twhen \"Zero MCV Dose Administered to Patient\" is not null then 1\n\t//\telse 'zero'\n\t//\tend\n\t//else\n\t\t" ]
+                  }, {
+                     "r" : "157",
+                     "s" : [ {
+                        "value" : [ "case \n\t\t//when \"Second MCV Dose Administered to Patient\" is not null and \"Needs Supplementary MCV Dose\" then 'booster'\n\t\t" ]
+                     }, {
+                        "r" : "155",
+                        "s" : [ {
+                           "value" : [ "when " ]
+                        }, {
+                           "r" : "153",
+                           "s" : [ {
+                              "r" : "152",
+                              "s" : [ {
+                                 "value" : [ "\"First MCV Dose Administered to Patient\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " is not null" ]
+                           } ]
+                        }, {
+                           "r" : "154",
+                           "value" : [ " then ","2" ]
+                        } ]
+                     }, {
+                        "r" : "156",
+                        "value" : [ "\n\t\telse ","1","\n\t\tend" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "157",
+               "locator" : "68:3-72:5",
+               "type" : "Case",
+               "caseItem" : [ {
+                  "localId" : "155",
+                  "locator" : "70:3-70:66",
+                  "when" : {
+                     "localId" : "153",
+                     "locator" : "70:8-70:59",
+                     "type" : "Not",
+                     "operand" : {
+                        "locator" : "70:8-70:59",
+                        "type" : "IsNull",
+                        "operand" : {
+                           "localId" : "152",
+                           "locator" : "70:8-70:47",
+                           "name" : "First MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "localId" : "154",
+                     "locator" : "70:66",
+                     "valueType" : "{urn:hl7-org:elm-types:r1}Integer",
+                     "value" : "2",
+                     "type" : "Literal"
+                  }
+               } ],
+               "else" : {
+                  "localId" : "156",
+                  "locator" : "71:8",
+                  "valueType" : "{urn:hl7-org:elm-types:r1}Integer",
+                  "value" : "1",
+                  "type" : "Literal"
+               }
+            }
+         }, {
+            "localId" : "160",
+            "locator" : "74:1-75:2",
+            "name" : "Number of Required MCV Doses",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "160",
+                  "s" : [ {
+                     "r" : "159",
+                     "value" : [ "","define ","\"Number of Required MCV Doses\"",":\n\t","2" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "159",
+               "locator" : "75:2",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Integer",
+               "value" : "2",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "162",
+            "locator" : "77:1-83:5",
+            "name" : "Expiration Date for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "162",
+                  "s" : [ {
+                     "r" : "161",
+                     "value" : [ "","define ","\"Expiration Date for MCV dose\"",":\n\t//case\n\t//when \"Needs Zero MCV Dose\"\n\t//\tthen Patient.birthDate + 9 months\n\t//else null\n\t//end\n\t","null" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "161",
+               "locator" : "83:2-83:5",
+               "type" : "Null"
+            }
+         }, {
+            "localId" : "164",
+            "locator" : "85:1-86:5",
+            "name" : "Overdue Date for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "164",
+                  "s" : [ {
+                     "r" : "163",
+                     "value" : [ "","define ","\"Overdue Date for MCV dose\"",":\n\t","null" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "163",
+               "locator" : "86:2-86:5",
+               "type" : "Null"
+            }
+         }, {
+            "localId" : "172",
+            "locator" : "215:1-216:83",
+            "name" : "Date Second MCV Dose Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "172",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement Date second MCV dose administered\n */\n","define ","\"Date Second MCV Dose Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "171",
+                     "s" : [ {
+                        "value" : [ "date from " ]
+                     }, {
+                        "r" : "170",
+                        "s" : [ {
+                           "value" : [ "(" ]
+                        }, {
+                           "r" : "170",
+                           "s" : [ {
+                              "r" : "168",
+                              "s" : [ {
+                                 "r" : "167",
+                                 "s" : [ {
+                                    "value" : [ "\"Second MCV Dose Administered to Patient\"" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "168",
+                                 "s" : [ {
+                                    "value" : [ "occurrence" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " as " ]
+                           }, {
+                              "r" : "169",
+                              "s" : [ {
+                                 "value" : [ "FHIR",".","dateTime" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "171",
+               "locator" : "216:3-216:83",
+               "type" : "DateFrom",
+               "operand" : {
+                  "name" : "ToDateTime",
+                  "libraryName" : "FHIRHelpers",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "localId" : "170",
+                     "locator" : "216:13-216:83",
+                     "strict" : false,
+                     "type" : "As",
+                     "operand" : {
+                        "localId" : "168",
+                        "locator" : "216:14-216:65",
+                        "path" : "occurrence",
+                        "type" : "Property",
+                        "source" : {
+                           "localId" : "167",
+                           "locator" : "216:14-216:54",
+                           "name" : "Second MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     },
+                     "asTypeSpecifier" : {
+                        "localId" : "169",
+                        "locator" : "216:70-216:82",
+                        "name" : "{http://hl7.org/fhir}dateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "181",
+            "locator" : "88:1-95:4",
+            "name" : "Date Last Valid MCV Dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "181",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Date Last Valid MCV Dose\"",":\n\t" ]
+                  }, {
+                     "r" : "180",
+                     "s" : [ {
+                        "value" : [ "case \n\t//when \"Supplementary MCV Dose Administered to Patient\" is not null then \"Date Supplementary MCV Dose Administered to Patient\"\n\t" ]
+                     }, {
+                        "r" : "174",
+                        "s" : [ {
+                           "value" : [ "when " ]
+                        }, {
+                           "r" : "166",
+                           "s" : [ {
+                              "r" : "165",
+                              "s" : [ {
+                                 "value" : [ "\"Second MCV Dose Administered to Patient\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " is not null" ]
+                           } ]
+                        }, {
+                           "value" : [ " then " ]
+                        }, {
+                           "r" : "173",
+                           "s" : [ {
+                              "value" : [ "\"Date Second MCV Dose Administered to Patient\"" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\t" ]
+                     }, {
+                        "r" : "178",
+                        "s" : [ {
+                           "value" : [ "when " ]
+                        }, {
+                           "r" : "176",
+                           "s" : [ {
+                              "r" : "175",
+                              "s" : [ {
+                                 "value" : [ "\"First MCV Dose Administered to Patient\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " is not null" ]
+                           } ]
+                        }, {
+                           "value" : [ " then " ]
+                        }, {
+                           "r" : "177",
+                           "s" : [ {
+                              "value" : [ "\"Date First MCV Dose Administered to Patient\"" ]
+                           } ]
+                        } ]
+                     }, {
+                        "r" : "179",
+                        "value" : [ "\n\t//when \"Zero MCV Dose Administered to Patient\" is not null then \"Date Zero MCV Dose Administered to Patient\"\n\telse ","null","\n\tend" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "180",
+               "locator" : "89:2-95:4",
+               "type" : "Case",
+               "caseItem" : [ {
+                  "localId" : "174",
+                  "locator" : "91:2-91:111",
+                  "when" : {
+                     "localId" : "166",
+                     "locator" : "91:7-91:59",
+                     "type" : "Not",
+                     "operand" : {
+                        "locator" : "91:7-91:59",
+                        "type" : "IsNull",
+                        "operand" : {
+                           "localId" : "165",
+                           "locator" : "91:7-91:47",
+                           "name" : "Second MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "localId" : "173",
+                     "locator" : "91:66-91:111",
+                     "name" : "Date Second MCV Dose Administered to Patient",
+                     "type" : "ExpressionRef"
+                  }
+               }, {
+                  "localId" : "178",
+                  "locator" : "92:2-92:109",
+                  "when" : {
+                     "localId" : "176",
+                     "locator" : "92:7-92:58",
+                     "type" : "Not",
+                     "operand" : {
+                        "locator" : "92:7-92:58",
+                        "type" : "IsNull",
+                        "operand" : {
+                           "localId" : "175",
+                           "locator" : "92:7-92:46",
+                           "name" : "First MCV Dose Administered to Patient",
+                           "type" : "ExpressionRef"
+                        }
+                     }
+                  },
+                  "then" : {
+                     "localId" : "177",
+                     "locator" : "92:65-92:109",
+                     "name" : "Date First MCV Dose Administered to Patient",
+                     "type" : "ExpressionRef"
+                  }
+               } ],
+               "else" : {
+                  "asType" : "{urn:hl7-org:elm-types:r1}Date",
+                  "type" : "As",
+                  "operand" : {
+                     "localId" : "179",
+                     "locator" : "94:7-94:10",
+                     "type" : "Null"
+                  }
+               }
+            }
+         }, {
+            "localId" : "187",
+            "locator" : "97:1-98:78",
+            "name" : "Should vaccinate patient for MCV",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "187",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Should vaccinate patient for MCV\"",":\n\t" ]
+                  }, {
+                     "r" : "186",
+                     "s" : [ {
+                        "r" : "182",
+                        "s" : [ {
+                           "value" : [ "\"Provision of the MCV dose\"" ]
+                        } ]
+                     }, {
+                        "value" : [ " and " ]
+                     }, {
+                        "r" : "185",
+                        "s" : [ {
+                           "value" : [ "(" ]
+                        }, {
+                           "r" : "185",
+                           "s" : [ {
+                              "r" : "183",
+                              "s" : [ {
+                                 "value" : [ "\"Schedule Due Date for MCV dose\"" ]
+                              } ]
+                           }, {
+                              "value" : [ " ","<="," " ]
+                           }, {
+                              "r" : "184",
+                              "s" : [ {
+                                 "value" : [ "(" ]
+                              }, {
+                                 "r" : "184",
+                                 "s" : [ {
+                                    "value" : [ "Now","()" ]
+                                 } ]
+                              }, {
+                                 "value" : [ ")" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "186",
+               "locator" : "98:2-98:78",
+               "type" : "And",
+               "operand" : [ {
+                  "localId" : "182",
+                  "locator" : "98:2-98:28",
+                  "name" : "Provision of the MCV dose",
+                  "type" : "ExpressionRef"
+               }, {
+                  "localId" : "185",
+                  "locator" : "98:34-98:78",
+                  "type" : "LessOrEqual",
+                  "operand" : [ {
+                     "localId" : "183",
+                     "locator" : "98:35-98:66",
+                     "name" : "Schedule Due Date for MCV dose",
+                     "type" : "ExpressionRef"
+                  }, {
+                     "localId" : "184",
+                     "locator" : "98:71-98:77",
+                     "type" : "Now"
+                  } ]
+               } ]
+            }
+         }, {
+            "localId" : "194",
+            "locator" : "100:1-102:57",
+            "name" : "MCV Dose Contraindicated",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "194",
+                  "s" : [ {
+                     "value" : [ "","define ","\"MCV Dose Contraindicated\"",":\n\t" ]
+                  }, {
+                     "r" : "193",
+                     "s" : [ {
+                        "r" : "189",
+                        "s" : [ {
+                           "r" : "188",
+                           "s" : [ {
+                              "value" : [ "IMMZCom" ]
+                           } ]
+                        }, {
+                           "value" : [ "." ]
+                        }, {
+                           "r" : "189",
+                           "s" : [ {
+                              "value" : [ "\"Pregnant\"" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\tor " ]
+                     }, {
+                        "r" : "192",
+                        "s" : [ {
+                           "value" : [ "exists" ]
+                        }, {
+                           "r" : "191",
+                           "s" : [ {
+                              "value" : [ "(" ]
+                           }, {
+                              "r" : "191",
+                              "s" : [ {
+                                 "r" : "190",
+                                 "s" : [ {
+                                    "value" : [ "IMMZCom" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "191",
+                                 "s" : [ {
+                                    "value" : [ "\"Severely Immunosuppressed Condition\"" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "193",
+               "locator" : "101:2-102:57",
+               "type" : "Or",
+               "operand" : [ {
+                  "localId" : "189",
+                  "locator" : "101:2-101:19",
+                  "name" : "Pregnant",
+                  "libraryName" : "IMMZCom",
+                  "type" : "ExpressionRef"
+               }, {
+                  "localId" : "192",
+                  "locator" : "102:5-102:57",
+                  "type" : "Exists",
+                  "operand" : {
+                     "localId" : "191",
+                     "locator" : "102:11-102:57",
+                     "name" : "Severely Immunosuppressed Condition",
+                     "libraryName" : "IMMZCom",
+                     "type" : "ExpressionRef"
+                  }
+               } ]
+            }
+         }, {
+            "localId" : "209",
+            "locator" : "104:1-109:2",
+            "name" : "Contraindication Evaluation of the MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "209",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Contraindication Evaluation of the MCV dose\"",":\n\t" ]
+                  }, {
+                     "r" : "208",
+                     "s" : [ {
+                        "r" : "196",
+                        "s" : [ {
+                           "value" : [ "not" ]
+                        }, {
+                           "r" : "195",
+                           "s" : [ {
+                              "value" : [ "(" ]
+                           }, {
+                              "r" : "195",
+                              "s" : [ {
+                                 "value" : [ "\"MCV Dose Contraindicated\"" ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " and " ]
+                     }, {
+                        "r" : "207",
+                        "s" : [ {
+                           "value" : [ "(\n\t\t" ]
+                        }, {
+                           "r" : "207",
+                           "s" : [ {
+                              "r" : "203",
+                              "s" : [ {
+                                 "r" : "199",
+                                 "s" : [ {
+                                    "value" : [ "exists" ]
+                                 }, {
+                                    "r" : "198",
+                                    "s" : [ {
+                                       "value" : [ "(" ]
+                                    }, {
+                                       "r" : "198",
+                                       "s" : [ {
+                                          "r" : "197",
+                                          "s" : [ {
+                                             "value" : [ "IMMZCom" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "198",
+                                          "s" : [ {
+                                             "value" : [ "\"History of Anaphylactic Reactions Condition\"" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ ")" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ "\n\t\tor " ]
+                              }, {
+                                 "r" : "202",
+                                 "s" : [ {
+                                    "value" : [ "exists" ]
+                                 }, {
+                                    "r" : "201",
+                                    "s" : [ {
+                                       "value" : [ "(" ]
+                                    }, {
+                                       "r" : "201",
+                                       "s" : [ {
+                                          "r" : "200",
+                                          "s" : [ {
+                                             "value" : [ "IMMZCom" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "201",
+                                          "s" : [ {
+                                             "value" : [ "\"Severe Allergic Reactions Condition\"" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ ")" ]
+                                    } ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ "\n\t\tor " ]
+                           }, {
+                              "r" : "206",
+                              "s" : [ {
+                                 "value" : [ "exists" ]
+                              }, {
+                                 "r" : "205",
+                                 "s" : [ {
+                                    "value" : [ "(" ]
+                                 }, {
+                                    "r" : "205",
+                                    "s" : [ {
+                                       "r" : "204",
+                                       "s" : [ {
+                                          "value" : [ "IMMZCom" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "205",
+                                       "s" : [ {
+                                          "value" : [ "\"Symptomatic HIV Infection Condition\"" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "value" : [ ")" ]
+                                 } ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ "\n\t)" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "208",
+               "locator" : "105:2-109:2",
+               "type" : "And",
+               "operand" : [ {
+                  "localId" : "196",
+                  "locator" : "105:2-105:32",
+                  "type" : "Not",
+                  "operand" : {
+                     "localId" : "195",
+                     "locator" : "105:5-105:32",
+                     "name" : "MCV Dose Contraindicated",
+                     "type" : "ExpressionRef"
+                  }
+               }, {
+                  "localId" : "207",
+                  "locator" : "105:38-109:2",
+                  "type" : "Or",
+                  "operand" : [ {
+                     "localId" : "203",
+                     "locator" : "106:3-107:58",
+                     "type" : "Or",
+                     "operand" : [ {
+                        "localId" : "199",
+                        "locator" : "106:3-106:63",
+                        "type" : "Exists",
+                        "operand" : {
+                           "localId" : "198",
+                           "locator" : "106:9-106:63",
+                           "name" : "History of Anaphylactic Reactions Condition",
+                           "libraryName" : "IMMZCom",
+                           "type" : "ExpressionRef"
+                        }
+                     }, {
+                        "localId" : "202",
+                        "locator" : "107:6-107:58",
+                        "type" : "Exists",
+                        "operand" : {
+                           "localId" : "201",
+                           "locator" : "107:12-107:58",
+                           "name" : "Severe Allergic Reactions Condition",
+                           "libraryName" : "IMMZCom",
+                           "type" : "ExpressionRef"
+                        }
+                     } ]
+                  }, {
+                     "localId" : "206",
+                     "locator" : "108:6-108:58",
+                     "type" : "Exists",
+                     "operand" : {
+                        "localId" : "205",
+                        "locator" : "108:12-108:58",
+                        "name" : "Symptomatic HIV Infection Condition",
+                        "libraryName" : "IMMZCom",
+                        "type" : "ExpressionRef"
+                     }
+                  } ]
+               } ]
+            }
+         }, {
+            "localId" : "216",
+            "locator" : "129:1-130:84",
+            "name" : "Date Last MCV Dose Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "216",
+                  "s" : [ {
+                     "value" : [ "/** \n * @dataElement Date of last MCV dose administration\n */\n","define ","\"Date Last MCV Dose Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "215",
+                     "s" : [ {
+                        "value" : [ "date from " ]
+                     }, {
+                        "r" : "214",
+                        "s" : [ {
+                           "value" : [ "(" ]
+                        }, {
+                           "r" : "214",
+                           "s" : [ {
+                              "r" : "212",
+                              "s" : [ {
+                                 "r" : "211",
+                                 "s" : [ {
+                                    "value" : [ "First","(" ]
+                                 }, {
+                                    "r" : "210",
+                                    "s" : [ {
+                                       "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ ")" ]
+                                 } ]
+                              }, {
+                                 "value" : [ "." ]
+                              }, {
+                                 "r" : "212",
+                                 "s" : [ {
+                                    "value" : [ "occurrence" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " as " ]
+                           }, {
+                              "r" : "213",
+                              "s" : [ {
+                                 "value" : [ "FHIR",".","dateTime" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "215",
+               "locator" : "130:3-130:84",
+               "type" : "DateFrom",
+               "operand" : {
+                  "name" : "ToDateTime",
+                  "libraryName" : "FHIRHelpers",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "localId" : "214",
+                     "locator" : "130:13-130:84",
+                     "strict" : false,
+                     "type" : "As",
+                     "operand" : {
+                        "localId" : "212",
+                        "locator" : "130:14-130:66",
+                        "path" : "occurrence",
+                        "type" : "Property",
+                        "source" : {
+                           "localId" : "211",
+                           "locator" : "130:14-130:55",
+                           "type" : "First",
+                           "source" : {
+                              "localId" : "210",
+                              "locator" : "130:20-130:54",
+                              "name" : "MCV Doses Administered to Patient",
+                              "type" : "ExpressionRef"
+                           }
+                        }
+                     },
+                     "asTypeSpecifier" : {
+                        "localId" : "213",
+                        "locator" : "130:71-130:83",
+                        "name" : "{http://hl7.org/fhir}dateTime",
+                        "type" : "NamedTypeSpecifier"
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "219",
+            "locator" : "135:1-136:44",
+            "name" : "Number of MCV Doses Administered to Patient",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "219",
+                  "s" : [ {
+                     "value" : [ "/**\n * @define The number of MCV doses administerd to the patient\n */\n","define ","\"Number of MCV Doses Administered to Patient\"",":\n  " ]
+                  }, {
+                     "r" : "218",
+                     "s" : [ {
+                        "value" : [ "Count","(" ]
+                     }, {
+                        "r" : "217",
+                        "s" : [ {
+                           "value" : [ "\"MCV Doses Administered to Patient\"" ]
+                        } ]
+                     }, {
+                        "value" : [ ")" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "218",
+               "locator" : "136:3-136:44",
+               "type" : "Count",
+               "source" : {
+                  "localId" : "217",
+                  "locator" : "136:9-136:43",
+                  "name" : "MCV Doses Administered to Patient",
+                  "type" : "ExpressionRef"
+               }
+            }
+         }, {
+            "localId" : "238",
+            "locator" : "232:1-234:53",
+            "name" : "Draft Medication Request for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "238",
+                  "s" : [ {
+                     "value" : [ "/**\n * @dataElement \"Second MCV Dose Administered to Patient\"\n * only valid if 4 weeks after first dose\n */\n//define \"Supplementary MCV Dose Administered to Patient\":\n//  Last(\"MCV Doses Administered to Patient\" I where I.occurrence after \"Date Second MCV Dose Administered to Patient\")\n\n/**\n * @dataElement Date second MCV dose administered\n */\n//define \"Date Supplementary MCV Dose Administered to Patient\":\n//  date from (\"Supplementary MCV Dose Administered to Patient\".occurrence as FHIR.dateTime)","define ","\"Draft Medication Request for MCV dose\"",":\n\t" ]
+                  }, {
+                     "r" : "237",
+                     "s" : [ {
+                        "s" : [ {
+                           "r" : "221",
+                           "s" : [ {
+                              "r" : "220",
+                              "s" : [ {
+                                 "r" : "220",
+                                 "s" : [ {
+                                    "value" : [ "[","MedicationRequest","]" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " ","MR" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " " ]
+                     }, {
+                        "r" : "230",
+                        "s" : [ {
+                           "value" : [ "where " ]
+                        }, {
+                           "r" : "230",
+                           "s" : [ {
+                              "r" : "225",
+                              "s" : [ {
+                                 "r" : "223",
+                                 "s" : [ {
+                                    "r" : "222",
+                                    "s" : [ {
+                                       "value" : [ "MR" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "223",
+                                    "s" : [ {
+                                       "value" : [ "status" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " ","="," " ]
+                              }, {
+                                 "r" : "224",
+                                 "s" : [ {
+                                    "value" : [ "'draft'" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " and " ]
+                           }, {
+                              "r" : "229",
+                              "s" : [ {
+                                 "r" : "227",
+                                 "s" : [ {
+                                    "r" : "226",
+                                    "s" : [ {
+                                       "value" : [ "MR" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "227",
+                                    "s" : [ {
+                                       "value" : [ "intent" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " ","="," " ]
+                              }, {
+                                 "r" : "228",
+                                 "s" : [ {
+                                    "value" : [ "'proposal'" ]
+                                 } ]
+                              } ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "\n\t" ]
+                     }, {
+                        "r" : "236",
+                        "s" : [ {
+                           "value" : [ "sort by " ]
+                        }, {
+                           "r" : "235",
+                           "s" : [ {
+                              "r" : "234",
+                              "s" : [ {
+                                 "value" : [ "date from " ]
+                              }, {
+                                 "r" : "233",
+                                 "s" : [ {
+                                    "value" : [ "(" ]
+                                 }, {
+                                    "r" : "233",
+                                    "s" : [ {
+                                       "r" : "231",
+                                       "s" : [ {
+                                          "value" : [ "authoredOn" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " as " ]
+                                    }, {
+                                       "r" : "232",
+                                       "s" : [ {
+                                          "value" : [ "FHIR",".","dateTime" ]
+                                       } ]
+                                    } ]
+                                 }, {
+                                    "value" : [ ")" ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ " desc" ]
+                           } ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "237",
+               "locator" : "233:2-234:53",
+               "type" : "Query",
+               "source" : [ {
+                  "localId" : "221",
+                  "locator" : "233:2-233:23",
+                  "alias" : "MR",
+                  "expression" : {
+                     "localId" : "220",
+                     "locator" : "233:2-233:20",
+                     "dataType" : "{http://hl7.org/fhir}MedicationRequest",
+                     "templateId" : "http://hl7.org/fhir/StructureDefinition/MedicationRequest",
+                     "type" : "Retrieve"
+                  }
+               } ],
+               "relationship" : [ ],
+               "where" : {
+                  "localId" : "230",
+                  "locator" : "233:25-233:76",
+                  "type" : "And",
+                  "operand" : [ {
+                     "localId" : "225",
+                     "locator" : "233:31-233:49",
+                     "type" : "Equal",
+                     "operand" : [ {
+                        "name" : "ToString",
+                        "libraryName" : "FHIRHelpers",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "localId" : "223",
+                           "locator" : "233:31-233:39",
+                           "path" : "status",
+                           "scope" : "MR",
+                           "type" : "Property"
+                        } ]
+                     }, {
+                        "localId" : "224",
+                        "locator" : "233:43-233:49",
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "draft",
+                        "type" : "Literal"
+                     } ]
+                  }, {
+                     "localId" : "229",
+                     "locator" : "233:55-233:76",
+                     "type" : "Equal",
+                     "operand" : [ {
+                        "name" : "ToString",
+                        "libraryName" : "FHIRHelpers",
+                        "type" : "FunctionRef",
+                        "operand" : [ {
+                           "localId" : "227",
+                           "locator" : "233:55-233:63",
+                           "path" : "intent",
+                           "scope" : "MR",
+                           "type" : "Property"
+                        } ]
+                     }, {
+                        "localId" : "228",
+                        "locator" : "233:67-233:76",
+                        "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                        "value" : "proposal",
+                        "type" : "Literal"
+                     } ]
+                  } ]
+               },
+               "sort" : {
+                  "localId" : "236",
+                  "locator" : "234:2-234:53",
+                  "by" : [ {
+                     "localId" : "235",
+                     "locator" : "234:10-234:53",
+                     "direction" : "desc",
+                     "type" : "ByExpression",
+                     "expression" : {
+                        "localId" : "234",
+                        "locator" : "234:10-234:48",
+                        "type" : "DateFrom",
+                        "operand" : {
+                           "name" : "ToDateTime",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "localId" : "233",
+                              "locator" : "234:20-234:48",
+                              "strict" : false,
+                              "type" : "As",
+                              "operand" : {
+                                 "localId" : "231",
+                                 "locator" : "234:21-234:30",
+                                 "name" : "authoredOn",
+                                 "type" : "IdentifierRef"
+                              },
+                              "asTypeSpecifier" : {
+                                 "localId" : "232",
+                                 "locator" : "234:35-234:47",
+                                 "name" : "{http://hl7.org/fhir}dateTime",
+                                 "type" : "NamedTypeSpecifier"
+                              }
+                           } ]
+                        }
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "242",
+            "locator" : "236:1-237:50",
+            "name" : "Draft Medication Request ID for MCV dose",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "242",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Draft Medication Request ID for MCV dose\"",":\n\t" ]
+                  }, {
+                     "r" : "241",
+                     "s" : [ {
+                        "r" : "240",
+                        "s" : [ {
+                           "value" : [ "First","(" ]
+                        }, {
+                           "r" : "239",
+                           "s" : [ {
+                              "value" : [ "\"Draft Medication Request for MCV dose\"" ]
+                           } ]
+                        }, {
+                           "value" : [ ")" ]
+                        } ]
+                     }, {
+                        "value" : [ "." ]
+                     }, {
+                        "r" : "241",
+                        "s" : [ {
+                           "value" : [ "id" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "241",
+               "locator" : "237:2-237:50",
+               "path" : "id",
+               "type" : "Property",
+               "source" : {
+                  "localId" : "240",
+                  "locator" : "237:2-237:47",
+                  "type" : "First",
+                  "source" : {
+                     "localId" : "239",
+                     "locator" : "237:8-237:46",
+                     "name" : "Draft Medication Request for MCV dose",
+                     "type" : "ExpressionRef"
+                  }
+               }
+            }
+         } ]
+      }
+   }
+}

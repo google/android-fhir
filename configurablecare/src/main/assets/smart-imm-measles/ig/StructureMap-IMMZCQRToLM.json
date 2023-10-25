@@ -1,0 +1,332 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZCQRToLM",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToLM<span style=\"color: navy\">&quot; = &quot;</span>IMMZCQRToLM<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/questionnaireresponse.html\" title=\"QuestionnaireResponse\">http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse</a><span style=\"color: navy\">&quot; </span><b>alias </b>QResp <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZCRegisterClient.html\" title=\"IMMZ.C Register Client\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZC <b>as </b><b>target</b>\r\n\r\n<b>group </b>QRespToIMMZC<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">qr</span><span style=\"color: navy\"> : </span>QResp, <b>target</b> <span style=\"color: maroon\">immzc</span><span style=\"color: navy\"> : </span>IMMZC<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  qr.item<b> as </b><span style=\"color: maroon\">item</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'uniqueId'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.uniqueId = <span style=\"color: maroon\">content</span> <i>&quot;SetIdentifier&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForIdentifier&quot;</i><span style=\"color: navy\">;</span>\r\n    item<b> as </b><span style=\"color: maroon\">pname</span><b> where </b>item.linkId = 'name'<b> then </b>NameToIMMZC<span style=\"color: navy\">(</span><span style=\"color: maroon\">pname</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">immzc</span><span style=\"color: navy\">)</span> <i>&quot;SetNames&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'sex'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        coding.code<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.sex = <span style=\"color: maroon\">content</span> <i>&quot;SetSex&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;ProcessCoding&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForIdentifier&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'birthDate'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.birthDate = <span style=\"color: maroon\">content</span> <i>&quot;SetBirthDate2&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForBirthDate&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer<b> as </b><span style=\"color: maroon\">caregiver</span><b> where </b>item.linkId = 'caregiver'<span style=\"color: navy\"><b> -&gt; </b></span>immzc.caregiver<b> as </b><span style=\"color: maroon\">caretgt</span><b> then </b>NameToIMMZC<span style=\"color: navy\">(</span><span style=\"color: maroon\">caregiver</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">caretgt</span><span style=\"color: navy\">)</span> <i>&quot;SetCaregiver&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'phone'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.phone = <span style=\"color: maroon\">content</span> <i>&quot;SetPhone&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForPhone&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'administrativeArea'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">coding</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.administrativeArea<b> as </b><span style=\"color: maroon\">area</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        coding<span style=\"color: navy\"><b> -&gt; </b></span>area.coding = <span style=\"color: maroon\">coding</span> <i>&quot;SetCodingValue&quot;</i><span style=\"color: navy\">;</span>\r\n        coding.display<b> as </b><span style=\"color: maroon\">display</span><span style=\"color: navy\"><b> -&gt; </b></span>area.text = <span style=\"color: maroon\">display</span> <i>&quot;SetDisplay&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetCoding&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForAdministrativeArea&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'healthWorker'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.healthWorker = <span style=\"color: maroon\">content</span> <i>&quot;SetHealthWorker&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForHealthWorker&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;processItems&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span><b>group </b>NameToIMMZC<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">name</span>, <b>target</b> <span style=\"color: maroon\">immzc</span><span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  name.item<b> as </b><span style=\"color: maroon\">item</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'fullName'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immzc.name = <span style=\"color: maroon\">content</span> <i>&quot;SetFullName&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForFullName&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;processNameItems&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToLM",
+  "version" : "0.1.0",
+  "name" : "IMMZCQRToLM",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse",
+    "mode" : "source",
+    "alias" : "QResp"
+  },
+  {
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient",
+    "mode" : "target",
+    "alias" : "IMMZC"
+  }],
+  "group" : [{
+    "name" : "QRespToIMMZC",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "qr",
+      "type" : "QResp",
+      "mode" : "source"
+    },
+    {
+      "name" : "immzc",
+      "type" : "IMMZC",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "processItems",
+      "source" : [{
+        "context" : "qr",
+        "element" : "item",
+        "variable" : "item"
+      }],
+      "rule" : [{
+        "name" : "FirstAnswerForIdentifier",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'uniqueId'"
+        }],
+        "rule" : [{
+          "name" : "SetIdentifier",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "uniqueId",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetNames",
+        "source" : [{
+          "context" : "item",
+          "variable" : "pname",
+          "condition" : "item.linkId = 'name'"
+        }],
+        "dependent" : [{
+          "name" : "NameToIMMZC",
+          "variable" : ["pname",
+          "immzc"]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForIdentifier",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'sex'"
+        }],
+        "rule" : [{
+          "name" : "ProcessCoding",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "coding"
+          }],
+          "rule" : [{
+            "name" : "SetSex",
+            "source" : [{
+              "context" : "coding",
+              "element" : "code",
+              "variable" : "content"
+            }],
+            "target" : [{
+              "context" : "immzc",
+              "contextType" : "variable",
+              "element" : "sex",
+              "transform" : "copy",
+              "parameter" : [{
+                "valueId" : "content"
+              }]
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForBirthDate",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'birthDate'"
+        }],
+        "rule" : [{
+          "name" : "SetBirthDate2",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "birthDate",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetCaregiver",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "variable" : "caregiver",
+          "condition" : "item.linkId = 'caregiver'"
+        }],
+        "target" : [{
+          "context" : "immzc",
+          "contextType" : "variable",
+          "element" : "caregiver",
+          "variable" : "caretgt"
+        }],
+        "dependent" : [{
+          "name" : "NameToIMMZC",
+          "variable" : ["caregiver",
+          "caretgt"]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForPhone",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'phone'"
+        }],
+        "rule" : [{
+          "name" : "SetPhone",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "phone",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForAdministrativeArea",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'administrativeArea'"
+        }],
+        "rule" : [{
+          "name" : "SetCoding",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "coding"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "administrativeArea",
+            "variable" : "area"
+          }],
+          "rule" : [{
+            "name" : "SetCodingValue",
+            "source" : [{
+              "context" : "coding"
+            }],
+            "target" : [{
+              "context" : "area",
+              "contextType" : "variable",
+              "element" : "coding",
+              "transform" : "copy",
+              "parameter" : [{
+                "valueId" : "coding"
+              }]
+            }]
+          },
+          {
+            "name" : "SetDisplay",
+            "source" : [{
+              "context" : "coding",
+              "element" : "display",
+              "variable" : "display"
+            }],
+            "target" : [{
+              "context" : "area",
+              "contextType" : "variable",
+              "element" : "text",
+              "transform" : "copy",
+              "parameter" : [{
+                "valueId" : "display"
+              }]
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForHealthWorker",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'healthWorker'"
+        }],
+        "rule" : [{
+          "name" : "SetHealthWorker",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "healthWorker",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      }]
+    }]
+  },
+  {
+    "name" : "NameToIMMZC",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "name",
+      "mode" : "source"
+    },
+    {
+      "name" : "immzc",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "processNameItems",
+      "source" : [{
+        "context" : "name",
+        "element" : "item",
+        "variable" : "item"
+      }],
+      "rule" : [{
+        "name" : "FirstAnswerForFullName",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'fullName'"
+        }],
+        "rule" : [{
+          "name" : "SetFullName",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immzc",
+            "contextType" : "variable",
+            "element" : "name",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      }]
+    }]
+  }]
+}

@@ -1,0 +1,336 @@
+{
+  "resourceType" : "ConceptMap",
+  "id" : "IMMZD4ConceptMap",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Mapping from (not specified) to (not specified)</p><p>ACTIVE. Published on 2023-10-09 by WHO (WHO: <a href=\"http://who.int\">http://who.int</a>). </p><div><p>Mapping to and from IMMZ.D4 Data Dictionary to other codesystems.</p>\n</div><br/><p><b>Group 1</b>Mapping from <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a> to <a href=\"CodeSystem-ICD11.html\">ICD-11</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>DE162 (Currently pregnant)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>QA41 (Pregnant state)</td></tr><tr><td>DE165 (Severely immunosuppressed)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>4B4Z (Diseases of the immune system)</td></tr><tr><td>DE166 (History of anaphylactic reactions)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>QC44.0 (Personal history of anaphylaxis)</td></tr><tr><td>DE167 (Severe allergic reactions)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>QC44.2 (Personal history of allergy to drugs, medicaments or biological substances)</td></tr><tr><td>DE168 (Symptomatic HIV infection)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>1C62.1 (HIV disease clinical stage 2 without mention of tuberculosis or malaria)</td></tr></table><hr/><p><b>Group 2</b>Mapping from <a href=\"CodeSystem-ICD11.html\">ICD-11</a> to <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>QA41 (Pregnant state)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE162 (Currently pregnant)</td></tr><tr><td>4B4Z (Diseases of the immune system)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE165 (Severely immunosuppressed)</td></tr><tr><td>QC44.0 (Personal history of anaphylaxis)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE166 (History of anaphylactic reactions)</td></tr><tr><td>QC44.2 (Personal history of allergy to drugs, medicaments or biological substances)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE167 (Severe allergic reactions)</td></tr><tr><td>1C62.1 (HIV disease clinical stage 2 without mention of tuberculosis or malaria)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE168 (Symptomatic HIV infection)</td></tr></table><hr/><p><b>Group 3</b>Mapping from <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a> to <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-loinc.html\">Logical Observation Identifiers, Names and Codes (LOINC)</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>DE162 (Currently pregnant)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>82810-3</td></tr><tr><td>DE165 (Severely immunosuppressed)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>96381-9</td></tr><tr><td>DE168 (Symptomatic HIV infection)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>47244-9</td></tr></table><hr/><p><b>Group 4</b>Mapping from <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-loinc.html\">Logical Observation Identifiers, Names and Codes (LOINC)</a> to <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td><td><b>Comment</b></td></tr><tr><td>82810-3</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE162 (Currently pregnant)</td><td/></tr><tr><td>96381-9</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE165 (Severely immunosuppressed)</td><td/></tr><tr><td>47244-9</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE168 (Symptomatic HIV infection)</td><td>The source concept is more specific than the target</td></tr></table><hr/><p><b>Group 5</b>Mapping from <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a> to <a href=\"http://hl7.org/fhir/R4/codesystem-snomedct.html\">SNOMED CT (all versions)</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>DE162 (Currently pregnant)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>77386006</td></tr><tr><td>DE165 (Severely immunosuppressed)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>370388006</td></tr><tr><td>DE166 (History of anaphylactic reactions)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>10839421000119100</td></tr><tr><td>DE167 (Severe allergic reactions)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>419076005</td></tr><tr><td>DE168 (Symptomatic HIV infection)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>86406008</td></tr></table><hr/><p><b>Group 6</b>Mapping from <a href=\"http://hl7.org/fhir/R4/codesystem-snomedct.html\">SNOMED CT (all versions)</a> to <a href=\"CodeSystem-IMMZ.D4.html\">IMMZ.D4 CodeSystem for Check Contraindications Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td><td><b>Comment</b></td></tr><tr><td>77386006</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE162 (Currently pregnant)</td><td/></tr><tr><td>370388006</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE165 (Severely immunosuppressed)</td><td/></tr><tr><td>10839421000119100</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE166 (History of anaphylactic reactions)</td><td/></tr><tr><td>419076005</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE167 (Severe allergic reactions)</td><td>The source concept is more specific than the target</td></tr><tr><td>86406008</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE168 (Symptomatic HIV infection)</td><td/></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZD4ConceptMap",
+  "version" : "0.1.0",
+  "name" : "IMMZ_D4_ConceptMap",
+  "title" : "ConceptMap to and from IMMZ.D4 DataElements",
+  "status" : "active",
+  "experimental" : false,
+  "date" : "2023-10-09",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Mapping to and from IMMZ.D4 Data Dictionary to other codesystems.",
+  "group" : [{
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "target" : "http://hl7.org/fhir/sid/icd-11/mms",
+    "element" : [{
+      "code" : "DE162",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "QA41",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE165",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "4B4Z",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE166",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "QC44.0",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE167",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "QC44.2",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE168",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "1C62.1",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  },
+  {
+    "source" : "http://hl7.org/fhir/sid/icd-11/mms",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "element" : [{
+      "code" : "QA41",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE162",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "4B4Z",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "DE165",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "QC44.0",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE166",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "QC44.2",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "DE167",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "1C62.1",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE168",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  },
+  {
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "target" : "http://loinc.org",
+    "element" : [{
+      "code" : "DE162",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "82810-3",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE165",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "96381-9",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE168",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "47244-9",
+        "equivalence" : "wider"
+      }]
+    }]
+  },
+  {
+    "source" : "http://loinc.org",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "element" : [{
+      "code" : "82810-3",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE162",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "96381-9",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "DE165",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "47244-9",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "narrower"
+        }],
+        "code" : "DE168",
+        "equivalence" : "narrower",
+        "comment" : "The source concept is more specific than the target"
+      }]
+    }]
+  },
+  {
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "target" : "http://snomed.info/sct",
+    "element" : [{
+      "code" : "DE162",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "77386006",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE165",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "370388006",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE166",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "10839421000119100",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE167",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "419076005",
+        "equivalence" : "wider"
+      }]
+    },
+    {
+      "code" : "DE168",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "86406008",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  },
+  {
+    "source" : "http://snomed.info/sct",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "element" : [{
+      "code" : "77386006",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE162",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "370388006",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE165",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "10839421000119100",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE166",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "419076005",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "narrower"
+        }],
+        "code" : "DE167",
+        "equivalence" : "narrower",
+        "comment" : "The source concept is more specific than the target"
+      }]
+    },
+    {
+      "code" : "86406008",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE168",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  }]
+}

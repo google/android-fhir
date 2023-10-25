@@ -1,0 +1,53 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "VaccineTypes",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include codes from <a href=\"CodeSystem-ICD11.html\"><code>http://hl7.org/fhir/sid/icd-11/mms</code></a> where parent  =  <a href=\"CodeSystem-ICD11.html#ICD11-XM28X5\">XM28X5</a></li><li>Include these codes as defined in <a href=\"CodeSystem-ICD11.html\"><code>http://hl7.org/fhir/sid/icd-11/mms</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM28X5\">XM28X5</a></td><td style=\"color: #cccccc\">Measles vaccines</td></tr></table></li><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/30940-1/\">30940-1</a></td><td>Measles virus+Mumps virus+Rubella virus dose count in combination vaccine</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/836382004\">836382004</a></td><td>Measles morbillivirus antigen-containing vaccine product</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VaccineTypes",
+  "version" : "0.1.0",
+  "name" : "VaccineTypes",
+  "title" : "Measles Vaccine Type ValueSet",
+  "status" : "active",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Measles Vaccine type Codes, containing the different types of antigens used in vaccine guidelines.",
+  "compose" : {
+    "include" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "filter" : [{
+        "property" : "parent",
+        "op" : "=",
+        "value" : "XM28X5"
+      }]
+    },
+    {
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "concept" : [{
+        "code" : "XM28X5"
+      }]
+    },
+    {
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "30940-1",
+        "display" : "Measles virus+Mumps virus+Rubella virus dose count in combination vaccine"
+      }]
+    },
+    {
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "836382004",
+        "display" : "Measles morbillivirus antigen-containing vaccine product"
+      }]
+    }]
+  }
+}

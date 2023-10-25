@@ -1,0 +1,66 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "IMMZ.Z.DE9",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"CodeSystem-ICD11.html\"><code>http://hl7.org/fhir/sid/icd-11/mms</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM28X5\">XM28X5</a></td><td>Measles vaccines</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM8L15\">XM8L15</a></td><td>Measles, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM8TF3\">XM8TF3</a></td><td>Measles, combinations with mumps and rubella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM21H2\">XM21H2</a></td><td>Measles, combinations with rubella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM4AJ8\">XM4AJ8</a></td><td>Measles, combinations with mumps, rubella and varicella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM9439\">XM9439</a></td><td>Measles, combinations with mumps, live attenuated</td></tr></table></li><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/30940-1/\">30940-1</a></td><td>Measles virus+Mumps virus+Rubella virus dose count in combination vaccine</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/836382004\">836382004</a></td><td>Measles morbillivirus antigen-containing vaccine product</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.Z.DE9",
+  "version" : "0.1.0",
+  "name" : "IMMZ_Z_DE9",
+  "title" : "IMMZ.Z.DE10 ValueSet for Measles Vaccines",
+  "status" : "active",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "ValueSet for Measles Vaccines for IMMZ.Z.DE9.",
+  "compose" : {
+    "include" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "concept" : [{
+        "code" : "XM28X5",
+        "display" : "Measles vaccines"
+      },
+      {
+        "code" : "XM8L15",
+        "display" : "Measles, live attenuated"
+      },
+      {
+        "code" : "XM8TF3",
+        "display" : "Measles, combinations with mumps and rubella, live attenuated"
+      },
+      {
+        "code" : "XM21H2",
+        "display" : "Measles, combinations with rubella, live attenuated"
+      },
+      {
+        "code" : "XM4AJ8",
+        "display" : "Measles, combinations with mumps, rubella and varicella, live attenuated"
+      },
+      {
+        "code" : "XM9439",
+        "display" : "Measles, combinations with mumps, live attenuated"
+      }]
+    },
+    {
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "30940-1",
+        "display" : "Measles virus+Mumps virus+Rubella virus dose count in combination vaccine"
+      }]
+    },
+    {
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "836382004",
+        "display" : "Measles morbillivirus antigen-containing vaccine product"
+      }]
+    }]
+  }
+}

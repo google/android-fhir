@@ -1,0 +1,293 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZCLMToPatient",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCLMToPatient<span style=\"color: navy\">&quot; = &quot;</span>IMMZCLMToPatient<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZCRegisterClient.html\" title=\"IMMZ.C Register Client\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZC <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/bundle.html\" title=\"Bundle\">http://hl7.org/fhir/StructureDefinition/Bundle</a><span style=\"color: navy\">&quot; </span><b>alias </b>Bundle <b>as </b><b>target</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/patient.html\" title=\"Patient\">http://hl7.org/fhir/StructureDefinition/Patient</a><span style=\"color: navy\">&quot; </span><b>alias </b>Patient <b>as </b><b>target</b>\r\n\r\n<b>group </b>IMMZCToPatient<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">immzc</span><span style=\"color: navy\"> : </span>IMMZC, <b>target</b> <span style=\"color: maroon\">patient</span><span style=\"color: navy\"> : </span>Patient<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  immzc.uniqueId<b> as </b><span style=\"color: maroon\">id</span><span style=\"color: navy\"><b> -&gt; </b></span>patient.identifier<b> as </b><span style=\"color: maroon\">identifier</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    id<span style=\"color: navy\"><b> -&gt; </b></span>identifier.value = <span style=\"color: maroon\">id</span> <i>&quot;SetIdentifierValue&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;SetIdentifier&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc<span style=\"color: navy\"><b> -&gt; </b></span>patient.name<b> as </b><span style=\"color: maroon\">pname</span><b> then </b>NameToHumanName<span style=\"color: navy\">(</span><span style=\"color: maroon\">immzc</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">pname</span><span style=\"color: navy\">)</span> <i>&quot;SetName&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc.sex<b> as </b><span style=\"color: maroon\">sex</span><span style=\"color: navy\"><b> -&gt; </b></span>patient.gender = <b>translate</b><span style=\"color: navy\">(</span><span style=\"color: maroon\">sex</span><span style=\"color: navy\">, </span><span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCSexToAdministrativeGender'</span><span style=\"color: navy\">, </span><span style=\"color: blue\">'code'</span><span style=\"color: navy\">)</span> <i>&quot;SetGender&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc.birthDate<b> as </b><span style=\"color: maroon\">birthDate</span><span style=\"color: navy\"><b> -&gt; </b></span>patient.birthDate = <span style=\"color: maroon\">birthDate</span> <i>&quot;SetBirthDate&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc.caregiver<b> as </b><span style=\"color: maroon\">caregiver</span><span style=\"color: navy\"><b> -&gt; </b></span> patient.contact<b> as </b><span style=\"color: maroon\">contact</span><span style=\"color: navy\">, </span> contact.name<b> as </b><span style=\"color: maroon\">hname</span><b> then </b>NameToHumanName<span style=\"color: navy\">(</span><span style=\"color: maroon\">caregiver</span><span style=\"color: navy\">, </span><span style=\"color: maroon\">hname</span><span style=\"color: navy\">)</span> <i>&quot;SetCaregiver&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc.phone<b> as </b><span style=\"color: maroon\">phone</span><span style=\"color: navy\"><b> -&gt; </b></span>patient.telecom<b> as </b><span style=\"color: maroon\">telecom</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    phone<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> telecom.value = <span style=\"color: maroon\">content</span><span style=\"color: navy\">, </span> telecom.system = <span style=\"color: blue\">'phone'</span> <i>&quot;SetPhoneValue&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;SetPhone&quot;</i><span style=\"color: navy\">;</span>\r\n  immzc.administrativeArea<b> as </b><span style=\"color: maroon\">area</span><span style=\"color: navy\"><b> -&gt; </b></span>patient.address<b> as </b><span style=\"color: maroon\">address</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    area.coding first<b> as </b><span style=\"color: maroon\">coding</span><span style=\"color: navy\"><b> -&gt; </b></span><span style=\"color: maroon\">address</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      coding.code<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>address.text = <span style=\"color: maroon\">content</span> <i>&quot;SetAddressToCode&quot;</i><span style=\"color: navy\">;</span>\r\n      coding.display<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>address.text = <span style=\"color: maroon\">content</span> <i>&quot;SetAddressToDisplay&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetAddressText&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;SetAdministrativeArea&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span><b>group </b>NameToHumanName<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">name</span>, <b>target</b> <span style=\"color: maroon\">hname</span><span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  name.name<b> as </b><span style=\"color: maroon\">fullName</span><span style=\"color: navy\"><b> -&gt; </b></span>hname.text = <span style=\"color: maroon\">fullName</span> <i>&quot;SetFullName&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: #b36b00\" title=\"This element was not defined prior to R5\">// name.firstName as firstName -&gt; hname.given = firstName &quot;SetFirstName&quot;;</span>\r\n<span style=\"color: #b36b00\" title=\"This element was not defined prior to R5\">// name.familyName as familyName -&gt; hname.family = familyName &quot;SetFamilyName&quot;;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCLMToPatient",
+  "version" : "0.1.0",
+  "name" : "IMMZCLMToPatient",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient",
+    "mode" : "source",
+    "alias" : "IMMZC"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/Bundle",
+    "mode" : "target",
+    "alias" : "Bundle"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/Patient",
+    "mode" : "target",
+    "alias" : "Patient"
+  }],
+  "group" : [{
+    "name" : "IMMZCToPatient",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "immzc",
+      "type" : "IMMZC",
+      "mode" : "source"
+    },
+    {
+      "name" : "patient",
+      "type" : "Patient",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetIdentifier",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "uniqueId",
+        "variable" : "id"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "identifier",
+        "variable" : "identifier"
+      }],
+      "rule" : [{
+        "name" : "SetIdentifierValue",
+        "source" : [{
+          "context" : "id"
+        }],
+        "target" : [{
+          "context" : "identifier",
+          "contextType" : "variable",
+          "element" : "value",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueId" : "id"
+          }]
+        }]
+      }]
+    },
+    {
+      "name" : "SetName",
+      "source" : [{
+        "context" : "immzc"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "name",
+        "variable" : "pname"
+      }],
+      "dependent" : [{
+        "name" : "NameToHumanName",
+        "variable" : ["immzc",
+        "pname"]
+      }]
+    },
+    {
+      "name" : "SetGender",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "sex",
+        "variable" : "sex"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "gender",
+        "transform" : "translate",
+        "parameter" : [{
+          "valueId" : "sex"
+        },
+        {
+          "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCSexToAdministrativeGender"
+        },
+        {
+          "valueString" : "code"
+        }]
+      }]
+    },
+    {
+      "name" : "SetBirthDate",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "birthDate",
+        "variable" : "birthDate"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "birthDate",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueId" : "birthDate"
+        }]
+      }]
+    },
+    {
+      "name" : "SetCaregiver",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "caregiver",
+        "variable" : "caregiver"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "contact",
+        "variable" : "contact"
+      },
+      {
+        "context" : "contact",
+        "contextType" : "variable",
+        "element" : "name",
+        "variable" : "hname"
+      }],
+      "dependent" : [{
+        "name" : "NameToHumanName",
+        "variable" : ["caregiver",
+        "hname"]
+      }]
+    },
+    {
+      "name" : "SetPhone",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "phone",
+        "variable" : "phone"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "telecom",
+        "variable" : "telecom"
+      }],
+      "rule" : [{
+        "name" : "SetPhoneValue",
+        "source" : [{
+          "context" : "phone",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "telecom",
+          "contextType" : "variable",
+          "element" : "value",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueId" : "content"
+          }]
+        },
+        {
+          "context" : "telecom",
+          "contextType" : "variable",
+          "element" : "system",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueString" : "phone"
+          }]
+        }]
+      }]
+    },
+    {
+      "name" : "SetAdministrativeArea",
+      "source" : [{
+        "context" : "immzc",
+        "element" : "administrativeArea",
+        "variable" : "area"
+      }],
+      "target" : [{
+        "context" : "patient",
+        "contextType" : "variable",
+        "element" : "address",
+        "variable" : "address"
+      }],
+      "rule" : [{
+        "name" : "SetAddressText",
+        "source" : [{
+          "context" : "area",
+          "element" : "coding",
+          "listMode" : "first",
+          "variable" : "coding"
+        }],
+        "target" : [{
+          "contextType" : "variable",
+          "transform" : "copy",
+          "parameter" : [{
+            "valueId" : "address"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetAddressToCode",
+          "source" : [{
+            "context" : "coding",
+            "element" : "code",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "address",
+            "contextType" : "variable",
+            "element" : "text",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        },
+        {
+          "name" : "SetAddressToDisplay",
+          "source" : [{
+            "context" : "coding",
+            "element" : "display",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "address",
+            "contextType" : "variable",
+            "element" : "text",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      }]
+    }]
+  },
+  {
+    "name" : "NameToHumanName",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "name",
+      "mode" : "source"
+    },
+    {
+      "name" : "hname",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetFullName",
+      "source" : [{
+        "context" : "name",
+        "element" : "name",
+        "variable" : "fullName"
+      }],
+      "target" : [{
+        "context" : "hname",
+        "contextType" : "variable",
+        "element" : "text",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueId" : "fullName"
+        }]
+      }]
+    }]
+  }]
+}

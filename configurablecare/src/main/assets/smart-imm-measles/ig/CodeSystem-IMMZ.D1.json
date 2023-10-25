@@ -1,0 +1,87 @@
+{
+  "resourceType" : "CodeSystem",
+  "id" : "IMMZ.D1",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This case-insensitive code system <code>http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1</code> defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\">DE80<a name=\"IMMZ.D1-DE80\"> </a></td><td>Dose 0 administered</td><td>Indicates if the client has received a birth dose and/or supplementary dose</td></tr><tr><td style=\"white-space:nowrap\">DE8<a name=\"IMMZ.D1-DE8\"> </a></td><td>Completed the primary vaccination series</td><td>Indicates if the client has completed the primary vaccination series of a product/antigen. If the client has not yet completed their primary series, it means they may be expected to receive more doses to complete their vaccination regimen for the respective product/antigen.</td></tr><tr><td style=\"white-space:nowrap\">DE81<a name=\"IMMZ.D1-DE81\"> </a></td><td>Date when primary vaccination series was completed</td><td>The date when the client completed the primary vaccination series (per product/antigen)</td></tr><tr><td style=\"white-space:nowrap\">DE10<a name=\"IMMZ.D1-DE10\"> </a></td><td>HIV status</td><td>The current human immunodeficiency virus (HIV) status of the client</td></tr><tr><td style=\"white-space:nowrap\">DE11<a name=\"IMMZ.D1-DE11\"> </a></td><td>HIV-positive</td><td>The client is known to be HIV positive</td></tr><tr><td style=\"white-space:nowrap\">DE12<a name=\"IMMZ.D1-DE12\"> </a></td><td>HIV-negative</td><td>The client is known to be HIV negative</td></tr><tr><td style=\"white-space:nowrap\">DE13<a name=\"IMMZ.D1-DE13\"> </a></td><td>Unknown</td><td>The client's HIV status is unknown</td></tr><tr><td style=\"white-space:nowrap\">DE15<a name=\"IMMZ.D1-DE15\"> </a></td><td>Preterm birth</td><td>The infant was preterm; the mother gave birth to the infant when gestational age was less than 37 weeks</td></tr><tr><td style=\"white-space:nowrap\">DE92<a name=\"IMMZ.D1-DE92\"> </a></td><td>Severely immunosuppressed</td><td>The client is known to be severely immunocompromised or immunosuppressed</td></tr><tr><td style=\"white-space:nowrap\">DE49<a name=\"IMMZ.D1-DE49\"> </a></td><td>ART start date</td><td>The date on which the client started or restarted antiretroviral therapy (ART)</td></tr><tr><td style=\"white-space:nowrap\">DE19<a name=\"IMMZ.D1-DE19\"> </a></td><td>Vaccine type</td><td>Vaccine type/category that was administered or was to be administered. Any vaccine code available in the IMMZ.Z Vaccine Library list of codes applies in this data element</td></tr><tr><td style=\"white-space:nowrap\">DE20<a name=\"IMMZ.D1-DE20\"> </a></td><td>Date and time of vaccination</td><td>Represents the visit/encounter date, which is the date and time when the vaccine was administered to the client</td></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1",
+  "version" : "0.1.0",
+  "name" : "IMMZ_D1",
+  "title" : "IMMZ.D1 CodeSystem for Data Elements",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "CodeSystem for IMMZ.C Data Elements",
+  "caseSensitive" : false,
+  "content" : "complete",
+  "count" : 12,
+  "concept" : [{
+    "code" : "DE80",
+    "display" : "Dose 0 administered",
+    "definition" : "Indicates if the client has received a birth dose and/or supplementary dose"
+  },
+  {
+    "code" : "DE8",
+    "display" : "Completed the primary vaccination series",
+    "definition" : "Indicates if the client has completed the primary vaccination series of a product/antigen. If the client has not yet completed their primary series, it means they may be expected to receive more doses to complete their vaccination regimen for the respective product/antigen."
+  },
+  {
+    "code" : "DE81",
+    "display" : "Date when primary vaccination series was completed",
+    "definition" : "The date when the client completed the primary vaccination series (per product/antigen)"
+  },
+  {
+    "code" : "DE10",
+    "display" : "HIV status",
+    "definition" : "The current human immunodeficiency virus (HIV) status of the client"
+  },
+  {
+    "code" : "DE11",
+    "display" : "HIV-positive",
+    "definition" : "The client is known to be HIV positive"
+  },
+  {
+    "code" : "DE12",
+    "display" : "HIV-negative",
+    "definition" : "The client is known to be HIV negative"
+  },
+  {
+    "code" : "DE13",
+    "display" : "Unknown",
+    "definition" : "The client's HIV status is unknown"
+  },
+  {
+    "code" : "DE15",
+    "display" : "Preterm birth",
+    "definition" : "The infant was preterm; the mother gave birth to the infant when gestational age was less than 37 weeks"
+  },
+  {
+    "code" : "DE92",
+    "display" : "Severely immunosuppressed",
+    "definition" : "The client is known to be severely immunocompromised or immunosuppressed"
+  },
+  {
+    "code" : "DE49",
+    "display" : "ART start date",
+    "definition" : "The date on which the client started or restarted antiretroviral therapy (ART)"
+  },
+  {
+    "code" : "DE19",
+    "display" : "Vaccine type",
+    "definition" : "Vaccine type/category that was administered or was to be administered. Any vaccine code available in the IMMZ.Z Vaccine Library list of codes applies in this data element"
+  },
+  {
+    "code" : "DE20",
+    "display" : "Date and time of vaccination",
+    "definition" : "Represents the visit/encounter date, which is the date and time when the vaccine was administered to the client"
+  }]
+}

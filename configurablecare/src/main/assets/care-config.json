@@ -1,0 +1,76 @@
+{
+  "supportedImplementationGuides": [
+    {
+      "location": "http://hostname/fhir/ImplementationGuide/ImmunizationReview",
+      "carePlanPolicy": "ACCEPT_ALL",
+      "implementationGuideConfig": {
+        "implementationGuideId": "ImplementationGuide/who.fhir.immunization",
+        "patientRegistrationQuestionnaire": "Questionnaire/QIMMZCRegisterClient",
+        "entryPoint": "Smart Immunization",
+        "triggers": [
+          {
+            "event": "Questionnaire/QIMMZCRegisterClient",
+            "planDefinition":"",
+            "structureMap": "StructureMap/IMMZCQRToPatient",
+            "targetResourceType": "Bundle"
+          },
+          {
+            "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
+            "planDefinition":"http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
+            "structureMap": "StructureMap/IMMZD1QRToResources",
+            "targetResourceType": "Bundle"
+          },
+          {
+            "event": "Questionnaire/QIMMZD4CheckContraindicationsMeasles",
+            "planDefinition": "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeaslesCI",
+            "structureMap": "StructureMap/IMMZD4QRToResources",
+            "targetResourceType": "Bundle"
+          },
+          {
+            "event": "Questionnaire/AdministerVaccine",
+            "planDefinition": "PlanDefinition/CreateImmunizationRecord",
+            "structureMap": "",
+            "targetResourceType": ""
+          },
+          {
+            "event": "Questionnaire/ProposalApproval",
+            "planDefinition": "",
+            "structureMap": "",
+            "targetResourceType": ""
+          }
+        ],
+        "requestConfigurations": [
+          {
+            "requestType": "MedicationRequest",
+            "intentConditions": [
+              {
+                "intent": "proposal",
+                "action": "begin-plan",
+                "condition": "Questionnaire/ProposalApproval"
+              },
+              {
+                "intent": "plan",
+                "action": "begin-order",
+                "condition": "Questionnaire/QIMMZD4CheckContraindicationsMeasles"
+              },
+              {
+                "intent": "order",
+                "action": "complete-order",
+                "condition": "Questionnaire/AdministerVaccine"
+              }
+            ]
+          }
+        ],
+        "requestResourceConfigurations": [
+          {
+            "resourceType": "MedicationRequest",
+            "values": [],
+            "maxDuration": "1",
+            "unit": "years"
+          }
+        ],
+        "supportedValueSets": []
+      }
+    }
+  ]
+}

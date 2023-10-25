@@ -1,0 +1,86 @@
+{
+  "resourceType" : "CodeSystem",
+  "id" : "IMMZ.D1.DE5",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This case-insensitive code system <code>http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE5</code> defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE6<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE6\"> </a></td><td>Immunity Testing has shown that the client already has immunity to the agent targeted by the immunization</td><td/></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE7<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE7\"> </a></td><td>Medical precaution</td><td>The client currently has a medical condition for which the vaccine is contraindicated or for which precaution is warranted</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE8<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE8\"> </a></td><td>Product out of stock</td><td>There was no supply of the product on hand to perform the service</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE9<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE9\"> </a></td><td>Client objection</td><td>The client or their guardian objects to receiving the vaccine</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE10<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE10\"> </a></td><td>Caregiver refusal</td><td>The client's caregiver refused the vaccine</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE11<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE11\"> </a></td><td>Unspecified reason</td><td>The immunization event was not carried out for an unspecified reason</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE12<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE12\"> </a></td><td>Client allergy to vaccine or component</td><td>The immunization event was not carried out because of client allergy to vaccine or component</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE13<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE13\"> </a></td><td>Immunocompromised</td><td>The immunization event was not carried out because the client is immunocompromised</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE14<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE14\"> </a></td><td>Chronic illness or condition</td><td>The immunization event was not carried out due a chronic illness or condition of the client</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE15<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE15\"> </a></td><td>Acute illness</td><td>The immunization event was not carried out due to an acute illness present in the client</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE16<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE16\"> </a></td><td>Had the disease</td><td>The immunization event was not carried out due to the client having had the disease</td></tr><tr><td style=\"white-space:nowrap\">IMMZ.D.DE17<a name=\"IMMZ.D1.DE5-IMMZ.46D.46DE17\"> </a></td><td>Immunization not carried out for other reasons</td><td>The immunization event was not carried out for other reasons</td></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE5",
+  "version" : "0.1.0",
+  "name" : "IMMZ_D1",
+  "title" : "IMMZ.D1.DE5 CodeSystem for Reason Not Done",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "CodeSystem for IMMZ.D1.DE5 Reason Not Done",
+  "caseSensitive" : false,
+  "content" : "complete",
+  "count" : 12,
+  "concept" : [{
+    "code" : "IMMZ.D.DE6",
+    "display" : "Immunity Testing has shown that the client already has immunity to the agent targeted by the immunization"
+  },
+  {
+    "code" : "IMMZ.D.DE7",
+    "display" : "Medical precaution",
+    "definition" : "The client currently has a medical condition for which the vaccine is contraindicated or for which precaution is warranted"
+  },
+  {
+    "code" : "IMMZ.D.DE8",
+    "display" : "Product out of stock",
+    "definition" : "There was no supply of the product on hand to perform the service"
+  },
+  {
+    "code" : "IMMZ.D.DE9",
+    "display" : "Client objection",
+    "definition" : "The client or their guardian objects to receiving the vaccine"
+  },
+  {
+    "code" : "IMMZ.D.DE10",
+    "display" : "Caregiver refusal",
+    "definition" : "The client's caregiver refused the vaccine"
+  },
+  {
+    "code" : "IMMZ.D.DE11",
+    "display" : "Unspecified reason",
+    "definition" : "The immunization event was not carried out for an unspecified reason"
+  },
+  {
+    "code" : "IMMZ.D.DE12",
+    "display" : "Client allergy to vaccine or component",
+    "definition" : "The immunization event was not carried out because of client allergy to vaccine or component"
+  },
+  {
+    "code" : "IMMZ.D.DE13",
+    "display" : "Immunocompromised",
+    "definition" : "The immunization event was not carried out because the client is immunocompromised"
+  },
+  {
+    "code" : "IMMZ.D.DE14",
+    "display" : "Chronic illness or condition",
+    "definition" : "The immunization event was not carried out due a chronic illness or condition of the client"
+  },
+  {
+    "code" : "IMMZ.D.DE15",
+    "display" : "Acute illness",
+    "definition" : "The immunization event was not carried out due to an acute illness present in the client"
+  },
+  {
+    "code" : "IMMZ.D.DE16",
+    "display" : "Had the disease",
+    "definition" : "The immunization event was not carried out due to the client having had the disease"
+  },
+  {
+    "code" : "IMMZ.D.DE17",
+    "display" : "Immunization not carried out for other reasons",
+    "definition" : "The immunization event was not carried out for other reasons"
+  }]
+}

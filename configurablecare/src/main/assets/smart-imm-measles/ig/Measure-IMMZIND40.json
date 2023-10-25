@@ -1,0 +1,103 @@
+{
+  "resourceType" : "Measure",
+  "id" : "IMMZIND40",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cv-measure-cqfm"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Measure</b><a name=\"IMMZIND40\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Measure &quot;IMMZIND40&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"https://build.fhir.org/ig/HL7/cqf-measures//StructureDefinition-cv-measure-cqfm.html\">CQFM Continuous Variable Measure</a></p></div><p><b>url</b>: <code>http://smart.who.int/ig/smart-immunizations-measles/Measure/IMMZIND40</code></p><p><b>version</b>: 0.1.0</p><p><b>name</b>: IMMZIND40</p><p><b>status</b>: draft</p><p><b>experimental</b>: false</p><p><b>date</b>: 2023-10-05</p><p><b>publisher</b>: WHO</p><p><b>contact</b>: WHO: <a href=\"http://who.int\">http://who.int</a></p><p><b>description</b>: IMMZ.IND.40 Measles indicator for second dose.</p><p><b>library</b>: <a href=\"Library-IMMZINDMeasles.html\">IMMZINDMeasles</a></p><p><b>scoring</b>: Continuous Variable <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-measure-scoring.html\">MeasureScoring</a>#continuous-variable)</span></p><blockquote><p><b>group</b></p><blockquote><p><b>population</b></p><blockquote><p><b>id</b></p>IMMZ.IND.40.IP</blockquote><p><b>CQFM Population Basis</b>: boolean</p><p><b>code</b>: Initial Population <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-measure-population.html\">MeasurePopulationType</a>#initial-population)</span></p><p><b>description</b>: Initial Population</p><h3>Criteria</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>text/cql</td><td>Initial Population 40</td></tr></table></blockquote><blockquote><p><b>population</b></p><blockquote><p><b>id</b></p>IMMZ.IND.40.MP</blockquote><p><b>CQFM Population Basis</b>: boolean</p><p><b>code</b>: Measure Population <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-measure-population.html\">MeasurePopulationType</a>#measure-population)</span></p><p><b>description</b>: Measure Population</p><h3>Criteria</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>text/cql</td><td>Measure Population 40</td></tr></table></blockquote><blockquote><p><b>population</b></p><blockquote><p><b>id</b></p>IMMZ.IND.40.MO</blockquote><p><b>CQFM Criteria Reference</b>: measure-population</p><p><b>CQFM Aggregate Method</b>: count</p><p><b>code</b>: Measure Observation <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-measure-population.html\">MeasurePopulationType</a>#measure-observation)</span></p><p><b>description</b>: Measure Observation</p><h3>Criteria</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>text/cql</td><td>Measure Observation 40</td></tr></table></blockquote><blockquote><p><b>stratifier</b></p><blockquote><p><b>id</b></p>IMMZ.IND.40.S</blockquote><h3>Criteria</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>text/cql</td><td>Stratification</td></tr></table></blockquote></blockquote></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/Measure/IMMZIND40",
+  "version" : "0.1.0",
+  "name" : "IMMZIND40",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-05",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "IMMZ.IND.40 Measles indicator for second dose.",
+  "library" : ["http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZINDMeasles"],
+  "scoring" : {
+    "coding" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/measure-scoring",
+      "code" : "continuous-variable",
+      "display" : "Continuous Variable"
+    }]
+  },
+  "group" : [{
+    "population" : [{
+      "id" : "IMMZ.IND.40.IP",
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis",
+        "valueCode" : "boolean"
+      }],
+      "code" : {
+        "coding" : [{
+          "system" : "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code" : "initial-population",
+          "display" : "Initial Population"
+        }]
+      },
+      "description" : "Initial Population",
+      "criteria" : {
+        "language" : "text/cql",
+        "expression" : "Initial Population 40"
+      }
+    },
+    {
+      "id" : "IMMZ.IND.40.MP",
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis",
+        "valueCode" : "boolean"
+      }],
+      "code" : {
+        "coding" : [{
+          "system" : "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code" : "measure-population",
+          "display" : "Measure Population"
+        }]
+      },
+      "description" : "Measure Population",
+      "criteria" : {
+        "language" : "text/cql",
+        "expression" : "Measure Population 40"
+      }
+    },
+    {
+      "id" : "IMMZ.IND.40.MO",
+      "extension" : [{
+        "url" : "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-criteriaReference",
+        "valueString" : "measure-population"
+      },
+      {
+        "url" : "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-aggregateMethod",
+        "valueCode" : "count"
+      }],
+      "code" : {
+        "coding" : [{
+          "system" : "http://terminology.hl7.org/CodeSystem/measure-population",
+          "code" : "measure-observation"
+        }]
+      },
+      "description" : "Measure Observation",
+      "criteria" : {
+        "language" : "text/cql",
+        "expression" : "Measure Observation 40"
+      }
+    }],
+    "stratifier" : [{
+      "id" : "IMMZ.IND.40.S",
+      "criteria" : {
+        "language" : "text/cql",
+        "expression" : "Stratification"
+      }
+    }]
+  }]
+}

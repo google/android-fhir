@@ -1,0 +1,46 @@
+{
+  "resourceType" : "CodeSystem",
+  "id" : "VaccineProducts",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Properties</b></p><p><b>This code system  defines the following properties for its concepts</b></p><table class=\"grid\"><tr><td><b>Code</b></td><td><b>URI</b></td><td><b>Type</b></td></tr><tr><td>classification</td><td>http://smart.who.int/ig/smart-immunizations-measles#classification</td><td>code</td></tr></table><p><b>Concepts</b></p><p>This  code system <code>http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts</code> defines the following codes:</p><table class=\"codes\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td style=\"white-space:nowrap\">20009060/2<a name=\"VaccineProducts-20009060.472\"> </a></td><td>Serum Institute of India Measles vaccine</td></tr><tr><td style=\"white-space:nowrap\">7680007030014<a name=\"VaccineProducts-7680007030014\"> </a></td><td>M-M-RvaxPRO</td></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts",
+  "version" : "0.1.0",
+  "name" : "VaccineProducts",
+  "title" : "Vaccine Product codes CodeSet",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Vaccine Product codes, containing the different available products.",
+  "content" : "complete",
+  "count" : 2,
+  "property" : [{
+    "code" : "classification",
+    "uri" : "http://smart.who.int/ig/smart-immunizations-measles#classification",
+    "type" : "code"
+  }],
+  "concept" : [{
+    "code" : "20009060/2",
+    "display" : "Serum Institute of India Measles vaccine",
+    "property" : [{
+      "code" : "classification",
+      "valueCode" : "XM8L15"
+    }]
+  },
+  {
+    "code" : "7680007030014",
+    "display" : "M-M-RvaxPRO",
+    "property" : [{
+      "code" : "classification",
+      "valueCode" : "XM8TF3"
+    }]
+  }]
+}

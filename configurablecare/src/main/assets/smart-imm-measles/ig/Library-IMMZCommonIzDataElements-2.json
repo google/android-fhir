@@ -1,0 +1,578 @@
+{
+   "library" : {
+      "annotation" : [ {
+         "translatorVersion" : "2.9.0",
+         "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion",
+         "type" : "CqlToElmInfo"
+      }, {
+         "type" : "Annotation",
+         "s" : {
+            "r" : "36",
+            "s" : [ {
+               "value" : [ "/**\n * Immunization Common Stratifiers by Patients as Context\n */\n","library IMMZCommonIzDataElements" ]
+            } ]
+         }
+      } ],
+      "identifier" : {
+         "id" : "IMMZCommonIzDataElements",
+         "system" : "http://smart.who.int/ig/smart-immunizations-measles"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         }, {
+            "localId" : "1",
+            "locator" : "7:1-7:26",
+            "localIdentifier" : "FHIR",
+            "uri" : "http://hl7.org/fhir",
+            "version" : "4.0.1",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "1",
+                  "s" : [ {
+                     "value" : [ "","using " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIR" ]
+                     } ]
+                  }, {
+                     "value" : [ " version ","'4.0.1'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "includes" : {
+         "def" : [ {
+            "localId" : "2",
+            "locator" : "9:1-9:35",
+            "localIdentifier" : "FHIRHelpers",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/FHIRHelpers",
+            "version" : "4.0.1",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "2",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIRHelpers" ]
+                     } ]
+                  }, {
+                     "value" : [ " version ","'4.0.1'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "3",
+            "locator" : "10:1-10:29",
+            "localIdentifier" : "WCom",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/WHOCommon",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "3",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "WHOCommon" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","WCom" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "4",
+            "locator" : "11:1-11:33",
+            "localIdentifier" : "IMMZCom",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZCommon",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "4",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZCommon" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZCom" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "5",
+            "locator" : "12:1-12:33",
+            "localIdentifier" : "IMMZc",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZConcepts",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "5",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZConcepts" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZc" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "6",
+            "locator" : "13:1-13:40",
+            "localIdentifier" : "IMMZvl",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZVaccineLibrary",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "6",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZVaccineLibrary" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZvl" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "codeSystems" : {
+         "def" : [ {
+            "localId" : "7",
+            "locator" : "15:1-15:79",
+            "name" : "Vaccines Administered",
+            "id" : "http://hl7.org/fhir/ValueSet/vaccine-code",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "7",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"Vaccines Administered\"",": ","'http://hl7.org/fhir/ValueSet/vaccine-code'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "codes" : {
+         "def" : [ {
+            "localId" : "9",
+            "locator" : "18:1-18:60",
+            "name" : "BCG",
+            "id" : "BCG",
+            "display" : "BCG",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "9",
+                  "s" : [ {
+                     "value" : [ "// Vaccines administered\n","code ","\"BCG\"",": ","'BCG'"," from " ]
+                  }, {
+                     "r" : "8",
+                     "s" : [ {
+                        "value" : [ "\"Vaccines Administered\"" ]
+                     } ]
+                  }, {
+                     "value" : [ " display ","'BCG'" ]
+                  } ]
+               }
+            } ],
+            "codeSystem" : {
+               "localId" : "8",
+               "locator" : "18:24-18:46",
+               "name" : "Vaccines Administered"
+            }
+         } ]
+      },
+      "statements" : {
+         "def" : [ {
+            "locator" : "21:1-21:20",
+            "name" : "Immunization",
+            "context" : "Immunization",
+            "expression" : {
+               "type" : "SingletonFrom",
+               "operand" : {
+                  "locator" : "21:1-21:20",
+                  "dataType" : "{http://hl7.org/fhir}Immunization",
+                  "templateId" : "http://hl7.org/fhir/StructureDefinition/Immunization",
+                  "type" : "Retrieve"
+               }
+            }
+         }, {
+            "localId" : "28",
+            "locator" : "24:1-27:31",
+            "name" : "Geographic Region of Vaccine Administration",
+            "context" : "Immunization",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "28",
+                  "s" : [ {
+                     "value" : [ "// @dataElement: Geographic Region where the vaccination was provided\n","define ","\"Geographic Region of Vaccine Administration\"",": \n    " ]
+                  }, {
+                     "r" : "27",
+                     "s" : [ {
+                        "r" : "26",
+                        "s" : [ {
+                           "r" : "10",
+                           "s" : [ {
+                              "value" : [ "WCom" ]
+                           } ]
+                        }, {
+                           "value" : [ "." ]
+                        }, {
+                           "r" : "26",
+                           "s" : [ {
+                              "value" : [ "Official","(" ]
+                           }, {
+                              "r" : "25",
+                              "s" : [ {
+                                 "s" : [ {
+                                    "r" : "12",
+                                    "s" : [ {
+                                       "r" : "11",
+                                       "s" : [ {
+                                          "r" : "11",
+                                          "s" : [ {
+                                             "value" : [ "[","Location","]" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " ","L" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ " \n        " ]
+                              }, {
+                                 "r" : "21",
+                                 "s" : [ {
+                                    "value" : [ "where " ]
+                                 }, {
+                                    "r" : "21",
+                                    "s" : [ {
+                                       "r" : "14",
+                                       "s" : [ {
+                                          "r" : "13",
+                                          "s" : [ {
+                                             "value" : [ "L" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ "." ]
+                                       }, {
+                                          "r" : "14",
+                                          "s" : [ {
+                                             "value" : [ "id" ]
+                                          } ]
+                                       } ]
+                                    }, {
+                                       "value" : [ " ","="," " ]
+                                    }, {
+                                       "r" : "20",
+                                       "s" : [ {
+                                          "value" : [ "Last","(" ]
+                                       }, {
+                                          "r" : "19",
+                                          "s" : [ {
+                                             "value" : [ "Split","(" ]
+                                          }, {
+                                             "r" : "17",
+                                             "s" : [ {
+                                                "r" : "16",
+                                                "s" : [ {
+                                                   "r" : "15",
+                                                   "s" : [ {
+                                                      "value" : [ "Immunization" ]
+                                                   } ]
+                                                }, {
+                                                   "value" : [ "." ]
+                                                }, {
+                                                   "r" : "16",
+                                                   "s" : [ {
+                                                      "value" : [ "location" ]
+                                                   } ]
+                                                } ]
+                                             }, {
+                                                "value" : [ "." ]
+                                             }, {
+                                                "r" : "17",
+                                                "s" : [ {
+                                                   "value" : [ "reference" ]
+                                                } ]
+                                             } ]
+                                          }, {
+                                             "value" : [ ", " ]
+                                          }, {
+                                             "r" : "18",
+                                             "s" : [ {
+                                                "value" : [ "'/'" ]
+                                             } ]
+                                          }, {
+                                             "value" : [ ")" ]
+                                          } ]
+                                       }, {
+                                          "value" : [ ")" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ "\n        " ]
+                              }, {
+                                 "r" : "24",
+                                 "s" : [ {
+                                    "value" : [ "return " ]
+                                 }, {
+                                    "r" : "23",
+                                    "s" : [ {
+                                       "r" : "22",
+                                       "s" : [ {
+                                          "value" : [ "L" ]
+                                       } ]
+                                    }, {
+                                       "value" : [ "." ]
+                                    }, {
+                                       "r" : "23",
+                                       "s" : [ {
+                                          "value" : [ "address" ]
+                                       } ]
+                                    } ]
+                                 } ]
+                              } ]
+                           }, {
+                              "value" : [ ")" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ "." ]
+                     }, {
+                        "r" : "27",
+                        "s" : [ {
+                           "value" : [ "state" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "27",
+               "locator" : "25:5-27:31",
+               "path" : "state",
+               "type" : "Property",
+               "source" : {
+                  "localId" : "26",
+                  "locator" : "25:5-27:25",
+                  "name" : "Official",
+                  "libraryName" : "WCom",
+                  "type" : "FunctionRef",
+                  "operand" : [ {
+                     "localId" : "25",
+                     "locator" : "25:19-27:24",
+                     "type" : "Query",
+                     "source" : [ {
+                        "localId" : "12",
+                        "locator" : "25:19-25:30",
+                        "alias" : "L",
+                        "expression" : {
+                           "localId" : "11",
+                           "locator" : "25:19-25:28",
+                           "dataType" : "{http://hl7.org/fhir}Location",
+                           "templateId" : "http://hl7.org/fhir/StructureDefinition/Location",
+                           "type" : "Retrieve"
+                        }
+                     } ],
+                     "relationship" : [ ],
+                     "where" : {
+                        "localId" : "21",
+                        "locator" : "26:9-26:70",
+                        "type" : "Equal",
+                        "operand" : [ {
+                           "name" : "ToString",
+                           "libraryName" : "FHIRHelpers",
+                           "type" : "FunctionRef",
+                           "operand" : [ {
+                              "localId" : "14",
+                              "locator" : "26:15-26:18",
+                              "path" : "id",
+                              "scope" : "L",
+                              "type" : "Property"
+                           } ]
+                        }, {
+                           "localId" : "20",
+                           "locator" : "26:22-26:70",
+                           "type" : "Last",
+                           "source" : {
+                              "localId" : "19",
+                              "locator" : "26:27-26:69",
+                              "type" : "Split",
+                              "stringToSplit" : {
+                                 "name" : "ToString",
+                                 "libraryName" : "FHIRHelpers",
+                                 "type" : "FunctionRef",
+                                 "operand" : [ {
+                                    "localId" : "17",
+                                    "locator" : "26:33-26:63",
+                                    "path" : "reference",
+                                    "type" : "Property",
+                                    "source" : {
+                                       "localId" : "16",
+                                       "locator" : "26:33-26:53",
+                                       "path" : "location",
+                                       "type" : "Property",
+                                       "source" : {
+                                          "localId" : "15",
+                                          "locator" : "26:33-26:44",
+                                          "name" : "Immunization",
+                                          "type" : "ExpressionRef"
+                                       }
+                                    }
+                                 } ]
+                              },
+                              "separator" : {
+                                 "localId" : "18",
+                                 "locator" : "26:66-26:68",
+                                 "valueType" : "{urn:hl7-org:elm-types:r1}String",
+                                 "value" : "/",
+                                 "type" : "Literal"
+                              }
+                           }
+                        } ]
+                     },
+                     "return" : {
+                        "localId" : "24",
+                        "locator" : "27:9-27:24",
+                        "expression" : {
+                           "localId" : "23",
+                           "locator" : "27:16-27:24",
+                           "path" : "address",
+                           "scope" : "L",
+                           "type" : "Property"
+                        }
+                     }
+                  } ]
+               }
+            }
+         }, {
+            "localId" : "36",
+            "locator" : "30:1-31:77",
+            "name" : "Dose Number of Vaccine Administration",
+            "context" : "Immunization",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "36",
+                  "s" : [ {
+                     "value" : [ "// @dataElement: The vaccination dose sequence\n","define ","\"Dose Number of Vaccine Administration\"",": \n    " ]
+                  }, {
+                     "r" : "35",
+                     "s" : [ {
+                        "r" : "33",
+                        "s" : [ {
+                           "r" : "32",
+                           "s" : [ {
+                              "r" : "29",
+                              "s" : [ {
+                                 "value" : [ "IMMZCom" ]
+                              } ]
+                           }, {
+                              "value" : [ "." ]
+                           }, {
+                              "r" : "32",
+                              "s" : [ {
+                                 "value" : [ "Only","(" ]
+                              }, {
+                                 "r" : "31",
+                                 "s" : [ {
+                                    "r" : "30",
+                                    "s" : [ {
+                                       "value" : [ "Immunization" ]
+                                    } ]
+                                 }, {
+                                    "value" : [ "." ]
+                                 }, {
+                                    "r" : "31",
+                                    "s" : [ {
+                                       "value" : [ "protocolApplied" ]
+                                    } ]
+                                 } ]
+                              }, {
+                                 "value" : [ ")" ]
+                              } ]
+                           } ]
+                        }, {
+                           "value" : [ "." ]
+                        }, {
+                           "r" : "33",
+                           "s" : [ {
+                              "value" : [ "doseNumber" ]
+                           } ]
+                        } ]
+                     }, {
+                        "value" : [ " as " ]
+                     }, {
+                        "r" : "34",
+                        "s" : [ {
+                           "value" : [ "FHIR",".","positiveInt" ]
+                        } ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "35",
+               "locator" : "31:5-31:77",
+               "strict" : false,
+               "type" : "As",
+               "operand" : {
+                  "localId" : "33",
+                  "locator" : "31:5-31:57",
+                  "path" : "doseNumber",
+                  "type" : "Property",
+                  "source" : {
+                     "localId" : "32",
+                     "locator" : "31:5-31:46",
+                     "name" : "Only",
+                     "libraryName" : "IMMZCom",
+                     "type" : "FunctionRef",
+                     "operand" : [ {
+                        "localId" : "31",
+                        "locator" : "31:18-31:45",
+                        "path" : "protocolApplied",
+                        "type" : "Property",
+                        "source" : {
+                           "localId" : "30",
+                           "locator" : "31:18-31:29",
+                           "name" : "Immunization",
+                           "type" : "ExpressionRef"
+                        }
+                     } ]
+                  }
+               },
+               "asTypeSpecifier" : {
+                  "localId" : "34",
+                  "locator" : "31:62-31:77",
+                  "name" : "{http://hl7.org/fhir}positiveInt",
+                  "type" : "NamedTypeSpecifier"
+               }
+            }
+         } ]
+      }
+   }
+}

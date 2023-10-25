@@ -1,0 +1,90 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "LiveAttenuatedVaccines",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"CodeSystem-ICD11.html\"><code>http://hl7.org/fhir/sid/icd-11/mms</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM8142\">XM8142</a></td><td style=\"color: #cccccc\">Tuberculosis, live attenuated vaccines</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM72A0\">XM72A0</a></td><td style=\"color: #cccccc\">Cholera, live attenuated vaccines</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM47S0\">XM47S0</a></td><td style=\"color: #cccccc\">Encephalitis, Japanese, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM8L15\">XM8L15</a></td><td style=\"color: #cccccc\">Measles, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM8TF3\">XM8TF3</a></td><td style=\"color: #cccccc\">Measles, combinations with mumps and rubella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM21H2\">XM21H2</a></td><td style=\"color: #cccccc\">Measles, combinations with rubella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM4AJ8\">XM4AJ8</a></td><td style=\"color: #cccccc\">Measles, combinations with mumps, rubella and varicella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM9439\">XM9439</a></td><td style=\"color: #cccccc\">Measles, combinations with mumps, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM2340\">XM2340</a></td><td style=\"color: #cccccc\">Mumps, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM79H3\">XM79H3</a></td><td style=\"color: #cccccc\">Poliomyelitis oral, bivalent, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM0VX8\">XM0VX8</a></td><td style=\"color: #cccccc\">Poliomyelitis oral, monovalent live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM0KZ1\">XM0KZ1</a></td><td style=\"color: #cccccc\">Poliomyelitis oral, trivalent, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM4GV0\">XM4GV0</a></td><td style=\"color: #cccccc\">Rota virus, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM9PS9\">XM9PS9</a></td><td style=\"color: #cccccc\">Rubella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM3B09\">XM3B09</a></td><td style=\"color: #cccccc\">Rubella, combinations with mumps, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM5V64\">XM5V64</a></td><td style=\"color: #cccccc\">Influenza vaccines, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM33K4\">XM33K4</a></td><td style=\"color: #cccccc\">Typhoid, oral, live attenuated vaccines</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM0NS8\">XM0NS8</a></td><td style=\"color: #cccccc\">Varicella, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM3418\">XM3418</a></td><td style=\"color: #cccccc\">Yellow Fever, live attenuated</td></tr><tr><td><a href=\"CodeSystem-ICD11.html#ICD11-XM5DF6\">XM5DF6</a></td><td style=\"color: #cccccc\">COVID-19 vaccines, live attenuated virus</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/LiveAttenuatedVaccines",
+  "version" : "0.1.0",
+  "name" : "LiveAttenuatedVaccines",
+  "title" : "Set of live attenuated vaccines",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Codes representing live attenuated vaccines",
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "concept" : [{
+        "code" : "XM8142"
+      },
+      {
+        "code" : "XM72A0"
+      },
+      {
+        "code" : "XM47S0"
+      },
+      {
+        "code" : "XM8L15"
+      },
+      {
+        "code" : "XM8TF3"
+      },
+      {
+        "code" : "XM21H2"
+      },
+      {
+        "code" : "XM4AJ8"
+      },
+      {
+        "code" : "XM9439"
+      },
+      {
+        "code" : "XM2340"
+      },
+      {
+        "code" : "XM79H3"
+      },
+      {
+        "code" : "XM0VX8"
+      },
+      {
+        "code" : "XM0KZ1"
+      },
+      {
+        "code" : "XM4GV0"
+      },
+      {
+        "code" : "XM9PS9"
+      },
+      {
+        "code" : "XM3B09"
+      },
+      {
+        "code" : "XM5V64"
+      },
+      {
+        "code" : "XM33K4"
+      },
+      {
+        "code" : "XM0NS8"
+      },
+      {
+        "code" : "XM3418"
+      },
+      {
+        "code" : "XM5DF6"
+      }]
+    }]
+  }
+}

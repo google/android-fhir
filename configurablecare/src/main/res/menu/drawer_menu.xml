@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<group android:checkableBehavior="single">
+  <item
+            android:id="@+id/menu_sync"
+            android:icon="@android:drawable/ic_popup_sync"
+            android:title="@string/sync_menu"
+        />
+</group>
+</menu>

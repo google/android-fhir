@@ -1,0 +1,18 @@
+{
+  "resourceType" : "Patient",
+  "id" : "P123456",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p style=\"border: 1px #661aff solid; background-color: #e6e6ff; padding: 10px;\"><b>Test Patient</b> female, DoB: 2023-03-02 ( id:\u00a0123456)</p><hr/></div>"
+  },
+  "identifier" : [{
+    "value" : "123456"
+  }],
+  "name" : [{
+    "text" : "Test Patient",
+    "family" : "Patient",
+    "given" : ["Test"]
+  }],
+  "gender" : "female",
+  "birthDate" : "2023-03-02"
+}

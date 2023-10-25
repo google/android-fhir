@@ -1,0 +1,555 @@
+[
+  {
+    "id" : "FHIRHelpers",
+    "type" : "Library",
+    "url" : "http://hl7.org/fhir/Library/FHIRHelpers",
+    "version" : "0.1.0",
+    "name" : "FHIRHelpers"
+  },
+  {
+    "id" : "country",
+    "type" : "ValueSet",
+    "url" : "http://hl7.org/fhir/ValueSet/country",
+    "version" : "0.1.0",
+    "name" : "CountryValueSet",
+    "oids" : ["2.16.840.1.113883.4.642.3.3297"]
+  },
+  {
+    "id" : "immunization-status",
+    "type" : "ValueSet",
+    "url" : "http://hl7.org/fhir/ValueSet/immunization-status",
+    "version" : "0.1.0",
+    "name" : "ImmunizationStatusCodes",
+    "oids" : [
+      "2.16.840.1.113883.4.642.3.295",
+      "2.16.840.1.113883.4.642.3.292"
+    ]
+  },
+  {
+    "id" : "ICD11",
+    "type" : "CodeSystem",
+    "url" : "http://hl7.org/fhir/sid/icd-11/mms",
+    "version" : "0.1.0",
+    "name" : "ICD11"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesCIMR",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesCIMR",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindication"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesEval",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesEval",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindicationEvaluation"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesMR",
+    "type" : "ActivityDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesMR",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesMedicationRequest"
+  },
+  {
+    "id" : "CommunityHealthWorker",
+    "type" : "ActorDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActorDefinition/CommunityHealthWorker",
+    "version" : "0.1.0",
+    "name" : "Community Health Worker"
+  },
+  {
+    "id" : "EPIManager",
+    "type" : "ActorDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActorDefinition/EPIManager",
+    "version" : "0.1.0",
+    "name" : "Expanded Programme on Immunization (EPI) Manager"
+  },
+  {
+    "id" : "HealthWorker",
+    "type" : "ActorDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActorDefinition/HealthWorker",
+    "version" : "0.1.0",
+    "name" : "HealthcareWorker"
+  },
+  {
+    "id" : "IMMZ.C",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C"
+  },
+  {
+    "id" : "IMMZ.D1",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1"
+  },
+  {
+    "id" : "IMMZ.D1.DE1",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE1",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1"
+  },
+  {
+    "id" : "IMMZ.D1.DE5",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE5",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1"
+  },
+  {
+    "id" : "IMMZ.D4",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D4",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4"
+  },
+  {
+    "id" : "VaccineProducts",
+    "type" : "CodeSystem",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts",
+    "version" : "0.1.0",
+    "name" : "VaccineProducts"
+  },
+  {
+    "id" : "IMMZCConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_ConceptMap"
+  },
+  {
+    "id" : "IMMZCSexToAdministrativeGender",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCSexToAdministrativeGender",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_SexToAdministrativeGender"
+  },
+  {
+    "id" : "IMMZD1ConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZD1ConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_ConceptMap"
+  },
+  {
+    "id" : "IMMZD4ConceptMap",
+    "type" : "ConceptMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZD4ConceptMap",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_ConceptMap"
+  },
+  {
+    "id" : "who.fhir.smart-immunizations-measles",
+    "type" : "ImplementationGuide",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ImplementationGuide/who.fhir.smart-immunizations-measles",
+    "version" : "0.1.0",
+    "name" : "SMART"
+  },
+  {
+    "id" : "FHIRCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/FHIRCommon",
+    "version" : "0.1.0",
+    "name" : "FHIRCommon"
+  },
+  {
+    "id" : "IMMZCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZCommon",
+    "version" : "0.1.0",
+    "name" : "IMMZCommon"
+  },
+  {
+    "id" : "IMMZCommonIzDataElements",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZCommonIzDataElements",
+    "version" : "0.1.0",
+    "name" : "IMMZCommonIzDataElements"
+  },
+  {
+    "id" : "IMMZConcepts",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZConcepts",
+    "version" : "0.1.0",
+    "name" : "IMMZConcepts"
+  },
+  {
+    "id" : "IMMZConfig",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZConfig",
+    "version" : "0.1.0",
+    "name" : "IMMZConfig"
+  },
+  {
+    "id" : "IMMZD2DTMeasles",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZD2DTMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeasles"
+  },
+  {
+    "id" : "IMMZDT08",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZDT08",
+    "version" : "0.1.0",
+    "name" : "IMMZDT08"
+  },
+  {
+    "id" : "IMMZINDMeasles",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZINDMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZINDMeasles"
+  },
+  {
+    "id" : "IMMZIndicatorCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZIndicatorCommon",
+    "version" : "0.1.0",
+    "name" : "IMMZIndicatorCommon"
+  },
+  {
+    "id" : "IMMZVaccineLibrary",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZVaccineLibrary",
+    "version" : "0.1.0",
+    "name" : "IMMZVaccineLibrary"
+  },
+  {
+    "id" : "WHOCommon",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/WHOCommon",
+    "version" : "0.1.0",
+    "name" : "WHOCommon"
+  },
+  {
+    "id" : "WHOConcepts",
+    "type" : "Library",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Library/WHOConcepts",
+    "version" : "0.1.0",
+    "name" : "WHOConcepts"
+  },
+  {
+    "id" : "IMMZIND05",
+    "type" : "Measure",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Measure/IMMZIND05",
+    "version" : "0.1.0",
+    "name" : "IMMZIND05"
+  },
+  {
+    "id" : "IMMZIND40",
+    "type" : "Measure",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Measure/IMMZIND40",
+    "version" : "0.1.0",
+    "name" : "IMMZIND40"
+  },
+  {
+    "id" : "IMMZD2DTMeasles",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeasles"
+  },
+  {
+    "id" : "IMMZD2DTMeaslesCI",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeaslesCI",
+    "version" : "0.1.0",
+    "name" : "IMMZD2DTMeaslesContraindication"
+  },
+  {
+    "id" : "IMMZDTUmbrella",
+    "type" : "PlanDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZDTUmbrella",
+    "version" : "0.1.0",
+    "name" : "IMMZDTUmbrella"
+  },
+  {
+    "id" : "AdministerVaccine",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Questionnaire/AdministerVaccine",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "IMMZD1ClientHistoryMeasles",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Questionnaire/IMMZD1ClientHistoryMeasles",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "QIMMZCRegisterClient",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Questionnaire/QIMMZCRegisterClient",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "QIMMZD4CheckContraindicationsMeasles",
+    "type" : "Questionnaire",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Questionnaire/QIMMZD4CheckContraindicationsMeasles",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "immz-e-fxnreq",
+    "type" : "Requirements",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/Requirements/immz-e-fxnreq",
+    "version" : "0.1.0"
+  },
+  {
+    "id" : "IMMZCRegisterClient",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZCRegisterClient",
+    "version" : "0.1.0",
+    "name" : "IMMZCRegisterClient"
+  },
+  {
+    "id" : "IMMZD1ClientHistoryMeasles",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD1ClientHistoryMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_Client_History_Measles"
+  },
+  {
+    "id" : "IMMZD4CheckContraindicationsMeasles",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_Check_Contraindications_Measles"
+  },
+  {
+    "id" : "IMMZDUpdateVaccinationRecord",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZDUpdateVaccinationRecord",
+    "version" : "0.1.0",
+    "name" : "IMMZDUpdateVaccinationRecord"
+  },
+  {
+    "id" : "SGImmunization",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGImmunization",
+    "version" : "0.1.0",
+    "name" : "SGImmunization"
+  },
+  {
+    "id" : "SGMedicationClassification",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification",
+    "version" : "0.1.0",
+    "name" : "SGMedicationClassification"
+  },
+  {
+    "id" : "SGVaccineProduct",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProduct",
+    "version" : "0.1.0",
+    "name" : "SGVaccineProduct"
+  },
+  {
+    "id" : "SGVaccineProposal",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProposal",
+    "version" : "0.1.0",
+    "name" : "SGVaccineProposal"
+  },
+  {
+    "id" : "SGVaccineRequest",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineRequest",
+    "version" : "0.1.0",
+    "name" : "SGVaccineRequest"
+  },
+  {
+    "id" : "sg-ext-administeredProduct",
+    "type" : "StructureDefinition",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/sg-ext-administeredProduct",
+    "version" : "0.1.0",
+    "name" : "SGIMMAdministeredProduct"
+  },
+  {
+    "id" : "IMMZCLMToPatient",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCLMToPatient",
+    "version" : "0.1.0",
+    "name" : "IMMZCLMToPatient"
+  },
+  {
+    "id" : "IMMZCQRToLM",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToLM",
+    "version" : "0.1.0",
+    "name" : "IMMZCQRToLM"
+  },
+  {
+    "id" : "IMMZCQRToPatient",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZCQRToPatient",
+    "version" : "0.1.0",
+    "name" : "IMMZCQRToPatient"
+  },
+  {
+    "id" : "IMMZD1LMToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1LMToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD1LMToResources"
+  },
+  {
+    "id" : "IMMZD1QRToLM",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1QRToLM",
+    "version" : "0.1.0",
+    "name" : "IMMZD1QRToLM"
+  },
+  {
+    "id" : "IMMZD1QRToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1QRToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD1QRToResources"
+  },
+  {
+    "id" : "IMMZD4LMToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4LMToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD4LMToResources"
+  },
+  {
+    "id" : "IMMZD4QRToLM",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToLM",
+    "version" : "0.1.0",
+    "name" : "IMMZD4QRToLM"
+  },
+  {
+    "id" : "IMMZD4QRToResources",
+    "type" : "StructureMap",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToResources",
+    "version" : "0.1.0",
+    "name" : "IMMZD4QRToResources"
+  },
+  {
+    "id" : "ARVDrugs-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/ARVDrugs-values",
+    "version" : "0.1.0",
+    "name" : "ARVDrugsvalues"
+  },
+  {
+    "id" : "AllVaccineTypes",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/AllVaccineTypes",
+    "version" : "0.1.0",
+    "name" : "AllVaccineTypes"
+  },
+  {
+    "id" : "Birthweight-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/Birthweight-values",
+    "version" : "0.1.0",
+    "name" : "Birthweightvalues"
+  },
+  {
+    "id" : "HIVstatus-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/HIVstatus-values",
+    "version" : "0.1.0",
+    "name" : "HIVstatusvalues"
+  },
+  {
+    "id" : "IMMZ.C.DE5",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.C.DE5",
+    "version" : "0.1.0",
+    "name" : "IMMZ_C_DE5"
+  },
+  {
+    "id" : "IMMZ.D1.DE10",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D1.DE10",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D1_DE10"
+  },
+  {
+    "id" : "IMMZ.D1.DE1VS",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D1.DE1VS",
+    "version" : "0.1.0",
+    "name" : "IMMZ.D1.DE1VS"
+  },
+  {
+    "id" : "IMMZ.D1.DE5VS",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D1.DE5VS",
+    "version" : "0.1.0",
+    "name" : "IMMZ.D1.DE5VS"
+  },
+  {
+    "id" : "IMMZ.D4.DE161",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D4.DE161",
+    "version" : "0.1.0",
+    "name" : "IMMZ_D4_DE161"
+  },
+  {
+    "id" : "IMMZ.Z.DE9",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.Z.DE9",
+    "version" : "0.1.0",
+    "name" : "IMMZ_Z_DE9"
+  },
+  {
+    "id" : "Immunocompromised-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/Immunocompromised-values",
+    "version" : "0.1.0",
+    "name" : "Immunocompromisedvalues"
+  },
+  {
+    "id" : "LiveAttenuatedVaccines",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/LiveAttenuatedVaccines",
+    "version" : "0.1.0",
+    "name" : "LiveAttenuatedVaccines"
+  },
+  {
+    "id" : "Negativetestresult-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/Negativetestresult-values",
+    "version" : "0.1.0",
+    "name" : "Negativetestresultvalues"
+  },
+  {
+    "id" : "PositiveTestResult-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/PositiveTestResult-values",
+    "version" : "0.1.0",
+    "name" : "PositiveTestResultvalues"
+  },
+  {
+    "id" : "VSMeaslesVaccineProducts",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VSMeaslesVaccineProducts",
+    "version" : "0.1.0",
+    "name" : "VSMeaslesVaccineProducts"
+  },
+  {
+    "id" : "VaccineTypes",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/VaccineTypes",
+    "version" : "0.1.0",
+    "name" : "VaccineTypes"
+  },
+  {
+    "id" : "pregnancystatus-values",
+    "type" : "ValueSet",
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/pregnancystatus-values",
+    "version" : "0.1.0",
+    "name" : "pregnancystatus-values"
+  }
+]

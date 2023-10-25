@@ -86,6 +86,12 @@ object Releases {
     const val versionName = "1.0"
   }
 
+  object ConfigurableCare {
+    const val applicationId = "com.google.android.fhir.configurablecare"
+    const val versionCode = 1
+    const val versionName = "1.0"
+  }
+
   object Catalog {
     const val applicationId = "com.google.android.fhir.catalog"
     const val versionCode = 1

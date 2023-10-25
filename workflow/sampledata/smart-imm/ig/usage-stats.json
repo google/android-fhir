@@ -1,0 +1,129 @@
+{
+  "package": "who.fhir.immunization",
+  "version": "0.1.0",
+  "fhirVersion": "4.0.1",
+  "jurisdiction": "001",
+  "extensions": [
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/consenttocontact",
+      "title": "Communication consent",
+      "types": [
+        "boolean"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/educationlevel",
+      "title": "Highest level of education achieved",
+      "types": [
+        "CodeableConcept"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/estimatedage",
+      "title": "Estimated age",
+      "types": [
+        "string"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/insurance",
+      "title": "Insurance coverage",
+      "types": [
+        "boolean"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/method",
+      "title": "Payment method",
+      "types": [
+        "CodeableConcept"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/occupation",
+      "title": "Occupation",
+      "types": [
+        "CodeableConcept"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/reminder",
+      "title": "Reminder messages",
+      "types": [
+        "boolean"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/requestertype",
+      "title": "Referred by",
+      "types": [
+        "CodeableConcept"
+      ]
+    },
+    {
+      "url": "http://fhir.org/guides/who/core/StructureDefinition/stage",
+      "title": "Miscarriage or abortion stage of pregnancy",
+      "types": [
+        "CodeableConcept"
+      ]
+    }
+  ],
+  "profiles": {},
+  "usage": {
+    "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence": [
+      "ConceptMap.group.element.target"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type": [
+      "StructureDefinition.snapshot.element.type"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm": [
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status": [
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-wg": [
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/valueset-author": [
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-internal-dependency": [
+      "ImplementationGuide.definition"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-page-name": [
+      "ImplementationGuide.definition.page",
+      "ImplementationGuide.definition.page.page",
+      "ImplementationGuide.definition.page.page.page"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-parameter": [
+      "ImplementationGuide.definition"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-dependency-comment": [
+      "ImplementationGuide.dependsOn"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/resource-information": [
+      "ImplementationGuide.definition.resource"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-aggregateMethod": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-criteriaReference": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem": [
+      "Library"
+    ],
+    "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability": [
+      "ActivityDefinition",
+      "PlanDefinition",
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel": [
+      "ValueSet"
+    ]
+  }
+}

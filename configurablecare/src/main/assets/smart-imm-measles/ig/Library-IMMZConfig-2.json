@@ -1,0 +1,843 @@
+{
+   "library" : {
+      "annotation" : [ {
+         "translatorVersion" : "2.9.0",
+         "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion",
+         "type" : "CqlToElmInfo"
+      }, {
+         "type" : "Annotation",
+         "s" : {
+            "r" : "66",
+            "s" : [ {
+               "value" : [ "","library IMMZConfig" ]
+            } ]
+         }
+      } ],
+      "identifier" : {
+         "id" : "IMMZConfig",
+         "system" : "http://smart.who.int/ig/smart-immunizations-measles"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         }, {
+            "localId" : "1",
+            "locator" : "2:1-2:26",
+            "localIdentifier" : "FHIR",
+            "uri" : "http://hl7.org/fhir",
+            "version" : "4.0.1",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "1",
+                  "s" : [ {
+                     "value" : [ "","using " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "FHIR" ]
+                     } ]
+                  }, {
+                     "value" : [ " version ","'4.0.1'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "includes" : {
+         "def" : [ {
+            "localId" : "2",
+            "locator" : "3:1-3:33",
+            "localIdentifier" : "IMMZc",
+            "path" : "http://smart.who.int/ig/smart-immunizations-measles/IMMZConcepts",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "2",
+                  "s" : [ {
+                     "value" : [ "","include " ]
+                  }, {
+                     "s" : [ {
+                        "value" : [ "IMMZConcepts" ]
+                     } ]
+                  }, {
+                     "value" : [ " called ","IMMZc" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "statements" : {
+         "def" : [ {
+            "locator" : "5:1-5:15",
+            "name" : "Patient",
+            "context" : "Patient",
+            "expression" : {
+               "type" : "SingletonFrom",
+               "operand" : {
+                  "locator" : "5:1-5:15",
+                  "dataType" : "{http://hl7.org/fhir}Patient",
+                  "templateId" : "http://hl7.org/fhir/StructureDefinition/Patient",
+                  "type" : "Retrieve"
+               }
+            }
+         }, {
+            "localId" : "4",
+            "locator" : "7:1-7:62",
+            "name" : "High incidence of TB and/or high leprosy burden",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "4",
+                  "s" : [ {
+                     "r" : "3",
+                     "value" : [ "","define ","\"High incidence of TB and/or high leprosy burden\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "3",
+               "locator" : "7:59-7:62",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "6",
+            "locator" : "8:1-8:61",
+            "name" : "Polio-endemic country with high risk of spread",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "6",
+                  "s" : [ {
+                     "r" : "5",
+                     "value" : [ "","define ","\"Polio-endemic country with high risk of spread\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "5",
+               "locator" : "8:58-8:61",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "8",
+            "locator" : "16:1-16:38",
+            "name" : "Polio dose scheme",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "8",
+                  "s" : [ {
+                     "value" : [ "/*\ndefine \"Combined bOPV and IPV Schedule\": true\ndefine \"Sequential IPV-OPV Schedule\": true\n*/\n/*\n * Possible Polio dose schemes are 'combined', 'sequential', or 'ipv'\n */\n","define ","\"Polio dose scheme\"",": " ]
+                  }, {
+                     "r" : "7",
+                     "s" : [ {
+                        "value" : [ "'combined'" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "7",
+               "locator" : "16:29-16:38",
+               "valueType" : "{urn:hl7-org:elm-types:r1}String",
+               "value" : "combined",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "10",
+            "locator" : "17:1-17:59",
+            "name" : "Country has a high risk of exposure to polio",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "10",
+                  "s" : [ {
+                     "r" : "9",
+                     "value" : [ "","define ","\"Country has a high risk of exposure to polio\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "9",
+               "locator" : "17:56-17:59",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "12",
+            "locator" : "18:1-18:66",
+            "name" : "High Coverage of Polio and Risk of Wild Importation",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "12",
+                  "s" : [ {
+                     "r" : "11",
+                     "value" : [ "","define ","\"High Coverage of Polio and Risk of Wild Importation\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "11",
+               "locator" : "18:63-18:66",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "14",
+            "locator" : "20:1-20:94",
+            "name" : "In a country where the peak burden of severe Hib disease occurs in young infants",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "14",
+                  "s" : [ {
+                     "r" : "13",
+                     "value" : [ "","define ","\"In a country where the peak burden of severe Hib disease occurs in young infants\"",":","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "13",
+               "locator" : "20:91-20:94",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "16",
+            "locator" : "21:1-21:187",
+            "name" : "In a setting where the greatest disease morbidity and mortality occur later, or whererate reductions of disease are not fully sustained after the routine use of Hib vaccine",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "16",
+                  "s" : [ {
+                     "r" : "15",
+                     "value" : [ "","define ","\"In a setting where the greatest disease morbidity and mortality occur later, or whererate reductions of disease are not fully sustained after the routine use of Hib vaccine\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "15",
+               "locator" : "21:184-21:187",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "18",
+            "locator" : "22:1-22:30",
+            "name" : "Hib dose scheme",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "18",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Hib dose scheme\"",": " ]
+                  }, {
+                     "r" : "17",
+                     "s" : [ {
+                        "value" : [ "'1p'" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "17",
+               "locator" : "22:27-22:30",
+               "valueType" : "{urn:hl7-org:elm-types:r1}String",
+               "value" : "1p",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "20",
+            "locator" : "23:1-23:42",
+            "name" : "Hepatitis A endemic country",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "20",
+                  "s" : [ {
+                     "r" : "19",
+                     "value" : [ "","define ","\"Hepatitis A endemic country\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "19",
+               "locator" : "23:39-23:42",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "22",
+            "locator" : "25:1-25:56",
+            "name" : "Japanese Encephalitis dose scheme",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "22",
+                  "s" : [ {
+                     "value" : [ "","define ","\"Japanese Encephalitis dose scheme\"",": " ]
+                  }, {
+                     "r" : "21",
+                     "s" : [ {
+                        "value" : [ "'attenuated'" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "21",
+               "locator" : "25:45-25:56",
+               "valueType" : "{urn:hl7-org:elm-types:r1}String",
+               "value" : "attenuated",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "24",
+            "locator" : "31:1-31:57",
+            "name" : "Country recognizes JE as a health priority",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "24",
+                  "s" : [ {
+                     "r" : "23",
+                     "value" : [ "/*\ndefine \"Country is administering Live recombinant JE antigen\":true\ndefine \"Country is administering Live attentuated JE antigen\": true\ndefine \"Country is administering Inactivated Vero cell-derived JE antigen\": true\n*/\n","define ","\"Country recognizes JE as a health priority\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "23",
+               "locator" : "31:54-31:57",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "26",
+            "locator" : "37:1-37:41",
+            "name" : "Pneumococcal dose scheme",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "26",
+                  "s" : [ {
+                     "value" : [ "/*\ndefine \"Country is following a 2 dose scheme for Pneumococcal\": true\ndefine \"Country is following a 3 dose scheme for Pneumococcal\": true\n*/\n","define ","\"Pneumococcal dose scheme\"",": " ]
+                  }, {
+                     "r" : "25",
+                     "s" : [ {
+                        "value" : [ "'2p+1'" ]
+                     } ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "25",
+               "locator" : "37:36-37:41",
+               "valueType" : "{urn:hl7-org:elm-types:r1}String",
+               "value" : "2p+1",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "28",
+            "locator" : "38:1-38:59",
+            "name" : "Country is not highly endemic for Hepatitis A",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "28",
+                  "s" : [ {
+                     "r" : "27",
+                     "value" : [ "","define ","\"Country is not highly endemic for Hepatitis A\"",":","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "27",
+               "locator" : "38:56-38:59",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "30",
+            "locator" : "39:1-39:69",
+            "name" : "Country is administering a Live attenuated HAV vaccine",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "30",
+                  "s" : [ {
+                     "r" : "29",
+                     "value" : [ "","define ","\"Country is administering a Live attenuated HAV vaccine\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "29",
+               "locator" : "39:66-39:69",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "32",
+            "locator" : "40:1-40:68",
+            "name" : "In a setting with a high disease burden and mortality",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "32",
+                  "s" : [ {
+                     "r" : "31",
+                     "value" : [ "","define ","\"In a setting with a high disease burden and mortality\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "31",
+               "locator" : "40:65-40:68",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "34",
+            "locator" : "42:1-42:58",
+            "name" : "Region recommends Meningococcal vaccination",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "34",
+                  "s" : [ {
+                     "r" : "33",
+                     "value" : [ "","define ","\"Region recommends Meningococcal vaccination\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "33",
+               "locator" : "42:55-42:58",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "36",
+            "locator" : "43:1-43:52",
+            "name" : "Region recommends Cholera vaccination",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "36",
+                  "s" : [ {
+                     "r" : "35",
+                     "value" : [ "","define ","\"Region recommends Cholera vaccination\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "35",
+               "locator" : "43:49-43:52",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "38",
+            "locator" : "44:1-44:52",
+            "name" : "Region recommends Typhoid vaccination",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "38",
+                  "s" : [ {
+                     "r" : "37",
+                     "value" : [ "","define ","\"Region recommends Typhoid vaccination\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "37",
+               "locator" : "44:49-44:52",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "40",
+            "locator" : "45:1-45:55",
+            "name" : "Country is administering the TCV vaccine",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "40",
+                  "s" : [ {
+                     "r" : "39",
+                     "value" : [ "","define ","\"Country is administering the TCV vaccine\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "39",
+               "locator" : "45:52-45:55",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "42",
+            "locator" : "46:1-46:52",
+            "name" : "Country is administering ViPS vaccine",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "42",
+                  "s" : [ {
+                     "r" : "41",
+                     "value" : [ "","define ","\"Country is administering ViPS vaccine\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "41",
+               "locator" : "46:49-46:52",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "44",
+            "locator" : "47:1-47:66",
+            "name" : "Country is administering an Inactivated HAV vaccine",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "44",
+                  "s" : [ {
+                     "r" : "43",
+                     "value" : [ "","define ","\"Country is administering an Inactivated HAV vaccine\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "43",
+               "locator" : "47:63-47:66",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "46",
+            "locator" : "48:1-48:99",
+            "name" : "In a setting where the risk of measles among infants < 9 months of age remains high",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "46",
+                  "s" : [ {
+                     "r" : "45",
+                     "value" : [ "","define ","\"In a setting where the risk of measles among infants < 9 months of age remains high\"",": ","false" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "45",
+               "locator" : "48:95-48:99",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "48",
+            "locator" : "49:1-49:56",
+            "name" : "Country currently has a measles outbreak",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "48",
+                  "s" : [ {
+                     "r" : "47",
+                     "value" : [ "","define ","\"Country currently has a measles outbreak\"",": ","false" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "47",
+               "locator" : "49:52-49:56",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "50",
+            "locator" : "50:1-50:93",
+            "name" : "Population is in conflict zones internally displaced populations and refugees",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "50",
+                  "s" : [ {
+                     "r" : "49",
+                     "value" : [ "","define ","\"Population is in conflict zones internally displaced populations and refugees\"",": ","false" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "49",
+               "locator" : "50:89-50:93",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "52",
+            "locator" : "51:1-51:71",
+            "name" : "In a setting where there is high transmission of Measles",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "52",
+                  "s" : [ {
+                     "r" : "51",
+                     "value" : [ "","define ","\"In a setting where there is high transmission of Measles\"",":","false" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "51",
+               "locator" : "51:67-51:71",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "54",
+            "locator" : "52:1-52:70",
+            "name" : "In a setting where there is low transmission of Measles",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "54",
+                  "s" : [ {
+                     "r" : "53",
+                     "value" : [ "","define ","\"In a setting where there is low transmission of Measles\"",":","false" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "53",
+               "locator" : "52:66-52:70",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "false",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "56",
+            "locator" : "54:1-54:47",
+            "name" : "Country has Yellow Fever Endemic",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "56",
+                  "s" : [ {
+                     "r" : "55",
+                     "value" : [ "","define ","\"Country has Yellow Fever Endemic\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "55",
+               "locator" : "54:44-54:47",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "58",
+            "locator" : "55:1-55:51",
+            "name" : "Country recognizes TBE as a priority",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "58",
+                  "s" : [ {
+                     "r" : "57",
+                     "value" : [ "","define ","\"Country recognizes TBE as a priority\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "57",
+               "locator" : "55:48-55:51",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "60",
+            "locator" : "57:1-57:109",
+            "name" : "There is a compelling reason to vaccinate infants with Meningococcal between 3 to 9 months old",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "60",
+                  "s" : [ {
+                     "r" : "59",
+                     "value" : [ "","define ","\"There is a compelling reason to vaccinate infants with Meningococcal between 3 to 9 months old\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "59",
+               "locator" : "57:106-57:109",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "62",
+            "locator" : "58:1-58:77",
+            "name" : "Country recognizes Varicella an important public health burden",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "62",
+                  "s" : [ {
+                     "r" : "61",
+                     "value" : [ "","define ","\"Country recognizes Varicella an important public health burden\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "61",
+               "locator" : "58:74-58:77",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "64",
+            "locator" : "59:1-59:77",
+            "name" : "Country recognizes MUMPS reduction as a public health priority",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "64",
+                  "s" : [ {
+                     "r" : "63",
+                     "value" : [ "","define ","\"Country recognizes MUMPS reduction as a public health priority\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "63",
+               "locator" : "59:74-59:77",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         }, {
+            "localId" : "66",
+            "locator" : "60:1-60:60",
+            "name" : "Country is using a 3 dose series ROTA product",
+            "context" : "Patient",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "66",
+                  "s" : [ {
+                     "r" : "65",
+                     "value" : [ "","define ","\"Country is using a 3 dose series ROTA product\"",": ","true" ]
+                  } ]
+               }
+            } ],
+            "expression" : {
+               "localId" : "65",
+               "locator" : "60:57-60:60",
+               "valueType" : "{urn:hl7-org:elm-types:r1}Boolean",
+               "value" : "true",
+               "type" : "Literal"
+            }
+         } ]
+      }
+   }
+}

@@ -1,0 +1,38 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "IMMZ.D1.DE1VS",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"CodeSystem-IMMZ.D1.DE1.html\"><code>http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE1</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.DE1.html#IMMZ.D1.DE1-IMMZ.46D.46DE2\">IMMZ.D.DE2</a></td><td style=\"color: #cccccc\">Completed</td><td>The immunization event was successfully carried out as intended</td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.DE1.html#IMMZ.D1.DE1-IMMZ.46D.46DE3\">IMMZ.D.DE3</a></td><td style=\"color: #cccccc\">Entered in error</td><td>Immunization event record has been mistakenly created or entered into system. Recorded information is incorrect or should not have been documented, though it is possible that real-world decisions were based on it</td></tr><tr><td><a href=\"CodeSystem-IMMZ.D1.DE1.html#IMMZ.D1.DE1-IMMZ.46D.46DE4\">IMMZ.D.DE4</a></td><td style=\"color: #cccccc\">Not Done</td><td>Planned immunization event was not carried out for some reason</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/IMMZ.D1.DE1VS",
+  "version" : "0.1.0",
+  "name" : "IMMZ.D1.DE1VS",
+  "title" : "IMMZ.D1.DE1 CodeSystem for Immunization status",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "CodeSystem for IMMZ.D1.DE1 Immunization status",
+  "compose" : {
+    "include" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1.DE1",
+      "concept" : [{
+        "code" : "IMMZ.D.DE2"
+      },
+      {
+        "code" : "IMMZ.D.DE3"
+      },
+      {
+        "code" : "IMMZ.D.DE4"
+      }]
+    }]
+  }
+}

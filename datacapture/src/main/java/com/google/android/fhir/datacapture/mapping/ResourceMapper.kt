@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.initialExpression
@@ -48,7 +47,6 @@ import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
@@ -192,24 +190,21 @@ object ResourceMapper {
    * See http://build.fhir.org/ig/HL7/sdc/extraction.html#structuremap-based-extraction for more on
    * StructureMap-based extraction.
    */
-  private suspend fun extractByStructureMap(
+  suspend fun extractByStructureMap(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
-    val simpleWorkerContext =
-      DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
+    val workerContext = structureMapExtractionContext.workerContext
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, workerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
-          simpleWorkerContext,
+          workerContext,
           structureMapExtractionContext.transformSupportServices,
         )
-        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
+        .transform(workerContext, questionnaireResponse, structureMap, this)
     }
   }
 

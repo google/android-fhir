@@ -1,0 +1,60 @@
+{
+  "resourceType": "CarePlan",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "Plan-Definition-Example",
+      "instantiatesCanonical": [
+        "http://example.com/PlanDefinition/Plan-Definition-Example"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "Patient/Female-Patient-Example"
+      },
+      "action": [
+        {
+          "resource": {
+            "reference": "Task"
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "Task",
+      "id": "Task",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
+          "valueExpression": {
+            "language": "text/cql.identifier",
+            "expression": "Patient is Female"
+          }
+        }
+      ],
+      "basedOn": [
+        {
+          "reference": "#RequestGroup/Plan-Definition-Example",
+          "type": "RequestGroup"
+        }
+      ],
+      "status": "draft",
+      "description": "Example Task"
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://example.com/PlanDefinition/Plan-Definition-Example"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "Patient/Female-Patient-Example"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#Plan-Definition-Example"
+      }
+    }
+  ]
+}
