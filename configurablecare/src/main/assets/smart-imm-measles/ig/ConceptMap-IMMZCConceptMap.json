@@ -1,0 +1,409 @@
+{
+  "resourceType" : "ConceptMap",
+  "id" : "IMMZCConceptMap",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Mapping from (not specified) to (not specified)</p><p>ACTIVE. Published on 2023-08-04 by WHO (WHO: <a href=\"http://who.int\">http://who.int</a>). </p><div><p>Mapping to and from IMMZ.C Data Dictionary to other codesystems.</p>\n</div><br/><p><b>Group 1</b>Mapping from <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a> to <a href=\"CodeSystem-ICD11.html\">ICD-11</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>DE6 (Male)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>XX2UQ8 (Male)</td></tr><tr><td>DE7 (Female)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>XX2V25 (Female)</td></tr><tr><td>DE8 (Biological sex not specified)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>XX2PX3 (Biological sex not specified)</td></tr><tr><td>DE9 (Intersex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>XX45B7 (Intersex)</td></tr></table><hr/><p><b>Group 2</b>Mapping from <a href=\"CodeSystem-ICD11.html\">ICD-11</a> to <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>XX2UQ8 (Male)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE6 (Male)</td></tr><tr><td>XX2V25 (Female)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE7 (Female)</td></tr><tr><td>XX2PX3 (Biological sex not specified)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE8 (Biological sex not specified)</td></tr><tr><td>XX45B7 (Intersex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE9 (Intersex)</td></tr></table><hr/><p><b>Group 3</b>Mapping from <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a> to <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-loinc.html\">Logical Observation Identifiers, Names and Codes (LOINC)</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td><td><b>Comment</b></td></tr><tr><td>DE2 (Name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>54125-0</td><td/></tr><tr><td>DE3 (First name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>45392-8</td><td/></tr><tr><td>DE4 (Family name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>45394-4</td><td/></tr><tr><td>DE5 (Sex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>46098-0</td><td/></tr><tr><td>DE10 (Date of birth)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>21112-8</td><td/></tr><tr><td>DE13 (Age)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>63900-5</td><td/></tr><tr><td>DE18 (Contact phone number)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>42077-8</td><td/></tr><tr><td>DE19 (Administrative area)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>56799-0</td><td>The source concept is more specific than the target</td></tr></table><hr/><p><b>Group 4</b>Mapping from <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a> to <a href=\"http://hl7.org/fhir/R4/codesystem-snomedct.html\">SNOMED CT (all versions)</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td><td><b>Comment</b></td></tr><tr><td>DE2 (Name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>371484003</td><td/></tr><tr><td>DE3 (First name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184095009</td><td/></tr><tr><td>DE4 (Family name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184096005</td><td/></tr><tr><td>DE5 (Sex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184100006</td><td/></tr><tr><td>DE6 (Male)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>248153007</td><td/></tr><tr><td>DE7 (Female)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>248152002</td><td/></tr><tr><td>DE8 (Biological sex not specified)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>772004004</td><td/></tr><tr><td>DE9 (Intersex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>15867007</td><td/></tr><tr><td>DE10 (Date of birth)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184099003</td><td/></tr><tr><td>DE14 (Caregivers (multiple))</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184140000</td><td/></tr><tr><td>DE15 (Caregiver's full name)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184140000</td><td/></tr><tr><td>DE18 (Contact phone number)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184103008</td><td/></tr><tr><td>DE19 (Administrative area)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>184097001</td><td>The source concept is more specific than the target</td></tr></table><hr/><p><b>Group 5</b>Mapping from <a href=\"http://hl7.org/fhir/R4/codesystem-snomedct.html\">SNOMED CT (all versions)</a> to <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>248153007</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE6 (Male)</td></tr><tr><td>248152002</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE7 (Female)</td></tr><tr><td>772004004</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE8 (Biological sex not specified)</td></tr><tr><td>15867007</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE9 (Intersex)</td></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCConceptMap",
+  "version" : "0.1.0",
+  "name" : "IMMZ_C_ConceptMap",
+  "title" : "ConceptMap to and from IMMZ.C DataElements",
+  "status" : "active",
+  "experimental" : false,
+  "date" : "2023-08-04",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Mapping to and from IMMZ.C Data Dictionary to other codesystems.",
+  "group" : [{
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "target" : "http://hl7.org/fhir/sid/icd-11/mms",
+    "element" : [{
+      "code" : "DE6",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "XX2UQ8",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE7",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "XX2V25",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE8",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "XX2PX3",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE9",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "XX45B7",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  },
+  {
+    "source" : "http://hl7.org/fhir/sid/icd-11/mms",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "element" : [{
+      "code" : "XX2UQ8",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE6",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "XX2V25",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE7",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "XX2PX3",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE8",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "XX45B7",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE9",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  },
+  {
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "target" : "http://loinc.org",
+    "element" : [{
+      "code" : "DE2",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "54125-0",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE3",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "45392-8",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE4",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "45394-4",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE5",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "46098-0",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE10",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "21112-8",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE13",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "63900-5",
+        "equivalence" : "wider"
+      }]
+    },
+    {
+      "code" : "DE18",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "42077-8",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE19",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "narrower"
+        }],
+        "code" : "56799-0",
+        "equivalence" : "narrower",
+        "comment" : "The source concept is more specific than the target"
+      }]
+    }]
+  },
+  {
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "target" : "http://snomed.info/sct",
+    "element" : [{
+      "code" : "DE2",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "371484003",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE3",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "184095009",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE4",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "184096005",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE5",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "184100006",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE6",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "248153007",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE7",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "248152002",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE8",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "772004004",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "DE9",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "15867007",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE10",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "184099003",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE14",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "184140000",
+        "equivalence" : "wider"
+      }]
+    },
+    {
+      "code" : "DE15",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "184140000",
+        "equivalence" : "wider"
+      }]
+    },
+    {
+      "code" : "DE18",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "184103008",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE19",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "narrower"
+        }],
+        "code" : "184097001",
+        "equivalence" : "narrower",
+        "comment" : "The source concept is more specific than the target"
+      }]
+    }]
+  },
+  {
+    "source" : "http://snomed.info/sct",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "element" : [{
+      "code" : "248153007",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE6",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "248152002",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE7",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "772004004",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "relatedto"
+        }],
+        "code" : "DE8",
+        "equivalence" : "relatedto"
+      }]
+    },
+    {
+      "code" : "15867007",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE9",
+        "equivalence" : "equivalent"
+      }]
+    }]
+  }]
+}

@@ -1,0 +1,333 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZD1QRToLM",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1QRToLM<span style=\"color: navy\">&quot; = &quot;</span>IMMZD1QRToLM<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/questionnaireresponse.html\" title=\"QuestionnaireResponse\">http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse</a><span style=\"color: navy\">&quot; </span><b>alias </b>QResp <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZD1ClientHistoryMeasles.html\" title=\"IMMZ.D1 Capture Client History for Measles\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD1ClientHistoryMeasles</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZD1 <b>as </b><b>target</b>\r\n\r\n<b>group </b>QRespToIMMZD1<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">qr</span><span style=\"color: navy\"> : </span>QResp, <b>target</b> <span style=\"color: maroon\">immz</span><span style=\"color: navy\"> : </span>IMMZD1<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  qr.subject<b> as </b><span style=\"color: maroon\">patient</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.patient = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n  qr.item<b> as </b><span style=\"color: maroon\">item</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'dose0'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.dose0 = <span style=\"color: maroon\">content</span> <i>&quot;SetDose0&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForDose0&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'completedPrimarySeries'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.completedPrimarySeries = <span style=\"color: maroon\">content</span> <i>&quot;SetCompletedPrimarySeries&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForCompletedPrimarySeries&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'dateSeriesCompleted'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.dateSeriesCompleted = <span style=\"color: maroon\">content</span> <i>&quot;SetDateSeriesCompleted&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerDateSeriesCompleted&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'hivStatus'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">coding</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.hivStatus = <span style=\"color: maroon\">coding</span> <i>&quot;SetHIVStatus&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForHIVStatus&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'pretermBirth'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.pretermBirth = <span style=\"color: maroon\">content</span> <i>&quot;SetPretermBirth&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForPretermBirth&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'severelyImmunosuppressed'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.severelyImmunosuppressed = <span style=\"color: maroon\">content</span> <i>&quot;SetSeverelyImmunosuppressed&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerForSeverelyImmunosuppressed&quot;</i><span style=\"color: navy\">;</span>\r\n    item.answer first<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>item.linkId = 'artStartDate'<b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.artStartDate = <span style=\"color: maroon\">content</span> <i>&quot;SetARTStartDated&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;FirstAnswerARTStartDate&quot;</i><span style=\"color: navy\">;</span>\r\n    item<b> as </b><span style=\"color: maroon\">history</span><b> where </b>item.linkId = 'vaccineHistory'<span style=\"color: navy\"><b> -&gt; </b></span>immz.vaccineHistory<b> as </b><span style=\"color: maroon\">vaccine</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      history.item<b> as </b><span style=\"color: maroon\">entry</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        entry.answer<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>entry.linkId = 'vaccineType'<b> then</b><span style=\"color: navy\"> {\r\n</span>          answer.value<b> as </b><span style=\"color: maroon\">coding</span><span style=\"color: navy\"><b> -&gt; </b></span>vaccine.vaccineType = <span style=\"color: maroon\">coding</span> <i>&quot;SetVaccineType&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;AnswerForVaccineType&quot;</i><span style=\"color: navy\">;</span>\r\n        entry.answer<b> as </b><span style=\"color: maroon\">answer</span><b> where </b>entry.linkId = 'vaccineDate'<b> then</b><span style=\"color: navy\"> {\r\n</span>          answer.value<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span>vaccine.vaccineDate = <span style=\"color: maroon\">content</span> <i>&quot;SetVaccineDate&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;AnswerForVaccineDate&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;HistoryLoop&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;ForVaccineHistory&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;processItems&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1QRToLM",
+  "version" : "0.1.0",
+  "name" : "IMMZD1QRToLM",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse",
+    "mode" : "source",
+    "alias" : "QResp"
+  },
+  {
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD1ClientHistoryMeasles",
+    "mode" : "target",
+    "alias" : "IMMZD1"
+  }],
+  "group" : [{
+    "name" : "QRespToIMMZD1",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "qr",
+      "type" : "QResp",
+      "mode" : "source"
+    },
+    {
+      "name" : "immz",
+      "type" : "IMMZD1",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetPatient",
+      "source" : [{
+        "context" : "qr",
+        "element" : "subject",
+        "variable" : "patient"
+      }],
+      "target" : [{
+        "context" : "immz",
+        "contextType" : "variable",
+        "element" : "patient",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueId" : "patient"
+        }]
+      }]
+    },
+    {
+      "name" : "processItems",
+      "source" : [{
+        "context" : "qr",
+        "element" : "item",
+        "variable" : "item"
+      }],
+      "rule" : [{
+        "name" : "FirstAnswerForDose0",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'dose0'"
+        }],
+        "rule" : [{
+          "name" : "SetDose0",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "dose0",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForCompletedPrimarySeries",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'completedPrimarySeries'"
+        }],
+        "rule" : [{
+          "name" : "SetCompletedPrimarySeries",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "completedPrimarySeries",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerDateSeriesCompleted",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'dateSeriesCompleted'"
+        }],
+        "rule" : [{
+          "name" : "SetDateSeriesCompleted",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "dateSeriesCompleted",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForHIVStatus",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'hivStatus'"
+        }],
+        "rule" : [{
+          "name" : "SetHIVStatus",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "coding"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "hivStatus",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "coding"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForPretermBirth",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'pretermBirth'"
+        }],
+        "rule" : [{
+          "name" : "SetPretermBirth",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "pretermBirth",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerForSeverelyImmunosuppressed",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'severelyImmunosuppressed'"
+        }],
+        "rule" : [{
+          "name" : "SetSeverelyImmunosuppressed",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "severelyImmunosuppressed",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "FirstAnswerARTStartDate",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "listMode" : "first",
+          "variable" : "answer",
+          "condition" : "item.linkId = 'artStartDate'"
+        }],
+        "rule" : [{
+          "name" : "SetARTStartDated",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "content"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "artStartDate",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "ForVaccineHistory",
+        "source" : [{
+          "context" : "item",
+          "variable" : "history",
+          "condition" : "item.linkId = 'vaccineHistory'"
+        }],
+        "target" : [{
+          "context" : "immz",
+          "contextType" : "variable",
+          "element" : "vaccineHistory",
+          "variable" : "vaccine"
+        }],
+        "rule" : [{
+          "name" : "HistoryLoop",
+          "source" : [{
+            "context" : "history",
+            "element" : "item",
+            "variable" : "entry"
+          }],
+          "rule" : [{
+            "name" : "AnswerForVaccineType",
+            "source" : [{
+              "context" : "entry",
+              "element" : "answer",
+              "variable" : "answer",
+              "condition" : "entry.linkId = 'vaccineType'"
+            }],
+            "rule" : [{
+              "name" : "SetVaccineType",
+              "source" : [{
+                "context" : "answer",
+                "element" : "value",
+                "variable" : "coding"
+              }],
+              "target" : [{
+                "context" : "vaccine",
+                "contextType" : "variable",
+                "element" : "vaccineType",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueId" : "coding"
+                }]
+              }]
+            }]
+          },
+          {
+            "name" : "AnswerForVaccineDate",
+            "source" : [{
+              "context" : "entry",
+              "element" : "answer",
+              "variable" : "answer",
+              "condition" : "entry.linkId = 'vaccineDate'"
+            }],
+            "rule" : [{
+              "name" : "SetVaccineDate",
+              "source" : [{
+                "context" : "answer",
+                "element" : "value",
+                "variable" : "content"
+              }],
+              "target" : [{
+                "context" : "vaccine",
+                "contextType" : "variable",
+                "element" : "vaccineDate",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueId" : "content"
+                }]
+              }]
+            }]
+          }]
+        }]
+      }]
+    }]
+  }]
+}

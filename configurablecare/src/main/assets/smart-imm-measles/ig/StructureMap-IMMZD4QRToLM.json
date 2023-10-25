@@ -1,0 +1,96 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZD4QRToLM",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToLM<span style=\"color: navy\">&quot; = &quot;</span>IMMZD4QRToLM<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/questionnaireresponse.html\" title=\"QuestionnaireResponse\">http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse</a><span style=\"color: navy\">&quot; </span><b>alias </b>QResp <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZD4CheckContraindicationsMeasles.html\" title=\"IMMZ.D4 Check Contraindications for Measles\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZD4 <b>as </b><b>target</b>\r\n\r\n<b>group </b>QRespToIMMZD4<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">qr</span><span style=\"color: navy\"> : </span>QResp, <b>target</b> <span style=\"color: maroon\">immz</span><span style=\"color: navy\"> : </span>IMMZD4<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  qr.subject<b> as </b><span style=\"color: maroon\">patient</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.patient = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n  qr.item<b> as </b><span style=\"color: maroon\">item</span><b> where </b>linkId = 'contraindications'<b> then</b><span style=\"color: navy\"> {\r\n</span>    item.answer<b> as </b><span style=\"color: maroon\">answer</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      answer.value<b> as </b><span style=\"color: maroon\">val</span><span style=\"color: navy\"><b> -&gt; </b></span>immz.contraindications = <span style=\"color: maroon\">val</span> <i>&quot;SetContraindication&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetContraindicationAnswer&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;processItems&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD4QRToLM",
+  "version" : "0.1.0",
+  "name" : "IMMZD4QRToLM",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://hl7.org/fhir/StructureDefinition/QuestionnaireResponse",
+    "mode" : "source",
+    "alias" : "QResp"
+  },
+  {
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD4CheckContraindicationsMeasles",
+    "mode" : "target",
+    "alias" : "IMMZD4"
+  }],
+  "group" : [{
+    "name" : "QRespToIMMZD4",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "qr",
+      "type" : "QResp",
+      "mode" : "source"
+    },
+    {
+      "name" : "immz",
+      "type" : "IMMZD4",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetPatient",
+      "source" : [{
+        "context" : "qr",
+        "element" : "subject",
+        "variable" : "patient"
+      }],
+      "target" : [{
+        "context" : "immz",
+        "contextType" : "variable",
+        "element" : "patient",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueId" : "patient"
+        }]
+      }]
+    },
+    {
+      "name" : "processItems",
+      "source" : [{
+        "context" : "qr",
+        "element" : "item",
+        "variable" : "item",
+        "condition" : "linkId = 'contraindications'"
+      }],
+      "rule" : [{
+        "name" : "SetContraindicationAnswer",
+        "source" : [{
+          "context" : "item",
+          "element" : "answer",
+          "variable" : "answer"
+        }],
+        "rule" : [{
+          "name" : "SetContraindication",
+          "source" : [{
+            "context" : "answer",
+            "element" : "value",
+            "variable" : "val"
+          }],
+          "target" : [{
+            "context" : "immz",
+            "contextType" : "variable",
+            "element" : "contraindications",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "val"
+            }]
+          }]
+        }]
+      }]
+    }]
+  }]
+}

@@ -1,0 +1,38 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "ARVDrugs-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/713540004\">713540004</a></td><td>Substance with antiretroviral mechanism of action (substance)</td></tr><tr><td><a href=\"http://snomed.info/id/788075003\">788075003</a></td><td>Medicinal product acting as antiretroviral agent (product)</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/ARVDrugs-values",
+  "version" : "0.1.0",
+  "name" : "ARVDrugsvalues",
+  "title" : "ARV Drugs values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Codes representing ARV Drugs values",
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "713540004",
+        "display" : "Substance with antiretroviral mechanism of action (substance)"
+      },
+      {
+        "code" : "788075003",
+        "display" : "Medicinal product acting as antiretroviral agent (product)"
+      }]
+    }]
+  }
+}

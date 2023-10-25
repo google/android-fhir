@@ -1,0 +1,33 @@
+{
+  "resourceType" : "Immunization",
+  "id" : "Immunization1",
+  "meta" : {
+    "profile" : ["http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGImmunization"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Immunization</b><a name=\"Immunization1\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Immunization &quot;Immunization1&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-SGImmunization.html\">SGImmunization</a></p></div><p><b>SGAdministeredProduct</b>: Serum Institute of India Measles vaccine <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-VaccineProducts.html\">Vaccine Product codes CodeSet</a>#20009060/2)</span></p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: Measles vaccines <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM28X5)</span></p><p><b>patient</b>: <a href=\"Patient-P123456.html\">Patient/P123456</a> &quot; PATIENT&quot;</p><p><b>occurrence</b>: 2023-08-05</p><p><b>lotNumber</b>: lot123</p><p><b>expirationDate</b>: 2023-10-01</p></div>"
+  },
+  "extension" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/sg-ext-administeredProduct",
+    "valueCodeableConcept" : {
+      "coding" : [{
+        "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts",
+        "code" : "20009060/2"
+      }]
+    }
+  }],
+  "status" : "completed",
+  "vaccineCode" : {
+    "coding" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "code" : "XM28X5"
+    }]
+  },
+  "patient" : {
+    "reference" : "Patient/P123456"
+  },
+  "occurrenceDateTime" : "2023-08-05",
+  "lotNumber" : "lot123",
+  "expirationDate" : "2023-10-01"
+}

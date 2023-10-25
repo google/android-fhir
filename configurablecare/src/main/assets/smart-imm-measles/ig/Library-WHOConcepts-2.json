@@ -1,0 +1,202 @@
+{
+   "library" : {
+      "annotation" : [ {
+         "translatorVersion" : "2.9.0",
+         "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion",
+         "type" : "CqlToElmInfo"
+      }, {
+         "type" : "Annotation",
+         "s" : {
+            "r" : "11",
+            "s" : [ {
+               "value" : [ "","library WHOConcepts" ]
+            } ]
+         }
+      } ],
+      "identifier" : {
+         "id" : "WHOConcepts",
+         "system" : "http://smart.who.int/ig/smart-immunizations-measles"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         } ]
+      },
+      "codeSystems" : {
+         "def" : [ {
+            "localId" : "1",
+            "locator" : "4:1-4:53",
+            "name" : "ICD-10",
+            "id" : "http://hl7.org/fhir/sid/icd-10",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "1",
+                  "s" : [ {
+                     "value" : [ "// Code Systems\n","codesystem ","\"ICD-10\"",": ","'http://hl7.org/fhir/sid/icd-10'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "2",
+            "locator" : "5:1-5:48",
+            "name" : "SNOMED-CT",
+            "id" : "http://snomed.info/sct",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "2",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"SNOMED-CT\"",": ","'http://snomed.info/sct'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "3",
+            "locator" : "6:1-6:38",
+            "name" : "LOINC",
+            "id" : "http://loinc.org",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "3",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"LOINC\"",": ","'http://loinc.org'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "4",
+            "locator" : "7:1-7:66",
+            "name" : "RxNorm",
+            "id" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "4",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"RxNorm\"",": ","'http://www.nlm.nih.gov/research/umls/rxnorm'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "5",
+            "locator" : "8:1-8:49",
+            "name" : "CIEL",
+            "id" : "http://hl7.org/fhir/sid/ciel",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "5",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"CIEL\"",": ","'http://hl7.org/fhir/sid/ciel'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "6",
+            "locator" : "9:1-9:57",
+            "name" : "ICD-11",
+            "id" : "http://hl7.org/fhir/sid/icd-11/mms",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "6",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICD-11\"",": ","'http://hl7.org/fhir/sid/icd-11/mms'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "7",
+            "locator" : "10:1-10:77",
+            "name" : "ICHI",
+            "id" : "https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "7",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICHI\"",": ","'https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "8",
+            "locator" : "11:1-11:50",
+            "name" : "ICF",
+            "id" : "http://hl7.org/fhir/sid/icf-nl",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "8",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICF\"",": ","'http://hl7.org/fhir/sid/icf-nl'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "9",
+            "locator" : "12:1-12:110",
+            "name" : "Extended Codes CodeSystem codes",
+            "id" : "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "9",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"Extended Codes CodeSystem codes\"",": ","'http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "valueSets" : {
+         "def" : [ {
+            "localId" : "10",
+            "locator" : "15:1-15:103",
+            "name" : "Pregnancy Status Pregnant",
+            "id" : "http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "10",
+                  "s" : [ {
+                     "value" : [ "// ValuSets\n","valueset ","\"Pregnancy Status Pregnant\"",": ","'http://fhir.org/guides/who/core/ValueSet/pregnancystatus-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "11",
+            "locator" : "16:1-16:76",
+            "name" : "Adverse Events",
+            "id" : "http://hl7.org/fhir/ValueSet/adverse-event-type",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "11",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Adverse Events\"",": ","'http://hl7.org/fhir/ValueSet/adverse-event-type'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      }
+   }
+}

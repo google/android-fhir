@@ -1,0 +1,183 @@
+{
+  "package": "who.fhir.smart-immunizations-measles",
+  "version": "0.1.0",
+  "fhirVersion": "4.0.1",
+  "extensions": [
+    {
+      "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification",
+      "title": "SGMedicationClassification",
+      "types": [
+        "CodeableConcept"
+      ]
+    },
+    {
+      "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/sg-ext-administeredProduct",
+      "title": "SGAdministeredProduct",
+      "types": [
+        "CodeableConcept",
+        "Reference"
+      ]
+    }
+  ],
+  "profiles": {
+    "Immunization": [
+      {
+        "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGImmunization",
+        "title": "SGImmunization"
+      }
+    ],
+    "Medication": [
+      {
+        "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProduct",
+        "title": "SGVaccineProduct"
+      }
+    ],
+    "MedicationRequest": [
+      {
+        "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProposal",
+        "title": "SGVaccineProposal"
+      },
+      {
+        "url": "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineRequest",
+        "title": "SGVaccineRequest"
+      }
+    ]
+  },
+  "usage": {
+    "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence": [
+      "ConceptMap.group.element.target"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.contact": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.date": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.description": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.experimental": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.name": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.publisher": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.status": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.title": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.type": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.url": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-ActorDefinition.version": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.contact": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.date": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.publisher": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.statement": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.status": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.url": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/5.0/StructureDefinition/extension-Requirements.version": [
+      "Basic"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/elementdefinition-bestpractice": [
+      "StructureDefinition.snapshot.element.constraint"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/elementdefinition-bestpractice-explanation": [
+      "StructureDefinition.snapshot.element.constraint"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/elementdefinition-bindingName": [
+      "StructureDefinition.snapshot.element.binding"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/elementdefinition-isCommonBinding": [
+      "StructureDefinition.snapshot.element.binding"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/elementdefinition-maxValueSet": [
+      "StructureDefinition.snapshot.element.binding"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fhir-type": [
+      "StructureDefinition.snapshot.element.type"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-fmm": [
+      "Questionnaire.contained",
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-standards-status": [
+      "Questionnaire.contained",
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/StructureDefinition/structuredefinition-wg": [
+      "Questionnaire.contained",
+      "ValueSet"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-internal-dependency": [
+      "ImplementationGuide.definition"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-page-name": [
+      "ImplementationGuide.definition.page",
+      "ImplementationGuide.definition.page.page",
+      "ImplementationGuide.definition.page.page.page"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/ig-parameter": [
+      "ImplementationGuide.definition"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/implementationguide-dependency-comment": [
+      "ImplementationGuide.dependsOn"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/logical-target": [
+      "StructureDefinition"
+    ],
+    "http://hl7.org/fhir/tools/StructureDefinition/resource-information": [
+      "ImplementationGuide.definition.resource"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-aggregateMethod": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-criteriaReference": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-populationBasis": [
+      "Measure.group.population"
+    ],
+    "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem": [
+      "Library"
+    ],
+    "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability": [
+      "ActivityDefinition",
+      "PlanDefinition"
+    ],
+    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext": [
+      "Questionnaire"
+    ],
+    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-targetStructureMap": [
+      "Questionnaire"
+    ],
+    "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification": [
+      "Medication"
+    ],
+    "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/sg-ext-administeredProduct": [
+      "Immunization"
+    ]
+  }
+}

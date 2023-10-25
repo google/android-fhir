@@ -1,0 +1,38 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "Immunocompromised-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/370388006\">370388006</a></td><td>Patient immunocompromised</td></tr><tr><td><a href=\"http://snomed.info/id/370391006\">370391006</a></td><td>Patient immunosuppressed</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ValueSet/Immunocompromised-values",
+  "version" : "0.1.0",
+  "name" : "Immunocompromisedvalues",
+  "title" : "Immunocompromised valueset",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Codes representing Immunocompromised values",
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "370388006",
+        "display" : "Patient immunocompromised"
+      },
+      {
+        "code" : "370391006",
+        "display" : "Patient immunosuppressed"
+      }]
+    }]
+  }
+}

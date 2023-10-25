@@ -12,17 +12,17 @@
             "event": "Questionnaire/QIMMZCRegisterClient",
             "planDefinition":"",
             "structureMap": "StructureMap/IMMZCQRToPatient",
-            "targetResourceType": "Patient"
+            "targetResourceType": "Bundle"
           },
           {
             "event": "Questionnaire/IMMZD1ClientHistoryMeasles",
-            "planDefinition":"http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeasles",
+            "planDefinition":"http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
             "structureMap": "StructureMap/IMMZD1QRToResources",
             "targetResourceType": "Bundle"
           },
           {
             "event": "Questionnaire/QIMMZD4CheckContraindicationsMeasles",
-            "planDefinition": "http://smart.who.int/ig/smart-immunizations/PlanDefinition/IMMZD2DTMeaslesCI",
+            "planDefinition": "http://smart.who.int/ig/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeaslesCI",
             "structureMap": "StructureMap/IMMZD4QRToResources",
             "targetResourceType": "Bundle"
           },

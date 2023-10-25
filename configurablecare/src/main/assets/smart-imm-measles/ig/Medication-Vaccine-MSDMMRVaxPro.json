@@ -1,0 +1,35 @@
+{
+  "resourceType" : "Medication",
+  "id" : "Vaccine-MSDMMRVaxPro",
+  "meta" : {
+    "profile" : ["http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGVaccineProduct"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Medication</b><a name=\"Vaccine-MSDMMRVaxPro\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Medication &quot;Vaccine-MSDMMRVaxPro&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-SGVaccineProduct.html\">SGVaccineProduct</a></p></div><p><b>SGMedicationClassification</b>: Measles, live attenuated <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM8L15)</span></p><p><b>SGMedicationClassification</b>: Mumps, live attenuated <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM2340)</span></p><p><b>code</b>: M-M-RvaxPRO <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-VaccineProducts.html\">Vaccine Product codes CodeSet</a>#7680007030014)</span></p></div>"
+  },
+  "extension" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification",
+    "valueCodeableConcept" : {
+      "coding" : [{
+        "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+        "code" : "XM8L15"
+      }]
+    }
+  },
+  {
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/SGMedicationClassification",
+    "valueCodeableConcept" : {
+      "coding" : [{
+        "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+        "code" : "XM2340"
+      }]
+    }
+  }],
+  "code" : {
+    "coding" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts",
+      "code" : "7680007030014"
+    }]
+  }
+}

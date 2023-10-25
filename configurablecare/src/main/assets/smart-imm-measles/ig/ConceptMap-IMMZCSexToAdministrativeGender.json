@@ -1,0 +1,121 @@
+{
+  "resourceType" : "ConceptMap",
+  "id" : "IMMZCSexToAdministrativeGender",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>Mapping from (not specified) to (not specified)</p><p>ACTIVE. Published on 2023-08-09 by WHO (WHO: <a href=\"http://who.int\">http://who.int</a>). </p><div><p>Mapping to and from IMMZ.C sex coding to FHIR Administrative Gender.</p>\n</div><br/><p><b>Group 1</b>Mapping from <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a> to <a href=\"http://hl7.org/fhir/R4/codesystem-administrative-gender.html\">AdministrativeGender</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td></tr><tr><td>DE6 (Male)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>male</td></tr><tr><td>DE7 (Female)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>female</td></tr><tr><td>DE8 (Biological sex not specified)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>unknown</td></tr><tr><td>DE9 (Intersex)</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>other</td></tr></table><hr/><p><b>Group 2</b>Mapping from <a href=\"http://hl7.org/fhir/R4/codesystem-administrative-gender.html\">AdministrativeGender</a> to <a href=\"CodeSystem-IMMZ.C.html\">IMMZ.C CodeSystem for Data Elements</a></p><table class=\"grid\"><tr><td><b>Source Code</b></td><td><b>Relationship</b></td><td><b>Target Code</b></td><td><b>Comment</b></td></tr><tr><td>male</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE6 (Male)</td><td/></tr><tr><td>female</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE7 (Female)</td><td/></tr><tr><td>unknown</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE8 (Biological sex not specified)</td><td/></tr><tr><td>other</td><td><a href=\"http://hl7.org/fhir/R4/codesystem-concept-map-equivalence.html#null\"/></td><td>DE9 (Intersex)</td><td>The source concept is more specific than the target</td></tr></table></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ConceptMap/IMMZCSexToAdministrativeGender",
+  "version" : "0.1.0",
+  "name" : "IMMZ_C_SexToAdministrativeGender",
+  "title" : "ConceptMap to and From IMMZ.C sex to administrative gender",
+  "status" : "active",
+  "experimental" : false,
+  "date" : "2023-08-09",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Mapping to and from IMMZ.C sex coding to FHIR Administrative Gender.",
+  "group" : [{
+    "source" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "target" : "http://hl7.org/fhir/administrative-gender",
+    "element" : [{
+      "code" : "DE6",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "male",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE7",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "female",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE8",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "unknown",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "DE9",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "wider"
+        }],
+        "code" : "other",
+        "equivalence" : "wider"
+      }]
+    }]
+  },
+  {
+    "source" : "http://hl7.org/fhir/administrative-gender",
+    "target" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.C",
+    "element" : [{
+      "code" : "male",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE6",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "female",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE7",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "unknown",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "equivalent"
+        }],
+        "code" : "DE8",
+        "equivalence" : "equivalent"
+      }]
+    },
+    {
+      "code" : "other",
+      "target" : [{
+        "modifierExtension" : [{
+          "url" : "http://hl7.org/fhir/1.0/StructureDefinition/extension-ConceptMap.element.target.equivalence",
+          "valueCode" : "narrower"
+        }],
+        "code" : "DE9",
+        "equivalence" : "narrower",
+        "comment" : "The source concept is more specific than the target"
+      }]
+    }]
+  }]
+}

@@ -51,7 +51,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   init {
     viewModelScope.launch {
-      carePlanManager.saveKnowledgeResources("smart-imm/ig")
+      carePlanManager.saveKnowledgeResources("smart-imm-measles/ig")
       // carePlanManager.installKnowledgeResources()
       // carePlanManager.initializeKnowledgeManager()
       Sync.periodicSync<FhirSyncWorker>(

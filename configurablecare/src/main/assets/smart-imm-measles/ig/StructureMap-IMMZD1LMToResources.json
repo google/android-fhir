@@ -1,0 +1,999 @@
+{
+  "resourceType" : "StructureMap",
+  "id" : "IMMZD1LMToResources",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><pre class=\"fml\">\r\n<b>map</b><span style=\"color: navy\"> &quot;</span>http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1LMToResources<span style=\"color: navy\">&quot; = &quot;</span>IMMZD1LMToResources<span style=\"color: navy\">&quot;\r\n\r\n</span><b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"StructureDefinition-IMMZD1ClientHistoryMeasles.html\" title=\"IMMZ.D1 Capture Client History for Measles\">http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD1ClientHistoryMeasles</a><span style=\"color: navy\">&quot; </span><b>alias </b>IMMZD1 <b>as </b><b>source</b>\r\n<b>uses</b><span style=\"color: navy\"> &quot;</span><a href=\"http://hl7.org/fhir/R4/bundle.html\" title=\"Bundle\">http://hl7.org/fhir/StructureDefinition/Bundle</a><span style=\"color: navy\">&quot; </span><b>alias </b>Bundle <b>as </b><b>target</b>\r\n\r\n<b>group </b>IMMZD1ToBundle<span style=\"color: navy\">(</span><b>source</b> <span style=\"color: maroon\">immz</span><span style=\"color: navy\"> : </span>IMMZD1, <b>target</b> <span style=\"color: maroon\">bundle</span><span style=\"color: navy\"> : </span>Bundle<span style=\"color: navy\">)</span><span style=\"color: navy\"> {\r\n</span>  immz<span style=\"color: navy\"><b> -&gt; </b></span>bundle.type = <span style=\"color: blue\">'collection'</span> <i>&quot;SetCollection&quot;</i><span style=\"color: navy\">;</span>\r\n  immz.patient<b> as </b><span style=\"color: maroon\">patient</span><b> then</b><span style=\"color: navy\"> {\r\n</span>    immz.dose0<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE80'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetDose0Observation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.completedPrimarySeries<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE8'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetPrimarySeriesObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.dateSeriesCompleted<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE81'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetDateSeriesObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.hivStatus<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE10'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <span style=\"color: maroon\">content</span> <i>&quot;SetCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetCodeableConcept&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetHIVStatusObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.pretermBirth<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE15'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetPretermBirthObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.severelyImmunosuppressed<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE92'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetSeverelyImmunosuppressedObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.artStartDate<b> as </b><span style=\"color: maroon\">content</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Observation'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">obs</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>obs.subject = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.code = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'CodeableConcept'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        content<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Coding'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">coding</span><b> then</b><span style=\"color: navy\"> {\r\n</span>          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.system = <span style=\"color: blue\">'http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1'</span> <i>&quot;SetObsSystem&quot;</i><span style=\"color: navy\">;</span>\r\n          content<span style=\"color: navy\"><b> -&gt; </b></span>coding.code = <span style=\"color: blue\">'DE49'</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n        <span style=\"color: navy\">}</span> <i>&quot;SetObsCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetObsCode&quot;</i><span style=\"color: navy\">;</span>\r\n      content<span style=\"color: navy\"><b> -&gt; </b></span>obs.value = <span style=\"color: maroon\">content</span> <i>&quot;SetValue&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetARTDateObservation&quot;</i><span style=\"color: navy\">;</span>\r\n    immz.vaccineHistory<b> as </b><span style=\"color: maroon\">history</span><span style=\"color: navy\"><b> -&gt; </b></span> bundle.entry<b> as </b><span style=\"color: maroon\">entry</span><span style=\"color: navy\">, </span> entry.resource = <b>create</b><span style=\"color: navy\">(</span><span style=\"color: blue\">'Immunization'</span><span style=\"color: navy\">)</span><b> as </b><span style=\"color: maroon\">imm</span><b> then</b><span style=\"color: navy\"> {\r\n</span>      patient<span style=\"color: navy\"><b> -&gt; </b></span>imm.patient = <span style=\"color: maroon\">patient</span> <i>&quot;SetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n      history<span style=\"color: navy\"><b> -&gt; </b></span>imm.status = <span style=\"color: blue\">'completed'</span> <i>&quot;SetStatus&quot;</i><span style=\"color: navy\">;</span>\r\n      history.vaccineType<b> as </b><span style=\"color: maroon\">vaccine</span><span style=\"color: navy\"><b> -&gt; </b></span>imm.vaccineCode<b> as </b><span style=\"color: maroon\">code</span><b> then</b><span style=\"color: navy\"> {\r\n</span>        vaccine<span style=\"color: navy\"><b> -&gt; </b></span>code.coding = <span style=\"color: maroon\">vaccine</span> <i>&quot;SetVaccineCoding&quot;</i><span style=\"color: navy\">;</span>\r\n      <span style=\"color: navy\">}</span> <i>&quot;SetVaccineType&quot;</i><span style=\"color: navy\">;</span>\r\n      history.vaccineDate<b> as </b><span style=\"color: maroon\">date</span><span style=\"color: navy\"><b> -&gt; </b></span>imm.occurrence = <b>cast</b><span style=\"color: navy\">(</span><span style=\"color: maroon\">date</span><span style=\"color: navy\">, </span><span style=\"color: blue\">'string'</span><span style=\"color: navy\">)</span> <i>&quot;SetDate&quot;</i><span style=\"color: navy\">;</span>\r\n    <span style=\"color: navy\">}</span> <i>&quot;SetVaccineHistoryObservation&quot;</i><span style=\"color: navy\">;</span>\r\n  <span style=\"color: navy\">}</span> <i>&quot;GetPatient&quot;</i><span style=\"color: navy\">;</span>\r\n<span style=\"color: navy\">}\r\n\r\n</span></pre></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureMap/IMMZD1LMToResources",
+  "version" : "0.1.0",
+  "name" : "IMMZD1LMToResources",
+  "status" : "draft",
+  "date" : "2023-10-25T07:53:33+00:00",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "structure" : [{
+    "url" : "http://smart.who.int/ig/smart-immunizations-measles/StructureDefinition/IMMZD1ClientHistoryMeasles",
+    "mode" : "source",
+    "alias" : "IMMZD1"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/Bundle",
+    "mode" : "target",
+    "alias" : "Bundle"
+  }],
+  "group" : [{
+    "name" : "IMMZD1ToBundle",
+    "typeMode" : "none",
+    "input" : [{
+      "name" : "immz",
+      "type" : "IMMZD1",
+      "mode" : "source"
+    },
+    {
+      "name" : "bundle",
+      "type" : "Bundle",
+      "mode" : "target"
+    }],
+    "rule" : [{
+      "name" : "SetCollection",
+      "source" : [{
+        "context" : "immz"
+      }],
+      "target" : [{
+        "context" : "bundle",
+        "contextType" : "variable",
+        "element" : "type",
+        "transform" : "copy",
+        "parameter" : [{
+          "valueString" : "collection"
+        }]
+      }]
+    },
+    {
+      "name" : "GetPatient",
+      "source" : [{
+        "context" : "immz",
+        "element" : "patient",
+        "variable" : "patient"
+      }],
+      "rule" : [{
+        "name" : "SetDose0Observation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "dose0",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE80"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetPrimarySeriesObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "completedPrimarySeries",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE8"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetDateSeriesObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "dateSeriesCompleted",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE81"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetHIVStatusObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "hivStatus",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE10"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetCodeableConcept",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "transform" : "copy",
+              "parameter" : [{
+                "valueId" : "content"
+              }]
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetPretermBirthObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "pretermBirth",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE15"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetSeverelyImmunosuppressedObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "severelyImmunosuppressed",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE92"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetARTDateObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "artStartDate",
+          "variable" : "content"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "obs",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Observation"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "subject",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetObsCode",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "code",
+            "variable" : "code",
+            "transform" : "create",
+            "parameter" : [{
+              "valueString" : "CodeableConcept"
+            }]
+          }],
+          "rule" : [{
+            "name" : "SetObsCoding",
+            "source" : [{
+              "context" : "content"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "variable" : "coding",
+              "transform" : "create",
+              "parameter" : [{
+                "valueString" : "Coding"
+              }]
+            }],
+            "rule" : [{
+              "name" : "SetObsSystem",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "system",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/IMMZ.D1"
+                }]
+              }]
+            },
+            {
+              "name" : "SetObsCode",
+              "source" : [{
+                "context" : "content"
+              }],
+              "target" : [{
+                "context" : "coding",
+                "contextType" : "variable",
+                "element" : "code",
+                "transform" : "copy",
+                "parameter" : [{
+                  "valueString" : "DE49"
+                }]
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetValue",
+          "source" : [{
+            "context" : "content"
+          }],
+          "target" : [{
+            "context" : "obs",
+            "contextType" : "variable",
+            "element" : "value",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "content"
+            }]
+          }]
+        }]
+      },
+      {
+        "name" : "SetVaccineHistoryObservation",
+        "source" : [{
+          "context" : "immz",
+          "element" : "vaccineHistory",
+          "variable" : "history"
+        }],
+        "target" : [{
+          "context" : "bundle",
+          "contextType" : "variable",
+          "element" : "entry",
+          "variable" : "entry"
+        },
+        {
+          "context" : "entry",
+          "contextType" : "variable",
+          "element" : "resource",
+          "variable" : "imm",
+          "transform" : "create",
+          "parameter" : [{
+            "valueString" : "Immunization"
+          }]
+        }],
+        "rule" : [{
+          "name" : "SetPatient",
+          "source" : [{
+            "context" : "patient"
+          }],
+          "target" : [{
+            "context" : "imm",
+            "contextType" : "variable",
+            "element" : "patient",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueId" : "patient"
+            }]
+          }]
+        },
+        {
+          "name" : "SetStatus",
+          "source" : [{
+            "context" : "history"
+          }],
+          "target" : [{
+            "context" : "imm",
+            "contextType" : "variable",
+            "element" : "status",
+            "transform" : "copy",
+            "parameter" : [{
+              "valueString" : "completed"
+            }]
+          }]
+        },
+        {
+          "name" : "SetVaccineType",
+          "source" : [{
+            "context" : "history",
+            "element" : "vaccineType",
+            "variable" : "vaccine"
+          }],
+          "target" : [{
+            "context" : "imm",
+            "contextType" : "variable",
+            "element" : "vaccineCode",
+            "variable" : "code"
+          }],
+          "rule" : [{
+            "name" : "SetVaccineCoding",
+            "source" : [{
+              "context" : "vaccine"
+            }],
+            "target" : [{
+              "context" : "code",
+              "contextType" : "variable",
+              "element" : "coding",
+              "transform" : "copy",
+              "parameter" : [{
+                "valueId" : "vaccine"
+              }]
+            }]
+          }]
+        },
+        {
+          "name" : "SetDate",
+          "source" : [{
+            "context" : "history",
+            "element" : "vaccineDate",
+            "variable" : "date"
+          }],
+          "target" : [{
+            "context" : "imm",
+            "contextType" : "variable",
+            "element" : "occurrence",
+            "transform" : "cast",
+            "parameter" : [{
+              "valueId" : "date"
+            },
+            {
+              "valueString" : "string"
+            }]
+          }]
+        }]
+      }]
+    }]
+  }]
+}

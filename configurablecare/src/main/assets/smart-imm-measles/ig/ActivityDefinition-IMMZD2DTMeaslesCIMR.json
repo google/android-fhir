@@ -1,0 +1,51 @@
+{
+  "resourceType" : "ActivityDefinition",
+  "id" : "IMMZD2DTMeaslesCIMR",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationactivity"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: ActivityDefinition</b><a name=\"IMMZD2DTMeaslesCIMR\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource ActivityDefinition &quot;IMMZD2DTMeaslesCIMR&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"https://build.fhir.org/ig/HL7/cqf-recommendations//StructureDefinition-cpg-immunizationactivity.html\">CPG Immunization Activity</a></p></div><p><b>CPG Knowledge Capability Extension</b>: computable</p><p><b>url</b>: <code>http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesCIMR</code></p><p><b>version</b>: 0.1.0</p><p><b>name</b>: IMMZD2DTMeaslesContraindication</p><p><b>title</b>: IMMZ.D2.DT.Measles.Contraindication</p><p><b>status</b>: draft</p><p><b>experimental</b>: false</p><p><b>date</b>: 2023-10-03</p><p><b>publisher</b>: WHO</p><p><b>contact</b>: WHO: <a href=\"http://who.int\">http://who.int</a></p><p><b>description</b>: Provide measles immunization</p><p><b>library</b>: <a href=\"Library-IMMZD2DTMeasles.html\">IMMZD2DTMeasles</a></p><p><b>kind</b>: MedicationRequest</p><p><b>profile</b>: <a href=\"https://build.fhir.org/ig/HL7/cqf-recommendations//StructureDefinition-cpg-immunizationrequest.html\">CPG Immunization Request</a></p><p><b>intent</b>: proposal</p><p><b>doNotPerform</b>: true</p><p><b>product</b>: Measles vaccines <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"CodeSystem-ICD11.html\">ICD-11</a>#XM28X5)</span></p><blockquote><p><b>dynamicValue</b></p><p><b>path</b>: id</p><h3>Expressions</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Description</b></td><td><b>Language</b></td><td><b>Expression</b></td></tr><tr><td style=\"display: none\">*</td><td>Draft Medication Request ID for MCV dose</td><td>text/cql-identifier</td><td>Draft Medication Request ID for MCV dose</td></tr></table></blockquote></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueCode" : "computable"
+  }],
+  "url" : "http://smart.who.int/ig/smart-immunizations-measles/ActivityDefinition/IMMZD2DTMeaslesCIMR",
+  "version" : "0.1.0",
+  "name" : "IMMZD2DTMeaslesContraindication",
+  "title" : "IMMZ.D2.DT.Measles.Contraindication",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-03",
+  "publisher" : "WHO",
+  "contact" : [{
+    "name" : "WHO",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "http://who.int"
+    }]
+  }],
+  "description" : "Provide measles immunization",
+  "library" : ["http://smart.who.int/ig/smart-immunizations-measles/Library/IMMZD2DTMeasles"],
+  "kind" : "MedicationRequest",
+  "profile" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationrequest",
+  "intent" : "proposal",
+  "doNotPerform" : true,
+  "productCodeableConcept" : {
+    "coding" : [{
+      "system" : "http://hl7.org/fhir/sid/icd-11/mms",
+      "code" : "XM28X5",
+      "display" : "Measles vaccines"
+    }]
+  },
+  "dynamicValue" : [{
+    "path" : "id",
+    "expression" : {
+      "description" : "Draft Medication Request ID for MCV dose",
+      "language" : "text/cql-identifier",
+      "expression" : "Draft Medication Request ID for MCV dose"
+    }
+  }]
+}
