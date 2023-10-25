@@ -84,32 +84,7 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
           // carePlanManager.smartIgTest()
           if (currentPlanDefinitionId != "") {
             if (currentPlanDefinitionId.contains("CreateImmunizationRecord")) {
-              // println("About to create Immunization record")
-              // val patientId = IdType(careWorkflowExecutionRequest.patient.id).idPart
-              // val medicationRequest = requestManager.getRequestsForPatient(
-              //   patientId,
-              //   ResourceType.MedicationRequest,
-              //   status = "draft", // "active",
-              //   intent = "order"
-              // ).first() as MedicationRequest
-              // requestManager.endOrder(medicationRequest, MedicationRequest.MedicationRequestStatus.COMPLETED, "Completed successfully")
 
-              // var vaccineCoding: Coding? = null
-              // if (medicationRequest.hasMedicationCodeableConcept() && medicationRequest.medicationCodeableConcept.hasCoding()) {
-              //   vaccineCoding = medicationRequest.medicationCodeableConcept.codingFirstRep
-              // }
-              // val immunization = Immunization().apply {
-              //   id = UUID.randomUUID().toString()
-              //   vaccineCode.addCoding(vaccineCoding)
-              //   patient = Reference("Patient/$patientId")
-              //   status = Immunization.ImmunizationStatus.COMPLETED
-              // }
-              //
-              // fhirEngine.create(immunization)
-              // fhirEngine.update(medicationRequest)
-
-              // println(jsonParser.encodeResourceToString(immunization))
-              // println(jsonParser.encodeResourceToString(medicationRequest))
             }
             else {
               println("About to apply $currentPlanDefinitionId")
@@ -158,18 +133,6 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
     updateCarePlan: Boolean,
   ) {
     viewModelScope.launch {
-
-      // val resourceType: ResourceType = when (requestResourceType) {
-      //   "Task" -> ResourceType.Task
-      //   "MedicationRequest" -> ResourceType.MedicationRequest
-      //   "ServiceRequest" -> ResourceType.ServiceRequest
-      //   else -> ResourceType.Task
-      // }
-
-      // val request = fhirEngine.search<Task> { filter(
-      //         Task.RES_ID,
-      //         { taskLogicalId }
-      //       )}
       val taskSearch = fhirEngine.search<Task> {
         filter(
           Task.RES_ID,
@@ -201,30 +164,10 @@ class CareWorkflowExecutionViewModel(application: Application) : AndroidViewMode
         patient =
           fhirEngine.get(medicationRequest.subject.reference.substring("Patient/".length))
         executeCareWorkflowForPatient(patient)
-
-        // val nextAction = getNextActionForMedicationRequest(medicationRequest.intent.toCode())
-        // println("intent: ${medicationRequest.intent} nextAction: $nextAction")
-        // if (nextAction.isEmpty()) {
-        //   requestManager.updateIntent(IdType(medicationRequest.id).idPart, ResourceType.MedicationRequest.toString())
-        // }
-        // else {
-        //   medicationRequest.addSupportingInformation(Reference(nextAction))
-        // }
-
-        // medicationRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
-        // fhirEngine.update(medicationRequest)
       }
       else
         patient = Patient()
 
-      // carePlanManager.updateCarePlanActivity(
-      //   task,
-      //   taskStatus.toString(),
-      //   encounterReferences,
-      //   updateCarePlan
-      // )
-
-      // executeCareWorkflowForPatient(patient)
     }
   }
 

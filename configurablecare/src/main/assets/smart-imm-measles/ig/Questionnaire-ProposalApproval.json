@@ -1,0 +1,36 @@
+{
+  "resourceType": "Questionnaire",
+  "id": "ProposalApproval",
+  "title": "Administer Vaccine",
+  "status": "active",
+  "item": [
+    {
+      "type": "boolean",
+      "linkId": "approval-choice",
+      "text": "Do you accept this proposal?",
+      "required": true,
+      "repeats": false,
+      "readOnly": false,
+      "initial": [
+        {
+          "valueBoolean": true
+        }
+      ]
+    },
+    {
+      "type": "string",
+      "linkId": "reason",
+      "text": "Reason for rejection",
+      "enableWhen": [
+        {
+          "question": "approval-choice",
+          "operator": "=",
+          "answerBoolean": false
+        }
+      ],
+      "enableBehavior": "all",
+      "required": false,
+      "repeats": false
+    }
+  ]
+}

@@ -211,24 +211,6 @@ class RequestManager(
     // else do nothing
   }
 
-//   fun applyDecision(baseRequest: Resource, decision: Boolean, reason: String = ""): Boolean {
-//     when (baseRequest) {
-//       is MedicationRequest -> {
-//         if (decision) { // accept proposal
-//           baseRequest.status = MedicationRequest.MedicationRequestStatus.COMPLETED
-//         } else {
-//           baseRequest.status = MedicationRequest.MedicationRequestStatus.CANCELLED
-//           baseRequest.statusReason = CodeableConcept().addCoding(Coding().apply{ display = reason})
-//         }
-//       }
-//       else -> {}
-//     }
-//
-//     // This is specifically for the app-based Questionnaire
-//     println("Proposal QR: ${jsonParser.encodeResourceToString(proposalQuestionnaireResponse)}" )
-//     return true
-//   }
-// }
 
   suspend fun handleDoNotPerform(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration> = emptyList()) {
     println("Do not perform handler")

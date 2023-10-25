@@ -84,7 +84,7 @@ class CarePlanManager(
     val rootDirectory = File(context.filesDir, path)
     if (rootDirectory.exists()) {
       initializeKnowledgeManager(rootDirectory)
-      // return
+      return
     }
     rootDirectory.mkdirs()
 
@@ -257,38 +257,6 @@ class CarePlanManager(
     }
   }
 
-  /**
-   * Accept the proposed [CarePlan] and create the proposed request resources as per the
-   * configurations
-   *
-   * @param proposedCarePlan Proposed [CarePlan] generated when $apply is run on a [PlanDefinition]
-   * @param carePlanOfRecord CarePlan of record for a [Patient] which needs to be updated with the
-   * new request resources created as per the proposed CarePlan
-   * @param requestResourceConfigs Application-specific configurations to be applied on the created
-   * request resources
-   */
-  // private suspend fun acceptCarePlan(
-  //   proposedCarePlan: CarePlan,
-  //   carePlanOfRecord: CarePlan,
-  //   requestResourceConfigs: List<RequestResourceConfig>,
-  // ) {
-  //   // modify this and use:
-  //   val resourceList: MutableList<Resource> = mutableListOf()
-  //   for (request in proposedCarePlan.contained) {
-  //     if (request is RequestGroup) {
-  //       resourceList.addAll(requestManager.createRequestFromRequestGroup(request))
-  //     }
-  //   }
-  //
-  //   // val resourceList =
-  //   //   createProposedRequestResources(proposedCarePlan.contained, requestResourceConfigs)
-  //   updateCarePlanWithProtocol(carePlanOfRecord, proposedCarePlan.instantiatesCanonical)
-  //   addRequestResourcesToCarePlanOfRecord(carePlanOfRecord, resourceList)
-  //
-  //   fhirEngine.update(carePlanOfRecord)
-  //   linkRequestResourcesToCarePlan(carePlanOfRecord, resourceList)
-  // }
-
   private suspend fun acceptCarePlan(
     proposedCarePlan: CarePlan,
     requestConfiguration: List<RequestConfiguration>,
@@ -302,97 +270,6 @@ class CarePlanManager(
     }
 
     requestManager.evaluateNextStage(resourceList, requestConfiguration)
-    // Workaround until we figure out how to handle sequential events
-    // for (resource in resourceList) {
-    //   if (resource is MedicationRequest) {
-    //     if (resource.doNotPerform) continue
-    //     if (resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
-    //       requestManager.beginProposal(resource, requestConfiguration)
-    //     }
-    //   }
-    // }
-
-    // val resourceList =
-    //   createProposedRequestResources(proposedCarePlan.contained, requestResourceConfigs)
-    // updateCarePlanWithProtocol(carePlanOfRecord, proposedCarePlan.instantiatesCanonical)
-    // addRequestResourcesToCarePlanOfRecord(carePlanOfRecord, resourceList)
-    //
-    // fhirEngine.update(carePlanOfRecord)
-    // linkRequestResourcesToCarePlan(carePlanOfRecord, resourceList)
     return resourceList
   }
-
-  /** Update status of a [CarePlan] activity */
-  // private suspend fun updateCarePlanStatus(
-  //   carePlan: CarePlan,
-  //   requestedActivityResource: Resource,
-  //   carePlanActivityStatus: CarePlanActivityStatus,
-  //   outcomeReferences: List<Reference>,
-  // ) {
-  //   if (carePlan.isEmpty) return
-  //   for (activity in carePlan.activity) {
-  //     if (activity.reference.reference.equals(
-  //         requestedActivityResource.fhirType() + "/" + IdType(requestedActivityResource.id).idPart
-  //       )
-  //     ) {
-  //       activity.detail.status = carePlanActivityStatus
-  //       activity.outcomeReference = outcomeReferences
-  //       fhirEngine.update(carePlan)
-  //       break
-  //     }
-  //   }
-  // }
-
-  /**
-   * Find and update the status of the [CarePlan] activity as per the corresponding request resource
-   * status
-   */
-  // suspend fun updateCarePlanActivity(
-  //   requestResource: Resource,
-  //   requestResourceStatus: String,
-  //   outcomeReferences: List<Reference>,
-  //   updateCarePlan: Boolean = true,
-  // ) {
-  //   val carePlanActivityStatus: CarePlanActivityStatus
-  //   val carePlan: CarePlan
-  //   when (requestResource.fhirType()) {
-  //     "Task" -> {
-  //       taskManager.updateRequestResourceStatus(requestResource as Task, requestResourceStatus)
-  //       if (updateCarePlan) {
-  //         carePlanActivityStatus =
-  //           taskManager.mapRequestResourceStatusToCarePlanStatus(requestResource)
-  //         carePlan =
-  //           if (requestResource.hasBasedOn())
-  //             fhirEngine.get(
-  //               ResourceType.CarePlan,
-  //               IdType(requestResource.basedOnFirstRep.referenceElement.value).idPart
-  //             ) as CarePlan
-  //           else return
-  //         updateCarePlanStatus(carePlan, requestResource, carePlanActivityStatus, outcomeReferences)
-  //       }
-  //     }
-  //     "ServiceRequest" -> TODO("Not supported yet")
-  //     "MedicationRequest" -> TODO("Not supported yet")
-  //     "SupplyRequest" -> TODO("Not supported yet")
-  //     "Procedure" -> TODO("Not supported yet")
-  //     "DiagnosticReport" -> TODO("Not supported yet")
-  //     "Communication" -> TODO("Not supported yet")
-  //     "CommunicationRequest" -> TODO("Not supported yet")
-  //     "RequestGroup" -> {}
-  //     else -> TODO("Not a valid request resource")
-  //   }
-  // }
-
-  // This should be in the RequestManager
-  // companion object {
-  //   fun getNextActionForMedicationRequest(medicationRequest: MedicationRequest, requestConfiguration: List<RequestConfiguration>): RequestConfiguration.IntentCondition? {
-  //     val mrConfig = requestConfiguration.firstOrNull {
-  //       it.requestType == "MedicationRequest"
-  //     }?.intentConditions?.firstOrNull {
-  //       it.intent == medicationRequest.intent.toCode()
-  //     }
-  //     return mrConfig
-  //   }
-  // }
-
 }
