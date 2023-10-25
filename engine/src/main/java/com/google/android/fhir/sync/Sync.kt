@@ -122,6 +122,15 @@ object Sync {
           }
       }
 
+  /**
+   * Combines the sync state for a periodic sync operation, including work state, progress, and
+   * terminal states.
+   *
+   * @param context The Android application context.
+   * @param workName The name of the periodic sync work.
+   * @param syncJobProgressStateFlow A flow representing the progress of the sync job.
+   * @return A flow of [PeriodicSyncState] combining the sync job states.
+   */
   @PublishedApi
   internal fun combineSyncStateForPeriodicSync(
     context: Context,
@@ -149,6 +158,15 @@ object Sync {
     }
   }
 
+  /**
+   * Combines the sync state for a one-time sync operation, including work state, progress, and
+   * terminal states.
+   *
+   * @param context The Android application context.
+   * @param workName The name of the one-time sync work.
+   * @param syncJobProgressStateFlow A flow representing the progress of the sync job.
+   * @return A flow of [SyncState] combining the sync job states.
+   */
   @PublishedApi
   internal fun combineSyncStateForOneTimeSync(
     context: Context,
@@ -191,7 +209,7 @@ object Sync {
       oneTimeWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+          .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
           .build(),
       )
     }
@@ -221,7 +239,7 @@ object Sync {
       periodicWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(STRING_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+          .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
           .build(),
       )
     }

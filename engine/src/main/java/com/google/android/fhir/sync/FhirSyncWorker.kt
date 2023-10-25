@@ -78,7 +78,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       CoroutineScope(Dispatchers.IO).launch {
         val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
         synchronizer.syncState.collect { syncJobStatus ->
-          val uniqueWorkerName = inputData.getString(STRING_PREFERENCES_DATASTORE_KEY)!!
+          val uniqueWorkerName = inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY)!!
           when (syncJobStatus) {
             is SyncJobStatus.Finished,
             is SyncJobStatus.Failed, -> {

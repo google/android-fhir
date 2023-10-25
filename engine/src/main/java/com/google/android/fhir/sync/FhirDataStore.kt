@@ -45,14 +45,18 @@ internal class FhirDataStore(context: Context) {
       .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
       .create()
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
+  private val allowedSyncJobStatusPackages =
+    listOf(
+      "com.google.android.fhir.sync.SyncJobStatus.Finished",
+      "com.google.android.fhir.sync.SyncJobStatus.Failed",
+    )
 
   /**
-   * Utilizes a flow from the DataStore to collect and transform data. It catches potential
-   * IOExceptions and emits an empty preference instance in such cases. The collected data is then
-   * mapped into a [FhirSyncWorkStatus].
+   * Observes the sync job terminal state for a given key and provides it as a Flow.
    *
-   * @param key The key associated with the data to collect.
-   * @return A flow that emits the [FhirSyncWorkStatus].
+   * @param key The key associated with the sync job.
+   * @return A Flow of [SyncJobStatus] representing the terminal state of the sync job, or null if
+   *   the state is not allowed.
    */
   @PublishedApi
   internal fun observeSyncJobTerminalState(key: String): Flow<SyncJobStatus?> =
@@ -71,8 +75,10 @@ internal class FhirDataStore(context: Context) {
           data?.let {
             val stateType = data.getString(STATE_TYPE)
             val stateData = data.getString(STATE)
-            stateType?.let { type ->
-              stateData?.let { gson.fromJson(stateData, Class.forName(type)) as? SyncJobStatus }
+            if (stateType?.isAllowedClass() == true) {
+              stateData?.let { gson.fromJson(it, Class.forName(stateType)) as? SyncJobStatus }
+            } else {
+              null
             }
           }
         }
@@ -134,6 +140,10 @@ internal class FhirDataStore(context: Context) {
         }
       preferences[stringPreferencesKey(key)] = gson.toJson(data)
     }
+  }
+
+  private fun String.isAllowedClass(): Boolean {
+    return allowedSyncJobStatusPackages.any { this.startsWith(it) }
   }
 
   companion object {
