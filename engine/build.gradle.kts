@@ -87,6 +87,7 @@ configurations {
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
+    exclude(module = "jcl-over-slf4j")
 
     forceGuava()
     forceHapiVersion()
