@@ -24,6 +24,7 @@ import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.get
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
@@ -36,7 +37,9 @@ import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
+import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOf
@@ -590,6 +593,87 @@ class FhirEngineImplTest {
         )
         .isEqualTo(localChangeDiff)
       assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
+    }
+
+  @Test
+  fun `syncDownload ResourceEntity should have the latest versionId and lastUpdated from server`() =
+    runBlocking {
+      val originalPatient =
+        Patient().apply {
+          id = "original-002"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdated = Date.from(Instant.parse("2022-12-02T10:15:30.00Z"))
+            }
+          addName(
+            HumanName().apply {
+              family = "Stark"
+              addGiven("Tony")
+            },
+          )
+        }
+      // First sync
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+
+      val updatedPatient =
+        originalPatient.copy().apply {
+          meta =
+            Meta().apply {
+              versionId = "2"
+              lastUpdated = Date.from(Instant.parse("2022-12-03T10:15:30.00Z"))
+            }
+          addAddress(Address().apply { country = "USA" })
+        }
+
+      // Sync to get updates from server
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
+
+      val result = services.database.selectEntity(ResourceType.Patient, "original-002")
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
+      assertThat(result.lastUpdatedRemote).isEqualTo(updatedPatient.lastUpdated)
+    }
+
+  @Test
+  fun `syncDownload LocalChangeEntity should have the latest versionId from server`() =
+    runBlocking {
+      val originalPatient =
+        Patient().apply {
+          id = "original-002"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdated = Date.from(Instant.parse("2022-12-02T10:15:30.00Z"))
+            }
+          addName(
+            HumanName().apply {
+              family = "Stark"
+              addGiven("Tony")
+            },
+          )
+        }
+      // First sync
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+
+      val localChange =
+        originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
+      fhirEngine.update(localChange)
+
+      val updatedPatient =
+        originalPatient.copy().apply {
+          meta =
+            Meta().apply {
+              versionId = "2"
+              lastUpdated = Date.from(Instant.parse("2022-12-03T10:15:30.00Z"))
+            }
+          addAddress(Address().apply { country = "USA" })
+        }
+
+      // Sync to get updates from server
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
+
+      val result = fhirEngine.getLocalChanges(ResourceType.Patient, "original-002").first()
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
     }
 
   @Test

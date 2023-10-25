@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db.impl.dao
 
-import androidx.annotation.VisibleForTesting
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -50,7 +49,6 @@ import timber.log.Timber
  * e.g. an INSERT or UPDATE. The UPDATES (diffs) are stored as RFC 6902 JSON patches.
  */
 @Dao
-@VisibleForTesting
 internal abstract class LocalChangeDao {
 
   lateinit var iParser: IParser
@@ -188,32 +186,32 @@ internal abstract class LocalChangeDao {
     fhirTerser.getAllResourceReferences(resource).toSet()
 
   /**
-   * Extract the difference in the [ResourceReferenceInfo] by getting all the references from both
-   * the versions of the resource and then finding out the difference in the two sets.
+   * Extract the difference in the [ResourceReferenceInfo]s in the two versions of the resource.
    *
    * Two versions of a resource can vary in two ways in terms of the resources they refer:
-   * 1) A reference present in resource1 is removed and is not present in resource2. Such
-   *    differences in resource references can be extracted by subtracting the set of references in
-   *    the resource2 from the set of references in the resource1
-   * 2) A new reference is added to the resource1. This implies that the reference is present in
-   *    resource2 and not in resource1. Such differences in resource references can be extracted by
-   *    subtracting the set of references in the resource1 from the set of references in the
-   *    resource2
+   * 1) A reference present in oldVersionResource is removed, hence, not present in
+   *    newVersionResource.
+   * 2) A new reference is added to the oldVersionResource, hence, the reference is present in
+   *    newVersionResource and not in oldVersionResource.
    *
-   * Combining the above two types of differences would give the entire set of difference in the two
-   * versions of the resource.
+   * We compute the differences of both the above kinds to return the entire set of differences.
    *
    * This method is useful to extract differences for UPDATE kind of [LocalChange]
+   *
+   * @param oldVersionResource: The older version of the resource
+   * @param newVersionResource: The new version of the resource
+   * @return A set of [ResourceReferenceInfo] containing the differences in references between the
+   *   two resource versions.
    */
   private fun extractReferencesDiff(
-    resource1: Resource,
-    resource2: Resource,
+    oldVersionResource: Resource,
+    newVersionResource: Resource,
   ): Set<ResourceReferenceInfo> {
-    require(resource1.resourceType.equals(resource2.resourceType))
-    val resource1References = extractResourceReferences(resource1).toSet()
-    val resource2References = extractResourceReferences(resource2).toSet()
-    return resource1References.minus(resource2References) +
-      resource2References.minus(resource1References)
+    require(oldVersionResource.resourceType.equals(newVersionResource.resourceType))
+    val oldVersionResourceReferences = extractResourceReferences(oldVersionResource).toSet()
+    val newVersionResourceReferences = extractResourceReferences(newVersionResource).toSet()
+    return oldVersionResourceReferences.minus(newVersionResourceReferences) +
+      newVersionResourceReferences.minus(oldVersionResourceReferences)
   }
 
   private fun Set<ResourceReferenceInfo>.minus(set: Set<ResourceReferenceInfo>) =
@@ -470,6 +468,20 @@ internal abstract class LocalChangeDao {
       LocalChangeEntity.Type.DELETE -> localChange
     }
   }
+
+  @Query(
+    """
+    SELECT * 
+      FROM LocalChangeEntity 
+      WHERE resourceUuid = (
+        SELECT resourceUuid 
+        FROM LocalChangeEntity 
+        ORDER BY timestamp ASC 
+        LIMIT 1)
+      ORDER BY timestamp ASC
+    """,
+  )
+  abstract suspend fun getAllChangesForEarliestChangedResource(): List<LocalChangeEntity>
 
   class InvalidLocalChangeException(message: String?) : Exception(message)
 
