@@ -1,5 +1,4 @@
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
+import Dependencies.forceGuava
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
@@ -50,8 +49,7 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations {
   all {
     removeIncompatibleDependencies()
-    forceHapiVersion()
-    forceJacksonVersion()
+    forceGuava()
   }
 }
 
@@ -59,15 +57,15 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.Cql.engineJackson)
   androidTestImplementation(Dependencies.Cql.evaluator)
-  androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
+  androidTestImplementation(Dependencies.Cql.evaluatorFhirJackson)
+  androidTestImplementation(Dependencies.Cql.evaluatorFhirUtilities)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
+  androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }

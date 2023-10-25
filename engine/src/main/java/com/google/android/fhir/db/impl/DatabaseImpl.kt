@@ -140,7 +140,7 @@ internal class DatabaseImpl(
       resources.forEach {
         val timeOfLocalChange = Instant.now()
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, timeOfLocalChange)
+        resourceDao.applyLocalUpdate(it, timeOfLocalChange)
         localChangeDao.addUpdate(oldResourceEntity, it, timeOfLocalChange)
       }
     }
@@ -226,6 +226,10 @@ internal class DatabaseImpl(
 
   override suspend fun getLocalChangesCount(): Int {
     return db.withTransaction { localChangeDao.getLocalChangesCount() }
+  }
+
+  override suspend fun getAllChangesForEarliestChangedResource(): List<LocalChange> {
+    return localChangeDao.getAllChangesForEarliestChangedResource().map { it.toLocalChange() }
   }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {

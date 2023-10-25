@@ -21,9 +21,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.npm.LocalFhirNpmPackageMetadata
-import com.google.android.fhir.knowledge.npm.NpmFileManager
+import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.files.NpmFileManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
@@ -45,9 +44,8 @@ internal class KnowledgeManagerTest {
   private val knowledgeManager =
     KnowledgeManager(
       knowledgeDb,
-      context.dataDir,
       npmFileManager = npmFileManager,
-      packageDownloader = { fhirPackage, _ ->
+      npmPackageDownloader = { fhirPackage, _ ->
         LocalFhirNpmPackageMetadata(
           fhirPackage.name,
           fhirPackage.version,
@@ -115,14 +113,14 @@ internal class KnowledgeManagerTest {
   fun `inserting a library of a different version creates new entry`() = runTest {
     val libraryAOld =
       Library().apply {
-        id = "defaultA"
+        id = "Library/defaultA-A.1.0.0"
         name = "defaultA"
         url = "www.exampleA.com"
         version = "A.1.0.0"
       }
     val libraryANew =
       Library().apply {
-        id = "defaultA"
+        id = "Library/defaultA-A.1.0.1"
         name = "defaultA"
         url = "www.exampleA.com"
         version = "A.1.0.1"
@@ -133,6 +131,18 @@ internal class KnowledgeManagerTest {
 
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
+
+    val resourceA100 =
+      knowledgeManager
+        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.0")
+        .single()
+    assertThat(resourceA100.idElement.toString()).isEqualTo("Library/1")
+
+    val resourceA101 =
+      knowledgeManager
+        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.1")
+        .single()
+    assertThat(resourceA101.idElement.toString()).isEqualTo("Library/2")
   }
 
   fun `installing from npmPackageManager`() = runTest {
@@ -155,7 +165,8 @@ internal class KnowledgeManagerTest {
   }
 
   private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.name).apply {
+    return File(context.filesDir, library.id).apply {
+      this.parentFile?.mkdirs()
       writeText(jsonParser.encodeResourceToString(library))
     }
   }

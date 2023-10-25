@@ -1,0 +1,264 @@
+{
+  "resourceType": "Claim",
+  "id": "OPA-Claim1",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/profile-claim"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-levelOfServiceCode",
+      "valueCodeableConcept": {
+        "coding": [
+          {
+            "system": "http://codesystem.x12.org/005010/1338",
+            "code": "U",
+            "display": "Urgent"
+          }
+        ]
+      }
+    }
+  ],
+  "identifier": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierJurisdiction",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://www.usps.com/",
+                "code": "MA"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-identifierSubDepartment",
+          "valueString": "223412"
+        }
+      ],
+      "system": "http://example.org/PATIENT_EVENT_TRACE_NUMBER",
+      "value": "111099",
+      "assigner": {
+        "identifier": {
+          "system": "http://example.org/USER_ASSIGNED",
+          "value": "9012345678"
+        }
+      }
+    }
+  ],
+  "status": "active",
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/claim-type",
+        "code": "professional"
+      }
+    ]
+  },
+  "use": "preauthorization",
+  "patient": {
+    "reference": "Patient/OPA-Patient1"
+  },
+  "created": "2005-05-02",
+  "insurer": {
+    "reference": "Organization/OPA-PayorOrganization1"
+  },
+  "provider": {
+    "reference": "Organization/OPA-ProviderOrganization1"
+  },
+  "facility": {
+    "reference": "Location/OPA-Location1"
+  },
+  "priority": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/processpriority",
+        "code": "normal"
+      }
+    ]
+  },
+  "careTeam": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope",
+          "valueBoolean": true
+        }
+      ],
+      "sequence": 1,
+      "provider": {
+        "reference": "Practitioner/OPA-OperatingPhysician1"
+      }
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-careTeamClaimScope",
+          "valueBoolean": true
+        }
+      ],
+      "sequence": 2,
+      "provider": {
+        "reference": "Practitioner/OPA-AttendingPhysician1"
+      }
+    }
+  ],
+  "diagnosis": [
+    {
+      "sequence": 123,
+      "diagnosisReference": {
+        "reference": "Condition/OPA-Condition1"
+      }
+    }
+  ],
+  "procedure": [
+    {
+      "sequence": 1,
+      "procedureReference": {
+        "reference": "Procedure/OPA-Procedure1"
+      }
+    },
+    {
+      "sequence": 2,
+      "procedureReference": {
+        "reference": "Procedure/OPA-Procedure2"
+      }
+    }
+  ],
+  "supportingInfo": [
+    {
+      "sequence": 1,
+      "category": {
+        "coding": [
+          {
+            "system": "http://hl7.org/us/davinci-pas/CodeSystem/PASSupportingInfoType",
+            "code": "patientEvent"
+          }
+        ]
+      },
+      "timingPeriod": {
+        "start": "2015-10-01T00:00:00-07:00",
+        "end": "2015-10-05T00:00:00-07:00"
+      }
+    }
+  ],
+  "insurance": [
+    {
+      "sequence": 1,
+      "focal": true,
+      "coverage": {
+        "reference": "Coverage/OPA-Coverage1"
+      }
+    }
+  ],
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-itemTraceNumber",
+          "valueIdentifier": {
+            "system": "http://example.org/ITEM_TRACE_NUMBER",
+            "value": "1122334"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-authorizationNumber",
+          "valueString": "1122445"
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-administrationReferenceNumber",
+          "valueString": "9988311"
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-serviceItemRequestType",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1525",
+                "code": "SC",
+                "display": "Specialty Care Review"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-certificationType",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1322",
+                "code": "I",
+                "display": "Initial"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-requestedService",
+          "valueReference": {
+            "reference": "ServiceRequest/OPA-ServiceRequest1"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-epsdtIndicator",
+          "valueBoolean": false
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeResidentialStatus",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1345",
+                "code": "2",
+                "display": "Newly Admitted"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-nursingHomeLevelOfCare",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://codesystem.x12.org/005010/1337",
+                "code": "2",
+                "display": "Intermediate Care Facility (ICF)"
+              }
+            ]
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/us/davinci-pas/StructureDefinition/extension-revenueUnitRateLimit",
+          "valueDecimal": 100
+        }
+      ],
+      "sequence": 1,
+      "careTeamSequence": [
+        1
+      ],
+      "diagnosisSequence": [
+        1
+      ],
+      "productOrService": {
+        "coding": [
+          {
+            "system": "http://codesystem.x12.org/005010/1365",
+            "code": "3",
+            "display": "Consultation"
+          }
+        ]
+      },
+      "locationCodeableConcept": {
+        "coding": [
+          {
+            "system": "https://www.cms.gov/Medicare/Coding/place-of-service-codes/Place_of_Service_Code_Set",
+            "code": "11"
+          }
+        ]
+      }
+    }
+  ]
+}
