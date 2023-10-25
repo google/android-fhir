@@ -51,12 +51,13 @@ android {
         "META-INF/LICENSE.md",
         "META-INF/NOTICE.md",
         "META-INF/sun-jaxb.episode",
-        "META-INF/DEPENDENCIES"
-      )
+        "META-INF/DEPENDENCIES",
+      ),
     )
   }
 
-  // packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
+  // packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
+  // }
   // packaging {
   //   resources.excludes.addAll(listOf(
   //   "META-INF/DEPENDENCIES",
@@ -73,7 +74,8 @@ android {
 // sourceSets {
 //   // getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
 //
-//   getByName("com.google.android.fhir.configurablecare").apply { resources.setSrcDirs(listOf("sampledata")) }
+//   getByName("com.google.android.fhir.configurablecare").apply {
+// resources.setSrcDirs(listOf("sampledata")) }
 // }
 
 configurations { all { forceGuava() } }
@@ -108,12 +110,16 @@ dependencies {
   }
   implementation(project(":knowledge")) {
     // exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
-    exclude(group = "org.apache.commons", module = "compress:${Dependencies.Versions.apacheCommonsCompress}")
+    exclude(
+      group = "org.apache.commons",
+      module = "compress:${Dependencies.Versions.apacheCommonsCompress}"
+    )
     exclude(group = "org.apache.commons.logging.Log", module = "commons-logging-1.2")
   }
   implementation(project(":workflow")) {
     // exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
-    // exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
+    // exclude(group = Dependencies.androidFhirGroup, module =
+    // Dependencies.androidFhirKnowledgeModule)
   }
   // testImplementation(Dependencies.junit)
 }

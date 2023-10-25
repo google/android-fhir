@@ -34,7 +34,6 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.StringType
 import org.intellij.lang.annotations.Language
 import org.junit.Before
@@ -80,8 +79,9 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     for (entry in knowledgeResources.entry) {
       val resource = entry.resource
-      if (resource is Library)
+      if (resource is Library) {
         knowledgeManager.install(writeToFile(resource))
+      }
     }
     // Evaluates a specific Patient
     val results =

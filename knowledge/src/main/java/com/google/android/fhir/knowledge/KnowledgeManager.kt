@@ -112,6 +112,7 @@ internal constructor(
       }
     }
   }
+
   /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
     importFile(null, file)

@@ -84,7 +84,7 @@ class CarePlanManager(
     val rootDirectory = File(context.filesDir, path)
     if (rootDirectory.exists()) {
       initializeKnowledgeManager(rootDirectory)
-      return
+      // return
     }
     rootDirectory.mkdirs()
 

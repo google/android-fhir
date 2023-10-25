@@ -35,8 +35,6 @@ import org.hl7.fhir.r4.model.Task.TaskStatus
 class ListScreeningsViewModel(application: Application) : AndroidViewModel(application) {
 
   private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val taskManager =
-    FhirApplication.taskManager(getApplication<Application>().applicationContext)
   private val requestManager =
     FhirApplication.requestManager(getApplication<Application>().applicationContext)
 

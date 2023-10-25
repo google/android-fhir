@@ -30,11 +30,8 @@ import java.io.FileInputStream
 import java.util.TimeZone
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.hl7.fhir.r4.model.ActivityDefinition
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.PlanDefinition
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ValueSet
 import org.junit.Before
@@ -72,19 +69,23 @@ class SmartImmunizationTest {
 
     for (file in rootDirectory.listFiles()!!) {
       val filename = file.name
-      if (filename.contains(".txt") || (filename[0] >= 'a' && filename[0] < 'z') || filename.contains("2.json"))
+      if (
+        filename.contains(".txt") ||
+          (filename[0] >= 'a' && filename[0] < 'z') ||
+          filename.contains("2.json")
+      ) {
         continue
-      val res = withContext(Dispatchers.IO) {
-        jsonParser.parseResource(FileInputStream(file))
       }
+      val res = withContext(Dispatchers.IO) { jsonParser.parseResource(FileInputStream(file)) }
       if (res is Resource) {
         // if (res is PlanDefinition || res is Library || res is ActivityDefinition) {
         if (res is ValueSet) {
-          val bundleEntryComponent = Bundle.BundleEntryComponent().apply {
-            resource = res
-            request.method = Bundle.HTTPVerb.PUT
-            request.url = "${res.resourceType}/${IdType(res.id).idPart}"
-          }
+          val bundleEntryComponent =
+            Bundle.BundleEntryComponent().apply {
+              resource = res
+              request.method = Bundle.HTTPVerb.PUT
+              request.url = "${res.resourceType}/${IdType(res.id).idPart}"
+            }
           bundle.addEntry(bundleEntryComponent)
         }
       }

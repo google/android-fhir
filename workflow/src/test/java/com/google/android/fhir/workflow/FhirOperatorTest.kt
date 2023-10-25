@@ -157,15 +157,14 @@ class FhirOperatorTest {
     loadFile("/plan-definition/multiple-resources-same-id/patient.json", ::importToFhirEngine)
     loadFile(
       "/plan-definition/multiple-resources-same-id/plan_definition.json",
-      ::installToIgManager
+      ::installToIgManager,
     )
 
     assertThat(knowledgeManager.loadResources(resourceType = "PlanDefinition", id = "example"))
       .isNotNull()
 
     loadFile("/plan-definition/multiple-resources-same-id/example-1.0.0.cql", ::installToIgManager)
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", id = "example"))
-      .isNotNull()
+    assertThat(knowledgeManager.loadResources(resourceType = "Library", id = "example")).isNotNull()
     // val resources = knowledgeManager.loadResources(resourceType = "Library", id = "example")
     // for (resource in resources)
     //   println(jsonParser.encodeResourceToString(resource))
@@ -175,7 +174,7 @@ class FhirOperatorTest {
     val carePlan =
       fhirOperator.generateCarePlan(
         planDefinitionId = "example",
-        subject = "Patient/Female-Patient-Example"
+        subject = "Patient/Female-Patient-Example",
       )
 
     // assertEquals(
