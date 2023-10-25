@@ -17,8 +17,8 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
@@ -56,7 +56,7 @@ internal class FhirSynchronizer(
   private val _syncState = MutableSharedFlow<SyncJobStatus>()
   val syncState: SharedFlow<SyncJobStatus> = _syncState
 
-  private val datastoreUtil = DatastoreUtil(context)
+  private val datastoreUtil = FhirEngineProvider.getFhirDataStore(context)
 
   private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 

@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 @PublishedApi
 internal class FhirDataStore(context: Context) {
@@ -50,6 +52,7 @@ internal class FhirDataStore(context: Context) {
       "com.google.android.fhir.sync.SyncJobStatus.Finished",
       "com.google.android.fhir.sync.SyncJobStatus.Failed",
     )
+  private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 
   /**
    * Observes the sync job terminal state for a given key and provides it as a Flow.
@@ -66,6 +69,7 @@ internal class FhirDataStore(context: Context) {
           if (exception is IOException) {
             emit(emptyPreferences())
           } else {
+            Timber.e(exception)
             throw exception
           }
         }
@@ -129,6 +133,15 @@ internal class FhirDataStore(context: Context) {
   internal suspend fun getLastSyncJobStatus(key: String) =
     observeSyncJobTerminalState(key + LAST_JOB_TERMINAL_STATE).first()
 
+  internal fun readLastSyncTimestamp(): OffsetDateTime? {
+    val millis = runBlocking { dataStore.data.first()[lastSyncTimestampKey] } ?: return null
+    return OffsetDateTime.parse(millis)
+  }
+
+  internal fun writeLastSyncTimestamp(datetime: OffsetDateTime) {
+    runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
+  }
+
   private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus?) {
     dataStore.edit { preferences ->
       val data =
@@ -147,9 +160,11 @@ internal class FhirDataStore(context: Context) {
   }
 
   companion object {
-    private const val FHIR_PREFERENCES_NAME = "fhir_preferences"
     private const val STATE_TYPE = "StateType"
     private const val STATE = "State"
     private const val LAST_JOB_TERMINAL_STATE = "lastJobTerminalState"
+
+    private const val FHIR_PREFERENCES_NAME = "FHIR_ENGINE_PREF_DATASTORE"
+    private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
   }
 }

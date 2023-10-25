@@ -31,7 +31,6 @@ import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
-import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.SyncState.Cancelled
@@ -248,7 +247,7 @@ object Sync {
 
   /** Gets the timestamp of the last sync job. */
   fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-    return DatastoreUtil(context).readLastSyncTimestamp()
+    return FhirEngineProvider.getFhirDataStore(context).readLastSyncTimestamp()
   }
 
   private fun createSyncState(
