@@ -3,8 +3,9 @@
 ## Set-up
 
 1. Pull the latest changes in the [android-fhir](https://github.com/google/android-fhir) repo
-2. Switch to the `configurable-care-codelab` branch
-3. Build the `configurablecare` module in Android Studio
+2. Switch to the `configurable-care-codelab` branch.
+3. Open `android-fhir` as the root project.
+4. Build the `configurablecare` module in Android Studio. 
 
 ## Exercises
 
