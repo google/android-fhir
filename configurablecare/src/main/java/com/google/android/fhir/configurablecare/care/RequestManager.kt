@@ -166,7 +166,6 @@ class RequestManager(
       if (intent.isNotEmpty()) {
         xFhirQueryBuilder.append("&intent=$intent")
       }
-      println("get all requests: $xFhirQueryBuilder")
       val searchList = fhirEngine.search(xFhirQueryBuilder.toString())
       for (item in searchList) {
         requestList.add(item.resource)

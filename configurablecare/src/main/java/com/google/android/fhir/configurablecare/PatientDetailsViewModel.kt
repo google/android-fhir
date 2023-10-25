@@ -176,12 +176,17 @@ class PatientDetailsViewModel(
       immunization: Immunization,
       resources: Resources
     ): PatientListViewModel.ObservationItem {
-      val immunizationCode = immunization.vaccineCode.codingFirstRep.code
-      val immunizationDisplay = immunization.vaccineCode.codingFirstRep.display
+      var immunizationCode = ""
+      var immunizationDisplay = ""
+
+      if (immunization.hasVaccineCode() && immunization.vaccineCode.hasCoding()) {
+        immunizationCode = immunization.vaccineCode.codingFirstRep.code
+        immunizationDisplay = immunization.vaccineCode.codingFirstRep.display
+      }
 
       return PatientListViewModel.ObservationItem(
         immunization.logicalId,
-        "Immunization: $immunizationDisplay [$immunizationCode]",
+        "$immunizationDisplay: $immunizationCode | Lot: ${immunization.lotNumber}",
         immunizationDisplay,
         "${immunization.meta.lastUpdated}"
       )

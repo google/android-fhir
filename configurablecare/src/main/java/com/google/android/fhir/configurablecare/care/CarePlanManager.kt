@@ -80,28 +80,28 @@ class CarePlanManager(
     return context.assets.open(filename).bufferedReader().use { it.readText() }
   }
 
-  suspend fun saveKnowledgeResources() {
-    val rootDirectory = File(context.filesDir, "smart-imm/ig")
+  suspend fun saveKnowledgeResources(path: String) {
+    val rootDirectory = File(context.filesDir, path)
     if (rootDirectory.exists()) {
       initializeKnowledgeManager(rootDirectory)
-      return
+      // return
     }
     rootDirectory.mkdirs()
 
-    val fileList = context.assets.list("smart-imm/ig")
+    val fileList = context.assets.list(path)
     if (fileList != null) {
       for (filename in fileList) {
         if (filename.contains(".json")) {
-          val contents = readFileFromAssets(context, "smart-imm/ig/$filename")
+          val contents = readFileFromAssets(context, "$path/$filename")
           try {
             val resource = jsonParser.parseResource(contents)
             if (resource is Resource) {
               fhirEngine.create(resource)
 
               withContext(Dispatchers.IO) {
-                val fis = FileOutputStream(File(context.filesDir, "smart-imm/ig/$filename"))
+                val fis = FileOutputStream(File(context.filesDir, "$path/$filename"))
                 fis.write(contents.toByteArray())
-                println("Saved: ${context.filesDir}/smart-imm/ig/$filename")
+                println("Saved: ${context.filesDir}/$path/$filename")
               }
             }
           } catch (exception: Exception) {
@@ -143,8 +143,7 @@ class CarePlanManager(
     return bundleCollection
   }
 
-  suspend fun initializeKnowledgeManager(rootDirectory: File) {
-    // val rootDirectory = File(context.filesDir, "smart-imm/ig")
+  private suspend fun initializeKnowledgeManager(rootDirectory: File) {
     knowledgeManager.install(
       FhirNpmPackage(
         "who.fhir.immunization",
@@ -154,67 +153,6 @@ class CarePlanManager(
       rootDirectory,
     )
     println("KM installed")
-  }
-
-  suspend fun installKnowledgeResources() {
-    val rootDirectory = File(context.filesDir, "smart-imm/ig")
-
-    rootDirectory.listFiles()?.forEach { file ->
-      try {
-        val resource = jsonParser.parseResource(FileInputStream(file))
-        if (resource is Resource) {
-          //   if (!(resource is PlanDefinition || resource is ActivityDefinition || resource is Library)) {
-          //     fhirEngine.create(resource)
-          //     println("Saved to engine: ${resource.id}")
-          //   }
-          // } else {
-          //   // Timber.d("Unable to import file: %file")
-          // }
-          fhirEngine.create(resource)
-          // println("Saved to engine: ${resource.id}")
-        }
-      } catch (exception: Exception) {
-        // Timber.d(exception, "Unable to import file: %file")
-      }
-    }
-
-    // initializeKnowledgeManager()
-    // knowledgeManager.install(
-    //   FhirNpmPackage(
-    //     "who.fhir.immunization",
-    //     "1.0.0",
-    //     "https://github.com/WorldHealthOrganization/smart-immunizations",
-    //   ),
-    //   rootDirectory,
-    // )
-    // println("KM installed")
-  }
-
-  /**
-   * Knowledge resources are loaded from [FhirEngine] and installed so that they may be used when
-   * running $apply on a [PlanDefinition]
-   */
-  private suspend fun loadCarePlanResourcesFromDb() {
-
-    // installKnowledgeResources()
-
-    // Load Library resources
-    val availableCqlLibraries = fhirEngine.search<Library> {}
-    val availablePlanDefinitions = fhirEngine.search<PlanDefinition> {}
-    val availableActivityDefinitions = fhirEngine.search<ActivityDefinition> {}
-    for (cqlLibrary in availableCqlLibraries) {
-      knowledgeManager.install(writeToFile(cqlLibrary.resource))
-      cqlLibraryIdList.add(IdType(cqlLibrary.resource.id).idPart)
-      println(jsonParser.encodeResourceToString(cqlLibrary.resource))
-    }
-    for (planDefinition in availablePlanDefinitions) {
-      knowledgeManager.install(writeToFile(planDefinition.resource))
-      println(jsonParser.encodeResourceToString(planDefinition.resource))
-    }
-    for (activityDefinition in availableActivityDefinitions) {
-      knowledgeManager.install(writeToFile(activityDefinition.resource))
-      println(jsonParser.encodeResourceToString(activityDefinition.resource))
-    }
   }
 
   /**

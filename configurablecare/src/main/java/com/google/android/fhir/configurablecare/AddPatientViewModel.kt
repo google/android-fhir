@@ -170,8 +170,8 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         if (targetResource is Bundle) {
           var flag = false
           var patient = Patient()
-          val outputFil1e = File(getApplication<Application>().externalCacheDir, "bundle.json")
-          outputFil1e.writeText(
+          val outputFile = File(getApplication<Application>().externalCacheDir, "bundle.json")
+          outputFile.writeText(
             FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
               .encodeResourceToString(targetResource)
           )
@@ -181,8 +181,10 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
             if (resource is Observation && resource.effective is DateType) {
               resource.effective = null
             }
+            resource.id = UUID.randomUUID().toString()
             fhirEngine.create(resource)
             if (resource is Patient) {
+              createImmunizationReviewTask(resource.id)
               flag = true
               patient = resource
             }

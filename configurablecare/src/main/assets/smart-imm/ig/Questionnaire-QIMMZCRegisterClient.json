@@ -115,48 +115,6 @@
       "type" : "string",
       "required" : true,
       "repeats" : false
-    },
-    {
-      "linkId" : "firstName",
-      "code" : [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE3"
-      },
-      {
-        "system" : "http://loinc.org",
-        "code" : "45392-8",
-        "display" : "First name"
-      },
-      {
-        "system" : "http://snomed.info/sct",
-        "code" : "184095009",
-        "display" : "Patient forename (observable entity)"
-      }],
-      "text" : "First or given name",
-      "type" : "string",
-      "required" : false,
-      "repeats" : false
-    },
-    {
-      "linkId" : "familyName",
-      "code" : [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE4"
-      },
-      {
-        "system" : "http://loinc.org",
-        "code" : "45394-4",
-        "display" : "Last name"
-      },
-      {
-        "system" : "http://snomed.info/sct",
-        "code" : "184096005",
-        "display" : "Patient surname (observable entity)"
-      }],
-      "text" : "Family name",
-      "type" : "string",
-      "required" : false,
-      "repeats" : false
     }]
   },
   {
@@ -231,28 +189,6 @@
       "text" : "Full name of the care giver",
       "type" : "string",
       "required" : true,
-      "repeats" : false
-    },
-    {
-      "linkId" : "firstName",
-      "code" : [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE16"
-      }],
-      "text" : "First or given name",
-      "type" : "string",
-      "required" : false,
-      "repeats" : false
-    },
-    {
-      "linkId" : "familyName",
-      "code" : [{
-        "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
-        "code" : "DE17"
-      }],
-      "text" : "Family name",
-      "type" : "string",
-      "required" : false,
       "repeats" : false
     }]
   },

@@ -107,7 +107,6 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
               )
           }
 
-          // how to map to MR?
         } else {
           val encounterId = generateUuid()
           if (isRequiredFieldMissing(bundle)) {
@@ -285,22 +284,15 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
           ).first() as MedicationRequest
           requestManager.endOrder(medicationRequest, MedicationRequest.MedicationRequestStatus.COMPLETED, "Completed successfully")
 
-          var vaccineCoding: Coding? = null
-          if (medicationRequest.hasMedicationCodeableConcept() && medicationRequest.medicationCodeableConcept.hasCoding()) {
-            vaccineCoding = medicationRequest.medicationCodeableConcept.codingFirstRep
-          }
-          val immunization = Immunization().apply {
-            id = UUID.randomUUID().toString()
-            vaccineCode.addCoding(vaccineCoding)
-            patient = subjectReference
-            status = Immunization.ImmunizationStatus.COMPLETED
-            encounter = encounterReference
-            meta.lastUpdated = Date.from(Instant.now())
-          }
+          resource.id = UUID.randomUUID().toString()
+          resource.patient = subjectReference
+          resource.status = Immunization.ImmunizationStatus.COMPLETED
+          resource.encounter = encounterReference
+          resource.meta.lastUpdated = Date.from(Instant.now())
 
-          println(jsonParser.encodeResourceToString(immunization))
+          println(jsonParser.encodeResourceToString(resource))
 
-          fhirEngine.create(immunization)
+          fhirEngine.create(resource)
           fhirEngine.update(medicationRequest)
         }
         is ServiceRequest -> {

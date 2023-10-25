@@ -7,7 +7,7 @@
     {
       "type": "boolean",
       "linkId": "approval-choice",
-      "text": "Do you approve this proposal?",
+      "text": "Do you accept this proposal?",
       "required": true,
       "repeats": false,
       "readOnly": false,

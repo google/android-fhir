@@ -10,7 +10,7 @@
   "name" : "VSMeaslesVaccineProducts",
   "title" : "MeaslesVaccine Products ValueSet",
   "status" : "draft",
-  "date" : "2023-10-22T18:20:30+00:00",
+  "date" : "2023-10-24T19:56:47+00:00",
   "publisher" : "WHO",
   "contact" : [{
     "name" : "WHO",
@@ -20,16 +20,9 @@
     }]
   }],
   "description" : "Vaccine Product Codes - representing the codes of the products currently available.",
-  "expansion": {
-    "contains": [
-      {
-        "code": "XM8L15",
-        "display": "Serum Institute of India Measles vaccine"
-      },
-      {
-        "code": "XM8TF3",
-        "display": "M-M-RvaxPRO"
-      }
-    ]
+  "compose" : {
+    "include" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations-measles/CodeSystem/VaccineProducts"
+    }]
   }
 }

@@ -68,10 +68,25 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
       val valueSets = fhirEngine.search<ValueSet> { filter(ValueSet.URL, { value = uri }) }
       println("ValueSets found: ${jsonParser.encodeResourceToString(valueSets.first().resource)}")
 
+      // val listValues = workerContext.fetchResource(
+      //   ValueSet::class.java,
+      //   uri
+      // )?.compose?.include?.firstOrNull()?.concept?.map { Coding().apply {
+      //   code = it.code
+      //   display = it.display
+      //   system = uri
+      // } } ?: emptyList()
+      //
+      // println(listValues.size)
+      //
+      // if (listValues.isNotEmpty()) return listValues
+
       val systemUrl = workerContext.fetchResource(
         ValueSet::class.java,
         uri
       )?.compose?.include?.firstOrNull()?.system
+
+      println("ValueSetResolver: $systemUrl")
 
       val list = workerContext.fetchCodeSystem(systemUrl)?.concept?.map {
         Coding().apply {
@@ -80,6 +95,8 @@ abstract class ValueSetResolver : ExternalAnswerValueSetResolver {
           system = systemUrl
         }
       } ?: emptyList()
+
+      println(list)
 
       if (list.isNotEmpty()) return list
 
