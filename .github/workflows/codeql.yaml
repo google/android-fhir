@@ -12,7 +12,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: ubuntu-22.04-64core
+    runs-on: ubuntu-22.04-16core
     timeout-minutes: 60
     permissions:
       actions: read
