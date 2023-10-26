@@ -28,16 +28,28 @@ if (kokoroRun == true) {
   }
 }
 
-// NECESSARY force of the Jackson to run generateSearchParams in the new version of HAPI (6.8)
+dependencyResolutionManagement {
+    versionCatalogs {
+        create("libs") {
+            // TODO(vorburger): Once this actually works, move it into gradle/libs.versions.toml instead, by
+            // using https://docs.gradle.org/current/userguide/platforms.html#sec:sharing-catalogs
+            version("jackson", "2.15.2")
+            library("jackson-core", "com.fasterxml.jackson.core", "jackson-core").versionRef("jackson")
+            library("jackson-annotations", "com.fasterxml.jackson.core", "jackson-annotations").versionRef("jackson")
+            library("jackson-databind", "com.fasterxml.jackson.core", "jackson-databind").versionRef("jackson")
+            library("jackson-xml", "com.fasterxml.jackson.dataformat", "jackson-dataformat-xml").versionRef("jackson")
+            library("jackson-jaxb-annotations", "com.fasterxml.jackson.module", "jackson-module-jaxb-annotations").versionRef("jackson")
+            library("jackson-jsr310", "com.fasterxml.jackson.datatype", "jackson-datatype-jsr310").versionRef("jackson")
+            library("jackson-kotlin", "com.fasterxml.jackson.module", "jackson-module-kotlin").versionRef("jackson")
+            bundle("jackson", listOf("jackson-core", "jackson-annotations", "jackson-databind", "jackson-xml", "jackson-jaxb-annotations", "jackson-jsr310", "jackson-kotlin"))
+        }
+    }
+}
+
 buildscript {
   dependencies {
-    classpath("com.fasterxml.jackson.core:jackson-core:2.15.2")
-    classpath("com.fasterxml.jackson.core:jackson-annotations:2.15.2")
-    classpath("com.fasterxml.jackson.core:jackson-databind:2.15.2")
-    classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.15.2")
-    classpath("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.15.2")
-    classpath("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
-    classpath("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+    // NECESSARY force of the Jackson to run generateSearchParams in the new version of HAPI (6.8)
+    classpath(libs.bundles.jackson) // defined in gradle/libs.versions.toml
   }
 }
 
