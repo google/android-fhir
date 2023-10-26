@@ -34,6 +34,10 @@ env:
   GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
   GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
+  cancel-in-progress: true
+
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
@@ -49,10 +53,6 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ github.token }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
