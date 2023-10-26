@@ -80,6 +80,7 @@ import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
 import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -552,7 +553,7 @@ class DatabaseImplTest {
           .first { it.resourceId == "remote-patient-3" }
           .let {
             UploadSyncResult.Success(
-              it.token,
+              listOf(it),
               listOf(
                 Patient().apply {
                   id = it.resourceId
@@ -3547,6 +3548,229 @@ class DatabaseImplTest {
           ),
         ),
       )
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateResourceEntityResourceId() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+    // Retrieving ResourceEntity so that we have the resourceUuid available for assertions
+    val patientResourceEntity =
+      database.selectEntity(locallyCreatedPatient.resourceType, locallyCreatedPatientResourceId)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // check if resource is fetch-able by its new server assigned ID
+    val updatedPatientResourceEntity =
+      database.selectEntity(remotelyCreatedPatient.resourceType, remotelyCreatedPatient.id)
+    assertThat(updatedPatientResourceEntity.resourceUuid)
+      .isEqualTo(patientResourceEntity.resourceUuid)
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateLocalChangeResourceId() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+    val patientResourceEntity =
+      database.selectEntity(locallyCreatedPatient.resourceType, locallyCreatedPatientResourceId)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // check if resource is fetch-able by its new server assigned ID
+    val patientLocalChanges = database.getLocalChanges(patientResourceEntity.resourceUuid)
+    assertThat(patientLocalChanges.all { it.resourceId == remotelyCreatedPatientResourceId })
+      .isTrue()
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringLocalChangesOfInsertType() =
+    runBlocking {
+      // create a patient
+      val locallyCreatedPatientResourceId = "local-patient-1"
+      val locallyCreatedPatient =
+        Patient().apply {
+          id = locallyCreatedPatientResourceId
+          name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+        }
+      database.insert(locallyCreatedPatient)
+
+      // create an observation for the patient
+      val locallyCreatedObservationResourceId = "local-observation-1"
+      val locallyCreatedPatientObservation =
+        Observation().apply {
+          subject = Reference("Patient/$locallyCreatedPatientResourceId")
+          addPerformer(Reference("Practitioner/123"))
+          id = locallyCreatedObservationResourceId
+        }
+      database.insert(locallyCreatedPatientObservation)
+
+      // pretend that the resource has been created on the server with an updated ID
+      val remotelyCreatedPatientResourceId = "remote-patient-1"
+      val remotelyCreatedPatient =
+        locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+      // perform updates
+      database.updateResourceAndReferences(
+        locallyCreatedPatientResourceId,
+        remotelyCreatedPatient,
+      )
+
+      // verify that Observation's LocalChanges are updated with new patient ID reference
+      val updatedObservationLocalChanges =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(updatedObservationLocalChanges.size).isEqualTo(1)
+      val observationLocalChange = updatedObservationLocalChanges[0]
+      assertThat(observationLocalChange.type).isEqualTo(LocalChange.Type.INSERT)
+      val observationLocalChangePayload =
+        services.parser.parseResource(observationLocalChange.payload) as Observation
+      assertThat(observationLocalChangePayload.subject.reference)
+        .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+    }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringLocalChangesOfUpdateType() =
+    runBlocking {
+      // create a patient
+      val locallyCreatedPatientResourceId = "local-patient-1"
+      val locallyCreatedPatient =
+        Patient().apply {
+          id = locallyCreatedPatientResourceId
+          name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+        }
+      database.insert(locallyCreatedPatient)
+
+      // create an observation for the patient
+      val locallyCreatedObservationResourceId = "local-observation-1"
+      val locallyCreatedPatientObservation =
+        Observation().apply {
+          subject = Reference("Patient/$locallyCreatedPatientResourceId")
+          addPerformer(Reference("Practitioner/123"))
+          id = locallyCreatedObservationResourceId
+        }
+      database.insert(locallyCreatedPatientObservation)
+      database.update(
+        locallyCreatedPatientObservation.copy().apply {
+          performer = listOf(Reference("Patient/$locallyCreatedPatientResourceId"))
+        },
+      )
+
+      // pretend that the resource has been created on the server with an updated ID
+      val remotelyCreatedPatientResourceId = "remote-patient-1"
+      val remotelyCreatedPatient =
+        locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+      // perform updates
+      database.updateResourceAndReferences(
+        locallyCreatedPatientResourceId,
+        remotelyCreatedPatient,
+      )
+
+      // verify that Observation's LocalChanges are updated with new patient ID reference
+      val updatedObservationLocalChanges =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(updatedObservationLocalChanges.size).isEqualTo(2)
+      val observationLocalChange2 = updatedObservationLocalChanges[1]
+      assertThat(observationLocalChange2.type).isEqualTo(LocalChange.Type.UPDATE)
+      // payload =
+      // [{"op":"replace","path":"\/performer\/0\/reference","value":"Patient\/remote-patient-1"}]
+      val observationLocalChange2Payload = JSONArray(observationLocalChange2.payload)
+      val patch = observationLocalChange2Payload.get(0) as JSONObject
+      val referenceValue = patch.getString("value")
+      assertThat(referenceValue).isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+    }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringResource() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+
+    // create an observation for the patient
+    val locallyCreatedObservationResourceId = "local-observation-1"
+    val locallyCreatedPatientObservation =
+      Observation().apply {
+        subject = Reference("Patient/$locallyCreatedPatientResourceId")
+        addPerformer(Reference("Practitioner/123"))
+        id = locallyCreatedObservationResourceId
+      }
+    database.insert(locallyCreatedPatientObservation)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // verify that Observation is updated with new patient ID reference
+    val updatedObservationResource =
+      database.select(
+        locallyCreatedPatientObservation.resourceType,
+        locallyCreatedObservationResourceId,
+      ) as Observation
+    assertThat(updatedObservationResource.subject.reference)
+      .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+
+    // verify that Observation is searchable i.e. ReferenceIndex is updated with new patient ID
+    // reference
+    val searchedObservations =
+      database.search<Observation>(
+        Search(ResourceType.Observation)
+          .apply {
+            filter(
+              Observation.SUBJECT,
+              { value = "Patient/$remotelyCreatedPatientResourceId" },
+            )
+          }
+          .getQuery(),
+      )
+    assertThat(searchedObservations.size).isEqualTo(1)
+    assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
 
   private companion object {
