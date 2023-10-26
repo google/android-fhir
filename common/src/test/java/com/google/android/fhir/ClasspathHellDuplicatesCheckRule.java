@@ -113,65 +113,16 @@ public class ClasspathHellDuplicatesCheckRule implements TestRule {
                 || resourcePath.toUpperCase().startsWith("META-INF/LICENSE")
                 || resourcePath.toUpperCase().startsWith("LICENSE")
                 || resourcePath.toUpperCase().startsWith("LICENSE/NOTICE")
-                // list formerly in ClasspathHellDuplicatesCheckRule (moved here in INFRAUTILS-52)
                 || resourcePath.endsWith(".txt")
                 || resourcePath.endsWith("LICENSE")
                 || resourcePath.endsWith("license.html")
                 || resourcePath.endsWith("about.html")
                 || resourcePath.endsWith("readme.html")
-                || resourcePath.startsWith("META-INF/services")
-                || resourcePath.equals("META-INF/DEPENDENCIES")
-                || resourcePath.equals("META-INF/git.properties")
-                || resourcePath.equals("META-INF/io.netty.versions.properties")
-                || resourcePath.equals("META-INF/jersey-module-version")
-                || resourcePath.startsWith("OSGI-INF/blueprint/")
-                || resourcePath.startsWith("org/opendaylight/blueprint/")
-                || resourcePath.endsWith("reference.conf") // in Akka's JARs
-                || resourcePath.equals("WEB-INF/web.xml")
-                || resourcePath.equals("META-INF/web-fragment.xml")
-                || resourcePath.equals("META-INF/eclipse.inf")
-                || resourcePath.equals("META-INF/ECLIPSE_.SF")
-                || resourcePath.equals("META-INF/ECLIPSE_.RSA")
-                || resourcePath.equals("META-INF/BC2048KE.DSA")
-                || resourcePath.equals("META-INF/BC2048KE.SF")
-                || resourcePath.equals("META-INF/BC1024KE.SF")
-                || resourcePath.equals("OSGI-INF/bundle.info")
-                // Spring Framework knows what they are do..
-                || resourcePath.startsWith("META-INF/spring")
-                || resourcePath.startsWith("META-INF/additional-spring")
-                || resourcePath.startsWith("META-INF/terracotta")
                 // Groovy is groovy
                 || resourcePath.startsWith("META-INF/groovy-release-info.properties")
-                // Something doesn't to be a perfectly clean in Maven Surefire:
-                || resourcePath.startsWith("META-INF/maven/")
-                || resourcePath.contains("surefire")
-                // org.slf4j.impl.StaticLoggerBinder.class in testutils for the LogCaptureRule
-                || resourcePath.equals("org/slf4j/impl/StaticLoggerBinder.class")
-                // INFRAUTILS-35: JavaLaunchHelper is both in java and libinstrument.dylib (?) on Mac OS X
-                || resourcePath.contains("JavaLaunchHelper")
-                // javax.annotation is a big mess... :( E.g. javax.annotation.Resource (and some others)
-                // are present both in rt.jar AND javax.annotation-api-1.3.2.jar and similar - BUT those
-                // JARs cannot just be excluded, because they contain some additional annotations, in the
-                // (reserved!) package javax.annotation, such as javax.annotation.Priority et al.  The
-                // super proper way to address this cleanly would be to make our own JAR for javax.annotation
-                // and have it contain ONLY what is not already in package javax.annotation in rt.jar.. but for now:
-                || resourcePath.equals("javax/annotation/Resource$AuthenticationType.class")
-                // NEUTRON-205: javax.inject is a mess :( because of javax.inject:javax.inject (which we widely use in ODL)
-                // VS. org.glassfish.hk2.external:javax.inject (which Glassfish Jersey has dependencies on).  Attempts to
-                // cleanly exclude glassfish.hk2's javax.inject and align everything on only depending on
-                // javax.inject:javax.inject have failed, because the OSGi bundle
-                // org.glassfish.jersey.containers.jersey-container-servlet-core (2.25.1) has a non-optional Package-Import
-                // for javax.inject, but we made javax.inject:javax.inject <optional>true in odlparent, and don't bundle it.
-                || resourcePath.startsWith("javax/inject/")
                 // Java 9 modules
                 || resourcePath.endsWith("module-info.class")
                 || resourcePath.contains("findbugs")
-                // list newly introduced in INFRAUTILS-52, because classgraph scans more than JHades did
-                || resourcePath.equals("plugin.properties")
-                || resourcePath.equals(".api_description")
-                // errorprone with Java 11 integration leaks to classpath, which causes a conflict between
-                // checkerframework/checker-qual and checkerframework/dataflow
-                || resourcePath.startsWith("org/checkerframework/dataflow/qual/")
                 // Kotlin related stuff which seems to be normal expected duplicates
                 || resourcePath.equals("META-INF/common_debug.kotlin_module")
                 || resourcePath.equals("META-INF/common_release.kotlin_module")
