@@ -86,7 +86,7 @@ dependencies {
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.Glide.glide)
+  implementation(libs.glide)
   implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
