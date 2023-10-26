@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.SearchParameter
 object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
   private var fhirServices: FhirServices? = null
-  private var fhirDataStore: FhirDataStore? = null
 
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.
@@ -42,7 +41,6 @@ object FhirEngineProvider {
       "FhirEngineProvider: FhirEngineConfiguration has already been initialized."
     }
     this.fhirEngineConfiguration = fhirEngineConfiguration
-    fhirDataStore = FhirDataStore(fhirEngineConfiguration.context!!)
   }
 
   /**
@@ -131,7 +129,6 @@ data class FhirEngineConfiguration(
    * in the reindexing of the resource.
    */
   val customSearchParameters: List<SearchParameter>? = null,
-  val context: Context? = null,
 )
 
 enum class DatabaseErrorStrategy {

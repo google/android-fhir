@@ -59,7 +59,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
             },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
         ),
-        context = applicationContext,
       ),
     )
 
