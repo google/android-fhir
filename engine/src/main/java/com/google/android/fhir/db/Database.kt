@@ -23,6 +23,7 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -120,6 +121,18 @@ internal interface Database {
   /** Remove the [LocalChangeEntity] s with matching resource ids. */
   suspend fun deleteUpdates(resources: List<Resource>)
 
+  /**
+   * Updates the [ResourceEntity.serializedResource] and [ResourceEntity.resourceId] corresponding
+   * to the updatedResource. Updates all the [LocalChangeEntity] for this updated resource as well
+   * as all the [LocalChangeEntity] referring to this resource in their [LocalChangeEntity.payload]
+   * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
+   * updated resource.
+   */
+  suspend fun updateResourceAndReferences(
+    currentResourceId: String,
+    updatedResource: Resource,
+  )
+
   /** Runs the block as a database transaction. */
   suspend fun withTransaction(block: suspend () -> Unit)
 
@@ -144,6 +157,18 @@ internal interface Database {
    *   return empty list.
    */
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
+
+  /**
+   * Retrieve a list of [LocalChange] for [ResourceEntity] with given UUID, which can be used to
+   * purge resource from database. If there is no local change for [ResourceEntity.resourceUuid],
+   * return an empty list.
+   *
+   * @param resourceUuid The resource UUID [ResourceEntity.resourceUuid]
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   *   [Resource.id] . If there is no local change for given [resourceType] and
+   *   [ResourceEntity.resourceUuid], return empty list.
+   */
+  suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
 
   /**
    * Purge resource from database based on resource type and id without any deletion of data from

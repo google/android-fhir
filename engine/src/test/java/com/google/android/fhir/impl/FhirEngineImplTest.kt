@@ -326,7 +326,7 @@ class FhirEngineImplTest {
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
         UploadSyncResult.Success(
-          LocalChangeToken(it.flatMap { it.token.ids }),
+          it,
           listOf(),
         )
       }
