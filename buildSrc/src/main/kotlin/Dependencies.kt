@@ -41,10 +41,6 @@ object Dependencies {
       "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
   }
 
-  object Glide {
-    const val glide = "com.github.bumptech.glide:glide:${Versions.Glide.glide}"
-  }
-
   object HapiFhir {
     const val fhirBase = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
     const val fhirClient = "ca.uhn.hapi.fhir:hapi-fhir-client:${Versions.hapiFhir}"
@@ -216,10 +212,6 @@ object Dependencies {
 
     object Cql {
       const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
-    }
-
-    object Glide {
-      const val glide = "4.14.2"
     }
 
     object Kotlin {
