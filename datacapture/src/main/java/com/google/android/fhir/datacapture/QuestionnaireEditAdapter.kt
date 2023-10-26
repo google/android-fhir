@@ -115,7 +115,7 @@ internal class QuestionnaireEditAdapter(
       }
       is QuestionnaireAdapterItem.Navigation -> {
         holder as NavigationViewHolder
-        holder.bind(item.questionnairePageNavigationState)
+        holder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
@@ -293,7 +293,7 @@ internal object DiffCallbacks {
           }
           is QuestionnaireAdapterItem.Navigation -> {
             newItem is QuestionnaireAdapterItem.Navigation &&
-              oldItem.questionnairePageNavigationState == newItem.questionnairePageNavigationState
+              oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
         }
     }

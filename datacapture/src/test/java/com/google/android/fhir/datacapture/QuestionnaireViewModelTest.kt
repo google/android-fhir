@@ -2729,7 +2729,7 @@ class QuestionnaireViewModelTest {
     viewModel.setReviewMode(true)
 
     val questionnaireState = viewModel.questionnaireStateFlow.first()
-    assertThat(questionnaireState.pageNavigationState).isNull()
+    assertThat(questionnaireState.bottomNavigation).isNull()
     assertThat(questionnaireState.items.last())
       .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
@@ -2783,7 +2783,7 @@ class QuestionnaireViewModelTest {
       )
 
     val questionnaireState = viewModel.questionnaireStateFlow.first()
-    assertThat(questionnaireState.pageNavigationState).isNull()
+    assertThat(questionnaireState.bottomNavigation).isNull()
     assertThat(questionnaireState.items.last())
       .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
   }
@@ -3078,7 +3078,7 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showNavigationInLongScroll = true)
       val questionnaireState = viewModel.questionnaireStateFlow.first()
-      assertThat(questionnaireState.pageNavigationState).isNull()
+      assertThat(questionnaireState.bottomNavigation).isNull()
       assertThat(questionnaireState.items.last())
         .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
     }

@@ -229,6 +229,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   private var onSubmitButtonClickListener: () -> Unit = {}
 
+  private var onCancelButtonClickListener: () -> Unit = {}
+
   /** Flag to show/hide cancel button. Default is false */
   private var shouldShowCancelButton =
     state[QuestionnaireFragment.EXTRA_SHOW_CANCEL_BUTTON] ?: false
@@ -509,6 +511,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     onSubmitButtonClickListener = onClickAction
   }
 
+  internal fun setOnCancelButtonClickListener(onClickAction: () -> Unit) {
+    onCancelButtonClickListener = onClickAction
+  }
+
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
     this.shouldShowSubmitButton = showSubmitButton
   }
@@ -543,7 +549,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           QuestionnaireState(
             items = emptyList(),
             displayMode = DisplayMode.InitMode,
-            pageNavigationState = null,
+            bottomNavigation = QuestionnaireNavigationUIState(),
           ),
       )
 
@@ -638,111 +644,110 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (isReadOnly || isInReviewModeFlow.value) {
       val showSubmitButton = !isReadOnly && shouldShowSubmitButton
       val pageNavigationViewState =
-        QuestionnairePageNavigationState(
-          previousPageNavigationActionState = QuestionnaireNavigationViewState.Hidden,
-          nextPageNavigationActionState = QuestionnaireNavigationViewState.Hidden,
-          submitNavigationActionState =
+        QuestionnaireNavigationUIState(
+          navSubmit =
             if (showSubmitButton) {
-              QuestionnaireNavigationViewState.Enabled(onSubmitButtonClickListener)
+              QuestionnaireNavigationViewUIState.Enabled(onSubmitButtonClickListener)
             } else {
-              QuestionnaireNavigationViewState.Hidden
+              QuestionnaireNavigationViewUIState.Hidden
             },
-          reviewNavigationActionState = QuestionnaireNavigationViewState.Hidden,
+          navCancel =
+            if (!isReadOnly && shouldShowCancelButton) {
+              QuestionnaireNavigationViewUIState.Enabled(onCancelButtonClickListener)
+            } else {
+              QuestionnaireNavigationViewUIState.Hidden
+            },
         )
-      val itemsViewItems =
-        if (shouldSetNavigationInLongScroll) {
-          questionnaireItemViewItems + QuestionnaireAdapterItem.Navigation(pageNavigationViewState)
-        } else {
-          questionnaireItemViewItems
-        }
-      val pageNavState = if (shouldSetNavigationInLongScroll) null else pageNavigationViewState
 
       return QuestionnaireState(
-        items = itemsViewItems,
+        items = questionnaireItemViewItems,
         displayMode =
           DisplayMode.ReviewMode(
             showEditButton = !isReadOnly,
-            showSubmitButton = showSubmitButton,
-            showCancelButton = !isReadOnly && shouldShowCancelButton,
+            showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
-        pageNavigationState = pageNavState,
+        bottomNavigation = pageNavigationViewState,
       )
     }
 
+    val showReviewButton: Boolean
+    val showSubmitButton: Boolean
+    val showCancelButton: Boolean
     // Editing the questionnaire
     val questionnairePagination =
       if (!questionnaire.isPaginated) {
-        val showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
-        val showSubmitButton = shouldShowSubmitButton && !showReviewButton
-        val showCancelButton = shouldShowCancelButton && !showReviewButton
+        showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
+        showSubmitButton = shouldShowSubmitButton && !showReviewButton
+        showCancelButton = shouldShowCancelButton && !showReviewButton
         QuestionnairePagination(
           false,
           emptyList(),
           -1,
-          showSubmitButton,
-          showCancelButton,
-          showReviewButton,
         )
       } else {
         val hasNextPage =
           QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndexFlow.value!!)
             .hasNextPage
-        val showReviewButton = shouldEnableReviewPage && !hasNextPage
-        val showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
-        val showCancelButton = shouldShowCancelButton
+        showReviewButton = shouldEnableReviewPage && !hasNextPage
+        showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
+        showCancelButton = shouldShowCancelButton
         QuestionnairePagination(
           true,
           pages!!,
           currentPageIndexFlow.value!!,
-          showSubmitButton,
-          showCancelButton,
-          showReviewButton,
         )
       }
 
     val pageNavigationViewState =
-      QuestionnairePageNavigationState(
-        previousPageNavigationActionState =
-          if (questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage) {
-            QuestionnaireNavigationViewState.Enabled { goToPreviousPage() }
-          } else if (questionnairePagination.isPaginated) {
-            QuestionnaireNavigationViewState.Disabled
-          } else {
-            QuestionnaireNavigationViewState.Hidden
+      QuestionnaireNavigationUIState(
+        navPrevious =
+          when {
+            questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage -> {
+              QuestionnaireNavigationViewUIState.Enabled { goToPreviousPage() }
+            }
+            questionnairePagination.isPaginated -> {
+              QuestionnaireNavigationViewUIState.Disabled
+            }
+            else -> {
+              QuestionnaireNavigationViewUIState.Hidden
+            }
           },
-        nextPageNavigationActionState =
-          if (questionnairePagination.isPaginated && questionnairePagination.hasNextPage) {
-            QuestionnaireNavigationViewState.Enabled { goToNextPage() }
-          } else if (questionnairePagination.isPaginated) {
-            QuestionnaireNavigationViewState.Disabled
-          } else {
-            QuestionnaireNavigationViewState.Hidden
+        navNext =
+          when {
+            questionnairePagination.isPaginated && questionnairePagination.hasNextPage -> {
+              QuestionnaireNavigationViewUIState.Enabled { goToNextPage() }
+            }
+            questionnairePagination.isPaginated -> {
+              QuestionnaireNavigationViewUIState.Disabled
+            }
+            else -> {
+              QuestionnaireNavigationViewUIState.Hidden
+            }
           },
-        submitNavigationActionState =
-          if (questionnairePagination.showSubmitButton) {
-            QuestionnaireNavigationViewState.Enabled(onSubmitButtonClickListener)
+        navSubmit =
+          if (showSubmitButton) {
+            QuestionnaireNavigationViewUIState.Enabled(onSubmitButtonClickListener)
           } else {
-            QuestionnaireNavigationViewState.Hidden
+            QuestionnaireNavigationViewUIState.Hidden
           },
-        reviewNavigationActionState =
-          if (questionnairePagination.showReviewButton) {
-            QuestionnaireNavigationViewState.Enabled { setReviewMode(true) }
+        navReview =
+          if (showReviewButton) {
+            QuestionnaireNavigationViewUIState.Enabled { setReviewMode(true) }
           } else {
-            QuestionnaireNavigationViewState.Hidden
+            QuestionnaireNavigationViewUIState.Hidden
+          },
+        navCancel =
+          if (showCancelButton) {
+            QuestionnaireNavigationViewUIState.Enabled { setReviewMode(true) }
+          } else {
+            QuestionnaireNavigationViewUIState.Hidden
           },
       )
-    val itemsViewItems =
-      if (shouldSetNavigationInLongScroll) {
-        questionnaireItemViewItems + QuestionnaireAdapterItem.Navigation(pageNavigationViewState)
-      } else {
-        questionnaireItemViewItems
-      }
-    val pageNavState = if (shouldSetNavigationInLongScroll) null else pageNavigationViewState
 
     return QuestionnaireState(
-      items = itemsViewItems,
-      displayMode = DisplayMode.EditMode(questionnairePagination),
-      pageNavigationState = pageNavState,
+      items = questionnaireItemViewItems,
+      displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
+      bottomNavigation = pageNavigationViewState,
     )
   }
 
@@ -996,16 +1001,16 @@ typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, Questionnaire
 internal data class QuestionnaireState(
   val items: List<QuestionnaireAdapterItem>,
   val displayMode: DisplayMode,
-  val pageNavigationState: QuestionnairePageNavigationState? = null,
+  val bottomNavigation: QuestionnaireNavigationUIState,
 )
 
 internal sealed class DisplayMode {
-  class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
+  class EditMode(val pagination: QuestionnairePagination, val showNavAsScroll: Boolean) :
+    DisplayMode()
 
   data class ReviewMode(
     val showEditButton: Boolean,
-    val showSubmitButton: Boolean,
-    val showCancelButton: Boolean,
+    val showNavAsScroll: Boolean,
   ) : DisplayMode()
 
   // Sentinel displayMode that's used in setting the initial default QuestionnaireState
@@ -1020,9 +1025,6 @@ internal data class QuestionnairePagination(
   val isPaginated: Boolean = false,
   val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
-  val showSubmitButton: Boolean = false,
-  val showCancelButton: Boolean = false,
-  val showReviewButton: Boolean = false,
 )
 
 /** A single page in the questionnaire. This is used for the UI to render pagination controls. */

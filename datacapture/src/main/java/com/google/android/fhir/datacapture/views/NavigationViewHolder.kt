@@ -18,43 +18,47 @@ package com.google.android.fhir.datacapture.views
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.QuestionnaireNavigationViewState
-import com.google.android.fhir.datacapture.QuestionnairePageNavigationState
+import com.google.android.fhir.datacapture.QuestionnaireNavigationUIState
+import com.google.android.fhir.datacapture.QuestionnaireNavigationViewUIState
 import com.google.android.fhir.datacapture.R
 
 class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-  fun bind(questionnairePageNavigationState: QuestionnairePageNavigationState) {
-    fun View.updateState(navigationViewState: QuestionnaireNavigationViewState) {
-      when (navigationViewState) {
-        QuestionnaireNavigationViewState.Disabled -> {
-          visibility = View.VISIBLE
-          isEnabled = false
-        }
-        is QuestionnaireNavigationViewState.Enabled -> {
-          visibility = View.VISIBLE
-          isEnabled = true
-          setOnClickListener { navigationViewState.onClickAction() }
-        }
-        QuestionnaireNavigationViewState.Hidden -> {
-          visibility = View.GONE
-        }
+  fun bind(questionnaireNavigationUIState: QuestionnaireNavigationUIState) {
+    itemView.findViewById<View>(R.id.cancel_questionnaire).apply {
+      updateState(questionnaireNavigationUIState.navCancel)
+    }
+
+    itemView.findViewById<View>(R.id.pagination_previous_button).apply {
+      updateState(questionnaireNavigationUIState.navPrevious)
+    }
+
+    itemView.findViewById<View>(R.id.pagination_next_button).apply {
+      updateState(questionnaireNavigationUIState.navNext)
+    }
+
+    itemView.findViewById<View>(R.id.review_mode_button).apply {
+      updateState(questionnaireNavigationUIState.navReview)
+    }
+    itemView.findViewById<View>(R.id.submit_questionnaire).apply {
+      updateState(questionnaireNavigationUIState.navSubmit)
+    }
+  }
+
+  private fun View.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
+    when (navigationViewState) {
+      QuestionnaireNavigationViewUIState.Disabled -> {
+        visibility = View.VISIBLE
+        isEnabled = false
       }
-    }
-
-    itemView.findViewById<View>(R.id.navigation_item_pagination_previous_button).apply {
-      updateState(questionnairePageNavigationState.previousPageNavigationActionState)
-    }
-
-    itemView.findViewById<View>(R.id.navigation_item_pagination_next_button).apply {
-      updateState(questionnairePageNavigationState.nextPageNavigationActionState)
-    }
-
-    itemView.findViewById<View>(R.id.navigation_item_review_mode_button).apply {
-      updateState(questionnairePageNavigationState.reviewNavigationActionState)
-    }
-    itemView.findViewById<View>(R.id.navigation_item_submit_questionnaire).apply {
-      updateState(questionnairePageNavigationState.submitNavigationActionState)
+      is QuestionnaireNavigationViewUIState.Enabled -> {
+        visibility = View.VISIBLE
+        isEnabled = true
+        setOnClickListener { navigationViewState.onClickAction() }
+      }
+      QuestionnaireNavigationViewUIState.Hidden -> {
+        visibility = View.GONE
+      }
     }
   }
 }

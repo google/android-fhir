@@ -23,6 +23,6 @@ internal sealed interface QuestionnaireAdapterItem {
   /** A row for a question in a Questionnaire RecyclerView. */
   data class Question(val item: QuestionnaireViewItem) : QuestionnaireAdapterItem
 
-  data class Navigation(val questionnairePageNavigationState: QuestionnairePageNavigationState) :
+  data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
     QuestionnaireAdapterItem
 }

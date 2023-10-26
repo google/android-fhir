@@ -49,7 +49,7 @@ internal class QuestionnaireReviewAdapter :
       }
       is QuestionnaireAdapterItem.Navigation -> {
         holder as NavigationViewHolder
-        holder.bind(item.questionnairePageNavigationState)
+        holder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
