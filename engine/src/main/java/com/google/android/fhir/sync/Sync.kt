@@ -42,6 +42,7 @@ import com.google.android.fhir.sync.SyncState.Unknown
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
+import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -70,13 +71,15 @@ object Sync {
   ): Flow<SyncState> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     val flow = getWorkerInfo(context, uniqueWorkName)
+    val oneTimeWorkRequest =
+      createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         uniqueWorkName,
         ExistingWorkPolicy.KEEP,
-        createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName),
+        oneTimeWorkRequest,
       )
-    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow)
+    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow, oneTimeWorkRequest.id)
   }
 
   /**
@@ -96,13 +99,15 @@ object Sync {
   ): Flow<PeriodicSyncState> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
     val flow = getWorkerInfo(context, uniqueWorkName)
+    val periodicWorkRequest =
+      createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName)
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         uniqueWorkName,
         ExistingPeriodicWorkPolicy.KEEP,
-        createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName),
+        periodicWorkRequest,
       )
-    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
+    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow, periodicWorkRequest.id)
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
@@ -135,8 +140,9 @@ object Sync {
     context: Context,
     workName: String,
     syncJobProgressStateFlow: Flow<SyncJobStatus>,
+    id: UUID,
   ): Flow<PeriodicSyncState> {
-    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
+    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, id)
     val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
     val syncJobFlow =
@@ -171,8 +177,9 @@ object Sync {
     context: Context,
     workName: String,
     syncJobProgressStateFlow: Flow<SyncJobStatus>,
+    uuid: UUID,
   ): Flow<SyncState> {
-    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, workName)
+    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, uuid)
     val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
 
@@ -185,12 +192,12 @@ object Sync {
     }
   }
 
-  private fun observeWorkState(context: Context, workName: String): Flow<WorkInfo.State> =
-    WorkManager.getInstance(context)
-      .getWorkInfosForUniqueWorkLiveData(workName)
-      .asFlow()
-      .flatMapConcat { it.asFlow() }
-      .mapNotNull { workInfo -> workInfo.state }
+  private fun observeWorkState(context: Context, uuid: UUID): Flow<WorkInfo.State> {
+    return WorkManager.getInstance(context).getWorkInfoByIdLiveData(uuid).asFlow().mapNotNull {
+      workInfo ->
+      workInfo.state
+    }
+  }
 
   @PublishedApi
   internal inline fun <W : FhirSyncWorker> createOneTimeWorkRequest(

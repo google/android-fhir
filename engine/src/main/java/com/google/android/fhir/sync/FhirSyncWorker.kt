@@ -87,8 +87,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
               cancel()
             }
             else -> {
-              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName)
               setProgress(buildWorkData(syncJobStatus))
+              // remove previous job terminal state.
+              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName)
             }
           }
         }

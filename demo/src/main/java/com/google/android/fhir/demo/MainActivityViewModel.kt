@@ -18,7 +18,6 @@ package com.google.android.fhir.demo
 
 import android.app.Application
 import android.text.format.DateFormat
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -63,8 +62,6 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
         .shareIn(this, SharingStarted.Eagerly, 10)
         .collect {
           if (it.currentJobState != null) {
-            Log.d("demo1", "$it")
-            Log.d("demo1", "lastJobstate ${it.lastJobState}")
             _pollState.emit(it.currentJobState!!)
           }
         }
@@ -82,12 +79,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
       viewModelScope.launch {
         Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
           .shareIn(this, SharingStarted.Eagerly, 0)
-          .collect { result ->
-            result?.let {
-              Log.d("demo1", "$it")
-              _pollState.emit(it)
-            }
-          }
+          .collect { result -> result?.let { _pollState.emit(it) } }
       }
   }
 

@@ -49,8 +49,8 @@ internal class FhirDataStore(context: Context) {
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
   private val allowedSyncJobStatusPackages =
     listOf(
-      "com.google.android.fhir.sync.SyncJobStatus.Finished",
-      "com.google.android.fhir.sync.SyncJobStatus.Failed",
+      "com.google.android.fhir.sync.SyncJobStatus\$Finished",
+      "com.google.android.fhir.sync.SyncJobStatus\$Failed",
     )
   private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 
