@@ -74,7 +74,25 @@ internal abstract class ResourceDao {
         )
       updateChanges(entity, resource)
     }
-      ?: throw ResourceNotFoundException(resource.resourceType.name, resource.id)
+      ?: throw ResourceNotFoundException(
+        resource.resourceType.name,
+        resource.id,
+      )
+  }
+
+  suspend fun updateResourceWithUuid(resourceUuid: UUID, updatedResource: Resource) {
+    getResourceEntity(resourceUuid)?.let {
+      val entity =
+        it.copy(
+          resourceId = updatedResource.logicalId,
+          serializedResource = iParser.encodeResourceToString(updatedResource),
+          lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
+        )
+      updateChanges(entity, updatedResource)
+    }
+      ?: throw ResourceNotFoundException(
+        resourceUuid,
+      )
   }
 
   /**
@@ -195,6 +213,17 @@ internal abstract class ResourceDao {
   abstract suspend fun getResourceEntity(
     resourceId: String,
     resourceType: ResourceType,
+  ): ResourceEntity?
+
+  @Query(
+    """
+        SELECT *
+        FROM ResourceEntity
+        WHERE resourceUuid = :resourceUuid
+    """,
+  )
+  abstract suspend fun getResourceEntity(
+    resourceUuid: UUID,
   ): ResourceEntity?
 
   @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
