@@ -67,11 +67,11 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val synchronizer =
       FhirSynchronizer(
-        applicationContext,
         getFhirEngine(),
         Uploader(dataSource),
         DownloaderImpl(dataSource, getDownloadWorkManager()),
         getConflictResolver(),
+        FhirEngineProvider.getFhirDataStore(applicationContext),
       )
 
     val job =
@@ -101,7 +101,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     // await/join is needed to collect states completely
     kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    //    setProgress(output)
+    setProgress(output)
 
     Timber.d("Received result from worker $result and sending output $output")
 

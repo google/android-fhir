@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
@@ -49,6 +48,8 @@ class FhirSynchronizerTest {
 
   @Mock private lateinit var conflictResolver: ConflictResolver
 
+  @Mock private lateinit var fhirDataStore: FhirDataStore
+
   private lateinit var fhirSynchronizer: FhirSynchronizer
 
   @Before
@@ -56,11 +57,11 @@ class FhirSynchronizerTest {
     MockitoAnnotations.openMocks(this)
     fhirSynchronizer =
       FhirSynchronizer(
-        ApplicationProvider.getApplicationContext(),
         TestFhirEngineImpl,
         uploader,
         downloader,
         conflictResolver,
+        fhirDataStore,
       )
   }
 

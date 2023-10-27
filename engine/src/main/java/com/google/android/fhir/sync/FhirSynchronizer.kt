@@ -16,9 +16,7 @@
 
 package com.google.android.fhir.sync
 
-import android.content.Context
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
@@ -46,17 +44,15 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
-  context: Context,
   private val fhirEngine: FhirEngine,
   private val uploader: Uploader,
   private val downloader: Downloader,
   private val conflictResolver: ConflictResolver,
+  private val datastoreUtil: FhirDataStore,
 ) {
 
   private val _syncState = MutableSharedFlow<SyncJobStatus>()
   val syncState: SharedFlow<SyncJobStatus> = _syncState
-
-  private val datastoreUtil = FhirEngineProvider.getFhirDataStore(context)
 
   private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 
