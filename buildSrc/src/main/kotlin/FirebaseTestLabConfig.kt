@@ -87,7 +87,9 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
   maxTestShards.set(10)
   testTimeout.set("45m")
   directoriesToPull.set(listOf("/sdcard/Download"))
-  resultsBucket.set("android-fhir-build-artifacts")
+  resultsBucket.set(
+    "android-fhir-firebase-test-logs",
+  ) // This is also in //kokoro/gcp_ubuntu/kokoro_build.sh as GCS_BUCKET!
   resultsDir.set(
     if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
       "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"

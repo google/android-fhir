@@ -38,7 +38,8 @@ set -e
 export JAVA_HOME="/usr/lib/jvm/java-1.17.0-openjdk-amd64"
 export ANDROID_HOME=${HOME}/android_sdk
 export PATH=$PATH:$JAVA_HOME/bin:${ANDROID_HOME}/cmdline-tools/latest/bin
-export GCS_BUCKET="android-fhir-build-artifacts"
+export GCS_BUCKET="android-fhir-firebase-test-logs"
+# This ^^^ is also in //buildSrc/src/main/kotlin/FirebaseTestLabConfig.kt as resultsBucket.set()
 
 # Uploads files generated from builds and tests to GCS when this script exits.
 # If videos were recorded from Firebase, prints their URL to the console so users
