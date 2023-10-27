@@ -72,7 +72,7 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            LocalChangeToken(listOf()),
+            listOf(),
             listOf(),
           ),
         )
@@ -102,7 +102,7 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            LocalChangeToken(listOf()),
+            listOf(),
             listOf(),
           ),
         )
