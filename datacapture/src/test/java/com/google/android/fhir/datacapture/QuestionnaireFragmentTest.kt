@@ -157,12 +157,12 @@ class QuestionnaireFragmentTest {
       launchFragmentInContainer<QuestionnaireFragment>(
         bundleOf(
           EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-          EXTRA_SUBMIT_BUTTON_TEXT to true
+          EXTRA_SUBMIT_BUTTON_TEXT to true,
         ),
       )
     val customButtonText = "Submit"
 
-    scenario.onFragment{ fragment ->
+    scenario.onFragment { fragment ->
       val args = fragment.requireArguments()
       args.putString(QuestionnaireFragment.EXTRA_SUBMIT_BUTTON_TEXT, customButtonText)
       fragment.arguments = args
@@ -170,9 +170,8 @@ class QuestionnaireFragmentTest {
 
     scenario.moveToState(Lifecycle.State.RESUMED)
 
-    val button = scenario.withFragment {
-      this.requireView().findViewById<Button>(R.id.submit_questionnaire)
-    }
+    val button =
+      scenario.withFragment { this.requireView().findViewById<Button>(R.id.submit_questionnaire) }
 
     val buttonText = button.text.toString()
     assert(buttonText == customButtonText)

@@ -88,7 +88,9 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         QuestionnaireFragment.builder()
           .setQuestionnaire(viewModel.questionnaireJson)
           .setShowCancelButton(true)
-          .setSubmitButtonText(getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire))
+          .setSubmitButtonText(
+            getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+          )
           .build(),
         QUESTIONNAIRE_FRAGMENT_TAG,
       )
