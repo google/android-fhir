@@ -23,7 +23,7 @@ configurations {
     exclude(module = "hapi-fhir-caching-caffeine")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
 
-    resolutionStrategy { force("com.google.guava:guava:32.1.2-android") }
+    resolutionStrategy { force("com.google.guava:guava:32.1.3-android") }
   }
 }
 
