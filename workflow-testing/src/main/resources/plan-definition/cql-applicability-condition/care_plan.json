@@ -1,9 +1,9 @@
 {
   "resourceType": "CarePlan",
-  "id": "Plan-Definition-Example",
+  "id": "17",
   "contained": [ {
     "resourceType": "RequestGroup",
-    "id": "Plan-Definition-Example",
+    "id": "17",
     "instantiatesCanonical": [ "http://example.com/PlanDefinition/Plan-Definition-Example" ],
     "status": "draft",
     "intent": "proposal",
@@ -20,12 +20,12 @@
         }
       } ],
       "resource": {
-        "reference": "Task/Activity-Example"
+        "reference": "Task/16"
       }
     } ]
   }, {
     "resourceType": "Task",
-    "id": "Activity-Example",
+    "id": "16",
     "extension": [ {
       "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
       "valueExpression": {
@@ -35,7 +35,7 @@
     } ],
     "instantiatesCanonical": "http://example.com/ActivityDefinition/Activity-Example",
     "basedOn": [ {
-      "reference": "#RequestGroup/Plan-Definition-Example",
+      "reference": "#RequestGroup/17",
       "type": "RequestGroup"
     } ],
     "status": "draft",
@@ -53,7 +53,7 @@
   },
   "activity": [ {
     "reference": {
-      "reference": "#RequestGroup/Plan-Definition-Example"
+      "reference": "#RequestGroup/17"
     }
   } ]
 }

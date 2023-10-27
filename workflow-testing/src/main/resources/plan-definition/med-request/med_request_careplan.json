@@ -1,10 +1,10 @@
 {
   "resourceType": "CarePlan",
-  "id": "MedRequest-Example",
+  "id": "17",
   "contained": [
     {
       "resourceType": "RequestGroup",
-      "id": "MedRequest-Example",
+      "id": "17",
       "instantiatesCanonical": [
         "http://localhost/PlanDefinition/MedRequest-Example"
       ],
@@ -18,14 +18,14 @@
           "id": "medication-action-1",
           "title": "Administer Medication 1",
           "resource": {
-            "reference": "MedicationRequest/MedicationRequest-1"
+            "reference": "MedicationRequest/16"
           }
         }
       ]
     },
     {
       "resourceType": "MedicationRequest",
-      "id": "MedicationRequest-1",
+      "id": "16",
       "status": "draft",
       "intent": "order",
       "medicationCodeableConcept": {
@@ -50,7 +50,7 @@
   "activity": [
     {
       "reference": {
-        "reference": "#RequestGroup/MedRequest-Example"
+        "reference": "#RequestGroup/17"
       }
     }
   ]
