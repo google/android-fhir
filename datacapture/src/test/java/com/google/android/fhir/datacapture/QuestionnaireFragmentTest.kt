@@ -29,6 +29,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SUBMIT_BUTTON_TEXT
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
@@ -137,6 +138,44 @@ class QuestionnaireFragmentTest {
       .isEqualTo(View.VISIBLE)
     assertThat(view.findViewById<Button>(R.id.submit_questionnaire).visibility)
       .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun `questionnaire submit button text should be editable`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragmentInContainer<QuestionnaireFragment>(
+        bundleOf(
+          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          EXTRA_SUBMIT_BUTTON_TEXT to true
+        ),
+      )
+    val customButtonText = "Submit"
+
+    scenario.onFragment{ fragment ->
+      val args = fragment.requireArguments()
+      args.putString(QuestionnaireFragment.EXTRA_SUBMIT_BUTTON_TEXT, customButtonText)
+      fragment.arguments = args
+    }
+
+    scenario.moveToState(Lifecycle.State.RESUMED)
+
+    val button = scenario.withFragment {
+      this.requireView().findViewById<Button>(R.id.submit_questionnaire)
+    }
+
+    val buttonText = button.text.toString()
+    assert(buttonText == customButtonText)
   }
 
   @Test
