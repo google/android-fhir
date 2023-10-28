@@ -47,6 +47,8 @@ jobs:
     permissions:
       actions: read
       contents: read
+      # Required by codeql-action
+      security-events: write
 
     strategy:
       fail-fast: false
