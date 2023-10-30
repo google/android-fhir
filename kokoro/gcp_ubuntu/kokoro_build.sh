@@ -92,16 +92,7 @@ function build_only() {
 function device_tests() {
   ./gradlew packageDebugAndroidTest --scan --stacktrace
   ./gradlew packageReleaseAndroidTest --scan --stacktrace
-    local lib_names=("workflow:benchmark" "engine:benchmark" "datacapture" "engine" "knowledge" "workflow")
-    firebase_pids=()
-    for lib_name in "${lib_names[@]}"; do
-      ./gradlew :$lib_name:runFlank  --scan --stacktrace &
-      firebase_pids+=("$!")
-    done
-
-    for firebase_pid in ${firebase_pids[*]}; do
-        wait $firebase_pid
-    done
+  .github/workflows/runFlank.sh
 }
 
 # Generates JaCoCo reports and uploads to Codecov: https://about.codecov.io/
