@@ -133,7 +133,7 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  const val androidFhirGroup = "com.google.android.fhir"
+  const val androidFhirGroup = "org.smartregister"
   const val androidFhirEngineModule = "engine"
   const val androidFhirKnowledgeModule = "knowledge"
   const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
@@ -219,9 +219,9 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha05"
-    const val androidFhirEngine = "0.1.0-beta05"
-    const val androidFhirKnowledge = "0.1.0-alpha03"
+    const val androidFhirCommon = "0.1.0-alpha05-preview-SNAPSHOT"
+    const val androidFhirEngine = "0.1.0-beta05-preview1-SNAPSHOT"
+    const val androidFhirKnowledge = "0.1.0-alpha03-preview-SNAPSHOT"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
