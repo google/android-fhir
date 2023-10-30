@@ -63,7 +63,7 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
-   * @return a [Flow] of [FhirSyncWorkStatus]
+   * @return a [Flow] of [SyncState]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
@@ -90,7 +90,7 @@ object Sync {
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
    *   mechanism
-   * @return a [Flow] of [FhirSyncWorkStatus]
+   * @return a [Flow] of [PeriodicSyncState]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
@@ -284,45 +284,53 @@ object Sync {
     }
   }
 
+  /**
+   * Maps the [lastSyncJobStatus] to a specific [Result] based on the provided status.
+   *
+   * @param lastSyncJobStatus The last synchronization job status of type [SyncJobStatus].
+   * @return The mapped [Result] based on the provided [lastSyncJobStatus]:
+   * - [Result.Succeeded] with the timestamp if the last job status is [SyncJobStatus.Finished].
+   * - [Result.Failed] with exceptions and timestamp if the last job status is
+   *   [SyncJobStatus.Failed].
+   * - `null` if the last job status is neither Finished nor Failed.
+   */
   private fun mapSyncJobStatusToResult(
     lastSyncJobStatus: SyncJobStatus,
   ) =
     when (lastSyncJobStatus) {
-      is SyncJobStatus.Finished -> {
-        Result.Succeeded(lastSyncJobStatus.timestamp)
-      }
-      is SyncJobStatus.Failed -> {
+      is SyncJobStatus.Finished -> Result.Succeeded(lastSyncJobStatus.timestamp)
+      is SyncJobStatus.Failed ->
         Result.Failed(lastSyncJobStatus.exceptions, lastSyncJobStatus.timestamp)
-      }
-      else -> {
-        null
-      }
+      else -> null
     }
 
+  /**
+   * Creates the current job state based on the provided [currentSyncJobStatus] and
+   * [schedulingStatus].
+   *
+   * @param currentSyncJobStatus The current synchronization job status.
+   * @param schedulingStatus The scheduling status represented by [WorkInfo.State].
+   * @return The current job state based on the given parameters:
+   * - [Enqueued] if the job is in the enqueued state.
+   * - [Running] if the job is currently running.
+   * - [Succeeded] if the job has finished successfully.
+   * - [Failed] if the job has encountered a failure.
+   * - `null` if the scheduling status is neither enqueued nor running.
+   */
   private fun createCurrentJobState(
     currentSyncJobStatus: SyncJobStatus,
     schedulingStatus: WorkInfo.State,
   ) =
     when (schedulingStatus) {
-      RUNNING -> {
+      WorkInfo.State.ENQUEUED -> Enqueued
+      WorkInfo.State.RUNNING -> {
         when (currentSyncJobStatus) {
           is SyncJobStatus.Started,
-          is SyncJobStatus.InProgress, -> {
-            Running(currentSyncJobStatus)
-          }
-          is SyncJobStatus.Finished -> {
-            Succeeded(currentSyncJobStatus)
-          }
-          is SyncJobStatus.Failed -> {
-            Failed(currentSyncJobStatus)
-          }
+          is SyncJobStatus.InProgress, -> Running(currentSyncJobStatus)
+          is SyncJobStatus.Finished -> Succeeded(currentSyncJobStatus)
+          is SyncJobStatus.Failed -> Failed(currentSyncJobStatus)
         }
       }
-      ENQUEUED -> {
-        Enqueued
-      }
-      else -> {
-        null
-      }
+      else -> null
     }
 }
