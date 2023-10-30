@@ -38,6 +38,7 @@ import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.util.Collections
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -140,7 +141,7 @@ internal class DatabaseImpl(
   }
 
   override suspend fun <R : Resource> insertLocalOnly(vararg resource: R): List<String> {
-    return db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
+    return db.withTransaction { resourceDao.insertAllRemote(resource.toList()).map { it.toString() }.toList() }
   }
 
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
