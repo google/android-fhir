@@ -113,14 +113,14 @@ internal class KnowledgeManagerTest {
   fun `inserting a library of a different version creates new entry`() = runTest {
     val libraryAOld =
       Library().apply {
-        id = "defaultA"
+        id = "Library/defaultA-A.1.0.0"
         name = "defaultA"
         url = "www.exampleA.com"
         version = "A.1.0.0"
       }
     val libraryANew =
       Library().apply {
-        id = "defaultA"
+        id = "Library/defaultA-A.1.0.1"
         name = "defaultA"
         url = "www.exampleA.com"
         version = "A.1.0.1"
@@ -131,6 +131,18 @@ internal class KnowledgeManagerTest {
 
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
+
+    val resourceA100 =
+      knowledgeManager
+        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.0")
+        .single()
+    assertThat(resourceA100.idElement.toString()).isEqualTo("Library/1")
+
+    val resourceA101 =
+      knowledgeManager
+        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.1")
+        .single()
+    assertThat(resourceA101.idElement.toString()).isEqualTo("Library/2")
   }
 
   fun `installing from npmPackageManager`() = runTest {
@@ -153,7 +165,8 @@ internal class KnowledgeManagerTest {
   }
 
   private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.name).apply {
+    return File(context.filesDir, library.id).apply {
+      this.parentFile?.mkdirs()
       writeText(jsonParser.encodeResourceToString(library))
     }
   }

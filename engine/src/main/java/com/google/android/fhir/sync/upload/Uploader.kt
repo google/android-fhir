@@ -56,7 +56,7 @@ internal class Uploader(private val dataSource: DataSource) {
       }
     }
 
-    return UploadSyncResult.Success(token, successfulResponses)
+    return UploadSyncResult.Success(localChanges, successfulResponses)
   }
 
   private suspend fun handleUploadRequest(uploadRequest: UploadRequest): UploadRequestResult {
@@ -95,8 +95,8 @@ internal class Uploader(private val dataSource: DataSource) {
 
 sealed class UploadSyncResult {
   data class Success(
-    val localChangeToken: LocalChangeToken,
-    val resources: List<Resource>,
+    val localChanges: List<LocalChange>,
+    val responseResources: List<Resource>,
   ) : UploadSyncResult()
 
   data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
