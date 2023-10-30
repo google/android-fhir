@@ -153,20 +153,14 @@ class QuestionnaireFragmentTest {
         )
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val customButtonText = "Apply"
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
         bundleOf(
           EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-          EXTRA_SUBMIT_BUTTON_TEXT to true,
+          EXTRA_SUBMIT_BUTTON_TEXT to customButtonText,
         ),
       )
-    val customButtonText = "Submit"
-
-    scenario.onFragment { fragment ->
-      val args = fragment.requireArguments()
-      args.putString(QuestionnaireFragment.EXTRA_SUBMIT_BUTTON_TEXT, customButtonText)
-      fragment.arguments = args
-    }
 
     scenario.moveToState(Lifecycle.State.RESUMED)
 
