@@ -30,7 +30,7 @@ configurations {
 dependencies {
   // REVERT to DEPENDENCIES LATER
   api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.0")
-  api("ca.uhn.hapi.fhir:hapi-fhir-caching-guava:6.8.0")
+  api("ca.uhn.hapi.fhir:hapi-fhir-caching-guava:6.8.5")
 
   implementation(Dependencies.fhirUcum)
 
