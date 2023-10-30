@@ -35,8 +35,11 @@ env:
   GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.head_ref || github.ref || github.run_id }}
-  cancel-in-progress: true
+  # github.head_ref uniquely identifies Pull Requests (but is not available when building branches like main or master)
+  # github.ref is the fallback used when building for workflows triggered by push
+  # Note that || are fallback values (not "concatenations")
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true # Use e.g. ${{ github.ref != 'refs/heads/main' }} (or master, until #2180) to only cancel for PRs not on branch
 
   # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
