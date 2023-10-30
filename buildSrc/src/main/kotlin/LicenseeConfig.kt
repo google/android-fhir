@@ -22,6 +22,8 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
+    allow("BSD-2-Clause")
+    allow("BSD-3-Clause")
     allow("MIT")
 
     ignoreDependencies("com.ibm.icu", "icu4j") {

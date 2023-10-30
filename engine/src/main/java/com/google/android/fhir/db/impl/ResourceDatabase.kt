@@ -26,6 +26,7 @@ import com.google.android.fhir.db.impl.dao.ResourceDao
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.entities.LocalChangeResourceReferenceEntity
 import com.google.android.fhir.db.impl.entities.NumberIndexEntity
 import com.google.android.fhir.db.impl.entities.PositionIndexEntity
 import com.google.android.fhir.db.impl.entities.QuantityIndexEntity
@@ -34,6 +35,8 @@ import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
+import org.json.JSONArray
+import org.json.JSONObject
 
 @Database(
   entities =
@@ -49,8 +52,9 @@ import com.google.android.fhir.db.impl.entities.UriIndexEntity
       NumberIndexEntity::class,
       LocalChangeEntity::class,
       PositionIndexEntity::class,
+      LocalChangeResourceReferenceEntity::class,
     ],
-  version = 7,
+  version = 8,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -147,5 +151,60 @@ val MIGRATION_6_7 =
       database.execSQL(
         "CREATE INDEX IF NOT EXISTS `index_LocalChangeEntity_resourceUuid` ON `LocalChangeEntity` (`resourceUuid`)",
       )
+    }
+  }
+
+/** Create [LocalChangeResourceReferenceEntity] */
+val MIGRATION_7_8 =
+  object : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+        "CREATE TABLE IF NOT EXISTS `LocalChangeResourceReferenceEntity` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `localChangeId` INTEGER NOT NULL, `resourceReferenceValue` TEXT NOT NULL, `resourceReferencePath` TEXT, FOREIGN KEY(`localChangeId`) REFERENCES `LocalChangeEntity`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED)",
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeResourceReferenceEntity_resourceReferenceValue` ON `LocalChangeResourceReferenceEntity` (`resourceReferenceValue`)",
+      )
+      database.execSQL(
+        "CREATE INDEX IF NOT EXISTS `index_LocalChangeResourceReferenceEntity_localChangeId` ON `LocalChangeResourceReferenceEntity` (`localChangeId`)",
+      )
+
+      database.query("SELECT id,type,payload from LocalChangeEntity").let {
+        var continueIterating = it.moveToFirst()
+        while (continueIterating) {
+          val localChangeId = it.getLong(0)
+          val localChangeType = it.getInt(1)
+          val localChangePayload = it.getString(2)
+          val references =
+            when (localChangeType) {
+              LocalChangeEntity.Type.INSERT.value ->
+                extractAllValuesWithKey("reference", JSONObject(localChangePayload))
+              LocalChangeEntity.Type.UPDATE.value -> {
+                val patchArray = JSONArray(localChangePayload)
+                val references = mutableListOf<String>()
+                for (i in 0 until patchArray.length()) {
+                  // look for any value with key "reference" in JsonPatch's value
+                  references.addAll(
+                    extractAllValuesWithKey("reference", patchArray.getJSONObject(i)),
+                  )
+                  // look for value if the path of the JsonPatch is a reference path itself
+                  // example:
+                  // "[{\"op\":\"replace\",\"path\":\"\\/basedOn\\/0\\/reference\",\"value\":\"CarePlan\\/345\"}]"
+                  lookForReferencesInJsonPatch(patchArray.getJSONObject(i))?.let { ref ->
+                    references.add(ref)
+                  }
+                }
+                references
+              }
+              LocalChangeEntity.Type.DELETE.value -> emptyList()
+              else -> throw IllegalArgumentException("Unknown LocalChangeType")
+            }
+          references.forEach { refValue ->
+            database.execSQL(
+              "INSERT INTO LocalChangeResourceReferenceEntity (localChangeId, resourceReferenceValue) VALUES ('$localChangeId', '$refValue' );",
+            )
+          }
+          continueIterating = it.moveToNext()
+        }
+      }
     }
   }

@@ -41,15 +41,21 @@ class PatientListViewModel(application: Application) : AndroidViewModel(applicat
     updatePatientList { getSearchResults() }
   }
 
-  fun triggerOneTimeSync() {}
+  fun triggerOneTimeSync() {
+    // Add code to start sync
+  }
 
   /*
   Fetches patients stored locally based on the city they are in, and then updates the city field for
   each patient. Once that is complete, trigger a new sync so the changes can be uploaded.
    */
-  fun triggerUpdate() {}
+  fun triggerUpdate() {
+    // Add code to trigger update
+  }
 
-  fun searchPatientsByName(nameQuery: String) {}
+  fun searchPatientsByName(nameQuery: String) {
+    // Add code to use fhirEngine to search for patients
+  }
 
   /**
    * [updatePatientList] calls the search and count lambda and updates the live data values
@@ -66,7 +72,7 @@ class PatientListViewModel(application: Application) : AndroidViewModel(applicat
     val patients: MutableList<Patient> = mutableListOf()
     FhirApplication.fhirEngine(this.getApplication())
       .search<Patient> { sort(Patient.GIVEN, Order.ASCENDING) }
-      .let { patients.addAll(it) }
+      .let { patients.addAll(it.map { it.resource }) }
     return patients
   }
 }

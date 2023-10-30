@@ -41,10 +41,6 @@ object Dependencies {
       "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
   }
 
-  object Glide {
-    const val glide = "com.github.bumptech.glide:glide:${Versions.Glide.glide}"
-  }
-
   object HapiFhir {
     const val fhirBase = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
     const val fhirClient = "ca.uhn.hapi.fhir:hapi-fhir-client:${Versions.hapiFhir}"
@@ -218,18 +214,14 @@ object Dependencies {
       const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
     }
 
-    object Glide {
-      const val glide = "4.14.2"
-    }
-
     object Kotlin {
       const val kotlinCoroutinesCore = "1.7.2"
       const val stdlib = "1.8.20"
     }
 
     const val androidFhirCommon = "0.1.0-alpha05"
-    const val androidFhirEngine = "0.1.0-beta04"
-    const val androidFhirKnowledge = "0.1.0-alpha01"
+    const val androidFhirEngine = "0.1.0-beta05"
+    const val androidFhirKnowledge = "0.1.0-alpha03"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
