@@ -22,8 +22,7 @@ interface SHLinkGenerator {
 
   /* Returns the newly generated SHLink */
   suspend fun generateSHLink(
-    context: Context,
-    SHLinkGenerationData: SHLinkGenerationData,
+    shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
   ): String

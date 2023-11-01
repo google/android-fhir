@@ -18,14 +18,22 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.generate.EncryptionUtils
+import com.google.android.fhir.document.generate.SHLinkGenerationData
 import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
+import kotlinx.coroutines.test.runTest
+import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -45,10 +53,22 @@ class SHLinkGeneratorImplTest {
       .build()
   }
 
+  private val mockIPSDocument = mock(IPSDocument::class.java)
+
+  private val shLinkGenerationDataWithExp =
+    SHLinkGenerationData("Label", "2023-11-01", mockIPSDocument)
+  private val shLinkGenerationDataWithoutExp = SHLinkGenerationData("Label", "", mockIPSDocument)
+
+  val initialPostResponse = JSONObject().apply {
+    put("id", "123")
+    put("managementToken", "token123")
+  }
+
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
+    `when`(mockIPSDocument.document).thenReturn(Bundle())
   }
 
   @Test
@@ -73,11 +93,7 @@ class SHLinkGeneratorImplTest {
 
     /* Construct the expected JSON object */
     val expectedJson =
-      JSONObject()
-        .put("url", manifestUrl)
-        .put("key", key)
-        .put("flag", flags)
-        .put("label", label)
+      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
         .put("exp", shLinkGeneratorImpl.convertDateStringToEpochSeconds(expirationDate))
 
     val payload =
@@ -94,4 +110,43 @@ class SHLinkGeneratorImplTest {
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
 
+  @Test
+  fun testGenerateAndPostPayloadWithoutExp() = runTest {
+    `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
+
+    val initialPostResponse = JSONObject()
+    initialPostResponse.put("id", "123")
+    initialPostResponse.put("managementToken", "token123")
+
+    val mockResponse = MockResponse().setResponseCode(200)
+    mockResponse.setBody("Mocked Response Body")
+    mockWebServer.enqueue(mockResponse)
+
+    val mockSHLinkGenerationData =
+      SHLinkGenerationData("Mocked Label", "2023-12-31", mockIPSDocument)
+
+    val result = shLinkGeneratorImpl.generateAndPostPayload(
+      initialPostResponse, mockSHLinkGenerationData, "passcode", mockWebServer.url("/").toString()
+    )
+
+    assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
+
+  }
+
+  @Test
+  fun testPostPayload() = runTest {
+    val encryptedFile = "encryptedData"
+    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn(
+        encryptedFile
+      )
+
+    val response = MockResponse().setResponseCode(200).setBody(JSONObject().toString())
+
+    mockWebServer.enqueue(response)
+    shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+
+    val recordedRequest = mockWebServer.takeRequest()
+    recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
+    assertEquals(recordedRequest.method, "POST")
+  }
 }

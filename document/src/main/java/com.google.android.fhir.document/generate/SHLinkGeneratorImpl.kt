@@ -17,7 +17,6 @@
 package com.google.android.fhir.document.generate
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.util.Base64
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
@@ -38,19 +37,19 @@ internal class SHLinkGeneratorImpl(
 
   /* Generate an SHL */
   override suspend fun generateSHLink(
-    context: Context,
-    SHLinkGenerationData: SHLinkGenerationData,
+    shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
   ): String {
     val initialPostResponse = getManifestUrlAndToken(passcode)
     return generateAndPostPayload(
-      initialPostResponse, SHLinkGenerationData, passcode, serverBaseUrl
+      initialPostResponse, shLinkGenerationData, passcode, serverBaseUrl
     )
+
   }
 
   /* POST the IPS document to the manifest URL */
-  private suspend fun postPayload(
+  suspend fun postPayload(
     file: String,
     manifestToken: String,
     key: String,
@@ -63,7 +62,12 @@ internal class SHLinkGeneratorImpl(
 
       return if (response.isSuccessful) {
         val responseBody = response.body()?.string()
-        JSONObject(responseBody)
+        if (responseBody != null) {
+          println(responseBody)
+          JSONObject(responseBody)
+        } else {
+          JSONObject()
+        }
       } else {
         Timber.e("HTTP Error: ${response.code()}")
         JSONObject()
@@ -87,26 +91,26 @@ internal class SHLinkGeneratorImpl(
   }
 
   /* POST the data to the SHL server and return the link itself */
-  private suspend fun generateAndPostPayload(
+  suspend fun generateAndPostPayload(
     initialPostResponse: JSONObject,
-    SHLinkGenerationData: SHLinkGenerationData,
+    shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
   ): String {
     val manifestToken = initialPostResponse.getString("id")
     val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
-    val exp = if (SHLinkGenerationData.expirationTime.isNotEmpty()) {
-      convertDateStringToEpochSeconds(SHLinkGenerationData.expirationTime).toString()
+    val exp = if (shLinkGenerationData.expirationTime.isNotEmpty()) {
+      convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
     } else {
       ""
     }
     val key = encryptionUtility.generateRandomKey()
     val shLinkPayload = constructSHLinkPayload(
-      manifestUrl, SHLinkGenerationData.label, getKeyFlags(passcode), key, exp
+      manifestUrl, shLinkGenerationData.label, getKeyFlags(passcode), key, exp
     )
     val encodedPayload = base64UrlEncode(shLinkPayload)
-    val data: String = parser.encodeResourceToString(SHLinkGenerationData.ipsDoc.document)
+    val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
     postPayload(data, manifestToken, key, managementToken)
     return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
   }
@@ -147,7 +151,7 @@ internal class SHLinkGeneratorImpl(
       put("key", key)
       flags?.let { put("flag", it) }
       label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", convertDateStringToEpochSeconds(it)) }
+      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
     }.toString()
     return payloadObject
   }
