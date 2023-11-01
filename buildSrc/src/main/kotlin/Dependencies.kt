@@ -174,8 +174,6 @@ object Dependencies {
   const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
   const val androidFhirEngine =
     "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
-  const val androidFhirEngineBeta4 =
-    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngineBeta4}"
   const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
