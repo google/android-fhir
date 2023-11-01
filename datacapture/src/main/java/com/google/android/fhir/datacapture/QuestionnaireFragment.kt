@@ -92,7 +92,8 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
-    val bottomNavGroup = view.findViewById<View>(R.id.questionnaire_bottom_view_container)
+    val bottomNavigationRecyclerView =
+      view.findViewById<RecyclerView>(R.id.questionnaire_bottom_navigation_recycler_view)
 
     viewModel.setOnCancelButtonClickListener {
       QuestionnaireCancelDialogFragment()
@@ -133,6 +134,10 @@ class QuestionnaireFragment : Fragment() {
     questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
+    val bottomNavigationAdapter = QuestionnaireNavigationAdapter()
+    bottomNavigationRecyclerView.adapter = bottomNavigationAdapter
+    bottomNavigationRecyclerView.layoutManager = LinearLayoutManager(view.context)
+
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
@@ -140,17 +145,10 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.ReviewMode -> {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
-            val itemsData =
-              if (displayMode.showNavAsScroll) {
-                bottomNavGroup.visibility = View.GONE
-                state.items + QuestionnaireAdapterItem.Navigation(state.bottomNavigation)
-              } else {
-                updateNavigation(bottomNavGroup, state.bottomNavigation)
-                state.items
-              }
             questionnaireReviewAdapter.submitList(
-              itemsData,
+              state.items,
             )
+            bottomNavigationAdapter.submitList(state.bottomNavItems)
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
 
             reviewModeEditButton.visibility =
@@ -166,15 +164,8 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.EditMode -> {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
-            val itemsData =
-              if (displayMode.showNavAsScroll) {
-                bottomNavGroup.visibility = View.GONE
-                state.items + QuestionnaireAdapterItem.Navigation(state.bottomNavigation)
-              } else {
-                updateNavigation(bottomNavGroup, state.bottomNavigation)
-                state.items
-              }
-            questionnaireEditAdapter.submitList(itemsData)
+            questionnaireEditAdapter.submitList(state.items)
+            bottomNavigationAdapter.submitList(state.bottomNavItems)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
 
@@ -212,7 +203,7 @@ class QuestionnaireFragment : Fragment() {
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
-            bottomNavGroup.visibility = View.GONE
+            bottomNavigationRecyclerView.visibility = View.GONE
           }
         }
       }
@@ -253,52 +244,6 @@ class QuestionnaireFragment : Fragment() {
           Timber.e(
             "Unknown fragment result $result",
           )
-      }
-    }
-  }
-
-  internal fun updateNavigation(
-    navigationViewGroup: View,
-    questionnaireNavigationUIState: QuestionnaireNavigationUIState?,
-  ) {
-    if (questionnaireNavigationUIState == null) {
-      navigationViewGroup.visibility = View.GONE
-      return
-    }
-
-    navigationViewGroup.findViewById<View>(R.id.cancel_questionnaire).apply {
-      updateState(questionnaireNavigationUIState.navCancel)
-    }
-
-    navigationViewGroup.findViewById<View>(R.id.pagination_previous_button).apply {
-      updateState(questionnaireNavigationUIState.navPrevious)
-    }
-
-    navigationViewGroup.findViewById<View>(R.id.pagination_next_button).apply {
-      updateState(questionnaireNavigationUIState.navNext)
-    }
-
-    navigationViewGroup.findViewById<View>(R.id.review_mode_button).apply {
-      updateState(questionnaireNavigationUIState.navReview)
-    }
-    navigationViewGroup.findViewById<View>(R.id.submit_questionnaire).apply {
-      updateState(questionnaireNavigationUIState.navSubmit)
-    }
-  }
-
-  private fun View.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
-    when (navigationViewState) {
-      QuestionnaireNavigationViewUIState.Disabled -> {
-        visibility = View.VISIBLE
-        isEnabled = false
-      }
-      is QuestionnaireNavigationViewUIState.Enabled -> {
-        visibility = View.VISIBLE
-        isEnabled = true
-        setOnClickListener { navigationViewState.onClickAction() }
-      }
-      QuestionnaireNavigationViewUIState.Hidden -> {
-        visibility = View.GONE
       }
     }
   }

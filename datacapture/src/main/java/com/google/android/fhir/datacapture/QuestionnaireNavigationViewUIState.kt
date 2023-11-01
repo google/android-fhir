@@ -16,12 +16,13 @@
 
 package com.google.android.fhir.datacapture
 
-sealed class QuestionnaireNavigationViewUIState {
-  object Hidden : QuestionnaireNavigationViewUIState()
+sealed class QuestionnaireNavigationViewUIState(val isShown: Boolean, val isEnabled: Boolean) {
+  object Hidden : QuestionnaireNavigationViewUIState(isShown = false, isEnabled = false)
 
-  object Disabled : QuestionnaireNavigationViewUIState()
+  object Disabled : QuestionnaireNavigationViewUIState(isShown = true, isEnabled = false)
 
-  data class Enabled(val onClickAction: () -> Unit) : QuestionnaireNavigationViewUIState()
+  data class Enabled(val onClickAction: () -> Unit) :
+    QuestionnaireNavigationViewUIState(isShown = true, isEnabled = true)
 }
 
 data class QuestionnaireNavigationUIState(

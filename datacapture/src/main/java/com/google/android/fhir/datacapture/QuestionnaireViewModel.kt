@@ -549,7 +549,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           QuestionnaireState(
             items = emptyList(),
             displayMode = DisplayMode.InitMode,
-            bottomNavigation = QuestionnaireNavigationUIState(),
+            bottomNavItems = emptyList(),
           ),
       )
 
@@ -643,7 +643,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // Reviewing the questionnaire or the questionnaire is read-only
     if (isReadOnly || isInReviewModeFlow.value) {
       val showSubmitButton = !isReadOnly && shouldShowSubmitButton
-      val pageNavigationViewState =
+      val bottomNavigationViewState =
         QuestionnaireNavigationUIState(
           navSubmit =
             if (showSubmitButton) {
@@ -658,15 +658,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               QuestionnaireNavigationViewUIState.Hidden
             },
         )
+      val bottomNavigationItems =
+        listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationViewState))
 
       return QuestionnaireState(
-        items = questionnaireItemViewItems,
+        items =
+          if (shouldSetNavigationInLongScroll) {
+            questionnaireItemViewItems + bottomNavigationItems
+          } else {
+            questionnaireItemViewItems
+          },
         displayMode =
           DisplayMode.ReviewMode(
             showEditButton = !isReadOnly,
             showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
-        bottomNavigation = pageNavigationViewState,
+        bottomNavItems =
+          if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
       )
     }
 
@@ -698,7 +706,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         )
       }
 
-    val pageNavigationViewState =
+    val bottomNavigationUiViewState =
       QuestionnaireNavigationUIState(
         navPrevious =
           when {
@@ -738,16 +746,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           },
         navCancel =
           if (showCancelButton) {
-            QuestionnaireNavigationViewUIState.Enabled { setReviewMode(true) }
+            QuestionnaireNavigationViewUIState.Enabled(onCancelButtonClickListener)
           } else {
             QuestionnaireNavigationViewUIState.Hidden
           },
       )
+    val bottomNavigationItems =
+      listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState))
 
     return QuestionnaireState(
-      items = questionnaireItemViewItems,
+      items =
+        if (shouldSetNavigationInLongScroll) {
+          questionnaireItemViewItems + bottomNavigationItems
+        } else {
+          questionnaireItemViewItems
+        },
       displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
-      bottomNavigation = pageNavigationViewState,
+      bottomNavItems = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
     )
   }
 
@@ -1001,7 +1016,7 @@ typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, Questionnaire
 internal data class QuestionnaireState(
   val items: List<QuestionnaireAdapterItem>,
   val displayMode: DisplayMode,
-  val bottomNavigation: QuestionnaireNavigationUIState,
+  val bottomNavItems: List<QuestionnaireAdapterItem.Navigation>,
 )
 
 internal sealed class DisplayMode {
