@@ -31,6 +31,7 @@ dependencies {
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.material)
   implementation(Dependencies.androidFhirEngine)
+  implementation(Dependencies.androidFhirEngineBeta5)
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.httpInterceptor)
