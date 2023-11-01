@@ -69,6 +69,9 @@ class SHLinkGeneratorImplTest {
     MockitoAnnotations.openMocks(this)
     shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
     `when`(mockIPSDocument.document).thenReturn(Bundle())
+    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn(
+      ""
+    )
   }
 
   @Test
@@ -134,19 +137,34 @@ class SHLinkGeneratorImplTest {
   }
 
   @Test
-  fun testPostPayload() = runTest {
-    val encryptedFile = "encryptedData"
-    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn(
-        encryptedFile
-      )
-
-    val response = MockResponse().setResponseCode(200).setBody(JSONObject().toString())
-
+  fun testPostPayloadWithEmptyResponseBody() = runTest {
+    val response = MockResponse().setResponseCode(200).setBody("")
     mockWebServer.enqueue(response)
-    shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+
+    val result = shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
 
     val recordedRequest = mockWebServer.takeRequest()
     recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
     assertEquals(recordedRequest.method, "POST")
+
+    // Check that the result is an empty JSON
+    assertEquals(JSONObject().toString(), result.toString())
+  }
+
+  @Test
+  fun testPostPayloadWithNonEmptyResponseBody() = runTest {
+    val responseBodyString = "{'test key': 'test value'}"
+    val response = MockResponse().setResponseCode(200).setBody(responseBodyString)
+    mockWebServer.enqueue(response)
+
+    val result = shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+
+    val recordedRequest = mockWebServer.takeRequest()
+    recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
+    assertEquals(recordedRequest.method, "POST")
+
+    // Check that the result is a non-empty JSON
+    val expectedJson = JSONObject(responseBodyString)
+    assertEquals(expectedJson.toString(), result.toString())
   }
 }

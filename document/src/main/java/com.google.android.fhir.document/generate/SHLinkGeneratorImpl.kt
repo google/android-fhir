@@ -62,7 +62,7 @@ internal class SHLinkGeneratorImpl(
 
       return if (response.isSuccessful) {
         val responseBody = response.body()?.string()
-        if (responseBody != null) {
+        if (!responseBody.isNullOrEmpty()) {
           println(responseBody)
           JSONObject(responseBody)
         } else {
