@@ -18,33 +18,34 @@ package com.google.android.fhir.document.generate
 
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.graphics.Bitmap
-import android.os.Handler
-import android.os.Looper
 import android.util.Base64
-import android.widget.ImageView
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.dataClasses.SHLData
 import com.google.android.fhir.document.interfaces.RetrofitSHLService
 import java.lang.Exception
 import java.text.SimpleDateFormat
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import timber.log.Timber
 
 internal class SHLinkGeneratorImpl(
-  private val qrGeneratorUtils: QRGeneratorUtils,
   private val apiService: RetrofitSHLService,
   private val encryptionUtility: EncryptionUtils,
 ) : SHLinkGenerator {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-  private val handler = Handler(Looper.getMainLooper())
+
+  /* Generate an SHL */
+  override suspend fun generateSHLink(
+    context: Context,
+    shlData: SHLData,
+    passcode: String,
+  ): String {
+    val initialPostResponse = getManifestUrlAndToken(passcode)
+    return generateShLink(initialPostResponse, shlData, passcode)
+  }
 
   /* POST the IPS document to the manifest URL */
   private suspend fun postPayload(
@@ -83,28 +84,6 @@ internal class SHLinkGeneratorImpl(
     return Base64.encodeToString(data.toByteArray(), Base64.URL_SAFE)
   }
 
-  /* Generate an SHL */
-  fun generateAndPostPayload(
-    passcode: String,
-    shlData: SHLData,
-    context: Context,
-    qrView: ImageView,
-    viewModelScope: CoroutineScope,
-  ) {
-    viewModelScope.launch(Dispatchers.IO) {
-      val initialPostResponse = getManifestUrlAndToken(passcode)
-      val shLink = generateShLink(initialPostResponse, shlData, passcode)
-      generateAndSetQRCode(context, shLink, qrView)
-    }
-  }
-
-  // [[TODO - MOVE TO QR IMPL]]
-  /* Generate and display the SHL QR code*/
-  private fun generateAndSetQRCode(context: Context, shLink: String, qrView: ImageView) {
-    val qrCodeBitmap = generateQRCode(context, shLink)
-    updateImageViewOnMainThread(qrView, qrCodeBitmap)
-  }
-
   /* POST the data to the SHL server and return the link itself */
   private suspend fun generateShLink(
     initialPostResponse: JSONObject,
@@ -114,12 +93,11 @@ internal class SHLinkGeneratorImpl(
     val manifestToken = initialPostResponse.getString("id")
     val manifestUrl = "https://api.vaxx.link/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
-    val exp =
-      if (shlData.expirationTime.isNotEmpty()) {
-        convertDateStringToEpochSeconds(shlData.expirationTime).toString()
-      } else {
-        ""
-      }
+    val exp = if (shlData.expirationTime.isNotEmpty()) {
+      convertDateStringToEpochSeconds(shlData.expirationTime).toString()
+    } else {
+      ""
+    }
     val key = encryptionUtility.generateRandomKey()
     val shLinkPayload =
       constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
@@ -132,12 +110,11 @@ internal class SHLinkGeneratorImpl(
   /* Send a POST request to the SHL server to get a new manifest URL.
   Can optionally add a passcode to the SHL here */
   private suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val requestBody =
-      if (passcode.isNotBlank()) {
-        "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
-      } else {
-        "{}".toRequestBody("application/json".toMediaTypeOrNull())
-      }
+    val requestBody = if (passcode.isNotBlank()) {
+      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
+    } else {
+      "{}".toRequestBody("application/json".toMediaTypeOrNull())
+    }
     val response = apiService.getManifestUrlAndToken("", requestBody)
     return if (response.isSuccessful) {
       val responseBody = response.body()?.string()
@@ -148,23 +125,9 @@ internal class SHLinkGeneratorImpl(
     }
   }
 
-  // [[TODO - MOVE TO QR IMPL??]]
-  /* Set the image view to the QR code */
-  private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
-    handler.post { qrView.setImageBitmap(qrCodeBitmap) }
-  }
-
   /* Sets the P flag if a passcode has been set */
   fun getKeyFlags(passcode: String): String {
     return if (passcode.isNotEmpty()) "P" else ""
-  }
-
-  // [[TODO - MOVE TO QR IMPL]]
-  /* Generates the SHL QR code for the given payload */
-  private fun generateQRCode(context: Context, content: String): Bitmap {
-    val qrCodeBitmap = qrGeneratorUtils.createQRCodeBitmap(content)
-    val logoBitmap = qrGeneratorUtils.createLogoBitmap(context, qrCodeBitmap)
-    return qrGeneratorUtils.overlayLogoOnQRCode(qrCodeBitmap, logoBitmap)
   }
 
   /* Constructs the SHL payload */
@@ -175,25 +138,14 @@ internal class SHLinkGeneratorImpl(
     key: String,
     exp: String?,
   ): String {
-    val payloadObject =
-      JSONObject()
-        .apply {
-          put("url", manifestUrl)
-          put("key", key)
-          flags?.let { put("flag", it) }
-          label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", convertDateStringToEpochSeconds(it)) }
-        }
-        .toString()
+    val payloadObject = JSONObject().apply {
+      put("url", manifestUrl)
+      put("key", key)
+      flags?.let { put("flag", it) }
+      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", convertDateStringToEpochSeconds(it)) }
+    }.toString()
     return payloadObject
   }
 
-  // [[TODO - IMPLEMENT]]
-  override suspend fun generateSHLink(
-    context: Context,
-    shlData: SHLData,
-    passcode: String,
-  ) : String {
-    TODO("Not yet implemented")
-  }
 }
