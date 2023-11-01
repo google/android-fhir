@@ -17,9 +17,6 @@
 package com.google.android.fhir.document.generate
 
 import android.content.Context
-import android.widget.ImageView
-import com.google.android.fhir.document.dataClasses.SHLData
-import kotlinx.coroutines.CoroutineScope
 
 interface SHLinkGenerator {
 

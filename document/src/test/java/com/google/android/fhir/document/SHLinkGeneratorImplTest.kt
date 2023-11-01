@@ -17,7 +17,6 @@
 package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.document.interfaces.RetrofitSHLService
 import com.google.android.fhir.document.generate.EncryptionUtils
 import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
 import com.google.android.fhir.document.generate.QRGeneratorUtils
@@ -36,8 +35,6 @@ import org.robolectric.annotation.Config
 @Config(manifest = Config.NONE)
 class SHLinkGeneratorImplTest {
 
-  @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
-
   @Mock private lateinit var encryptionUtility: EncryptionUtils
   private lateinit var SHLinkGeneratorImpl: SHLinkGeneratorImpl
 
@@ -52,7 +49,7 @@ class SHLinkGeneratorImplTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    SHLinkGeneratorImpl = SHLinkGeneratorImpl(qrGeneratorUtils, apiService, encryptionUtility)
+    SHLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
   }
 
   @Test

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.interfaces
+package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.remote.GzipUploadInterceptor

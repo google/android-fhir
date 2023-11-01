@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.dataClasses
+package com.google.android.fhir.document.generate
+
+import com.google.android.fhir.document.IPSDocument
 
 /**
  * Represents a SHL data structure, which stores information related to SHL content.

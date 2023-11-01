@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.dataClasses
+package com.google.android.fhir.document
 
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient

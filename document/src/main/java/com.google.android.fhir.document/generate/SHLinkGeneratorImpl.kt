@@ -21,8 +21,7 @@ import android.content.Context
 import android.util.Base64
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.document.dataClasses.SHLData
-import com.google.android.fhir.document.interfaces.RetrofitSHLService
+import com.google.android.fhir.document.RetrofitSHLService
 import java.lang.Exception
 import java.text.SimpleDateFormat
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
