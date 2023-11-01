@@ -20,10 +20,11 @@ import android.content.Context
 
 interface SHLinkGenerator {
 
-  /* Returns the newly generated SHLink - which is also stored in the SHLData argument */
+  /* Returns the newly generated SHLink */
   suspend fun generateSHLink(
     context: Context,
-    shlData: SHLData,
+    SHLinkGenerationData: SHLinkGenerationData,
     passcode: String,
-  ) : String
+    serverBaseUrl: String,
+  ): String
 }

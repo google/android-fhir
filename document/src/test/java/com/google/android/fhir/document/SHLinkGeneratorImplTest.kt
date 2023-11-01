@@ -19,7 +19,6 @@ package com.google.android.fhir.document
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.generate.EncryptionUtils
 import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
-import com.google.android.fhir.document.generate.QRGeneratorUtils
 import okhttp3.mockwebserver.MockWebServer
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -36,7 +35,7 @@ import org.robolectric.annotation.Config
 class SHLinkGeneratorImplTest {
 
   @Mock private lateinit var encryptionUtility: EncryptionUtils
-  private lateinit var SHLinkGeneratorImpl: SHLinkGeneratorImpl
+  private lateinit var shLinkGeneratorImpl: SHLinkGeneratorImpl
 
   private val mockWebServer = MockWebServer()
   private val baseUrl = "/shl/"
@@ -49,18 +48,18 @@ class SHLinkGeneratorImplTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    SHLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
+    shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
   }
 
   @Test
   fun pFlagIsIncludedWhenPasscodeIsPresent() {
-    val flags = SHLinkGeneratorImpl.getKeyFlags("passcode")
+    val flags = shLinkGeneratorImpl.getKeyFlags("passcode")
     assert(flags.contains("P"))
   }
 
   @Test
   fun pFlagIsNotIncludedWhenPasscodeIsNotPresent() {
-    val flags = SHLinkGeneratorImpl.getKeyFlags("")
+    val flags = shLinkGeneratorImpl.getKeyFlags("")
     assert(!flags.contains("P"))
   }
 
@@ -79,10 +78,10 @@ class SHLinkGeneratorImplTest {
         .put("key", key)
         .put("flag", flags)
         .put("label", label)
-        .put("exp", SHLinkGeneratorImpl.convertDateStringToEpochSeconds(expirationDate))
+        .put("exp", shLinkGeneratorImpl.convertDateStringToEpochSeconds(expirationDate))
 
     val payload =
-      SHLinkGeneratorImpl.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
+      shLinkGeneratorImpl.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
     val actualJson = JSONObject(payload)
     assertEquals(expectedJson.toString(), actualJson.toString())
   }
@@ -91,7 +90,8 @@ class SHLinkGeneratorImplTest {
   fun testDateToEpochSeconds() {
     val dateString = "2023-09-30"
     val expectedEpochSeconds = 1696032000L
-    val epochSeconds = SHLinkGeneratorImpl.convertDateStringToEpochSeconds(dateString)
+    val epochSeconds = shLinkGeneratorImpl.convertDateStringToEpochSeconds(dateString)
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
+
 }

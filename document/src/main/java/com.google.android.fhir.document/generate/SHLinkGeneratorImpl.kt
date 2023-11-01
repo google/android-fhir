@@ -39,11 +39,14 @@ internal class SHLinkGeneratorImpl(
   /* Generate an SHL */
   override suspend fun generateSHLink(
     context: Context,
-    shlData: SHLData,
+    SHLinkGenerationData: SHLinkGenerationData,
     passcode: String,
+    serverBaseUrl: String,
   ): String {
     val initialPostResponse = getManifestUrlAndToken(passcode)
-    return generateShLink(initialPostResponse, shlData, passcode)
+    return generateAndPostPayload(
+      initialPostResponse, SHLinkGenerationData, passcode, serverBaseUrl
+    )
   }
 
   /* POST the IPS document to the manifest URL */
@@ -84,24 +87,26 @@ internal class SHLinkGeneratorImpl(
   }
 
   /* POST the data to the SHL server and return the link itself */
-  private suspend fun generateShLink(
+  private suspend fun generateAndPostPayload(
     initialPostResponse: JSONObject,
-    shlData: SHLData,
+    SHLinkGenerationData: SHLinkGenerationData,
     passcode: String,
+    serverBaseUrl: String,
   ): String {
     val manifestToken = initialPostResponse.getString("id")
-    val manifestUrl = "https://api.vaxx.link/api/shl/$manifestToken"
+    val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
-    val exp = if (shlData.expirationTime.isNotEmpty()) {
-      convertDateStringToEpochSeconds(shlData.expirationTime).toString()
+    val exp = if (SHLinkGenerationData.expirationTime.isNotEmpty()) {
+      convertDateStringToEpochSeconds(SHLinkGenerationData.expirationTime).toString()
     } else {
       ""
     }
     val key = encryptionUtility.generateRandomKey()
-    val shLinkPayload =
-      constructSHLinkPayload(manifestUrl, shlData.label, getKeyFlags(passcode), key, exp)
+    val shLinkPayload = constructSHLinkPayload(
+      manifestUrl, SHLinkGenerationData.label, getKeyFlags(passcode), key, exp
+    )
     val encodedPayload = base64UrlEncode(shLinkPayload)
-    val data: String = parser.encodeResourceToString(shlData.ipsDoc.document)
+    val data: String = parser.encodeResourceToString(SHLinkGenerationData.ipsDoc.document)
     postPayload(data, manifestToken, key, managementToken)
     return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
   }
