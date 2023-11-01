@@ -45,7 +45,6 @@ internal class SHLinkGeneratorImpl(
     return generateAndPostPayload(
       initialPostResponse, shLinkGenerationData, passcode, serverBaseUrl
     )
-
   }
 
   /* POST the IPS document to the manifest URL */
@@ -117,7 +116,7 @@ internal class SHLinkGeneratorImpl(
 
   /* Send a POST request to the SHL server to get a new manifest URL.
   Can optionally add a passcode to the SHL here */
-  private suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
+  suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
     val requestBody = if (passcode.isNotBlank()) {
       "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
     } else {

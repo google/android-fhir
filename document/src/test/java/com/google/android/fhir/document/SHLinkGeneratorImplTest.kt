@@ -69,9 +69,7 @@ class SHLinkGeneratorImplTest {
     MockitoAnnotations.openMocks(this)
     shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
     `when`(mockIPSDocument.document).thenReturn(Bundle())
-    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn(
-      ""
-    )
+    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn("")
   }
 
   @Test
@@ -114,6 +112,12 @@ class SHLinkGeneratorImplTest {
   }
 
   @Test
+  fun testGenerateSHLink() = runTest {
+    TODO("Test to be implemented")
+  }
+
+  /* Write the same test where exp isn't present */
+  @Test
   fun testGenerateAndPostPayloadWithoutExp() = runTest {
     `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
 
@@ -122,7 +126,7 @@ class SHLinkGeneratorImplTest {
     initialPostResponse.put("managementToken", "token123")
 
     val mockResponse = MockResponse().setResponseCode(200)
-    mockResponse.setBody("Mocked Response Body")
+    mockResponse.setBody("{'test key': 'test value'}")
     mockWebServer.enqueue(mockResponse)
 
     val mockSHLinkGenerationData =
@@ -133,7 +137,8 @@ class SHLinkGeneratorImplTest {
     )
 
     assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
-
+    /* Section after link is base64 encoded - can I decode this and check correct label is in there? */
+    /* Also check that exp isn't empty */
   }
 
   @Test
