@@ -65,14 +65,14 @@ class SyncInstrumentedTest {
     runBlocking {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
-          emit(it.lastSyncJobStatus is SyncJobStatus.Finished)
-          it.lastSyncJobStatus !is SyncJobStatus.Finished
+          emit(it is SyncState.Succeeded)
+          it !is SyncState.Succeeded
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
 
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().state)
-      .isEqualTo(WorkInfo.State.SUCCEEDED)
+      .isEqualTo(WorkInfo.State.RUNNING)
   }
 
   @Test
@@ -91,7 +91,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.lastSyncJobStatus !is SyncJobStatus.Finished
+          it.currentJobState !is SyncState.Succeeded
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -107,7 +107,7 @@ class SyncInstrumentedTest {
       Sync.oneTimeSync<TestSyncWorker>(context = context)
         .transformWhile {
           emit(it)
-          it.lastSyncJobStatus !is SyncJobStatus.Finished
+          it !is SyncState.Succeeded
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
