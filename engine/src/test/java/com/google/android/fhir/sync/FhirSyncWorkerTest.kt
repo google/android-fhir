@@ -90,7 +90,11 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<PassingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 1).build(),
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 1)
+              .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, "FailingPeriodicSyncWorker")
+              .build(),
           runAttemptCount = 0,
         )
         .build()
@@ -103,7 +107,11 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 0).build(),
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 0)
+              .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, "FailingPeriodicSyncWorker")
+              .build(),
           runAttemptCount = 0,
         )
         .build()
@@ -116,7 +124,11 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 2)
+              .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, "FailingPeriodicSyncWorker")
+              .build(),
           runAttemptCount = 2,
         )
         .build()
@@ -129,7 +141,11 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorker>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 2)
+              .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, "FailingPeriodicSyncWorker")
+              .build(),
           runAttemptCount = 1,
         )
         .build()
@@ -142,7 +158,11 @@ class FhirSyncWorkerTest {
     val worker =
       TestListenableWorkerBuilder<FailingPeriodicSyncWorkerWithoutDataSource>(
           context,
-          inputData = Data.Builder().putInt(MAX_RETRIES_ALLOWED, 2).build(),
+          inputData =
+            Data.Builder()
+              .putInt(MAX_RETRIES_ALLOWED, 2)
+              .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, "FailingPeriodicSyncWorker")
+              .build(),
           runAttemptCount = 2,
         )
         .build()
