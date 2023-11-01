@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.utils
+package com.google.android.fhir.document.generate
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -37,11 +37,11 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import timber.log.Timber
 
-internal class GenerateShlUtils(
+internal class SHLinkGeneratorImpl(
   private val qrGeneratorUtils: QRGeneratorUtils,
   private val apiService: RetrofitSHLService,
   private val encryptionUtility: EncryptionUtils,
-) {
+) : SHLinkGenerator {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
   private val handler = Handler(Looper.getMainLooper())
@@ -98,6 +98,7 @@ internal class GenerateShlUtils(
     }
   }
 
+  // [[TODO - MOVE TO QR IMPL]]
   /* Generate and display the SHL QR code*/
   private fun generateAndSetQRCode(context: Context, shLink: String, qrView: ImageView) {
     val qrCodeBitmap = generateQRCode(context, shLink)
@@ -130,7 +131,7 @@ internal class GenerateShlUtils(
 
   /* Send a POST request to the SHL server to get a new manifest URL.
   Can optionally add a passcode to the SHL here */
-  suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
+  private suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
     val requestBody =
       if (passcode.isNotBlank()) {
         "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
@@ -147,6 +148,7 @@ internal class GenerateShlUtils(
     }
   }
 
+  // [[TODO - MOVE TO QR IMPL??]]
   /* Set the image view to the QR code */
   private fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
     handler.post { qrView.setImageBitmap(qrCodeBitmap) }
@@ -157,6 +159,7 @@ internal class GenerateShlUtils(
     return if (passcode.isNotEmpty()) "P" else ""
   }
 
+  // [[TODO - MOVE TO QR IMPL]]
   /* Generates the SHL QR code for the given payload */
   private fun generateQRCode(context: Context, content: String): Bitmap {
     val qrCodeBitmap = qrGeneratorUtils.createQRCodeBitmap(content)
@@ -183,5 +186,14 @@ internal class GenerateShlUtils(
         }
         .toString()
     return payloadObject
+  }
+
+  // [[TODO - IMPLEMENT]]
+  override suspend fun generateSHLink(
+    context: Context,
+    shlData: SHLData,
+    passcode: String,
+  ) : String {
+    TODO("Not yet implemented")
   }
 }

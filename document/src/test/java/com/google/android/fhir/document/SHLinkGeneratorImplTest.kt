@@ -18,9 +18,9 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.interfaces.RetrofitSHLService
-import com.google.android.fhir.document.utils.EncryptionUtils
-import com.google.android.fhir.document.utils.GenerateShlUtils
-import com.google.android.fhir.document.utils.QRGeneratorUtils
+import com.google.android.fhir.document.generate.EncryptionUtils
+import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
+import com.google.android.fhir.document.generate.QRGeneratorUtils
 import okhttp3.mockwebserver.MockWebServer
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -34,12 +34,12 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class GenerateShlUtilsTest {
+class SHLinkGeneratorImplTest {
 
   @Mock private lateinit var qrGeneratorUtils: QRGeneratorUtils
 
   @Mock private lateinit var encryptionUtility: EncryptionUtils
-  private lateinit var generateShlUtils: GenerateShlUtils
+  private lateinit var SHLinkGeneratorImpl: SHLinkGeneratorImpl
 
   private val mockWebServer = MockWebServer()
   private val baseUrl = "/shl/"
@@ -52,18 +52,18 @@ class GenerateShlUtilsTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    generateShlUtils = GenerateShlUtils(qrGeneratorUtils, apiService, encryptionUtility)
+    SHLinkGeneratorImpl = SHLinkGeneratorImpl(qrGeneratorUtils, apiService, encryptionUtility)
   }
 
   @Test
   fun pFlagIsIncludedWhenPasscodeIsPresent() {
-    val flags = generateShlUtils.getKeyFlags("passcode")
+    val flags = SHLinkGeneratorImpl.getKeyFlags("passcode")
     assert(flags.contains("P"))
   }
 
   @Test
   fun pFlagIsNotIncludedWhenPasscodeIsNotPresent() {
-    val flags = generateShlUtils.getKeyFlags("")
+    val flags = SHLinkGeneratorImpl.getKeyFlags("")
     assert(!flags.contains("P"))
   }
 
@@ -82,10 +82,10 @@ class GenerateShlUtilsTest {
         .put("key", key)
         .put("flag", flags)
         .put("label", label)
-        .put("exp", generateShlUtils.convertDateStringToEpochSeconds(expirationDate))
+        .put("exp", SHLinkGeneratorImpl.convertDateStringToEpochSeconds(expirationDate))
 
     val payload =
-      generateShlUtils.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
+      SHLinkGeneratorImpl.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
     val actualJson = JSONObject(payload)
     assertEquals(expectedJson.toString(), actualJson.toString())
   }
@@ -94,7 +94,7 @@ class GenerateShlUtilsTest {
   fun testDateToEpochSeconds() {
     val dateString = "2023-09-30"
     val expectedEpochSeconds = 1696032000L
-    val epochSeconds = generateShlUtils.convertDateStringToEpochSeconds(dateString)
+    val epochSeconds = SHLinkGeneratorImpl.convertDateStringToEpochSeconds(dateString)
     assertEquals(expectedEpochSeconds, epochSeconds)
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.utils
+package com.google.android.fhir.document.generate
 
 import android.util.Base64
 import com.nimbusds.jose.EncryptionMethod

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.document.interfaces
+package com.google.android.fhir.document.generate
 
 import android.content.Context
 import android.widget.ImageView
 import com.google.android.fhir.document.dataClasses.SHLData
 import kotlinx.coroutines.CoroutineScope
 
-interface SHLGenerator {
+interface SHLinkGenerator {
 
-  /* Passcode added to generateSHL as it shouldn't be wrapped in the SHL object */
-  fun generateSHL(
+  /* Returns the newly generated SHLink - which is also stored in the SHLData argument */
+  suspend fun generateSHLink(
     context: Context,
     shlData: SHLData,
     passcode: String,
-    qrView: ImageView,
-    viewModelScope: CoroutineScope,
-  )
+  ) : String
 }
