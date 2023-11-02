@@ -40,6 +40,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
+import kotlin.test.assertEquals
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -156,10 +157,10 @@ class QuestionnaireFragmentTest {
     val customButtonText = "Apply"
     val scenario =
       launchFragmentInContainer<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-          EXTRA_SUBMIT_BUTTON_TEXT to customButtonText,
-        ),
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(questionnaireJson)
+          .setSubmitButtonText(customButtonText)
+          .buildArgs()
       )
 
     scenario.moveToState(Lifecycle.State.RESUMED)
@@ -168,7 +169,7 @@ class QuestionnaireFragmentTest {
       scenario.withFragment { this.requireView().findViewById<Button>(R.id.submit_questionnaire) }
 
     val buttonText = button.text.toString()
-    assert(buttonText == customButtonText)
+    assertEquals(buttonText, customButtonText)
   }
 
   @Test
