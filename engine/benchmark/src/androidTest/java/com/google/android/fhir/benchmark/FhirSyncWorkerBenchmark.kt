@@ -22,6 +22,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
+import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
@@ -135,7 +136,12 @@ class FhirSyncWorkerBenchmark {
   private fun oneTimeSync(numberPatients: Int, numberObservations: Int, numberEncounters: Int) =
     runBlocking {
       val context: Context = ApplicationProvider.getApplicationContext()
-      val worker = TestListenableWorkerBuilder<BenchmarkTestOneTimeSyncWorker>(context).build()
+      val inputData =
+        Data.Builder()
+          .putString("sync_status_preferences_datastore_key", "BenchmarkTestOneTimeSyncWorker")
+          .build()
+      val worker =
+        TestListenableWorkerBuilder<BenchmarkTestOneTimeSyncWorker>(context, inputData).build()
       setupMockServerDispatcher(numberPatients, numberObservations, numberEncounters)
       benchmarkRule.measureRepeated {
         runBlocking {
