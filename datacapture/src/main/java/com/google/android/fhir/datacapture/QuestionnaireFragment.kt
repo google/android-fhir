@@ -95,7 +95,8 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
     val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
     paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
-    val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
+    val circularProgressIndicator = view.findViewById<View>(R.id.progress_circular_next_button)
+    val paginationNextButton = view.findViewById<Button>(R.id.pagination_next_button)
     paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
     view.findViewById<Button>(R.id.cancel_questionnaire).setOnClickListener {
       QuestionnaireCancelDialogFragment()
@@ -146,6 +147,7 @@ class QuestionnaireFragment : Fragment() {
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
     // Listen to updates from the view model.
+    viewModel.pages = viewModel.getQuestionnairePages()
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
         when (val displayMode = state.displayMode) {
@@ -194,6 +196,8 @@ class QuestionnaireFragment : Fragment() {
               paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
               paginationNextButton.visibility = View.VISIBLE
               paginationNextButton.isEnabled = displayMode.pagination.hasNextPage
+              circularProgressIndicator.visibility = if (displayMode.pagination.isLoadingNextPage) View.VISIBLE else View.GONE
+              paginationNextButton.text = if (displayMode.pagination.isLoadingNextPage) "" else "Next"
             } else {
               paginationPreviousButton.visibility = View.GONE
               paginationNextButton.visibility = View.GONE

@@ -541,8 +541,8 @@ class ExpressionEvaluatorTest {
 
     val result =
       expressionEvaluator.evaluateCalculatedExpressions(
-        questionnaire.item.elementAt(1),
-        questionnaireResponse.item.elementAt(1),
+          questionnaire.item.elementAt(1),
+          questionnaireResponse.item.elementAt(1),
       )
 
     assertThat(result.first().second.first().asStringValue())
@@ -613,8 +613,8 @@ class ExpressionEvaluatorTest {
 
       val result =
         expressionEvaluator.evaluateCalculatedExpressions(
-          questionnaire.item.elementAt(1),
-          questionnaireResponse.item.elementAt(1),
+            questionnaire.item.elementAt(1),
+            questionnaireResponse.item.elementAt(1),
         )
 
       assertThat(result.first().second.first().asStringValue())

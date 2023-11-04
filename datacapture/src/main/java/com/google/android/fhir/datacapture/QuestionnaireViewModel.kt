@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvalu
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
@@ -40,6 +41,9 @@ import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isExpressionReferencedBy
+import com.google.android.fhir.datacapture.extensions.isEnableWhenReferencedBy
+import com.google.android.fhir.datacapture.extensions.isVariableReferencedBy
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
@@ -57,6 +61,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -66,6 +71,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
@@ -237,7 +243,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val showOptionalText = state[QuestionnaireFragment.EXTRA_SHOW_OPTIONAL_TEXT] ?: false
 
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
-  @VisibleForTesting var pages: List<QuestionnairePage>? = null
+  internal var pages: List<QuestionnairePage>? = null
 
   /**
    * The flow representing the index of the current page. This value is meaningless if the
@@ -250,6 +256,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Toggles review mode. */
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
+
+  private val isLoadingNextPage = MutableStateFlow(false)
 
   /**
    * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
@@ -336,7 +344,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
+      var isReferenced = false
+      kotlin.run {
+        isReferenced = questionnaireItem.isVariableReferencedBy(questionnaire)
+        if (isReferenced) return@run
+
+        questionnaire.item.flattened().forEach { item ->
+          isReferenced = questionnaireItem.isEnableWhenReferencedBy(item)
+          if (isReferenced) return@run
+
+          isReferenced = questionnaireItem.isExpressionReferencedBy(item)
+          if (isReferenced) return@run
+        }
+      }
+      if (isReferenced) isLoadingNextPage.value = true
+
+      viewModelScope.launch(Dispatchers.IO) {
+        updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem, currentPageIndexFlow.value ?: -1)
+        pages = getQuestionnairePages()
+        isLoadingNextPage.value = false
+        modificationCount.update { it + 1 }
+      }
 
       modificationCount.update { it + 1 }
     }
@@ -452,6 +480,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           "Can't call goToPreviousPage() if no preceding page is enabled"
         }
         currentPageIndexFlow.value = previousPageIndex
+
+        questionnaire.item[currentPageIndexFlow.value!!].item.flattened().filter { qItem -> qItem.calculatedExpression != null }.forEach { qItem ->
+          updateDependentQuestionnaireResponseItems(
+            qItem,
+            questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+            currentPageIndexFlow.value!!,
+          )
+        }
+        modificationCount.update { it + 1 }
       }
       else -> {
         Timber.w("Previous questions and submitted answers cannot be viewed or edited.")
@@ -463,6 +500,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
+        if (isLoadingNextPage.value) return
         validateCurrentPageItems {
           val nextPageIndex =
             pages!!.indexOfFirst {
@@ -470,15 +508,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
           check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
           currentPageIndexFlow.value = nextPageIndex
+
+          questionnaire.item[currentPageIndexFlow.value!!].item.flattened().filter { qItem -> qItem.calculatedExpression != null }.forEach { qItem ->
+            updateDependentQuestionnaireResponseItems(
+              qItem,
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+              currentPageIndexFlow.value!!,
+            )
+          }
+          modificationCount.update { it + 1 }
         }
       }
       EntryMode.RANDOM -> {
-        val nextPageIndex =
-          pages!!.indexOfFirst {
-            it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
+        if (isLoadingNextPage.value) return
+          val nextPageIndex =
+            pages!!.indexOfFirst {
+              println("FIKRI ${it.index}, ${it.enabled}, ${it.hidden}")
+              it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
+            }
+          check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
+          currentPageIndexFlow.value = nextPageIndex
+
+          questionnaire.item[currentPageIndexFlow.value!!].item.flattened().filter { qItem -> qItem.calculatedExpression != null }.forEach { qItem ->
+            updateDependentQuestionnaireResponseItems(
+              qItem,
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+              currentPageIndexFlow.value!!,
+            )
           }
-        check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
-        currentPageIndexFlow.value = nextPageIndex
+          modificationCount.update { it + 1 }
       }
     }
   }
@@ -516,10 +574,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .onEach {
         if (it.index == 0) {
           expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-          questionnaire.item.flattened().forEach { qItem ->
+          val questionnaireItems = if (!questionnaire.isPaginated) {
+            questionnaire.item
+          } else {
+            questionnaire.item[currentPageIndexFlow.value!!].item
+          }
+          questionnaireItems.flattened().filter { qItem -> qItem.calculatedExpression != null }.forEach { qItem ->
             updateDependentQuestionnaireResponseItems(
               qItem,
               questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+              -1,
             )
           }
           modificationCount.update { count -> count + 1 }
@@ -535,11 +599,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private fun updateDependentQuestionnaireResponseItems(
     questionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
+    currentPageIndex: Int,
   ) {
     expressionEvaluator
       .evaluateCalculatedExpressions(
         questionnaireItem,
         updatedQuestionnaireResponseItem,
+        currentPageIndex,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -607,7 +673,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // display all items.
     val questionnaireItemViewItems =
       if (!isReadOnly && !isInReviewModeFlow.value && questionnaire.isPaginated) {
-        pages = getQuestionnairePages()
         if (currentPageIndexFlow.value == null) {
           currentPageIndexFlow.value = pages!!.first { it.enabled && !it.hidden }.index
         }
@@ -660,6 +725,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           showSubmitButton,
           showCancelButton,
           showReviewButton,
+          isLoadingNextPage.value
         )
       }
 
@@ -865,7 +931,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Gets a list of [QuestionnairePage]s for a paginated questionnaire, or `null` if the
    * questionnaire is not paginated.
    */
-  private fun getQuestionnairePages(): List<QuestionnairePage>? =
+  internal fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,
@@ -945,6 +1011,7 @@ internal data class QuestionnairePagination(
   val showSubmitButton: Boolean = false,
   val showCancelButton: Boolean = false,
   val showReviewButton: Boolean = false,
+  val isLoadingNextPage: Boolean = false,
 )
 
 /** A single page in the questionnaire. This is used for the UI to render pagination controls. */

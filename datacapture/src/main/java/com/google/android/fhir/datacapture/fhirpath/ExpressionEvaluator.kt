@@ -19,7 +19,8 @@ package com.google.android.fhir.datacapture.fhirpath
 import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.findVariableExpression
 import com.google.android.fhir.datacapture.extensions.flattened
-import com.google.android.fhir.datacapture.extensions.isReferencedBy
+import com.google.android.fhir.datacapture.extensions.isPaginated
+import com.google.android.fhir.datacapture.extensions.isExpressionReferencedBy
 import com.google.android.fhir.datacapture.extensions.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
@@ -90,7 +91,7 @@ internal class ExpressionEvaluator(
           // no calculable item depending on current item should be used as dependency into current
           // item
           this.forEach { dependent ->
-            check(!(current.isReferencedBy(dependent) && dependent.isReferencedBy(current))) {
+            check(!(current.isExpressionReferencedBy(dependent) && dependent.isExpressionReferencedBy(current))) {
               "${current.linkId} and ${dependent.linkId} have cyclic dependency in expression based extension"
             }
           }
@@ -128,15 +129,21 @@ internal class ExpressionEvaluator(
   fun evaluateCalculatedExpressions(
     questionnaireItem: QuestionnaireItemComponent,
     updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
+    currentPageIndex: Int = -1,
   ): List<ItemToAnswersPair> {
-    return questionnaire.item
+    val questionnaireItems = if (currentPageIndex == -1 || !questionnaire.isPaginated) {
+      questionnaire.item
+    } else {
+      questionnaire.item[currentPageIndex].item
+    }
+    return questionnaireItems
       .flattened()
       .filter { item ->
         // Condition 1. item is calculable
         // Condition 2. item answer depends on the updated item answer OR has a variable dependency
         item.calculatedExpression != null &&
-          (questionnaireItem.isReferencedBy(item) ||
-            findDependentVariables(item.calculatedExpression!!).isNotEmpty())
+          (questionnaireItem.isExpressionReferencedBy(item) ||
+                  findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
         val updatedAnswer =
