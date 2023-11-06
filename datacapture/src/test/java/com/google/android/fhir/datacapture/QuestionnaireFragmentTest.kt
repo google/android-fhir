@@ -29,10 +29,10 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SUBMIT_BUTTON_TEXT
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertEquals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
@@ -40,7 +40,6 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.util.ReflectionHelpers
-import kotlin.test.assertEquals
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P], application = DataCaptureTestApplication::class)
@@ -160,7 +159,7 @@ class QuestionnaireFragmentTest {
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setSubmitButtonText(customButtonText)
-          .buildArgs()
+          .buildArgs(),
       )
 
     scenario.moveToState(Lifecycle.State.RESUMED)
