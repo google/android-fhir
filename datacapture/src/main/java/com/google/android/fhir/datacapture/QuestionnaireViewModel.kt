@@ -421,6 +421,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** Clears all the answers from the questionnaire response by iterating through each item. */
+  fun clearAllAnswers() {
+    for (item in questionnaireResponse.item) {
+      clearItemAnswerComponent(item)
+    }
+    modificationCount.update { it + 1 }
+  }
+
+  /**
+   * Recursively clears the answer components of a questionnaire response item by iterating through
+   * each child item.
+   *
+   * @param item The item component of the questionnaire response to clear.
+   */
+  private fun clearItemAnswerComponent(item: QuestionnaireResponseItemComponent) {
+    for (child in item.item) {
+      clearItemAnswerComponent(child)
+    }
+    item.answer = listOf()
+  }
+
   /**
    * Validates entire questionnaire and return the validation results. As a side effect, it triggers
    * the UI update to show errors in case there are any validation errors.
