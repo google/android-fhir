@@ -37,6 +37,8 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
+import android.util.Base64
+import org.junit.Assert.assertFalse
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -95,7 +97,7 @@ class SHLinkGeneratorImplTest {
     /* Construct the expected JSON object */
     val expectedJson =
       JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
-        .put("exp", shLinkGeneratorImpl.convertDateStringToEpochSeconds(expirationDate))
+        .put("exp", expirationDate)
 
     val payload =
       shLinkGeneratorImpl.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
@@ -113,12 +115,11 @@ class SHLinkGeneratorImplTest {
 
   @Test
   fun testGenerateSHLink() = runTest {
-    TODO("Test to be implemented")
+    TODO()
   }
 
-  /* Write the same test where exp isn't present */
   @Test
-  fun testGenerateAndPostPayloadWithoutExp() = runTest {
+  fun testGenerateAndPostPayloadWithExp() = runTest {
     `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
 
     val initialPostResponse = JSONObject()
@@ -136,9 +137,53 @@ class SHLinkGeneratorImplTest {
       initialPostResponse, mockSHLinkGenerationData, "passcode", mockWebServer.url("/").toString()
     )
 
+    val parts = result.split("#shlink:/")
+    assertTrue(parts.size == 2)
+
+    val base64EncodedSection = parts[1]
+    val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
+    val decodedString = String(decodedBytes, Charsets.UTF_8)
+    val decodedJSON = JSONObject(decodedString)
+    val expectedLabel = "Mocked Label"
+    val expectedEpochSeconds = "1703980800"
+    assertTrue(decodedJSON.has("label"))
+    assertEquals(decodedJSON.get("label"), expectedLabel)
+    assertTrue(decodedJSON.has("exp"))
+    assertEquals(decodedJSON.get("exp"), expectedEpochSeconds)
     assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
-    /* Section after link is base64 encoded - can I decode this and check correct label is in there? */
-    /* Also check that exp isn't empty */
+  }
+
+  @Test
+  fun testGenerateAndPostPayloadWithoutExp() = runTest {
+    `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
+
+    val initialPostResponse = JSONObject()
+    initialPostResponse.put("id", "123")
+    initialPostResponse.put("managementToken", "token123")
+
+    val mockResponse = MockResponse().setResponseCode(200)
+    mockResponse.setBody("{'test key': 'test value'}")
+    mockWebServer.enqueue(mockResponse)
+
+    val mockSHLinkGenerationData =
+      SHLinkGenerationData("Mocked Label", "", mockIPSDocument)
+
+    val result = shLinkGeneratorImpl.generateAndPostPayload(
+      initialPostResponse, mockSHLinkGenerationData, "passcode", mockWebServer.url("/").toString()
+    )
+
+    val parts = result.split("#shlink:/")
+    assertTrue(parts.size == 2)
+
+    val base64EncodedSection = parts[1]
+    val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
+    val decodedString = String(decodedBytes, Charsets.UTF_8)
+    val decodedJSON = JSONObject(decodedString)
+    val expectedLabel = "Mocked Label"
+    assertTrue(decodedJSON.has("label"))
+    assertEquals(decodedJSON.get("label"), expectedLabel)
+    assertFalse(decodedJSON.has("exp"))
+    assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
   }
 
   @Test
@@ -146,7 +191,8 @@ class SHLinkGeneratorImplTest {
     val response = MockResponse().setResponseCode(200).setBody("")
     mockWebServer.enqueue(response)
 
-    val result = shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+    val result =
+      shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
 
     val recordedRequest = mockWebServer.takeRequest()
     recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
@@ -162,7 +208,8 @@ class SHLinkGeneratorImplTest {
     val response = MockResponse().setResponseCode(200).setBody(responseBodyString)
     mockWebServer.enqueue(response)
 
-    val result = shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+    val result =
+      shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
 
     val recordedRequest = mockWebServer.takeRequest()
     recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }

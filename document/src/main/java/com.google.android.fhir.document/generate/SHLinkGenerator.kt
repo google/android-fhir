@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.document.generate
 
-import android.content.Context
-
 interface SHLinkGenerator {
 
   /* Returns the newly generated SHLink */

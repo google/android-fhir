@@ -25,9 +25,11 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
+import androidx.annotation.VisibleForTesting
 import org.json.JSONObject
 import timber.log.Timber
 
+@VisibleForTesting
 internal class SHLinkGeneratorImpl(
   private val apiService: RetrofitSHLService,
   private val encryptionUtility: EncryptionUtils,
@@ -47,8 +49,86 @@ internal class SHLinkGeneratorImpl(
     )
   }
 
+  /* Send a POST request to the SHL server to get a new manifest URL.
+Can optionally add a passcode to the SHL here */
+  private suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
+    val requestBody = if (passcode.isNotBlank()) {
+      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
+    } else {
+      "{}".toRequestBody("application/json".toMediaTypeOrNull())
+    }
+    val response = apiService.getManifestUrlAndToken("", requestBody)
+    return if (response.isSuccessful) {
+      val responseBody = response.body()?.string()
+      JSONObject(responseBody)
+    } else {
+      Timber.e("HTTP Error: ${response.code()}")
+      JSONObject()
+    }
+  }
+
+  /* POST the data to the SHL server and return the link itself */
+  internal suspend fun generateAndPostPayload(
+    initialPostResponse: JSONObject,
+    shLinkGenerationData: SHLinkGenerationData,
+    passcode: String,
+    serverBaseUrl: String,
+  ): String {
+    val manifestToken = initialPostResponse.getString("id")
+    val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
+    val managementToken = initialPostResponse.getString("managementToken")
+    val exp = if (shLinkGenerationData.expirationTime.isNotEmpty()) {
+      convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
+    } else {
+      ""
+    }
+    val key = encryptionUtility.generateRandomKey()
+    val shLinkPayload = constructSHLinkPayload(
+      manifestUrl, shLinkGenerationData.label, getKeyFlags(passcode), key, exp
+    )
+    val encodedPayload = base64UrlEncode(shLinkPayload)
+    val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
+    postPayload(data, manifestToken, key, managementToken)
+    return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
+  }
+
+  /* Converts the inputted expiry date to epoch seconds */
+  internal fun convertDateStringToEpochSeconds(dateString: String): Long {
+    val format = SimpleDateFormat("yyyy-M-d")
+    val date = format.parse(dateString)
+    return date?.time?.div(1000) ?: 0L
+  }
+
+  /* Constructs the SHL payload */
+  internal fun constructSHLinkPayload(
+    manifestUrl: String,
+    label: String?,
+    flags: String?,
+    key: String,
+    exp: String?,
+  ): String {
+    val payloadObject = JSONObject().apply {
+      put("url", manifestUrl)
+      put("key", key)
+      flags?.let { put("flag", it) }
+      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
+    }.toString()
+    return payloadObject
+  }
+
+  /* Base64Url encodes a given string */
+  private fun base64UrlEncode(data: String): String {
+    return Base64.encodeToString(data.toByteArray(), Base64.URL_SAFE)
+  }
+
+  /* Sets the P flag if a passcode has been set */
+  internal fun getKeyFlags(passcode: String): String {
+    return if (passcode.isNotEmpty()) "P" else ""
+  }
+
   /* POST the IPS document to the manifest URL */
-  suspend fun postPayload(
+  internal suspend fun postPayload(
     file: String,
     manifestToken: String,
     key: String,
@@ -75,84 +155,6 @@ internal class SHLinkGeneratorImpl(
       Timber.e(TAG, "Error while posting payload: ${e.message}", e)
       throw e
     }
-  }
-
-  /* Converts the inputted expiry date to epoch seconds */
-  fun convertDateStringToEpochSeconds(dateString: String): Long {
-    val format = SimpleDateFormat("yyyy-M-d")
-    val date = format.parse(dateString)
-    return date?.time?.div(1000) ?: 0L
-  }
-
-  /* Base64Url encodes a given string */
-  private fun base64UrlEncode(data: String): String {
-    return Base64.encodeToString(data.toByteArray(), Base64.URL_SAFE)
-  }
-
-  /* POST the data to the SHL server and return the link itself */
-  suspend fun generateAndPostPayload(
-    initialPostResponse: JSONObject,
-    shLinkGenerationData: SHLinkGenerationData,
-    passcode: String,
-    serverBaseUrl: String,
-  ): String {
-    val manifestToken = initialPostResponse.getString("id")
-    val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
-    val managementToken = initialPostResponse.getString("managementToken")
-    val exp = if (shLinkGenerationData.expirationTime.isNotEmpty()) {
-      convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
-    } else {
-      ""
-    }
-    val key = encryptionUtility.generateRandomKey()
-    val shLinkPayload = constructSHLinkPayload(
-      manifestUrl, shLinkGenerationData.label, getKeyFlags(passcode), key, exp
-    )
-    val encodedPayload = base64UrlEncode(shLinkPayload)
-    val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
-    postPayload(data, manifestToken, key, managementToken)
-    return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
-  }
-
-  /* Send a POST request to the SHL server to get a new manifest URL.
-  Can optionally add a passcode to the SHL here */
-  suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val requestBody = if (passcode.isNotBlank()) {
-      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
-    } else {
-      "{}".toRequestBody("application/json".toMediaTypeOrNull())
-    }
-    val response = apiService.getManifestUrlAndToken("", requestBody)
-    return if (response.isSuccessful) {
-      val responseBody = response.body()?.string()
-      JSONObject(responseBody)
-    } else {
-      Timber.e("HTTP Error: ${response.code()}")
-      JSONObject()
-    }
-  }
-
-  /* Sets the P flag if a passcode has been set */
-  fun getKeyFlags(passcode: String): String {
-    return if (passcode.isNotEmpty()) "P" else ""
-  }
-
-  /* Constructs the SHL payload */
-  fun constructSHLinkPayload(
-    manifestUrl: String,
-    label: String?,
-    flags: String?,
-    key: String,
-    exp: String?,
-  ): String {
-    val payloadObject = JSONObject().apply {
-      put("url", manifestUrl)
-      put("key", key)
-      flags?.let { put("flag", it) }
-      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
-    }.toString()
-    return payloadObject
   }
 
 }

@@ -6,6 +6,6 @@ import android.widget.ImageView
 interface QRGenerator {
 
   /* Generate and display the SHL QR code */
-  fun generateAndSetQRCode(context: Context, shLink: String, qrView: ImageView)
+  fun generateAndSetQRCode(shLink: String, qrView: ImageView)
 
 }

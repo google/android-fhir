@@ -27,7 +27,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.EncodeHintType
 import com.google.zxing.qrcode.QRCodeWriter
 
-internal class QRGeneratorUtils {
+internal class QRGeneratorUtils(private val context: Context) {
 
   /* Creates a QR for a given string */
   fun createQRCodeBitmap(content: String): Bitmap {
@@ -48,7 +48,7 @@ internal class QRGeneratorUtils {
   }
 
   /* Creates a bitmap containing the SMART logo */
-  fun createLogoBitmap(context: Context, qrCodeBitmap: Bitmap): Bitmap {
+  fun createLogoBitmap(qrCodeBitmap: Bitmap): Bitmap {
     val logoScale = 0.4
     val logoDrawable = ContextCompat.getDrawable(context, R.drawable.smart_logo)
     val logoAspectRatio =
