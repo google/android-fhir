@@ -134,7 +134,11 @@ class SHLinkGeneratorImplTest {
       SHLinkGenerationData("Mocked Label", "2023-12-31", mockIPSDocument)
 
     val result = shLinkGeneratorImpl.generateAndPostPayload(
-      initialPostResponse, mockSHLinkGenerationData, "passcode", mockWebServer.url("/").toString()
+      initialPostResponse,
+      mockSHLinkGenerationData,
+      "passcode",
+      mockWebServer.url("/").toString(),
+      "https://demo.vaxx.link/viewer#"
     )
 
     val parts = result.split("#shlink:/")
@@ -165,13 +169,15 @@ class SHLinkGeneratorImplTest {
     mockResponse.setBody("{'test key': 'test value'}")
     mockWebServer.enqueue(mockResponse)
 
-    val mockSHLinkGenerationData =
-      SHLinkGenerationData("Mocked Label", "", mockIPSDocument)
+    val mockSHLinkGenerationData = SHLinkGenerationData("Mocked Label", "", mockIPSDocument)
 
     val result = shLinkGeneratorImpl.generateAndPostPayload(
-      initialPostResponse, mockSHLinkGenerationData, "passcode", mockWebServer.url("/").toString()
+      initialPostResponse,
+      mockSHLinkGenerationData,
+      "passcode",
+      mockWebServer.url("/").toString(),
+      "https://demo.vaxx.link/viewer#"
     )
-
     val parts = result.split("#shlink:/")
     assertTrue(parts.size == 2)
 

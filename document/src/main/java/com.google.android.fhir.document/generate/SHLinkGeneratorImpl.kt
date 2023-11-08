@@ -42,10 +42,11 @@ internal class SHLinkGeneratorImpl(
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
+    optionalViewer: String,
   ): String {
     val initialPostResponse = getManifestUrlAndToken(passcode)
     return generateAndPostPayload(
-      initialPostResponse, shLinkGenerationData, passcode, serverBaseUrl
+      initialPostResponse, shLinkGenerationData, passcode, serverBaseUrl, "$optionalViewer#"
     )
   }
 
@@ -73,6 +74,7 @@ Can optionally add a passcode to the SHL here */
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
+    optionalViewer: String,
   ): String {
     val manifestToken = initialPostResponse.getString("id")
     val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
@@ -89,7 +91,7 @@ Can optionally add a passcode to the SHL here */
     val encodedPayload = base64UrlEncode(shLinkPayload)
     val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
     postPayload(data, manifestToken, key, managementToken)
-    return "https://demo.vaxx.link/viewer#shlink:/$encodedPayload"
+    return "${optionalViewer}shlink:/$encodedPayload"
   }
 
   /* Converts the inputted expiry date to epoch seconds */

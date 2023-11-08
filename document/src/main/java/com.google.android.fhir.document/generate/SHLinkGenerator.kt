@@ -23,5 +23,6 @@ interface SHLinkGenerator {
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     serverBaseUrl: String,
+    optionalViewer: String,
   ): String
 }
