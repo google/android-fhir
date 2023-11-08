@@ -20,6 +20,7 @@ import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
@@ -70,12 +71,14 @@ internal data class FhirServices(
 
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val terser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
       val searchParamMap =
         searchParameters?.asMapOfResourceTypeToSearchParamDefinitions() ?: emptyMap()
       val db =
         DatabaseImpl(
           context = context,
           iParser = parser,
+          fhirTerser = terser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
           resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap)),
         )
