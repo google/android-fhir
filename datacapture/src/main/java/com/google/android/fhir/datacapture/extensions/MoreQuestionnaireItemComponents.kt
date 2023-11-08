@@ -82,9 +82,6 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
 internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
 
-internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
-  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
-
 internal const val EXTENSION_DISPLAY_CATEGORY_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
 

@@ -154,7 +154,11 @@ class MinLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MinLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -165,7 +169,11 @@ class MinLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MinLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)

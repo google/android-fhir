@@ -18,9 +18,15 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
+import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 
@@ -69,6 +75,13 @@ object QuestionnaireResponseValidator {
     }
 
     val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap,
+      )
 
     validateQuestionnaireResponseItems(
       questionnaire.item,
@@ -80,10 +93,25 @@ object QuestionnaireResponseValidator {
         questionnaireItemParentMap,
         launchContextMap,
       ),
+      expressionEvaluator,
       linkIdToValidationResultMap,
     )
 
     return linkIdToValidationResultMap
+  }
+
+  private fun ExpressionEvaluator.resolveCqfCalculatedValue(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    expression: Expression,
+  ): Type? {
+    if (!expression.isFhirPath) {
+      throw UnsupportedOperationException("${expression.language} not supported yet")
+    }
+
+    return evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
+      .singleOrNull()
+      ?.let { it as Type }
   }
 
   private fun validateQuestionnaireResponseItems(
@@ -91,6 +119,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    expressionEvaluator: ExpressionEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -113,11 +142,31 @@ object QuestionnaireResponseValidator {
         )
 
       if (enabled) {
+        // Evaluate cqf-calculatedValues
+        questionnaireItem.extension
+          .filter { it.hasValue() && it.value.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
+          .forEach { extension ->
+            val expression =
+              extension.value.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL).value
+                as Expression
+            expressionEvaluator
+              .resolveCqfCalculatedValue(
+                questionnaireItem,
+                questionnaireResponseItem,
+                expression,
+              )
+              ?.let {
+                it.apply { setExtension(extension.value.extension) }
+                extension.setValue(it)
+              }
+          }
+
         validateQuestionnaireResponseItem(
           questionnaireItem,
           questionnaireResponseItem,
           context,
           enablementEvaluator,
+          expressionEvaluator,
           linkIdToValidationResultMap,
         )
       }
@@ -130,6 +179,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    expressionEvaluator: ExpressionEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -143,6 +193,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem.item,
           context,
           enablementEvaluator,
+          expressionEvaluator,
           linkIdToValidationResultMap,
         )
       else -> {
@@ -156,6 +207,7 @@ object QuestionnaireResponseValidator {
             it.item,
             context,
             enablementEvaluator,
+            expressionEvaluator,
             linkIdToValidationResultMap,
           )
         }

@@ -27,6 +27,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
@@ -68,12 +69,14 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Element
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
@@ -579,6 +582,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     )
   }
 
+  private fun resolveCqfCalculatedValueExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    expression: Expression,
+  ): Type? {
+    if (!expression.isFhirPath) {
+      throw UnsupportedOperationException("${expression.language} not supported yet")
+    }
+
+    return expressionEvaluator
+      .evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
+      .singleOrNull()
+      ?.let { it as Type }
+  }
+
   private fun removeDisabledAnswers(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
@@ -707,6 +725,23 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
+    // Evaluate cqf-calculatedValues
+    questionnaireItem.extension
+      .filter { it.hasValue() && it.value.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
+      .forEach { extension ->
+        val expression =
+          extension.value.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL).value as Expression
+        resolveCqfCalculatedValueExpression(
+            questionnaireItem,
+            questionnaireResponseItem,
+            expression,
+          )
+          ?.let {
+            it.apply { setExtension(extension.value.extension) }
+            extension.setValue(it)
+          }
+      }
+
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
       if (
@@ -717,7 +752,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
           questionnaireResponseItem.answer,
-          this@QuestionnaireViewModel.getApplication(),
+          context = this@QuestionnaireViewModel.getApplication(),
         )
       } else {
         NotValidated

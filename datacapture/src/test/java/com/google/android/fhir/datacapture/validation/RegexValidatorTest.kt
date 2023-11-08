@@ -175,7 +175,11 @@ class RegexValidatorTest {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
+        RegexValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -186,7 +190,11 @@ class RegexValidatorTest {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
+        RegexValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)

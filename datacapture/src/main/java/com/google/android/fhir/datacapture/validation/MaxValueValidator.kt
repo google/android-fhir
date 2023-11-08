@@ -22,9 +22,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValueAsString
 import com.google.android.fhir.datacapture.extensions.valueOrCalculateValue
 import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Type
 
 internal const val MAX_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/maxValue"
 
@@ -44,11 +42,4 @@ internal object MaxValueValidator :
         extension.value?.valueOrCalculateValue()?.getValueAsString(context),
       )
     },
-  ) {
-
-  fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {
-    return questionnaireItemComponent.extension
-      .firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }
-      ?.let { it.value?.valueOrCalculateValue() }
-  }
-}
+  )

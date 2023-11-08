@@ -22,16 +22,15 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
-import java.text.SimpleDateFormat
 import java.time.LocalDate
-import java.util.Calendar
+import java.time.ZoneId
 import java.util.Date
-import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.junit.Before
 import org.junit.Test
@@ -99,57 +98,6 @@ class MinValueValidatorTest {
   }
 
   @Test
-  fun `should return invalid result when entered value is less than minValue for cqf calculated expression`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            url = MIN_VALUE_EXTENSION_URL
-            this.setValue(
-              DateType().apply {
-                extension =
-                  listOf(
-                    Extension(
-                      EXTENSION_CQF_CALCULATED_VALUE_URL,
-                      Expression().apply {
-                        language = "text/fhirpath"
-                        expression = "today() - 1 'days'"
-                      },
-                    ),
-                  )
-              },
-            )
-          },
-        )
-      }
-    val answerDate =
-      DateType(
-        SimpleDateFormat("yyyy-MM-dd")
-          .parse(
-            (DateTimeType.today()
-              .apply {
-                add(Calendar.YEAR, -1)
-                add(Calendar.DAY_OF_MONTH, -1)
-              }
-              .valueAsString),
-          ),
-      )
-    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = answerDate }
-
-    val validationResult =
-      MinValueValidator.validate(
-        questionnaireItem,
-        answer,
-        InstrumentationRegistry.getInstrumentation().context,
-      )
-    val expectedDateRange =
-      (MinValueValidator.getMinValue(questionnaireItem) as? DateType)?.valueAsString
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage)
-      .isEqualTo("Minimum value allowed is:$expectedDateRange")
-  }
-
-  @Test
   fun `should return valid result when entered value is greater than minValue for cqf calculated expression`() {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -188,52 +136,44 @@ class MinValueValidatorTest {
   }
 
   @Test
-  fun `should return today's date when expression evaluates to today`() {
-    val today = LocalDate.now().toString()
-    val questionItem =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(
-            Extension().apply {
-              url = MIN_VALUE_EXTENSION_URL
-              this.setValue(
-                DateType().apply {
-                  extension =
-                    listOf(
-                      Extension(
-                        EXTENSION_CQF_CALCULATED_VALUE_URL,
-                        Expression().apply {
-                          language = "text/fhirpath"
-                          expression = "today()"
-                        },
-                      ),
-                    )
-                },
-              )
-            },
-          )
-        },
-      )
-    assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.valueAsString)
-      .isEqualTo(today)
-  }
+  fun `should return invalid result with correct min allowed value if contains both value and cqf-calculatedValue`() {
+    val threeDaysAgo = LocalDate.now().minusDays(3)
 
-  @Test
-  fun `should return minValue date`() {
-    val dateType = DateType(SimpleDateFormat("yyyy-MM-dd").parse("2021-06-01"))
-    val questionItem =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          addExtension(
-            Extension().apply {
-              url = MIN_VALUE_EXTENSION_URL
-              this.setValue(dateType)
-            },
-          )
-        },
-      )
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            this.url = MIN_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                value =
+                  Date.from(threeDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                addExtension(
+                  Extension(
+                    EXTENSION_CQF_CALCULATED_VALUE_URL,
+                    Expression().apply {
+                      expression = "today() - 7 'days'"
+                      language = "text/fhirpath"
+                    },
+                  ),
+                )
+              },
+            )
+          },
+        )
+      }
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        value =
+          DateType().apply {
+            val fiveDaysAgo = LocalDate.now().minusDays(5)
+            value = Date.from(fiveDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+          }
+      }
 
-    assertThat((MinValueValidator.getMinValue(questionItem.first()) as? DateType)?.value)
-      .isEqualTo(dateType.value)
+    val validationResult = MinValueValidator.validate(questionnaireItem, answer, context)
+
+    assertThat(validationResult.isValid).isFalse()
+    assertThat(validationResult.errorMessage).isEqualTo("Minimum value allowed is:$threeDaysAgo")
   }
 }

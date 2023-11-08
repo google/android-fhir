@@ -73,7 +73,11 @@ class QuestionnaireResponseItemValidatorTest {
       )
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        answers,
+        context,
+      )
 
     assertThat(validationResult).isEqualTo(Valid)
   }
@@ -111,7 +115,11 @@ class QuestionnaireResponseItemValidatorTest {
       )
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        answers,
+        context,
+      )
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
@@ -129,7 +137,11 @@ class QuestionnaireResponseItemValidatorTest {
     val answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(questionnaireItem, answers, context)
+      QuestionnaireResponseItemValidator.validate(
+        questionnaireItem,
+        answers,
+        context,
+      )
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid

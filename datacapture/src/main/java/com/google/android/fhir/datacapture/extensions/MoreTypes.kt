@@ -97,10 +97,8 @@ private fun getDisplayString(type: Type, context: Context): String? =
 
 private fun getValueString(type: Type): String? =
   when (type) {
-    is DateType,
-    is DateTimeType,
-    is StringType, -> type.asStringValue()
-    is Quantity -> type.value.toString()
+    is StringType -> type.getLocalizedText() ?: type.valueAsString
+    is Quantity -> type.takeIf { it.hasValue() }?.value?.toString()
     else -> (type as? PrimitiveType<*>)?.valueAsString
   }
 
@@ -125,15 +123,19 @@ internal fun Coding.toCodeType(): CodeType {
 }
 
 fun Type.valueOrCalculateValue(): Type {
-  return if (this.hasExtension()) {
-    this.extension
-      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
+  return if (getValueString(this) != null) {
+    this
+  } else {
+    this.takeIf { hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
+      ?.extension
+      ?.firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
       ?.let { extension ->
         val expression = (extension.value as Expression).expression
         fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
       }
       ?: this
-  } else {
-    this
   }
 }
+
+internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"

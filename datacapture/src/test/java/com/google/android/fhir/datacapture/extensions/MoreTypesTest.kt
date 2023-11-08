@@ -262,6 +262,18 @@ class MoreTypesTest {
   }
 
   @Test
+  fun `getValueAsString should return 'not answered' for an empty Quantity`() {
+    val quantity = Quantity()
+    assertThat(quantity.getValueAsString(context)).isEqualTo("Not Answered")
+  }
+
+  @Test
+  fun `getValueAsString should return correct value for a Quantity`() {
+    val quantity = Quantity(20L)
+    assertThat(quantity.getValueAsString(context)).isEqualTo("20")
+  }
+
+  @Test
   fun `should return calculated value for cqf expression`() {
     val today = LocalDate.now().toString()
     val type =

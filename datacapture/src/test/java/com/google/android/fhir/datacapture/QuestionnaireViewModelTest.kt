@@ -36,6 +36,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TO
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_OPTION
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
@@ -45,6 +46,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAUNCH_CONTEXT
+import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.asStringValue
@@ -53,9 +56,14 @@ import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResp
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.common.truth.Truth.assertThat
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.UUID
@@ -4376,13 +4384,13 @@ class QuestionnaireViewModelTest {
         extension =
           listOf(
             Extension(
-                "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+                EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT,
               )
               .apply {
                 addExtension(
                   "name",
                   Coding(
-                    "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
+                    EXTENSION_LAUNCH_CONTEXT,
                     "patient",
                     "Patient",
                   ),
@@ -5773,6 +5781,886 @@ class QuestionnaireViewModelTest {
     assertThat(exception.message)
       .isEqualTo("a-birthdate and a-age-years have cyclic dependency in expression based extension")
   }
+
+  // ==================================================================== //
+  //                                                                      //
+  //    cqf-calculatedValue Expression for minValue/maxValue Extension    //
+  //                                                                      //
+  // ==================================================================== //
+
+  @Test
+  fun `should return calculated value for minValue extension with cqf-calculatedValue`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MIN_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          val questionnaireItem = viewModel.questionnaire.item.single()
+          assertThat(
+              questionnaireItem.extension
+                .single()
+                .value
+                .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+            )
+            .isTrue()
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
+        }
+    }
+  }
+
+  @Test
+  fun `should replace value with evaluated cql-calculatedValue for minValue extension`() = runTest {
+    val lastLocalDate = LocalDate.now().minusMonths(1)
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MIN_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  value =
+                    Date.from(
+                      lastLocalDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                    )
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          val questionnaireItem = viewModel.questionnaire.item.single()
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isNotEqualTo(lastLocalDate.toString())
+        }
+    }
+  }
+
+  @Test
+  fun `should correctly validate cqf-calculatedValue for minValue extension`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MIN_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value = DateType.parseV3("20231010")
+          },
+        )
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat(validationResult)
+            .isEqualTo(Invalid(listOf("Minimum value allowed is:${LocalDate.now()}")))
+        }
+    }
+  }
+
+  @Test
+  fun `should return calculated value for maxValue extension with cqf-calculatedValue`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MAX_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat((maxValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          val questionnaireItem = viewModel.questionnaire.item.single()
+          assertThat(
+              questionnaireItem.extension
+                .single()
+                .value
+                .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+            )
+            .isTrue()
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
+        }
+    }
+  }
+
+  @Test
+  fun `should replace value with evaluated cql-calculatedValue for maxValue extension`() = runTest {
+    val lastLocalDate = LocalDate.now().minusMonths(1)
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MAX_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  value =
+                    Date.from(
+                      lastLocalDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                    )
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat((maxValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          val questionnaireItem = viewModel.questionnaire.item.single()
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
+          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+            .isNotEqualTo(lastLocalDate.toString())
+        }
+    }
+  }
+
+  @Test
+  fun `should correctly validate cqf-calculatedValue for maxValue extension`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "a"
+            type = Questionnaire.QuestionnaireItemType.DATE
+            text = "Select a date"
+            addExtension(
+              Extension(
+                MAX_VALUE_EXTENSION_URL,
+                DateType().apply {
+                  addExtension(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        expression = "today()"
+                        language = "text/fhirpath"
+                      },
+                    ),
+                  )
+                },
+              ),
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .setAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            value =
+              DateType().apply {
+                val tomorrow = LocalDate.now().plusDays(1)
+                value =
+                  Date.from(tomorrow.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+              }
+          },
+        )
+
+      viewModel
+        .getQuestionnaireItemViewItemList()
+        .map { it.asQuestion() }
+        .single { it.questionnaireItem.linkId == "a" }
+        .run {
+          assertThat(validationResult)
+            .isEqualTo(Invalid(listOf("Maximum value allowed is:${LocalDate.now()}")))
+        }
+    }
+  }
+
+  @Test
+  fun `should evaluate cqf-calculatedValue with expression dependent on other question`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select minimum date"
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression =
+                            "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run { assertThat((minValue as? DateType)?.valueAsString).isNull() }
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DateType.parseV3("20231014")
+            },
+          )
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat((minValue as DateType).valueAsString).isEqualTo("2023-10-14")
+            val questionnaireItem =
+              viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
+            assertThat(
+                questionnaireItem.extension
+                  .single()
+                  .value
+                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+              )
+              .isTrue()
+            assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+              .isEqualTo("2023-10-14")
+          }
+      }
+    }
+
+  @Test
+  fun `should correctly validate cqf-calculatedValue expression dependent on other question for maxValue extension`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select minimum date"
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MAX_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression =
+                            "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DateType.parseV3("20231014")
+            },
+          )
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                DateType().apply {
+                  val tomorrow = LocalDate.now().plusDays(1)
+                  value =
+                    Date.from(tomorrow.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                }
+            },
+          )
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "b" }
+          .run {
+            assertThat(validationResult)
+              .isEqualTo(Invalid(listOf("Maximum value allowed is:2023-10-14")))
+          }
+      }
+    }
+
+  @Test
+  fun `should evaluate cqf-calculatedValue with expression dependent on a variable expression`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_VARIABLE_URL).apply {
+              setValue(
+                Expression().apply {
+                  name = "dateToday"
+                  expression = "today()"
+                  language = "text/fhirpath"
+                },
+              )
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "%dateToday"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single()
+          .run {
+            assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+            val questionnaireItem =
+              viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
+            assertThat(
+                questionnaireItem.extension
+                  .single()
+                  .value
+                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+              )
+              .isTrue()
+            assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+              .isEqualTo(LocalDate.now().toString())
+          }
+      }
+    }
+
+  @Test
+  fun `should evaluate cqf-calculatedValue with expression dependent on x-fhir-query launchContext`() =
+    runTest {
+      val testDate = LocalDate.now().minusYears(20)
+      val patient0 =
+        Patient().apply {
+          birthDate = Date.from(testDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT).apply {
+              addExtension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient"))
+              addExtension("type", CodeType("Patient"))
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "%patient.birthDate"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] =
+        mapOf("patient" to printer.encodeResourceToString(patient0))
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single()
+          .run {
+            assertThat((minValue as DateType).valueAsString).isEqualTo(testDate.toString())
+            val questionnaireItem =
+              viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
+            assertThat(
+                questionnaireItem.extension
+                  .single()
+                  .value
+                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+              )
+              .isTrue()
+            assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+              .isEqualTo(testDate.toString())
+          }
+      }
+    }
+
+  @Test
+  fun `should correctly validate cqf-calculatedValue with expression dependent on x-fhir-query launchContext for minValue extension`() =
+    runTest {
+      val testDate = LocalDate.now().minusYears(20)
+      val patient0 =
+        Patient().apply {
+          birthDate = Date.from(testDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT).apply {
+              addExtension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient"))
+              addExtension("type", CodeType("Patient"))
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "%patient.birthDate"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] =
+        mapOf("patient" to printer.encodeResourceToString(patient0))
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value =
+                DateType().apply {
+                  value = patient0.birthDate
+                  add(Calendar.MONTH, -1)
+                }
+            },
+          )
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .run {
+            assertThat(validationResult)
+              .isEqualTo(Invalid(listOf("Minimum value allowed is:$testDate")))
+          }
+      }
+    }
+
+  @Test
+  fun `validateQuestionnaireAndUpdateUI should return correct result for cqf-calculatedValue with expression dependent on other question`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select minimum date"
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression =
+                            "%resource.repeat(item).where(linkId='a' and answer.empty().not()).select(answer.value)"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("a")).apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DateType.parseV3("20231108")
+                },
+              )
+            },
+          )
+
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("b")).apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DateType.parseV3("20231010")
+                },
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+      viewModel.runViewModelBlocking {
+        val results = viewModel.validateQuestionnaireAndUpdateUI()
+        assertThat(results.values).isNotEmpty()
+        assertThat(results["a"]?.single()).isInstanceOf(Valid::class.java)
+        assertThat(results["b"]?.single())
+          .isEqualTo(Invalid(listOf("Minimum value allowed is:2023-11-08")))
+      }
+    }
+
+  @Test
+  fun `validateQuestionnaireAndUpdateUI should return correct result for cqf-calculatedValue with variable expression`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_VARIABLE_URL).apply {
+              setValue(
+                Expression().apply {
+                  name = "dateToday"
+                  expression = "today()"
+                  language = "text/fhirpath"
+                },
+              )
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "%dateToday"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("a")).apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DateType.parseV3("20231010")
+                },
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+      viewModel.runViewModelBlocking {
+        val results = viewModel.validateQuestionnaireAndUpdateUI()
+        assertThat(results["a"]?.single())
+          .isEqualTo(Invalid(listOf("Minimum value allowed is:${LocalDate.now()}")))
+      }
+    }
+
+  @Test
+  fun `validateQuestionnaireAndUpdateUI should return correct result for cqf-calculatedValue expression dependent on x-fhir-query launchContext`() =
+    runTest {
+      val testDate = LocalDate.now().minusYears(20)
+      val patient0 =
+        Patient().apply {
+          birthDate = Date.from(testDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+        }
+
+      val questionnaire =
+        Questionnaire().apply {
+          addExtension(
+            Extension(EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT).apply {
+              addExtension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient"))
+              addExtension("type", CodeType("Patient"))
+            },
+          )
+
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MIN_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "%patient.birthDate"
+                          language = "text/fhirpath"
+                        },
+                      ),
+                    )
+                  },
+                ),
+              )
+            },
+          )
+        }
+
+      state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] =
+        mapOf("patient" to printer.encodeResourceToString(patient0))
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("a")).apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = DateType.parseV3("20001010")
+                },
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
+      viewModel.runViewModelBlocking {
+        val results = viewModel.validateQuestionnaireAndUpdateUI()
+        assertThat(results["a"]?.single())
+          .isEqualTo(Invalid(listOf("Minimum value allowed is:$testDate")))
+      }
+    }
 
   // ==================================================================== //
   //                                                                      //

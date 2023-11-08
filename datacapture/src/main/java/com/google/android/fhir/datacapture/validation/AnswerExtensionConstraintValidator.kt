@@ -35,7 +35,10 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal open class AnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
-    (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
+    (
+      Extension,
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+    ) -> Boolean,
   val messageGenerator: (Extension, Context) -> String,
 ) : AnswerConstraintValidator {
   override fun validate(

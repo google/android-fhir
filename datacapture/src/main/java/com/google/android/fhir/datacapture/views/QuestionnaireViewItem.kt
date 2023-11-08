@@ -23,6 +23,8 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.toSpanned
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -52,12 +54,9 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param validationResult the [ValidationResult] of the answer(s) against the `questionnaireItem`
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
- * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
- * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
- *   extension exists options
+ *     @param enabledAnswerOptions the enabled answer options in [questionnaireItem]]
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
- * @param showOptionalText the optional text is being added to the end of the question text
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
  *   in the header view.
  */
@@ -93,6 +92,10 @@ data class QuestionnaireViewItem(
    */
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
     questionnaireResponseItem.answer.map { it.copy() }
+
+  val minValue by lazy { questionnaireItem.getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value }
+
+  val maxValue by lazy { questionnaireItem.getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value }
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
   fun setAnswer(

@@ -145,7 +145,11 @@ class MaxLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
-        MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MaxLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)
@@ -159,7 +163,11 @@ class MaxLengthValidatorTest {
       val testComponent = createMaxLengthQuestionnaireTestItem(maxLength, value)
 
       val validationResult =
-        MaxLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MaxLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        )
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
