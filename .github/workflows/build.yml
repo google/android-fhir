@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: "GitHub Actions: Build"
+name: "Build"
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events for the `master` branch
@@ -22,25 +22,40 @@ on:
     tags:
       build*
   pull_request:
+    # The branches below must be a subset of the branches above
     branches: [ master ]
+  schedule:
+    # Run once a week (even if no new code or PRs) to detect random regressions
+    - cron: '12 13 * * 2'
+
 env:
   # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
   # See https://github.com/marketplace/actions/gradle-build-action?version=v2.1.1#cache-debugging-and-analysis
   GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
   GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+concurrency:
+  # github.head_ref uniquely identifies Pull Requests (but is not available when building branches like main or master)
+  # github.ref is the fallback used when building for workflows triggered by push
+  # Note that || are fallback values (not "concatenations")
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true # Use e.g. ${{ github.ref != 'refs/heads/main' }} (or master, until #2180) to only cancel for PRs not on branch
+
+  # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
+    runs-on: ubuntu-22.04-8core
+    timeout-minutes: 60
+    permissions:
+      actions: read
+      contents: read
 
-    runs-on: ubuntu-22.04-64core
+    strategy:
+      fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ github.token }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
@@ -49,17 +64,18 @@ jobs:
           # Fetch origin/master for spotless ratchet to work
           # https://github.com/diffplug/spotless/issues/1242
           fetch-depth: 0
+
       - name: Setup machine
         uses: ./.github/actions/commonSetup
 
       - name: Spotless check
-        run: ./gradlew spotlessCheck --scan --stacktrace
+        run: ./gradlew spotlessCheck --scan --full-stacktrace
 
-      - name: Build with Gradle
-        run: ./gradlew build --scan --stacktrace
+      - name: Build (full) with Gradle
+        run: ./gradlew build --scan --full-stacktrace
 
       - name: Check with Gradle
-        run: ./gradlew check --scan --stacktrace
+        run: ./gradlew check --scan --full-stacktrace
 
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
