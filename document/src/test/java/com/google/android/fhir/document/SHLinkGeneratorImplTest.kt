@@ -38,6 +38,7 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import android.util.Base64
+import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Assert.assertFalse
 
 @RunWith(RobolectricTestRunner::class)
@@ -56,12 +57,7 @@ class SHLinkGeneratorImplTest {
   }
 
   private val mockIPSDocument = mock(IPSDocument::class.java)
-
-  private val shLinkGenerationDataWithExp =
-    SHLinkGenerationData("Label", "2023-11-01", mockIPSDocument)
-  private val shLinkGenerationDataWithoutExp = SHLinkGenerationData("Label", "", mockIPSDocument)
-
-  val initialPostResponse = JSONObject().apply {
+  private val initialPostResponse = JSONObject().apply {
     put("id", "123")
     put("managementToken", "token123")
   }
@@ -71,75 +67,44 @@ class SHLinkGeneratorImplTest {
     MockitoAnnotations.openMocks(this)
     shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
     `when`(mockIPSDocument.document).thenReturn(Bundle())
-    `when`(encryptionUtility.encrypt(Mockito.anyString(), Mockito.anyString())).thenReturn("")
-  }
+    `when`(
+      encryptionUtility.encrypt(
+        Mockito.anyString(),
+        Mockito.anyString()
+      )
+    ).thenReturn("something")
+    `when`(encryptionUtility.generateRandomKey()).thenReturn("key")
 
-  @Test
-  fun pFlagIsIncludedWhenPasscodeIsPresent() {
-    val flags = shLinkGeneratorImpl.getKeyFlags("passcode")
-    assert(flags.contains("P"))
-  }
-
-  @Test
-  fun pFlagIsNotIncludedWhenPasscodeIsNotPresent() {
-    val flags = shLinkGeneratorImpl.getKeyFlags("")
-    assert(!flags.contains("P"))
-  }
-
-  @Test
-  fun canCorrectlyConstructSHLinkPayload() {
-    val manifestUrl = "https://example.com/manifest"
-    val label = "My SHL"
-    val flags = "P"
-    val key = "key"
-    val expirationDate = "2023-12-31"
-
-    /* Construct the expected JSON object */
-    val expectedJson =
-      JSONObject().put("url", manifestUrl).put("key", key).put("flag", flags).put("label", label)
-        .put("exp", expirationDate)
-
-    val payload =
-      shLinkGeneratorImpl.constructSHLinkPayload(manifestUrl, label, flags, key, expirationDate)
-    val actualJson = JSONObject(payload)
-    assertEquals(expectedJson.toString(), actualJson.toString())
-  }
-
-  @Test
-  fun testDateToEpochSeconds() {
-    val dateString = "2023-09-30"
-    val expectedEpochSeconds = 1696032000L
-    val epochSeconds = shLinkGeneratorImpl.convertDateStringToEpochSeconds(dateString)
-    assertEquals(expectedEpochSeconds, epochSeconds)
-  }
-
-  @Test
-  fun testGenerateSHLink() = runTest {
-    TODO()
-  }
-
-  @Test
-  fun testGenerateAndPostPayloadWithExp() = runTest {
-    `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
-
-    val initialPostResponse = JSONObject()
-    initialPostResponse.put("id", "123")
-    initialPostResponse.put("managementToken", "token123")
-
+    // Mock response for getManifestUrlAndToken
     val mockResponse = MockResponse().setResponseCode(200)
-    mockResponse.setBody("{'test key': 'test value'}")
+      .setBody(initialPostResponse.toString())
     mockWebServer.enqueue(mockResponse)
 
-    val mockSHLinkGenerationData =
-      SHLinkGenerationData("Mocked Label", "2023-12-31", mockIPSDocument)
+    // Mock response for postPayload
+    val postPayloadResponse = MockResponse().setResponseCode(200)
+      .setBody("{'test key': 'test value'}")
+    mockWebServer.enqueue(postPayloadResponse)
+  }
 
-    val result = shLinkGeneratorImpl.generateAndPostPayload(
-      initialPostResponse,
-      mockSHLinkGenerationData,
-      "passcode",
-      mockWebServer.url("/").toString(),
-      "https://demo.vaxx.link/viewer#"
+  private fun assertCommonFunctionality(
+    shLinkGenerationData: SHLinkGenerationData,
+    passcode: String,
+    optionalViewer: String,
+    expectedExp: String? = null,
+    expectedFlag: String? = null,
+    expectedLabel: String? = null
+  ) = runTest {
+    val result = shLinkGeneratorImpl.generateSHLink(
+      shLinkGenerationData,
+      passcode,
+      "",
+      optionalViewer
     )
+
+    val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
+    assertEquals("/shl/", recordedRequestGetManifest.path)
+    val recordedRequestPostPayload: RecordedRequest = mockWebServer.takeRequest()
+    assertEquals("/shl/123", recordedRequestPostPayload.path)
 
     val parts = result.split("#shlink:/")
     assertTrue(parts.size == 2)
@@ -148,81 +113,127 @@ class SHLinkGeneratorImplTest {
     val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
     val decodedString = String(decodedBytes, Charsets.UTF_8)
     val decodedJSON = JSONObject(decodedString)
-    val expectedLabel = "Mocked Label"
-    val expectedEpochSeconds = "1703980800"
-    assertTrue(decodedJSON.has("label"))
-    assertEquals(decodedJSON.get("label"), expectedLabel)
-    assertTrue(decodedJSON.has("exp"))
-    assertEquals(decodedJSON.get("exp"), expectedEpochSeconds)
-    assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
+
+    expectedExp?.let {
+      assertTrue(decodedJSON.has("exp"))
+      assertEquals(decodedJSON.get("exp"), it)
+    } ?: assertFalse(decodedJSON.has("exp"))
+
+    expectedFlag?.let {
+      assertTrue(decodedJSON.has("flag"))
+      assertEquals(decodedJSON.get("flag").toString(), expectedFlag)
+    } ?: {
+      assertTrue(decodedJSON.has("flag"))
+      assertFalse(decodedJSON.get("flag").toString().contains("P"))
+    }
+
+    expectedLabel?.let {
+      assertTrue(decodedJSON.has("label"))
+      assertEquals(decodedJSON.get("label"), expectedLabel)
+    } ?: assertFalse(decodedJSON.has("label"))
+
+    if (optionalViewer.isNotEmpty()) {
+      assertTrue(result.contains("$optionalViewer#shlink:/"))
+    }
   }
 
   @Test
-  fun testGenerateAndPostPayloadWithoutExp() = runTest {
-    `when`(encryptionUtility.generateRandomKey()).thenReturn("mockedKey")
-
-    val initialPostResponse = JSONObject()
-    initialPostResponse.put("id", "123")
-    initialPostResponse.put("managementToken", "token123")
-
-    val mockResponse = MockResponse().setResponseCode(200)
-    mockResponse.setBody("{'test key': 'test value'}")
-    mockWebServer.enqueue(mockResponse)
-
-    val mockSHLinkGenerationData = SHLinkGenerationData("Mocked Label", "", mockIPSDocument)
-
-    val result = shLinkGeneratorImpl.generateAndPostPayload(
-      initialPostResponse,
-      mockSHLinkGenerationData,
-      "passcode",
-      mockWebServer.url("/").toString(),
-      "https://demo.vaxx.link/viewer#"
-    )
-    val parts = result.split("#shlink:/")
-    assertTrue(parts.size == 2)
-
-    val base64EncodedSection = parts[1]
-    val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
-    val decodedString = String(decodedBytes, Charsets.UTF_8)
-    val decodedJSON = JSONObject(decodedString)
-    val expectedLabel = "Mocked Label"
-    assertTrue(decodedJSON.has("label"))
-    assertEquals(decodedJSON.get("label"), expectedLabel)
-    assertFalse(decodedJSON.has("exp"))
-    assertTrue(result.contains("https://demo.vaxx.link/viewer#shlink:/"))
-  }
+  fun testGenerateSHLinkWithExp() = assertCommonFunctionality(
+    SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
+    "",
+    "",
+    "1698796800",
+    null,
+    null
+  )
 
   @Test
-  fun testPostPayloadWithEmptyResponseBody() = runTest {
-    val response = MockResponse().setResponseCode(200).setBody("")
-    mockWebServer.enqueue(response)
-
-    val result =
-      shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
-
-    val recordedRequest = mockWebServer.takeRequest()
-    recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
-    assertEquals(recordedRequest.method, "POST")
-
-    // Check that the result is an empty JSON
-    assertEquals(JSONObject().toString(), result.toString())
-  }
+  fun testGenerateSHLinkWithoutExp() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    null,
+    null
+  )
 
   @Test
-  fun testPostPayloadWithNonEmptyResponseBody() = runTest {
-    val responseBodyString = "{'test key': 'test value'}"
-    val response = MockResponse().setResponseCode(200).setBody(responseBodyString)
-    mockWebServer.enqueue(response)
+  fun testGenerateSHLinkWithPasscode() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "passcode",
+    "",
+    null,
+    "P",
+    null
+  )
 
-    val result =
-      shLinkGeneratorImpl.postPayload("fileData", "manifestToken", "key", "managementToken")
+  @Test
+  fun testGenerateSHLinkWithoutPasscode() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    "",
+    null
+  )
 
-    val recordedRequest = mockWebServer.takeRequest()
-    recordedRequest.path?.let { assertTrue(it.contains(baseUrl)) }
-    assertEquals(recordedRequest.method, "POST")
+  @Test
+  fun testGenerateSHLinkWithLabel() = assertCommonFunctionality(
+    SHLinkGenerationData("label", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    null,
+    "label"
+  )
 
-    // Check that the result is a non-empty JSON
-    val expectedJson = JSONObject(responseBodyString)
-    assertEquals(expectedJson.toString(), result.toString())
-  }
+  @Test
+  fun testGenerateSHLinkWithoutLabel() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    null,
+    null
+  )
+
+  @Test
+  fun testGenerateSHLinkWithOptionalViewer() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "viewerUrl",
+    null,
+    null,
+    null
+  )
+
+  @Test
+  fun testGenerateSHLinkWithoutOptionalViewer() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    null,
+    null
+  )
+
+  @Test
+  fun testGenerateSHLinkWithAllFeatures() = assertCommonFunctionality(
+    SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
+    "passcode",
+    "viewerUrl",
+    "1698796800",
+    "P",
+    "label"
+  )
+
+  @Test
+  fun testGenerateSHLinkWithNoFeatures() = assertCommonFunctionality(
+    SHLinkGenerationData("", "", mockIPSDocument),
+    "",
+    "",
+    null,
+    null,
+    null
+  )
 }

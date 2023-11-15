@@ -25,11 +25,9 @@ import java.lang.Exception
 import java.text.SimpleDateFormat
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
-import androidx.annotation.VisibleForTesting
 import org.json.JSONObject
 import timber.log.Timber
 
-@VisibleForTesting
 internal class SHLinkGeneratorImpl(
   private val apiService: RetrofitSHLService,
   private val encryptionUtility: EncryptionUtils,
@@ -61,7 +59,12 @@ Can optionally add a passcode to the SHL here */
     val response = apiService.getManifestUrlAndToken("", requestBody)
     return if (response.isSuccessful) {
       val responseBody = response.body()?.string()
-      JSONObject(responseBody)
+      if (!responseBody.isNullOrBlank()) {
+        JSONObject(responseBody)
+      } else {
+        Timber.e("Empty response body")
+        JSONObject()
+      }
     } else {
       Timber.e("HTTP Error: ${response.code()}")
       JSONObject()
@@ -69,7 +72,7 @@ Can optionally add a passcode to the SHL here */
   }
 
   /* POST the data to the SHL server and return the link itself */
-  internal suspend fun generateAndPostPayload(
+  private suspend fun generateAndPostPayload(
     initialPostResponse: JSONObject,
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
@@ -95,14 +98,14 @@ Can optionally add a passcode to the SHL here */
   }
 
   /* Converts the inputted expiry date to epoch seconds */
-  internal fun convertDateStringToEpochSeconds(dateString: String): Long {
+  private fun convertDateStringToEpochSeconds(dateString: String): Long {
     val format = SimpleDateFormat("yyyy-M-d")
     val date = format.parse(dateString)
     return date?.time?.div(1000) ?: 0L
   }
 
   /* Constructs the SHL payload */
-  internal fun constructSHLinkPayload(
+  private fun constructSHLinkPayload(
     manifestUrl: String,
     label: String?,
     flags: String?,
@@ -125,12 +128,12 @@ Can optionally add a passcode to the SHL here */
   }
 
   /* Sets the P flag if a passcode has been set */
-  internal fun getKeyFlags(passcode: String): String {
+  private fun getKeyFlags(passcode: String): String {
     return if (passcode.isNotEmpty()) "P" else ""
   }
 
   /* POST the IPS document to the manifest URL */
-  internal suspend fun postPayload(
+  private suspend fun postPayload(
     file: String,
     manifestToken: String,
     key: String,
@@ -144,7 +147,6 @@ Can optionally add a passcode to the SHL here */
       return if (response.isSuccessful) {
         val responseBody = response.body()?.string()
         if (!responseBody.isNullOrEmpty()) {
-          println(responseBody)
           JSONObject(responseBody)
         } else {
           JSONObject()
