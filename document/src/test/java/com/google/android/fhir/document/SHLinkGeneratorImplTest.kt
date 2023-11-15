@@ -16,13 +16,19 @@
 
 package com.google.android.fhir.document
 
+import android.util.Base64
 import com.google.android.fhir.NetworkConfiguration
+import com.google.android.fhir.document.generate.EncryptionUtils
+import com.google.android.fhir.document.generate.SHLinkGenerationData
+import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import okhttp3.mockwebserver.RecordedRequest
 import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -34,12 +40,6 @@ import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import android.util.Base64
-import com.google.android.fhir.document.generate.EncryptionUtils
-import com.google.android.fhir.document.generate.SHLinkGenerationData
-import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
-import okhttp3.mockwebserver.RecordedRequest
-import org.junit.Assert.assertFalse
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
@@ -57,10 +57,11 @@ class SHLinkGeneratorImplTest {
   }
 
   private val mockIPSDocument = mock(IPSDocument::class.java)
-  private val initialPostResponse = JSONObject().apply {
-    put("id", "123")
-    put("managementToken", "token123")
-  }
+  private val initialPostResponse =
+    JSONObject().apply {
+      put("id", "123")
+      put("managementToken", "token123")
+    }
 
   @Before
   fun setUp() {
@@ -68,21 +69,21 @@ class SHLinkGeneratorImplTest {
     shLinkGeneratorImpl = SHLinkGeneratorImpl(apiService, encryptionUtility)
     `when`(mockIPSDocument.document).thenReturn(Bundle())
     `when`(
-      encryptionUtility.encrypt(
-        Mockito.anyString(),
-        Mockito.anyString()
+        encryptionUtility.encrypt(
+          Mockito.anyString(),
+          Mockito.anyString(),
+        ),
       )
-    ).thenReturn("something")
+      .thenReturn("something")
     `when`(encryptionUtility.generateRandomKey()).thenReturn("key")
 
     // Mock response for getManifestUrlAndToken
-    val mockResponse = MockResponse().setResponseCode(200)
-      .setBody(initialPostResponse.toString())
+    val mockResponse = MockResponse().setResponseCode(200).setBody(initialPostResponse.toString())
     mockWebServer.enqueue(mockResponse)
 
     // Mock response for postPayload
-    val postPayloadResponse = MockResponse().setResponseCode(200)
-      .setBody("{'test key': 'test value'}")
+    val postPayloadResponse =
+      MockResponse().setResponseCode(200).setBody("{'test key': 'test value'}")
     mockWebServer.enqueue(postPayloadResponse)
   }
 
@@ -92,14 +93,15 @@ class SHLinkGeneratorImplTest {
     optionalViewer: String,
     expectedExp: String? = null,
     expectedFlag: String? = null,
-    expectedLabel: String? = null
+    expectedLabel: String? = null,
   ) = runTest {
-    val result = shLinkGeneratorImpl.generateSHLink(
-      shLinkGenerationData,
-      passcode,
-      "",
-      optionalViewer
-    )
+    val result =
+      shLinkGeneratorImpl.generateSHLink(
+        shLinkGenerationData,
+        passcode,
+        "",
+        optionalViewer,
+      )
 
     val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
     assertEquals("/shl/", recordedRequestGetManifest.path)
@@ -117,20 +119,23 @@ class SHLinkGeneratorImplTest {
     expectedExp?.let {
       assertTrue(decodedJSON.has("exp"))
       assertEquals(decodedJSON.get("exp"), it)
-    } ?: assertFalse(decodedJSON.has("exp"))
+    }
+      ?: assertFalse(decodedJSON.has("exp"))
 
     expectedFlag?.let {
       assertTrue(decodedJSON.has("flag"))
       assertEquals(decodedJSON.get("flag").toString(), expectedFlag)
-    } ?: {
-      assertTrue(decodedJSON.has("flag"))
-      assertFalse(decodedJSON.get("flag").toString().contains("P"))
     }
+      ?: {
+        assertTrue(decodedJSON.has("flag"))
+        assertFalse(decodedJSON.get("flag").toString().contains("P"))
+      }
 
     expectedLabel?.let {
       assertTrue(decodedJSON.has("label"))
       assertEquals(decodedJSON.get("label"), expectedLabel)
-    } ?: assertFalse(decodedJSON.has("label"))
+    }
+      ?: assertFalse(decodedJSON.has("label"))
 
     if (optionalViewer.isNotEmpty()) {
       assertTrue(result.contains("$optionalViewer#shlink:/"))
@@ -138,102 +143,112 @@ class SHLinkGeneratorImplTest {
   }
 
   @Test
-  fun testGenerateSHLinkWithExp() = assertCommonFunctionality(
-    SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
-    "",
-    "",
-    "1698796800",
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithExp() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
+      "",
+      "",
+      "1698796800",
+      null,
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithoutExp() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithoutExp() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      null,
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithPasscode() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "passcode",
-    "",
-    null,
-    "P",
-    null
-  )
+  fun testGenerateSHLinkWithPasscode() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "passcode",
+      "",
+      null,
+      "P",
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithoutPasscode() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    "",
-    null
-  )
+  fun testGenerateSHLinkWithoutPasscode() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      "",
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithLabel() = assertCommonFunctionality(
-    SHLinkGenerationData("label", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    null,
-    "label"
-  )
+  fun testGenerateSHLinkWithLabel() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("label", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      null,
+      "label",
+    )
 
   @Test
-  fun testGenerateSHLinkWithoutLabel() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithoutLabel() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      null,
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithOptionalViewer() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "viewerUrl",
-    null,
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithOptionalViewer() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "viewerUrl",
+      null,
+      null,
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithoutOptionalViewer() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithoutOptionalViewer() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      null,
+      null,
+    )
 
   @Test
-  fun testGenerateSHLinkWithAllFeatures() = assertCommonFunctionality(
-    SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
-    "passcode",
-    "viewerUrl",
-    "1698796800",
-    "P",
-    "label"
-  )
+  fun testGenerateSHLinkWithAllFeatures() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
+      "passcode",
+      "viewerUrl",
+      "1698796800",
+      "P",
+      "label",
+    )
 
   @Test
-  fun testGenerateSHLinkWithNoFeatures() = assertCommonFunctionality(
-    SHLinkGenerationData("", "", mockIPSDocument),
-    "",
-    "",
-    null,
-    null,
-    null
-  )
+  fun testGenerateSHLinkWithNoFeatures() =
+    assertCommonFunctionality(
+      SHLinkGenerationData("", "", mockIPSDocument),
+      "",
+      "",
+      null,
+      null,
+      null,
+    )
 }

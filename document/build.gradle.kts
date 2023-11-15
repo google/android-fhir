@@ -38,6 +38,7 @@ dependencies {
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
+  implementation(Dependencies.vision)
 
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
