@@ -29,5 +29,7 @@ data class SHLinkScanData(
   val flag: String,
   val exp: String,
   val v: String,
-  val ipsDoc: IPSDocument,
-)
+  val ipsDoc: IPSDocument?,
+) {
+  constructor() : this("", "", "", "", "", "", "", "", null)
+}
