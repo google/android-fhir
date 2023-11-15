@@ -17,9 +17,6 @@
 package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
-import com.google.android.fhir.document.generate.EncryptionUtils
-import com.google.android.fhir.document.generate.SHLinkGenerationData
-import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -38,6 +35,9 @@ import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import android.util.Base64
+import com.google.android.fhir.document.generate.EncryptionUtils
+import com.google.android.fhir.document.generate.SHLinkGenerationData
+import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
 import okhttp3.mockwebserver.RecordedRequest
 import org.junit.Assert.assertFalse
 

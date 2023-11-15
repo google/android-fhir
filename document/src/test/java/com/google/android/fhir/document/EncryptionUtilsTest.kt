@@ -18,7 +18,6 @@ package com.google.android.fhir.document
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.document.generate.EncryptionUtils
 import com.google.android.fhir.testing.readFromFile
 import com.nimbusds.jose.shaded.gson.Gson
 import org.hl7.fhir.r4.model.Bundle

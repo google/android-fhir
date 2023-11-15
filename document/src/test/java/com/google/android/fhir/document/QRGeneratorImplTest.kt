@@ -2,8 +2,6 @@ package com.google.android.fhir.document
 
 import android.graphics.Bitmap
 import android.widget.ImageView
-import com.google.android.fhir.document.generate.QRGeneratorImpl
-import com.google.android.fhir.document.generate.QRGeneratorUtils
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
