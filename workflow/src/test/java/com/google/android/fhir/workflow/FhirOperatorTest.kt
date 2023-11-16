@@ -26,11 +26,11 @@ import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.CqlBuilder
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
-import junit.framework.TestCase.assertNotNull
 import java.io.File
 import java.io.InputStream
 import java.lang.IllegalArgumentException
 import java.util.TimeZone
+import junit.framework.TestCase.assertNotNull
 import kotlin.reflect.KSuspendFunction1
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CanonicalType
@@ -252,7 +252,10 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinition = CanonicalType("http://smart.who.int/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles"),
+        planDefinition =
+          CanonicalType(
+            "http://smart.who.int/smart-immunizations-measles/PlanDefinition/IMMZD2DTMeasles",
+          ),
         subject = "Patient/IMMZ-Patient-NoVaxeninfant-f",
       )
 
