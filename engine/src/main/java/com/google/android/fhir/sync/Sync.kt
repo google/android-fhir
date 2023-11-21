@@ -146,9 +146,9 @@ object Sync {
     val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
     val syncJobFlow =
-      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) { inprogress, terminal,
+      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) { inProgress, terminal,
         ->
-        terminal ?: inprogress
+        terminal ?: inProgress
       }
 
     return combine(workStateFlow, syncJobFlow) { workInfoState, syncJobIntermediateState ->
@@ -258,7 +258,7 @@ object Sync {
   }
 
   private fun createSyncState(
-    syncJobIntermediateState: SyncJobStatus,
+    currentSyncJobStatus: SyncJobStatus,
     workInfoState: WorkInfo.State,
     syncJobTerminalState: SyncJobStatus?,
   ): SyncState {
@@ -267,7 +267,7 @@ object Sync {
         Enqueued
       }
       RUNNING -> {
-        Running(syncJobIntermediateState)
+        Running(currentSyncJobStatus)
       }
       SUCCEEDED -> {
         Succeeded(syncJobTerminalState!!)
