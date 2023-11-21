@@ -21,10 +21,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import androidx.work.Data
-import androidx.work.workDataOf
-import com.google.android.fhir.OffsetDateTimeTypeAdapter
-import com.google.gson.GsonBuilder
 import java.io.IOException
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
@@ -41,17 +37,8 @@ internal class FhirDataStore(context: Context) {
       name = FHIR_PREFERENCES_NAME,
     )
   private val dataStore = context.dataStore
-  private val gson =
-    GsonBuilder()
-      .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
-      .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
-      .create()
+  private val gson = SyncJobStatusSerializer()
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
-  private val allowedSyncJobStatusPackages =
-    listOf(
-      "com.google.android.fhir.sync.SyncJobStatus\$Finished",
-      "com.google.android.fhir.sync.SyncJobStatus\$Failed",
-    )
   private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 
   /**
@@ -67,25 +54,14 @@ internal class FhirDataStore(context: Context) {
       dataStore.data
         .catch { exception ->
           if (exception is IOException) {
+            Timber.e(exception)
             emit(emptyPreferences())
           } else {
             Timber.e(exception)
             throw exception
           }
         }
-        .map { preferences -> preferences[stringPreferencesKey(key)] }
-        .map { statusData -> gson.fromJson(statusData, Data::class.java) }
-        .map { data ->
-          data?.let {
-            val stateType = data.getString(STATE_TYPE)
-            val stateData = data.getString(STATE)
-            if (stateType?.isAllowedClass() == true) {
-              stateData?.let { gson.fromJson(it, Class.forName(stateType)) as? SyncJobStatus }
-            } else {
-              null
-            }
-          }
-        }
+        .map { preferences -> gson.deserialize(preferences[stringPreferencesKey(key)]) }
     }
 
   /**
@@ -144,25 +120,14 @@ internal class FhirDataStore(context: Context) {
 
   private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus?) {
     dataStore.edit { preferences ->
-      val data =
-        syncJobStatus?.let {
-          workDataOf(
-            STATE_TYPE to it::class.java.name,
-            STATE to gson.toJson(it),
-          )
-        }
-      preferences[stringPreferencesKey(key)] = gson.toJson(data)
+      preferences[stringPreferencesKey(key)] = gson.serialize(syncJobStatus)
     }
   }
 
-  private fun String.isAllowedClass(): Boolean {
-    return allowedSyncJobStatusPackages.any { this.startsWith(it) }
-  }
-
   companion object {
-    private const val STATE_TYPE = "StateType"
-    private const val STATE = "State"
-    private const val LAST_JOB_TERMINAL_STATE = "lastJobTerminalState"
+    internal const val STATE_TYPE = "STATE_TYPE"
+    internal const val STATE = "STATE"
+    private const val LAST_JOB_TERMINAL_STATE = "LAST_JOB_TERMINAL_STATE"
 
     private const val FHIR_PREFERENCES_NAME = "FHIR_ENGINE_PREF_DATASTORE"
     private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
