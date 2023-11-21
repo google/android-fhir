@@ -26,6 +26,8 @@ import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -289,6 +291,14 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     }
     return null
   }
+
+/** The inclusive lower bound on the range of allowed answer values. */
+internal val Questionnaire.QuestionnaireItemComponent.minValue
+  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.valueOrCalculateValue()
+
+/** The inclusive upper bound on the range of allowed answer values. */
+internal val Questionnaire.QuestionnaireItemComponent.maxValue
+  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.valueOrCalculateValue()
 
 // ********************************************************************************************** //
 //                                                                                                //

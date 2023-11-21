@@ -53,7 +53,10 @@ import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
+import com.google.android.fhir.datacapture.extensions.isCqfCalculatedValue
 import com.google.android.fhir.datacapture.extensions.logicalId
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
@@ -5824,13 +5827,11 @@ class QuestionnaireViewModelTest {
         .map { it.asQuestion() }
         .single { it.questionnaireItem.linkId == "a" }
         .run {
-          assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          assertThat((questionnaireItem.minValue as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
           val questionnaireItem = viewModel.questionnaire.item.single()
           assertThat(
-              questionnaireItem.extension
-                .single()
-                .value
-                .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+              questionnaireItem.extension.single().value.isCqfCalculatedValue,
             )
             .isTrue()
           assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
@@ -5880,7 +5881,8 @@ class QuestionnaireViewModelTest {
         .map { it.asQuestion() }
         .single { it.questionnaireItem.linkId == "a" }
         .run {
-          assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          assertThat((questionnaireItem.minValue as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
           val questionnaireItem = viewModel.questionnaire.item.single()
           assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
             .isEqualTo(LocalDate.now().toString())
@@ -5978,13 +5980,11 @@ class QuestionnaireViewModelTest {
         .map { it.asQuestion() }
         .single { it.questionnaireItem.linkId == "a" }
         .run {
-          assertThat((maxValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+          assertThat((questionnaireItem.maxValue as DateType).valueAsString)
+            .isEqualTo(LocalDate.now().toString())
           val questionnaireItem = viewModel.questionnaire.item.single()
           assertThat(
-              questionnaireItem.extension
-                .single()
-                .value
-                .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+              questionnaireItem.extension.single().value.isCqfCalculatedValue,
             )
             .isTrue()
           assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
@@ -5994,55 +5994,62 @@ class QuestionnaireViewModelTest {
   }
 
   @Test
-  fun `should replace value with evaluated cql-calculatedValue for maxValue extension`() = runTest {
-    val lastLocalDate = LocalDate.now().minusMonths(1)
-    val questionnaire =
-      Questionnaire().apply {
-        addItem(
-          QuestionnaireItemComponent().apply {
-            linkId = "a"
-            type = Questionnaire.QuestionnaireItemType.DATE
-            text = "Select a date"
-            addExtension(
-              Extension(
-                MAX_VALUE_EXTENSION_URL,
-                DateType().apply {
-                  value =
-                    Date.from(
-                      lastLocalDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+  fun `should update initial value on evaluation cql-calculatedValue for maxValue extension`() =
+    runTest {
+      val lastLocalDate = LocalDate.now().minusMonths(1)
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              type = Questionnaire.QuestionnaireItemType.DATE
+              text = "Select a date"
+              addExtension(
+                Extension(
+                  MAX_VALUE_EXTENSION_URL,
+                  DateType().apply {
+                    value =
+                      Date.from(
+                        lastLocalDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+                      )
+                    addExtension(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          expression = "today()"
+                          language = "text/fhirpath"
+                        },
+                      ),
                     )
-                  addExtension(
-                    Extension(
-                      EXTENSION_CQF_CALCULATED_VALUE_URL,
-                      Expression().apply {
-                        expression = "today()"
-                        language = "text/fhirpath"
-                      },
-                    ),
-                  )
-                },
-              ),
-            )
-          },
-        )
-      }
-
-    val viewModel = createQuestionnaireViewModel(questionnaire)
-    viewModel.runViewModelBlocking {
-      viewModel
-        .getQuestionnaireItemViewItemList()
-        .map { it.asQuestion() }
-        .single { it.questionnaireItem.linkId == "a" }
-        .run {
-          assertThat((maxValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
-          val questionnaireItem = viewModel.questionnaire.item.single()
-          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
-            .isEqualTo(LocalDate.now().toString())
-          assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
-            .isNotEqualTo(lastLocalDate.toString())
+                  },
+                ),
+              )
+            },
+          )
         }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      assertThat(
+          (questionnaire.item.single { it.linkId == "a" }.maxValue as DateType).valueAsString,
+        )
+        .isEqualTo(lastLocalDate.toString())
+
+      viewModel.runViewModelBlocking {
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .map { it.asQuestion() }
+          .single { it.questionnaireItem.linkId == "a" }
+          .run {
+            assertThat((questionnaireItem.maxValue as DateType).valueAsString)
+              .isEqualTo(LocalDate.now().toString())
+            val questionnaireItem = viewModel.questionnaire.item.single()
+            assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+              .isEqualTo(LocalDate.now().toString())
+            assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
+              .isNotEqualTo(lastLocalDate.toString())
+          }
+      }
     }
-  }
 
   @Test
   fun `should correctly validate cqf-calculatedValue for maxValue extension`() = runTest {
@@ -6146,7 +6153,7 @@ class QuestionnaireViewModelTest {
           .getQuestionnaireItemViewItemList()
           .map { it.asQuestion() }
           .single { it.questionnaireItem.linkId == "b" }
-          .run { assertThat((minValue as? DateType)?.valueAsString).isNull() }
+          .run { assertThat((questionnaireItem.minValue as? DateType)?.valueAsString).isNull() }
 
         viewModel
           .getQuestionnaireItemViewItemList()
@@ -6163,14 +6170,12 @@ class QuestionnaireViewModelTest {
           .map { it.asQuestion() }
           .single { it.questionnaireItem.linkId == "b" }
           .run {
-            assertThat((minValue as DateType).valueAsString).isEqualTo("2023-10-14")
+            assertThat((questionnaireItem.minValue as DateType).valueAsString)
+              .isEqualTo("2023-10-14")
             val questionnaireItem =
               viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
             assertThat(
-                questionnaireItem.extension
-                  .single()
-                  .value
-                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+                questionnaireItem.extension.single().value.isCqfCalculatedValue,
               )
               .isTrue()
             assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
@@ -6305,14 +6310,12 @@ class QuestionnaireViewModelTest {
           .map { it.asQuestion() }
           .single()
           .run {
-            assertThat((minValue as DateType).valueAsString).isEqualTo(LocalDate.now().toString())
+            assertThat((questionnaireItem.minValue as DateType).valueAsString)
+              .isEqualTo(LocalDate.now().toString())
             val questionnaireItem =
               viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
             assertThat(
-                questionnaireItem.extension
-                  .single()
-                  .value
-                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+                questionnaireItem.extension.single().value.isCqfCalculatedValue,
               )
               .isTrue()
             assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)
@@ -6373,14 +6376,12 @@ class QuestionnaireViewModelTest {
           .map { it.asQuestion() }
           .single()
           .run {
-            assertThat((minValue as DateType).valueAsString).isEqualTo(testDate.toString())
+            assertThat((questionnaireItem.minValue as DateType).valueAsString)
+              .isEqualTo(testDate.toString())
             val questionnaireItem =
               viewModel.questionnaire.item.single { it.linkId == this.questionnaireItem.linkId }
             assertThat(
-                questionnaireItem.extension
-                  .single()
-                  .value
-                  .hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL),
+                questionnaireItem.extension.single().value.isCqfCalculatedValue,
               )
               .isTrue()
             assertThat((questionnaireItem.extension.single().value as DateType).valueAsString)

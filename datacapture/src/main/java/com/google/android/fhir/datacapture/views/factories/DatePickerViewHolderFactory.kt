@@ -29,6 +29,8 @@ import com.google.android.fhir.datacapture.extensions.format
 import com.google.android.fhir.datacapture.extensions.getDateSeparator
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -161,8 +163,8 @@ internal object DatePickerViewHolderFactory :
       }
 
       private fun getCalenderConstraint(): CalendarConstraints {
-        val min = (questionnaireViewItem.minValue as? DateType)?.value?.time
-        val max = (questionnaireViewItem.maxValue as? DateType)?.value?.time
+        val min = (questionnaireViewItem.questionnaireItem.minValue as? DateType)?.value?.time
+        val max = (questionnaireViewItem.questionnaireItem.maxValue as? DateType)?.value?.time
 
         if (min != null && max != null && min > max) {
           throw IllegalArgumentException("minValue cannot be greater than maxValue")

@@ -22,6 +22,7 @@ import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -38,6 +39,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
+import timber.log.Timber
 
 /**
  * Returns the string representation of a [PrimitiveType].
@@ -126,16 +128,26 @@ fun Type.valueOrCalculateValue(): Type {
   return if (getValueString(this) != null) {
     this
   } else {
-    this.takeIf { hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
-      ?.extension
-      ?.firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
-      ?.let { extension ->
-        val expression = (extension.value as Expression).expression
-        fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
+    this.cqfCalculatedValueExpression?.let { expression ->
+      try {
+        fhirPathEngine.evaluate(this, expression.expression).singleOrNull() as? Type
+      } catch (e: FHIRException) {
+        Timber.w("Could not evaluate expression with FHIRPathEngine", e)
+        null
       }
+    }
       ?: this
   }
 }
+
+internal val Type.isCqfCalculatedValue
+  get() = this.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL)
+
+internal val Type.cqfCalculatedValueExpression
+  get() =
+    this.takeIf { isCqfCalculatedValue }
+      ?.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL)
+      ?.value as? Expression
 
 internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
   "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"

@@ -18,7 +18,8 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
+import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.isCqfCalculatedValue
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
@@ -144,21 +145,19 @@ object QuestionnaireResponseValidator {
       if (enabled) {
         // Evaluate cqf-calculatedValues
         questionnaireItem.extension
-          .filter { it.hasValue() && it.value.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
+          .filter { it.hasValue() && it.value.isCqfCalculatedValue }
           .forEach { extension ->
-            val expression =
-              extension.value.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL).value
-                as Expression
-            expressionEvaluator
-              .resolveCqfCalculatedValue(
-                questionnaireItem,
-                questionnaireResponseItem,
-                expression,
-              )
-              ?.let {
-                it.apply { setExtension(extension.value.extension) }
-                extension.setValue(it)
-              }
+            extension.value.cqfCalculatedValueExpression?.let { expression ->
+              val previousValueExtensions = extension.value.extension
+              val evaluatedValue =
+                expressionEvaluator.resolveCqfCalculatedValue(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  expression,
+                )
+              evaluatedValue?.setExtension(previousValueExtensions)
+              if (evaluatedValue != null) extension.setValue(evaluatedValue)
+            }
           }
 
         validateQuestionnaireResponseItem(

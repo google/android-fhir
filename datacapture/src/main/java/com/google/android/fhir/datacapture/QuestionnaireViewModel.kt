@@ -27,16 +27,17 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
-import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
+import com.google.android.fhir.datacapture.extensions.isCqfCalculatedValue
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
@@ -68,7 +69,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -565,36 +565,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private fun resolveCqfExpression(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    element: Element,
-  ): List<Base> {
-    val cqfExpression = element.cqfExpression ?: return emptyList()
-
-    if (!cqfExpression.isFhirPath) {
-      throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
-    }
-    return expressionEvaluator.evaluateExpression(
-      questionnaireItem,
-      questionnaireResponseItem,
-      cqfExpression,
-    )
-  }
-
-  private fun resolveCqfCalculatedValueExpression(
+  private fun resolveExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
     expression: Expression,
-  ): Type? {
+  ): Base? {
     if (!expression.isFhirPath) {
       throw UnsupportedOperationException("${expression.language} not supported yet")
     }
-
     return expressionEvaluator
-      .evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
+      .evaluateExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+        expression,
+      )
       .singleOrNull()
-      ?.let { it as Type }
   }
 
   private fun removeDisabledAnswers(
@@ -687,6 +672,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     )
   }
 
+  private fun resolveCqfCalculatedValueExpressions(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+  ) {
+    questionnaireItem.extension
+      .filter { it.hasValue() && it.value.isCqfCalculatedValue }
+      .forEach { extension ->
+        val currentExtensionValue = extension.value
+        val currentExtensionValueExtensions = currentExtensionValue.extension
+        val evaluatedCqfCalculatedValue =
+          currentExtensionValue.cqfCalculatedValueExpression?.let {
+            resolveExpression(questionnaireItem, questionnaireResponseItem, it) as? Type
+          }
+        // add previous extensions to the evaluated value
+        evaluatedCqfCalculatedValue?.setExtension(currentExtensionValueExtensions)
+        if (evaluatedCqfCalculatedValue != null) {
+          extension.setValue(evaluatedCqfCalculatedValue)
+        }
+      }
+  }
+
   /**
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
    * questionnaire response items.
@@ -726,21 +732,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
     // Evaluate cqf-calculatedValues
-    questionnaireItem.extension
-      .filter { it.hasValue() && it.value.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL) }
-      .forEach { extension ->
-        val expression =
-          extension.value.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL).value as Expression
-        resolveCqfCalculatedValueExpression(
-            questionnaireItem,
-            questionnaireResponseItem,
-            expression,
-          )
-          ?.let {
-            it.apply { setExtension(extension.value.extension) }
-            extension.setValue(it)
-          }
-      }
+    resolveCqfCalculatedValueExpressions(questionnaireItem, questionnaireResponseItem)
 
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
@@ -759,11 +751,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
 
     // Set question text dynamically from CQL expression
-    questionnaireResponseItem.apply {
-      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
-        .firstOrNull()
-        ?.let { text = it.primitiveValue() }
+    questionnaireItem.textElement.cqfExpression?.let { expression ->
+      resolveExpression(questionnaireItem, questionnaireResponseItem, expression)
+        ?.primitiveValue()
+        ?.let { questionnaireResponseItem.text = it }
     }
+
     val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
       answerOptionsEvaluator.evaluate(
         questionnaireItem,

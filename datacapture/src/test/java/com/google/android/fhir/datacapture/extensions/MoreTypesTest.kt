@@ -293,6 +293,24 @@ class MoreTypesTest {
   }
 
   @Test
+  fun `should return calculated value for an invalid cqf expression`() {
+    val type =
+      DateType().apply {
+        extension =
+          listOf(
+            Extension(
+              EXTENSION_CQF_CALCULATED_VALUE_URL,
+              Expression().apply {
+                language = "text/fhirpath"
+                expression = "%resource" // Invalid, since no context passed and no focus resource
+              },
+            ),
+          )
+      }
+    assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isNull()
+  }
+
+  @Test
   fun `should return calculated value for a non-cqf extension`() {
     LocalDate.now().toString()
     val type =
