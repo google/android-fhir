@@ -111,19 +111,15 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `should throw exception if resource type in context is not part of launchContext value set`() {
+  fun `validateLaunchContextExtensions should throw exception if type in type extension is not a valid resource type`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
           addExtension(
             "name",
-            Coding(
-              "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext",
-              "observation",
-              "Observation",
-            ),
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "me", "Me"),
           )
-          addExtension("type", CodeType("Observation"))
+          addExtension("type", CodeType("Avocado"))
         }
 
     val errorMessage =
@@ -134,19 +130,80 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
   @Test
-  fun `should throw exception if resource type in type extension is different to what is in name extension`() {
+  fun `validateLaunchContextExtensions should throw exception if system in name extension is not valid`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension("name", Coding("http://wrong-system", "grandma", "Grandma"))
+          addExtension("type", CodeType("Patient"))
+        }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+  }
+
+  @Test
+  fun `validateLaunchContextExtensions should throw exception if the type extension has wrong url`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension("name", Coding("http://wrong-system", "grandma", "Grandma"))
+          addExtension("waitwhat", StringType("Patient"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+  }
+
+  @Test
+  fun `validateLaunchContextExtensions should throw exception if the type extension value is not CodeType`() {
+    val launchContextExtension =
+      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
+        .apply {
+          addExtension("name", Coding("http://wrong-system", "grandma", "Grandma"))
+          addExtension("type", StringType("Patient"))
+        }
+
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          validateLaunchContextExtensions(listOf(launchContextExtension))
+        }
+        .localizedMessage
+
+    assertThat(errorMessage)
+      .isEqualTo(
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+  }
+
+  @Test
+  fun `validateLaunchContextExtensions should throw exception if the name extension has wrong url`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
           addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "encounter", "Encounter"),
+            "waitwhat",
+            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "grandma", "Grandma"),
           )
           addExtension("type", CodeType("Patient"))
         }
@@ -159,21 +216,17 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 
   @Test
-  fun `should throw exception if type extension is not a subset of User value set in name extension`() {
+  fun `validateLaunchContextExtensions should throw exception if the name extension value is not Coding`() {
     val launchContextExtension =
       Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
         .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
-          )
-          addExtension("type", CodeType("Observation"))
+          addExtension("name", StringType("waitwhat"))
+          addExtension("type", CodeType("Patient"))
         }
 
     val errorMessage =
@@ -184,56 +237,7 @@ class MoreQuestionnairesTest {
 
     assertThat(errorMessage)
       .isEqualTo(
-        "The extension:name extension and/or extension:type extension do not follow " +
-          "the format specified in http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext",
-      )
-  }
-
-  @Test
-  fun `should throw exception if the type extension is not present`() {
-    val launchContextExtension =
-      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
-          )
-        }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension))
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "The extension:name or extension:type extension is missing in " +
-          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT,
-      )
-  }
-
-  @Test
-  fun `should throw exception if the name extension is not present`() {
-    val launchContextExtension =
-      Extension("http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext")
-        .apply {
-          addExtension(
-            "name",
-            Coding("http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext", "user", "User"),
-          )
-        }
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          validateLaunchContextExtensions(listOf(launchContextExtension))
-        }
-        .localizedMessage
-
-    assertThat(errorMessage)
-      .isEqualTo(
-        "The extension:name or extension:type extension is missing in " +
-          EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT,
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
   }
 }
