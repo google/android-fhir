@@ -16,17 +16,21 @@
 
 package com.google.android.fhir.document.scan
 
-class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) :
-  SHLinkScanner {
+/*
+Implementation of the SHLinkScanner interface.
+Calls successfulCallback with a newly instantiated SHLinkScanData if a SHL is successfully scanned.
+Otherwise, an error is thrown.
+ */
+class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) : SHLinkScanner {
 
-  private var scanCallback: ((SHLinkScanData) -> Unit)? = null
+  private var successfulCallback: ((SHLinkScanData) -> Unit)? = null
   private var failCallback: ((Error) -> Unit)? = null
 
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
   ) {
-    this.scanCallback = successCallback
+    this.successfulCallback = successCallback
     this.failCallback = failCallback
 
     return if (scannerUtils.hasCameraPermission()) {
@@ -35,8 +39,8 @@ class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) :
         val shLinkScanData = scannerUtils.setup()
         scannerUtils.releaseScanner()
         successCallback.invoke(shLinkScanData)
-      }
-      catch (error: Error) {
+      } catch (error: Error) {
+        // There was an error trying to scan the QR code
         failCallback.invoke(error)
       }
     } else {
@@ -44,6 +48,4 @@ class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) :
       failCallback.invoke(error)
     }
   }
-
-
 }

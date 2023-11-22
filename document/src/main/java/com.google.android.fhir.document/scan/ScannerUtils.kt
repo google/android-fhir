@@ -59,33 +59,35 @@ class ScannerUtils(
     surfaceHolder.addCallback(surfaceCallback)
   }
 
-  private val surfaceCallback = object : SurfaceHolder.Callback {
-    override fun surfaceCreated(holder: SurfaceHolder) {
-      try {
-        if (hasCameraPermission()) {
-          if (ActivityCompat.checkSelfPermission(
-              context,
-              Manifest.permission.CAMERA
-            ) != PackageManager.PERMISSION_GRANTED
-          ) {
-            return
+  private val surfaceCallback =
+    object : SurfaceHolder.Callback {
+      override fun surfaceCreated(holder: SurfaceHolder) {
+        try {
+          if (hasCameraPermission()) {
+            if (
+              ActivityCompat.checkSelfPermission(
+                context,
+                Manifest.permission.CAMERA,
+              ) != PackageManager.PERMISSION_GRANTED
+            ) {
+              return
+            }
+            cameraSource.start(holder)
           }
-          cameraSource.start(holder)
+        } catch (e: IOException) {
+          e.printStackTrace()
+          throw Error("Failed to start camera")
         }
-      } catch (e: IOException) {
-        e.printStackTrace()
-        throw Error("Failed to start camera")
+      }
+
+      override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        // Not needed for this example
+      }
+
+      override fun surfaceDestroyed(holder: SurfaceHolder) {
+        stopScanning()
       }
     }
-
-    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-      // Not needed for this example
-    }
-
-    override fun surfaceDestroyed(holder: SurfaceHolder) {
-      stopScanning()
-    }
-  }
 
   private fun startScanning(): SHLinkScanData {
     var scannedData: SHLinkScanData? = null

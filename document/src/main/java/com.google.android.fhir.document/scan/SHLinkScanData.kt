@@ -38,13 +38,13 @@ import com.google.android.fhir.document.IPSDocument
  */
 data class SHLinkScanData(
   val fullLink: String,
-  val shl: String,
+  val encodedShlPayload: String,
   val manifestUrl: String,
   val key: String,
   val label: String,
   val flag: String,
-  val exp: String,
-  val v: String,
+  val expirationTime: String,
+  val versionNumber: String,
   val ipsDoc: IPSDocument?,
 ) {
   constructor() : this("", "", "", "", "", "", "", "", null)
