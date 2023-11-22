@@ -125,7 +125,7 @@ file of your project:
 dependencies {
     // ...
 
-    implementation("com.google.android.fhir:engine:0.1.0-beta04")
+    implementation("com.google.android.fhir:engine:0.1.0-beta05")
 }
 ```
 
