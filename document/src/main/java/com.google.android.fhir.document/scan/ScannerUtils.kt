@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+package com.google.android.fhir.document.scan
+
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.view.SurfaceHolder
 import androidx.core.app.ActivityCompat
-import com.google.android.fhir.document.scan.SHLinkScanData
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -33,47 +35,60 @@ class ScannerUtils(
   private lateinit var cameraSource: CameraSource
   private lateinit var barcodeDetector: BarcodeDetector
 
-  fun setup() : SHLinkScanData {
+  fun setup(): SHLinkScanData {
+    initializeBarcodeDetector()
+    initializeCameraSource()
+    setSurfaceCallbacks()
+    return startScanning()
+  }
+
+  private fun initializeBarcodeDetector() {
     barcodeDetector =
       BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
+  }
 
+  private fun initializeCameraSource() {
     cameraSource =
       CameraSource.Builder(context, barcodeDetector)
         .setRequestedPreviewSize(1920, 1080)
         .setAutoFocusEnabled(true)
         .build()
+  }
 
-    var scannedData: SHLinkScanData? = null
+  private fun setSurfaceCallbacks() {
+    surfaceHolder.addCallback(surfaceCallback)
+  }
 
-    surfaceHolder.addCallback(
-      object : SurfaceHolder.Callback {
-        override fun surfaceCreated(holder: SurfaceHolder) {
-          try {
-            // Start preview after 1s delay
-            if (
-              ActivityCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.CAMERA,
-              ) != PackageManager.PERMISSION_GRANTED
-            ) {
-              return
-            }
-            cameraSource.start(holder)
-          } catch (e: IOException) {
-            e.printStackTrace()
-            throw Error("Failed to start camera")
+  private val surfaceCallback = object : SurfaceHolder.Callback {
+    override fun surfaceCreated(holder: SurfaceHolder) {
+      try {
+        if (hasCameraPermission()) {
+          if (ActivityCompat.checkSelfPermission(
+              context,
+              Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED
+          ) {
+            return
           }
+          cameraSource.start(holder)
         }
+      } catch (e: IOException) {
+        e.printStackTrace()
+        throw Error("Failed to start camera")
+      }
+    }
 
-        override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-          // Not needed for this example
-        }
+    override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+      // Not needed for this example
+    }
 
-        override fun surfaceDestroyed(holder: SurfaceHolder) {
-          stopScanning()
-        }
-      },
-    )
+    override fun surfaceDestroyed(holder: SurfaceHolder) {
+      stopScanning()
+    }
+  }
+
+  private fun startScanning(): SHLinkScanData {
+    var scannedData: SHLinkScanData? = null
 
     barcodeDetector.setProcessor(
       object : Detector.Processor<Barcode> {

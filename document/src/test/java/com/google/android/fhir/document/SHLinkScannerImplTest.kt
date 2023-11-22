@@ -1,15 +1,11 @@
 package com.google.android.fhir.document
 
-import ScannerUtils
 import com.google.android.fhir.document.scan.SHLinkScanData
 import com.google.android.fhir.document.scan.SHLinkScannerImpl
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import com.google.android.fhir.document.scan.ScannerUtils
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers.any
 import org.mockito.Mock
-import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -33,9 +29,6 @@ class SHLinkScannerImplTest {
 
   @Test
   fun testScanSHLQRCodeWithCameraPermission() {
-    val successCallback = mock<(SHLinkScanData) -> Unit>()
-    val failCallback = mock<(Error) -> Unit>()
-
     `when`(scannerUtils.hasCameraPermission()).thenReturn(true)
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
@@ -48,14 +41,28 @@ class SHLinkScannerImplTest {
 
   @Test
   fun testScanSHLQRCodeWithoutCameraPermission() {
-
     `when`(scannerUtils.hasCameraPermission()).thenReturn(false)
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
+
     verify(scannerUtils, times(0)).setup()
     verify(scannerUtils, times(0)).releaseScanner()
     verify(successCallback, times(0)).invoke(anyOrNull())
     verify(failCallback, times(1)).invoke(argThat { message == "Camera permission not granted" })
   }
+
+  @Test
+  fun testScanSHLQRCodeWithCameraPermissionAndScannerSetupFailure() {
+    `when`(scannerUtils.hasCameraPermission()).thenReturn(true)
+    `when`(scannerUtils.setup()).thenThrow(Error("Scanner setup failed"))
+
+    shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
+
+    verify(scannerUtils, times(1)).setup()
+    verify(scannerUtils, times(0)).releaseScanner()
+    verify(successCallback, times(0)).invoke(anyOrNull())
+    verify(failCallback, times(1)).invoke(argThat { message == "Scanner setup failed" })
+  }
+
 
 }
