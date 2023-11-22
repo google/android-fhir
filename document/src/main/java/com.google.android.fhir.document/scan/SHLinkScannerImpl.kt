@@ -17,9 +17,8 @@
 package com.google.android.fhir.document.scan
 
 import ScannerUtils
-import android.content.Context
 
-class SHLinkScannerImpl(private val context: Context, private val scannerUtils: ScannerUtils) :
+class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) :
   SHLinkScanner {
 
   private var scanCallback: ((SHLinkScanData) -> Unit)? = null
@@ -32,14 +31,17 @@ class SHLinkScannerImpl(private val context: Context, private val scannerUtils: 
     this.scanCallback = successCallback
     this.failCallback = failCallback
 
-    if (scannerUtils.hasCameraPermission()) {
+    return if (scannerUtils.hasCameraPermission()) {
       // Open camera and scan qr code
       scannerUtils.setup()
-      return SHLinkScanData()
+      scannerUtils.releaseScanner()
+      val data = SHLinkScanData()
+      successCallback.invoke(data)
+      data
     } else {
       val error = Error("Camera permission not granted")
       failCallback.invoke(error)
+      null
     }
-    return null
   }
 }
