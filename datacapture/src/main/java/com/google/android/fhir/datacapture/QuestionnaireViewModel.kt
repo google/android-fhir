@@ -424,6 +424,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
     questionnaireResponse.allItems.forEach { it.answer = emptyList() }
+    draftAnswerMap.clear()
+    modifiedQuestionnaireResponseItemSet.clear()
+    responseItemToAnswersMapForDisabledQuestionnaireItem.clear()
     modificationCount.update { it + 1 }
   }
 
