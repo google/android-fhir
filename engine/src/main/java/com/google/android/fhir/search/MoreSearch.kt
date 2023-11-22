@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.search
 
+ import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
@@ -152,6 +153,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     .let { SearchQuery(it, args) }
 }
 
+@SuppressLint("RestrictedApi")
 @VisibleForTesting
 internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
   val args = mutableListOf<Any>()
