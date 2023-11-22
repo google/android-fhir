@@ -4064,16 +4064,18 @@ class DatabaseImplTest {
     // verify that Observation is searchable i.e. ReferenceIndex is updated with new patient ID
     // reference
     val searchedObservations =
-      database.search<Observation>(
-        Search(ResourceType.Observation)
-          .apply {
-            filter(
-              Observation.SUBJECT,
-              { value = "Patient/$remotelyCreatedPatientResourceId" },
-            )
-          }
-          .getQuery(),
-      )
+      database
+        .search<Observation>(
+          Search(ResourceType.Observation)
+            .apply {
+              filter(
+                Observation.SUBJECT,
+                { value = "Patient/$remotelyCreatedPatientResourceId" },
+              )
+            }
+            .getQuery(),
+        )
+        .map { it.resource }
     assertThat(searchedObservations.size).isEqualTo(1)
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
