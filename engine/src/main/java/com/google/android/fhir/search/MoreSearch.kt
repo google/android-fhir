@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.search
 
- import android.annotation.SuppressLint
+import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
