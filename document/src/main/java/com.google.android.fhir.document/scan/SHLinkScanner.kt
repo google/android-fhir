@@ -22,5 +22,5 @@ interface SHLinkScanner {
   fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
-  ): SHLinkScanData?
+  )
 }

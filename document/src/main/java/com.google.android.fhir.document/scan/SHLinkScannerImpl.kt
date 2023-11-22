@@ -27,21 +27,21 @@ class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) :
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
-  ): SHLinkScanData? {
+  ) {
     this.scanCallback = successCallback
     this.failCallback = failCallback
 
     return if (scannerUtils.hasCameraPermission()) {
       // Open camera and scan qr code
-      scannerUtils.setup()
+      val shLinkScanData = scannerUtils.setup()
       scannerUtils.releaseScanner()
-      val data = SHLinkScanData()
-      successCallback.invoke(data)
-      data
+      successCallback.invoke(shLinkScanData)
+
     } else {
       val error = Error("Camera permission not granted")
       failCallback.invoke(error)
-      null
     }
   }
+
+
 }

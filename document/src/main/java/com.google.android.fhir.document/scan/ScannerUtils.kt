@@ -28,14 +28,12 @@ import java.io.IOException
 class ScannerUtils(
   private val context: Context,
   private val surfaceHolder: SurfaceHolder,
-  private val scanCallback: (SHLinkScanData) -> Unit,
-  private val failCallback: (Error) -> Unit,
 ) {
 
   private lateinit var cameraSource: CameraSource
   private lateinit var barcodeDetector: BarcodeDetector
 
-  fun setup() {
+  fun setup() : SHLinkScanData {
     barcodeDetector =
       BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
 
@@ -44,6 +42,8 @@ class ScannerUtils(
         .setRequestedPreviewSize(1920, 1080)
         .setAutoFocusEnabled(true)
         .build()
+
+    var scannedData: SHLinkScanData? = null
 
     surfaceHolder.addCallback(
       object : SurfaceHolder.Callback {
@@ -61,7 +61,7 @@ class ScannerUtils(
             cameraSource.start(holder)
           } catch (e: IOException) {
             e.printStackTrace()
-            failCallback.invoke(Error("Failed to start camera"))
+            throw Error("Failed to start camera")
           }
         }
 
@@ -91,13 +91,13 @@ class ScannerUtils(
           val barcodes = detections.detectedItems
           if (barcodes.size() == 1) {
             val scannedValue = barcodes.valueAt(0).rawValue
-            val shlData = SHLinkScanData(scannedValue)
-            scanCallback.invoke(shlData)
+            scannedData = SHLinkScanData(scannedValue)
             scanSucceeded = true
           }
         }
       },
     )
+    return scannedData ?: throw Error("No valid scan data found")
   }
 
   private fun stopScanning() {
