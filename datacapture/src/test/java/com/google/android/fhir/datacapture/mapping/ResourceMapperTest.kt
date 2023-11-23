@@ -812,16 +812,6 @@ class ResourceMapperTest {
     runBlocking {
       val questionnaire =
         Questionnaire()
-          .apply {
-            addExtension().apply {
-              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
-              extension =
-                listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
-                  Extension("type", CodeType("Patient")),
-                )
-            }
-          }
           .addItem(
             Questionnaire.QuestionnaireItemComponent().apply {
               linkId = "patient-dob"
@@ -839,9 +829,7 @@ class ResourceMapperTest {
             },
           )
 
-      val patientId = UUID.randomUUID().toString()
-      val patient = Patient().apply { id = "Patient/$patientId/_history/2" }
-      val questionnaireResponse = ResourceMapper.populate(questionnaire, mapOf("mother" to patient))
+      val questionnaireResponse = ResourceMapper.populate(questionnaire, emptyMap())
 
       assertThat((questionnaireResponse.item[0].answer[0].value as DateType).localDate)
         .isEqualTo((DateType(Date())).localDate)

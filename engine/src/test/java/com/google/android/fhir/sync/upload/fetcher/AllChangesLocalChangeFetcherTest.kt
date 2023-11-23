@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.sync.upload
+package com.google.android.fhir.sync.upload.fetcher
 
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirServices
+import com.google.android.fhir.sync.upload.AllChangesLocalChangeFetcher
+import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.common.truth.Truth.assertThat
 import java.util.Date
 import kotlinx.coroutines.test.runTest
