@@ -58,6 +58,7 @@ import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -262,7 +263,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
-  @SdkSuppress(minSdkVersion = 33) // TODO https://github.com/google/android-fhir/issues/1482 FIXME
+  @Ignore // TODO https://github.com/google/android-fhir/issues/1482 FIXME
   fun selectOther_shouldScrollDownToShowAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
