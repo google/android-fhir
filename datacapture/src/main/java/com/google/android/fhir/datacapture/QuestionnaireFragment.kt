@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
 
@@ -103,17 +104,19 @@ class QuestionnaireFragment : Fragment() {
     }
 
     view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
-        if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
-          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
-        } else {
-          val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
-          errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
-          QuestionnaireValidationErrorMessageDialogFragment()
-            .show(
-              requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG,
-            )
+      lifecycleScope.launch {
+        viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
+          if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
+            setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+          } else {
+            val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+            errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+            QuestionnaireValidationErrorMessageDialogFragment()
+              .show(
+                requireActivity().supportFragmentManager,
+                QuestionnaireValidationErrorMessageDialogFragment.TAG,
+              )
+          }
         }
       }
     }
@@ -291,7 +294,7 @@ class QuestionnaireFragment : Fragment() {
    * Returns a [QuestionnaireResponse][org.hl7.fhir.r4.model.QuestionnaireResponse] populated with
    * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
    */
-  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+  suspend fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {

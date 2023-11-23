@@ -48,6 +48,7 @@ import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import com.google.android.fhir.datacapture.mapping.asExpectedType
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -67,7 +68,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
@@ -337,7 +337,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
-      modificationCount.update { it + 1 }
 
       updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
 
@@ -412,7 +411,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
    * questions.
    */
-  fun getQuestionnaireResponse(): QuestionnaireResponse {
+  suspend fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
       // Use the view model's questionnaire and questionnaire response for calculating enabled items
       // because the calculation relies on references to the questionnaire response items.
@@ -430,7 +429,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Validates entire questionnaire and return the validation results. As a side effect, it triggers
    * the UI update to show errors in case there are any validation errors.
    */
-  internal fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
+  internal suspend fun validateQuestionnaireAndUpdateUI(): Map<String, List<ValidationResult>> =
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
@@ -561,7 +560,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             if (questionnaireResponseItem.answer.hasDifferentAnswerSet(calculatedAnswers)) {
               questionnaireResponseItem.answer =
                 calculatedAnswers.map {
-                  QuestionnaireResponseItemAnswerComponent().apply { value = it }
+                  val value = it.asExpectedType(questionnaireItem.type)
+                  QuestionnaireResponseItemAnswerComponent().setValue(value)
                 }
             }
           }
@@ -840,24 +840,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  private fun getEnabledResponseItems(
+  private suspend fun getEnabledResponseItems(
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponseItemComponent> {
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
-    return questionnaireItemList
-      .asSequence()
-      .filter { responseItemKeys.contains(it.linkId) }
-      .zip(questionnaireResponseItemList.asSequence())
-      .filter { (questionnaireItem, questionnaireResponseItem) ->
-        runBlocking {
-          enablementEvaluator.evaluate(
-            questionnaireItem,
-            questionnaireResponseItem,
-          )
-        }
-      }
-      .map { (questionnaireItem, questionnaireResponseItem) ->
+    val result = mutableListOf<QuestionnaireResponseItemComponent>()
+
+    for ((questionnaireItem, questionnaireResponseItem) in
+      questionnaireItemList.zip(questionnaireResponseItemList)) {
+      if (
+        responseItemKeys.contains(questionnaireItem.linkId) &&
+          enablementEvaluator.evaluate(questionnaireItem, questionnaireResponseItem)
+      ) {
         questionnaireResponseItem.apply {
           if (text.isNullOrBlank()) {
             text = questionnaireItem.localizedTextSpanned?.toString()
@@ -867,8 +862,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           // Nested question items
           answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
         }
+        result.add(questionnaireResponseItem)
       }
-      .toList()
+    }
+    return result
   }
 
   /**

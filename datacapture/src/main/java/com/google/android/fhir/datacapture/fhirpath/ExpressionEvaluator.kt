@@ -274,7 +274,7 @@ internal class ExpressionEvaluator(
     val variablesEvaluatedPairs =
       variablesMap
         .filterKeys { expression.expression.contains("{{%$it}}") }
-        .map { Pair("{{%${it.key}}}", it.value!!.primitiveValue()) }
+        .map { Pair("{{%${it.key}}}", it.value?.primitiveValue() ?: "") }
 
     val fhirPathsEvaluatedPairs =
       questionnaireLaunchContextMap
@@ -282,11 +282,25 @@ internal class ExpressionEvaluator(
         ?.let { evaluateXFhirEnhancement(expression, it) }
         ?: emptySequence()
 
-    return (fhirPathsEvaluatedPairs + variablesEvaluatedPairs).fold(expression.expression) {
+    return (variablesEvaluatedPairs + fhirPathsEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String>,
       ->
       acc.replace(pair.first, pair.second)
+    }
+  }
+
+  /**
+   * Check if the X-FHIR-Query expression has any missing param value, to prevent the resolver to
+   * get all resources when no param value is passed. For example: Patient?name=&address=
+   *
+   * TODO: add support for the _total common parameter, so user can limit the total resource that
+   *   the query returns.
+   */
+  private fun hasMissingParamValue(xFhirExpressionString: String): Boolean {
+    return xFhirExpressionString.split("&").any {
+      val valueOfParam = it.substringAfter("=")
+      valueOfParam.isEmpty()
     }
   }
 
@@ -435,8 +449,12 @@ internal class ExpressionEvaluator(
 
         Bundle().apply {
           entry =
-            xFhirQueryResolver.resolve(xFhirExpressionString).map {
-              BundleEntryComponent().apply { resource = it }
+            if (hasMissingParamValue(xFhirExpressionString)) {
+              listOf()
+            } else {
+              xFhirQueryResolver.resolve(xFhirExpressionString).map {
+                BundleEntryComponent().apply { resource = it }
+              }
             }
         }
       } else if (expression.isFhirPath) {

@@ -50,6 +50,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -122,40 +123,44 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(0)
+    runBlocking {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(0)
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
   }
 
   @Test
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.0))
+    runBlocking {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.0))
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
   }
 
   @Test
@@ -200,8 +205,10 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
-    assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    runBlocking {
+      assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
+      assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    }
   }
 
   @Test
@@ -218,9 +225,10 @@ class QuestionnaireUiEspressoTest {
     clickOnText("10")
     clickOnText("OK")
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
-
-    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    runBlocking {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    }
   }
 
   @Test
@@ -251,8 +259,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
-    assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    runBlocking {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
+      assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    }
   }
 
   @Test
@@ -286,17 +296,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val today = DateTimeType.today().valueAsString
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
 
-    assertThat(answer).isEqualTo(today)
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
+    runBlocking {
+      val answer =
+        getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
+      assertThat(answer).isEqualTo(today)
 
-    assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+      assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+    }
   }
 
   @Test
@@ -330,15 +343,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val maxDateAllowed = maxDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    runBlocking {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    }
   }
 
   @Test
@@ -372,15 +390,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val minDateAllowed = minDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    runBlocking {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    }
   }
 
   @Test
@@ -513,7 +536,7 @@ class QuestionnaireUiEspressoTest {
   private fun readFileFromAssets(filename: String) =
     javaClass.getResourceAsStream(filename)!!.bufferedReader().use { it.readText() }
 
-  private fun getQuestionnaireResponse(): QuestionnaireResponse {
+  private suspend fun getQuestionnaireResponse(): QuestionnaireResponse {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =

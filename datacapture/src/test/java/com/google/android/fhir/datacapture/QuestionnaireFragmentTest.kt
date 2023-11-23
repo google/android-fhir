@@ -34,6 +34,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
@@ -77,11 +78,13 @@ class QuestionnaireFragmentTest {
       QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).build()
     val appCompatActivity = Robolectric.buildActivity(AppCompatActivity::class.java).create().get()
     startFragment(questionnaireFragment, appCompatActivity)
-    assertThat(questionnaireFragment.getQuestionnaireResponse()).isNotNull()
-    assertThat(
-        questionnaireFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
-      )
-      .isTrue()
+    runTest {
+      assertThat(questionnaireFragment.getQuestionnaireResponse()).isNotNull()
+      assertThat(
+          questionnaireFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
+        )
+        .isTrue()
+    }
   }
 
   @Test

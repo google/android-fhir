@@ -206,10 +206,7 @@ internal class EnabledAnswerOptionsEvaluator(
         }
         val variablesMap = expressionEvaluator.extractDependentVariables(answerExpression, item)
         val xFhirExpressionString =
-          expressionEvaluator.createXFhirQueryFromExpression(
-            answerExpression,
-            variablesMap,
-          )
+          expressionEvaluator.createXFhirQueryFromExpression(answerExpression, variablesMap)
         if (answerExpressionMap.containsKey(xFhirExpressionString)) {
           answerExpressionMap[xFhirExpressionString]
         }
