@@ -87,6 +87,7 @@ configurations {
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
+    exclude(module = "jcl-over-slf4j")
 
     forceGuava()
     forceHapiVersion()
@@ -145,6 +146,7 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockWebServer)
