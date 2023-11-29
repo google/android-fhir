@@ -24,21 +24,27 @@ import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.get
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
+import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.SyncUploadProgress
+import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
+import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
@@ -238,7 +244,7 @@ class FhirEngineImplTest {
           fhirEngine.search("CustomResource?active=true&gender=male&_sort=name&_count=2")
         }
       }
-    assertThat(exception.message).isEqualTo("Unknown resource typeCustomResource")
+    assertThat(exception.message).isEqualTo("Unknown resource type CustomResource")
   }
 
   @Test
@@ -312,22 +318,49 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun syncUpload_uploadLocalChange() = runBlocking {
+  fun syncUpload_uploadLocalChange_success() = runTest {
     val localChanges = mutableListOf<LocalChange>()
-    fhirEngine.syncUpload(LocalChangesFetchMode.AllChanges) {
-      flow {
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
+
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
-        emit(LocalChangeToken(it.flatMap { it.token.ids }) to TEST_PATIENT_1)
+        UploadSyncResult.Success(
+          it,
+          listOf(),
+        )
       }
-    }
+      .collect { emittedProgress.add(it) }
 
     assertThat(localChanges).hasSize(1)
     with(localChanges[0]) {
-      assertThat(this.resourceType).isEqualTo(ResourceType.Patient.toString())
-      assertThat(this.resourceId).isEqualTo(TEST_PATIENT_1.id)
-      assertThat(this.type).isEqualTo(Type.INSERT)
-      assertThat(this.payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(resourceType).isEqualTo(ResourceType.Patient.toString())
+      assertThat(resourceId).isEqualTo(TEST_PATIENT_1.id)
+      assertThat(type).isEqualTo(Type.INSERT)
+      assertThat(payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
     }
+
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(0, 1))
+  }
+
+  @Test
+  fun syncUpload_uploadLocalChange_failure() = runBlocking {
+    val emittedProgress = mutableListOf<SyncUploadProgress>()
+    val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
+    fhirEngine
+      .syncUpload(LocalChangesFetchMode.AllChanges) {
+        UploadSyncResult.Failure(
+          uploadError,
+          LocalChangeToken(it.flatMap { it.token.ids }),
+        )
+      }
+      .collect { emittedProgress.add(it) }
+
+    assertThat(emittedProgress).hasSize(2)
+    assertThat(emittedProgress.first()).isEqualTo(SyncUploadProgress(1, 1))
+    assertThat(emittedProgress.last()).isEqualTo(SyncUploadProgress(1, 1, uploadError))
   }
 
   @Test
@@ -560,6 +593,87 @@ class FhirEngineImplTest {
         )
         .isEqualTo(localChangeDiff)
       assertResourceEquals(fhirEngine.get<Patient>("original-002"), localChange)
+    }
+
+  @Test
+  fun `syncDownload ResourceEntity should have the latest versionId and lastUpdated from server`() =
+    runBlocking {
+      val originalPatient =
+        Patient().apply {
+          id = "original-002"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdated = Date.from(Instant.parse("2022-12-02T10:15:30.00Z"))
+            }
+          addName(
+            HumanName().apply {
+              family = "Stark"
+              addGiven("Tony")
+            },
+          )
+        }
+      // First sync
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+
+      val updatedPatient =
+        originalPatient.copy().apply {
+          meta =
+            Meta().apply {
+              versionId = "2"
+              lastUpdated = Date.from(Instant.parse("2022-12-03T10:15:30.00Z"))
+            }
+          addAddress(Address().apply { country = "USA" })
+        }
+
+      // Sync to get updates from server
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
+
+      val result = services.database.selectEntity(ResourceType.Patient, "original-002")
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
+      assertThat(result.lastUpdatedRemote).isEqualTo(updatedPatient.lastUpdated)
+    }
+
+  @Test
+  fun `syncDownload LocalChangeEntity should have the latest versionId from server`() =
+    runBlocking {
+      val originalPatient =
+        Patient().apply {
+          id = "original-002"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdated = Date.from(Instant.parse("2022-12-02T10:15:30.00Z"))
+            }
+          addName(
+            HumanName().apply {
+              family = "Stark"
+              addGiven("Tony")
+            },
+          )
+        }
+      // First sync
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf((originalPatient)))) }
+
+      val localChange =
+        originalPatient.copy().apply { addAddress(Address().apply { city = "Malibu" }) }
+      fhirEngine.update(localChange)
+
+      val updatedPatient =
+        originalPatient.copy().apply {
+          meta =
+            Meta().apply {
+              versionId = "2"
+              lastUpdated = Date.from(Instant.parse("2022-12-03T10:15:30.00Z"))
+            }
+          addAddress(Address().apply { country = "USA" })
+        }
+
+      // Sync to get updates from server
+      fhirEngine.syncDownload(AcceptLocalConflictResolver) { flowOf((listOf(updatedPatient))) }
+
+      val result = fhirEngine.getLocalChanges(ResourceType.Patient, "original-002").first()
+      assertThat(result.versionId).isEqualTo(updatedPatient.versionId)
     }
 
   @Test

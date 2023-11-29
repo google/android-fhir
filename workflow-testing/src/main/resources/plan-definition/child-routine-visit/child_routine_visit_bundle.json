@@ -1,0 +1,99 @@
+{
+  "resourceType": "Bundle",
+  "id": "ChildRoutineVisit-PlanDefinition-1.0.0",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "ChildRoutineVisit-PlanDefinition-1.0.0",
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/resource-pertainsToGoal",
+            "valueReference": {
+              "reference": "Goal/1"
+            }
+          }
+        ],
+        "instantiatesCanonical": [
+          "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/ChildRoutineVisit-PlanDefinition-1.0.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "Patient/ChildRoutine-Reportable"
+        },
+        "action": [
+          {
+            "title": "Child Monthly Routine Visit",
+            "description": "This action will performed every month for a patient < 5 years old. The start date with be next month after registration while the end date will be the 60th week after birth.",
+            "priority": "routine",
+            "timingTiming": {
+              "repeat": {
+                "countMax": 59,
+                "duration": 2,
+                "durationMax": 4,
+                "durationUnit": "h",
+                "frequency": 1,
+                "frequencyMax": 1,
+                "period": 1,
+                "periodMax": 1,
+                "periodUnit": "mo"
+              }
+            },
+            "type": {
+              "coding": [
+                {
+                  "code": "clinical-protocol",
+                  "display": "Clinical Protocol"
+                }
+              ]
+            },
+            "resource": {
+              "reference": "https://fhir.labs.smartregister.org/fhir/Questionnaire/105056"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Goal",
+        "id": "1",
+        "lifecycleStatus": "proposed",
+        "category": [
+          {
+            "coding": [
+              {
+                "system": "https://www.hl7.org/fhir/codesystem-goal-category.html",
+                "code": "nursing",
+                "display": "Nursing"
+              }
+            ]
+          }
+        ],
+        "priority": {
+          "coding": [
+            {
+              "system": "https://www.hl7.org/fhir/codesystem-goal-priority.html",
+              "code": "high-priority",
+              "display": "High Priority"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/ChildRoutine-Reportable"
+        },
+        "startCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://www.snomed.org/",
+              "code": "32485007",
+              "display": "Admission to hospital"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

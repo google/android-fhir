@@ -1,0 +1,3029 @@
+{
+  "resourceType": "Library",
+  "id": "ANCConcepts",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://fhir.org/guides/who/anc-cds/Library/ANCConcepts",
+  "name": "ANCConcepts",
+  "title": "ANC Concepts",
+  "status": "active",
+  "experimental": false,
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/library-type",
+        "code": "logic-library"
+      }
+    ]
+  },
+  "description": "The ANC Concepts library provides concept declarations for all the concepts referenced by data elements.",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "Code system ICD-10",
+      "resource": "http://hl7.org/fhir/sid/icd-10"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system SNOMED-CT",
+      "resource": "http://snomed.info/sct"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system LOINC",
+      "resource": "http://loinc.org"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system RxNorm",
+      "resource": "http://www.nlm.nih.gov/research/umls/rxnorm"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system CIEL",
+      "resource": "http://hl7.org/fhir/sid/ciel"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICD-11",
+      "resource": "http://hl7.org/fhir/sid/icd-11"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICHI",
+      "resource": "https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system ICF",
+      "resource": "http://hl7.org/fhir/sid/icf-nl"
+    },
+    {
+      "type": "depends-on",
+      "display": "Code system Extended Codes CodeSystem codes",
+      "resource": "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Co-habitants",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-a-de13"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Co-habitants Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-a-de14"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pregnancy confirmed",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b4-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for coming to facility",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set First Antenatal Care Contact Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Scheduled Antenatal Care Contact Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de3"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for coming to facility Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de4"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for coming to facility Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de1-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Specific health concern(s)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Specific health concern(s) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de6"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Danger signs",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de48"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Danger Signs - No danger signs Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de49"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Danger signs Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de50"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Danger Signs - Central cyanosis Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de51"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Danger signs Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b5-de48-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Highest level of education achieved",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Highest level of education achieved Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Occupation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de7"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Occupation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de8"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Occupation - Employment that puts woman at increased risk for HIV (e.g. sex worker) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de11"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Occupation - Informal employment (other) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de12"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Occupation Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de7-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Last menstrual period (LMP) date",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de14"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Ultrasound done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de15"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational age",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Source of gestational age",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de18"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Source of gestational age Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de19"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Expected date of delivery (EDD)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de22"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of pregnancies (gravida)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de24"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of miscarriages and/or abortions",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de25"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of live births",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de26"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Whether last live birth was preterm",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de27"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Whether last live birth was preterm Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de28"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of stillbirths",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de31"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Parity",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de32"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of caesarian sections",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de33"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de34"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de35"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Pre-eclampsia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de37"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Eclampsia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de38"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Convulsions Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de41"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Forceps Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de42"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Gestational diabetes mellitus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de43"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Heavy bleeding (during or after delivery) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de44"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Macrosomia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de45"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications - Perineal tear (3rd or 4th degree) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de46"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past pregnancy complications Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de34-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Substance use during past pregnancy specification",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de51"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Substance use during past pregnancy specification Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de53"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Allergies",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de57"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Allergies Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de58"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past surgeries",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de72"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Past surgeries Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de73"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de83"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de84"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de85"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Autoimmune disease Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de86"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Diabetes arising in pregnancy (gestational diabetes) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de90"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Diabetes, other or unspecified Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de91"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Diabetes, pre-existing type 1 Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de92"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Diabetes, pre-existing type 2 Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de93"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Hypertension Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de96"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions - Kidney disease Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de97"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Existing chronic health conditions Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de83-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV diagnosis date",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de99"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de100"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history - Fully Immunized Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de101"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history - Under Immunized Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de102"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history - No Doses Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de103"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history - Unknown Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de104"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid-containing vaccine (TTCV) immunization history Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de100-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu immunization history",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de105"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu Immunization History - Fully Immunized Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de106"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu Immunization History - No Doses Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de107"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu Immunization History - Unknown Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de108"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu immunization history Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de105-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current medications",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de109"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current medications Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de110"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current Medications - Co-trimoxazole Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de125"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current medications Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de109-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de139"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake - More than 2 cups of coffee Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de140"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake - More than 4 cups of tea Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de141"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake - More than 12 bars of chocolate Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de142"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake - More than one can of soda or energy drink Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de143"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake - None of the above daily caffeine intake Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de144"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Daily caffeine intake Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de139-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Clinical enquiry for alcohol and other substance use done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de145"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de146"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de147"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - Alcohol Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de148"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - Cocaine Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de149"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - Injectable drugs Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de150"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - Marijuana Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de151"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use - Other (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de152"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current alcohol and/or other substance use Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de146-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tobacco use",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de153"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Recently quit tobacco products",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de154"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Exposure to second-hand smoke",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de155"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (reported)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de156"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (reported) - HIV Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de157"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (reported) - HIV Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de158"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (reported) - Inconclusive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de159"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (reported) Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de156-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Contraceptive use of male condoms",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de160"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Contraceptive use of female condoms",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b6-de161"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Medication follow-up",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Medication follow-up Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Medication follow-up - Has side-effects from iron and folic acid supplements Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Medication follow-up Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de1-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-ded9"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - High caffeine intake Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de10"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - Tobacco use Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de11"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - Recently quit tobacco products Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de12"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - Exposure to second-hand smoke Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de13"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - No condom use during sex Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de14"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - Alcohol use Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de15"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - Substance use Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de16"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours - No persistent behaviours Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent behaviours Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-ded9-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de18"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de19"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Abnormal vaginal discharge Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de20"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Breathing difficulty Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de21"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Breathless routine activities Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de22"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Constipation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de23"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Contractions Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de24"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Cough lasting more than 3 weeks Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de25"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Fever Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de26"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Gets tired easily Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de27"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Headache Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de28"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Heartburn Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de29"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Leg cramps Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de30"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Leg redness Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de31"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Nausea and Vomiting Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de32"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Oedema Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de33"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Pain - during urination (dysuria) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de34"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Pain - Leg Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de35"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Pain - Low back Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de36"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Pain - Pelvic Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de37"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Pain - Extreme pelvic pain Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de38"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Vaginal bleeding Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de39"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Varicose veins Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de40"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms - Visual disturbance Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de41"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Persistent physiological symptoms Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de18-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de43"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de44"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Abnormal pulse rate Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de45"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Abnormal vaginal discharges Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de46"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Breathing difficulty Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de47"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Breathless during routine activities Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de48"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Constipation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de49"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Contractions Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de50"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Cough lasting more than 3 weeks Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de51"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Fever Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de52"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Gets tired easily Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de53"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Headache Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de54"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Heartburn Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de55"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Leg cramps Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de56"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Leg redness Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de57"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Nausea and Vomiting Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de58"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Oedema Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de59"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - during urination (dysuria) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de60"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - Leg Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de61"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - Low back Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de62"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - Pelvic Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de63"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - Extreme pelvic pain Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de64"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Pain - Other Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de65"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Vaginal bleeding Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de66"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Varicose veins Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de67"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Visual disturbance Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de68"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms - Other (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de70"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current physiological symptoms Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de43-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs and symptoms that trigger suspicion of IPV and clinical inquiry",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de71"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs and symptoms that trigger suspicion of IPV and clinical inquiry - Ongoing stress Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de72"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs and symptoms that trigger suspicion of IPV and clinical inquiry Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de73"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs and symptoms that trigger suspicion of IPV and clinical inquiry Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de71-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Woman discloses or is suspected to be subjected to intimate partner violence",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de97"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal movement",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de98"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal movement Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b7-de-99"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Height",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pre-gestational weight",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Current  weight",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de3"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set BMI",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de4"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Weight category",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Weight category - Underweight Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de6"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Weight category Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de7"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Weight category Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de5-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Expected weight gain",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de10"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Expected weight gain Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de11"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Average weight gain per week",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de15"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Total weight gain (kg)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de16"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Systolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diastolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de19"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Repeat systolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de20"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Repeat diastolic blood pressure",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de21"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood pressure cannot be taken",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de22"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason blood pressure cannot be taken",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de23"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason blood pressure cannot be taken Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de24"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de27"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia - No symptoms Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de28"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de29"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symptoms of severe pre-eclampsia Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de27-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Body temperature",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de34"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Second body temperature",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de35"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pulse rate",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de36"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Second pulse rate",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de37"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pallor present",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de38"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de39"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Respiratory exam not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de40"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Normal respiratory exam result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de41"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Dyspnoea Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de42"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Cough Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de43"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Rapid breathing Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de44"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Slow breathing Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de45"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Wheezing Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de46"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Rales Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de47"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Other abnormal result (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de48"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de39-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Respiratory exam result - Oximetry",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de49"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de50"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Cardiac exam not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de51"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Normal cardiac exam result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de52"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Heart murmur Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de53"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Weak pulse Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de54"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Tachycardia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de55"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Bradycardia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de56"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Arrhythmia Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de57"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Peripheral cyanosis Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de58"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Cold sweats Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de59"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result - Other abnormal cardiac exam result (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de60"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cardiac exam result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de50-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de61"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Breast exam not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de62"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Normal breast exam result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de63"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Nodule Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de64"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Discharge Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de65"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Flushing Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de66"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Local pain Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de67"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Bleeding Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de68"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Increased temperature Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de69"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result - Other breast exam result (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de70"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Breast exam result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de61-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de71"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Abdominal exam result not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de72"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Normal abdominal exam result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de73"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Mass/tumour Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de74"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Pain on superficial palpation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de75"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Pain on deep palpation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de76"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Painful decompression Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de77"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result - Other abnormal abdominal exam result (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de78"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Abdominal exam result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de71-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de79"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Pelvic exam (visual) not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de80"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Normal pelvic exam (visual) result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de81"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Abnormal vaginal discharge Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de82"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Evidence of amniotic fluid Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de83"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Clusters of erythematous papules Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de84"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Vesicles Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de85"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Genital ulcer Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de86"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Genital pain Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de87"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Lymphadenopathy (pelvic - unilateral or bilateral) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de88"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Cervical friability Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de89"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Mucopurulent cervicitis Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de90"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) - Other abnormal pelvic exam (visual) result (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de91"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pelvic exam result (visual) Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de79-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cervical exam conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de92"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cervical dilation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de93"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oedema present",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de94"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oedema type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de95"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oedema type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de96"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oedema severity",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de100"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Oedema severity Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de101"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Symphysis-fundal height (SFH)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de105"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal heartbeat present",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de106"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal heart rate",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de107"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Second fetal heart rate",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de108"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of fetuses",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de109"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Number of fetuses unknown",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de110"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal presentation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de111"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal presentation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de112"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal presentation - Transverse fetal presentation Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de115"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal presentation - Other fetal presentation (specify) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de116"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fetal presentation Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de111-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs/conditions for IPV",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de117"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Presenting signs/conditions for IPV Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de118"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Clinical enquiry for IPV",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de121"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason clinical enquiry not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de122"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason clinical enquiry not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de123"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Has the woman  been subjected to intimate partner violence",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de128"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Types of IPV",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de129"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Types of IPV Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b8-de130"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Ultrasound required",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Ultrasound scan ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Ultrasound scan conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de3"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason ultrasound scan not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason ultrasound scan not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de6"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Amniotic fluid level",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de9"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Amniotic fluid level Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de10"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Placenta location",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de13"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Placenta location Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de14"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood type test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de22"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de24"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de25"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Rh factor",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de29"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Rh factor - Rh positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de30"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Rh factor - Rh negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de31"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Rh factor Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de29-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV test required",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de33"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de34"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de35"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason HIV test not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de36"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason HIV test not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de37"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de41"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV Test Result - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de42"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV Test Result - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de43"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV Test Result - Inconclusive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de44"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV test result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de41-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV status",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de45"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV status - HIV positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de46"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV status - HIV negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de47"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set HIV status Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de45-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de49"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de50"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de48"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test result - Partner HIV positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de52"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test result - Partner HIV negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de53"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test result - Inconclusive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de54"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV test result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de48-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (confirmed)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de55"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (confirmed) - HIV positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de56"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (confirmed) - HIV negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de57"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Partner HIV status (confirmed) Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de55-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set High risk for HIV",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de58"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test required",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de59"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de60"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de61"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de62"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de63"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de66"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de67"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B Test Result - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de72"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B Test Result - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de73"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B test result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de66-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de74"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B Diagnosis - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de75"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B Diagnosis - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de76"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B diagnosis Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de74-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test required",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de77"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de78"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de79"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de80"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de81"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason Hepatitis C test not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de84"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason Hepatitis C test not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de85"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de89"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C Test Result - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de90"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C Test Result - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de91"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C test result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de89-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de92"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C Diagnosis - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de93"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C Diagnosis - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de94"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis C diagnosis Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de92-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de96"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de97"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de98"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test type - Rapid syphilis test (RST) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de99"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test type - Rapidd plasma reagin (RPR) test Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de100"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de101"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test type Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de98-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason syphilis test not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de102"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason syphilis test not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de103"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de107"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test result - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de108"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test result - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de109"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis test result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de107-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de110"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis diagnosis - Syphilis positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de111"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis diagnosis - Syphilis negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de112"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis diagnosis Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de110-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine test required",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de113"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de114"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de115"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de116"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine test type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de117"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason urine test not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de120"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason urine test not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de121"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine culture (recommended)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de124"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine culture (recommended) - Positive - Any agent Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de126"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine culture (recommended) - Positive - Group B Strep (GBS) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de127"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine culture (recommended) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de128"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine culture (recommended) Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de124-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine Gram-staining",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de129"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine Gram-staining - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de130"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine Gram-staining - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de131"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Midstream urine Gram-staining Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de129-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - nitrites",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de132"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - nitrites - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de133"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - nitrites Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de134"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - nitrites Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de132-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - leukocytes",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de138"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - leukocytes - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de139"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - leukocytes Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de140"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - leukocytes Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de138-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de144"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de145"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 1 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de146"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 2 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de147"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 3 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de148"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein - 4 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de149"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - protein Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de144-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de150"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose - None Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de151"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose - 1 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de152"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose - 2 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de153"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose - 3 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de154"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose - 4 plus Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de155"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Urine dipstick result - glucose Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de150-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Asymptomatic bacteriuria (ASB) diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de156"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Asymptomatic bacteriuria (ASB) diagnosis Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de157"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood glucose test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de160"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood glucose test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de162"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Fasting plasma glucose",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de163"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set 75 g oral glucose tolerance test (OGTT) - fasting glucose",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de164"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set 75 g oral glucose tolerance test (OGTT) - 1 hour",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de165"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set 75 g oral glucose tolerance test (OGTT) - 2 hours",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de166"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Random plasma glucose",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de167"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood glucose test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de168"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational diabetes mellitus (GDM) diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de169"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational diabetes mellitus (GDM) diagnosis - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de170"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational diabetes mellitus (GDM) diagnosis - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de171"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational diabetes mellitus (GDM) diagnosis Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de169-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diabetes mellitus (DM) during pregnancy diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de172"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diabetes mellitus (DM) during pregnancy diagnosis - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de173"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diabetes mellitus (DM) during pregnancy diagnosis - Negative Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de174"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Diabetes mellitus (DM) during pregnancy diagnosis Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de172-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood haemoglobin test conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de175"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood haemoglobin test ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de176"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood haemoglobin test type",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de177"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood haemoglobin test type Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de178"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason blood haemoglobin test not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de181"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason blood haemoglobin test not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de182"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Blood haemoglobin test result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de186"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Anaemia diagnosis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de187"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Anaemia diagnosis Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de188"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hematocrit (Ht)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de190"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set White blood cell (WBC) count",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de191"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Platelet count",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de192"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB screening conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de194"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB screening ordered",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de195"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason TB screening not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de196"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason TB screening not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de197"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB screening result",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de206"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB Screening Result - Positive Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de207"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB screening result Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de208"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set TB screening result Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de206-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Other tests conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de211"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Other test(s) result(s)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de214"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Caffeine Reduction",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Procedure Not Done Reason Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de3"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Tobacco Cessation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Second-Hand Smoke",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de9"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Condom Use",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de13"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Alcohol Substance Abuse",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Non-Pharma Measures to Relieve Nausea and Vomiting",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de21"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Pharmacological Measures to Relieve Nausea and Vomiting",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de25"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Diet and Lifestyle Changes to Prevent and Relieve Heartburn",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de29"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Antacid Preparations to Relieve Heartburn",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de33"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Non-Pharmacological Treatment for Relief of Leg Cramps",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de37"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Use of Magnesium-and Calcium to Relieve Leg Cramps",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de41"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Dietary Modifications to Relieve Constipation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de45"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Use of Wheat Bran or Other Fibre Supplements to Relieve Constipation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de49"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Regular Exercise Physiotherapy Support Belts and Acupuncture to Relieve Low Back and Pelvic Pain",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de53"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Non-Pharmacological Options for Varicose Veins and Oedema",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de57"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Healthy Eating and Keeping Physically Active",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de61"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Increasing Daily Energy Protein Intake",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de65"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on Balanced Energy and Protein Dietary Supplementation",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de69"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hypertension",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de73"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Severe hypertension",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de74"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pre-eclampsia",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de75"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Severe pre-eclampsia",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de76"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on hypertension",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de77"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on HIV positive",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de78"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on hepatitis B positive",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de79"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on hepatitis C positive",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de80"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis counselling and treatment",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de81"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Syphilis counselling, treatment and further testing",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de82"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Seven-day antibiotic regimen for asymptomatic bacteriuria (ASB) provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de83"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason seven-day antibiotic regimen for asymptomatic bacteriuria (ASB) not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de84"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason seven-day antibiotic regimen for asymptomatic bacteriuria (ASB) not provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de85"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on TB screening positive",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de87"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on gestational diabetes mellitus (GDM)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de88"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on diabetes mellitus (DM)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de89"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Type of iron supplement dosage provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de93"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason iron and folic acid not prescribed",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de96"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason iron and folic acid not prescribed Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de97"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Vitamin A supplementation not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de104"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Vitamin A supplementation not provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de105"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason calcium not prescribed",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de108"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason calcium not prescribed Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de109"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Risk of pre-eclampsia",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de113"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Pre-eclampsia risk counselling provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de114"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason aspirin not prescribed",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de116"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason aspirin not prescribed Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de117"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Risk of gestational diabetes mellitus (GDM)",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de121"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Gestational diabetes mellitus (GDM) risk counselling conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de124"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on HIV risk",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de125"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set PrEP for HIV prevention provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de126"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason PrEP for HIV prevention was not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de127"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason PrEP for HIV prevention was not provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de128"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on seeking care when danger signs occur",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de133"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counsel to immediately go to the hospital if severe danger signs are present",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de134"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on ANC contact schedule conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de135"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on birth preparedness and complications readiness",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de136"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Planned birth place",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de137"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Planned birth place Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de138"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Planned birth place - Home Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de140"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Planned birth place Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de137-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on Rh factor negative",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de142"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on intrapartum antibiotic to prevent early neonatal Group B Streptococcus (GBS) infection",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de143"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling on postpartum family planning conducted",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de144"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de145"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected - Copper-bearing intrauterine device (Cu-IUD) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de146"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected - Levonorgestrel intrauterine device (LNG-IUD) Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de147"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de148"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected - Female sterilization Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de162"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Family planning method selected Choices Grouper",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de145-choices-grouper"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on breastfeeding",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de164"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid (TT) 1 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de165"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid (TT) 2 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de167"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid (TT) 3 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de169"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid (TT) 4 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de171"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Tetanus toxoid (TT) 5 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de173"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason tetanus toxoid (TT) vaccination not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de175"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on Hep B negative",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de181"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B-1 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de182"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B-2 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de184"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Hepatitis B-3 immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de186"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set No doses of hepatitis B",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de188"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason Hep B vaccination not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de189"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason Hep B vaccination not provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de190"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Flu immunization provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de195"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason flu vaccine not provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de197"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set IPV first-line support provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de203"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason IPV first line support not done",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de204"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason IPV first line support not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de205"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set What additional type of care provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de210"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set What additional type of care provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de211"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Safety assessement",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de216"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Has the physical violence happened more often or gotten worse over the past 6 months",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de217"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Has he ever used a weapon or threatened you with a weapon",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de218"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Has he ever tried to strangle you",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de219"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Has he ever beaten you when you were pregnant",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de220"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Is he violently and constantly jealous of you",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de221"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Do you believe he could kill you",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de222"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Referrals made as part of first-line support and care",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de223"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Was client referred",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de224"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Was client referred Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de225"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Preventive antihelminthic treatment provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de233"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Preventive antihelminthic treatment provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de234"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason no preventative treatment provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de237"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason no preventative treatment provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de238"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Counselling conducted on malaria prevention",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de241"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set IPTp-SP dose 1 provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de245"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set IPTp-SP dose 2 provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de247"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set IPTp-SP dose 3 provided",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de249"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Malaria Prophylaxis",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de251"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason malaria prophylaxis not provided Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de252"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Referral to Hospital",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de256"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason referral not done Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b10-de258"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Emergency referral",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-c-de1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for referral",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-c-de2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for referral Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-c-de3"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Any treatment given before referral",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-c-de5"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for closing ANC record",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Reason for closing ANC record Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-2"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Delivery date",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-12"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Place of delivery",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-13"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Place of delivery Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-14"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Preterm Birth",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-17"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Delivery mode",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-18"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Delivery mode Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-19"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Birth weight",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-23"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Exclusively breastfeeding",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-24"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Delivery complications",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-25"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Delivery complications Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-26"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Date of miscarriage or abortion",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-38"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Date of death",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-39"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cause of death",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-40"
+    },
+    {
+      "type": "depends-on",
+      "display": "Value set Cause of death Choices",
+      "resource": "http://fhir.org/guides/who/anc-cds/ValueSet/anc-end-41"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/ANCConcepts.cql"
+    }
+  ]
+}

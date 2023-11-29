@@ -1,0 +1,70 @@
+{
+  "resourceType": "Library",
+  "id": "SDHCommon",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/us/cqfmeasures/StructureDefinition/cqfm-softwaresystem",
+      "valueReference": {
+        "reference": "Device/cqf-tooling"
+      }
+    }
+  ],
+  "url": "http://example.org/sdh/dtr/aslp/Library/SDHCommon",
+  "name": "SDHCommon",
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "display": "FHIR model information",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIR-ModelInfo|4.0.1"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FHIRHelpers",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRHelpers|4.1.000"
+    },
+    {
+      "type": "depends-on",
+      "display": "Library FC",
+      "resource": "http://example.org/sdh/dtr/aslp/Library/FHIRCommon|1.1.000"
+    }
+  ],
+  "parameter": [
+    {
+      "name": "Patient",
+      "use": "out",
+      "min": 0,
+      "max": "1",
+      "type": "Patient"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "Patient",
+      "profile": [
+        "http://hl7.org/fhir/StructureDefinition/Patient"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/IdentifierUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    },
+    {
+      "profile": [
+        "http://hl7.org/fhir/NameUse"
+      ],
+      "mustSupport": [
+        "value"
+      ]
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/SDHCommon.cql"
+    }
+  ]
+}

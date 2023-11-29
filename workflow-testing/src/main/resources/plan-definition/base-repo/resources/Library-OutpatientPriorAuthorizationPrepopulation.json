@@ -1,0 +1,56 @@
+{
+  "resourceType": "Library",
+  "id": "OutpatientPriorAuthorizationPrepopulation",
+  "meta": {
+    "versionId": "4",
+    "lastUpdated": "2023-01-04T22:42:31.776+00:00",
+    "source": "#jvktlnzFIHZuPkeq"
+  },
+  "url": "http://somewhere.org/fhir/uv/mycontentig/Library/OutpatientPriorAuthorizationPrepopulation",
+  "version": "1.0.0",
+  "name": "OutpatientPriorAuthorizationPrepopulation",
+  "title": "Outpatient Prior Authorization Prepopulation",
+  "status": "draft",
+  "type": {
+    "coding": [
+      {
+        "code": "logic-library"
+      }
+    ]
+  },
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "resource": "http://fhir.org/guides/cqf/common/Library/FHIRHelpers|4.0.001"
+    }
+  ],
+  "dataRequirement": [
+    {
+      "type": "ServiceRequest"
+    },
+    {
+      "type": "Procedure"
+    },
+    {
+      "type": "Claim"
+    },
+    {
+      "type": "Organization"
+    },
+    {
+      "type": "Practitioner"
+    },
+    {
+      "type": "Coverage"
+    },
+    {
+      "type": "Condition"
+    }
+  ],
+  "content": [
+    {
+      "contentType": "text/cql",
+      "url": "../cql/OutpatientPriorAuthorizationPrepopulation.cql"
+    }
+  ]
+}

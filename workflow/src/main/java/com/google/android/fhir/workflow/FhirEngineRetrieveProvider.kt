@@ -16,29 +16,8 @@
 
 package com.google.android.fhir.workflow
 
-import ca.uhn.fhir.rest.gclient.DateClientParam
-import ca.uhn.fhir.rest.gclient.NumberClientParam
-import ca.uhn.fhir.rest.gclient.ReferenceClientParam
-import ca.uhn.fhir.rest.gclient.StringClientParam
-import ca.uhn.fhir.rest.gclient.TokenClientParam
-import ca.uhn.fhir.rest.param.ParamPrefixEnum
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.search.Search
-import com.google.android.fhir.search.filter.TokenParamFilterCriterion
-import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
-import java.math.BigDecimal
-import java.util.Date
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.Enumerations
-import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
-import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
-import org.opencds.cqf.cql.engine.runtime.Code
-import org.opencds.cqf.cql.engine.runtime.DateTime
-import org.opencds.cqf.cql.engine.runtime.Interval
-import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
+/*
+TODO: These operators must be migrated to equivalent calls in the Repository classes
 
 internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
   TerminologyAwareRetrieveProvider() {
@@ -74,7 +53,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       filterByCode(codePath, codes, search)
       filterByValueSet(codePath, valueSet, search)
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
-      fhirEngine.search(search)
+      fhirEngine.search<Resource>(search)
     }
   }
 
@@ -256,3 +235,4 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     return Class.forName("org.hl7.fhir.r4.model.$dataType")
   }
 }
+*/

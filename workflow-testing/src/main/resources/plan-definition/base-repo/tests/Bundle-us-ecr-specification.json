@@ -1,0 +1,24 @@
+{
+  "resourceType": "Bundle",
+  "id": "us-ecr-specification",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "us-ecr-specification",
+        "instantiatesCanonical": [
+          "http://ersd.aimsplatform.org/fhir/PlanDefinition/us-ecr-specification"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "helloworld-patient-1"
+        },
+        "encounter": {
+          "reference": "helloworld-patient-1-encounter-1"
+        }
+      }
+    }
+  ]
+}

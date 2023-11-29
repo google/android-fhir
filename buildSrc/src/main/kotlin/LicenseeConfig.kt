@@ -22,7 +22,15 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
+    allow("BSD-2-Clause")
+    allow("BSD-3-Clause")
     allow("MIT")
+
+    ignoreDependencies("com.ibm.icu", "icu4j") {
+      because(
+        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+      )
+    }
 
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
     nonStandardLicenseUrls.forEach { allowUrl(it) }
@@ -33,7 +41,7 @@ fun Project.configureLicensee() {
     ignoreDependencies("org.jacoco", "org.jacoco.agent") {
       because("JaCoCo is used in tests only, so it is not distributed with our library")
     }
-    allowDependency("org.javassist", "javassist", "3.20.0-GA") {
+    allowDependency("org.javassist", "javassist", "3.29.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
 

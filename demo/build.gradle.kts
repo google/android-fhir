@@ -1,3 +1,5 @@
+import Dependencies.forceGuava
+
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -37,6 +39,8 @@ android {
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
   kotlin { jvmToolchain(11) }
 }
+
+configurations { all { forceGuava() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)

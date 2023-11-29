@@ -1,11 +1,12 @@
 {
   "resourceType": "CarePlan",
+  "id": "plandefinition-RuleFilters-1.0.0",
   "contained": [
     {
       "resourceType": "RequestGroup",
       "id": "plandefinition-RuleFilters-1.0.0",
       "instantiatesCanonical": [
-        "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0"
+        "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0|1.1.0"
       ],
       "status": "draft",
       "intent": "proposal",
@@ -14,59 +15,153 @@
       },
       "action": [
         {
+          "id": "start",
+          "description": "This action represents the start of the reporting workflow in response to the encounter-start event",
+          "textEquivalent": "Start the reporting workflow in response to an encounter-start event",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                  "code": "start"
+                }
+              ]
+            }
+          ],
           "resource": {
             "reference": "Task/start"
           }
         },
         {
-          "resource": {
-            "reference": "Task/ckr-is-encounter-reportable"
-          }
-        },
-        {
-          "resource": {
-            "reference": "Task/ckr-is-encounter-in-progress"
-          }
-        },
-        {
+          "id": "check-reportable",
+          "description": "This action represents the check for suspected reportability of the eICR.",
+          "textEquivalent": "Check Reportable",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                  "code": "check-reportable"
+                }
+              ]
+            }
+          ],
           "resource": {
             "reference": "Task/check-reportable"
-          }
+          },
+          "action": [
+            {
+              "id": "ckr-is-encounter-reportable",
+              "resource": {
+                "reference": "Task/ckr-is-encounter-reportable"
+              }
+            },
+            {
+              "id": "ckr-is-encounter-in-progress",
+              "resource": {
+                "reference": "Task/ckr-is-encounter-in-progress"
+              }
+            }
+          ]
         },
         {
-          "resource": {
-            "reference": "Task/car-report-eicr"
-          }
-        },
-        {
-          "resource": {
-            "reference": "Task/car-is-encounter-complete"
-          }
-        },
-        {
-          "resource": {
-            "reference": "Task/car-is-encounter-in-progress"
-          }
-        },
-        {
+          "id": "create-and-report-eicr",
+          "description": "This action represents the creation and reporting of the eICR.",
+          "textEquivalent": "Create and Report eICR",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                  "code": "create-and-report-eicr"
+                }
+              ]
+            }
+          ],
           "resource": {
             "reference": "Task/create-and-report-eicr"
-          }
+          },
+          "action": [
+            {
+              "id": "car-report-eicr",
+              "resource": {
+                "reference": "Task/car-report-eicr"
+              }
+            },
+            {
+              "id": "car-is-encounter-complete",
+              "resource": {
+                "reference": "Task/car-is-encounter-complete"
+              }
+            },
+            {
+              "id": "car-is-encounter-in-progress",
+              "resource": {
+                "reference": "Task/car-is-encounter-in-progress"
+              }
+            }
+          ]
         },
         {
-          "resource": {
-            "reference": "Task/create-eicr"
-          }
-        },
-        {
-          "resource": {
-            "reference": "Task/validate-eicr"
-          }
-        },
-        {
-          "resource": {
-            "reference": "Task/route-and-send-eicr"
-          }
+          "id": "report-eicr",
+          "description": "This action represents the reporting of the eICR.",
+          "textEquivalent": "Report eICR",
+          "action": [
+            {
+              "id": "create-eicr",
+              "description": "This action represents the creation of the eICR.",
+              "textEquivalent": "Create eICR.",
+              "code": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                      "code": "create-eicr"
+                    }
+                  ]
+                }
+              ],
+              "resource": {
+                "reference": "Task/create-eicr"
+              }
+            },
+            {
+              "id": "validate-eicr",
+              "description": "This action represents the validation of the eICR.",
+              "textEquivalent": "Validate eICR.",
+              "code": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                      "code": "validate-eicr"
+                    }
+                  ]
+                }
+              ],
+              "resource": {
+                "reference": "Task/validate-eicr"
+              }
+            },
+            {
+              "id": "route-and-send-eicr",
+              "description": "This action represents the routing and sending of the eICR.",
+              "textEquivalent": "Route and send eICR",
+              "code": [
+                {
+                  "coding": [
+                    {
+                      "system": "http://hl7.org/fhir/us/ecr/CodeSystem/executabletask-type",
+                      "code": "route-and-send-eicr"
+                    }
+                  ]
+                }
+              ],
+              "resource": {
+                "reference": "Task/route-and-send-eicr"
+              }
+            }
+          ]
         }
       ]
     },
@@ -105,7 +200,11 @@
         }
       ],
       "status": "ready",
-      "description": "This action represents the start of the reporting workflow in response to the encounter-start event"
+      "intent": "proposal",
+      "description": "This action represents the start of the reporting workflow in response to the encounter-start event",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -290,7 +389,11 @@
         }
       ],
       "status": "draft",
-      "description": "Check Encounter Reportable"
+      "intent": "proposal",
+      "description": "Check Encounter Reportable",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -340,7 +443,11 @@
         }
       ],
       "status": "draft",
-      "description": "Check Reportable Is Encounter in progress"
+      "intent": "proposal",
+      "description": "Check Reportable Is Encounter in progress",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -352,7 +459,11 @@
         }
       ],
       "status": "draft",
-      "description": "This action represents the check for suspected reportability of the eICR."
+      "intent": "proposal",
+      "description": "This action represents the check for suspected reportability of the eICR.",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -377,7 +488,11 @@
         }
       ],
       "status": "draft",
-      "description": "Report Eicr"
+      "intent": "proposal",
+      "description": "Report Eicr",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -427,7 +542,11 @@
         }
       ],
       "status": "draft",
-      "description": "Check If Encounter Complete"
+      "intent": "proposal",
+      "description": "Check If Encounter Complete",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -477,7 +596,11 @@
         }
       ],
       "status": "draft",
-      "description": "Check If Encounter In Progress"
+      "intent": "proposal",
+      "description": "Check If Encounter In Progress",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -489,7 +612,11 @@
         }
       ],
       "status": "draft",
-      "description": "This action represents the creation and reporting of the eICR."
+      "intent": "proposal",
+      "description": "This action represents the creation and reporting of the eICR.",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -514,7 +641,11 @@
         }
       ],
       "status": "draft",
-      "description": "This action represents the creation of the eICR."
+      "intent": "proposal",
+      "description": "This action represents the creation of the eICR.",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -539,7 +670,11 @@
         }
       ],
       "status": "draft",
-      "description": "This action represents the validation of the eICR."
+      "intent": "proposal",
+      "description": "This action represents the validation of the eICR.",
+      "for": {
+        "reference": "NotReportable"
+      }
     },
     {
       "resourceType": "Task",
@@ -551,11 +686,15 @@
         }
       ],
       "status": "draft",
-      "description": "This action represents the routing and sending of the eICR."
+      "intent": "proposal",
+      "description": "This action represents the routing and sending of the eICR.",
+      "for": {
+        "reference": "NotReportable"
+      }
     }
   ],
   "instantiatesCanonical": [
-    "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0"
+    "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0|1.1.0"
   ],
   "status": "draft",
   "intent": "proposal",
@@ -565,7 +704,7 @@
   "activity": [
     {
       "reference": {
-        "reference": "#plandefinition-RuleFilters-1.0.0"
+        "reference": "#RequestGroup/plandefinition-RuleFilters-1.0.0"
       }
     }
   ]
