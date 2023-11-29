@@ -35,6 +35,7 @@ class ScannerUtils(
   private lateinit var cameraSource: CameraSource
   private lateinit var barcodeDetector: BarcodeDetector
 
+  /* Setup the camera and barcode scanners */
   fun setup(): SHLinkScanData {
     initializeBarcodeDetector()
     initializeCameraSource()
@@ -42,11 +43,13 @@ class ScannerUtils(
     return startScanning()
   }
 
+  /* Initialize the BarcodeDetector with the specified barcode format */
   private fun initializeBarcodeDetector() {
     barcodeDetector =
       BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
   }
 
+  /* Initialize the CameraSource with the barcode detector */
   private fun initializeCameraSource() {
     cameraSource =
       CameraSource.Builder(context, barcodeDetector)
@@ -54,7 +57,7 @@ class ScannerUtils(
         .setAutoFocusEnabled(true)
         .build()
   }
-
+  /* Set up SurfaceHolder callbacks for camera preview */
   private fun setSurfaceCallbacks() {
     surfaceHolder.addCallback(surfaceCallback)
   }
@@ -81,7 +84,7 @@ class ScannerUtils(
       }
 
       override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        // Not needed for this example
+        // Not necessary
       }
 
       override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -89,6 +92,7 @@ class ScannerUtils(
       }
     }
 
+  /* Start scanning and return scanned SHL or throw an error */
   private fun startScanning(): SHLinkScanData {
     var scannedData: SHLinkScanData? = null
 
@@ -121,10 +125,12 @@ class ScannerUtils(
     cameraSource.stop()
   }
 
+  /* Check if camera permissions have been accepted */
   internal fun hasCameraPermission(): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
   }
 
+  /* Stop scanning and release resources */
   fun releaseScanner() {
     stopScanning()
     cameraSource.release()
