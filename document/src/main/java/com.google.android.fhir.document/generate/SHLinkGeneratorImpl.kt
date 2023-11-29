@@ -44,18 +44,23 @@ internal class SHLinkGeneratorImpl(
   ): String {
     val initialPostResponse = getManifestUrlAndToken(passcode)
     return generateAndPostPayload(
-      initialPostResponse, shLinkGenerationData, passcode, serverBaseUrl, "$optionalViewer#"
+      initialPostResponse,
+      shLinkGenerationData,
+      passcode,
+      serverBaseUrl,
+      "$optionalViewer#",
     )
   }
 
   /* Send a POST request to the SHL server to get a new manifest URL.
-Can optionally add a passcode to the SHL here */
+  Can optionally add a passcode to the SHL here */
   private suspend fun getManifestUrlAndToken(passcode: String): JSONObject {
-    val requestBody = if (passcode.isNotBlank()) {
-      "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
-    } else {
-      "{}".toRequestBody("application/json".toMediaTypeOrNull())
-    }
+    val requestBody =
+      if (passcode.isNotBlank()) {
+        "{\"passcode\": \"$passcode\"}".toRequestBody("application/json".toMediaTypeOrNull())
+      } else {
+        "{}".toRequestBody("application/json".toMediaTypeOrNull())
+      }
     val response = apiService.getManifestUrlAndToken("", requestBody)
     return if (response.isSuccessful) {
       val responseBody = response.body()?.string()
@@ -82,15 +87,21 @@ Can optionally add a passcode to the SHL here */
     val manifestToken = initialPostResponse.getString("id")
     val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
-    val exp = if (shLinkGenerationData.expirationTime.isNotEmpty()) {
-      convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
-    } else {
-      ""
-    }
+    val exp =
+      if (shLinkGenerationData.expirationTime.isNotEmpty()) {
+        convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
+      } else {
+        ""
+      }
     val key = encryptionUtility.generateRandomKey()
-    val shLinkPayload = constructSHLinkPayload(
-      manifestUrl, shLinkGenerationData.label, getKeyFlags(passcode), key, exp
-    )
+    val shLinkPayload =
+      constructSHLinkPayload(
+        manifestUrl,
+        shLinkGenerationData.label,
+        getKeyFlags(passcode),
+        key,
+        exp,
+      )
     val encodedPayload = base64UrlEncode(shLinkPayload)
     val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
     postPayload(data, manifestToken, key, managementToken)
@@ -112,13 +123,16 @@ Can optionally add a passcode to the SHL here */
     key: String,
     exp: String?,
   ): String {
-    val payloadObject = JSONObject().apply {
-      put("url", manifestUrl)
-      put("key", key)
-      flags?.let { put("flag", it) }
-      label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
-      exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
-    }.toString()
+    val payloadObject =
+      JSONObject()
+        .apply {
+          put("url", manifestUrl)
+          put("key", key)
+          flags?.let { put("flag", it) }
+          label?.takeIf { it.isNotEmpty() }?.let { put("label", it) }
+          exp?.takeIf { it.isNotEmpty() }?.let { put("exp", it) }
+        }
+        .toString()
     return payloadObject
   }
 
@@ -160,5 +174,4 @@ Can optionally add a passcode to the SHL here */
       throw e
     }
   }
-
 }

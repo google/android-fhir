@@ -174,6 +174,11 @@ fun Project.configureLicensee() {
     allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
       because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
     }
+
+    // ICU4C License
+    allowDependency("com.ibm.icu", "icu4j", "72.1") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/unicode-org/icu/blob/main/LICENSE")
+    }
   }
 }
 
