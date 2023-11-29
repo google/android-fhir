@@ -36,4 +36,7 @@ sealed class SyncJobStatus {
 
   /** Sync job failed. */
   data class Failed(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
+
+  /** Sync job state if state is not [Started] [InProgress] [Finished] [Failed] */
+  object Unknown : SyncJobStatus()
 }

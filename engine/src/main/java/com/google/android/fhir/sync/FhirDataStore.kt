@@ -37,8 +37,8 @@ internal class FhirDataStore(context: Context) {
       name = FHIR_PREFERENCES_NAME,
     )
   private val dataStore = context.dataStore
-  private val gson = SyncJobStatusSerializer()
-  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
+  private val serializer = SyncJobStatusSerializer()
+  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus>>()
   private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 
   /**
@@ -49,7 +49,7 @@ internal class FhirDataStore(context: Context) {
    *   the state is not allowed.
    */
   @PublishedApi
-  internal fun observeSyncJobTerminalState(key: String): Flow<SyncJobStatus?> =
+  internal fun observeSyncJobTerminalState(key: String): Flow<SyncJobStatus> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
         .catch { exception ->
@@ -61,7 +61,7 @@ internal class FhirDataStore(context: Context) {
             throw exception
           }
         }
-        .map { preferences -> gson.deserialize(preferences[stringPreferencesKey(key)]) }
+        .map { preferences -> serializer.deserialize(preferences[stringPreferencesKey(key)]) }
     }
 
   /**
@@ -74,7 +74,7 @@ internal class FhirDataStore(context: Context) {
    */
   internal suspend fun updateSyncJobTerminalState(
     key: String,
-    syncJobStatus: SyncJobStatus? = null,
+    syncJobStatus: SyncJobStatus = SyncJobStatus.Unknown,
   ) {
     updateJobStatus(key, syncJobStatus)
   }
@@ -118,17 +118,14 @@ internal class FhirDataStore(context: Context) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
   }
 
-  private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus?) {
+  private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus) {
     dataStore.edit { preferences ->
-      preferences[stringPreferencesKey(key)] = gson.serialize(syncJobStatus)
+      preferences[stringPreferencesKey(key)] = serializer.serialize(syncJobStatus)
     }
   }
 
   companion object {
-    internal const val STATE_TYPE = "STATE_TYPE"
-    internal const val STATE = "STATE"
     private const val LAST_JOB_TERMINAL_STATE = "LAST_JOB_TERMINAL_STATE"
-
     private const val FHIR_PREFERENCES_NAME = "FHIR_ENGINE_PREF_DATASTORE"
     private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
   }

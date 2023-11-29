@@ -143,21 +143,24 @@ object Sync {
     id: UUID,
   ): Flow<PeriodicSyncState> {
     val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, id)
-    val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
+    val syncJobTerminalStateFlow: Flow<SyncJobStatus> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
     val syncJobFlow =
       combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) { inProgress, terminal,
         ->
-        terminal ?: inProgress
+        if (terminal == SyncJobStatus.Unknown) {
+          inProgress
+        } else {
+          terminal
+        }
       }
 
     return combine(workStateFlow, syncJobFlow) { workInfoState, syncJobIntermediateState ->
       val lastSyncJobStatus =
         FhirEngineProvider.getFhirDataStore(context).getLastSyncJobStatus(workName)
-      val currentJobState =
-        syncJobIntermediateState?.let { createCurrentJobState(it, workInfoState) }
+      val currentJobState = createCurrentJobState(syncJobIntermediateState, workInfoState)
       PeriodicSyncState(
-        lastJobState = lastSyncJobStatus?.let { mapSyncJobStatusToResult(it) },
+        lastJobState = mapSyncJobStatusToResult(lastSyncJobStatus),
         currentJobState = currentJobState,
       )
     }
@@ -180,15 +183,15 @@ object Sync {
     uuid: UUID,
   ): Flow<SyncState> {
     val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, uuid)
-    val syncJobTerminalStateFlow: Flow<SyncJobStatus?> =
+    val syncJobTerminalStateFlow: Flow<SyncJobStatus> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
 
     return combine(workStateFlow, syncJobProgressStateFlow, syncJobTerminalStateFlow) {
       workInfoState,
-      syncJobIntermediateState,
-      syncJobTerminalState,
+      currentSyncJobStatus,
+      terminalSyncJobStatus,
       ->
-      createSyncState(syncJobIntermediateState, workInfoState, syncJobTerminalState)
+      createSyncState(workInfoState, currentSyncJobStatus, terminalSyncJobStatus)
     }
   }
 
@@ -258,9 +261,9 @@ object Sync {
   }
 
   private fun createSyncState(
-    currentSyncJobStatus: SyncJobStatus,
     workInfoState: WorkInfo.State,
-    syncJobTerminalState: SyncJobStatus?,
+    currentSyncJobStatus: SyncJobStatus,
+    terminalSyncJobStatus: SyncJobStatus,
   ): SyncState {
     return when (workInfoState) {
       ENQUEUED -> {
@@ -270,10 +273,10 @@ object Sync {
         Running(currentSyncJobStatus)
       }
       SUCCEEDED -> {
-        Succeeded(syncJobTerminalState!!)
+        Succeeded(terminalSyncJobStatus)
       }
       FAILED -> {
-        Failed(syncJobTerminalState!!)
+        Failed(terminalSyncJobStatus)
       }
       CANCELLED -> {
         Cancelled
@@ -301,7 +304,7 @@ object Sync {
       is SyncJobStatus.Finished -> Result.Succeeded(lastSyncJobStatus.timestamp)
       is SyncJobStatus.Failed ->
         Result.Failed(lastSyncJobStatus.exceptions, lastSyncJobStatus.timestamp)
-      else -> null
+      else -> Result.Unknown
     }
 
   /**
@@ -329,8 +332,9 @@ object Sync {
           is SyncJobStatus.InProgress, -> Running(currentSyncJobStatus)
           is SyncJobStatus.Finished -> Succeeded(currentSyncJobStatus)
           is SyncJobStatus.Failed -> Failed(currentSyncJobStatus)
+          is SyncJobStatus.Unknown -> Unknown
         }
       }
-      else -> null
+      else -> Unknown
     }
 }

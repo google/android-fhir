@@ -80,16 +80,18 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         synchronizer.syncState.collect { syncJobStatus ->
           val uniqueWorkerName = inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY)!!
           when (syncJobStatus) {
+            is SyncJobStatus.Started,
+            is SyncJobStatus.InProgress,
+            is SyncJobStatus.Unknown, -> {
+              setProgress(buildWorkData(syncJobStatus))
+              // remove previous job terminal state.
+              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName)
+            }
             is SyncJobStatus.Finished,
             is SyncJobStatus.Failed, -> {
               fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName, syncJobStatus)
               fhirDataStore.updateLastSyncJobStatus(uniqueWorkerName, syncJobStatus)
               cancel()
-            }
-            else -> {
-              setProgress(buildWorkData(syncJobStatus))
-              // remove previous job terminal state.
-              fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName)
             }
           }
         }

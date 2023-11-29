@@ -22,8 +22,9 @@ import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
 
+/** Helper class for serializing and deserializing [SyncJobStatus] objects. */
 internal class SyncJobStatusSerializer {
-  private val gson =
+  private val serializer =
     GsonBuilder()
       .registerTypeAdapter(OffsetDateTime::class.java, OffsetDateTimeTypeAdapter().nullSafe())
       .setExclusionStrategies(FhirSyncWorker.StateExclusionStrategy())
@@ -42,18 +43,19 @@ internal class SyncJobStatusSerializer {
    * @return The deserialized [SyncJobStatus] object, or null if the deserialization fails or the
    *   data is not of an allowed class.
    */
-  fun deserialize(data: String?): SyncJobStatus? {
-    return gson.fromJson(data, Data::class.java)?.let {
-      val stateType = it.getString(FhirDataStore.STATE_TYPE)
-      val stateData = it.getString(FhirDataStore.STATE)
+  fun deserialize(data: String?): SyncJobStatus {
+    return serializer.fromJson(data, Data::class.java)?.let {
+      val stateType = it.getString(STATE_TYPE)
+      val stateData = it.getString(STATE)
       if (stateType?.isAllowedClass() == true) {
         stateData?.let { stateData ->
-          gson.fromJson(stateData, Class.forName(stateType)) as? SyncJobStatus
+          serializer.fromJson(stateData, Class.forName(stateType)) as? SyncJobStatus
         }
       } else {
-        null
+        SyncJobStatus.Unknown
       }
     }
+      ?: SyncJobStatus.Unknown
   }
 
   /**
@@ -66,14 +68,19 @@ internal class SyncJobStatusSerializer {
     val data =
       syncJobStatus?.let {
         workDataOf(
-          FhirDataStore.STATE_TYPE to it::class.java.name,
-          FhirDataStore.STATE to gson.toJson(it),
+          STATE_TYPE to it::class.java.name,
+          STATE to serializer.toJson(it),
         )
       }
-    return gson.toJson(data)
+    return serializer.toJson(data)
   }
 
   private fun String.isAllowedClass(): Boolean {
     return allowedSyncJobStatusPackages.any { this.startsWith(it) }
+  }
+
+  companion object {
+    internal const val STATE_TYPE = "STATE_TYPE"
+    internal const val STATE = "STATE"
   }
 }

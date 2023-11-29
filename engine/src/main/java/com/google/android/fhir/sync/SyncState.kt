@@ -58,8 +58,8 @@ sealed class SyncState {
  * @property currentJobState The current state of the synchronization job.
  */
 data class PeriodicSyncState(
-  val lastJobState: Result? = null,
-  val currentJobState: SyncState? = null,
+  val lastJobState: Result,
+  val currentJobState: SyncState,
 )
 
 /**
@@ -67,13 +67,13 @@ data class PeriodicSyncState(
  *
  * @property timestamp The timestamp when the synchronization result occurred.
  */
-sealed class Result(val timestamp: OffsetDateTime) {
+sealed class Result {
   /**
    * Represents a successful synchronization result.
    *
    * @property timestamp The timestamp when the synchronization succeeded.
    */
-  class Succeeded(timestamp: OffsetDateTime) : Result(timestamp)
+  class Succeeded(val timestamp: OffsetDateTime) : Result()
 
   /**
    * Represents a failed synchronization result.
@@ -81,6 +81,8 @@ sealed class Result(val timestamp: OffsetDateTime) {
    * @property exceptions The list of exceptions that occurred during the synchronization failure.
    * @property timestamp The timestamp when the synchronization failed.
    */
-  class Failed(val exceptions: List<ResourceSyncException>, timestamp: OffsetDateTime) :
-    Result(timestamp)
+  class Failed(val exceptions: List<ResourceSyncException>, val timestamp: OffsetDateTime) :
+    Result()
+
+  object Unknown : Result()
 }
