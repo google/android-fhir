@@ -87,14 +87,14 @@ class SHLinkGeneratorImplTest {
     mockWebServer.enqueue(postPayloadResponse)
   }
 
-  private fun assertCommonFunctionality(
+  private suspend fun assertCommonFunctionality(
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     optionalViewer: String,
     expectedExp: String? = null,
     expectedFlag: String? = null,
     expectedLabel: String? = null,
-  ) = runTest {
+  ) {
     val result =
       shLinkGeneratorImpl.generateSHLink(
         shLinkGenerationData,
@@ -143,7 +143,7 @@ class SHLinkGeneratorImplTest {
   }
 
   @Test
-  fun testGenerateSHLinkWithExp() =
+  fun testGenerateSHLinkWithExp() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
       "",
@@ -152,9 +152,10 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithoutExp() =
+  fun testGenerateSHLinkWithoutExp() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -163,9 +164,10 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithPasscode() =
+  fun testGenerateSHLinkWithPasscode() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "passcode",
@@ -174,9 +176,10 @@ class SHLinkGeneratorImplTest {
       "P",
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithoutPasscode() =
+  fun testGenerateSHLinkWithoutPasscode() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -185,9 +188,10 @@ class SHLinkGeneratorImplTest {
       "",
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithLabel() =
+  fun testGenerateSHLinkWithLabel() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("label", "", mockIPSDocument),
       "",
@@ -196,9 +200,10 @@ class SHLinkGeneratorImplTest {
       null,
       "label",
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithoutLabel() =
+  fun testGenerateSHLinkWithoutLabel() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -207,9 +212,10 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithOptionalViewer() =
+  fun testGenerateSHLinkWithOptionalViewer() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -218,9 +224,10 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithoutOptionalViewer() =
+  fun testGenerateSHLinkWithoutOptionalViewer() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -229,9 +236,10 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithAllFeatures() =
+  fun testGenerateSHLinkWithAllFeatures() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
       "passcode",
@@ -240,9 +248,10 @@ class SHLinkGeneratorImplTest {
       "P",
       "label",
     )
+  }
 
   @Test
-  fun testGenerateSHLinkWithNoFeatures() =
+  fun testGenerateSHLinkWithNoFeatures() = runTest {
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
       "",
@@ -251,4 +260,5 @@ class SHLinkGeneratorImplTest {
       null,
       null,
     )
+  }
 }
