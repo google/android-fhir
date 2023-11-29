@@ -102,9 +102,9 @@ internal class SHLinkGeneratorImpl(
         key,
         exp,
       )
-    val encodedPayload = base64UrlEncode(shLinkPayload)
     val data: String = parser.encodeResourceToString(shLinkGenerationData.ipsDoc.document)
     postPayload(data, manifestToken, key, managementToken)
+    val encodedPayload = base64UrlEncode(shLinkPayload)
     return "${optionalViewer}shlink:/$encodedPayload"
   }
 
@@ -152,22 +152,13 @@ internal class SHLinkGeneratorImpl(
     manifestToken: String,
     key: String,
     managementToken: String,
-  ): JSONObject {
+  ) {
     try {
       val contentEncrypted = encryptionUtility.encrypt(file, key)
       val authorization = "Bearer $managementToken"
       val response = apiService.postPayload(manifestToken, contentEncrypted, authorization)
-
-      return if (response.isSuccessful) {
-        val responseBody = response.body()?.string()
-        if (!responseBody.isNullOrEmpty()) {
-          JSONObject(responseBody)
-        } else {
-          JSONObject()
-        }
-      } else {
+      if (!response.isSuccessful) {
         Timber.e("HTTP Error: ${response.code()}")
-        JSONObject()
       }
     } catch (e: Exception) {
       Timber.e(TAG, "Error while posting payload: ${e.message}", e)
