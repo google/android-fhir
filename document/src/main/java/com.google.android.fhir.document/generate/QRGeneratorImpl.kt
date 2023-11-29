@@ -24,7 +24,7 @@ internal class QRGeneratorImpl(private val qrGeneratorUtils: QRGeneratorUtils) :
   /* Generate and display the SHL QR code */
   override fun generateAndSetQRCode(shLink: String, qrView: ImageView) {
     val qrCodeBitmap = generateQRCode(shLink)
-    updateImageViewOnMainThread(qrView, qrCodeBitmap)
+    qrView.setImageBitmap(qrCodeBitmap)
   }
 
   /* Generates the SHL QR code for the given payload */
@@ -34,8 +34,4 @@ internal class QRGeneratorImpl(private val qrGeneratorUtils: QRGeneratorUtils) :
     return qrGeneratorUtils.overlayLogoOnQRCode(qrCodeBitmap, logoBitmap)
   }
 
-  /* Set the image view to the QR code */
-  internal fun updateImageViewOnMainThread(qrView: ImageView, qrCodeBitmap: Bitmap) {
-    qrView.setImageBitmap(qrCodeBitmap)
-  }
 }

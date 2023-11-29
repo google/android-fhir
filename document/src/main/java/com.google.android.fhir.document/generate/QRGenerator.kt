@@ -18,6 +18,7 @@ package com.google.android.fhir.document.generate
 
 import android.widget.ImageView
 
+/* The QR Generator interface handles the generation of SHL QR codes */
 interface QRGenerator {
 
   /* Generate and display the SHL QR code */
