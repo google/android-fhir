@@ -8,9 +8,15 @@ android {
   compileSdk = Sdk.compileSdk
 
   defaultConfig {
-    minSdk = 26
+    minSdk = Sdk.minSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     consumerProguardFiles("consumer-rules.pro")
+  }
+
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
   }
 
   buildTypes {
@@ -37,6 +43,8 @@ dependencies {
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)

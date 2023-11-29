@@ -33,5 +33,4 @@ internal class QRGeneratorImpl(private val qrGeneratorUtils: QRGeneratorUtils) :
     val logoBitmap = qrGeneratorUtils.createLogoBitmap(qrCodeBitmap)
     return qrGeneratorUtils.overlayLogoOnQRCode(qrCodeBitmap, logoBitmap)
   }
-
 }
