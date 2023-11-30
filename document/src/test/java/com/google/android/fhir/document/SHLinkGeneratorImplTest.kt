@@ -21,6 +21,7 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.generate.EncryptionUtils
 import com.google.android.fhir.document.generate.SHLinkGenerationData
 import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
+import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -111,10 +112,11 @@ class SHLinkGeneratorImplTest {
     val parts = result.split("#shlink:/")
     assertTrue(parts.size == 2)
 
-    val base64EncodedSection = parts[1]
-    val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
-    val decodedString = String(decodedBytes, Charsets.UTF_8)
-    val decodedJSON = JSONObject(decodedString)
+    val decodedJSON =
+      with(parts[1]) {
+        val decodedString = String(Base64.decode(this, Base64.URL_SAFE), Charsets.UTF_8)
+        JSONObject(decodedString)
+      }
 
     expectedExp?.let {
       assertTrue(decodedJSON.has("exp"))
@@ -145,7 +147,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithExp() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
+      SHLinkGenerationData("", Instant.parse("2023-11-01T00:00:00.00Z"), mockIPSDocument),
       "",
       "",
       "1698796800",
@@ -157,7 +159,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithoutExp() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "",
       null,
@@ -169,7 +171,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithPasscode() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "passcode",
       "",
       null,
@@ -181,7 +183,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithoutPasscode() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "",
       null,
@@ -193,7 +195,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithLabel() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("label", "", mockIPSDocument),
+      SHLinkGenerationData("label", null, mockIPSDocument),
       "",
       "",
       null,
@@ -205,7 +207,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithoutLabel() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "",
       null,
@@ -217,7 +219,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithOptionalViewer() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "viewerUrl",
       null,
@@ -229,7 +231,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithoutOptionalViewer() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "",
       null,
@@ -241,7 +243,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithAllFeatures() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
+      SHLinkGenerationData("label", Instant.parse("2023-11-01T00:00:00.00Z"), mockIPSDocument),
       "passcode",
       "viewerUrl",
       "1698796800",
@@ -253,7 +255,7 @@ class SHLinkGeneratorImplTest {
   @Test
   fun testGenerateSHLinkWithNoFeatures() = runTest {
     assertCommonFunctionality(
-      SHLinkGenerationData("", "", mockIPSDocument),
+      SHLinkGenerationData("", null, mockIPSDocument),
       "",
       "",
       null,

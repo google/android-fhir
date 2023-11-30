@@ -21,8 +21,6 @@ import android.util.Base64
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.RetrofitSHLService
-import java.lang.Exception
-import java.text.SimpleDateFormat
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
@@ -87,12 +85,7 @@ internal class SHLinkGeneratorImpl(
     val manifestToken = initialPostResponse.getString("id")
     val manifestUrl = "$serverBaseUrl/api/shl/$manifestToken"
     val managementToken = initialPostResponse.getString("managementToken")
-    val exp =
-      if (shLinkGenerationData.expirationTime.isNotEmpty()) {
-        convertDateStringToEpochSeconds(shLinkGenerationData.expirationTime).toString()
-      } else {
-        ""
-      }
+    val exp = shLinkGenerationData.expirationTime?.epochSecond?.toString() ?: ""
     val key = encryptionUtility.generateRandomKey()
     val shLinkPayload =
       constructSHLinkPayload(
@@ -106,13 +99,6 @@ internal class SHLinkGeneratorImpl(
     postPayload(data, manifestToken, key, managementToken)
     val encodedPayload = base64UrlEncode(shLinkPayload)
     return "${optionalViewer}shlink:/$encodedPayload"
-  }
-
-  /* Converts the inputted expiry date to epoch seconds */
-  private fun convertDateStringToEpochSeconds(dateString: String): Long {
-    val format = SimpleDateFormat("yyyy-M-d")
-    val date = format.parse(dateString)
-    return date?.time?.div(1000) ?: 0L
   }
 
   /* Constructs the SHL payload */
