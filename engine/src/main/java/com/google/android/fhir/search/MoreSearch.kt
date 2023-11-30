@@ -293,6 +293,7 @@ internal fun Search.getQuery(
     filterArgs.addAll(it.args)
   }
   val whereArgs = mutableListOf<Any>()
+  val nestedArgs = mutableListOf<Any>()
   val query =
     when {
         isCount -> {
@@ -311,11 +312,12 @@ internal fun Search.getQuery(
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
+          nestedArgs.add(nestedContext.parentType.name)
           //  spotless:off
         """
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
@@ -342,7 +344,7 @@ internal fun Search.getQuery(
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
+  return SearchQuery(query, nestedArgs + sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
 private val Order?.sqlString: String
