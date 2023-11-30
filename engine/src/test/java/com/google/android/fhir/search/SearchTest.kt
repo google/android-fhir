@@ -1831,7 +1831,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1848,6 +1848,7 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
+          ResourceType.Patient.name,
           ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
@@ -1910,7 +1911,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1935,6 +1936,7 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.ADDRESS_COUNTRY.paramName,
           "IN",
+          ResourceType.Patient.name,
           ResourceType.Immunization.name,
           Immunization.PATIENT.paramName,
           ResourceType.Immunization.name,
@@ -1978,7 +1980,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1990,7 +1992,7 @@ class SearchTest {
         )  AND a.resourceUuid IN(
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -2008,12 +2010,14 @@ class SearchTest {
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
+          ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
           "44054006",
           "http://snomed.info/sct",
+          ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
