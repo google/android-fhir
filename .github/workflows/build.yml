@@ -75,8 +75,6 @@ jobs:
         run: ./gradlew check --scan --full-stacktrace
 
       - name: Package (build) APKs for Device UI Tests
-        # TODO(vorburger) Are both the Debug *AND* Release packages actually required for Device UI Tests?
-        # TODO(vorburger) Could building these be parallelized? Can Gradle do that, if invoked differently, or should we parallelize with Bash?
         run: ./gradlew packageDebugAndroidTest --scan --stacktrace && ./gradlew packageReleaseAndroidTest --scan --stacktrace
 
       - id: auth
@@ -87,9 +85,7 @@ jobs:
             credentials_json: '${{ secrets.GOOGLE_CREDENTIALS }}'
 
       - name: Run Device UI Tests on Firebase Test Lab with Flank
-        # TODO(vorburger) Run all modules (not just engine:), like in //kokoro/gcp_ubuntu/kokoro_build.sh
-        # TODO(vorburger) Parallelize and Bash `wait` as in kokoro_build.sh, or just run sequentially?!
-        run: ./gradlew :engine:runFlank --scan --stacktrace
+        run: ./.github/workflows/runFlank.sh
 
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
