@@ -81,11 +81,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           val uniqueWorkerName = inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY)
           when (syncJobStatus) {
             is SyncJobStatus.Started,
-            is SyncJobStatus.InProgress,
-            is SyncJobStatus.Unknown, -> {
+            is SyncJobStatus.InProgress, -> {
               setProgress(buildWorkData(syncJobStatus))
-              // remove previous job terminal state.
-              uniqueWorkerName?.let { fhirDataStore.updateSyncJobTerminalState(it) }
+              // As the currentJobStatus is in progress, update the terminal state to unknown.
+              uniqueWorkerName?.let { fhirDataStore.updateSyncJobTerminalState(it,SyncJobStatus.Unknown) }
             }
             is SyncJobStatus.Finished,
             is SyncJobStatus.Failed, -> {
@@ -99,6 +98,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
                 fhirDataStore.updateLastSyncJobStatus(uniqueWorkerName, syncJobStatus)
               }
               cancel()
+            }
+            is SyncJobStatus.Unknown, -> {
+              Timber.e("$syncJobStatus is received.")
             }
           }
         }
