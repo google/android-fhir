@@ -146,7 +146,9 @@ object Sync {
     val syncJobTerminalStateFlow: Flow<SyncJobStatus> =
       FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
     val syncJobFlow =
-      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) { inProgressStatus, terminalStatus,
+      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) {
+        inProgressStatus,
+        terminalStatus,
         ->
         if (terminalStatus == SyncJobStatus.Unknown) {
           inProgressStatus

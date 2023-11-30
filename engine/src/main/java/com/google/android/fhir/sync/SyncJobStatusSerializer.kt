@@ -65,8 +65,11 @@ internal class SyncJobStatusSerializer {
    * @return The JSON-formatted string representing the serialized [SyncJobStatus] object.
    */
   fun serialize(syncJobStatus: SyncJobStatus): String {
-    val data = workDataOf(STATE_TYPE to syncJobStatus::class.java.name,
-          STATE to serializer.toJson(syncJobStatus),)
+    val data =
+      workDataOf(
+        STATE_TYPE to syncJobStatus::class.java.name,
+        STATE to serializer.toJson(syncJobStatus),
+      )
     return serializer.toJson(data)
   }
 

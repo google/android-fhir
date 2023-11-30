@@ -84,7 +84,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
             is SyncJobStatus.InProgress, -> {
               setProgress(buildWorkData(syncJobStatus))
               // As the currentJobStatus is in progress, update the terminal state to unknown.
-              uniqueWorkerName?.let { fhirDataStore.updateSyncJobTerminalState(it,SyncJobStatus.Unknown) }
+              uniqueWorkerName?.let {
+                fhirDataStore.updateSyncJobTerminalState(it, SyncJobStatus.Unknown)
+              }
             }
             is SyncJobStatus.Finished,
             is SyncJobStatus.Failed, -> {
@@ -99,7 +101,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
               }
               cancel()
             }
-            is SyncJobStatus.Unknown, -> {
+            is SyncJobStatus.Unknown -> {
               Timber.e("$syncJobStatus is received.")
             }
           }
