@@ -77,8 +77,8 @@ internal class SyncJobStatusSerializer {
     return allowedSyncJobStatusPackages.any { this.startsWith(it) }
   }
 
-  companion object {
-    internal const val STATE_TYPE = "STATE_TYPE"
-    internal const val STATE = "STATE"
+  private companion object {
+    private const val STATE_TYPE = "STATE_TYPE"
+    private const val STATE = "STATE"
   }
 }
