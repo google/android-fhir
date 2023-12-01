@@ -28,7 +28,7 @@ import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -252,13 +252,11 @@ object ResourceMapper {
 
     questionnaireItem.initialExpression
       ?.let {
-        fhirPathEngine
-          .evaluate(
-            /* appContext= */ launchContexts,
-            /* focusResource= */ null,
-            /* rootResource= */ null,
-            /* base= */ null,
-            /* path= */ it.expression,
+        evaluateToBase(
+            null,
+            null,
+            it.expression,
+            launchContexts,
           )
           .firstOrNull()
       }

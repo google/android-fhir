@@ -20,12 +20,14 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.ExpressionNode
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
-internal val fhirPathEngine: FHIRPathEngine =
+private val fhirPathEngine: FHIRPathEngine =
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
     FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
       hostServices = FHIRPathEngineHostServices
@@ -37,6 +39,13 @@ internal val fhirPathEngine: FHIRPathEngine =
  */
 internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
   expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
+
+/** Evaluates the expression over resource [Resource] and returns string value */
+internal fun evaluateToString(
+  expression: ExpressionNode,
+  data: Resource?,
+  contextMap: Map<String, Base?>,
+) = fhirPathEngine.evaluateToString(contextMap, null, null, data, expression)
 
 /**
  * Evaluates the expression and returns the boolean result. The resources [QuestionnaireResponse]
@@ -59,4 +68,36 @@ internal fun evaluateToBoolean(
     questionnaireResponseItemComponent,
     expressionNode,
   )
+}
+
+internal fun evaluateToBase(
+  questionnaireResponse: QuestionnaireResponse?,
+  questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+  expression: String,
+  contextMap: Map<String, Base?> = mapOf(),
+): List<Base> {
+  return fhirPathEngine.evaluate(
+    contextMap,
+    questionnaireResponse,
+    null,
+    questionnaireResponseItem,
+    expression,
+  )
+}
+
+internal fun evaluateToBase(type: Type, expression: String): List<Base> {
+  return fhirPathEngine.evaluate(
+    type,
+    expression,
+  )
+}
+
+internal fun convertToBoolean(items: List<Base>) = fhirPathEngine.convertToBoolean(items)
+
+internal fun extractExpressionNode(fhirPath: String) = fhirPathEngine.parse(fhirPath)
+
+internal fun extractResourceType(expressionNode: ExpressionNode): String? {
+  // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
+  // expression vs an expression that is valid, but does not return one resource only.
+  return expressionNode.constant?.primitiveValue()?.substring(1) ?: expressionNode.name?.lowercase()
 }

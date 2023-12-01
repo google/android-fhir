@@ -80,6 +80,20 @@ internal class ExpressionEvaluator(
    */
   private val xFhirQueryEnhancementRegex = Regex("\\{\\{(.*?)\\}\\}")
 
+  /**
+   * Variable %questionnaire corresponds to the Questionnaire resource into
+   * QuestionnaireResponse.questionnaire element.
+   * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
+   */
+  private val questionnaireFhirpathSupplement = "questionnaire"
+
+  /**
+   * Variable %qitem refer to Questionnaire.item that corresponds to context
+   * QuestionnaireResponse.item. It is only valid for FHIRPath expressions defined within a
+   * Questionnaire item. https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
+   */
+  private val questionnaireItemFhirpathSupplement = "qItem"
+
   /** Detects if any item into list is referencing a dependent item in its calculated expression */
   internal fun detectExpressionCyclicDependency(items: List<QuestionnaireItemComponent>) {
     items
@@ -112,12 +126,11 @@ internal class ExpressionEvaluator(
     expression: Expression,
   ): List<Base> {
     val appContext = extractDependentVariables(expression, questionnaireItem)
-    return fhirPathEngine.evaluate(
-      appContext,
+    return evaluateToBase(
       questionnaireResponse,
-      null,
       questionnaireResponseItem,
       expression.expression,
+      appContext,
     )
   }
 
@@ -217,7 +230,10 @@ internal class ExpressionEvaluator(
         )
       }
     }
-    return variablesMap
+    return variablesMap.apply {
+      put(questionnaireFhirpathSupplement, questionnaire)
+      put(questionnaireItemFhirpathSupplement, questionnaireItem)
+    }
   }
 
   /**
@@ -275,7 +291,9 @@ internal class ExpressionEvaluator(
 
     val fhirPathsEvaluatedPairs =
       questionnaireLaunchContextMap
+        ?.toMutableMap()
         .takeIf { !it.isNullOrEmpty() }
+        ?.also { it.put(questionnaireFhirpathSupplement, questionnaire) }
         ?.let { evaluateXFhirEnhancement(expression, it) }
         ?: emptySequence()
 
@@ -304,19 +322,12 @@ internal class ExpressionEvaluator(
       .findAll(expression.expression)
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
-        // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
-        // expression vs an expression that is valid, but does not return one resource only.
-        val expressionNode = fhirPathEngine.parse(fhirPath)
-        val resourceType =
-          expressionNode.constant?.primitiveValue()?.substring(1)
-            ?: expressionNode.name?.lowercase()
+        val expressionNode = extractExpressionNode(fhirPath)
         val evaluatedResult =
-          fhirPathEngine.evaluateToString(
-            launchContextMap,
-            null,
-            null,
-            launchContextMap[resourceType],
+          evaluateToString(
             expressionNode,
+            launchContextMap[extractResourceType(expressionNode)],
+            launchContextMap,
           )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
@@ -425,13 +436,11 @@ internal class ExpressionEvaluator(
         "Unsupported expression language, language should be text/fhirpath"
       }
 
-      fhirPathEngine
-        .evaluate(
-          /* appContext= */ dependentVariables,
-          /* focusResource= */ questionnaireResponse,
-          /* rootResource= */ null,
-          /* base= */ null,
-          /* path= */ expression.expression,
+      evaluateToBase(
+          questionnaireResponse,
+          null,
+          expression.expression,
+          dependentVariables,
         )
         .firstOrNull()
     } catch (exception: FHIRException) {
