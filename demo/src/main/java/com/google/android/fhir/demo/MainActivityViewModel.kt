@@ -27,48 +27,45 @@ import com.google.android.fhir.demo.data.DemoFhirSyncWorker
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
-import com.google.android.fhir.sync.SyncJobStatus
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
-@OptIn(InternalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
 
-  private val _pollState = MutableSharedFlow<SyncJobStatus>()
-  val pollState: Flow<SyncJobStatus>
-    get() = _pollState
+  private val _oneTimeSyncTrigger = MutableStateFlow(false)
 
-  init {
-    viewModelScope.launch {
-      Sync.periodicSync<DemoFhirSyncWorker>(
-          application.applicationContext,
-          periodicSyncConfiguration =
-            PeriodicSyncConfiguration(
-              syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
-            ),
-        )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
-  }
+  val pollState =
+    Sync.periodicSync<DemoFhirSyncWorker>(
+        context = application.applicationContext,
+        periodicSyncConfiguration =
+          PeriodicSyncConfiguration(
+            syncConstraints = Constraints.Builder().build(),
+            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+          ),
+      )
+      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
+
+  val oneTimeSyncState =
+    _oneTimeSyncTrigger
+      .combine(
+        flow = Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext),
+      ) { _, syncJobStatus ->
+        syncJobStatus
+      }
+      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
 
   fun triggerOneTimeSync() {
-    viewModelScope.launch {
-      Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
+    _oneTimeSyncTrigger.value = !_oneTimeSyncTrigger.value
   }
 
   /** Emits last sync time. */

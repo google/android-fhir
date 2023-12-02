@@ -37,16 +37,15 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
@@ -151,37 +150,39 @@ class PatientListFragment : Fragment() {
     setHasOptionsMenu(true)
     (activity as MainActivity).setDrawerEnabled(true)
 
-    lifecycleScope.launch {
-      mainActivityViewModel.pollState.collect {
-        Timber.d("onViewCreated: pollState Got status $it")
-        when (it) {
-          is SyncJobStatus.Started -> {
-            Timber.i("Sync: ${it::class.java.simpleName}")
-            fadeInTopBanner(it)
-          }
-          is SyncJobStatus.InProgress -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
-            fadeInTopBanner(it)
-          }
-          is SyncJobStatus.Finished -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
-            fadeOutTopBanner(it)
-          }
-          is SyncJobStatus.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
-            fadeOutTopBanner(it)
-          }
-          else -> {
-            Timber.i("Sync: Unknown state.")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
-            fadeOutTopBanner(it)
-          }
-        }
+    launchAndRepeatStarted(
+      { mainActivityViewModel.pollState.collect(::syncJobStatus) },
+      { mainActivityViewModel.oneTimeSyncState.collect(::syncJobStatus) },
+    )
+  }
+
+  private fun syncJobStatus(it: SyncJobStatus) {
+    when (it) {
+      is SyncJobStatus.Started -> {
+        Timber.i("Sync: ${it::class.java.simpleName}")
+        fadeInTopBanner(it)
+      }
+      is SyncJobStatus.InProgress -> {
+        Timber.i("Sync: ${it::class.java.simpleName} with data $it")
+        fadeInTopBanner(it)
+      }
+      is SyncJobStatus.Finished -> {
+        Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp()
+        fadeOutTopBanner(it)
+      }
+      is SyncJobStatus.Failed -> {
+        Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp()
+        fadeOutTopBanner(it)
+      }
+      else -> {
+        Timber.i("Sync: Unknown state.")
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp()
+        fadeOutTopBanner(it)
       }
     }
   }
