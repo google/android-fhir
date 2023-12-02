@@ -215,7 +215,7 @@ internal class ExpressionEvaluator(
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
    *   defined
    */
-  internal fun extractDependentVariables(
+  private fun extractDependentVariables(
     expression: Expression,
     questionnaireItem: QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),

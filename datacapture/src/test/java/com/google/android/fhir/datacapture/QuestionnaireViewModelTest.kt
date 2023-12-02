@@ -81,6 +81,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
@@ -4727,6 +4728,59 @@ class QuestionnaireViewModelTest {
             .single { it.questionnaireItem.linkId == "b" }
         assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
           .containsExactly("Code 1-b", "Code 2-b")
+      }
+    }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement questionnaire and qItem`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          this.identifier = listOf(Identifier().apply { value = "A" })
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two")),
+                )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Q2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression =
+                        "%questionnaire.item[0].initial.value.select('Code ' + code + '-' + %qItem.text)"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    },
+                  ),
+                )
+            },
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Code 1-Q2", "Code 2-Q2")
       }
     }
 

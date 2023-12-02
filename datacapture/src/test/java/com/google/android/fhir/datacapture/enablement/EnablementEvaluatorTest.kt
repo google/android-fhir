@@ -348,6 +348,75 @@ class EnablementEvaluatorTest {
     }
 
   @Test
+  fun `evaluate() should evaluate enableWhenExpression with questionnaire and qItem fhirpath supplement literal`() =
+    runBlocking {
+      @Language("JSON")
+      val questionnaireJson =
+        """
+    {
+      "resourceType": "Questionnaire",
+      "subjectType": "Practitioner",
+          "item": [
+            {
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+                  "valueExpression": {
+                    "language": "text/fhirpath",
+                    "expression": "%questionnaire.subjectType='Practitioner' and %qItem.text = 'Contribution'"
+                  }
+                }
+              ],
+              "linkId" : "contribution",
+              "text": "Contribution",
+              "type": "choice",
+              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
+            }
+          ]
+    }
+                """
+          .trimIndent()
+
+      @Language("JSON")
+      val questionnaireResponseJson =
+        """
+    {
+      "resourceType": "QuestionnaireResponse",
+      "item": [
+        {
+          "linkId": "contribution",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "yes",
+                "display": "Yes"
+              }
+            }
+          ]
+        }
+      ]
+    }
+                """
+          .trimIndent()
+
+      val questionnaire =
+        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+      val questionnaireResponse =
+        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+          as QuestionnaireResponse
+
+      assertThat(
+          EnablementEvaluator(questionnaire, questionnaireResponse)
+            .evaluate(
+              questionnaire.item[0],
+              questionnaireResponse.item[0],
+            ),
+        )
+        .isTrue()
+    }
+
+  @Test
   fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
     assertEnableWhen(
         behavior = null,
