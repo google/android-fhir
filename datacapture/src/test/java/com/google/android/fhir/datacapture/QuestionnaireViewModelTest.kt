@@ -3990,12 +3990,13 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
     val viewModel = QuestionnaireViewModel(context, state)
     viewModel.clearAllAnswers()
-    val value = viewModel.getQuestionnaireResponse()
-    val expectedResponse =
-      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
-        as QuestionnaireResponse
-
-    assertResourceEquals(value, expectedResponse)
+    runTest {
+      val value = viewModel.getQuestionnaireResponse()
+      val expectedResponse =
+        printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+          as QuestionnaireResponse
+      assertResourceEquals(value, expectedResponse)
+    }
   }
 
   // ==================================================================== //
