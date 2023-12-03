@@ -291,20 +291,6 @@ internal class ExpressionEvaluator(
   }
 
   /**
-   * Check if the X-FHIR-Query expression has any missing param value, to prevent the resolver to
-   * get all resources when no param value is passed. For example: Patient?name=&address=
-   *
-   * TODO: add support for the _total common parameter, so user can limit the total resource that
-   *   the query returns.
-   */
-  private fun hasMissingParamValue(xFhirExpressionString: String): Boolean {
-    return xFhirExpressionString.split("&").any {
-      val valueOfParam = it.substringAfter("=")
-      valueOfParam.isEmpty()
-    }
-  }
-
-  /**
    * Evaluates an x-fhir-query that contains fhir-paths, returning a sequence of pairs. The first
    * element in the pair is the FhirPath expression surrounded by curly brackets {{ fhir.path }},
    * and the second element is the evaluated string result from evaluating the resource passed in.
@@ -449,12 +435,8 @@ internal class ExpressionEvaluator(
 
         Bundle().apply {
           entry =
-            if (hasMissingParamValue(xFhirExpressionString)) {
-              listOf()
-            } else {
-              xFhirQueryResolver.resolve(xFhirExpressionString).map {
-                BundleEntryComponent().apply { resource = it }
-              }
+            xFhirQueryResolver.resolve(xFhirExpressionString).map {
+              BundleEntryComponent().apply { resource = it }
             }
         }
       } else if (expression.isFhirPath) {
