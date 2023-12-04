@@ -30,6 +30,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
@@ -479,6 +480,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  @SdkSuppress(minSdkVersion = 33)
   fun clearAllAnswers_shouldClearDraftAnswer() {
     val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
     // Add month and day. No need to add slashes as they are added automatically
