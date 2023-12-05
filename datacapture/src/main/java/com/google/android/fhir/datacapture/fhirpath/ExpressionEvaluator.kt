@@ -85,7 +85,7 @@ internal class ExpressionEvaluator(
    * QuestionnaireResponse.questionnaire element.
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
    */
-  private val questionnaireFhirpathSupplement = "questionnaire"
+  private val questionnaireFhirPathSupplement = "questionnaire"
 
   /**
    * Variable %qitem refer to Questionnaire.item that corresponds to context
