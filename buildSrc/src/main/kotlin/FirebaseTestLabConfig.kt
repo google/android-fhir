@@ -87,7 +87,7 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
   maxTestShards.set(10)
   testTimeout.set("45m")
   directoriesToPull.set(listOf("/sdcard/Download"))
-  resultsBucket.set("android-fhir-firebase-test-logs")
+  resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(
     if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
       "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
