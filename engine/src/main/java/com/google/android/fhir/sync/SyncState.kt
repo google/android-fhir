@@ -46,9 +46,6 @@ sealed class SyncState {
 
   /** State indicating that the synchronization operation is canceled. */
   object Cancelled : SyncState()
-
-  /** State indicating that the synchronization operation is in an unknown state. */
-  object Unknown : SyncState()
 }
 
 /**
@@ -58,7 +55,7 @@ sealed class SyncState {
  * @property currentJobState The current state of the synchronization job.
  */
 data class PeriodicSyncState(
-  val lastJobState: Result,
+  val lastJobState: Result?,
   val currentJobState: SyncState,
 )
 
@@ -83,6 +80,4 @@ sealed class Result {
    */
   class Failed(val exceptions: List<ResourceSyncException>, val timestamp: OffsetDateTime) :
     Result()
-
-  object Unknown : Result()
 }

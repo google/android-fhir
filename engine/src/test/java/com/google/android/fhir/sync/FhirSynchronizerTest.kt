@@ -84,11 +84,11 @@ class FhirSynchronizerTest {
 
       assertThat(emittedValues)
         .containsExactly(
-          SyncJobStatus.Started,
+          SyncJobStatus.Started(),
           SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-          SyncJobStatus.Finished,
+          SyncJobStatus.Finished(),
         )
 
       assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
@@ -114,7 +114,7 @@ class FhirSynchronizerTest {
 
       assertThat(emittedValues)
         .containsExactly(
-          SyncJobStatus.Started,
+          SyncJobStatus.Started(),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
           SyncJobStatus.Failed(exceptions = listOf(error)),
@@ -139,7 +139,7 @@ class FhirSynchronizerTest {
 
       assertThat(emittedValues)
         .containsExactly(
-          SyncJobStatus.Started,
+          SyncJobStatus.Started(),
           SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
           SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
           SyncJobStatus.Failed(exceptions = listOf(error)),

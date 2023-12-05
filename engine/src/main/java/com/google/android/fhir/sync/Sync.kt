@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -26,7 +27,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
@@ -38,11 +38,9 @@ import com.google.android.fhir.sync.SyncState.Enqueued
 import com.google.android.fhir.sync.SyncState.Failed
 import com.google.android.fhir.sync.SyncState.Running
 import com.google.android.fhir.sync.SyncState.Succeeded
-import com.google.android.fhir.sync.SyncState.Unknown
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
-import java.util.UUID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -79,7 +77,7 @@ object Sync {
         ExistingWorkPolicy.KEEP,
         oneTimeWorkRequest,
       )
-    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow, oneTimeWorkRequest.id)
+    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow)
   }
 
   /**
@@ -107,7 +105,7 @@ object Sync {
         ExistingPeriodicWorkPolicy.KEEP,
         periodicWorkRequest,
       )
-    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow, periodicWorkRequest.id)
+    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
@@ -117,13 +115,14 @@ object Sync {
       .asFlow()
       .flatMapConcat { it.asFlow() }
       .mapNotNull { workInfo ->
-        workInfo.progress
-          .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
-          ?.let {
-            val state = it.getString("StateType")!!
-            val stateData = it.getString("State")
-            gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
-          }
+        workInfo.state to
+          workInfo.progress
+            .takeIf { it.keyValueMap.isNotEmpty() && it.hasKeyWithValueOfType<String>("StateType") }
+            ?.let {
+              val state = it.getString("StateType")!!
+              val stateData = it.getString("State")
+              gson.fromJson(stateData, Class.forName(state)) as SyncJobStatus
+            }
       }
 
   /**
@@ -139,31 +138,23 @@ object Sync {
   internal fun combineSyncStateForPeriodicSync(
     context: Context,
     workName: String,
-    syncJobProgressStateFlow: Flow<SyncJobStatus>,
-    id: UUID,
+    workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
   ): Flow<PeriodicSyncState> {
-    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, id)
-    val syncJobTerminalStateFlow: Flow<SyncJobStatus> =
-      FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
-    val syncJobFlow =
-      combine(syncJobProgressStateFlow, syncJobTerminalStateFlow) {
-        inProgressStatus,
-        terminalStatus,
-        ->
-        if (terminalStatus == SyncJobStatus.Unknown) {
-          inProgressStatus
-        } else {
-          terminalStatus
-        }
-      }
+    val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
+      FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
 
-    return combine(workStateFlow, syncJobFlow) { workInfoState, syncJobStatus ->
-      val lastSyncJobStatus =
-        FhirEngineProvider.getFhirDataStore(context).getLastSyncJobStatus(workName)
-      val currentJobState = createCurrentJobState(syncJobStatus, workInfoState)
+    return combine(workerInfoSyncJobStatusPairFromWorkManagerFlow, syncJobStatusInDataStoreFlow) {
+      workerInfoSyncJobStatusPairFromWorkManager,
+      syncJobStatusFromDataStore,
+      ->
       PeriodicSyncState(
-        lastJobState = mapSyncJobStatusToResult(lastSyncJobStatus),
-        currentJobState = currentJobState,
+        lastJobState = mapSyncJobStatusToResult(syncJobStatusFromDataStore),
+        currentJobState =
+          createSyncState(
+            workerInfoSyncJobStatusPairFromWorkManager.first,
+            workerInfoSyncJobStatusPairFromWorkManager.second,
+            syncJobStatusFromDataStore,
+          ),
       )
     }
   }
@@ -181,26 +172,20 @@ object Sync {
   internal fun combineSyncStateForOneTimeSync(
     context: Context,
     workName: String,
-    syncJobProgressStateFlow: Flow<SyncJobStatus>,
-    uuid: UUID,
+    workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
   ): Flow<SyncState> {
-    val workStateFlow: Flow<WorkInfo.State> = observeWorkState(context, uuid)
-    val syncJobTerminalStateFlow: Flow<SyncJobStatus> =
-      FhirEngineProvider.getFhirDataStore(context).observeSyncJobTerminalState(workName)
+    val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
+      FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
 
-    return combine(workStateFlow, syncJobProgressStateFlow, syncJobTerminalStateFlow) {
-      workInfoState,
-      currentSyncJobStatus,
-      terminalSyncJobStatus,
+    return combine(workerInfoSyncJobStatusPairFromWorkManagerFlow, syncJobStatusInDataStoreFlow) {
+      workerInfoSyncJobStatusPairFromWorkManager,
+      syncJobStatusFromDataStore,
       ->
-      createSyncState(workInfoState, currentSyncJobStatus, terminalSyncJobStatus)
-    }
-  }
-
-  private fun observeWorkState(context: Context, uuid: UUID): Flow<WorkInfo.State> {
-    return WorkManager.getInstance(context).getWorkInfoByIdLiveData(uuid).asFlow().mapNotNull {
-      workInfo ->
-      workInfo.state
+      createSyncState(
+        workerInfoSyncJobStatusPairFromWorkManager.first,
+        workerInfoSyncJobStatusPairFromWorkManager.second,
+        syncJobStatusFromDataStore,
+      )
     }
   }
 
@@ -264,27 +249,26 @@ object Sync {
 
   private fun createSyncState(
     workInfoState: WorkInfo.State,
-    currentSyncJobStatus: SyncJobStatus,
-    terminalSyncJobStatus: SyncJobStatus,
+    syncJobStatusFromWorkManager: SyncJobStatus?,
+    syncJobStatusFromDataStore: SyncJobStatus?,
   ): SyncState {
-    return when (workInfoState) {
-      ENQUEUED -> {
-        Enqueued
-      }
-      RUNNING -> {
-        Running(currentSyncJobStatus)
-      }
-      SUCCEEDED -> {
-        Succeeded(terminalSyncJobStatus)
-      }
-      FAILED -> {
-        Failed(terminalSyncJobStatus)
-      }
-      CANCELLED -> {
-        Cancelled
-      }
-      else -> {
-        Unknown
+    Log.d(
+      "PeriodicSync",
+      "$workInfoState, $syncJobStatusFromWorkManager,$syncJobStatusFromDataStore",
+    )
+    return when (syncJobStatusFromWorkManager) {
+      is SyncJobStatus.Started,
+      is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
+      is SyncJobStatus.Finished -> Succeeded(syncJobStatusFromDataStore!!)
+      is SyncJobStatus.Failed -> Failed(syncJobStatusFromDataStore!!)
+      null -> {
+        when (workInfoState) {
+          RUNNING -> Running(SyncJobStatus.Started())
+          ENQUEUED -> Enqueued
+          CANCELLED -> Cancelled
+          SUCCEEDED -> Succeeded(SyncJobStatus.Finished())
+          else -> error("Error message here")
+        }
       }
     }
   }
@@ -300,43 +284,13 @@ object Sync {
    * - `null` if the last job status is neither Finished nor Failed.
    */
   private fun mapSyncJobStatusToResult(
-    lastSyncJobStatus: SyncJobStatus,
+    lastSyncJobStatus: SyncJobStatus?,
   ) =
-    when (lastSyncJobStatus) {
-      is SyncJobStatus.Finished -> Result.Succeeded(lastSyncJobStatus.timestamp)
-      is SyncJobStatus.Failed ->
-        Result.Failed(lastSyncJobStatus.exceptions, lastSyncJobStatus.timestamp)
-      else -> Result.Unknown
-    }
-
-  /**
-   * Creates the current job state based on the provided [currentSyncJobStatus] and
-   * [schedulingStatus].
-   *
-   * @param currentSyncJobStatus The current synchronization job status.
-   * @param schedulingStatus The scheduling status represented by [WorkInfo.State].
-   * @return The current job state based on the given parameters:
-   * - [Enqueued] if the job is in the enqueued state.
-   * - [Running] if the job is currently running.
-   * - [Succeeded] if the job has finished successfully.
-   * - [Failed] if the job has encountered a failure.
-   * - `null` if the scheduling status is neither enqueued nor running.
-   */
-  private fun createCurrentJobState(
-    currentSyncJobStatus: SyncJobStatus,
-    schedulingStatus: WorkInfo.State,
-  ) =
-    when (schedulingStatus) {
-      WorkInfo.State.ENQUEUED -> Enqueued
-      WorkInfo.State.RUNNING -> {
-        when (currentSyncJobStatus) {
-          is SyncJobStatus.Started,
-          is SyncJobStatus.InProgress, -> Running(currentSyncJobStatus)
-          is SyncJobStatus.Finished -> Succeeded(currentSyncJobStatus)
-          is SyncJobStatus.Failed -> Failed(currentSyncJobStatus)
-          is SyncJobStatus.Unknown -> Unknown
-        }
+    lastSyncJobStatus?.let {
+      when (it) {
+        is SyncJobStatus.Finished -> Result.Succeeded(it.timestamp)
+        is SyncJobStatus.Failed -> Result.Failed(it.exceptions, lastSyncJobStatus.timestamp)
+        else -> error("Can't have")
       }
-      else -> Unknown
     }
 }

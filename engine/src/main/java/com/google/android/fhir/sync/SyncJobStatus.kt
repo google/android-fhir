@@ -22,7 +22,7 @@ sealed class SyncJobStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
   /** Sync job has been started on the client but the syncing is not necessarily in progress. */
-  object Started : SyncJobStatus()
+  class Started : SyncJobStatus()
 
   /** Syncing in progress with the server. */
   data class InProgress(
@@ -32,11 +32,8 @@ sealed class SyncJobStatus {
   ) : SyncJobStatus()
 
   /** Sync job finished successfully. */
-  object Finished : SyncJobStatus()
+  class Finished : SyncJobStatus()
 
   /** Sync job failed. */
   data class Failed(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
-
-  /** Sync job state if state is not [Started] [InProgress] [Finished] [Failed] */
-  object Unknown : SyncJobStatus()
 }

@@ -62,7 +62,7 @@ internal class FhirSynchronizer(
 
     val state =
       when (result) {
-        is SyncResult.Success -> SyncJobStatus.Finished
+        is SyncResult.Success -> SyncJobStatus.Finished()
         is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
       }
 
@@ -71,7 +71,7 @@ internal class FhirSynchronizer(
   }
 
   suspend fun synchronize(): SyncJobStatus {
-    setSyncState(SyncJobStatus.Started)
+    setSyncState(SyncJobStatus.Started())
 
     return listOf(download(), upload())
       .filterIsInstance<SyncResult.Error>()

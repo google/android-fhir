@@ -43,7 +43,7 @@ internal class SyncJobStatusSerializer {
    * @return The deserialized [SyncJobStatus] object, or null if the deserialization fails or the
    *   data is not of an allowed class.
    */
-  fun deserialize(data: String?): SyncJobStatus {
+  fun deserialize(data: String?): SyncJobStatus? {
     return serializer.fromJson(data, Data::class.java)?.let {
       val stateType = it.getString(STATE_TYPE)
       val stateData = it.getString(STATE)
@@ -52,10 +52,9 @@ internal class SyncJobStatusSerializer {
           serializer.fromJson(stateData, Class.forName(stateType)) as? SyncJobStatus
         }
       } else {
-        SyncJobStatus.Unknown
+        error("Not allowed")
       }
     }
-      ?: SyncJobStatus.Unknown
   }
 
   /**

@@ -38,7 +38,7 @@ internal class FhirDataStore(context: Context) {
     )
   private val dataStore = context.dataStore
   private val serializer = SyncJobStatusSerializer()
-  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus>>()
+  private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
   private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 
   /**
@@ -49,7 +49,7 @@ internal class FhirDataStore(context: Context) {
    *   the state is not allowed.
    */
   @PublishedApi
-  internal fun observeSyncJobTerminalState(key: String): Flow<SyncJobStatus> =
+  internal fun observeTerminalSyncJobStatus(key: String): Flow<SyncJobStatus?> =
     syncJobStatusFlowMap.getOrPut(key) {
       dataStore.data
         .catch { exception ->
@@ -72,42 +72,24 @@ internal class FhirDataStore(context: Context) {
    * @param syncJobStatus The synchronization job status to be stored.
    * @param key The key associated with the data to edit.
    */
-  internal suspend fun updateSyncJobTerminalState(
+  internal suspend fun writeTerminalSyncJobStatus(
     key: String,
-    syncJobStatus: SyncJobStatus = SyncJobStatus.Unknown,
+    syncJobStatus: SyncJobStatus,
   ) {
-    updateJobStatus(key, syncJobStatus)
-  }
-
-  /**
-   * Updates the last sync job status for the specified key.
-   *
-   * @param key The key associated with the sync job status.
-   * @param syncJobStatus The sync job status to be updated.
-   * @throws IllegalArgumentException if the provided syncJobStatus is an intermediate state.
-   */
-  internal suspend fun updateLastSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
     when (syncJobStatus) {
       is SyncJobStatus.Finished,
       is SyncJobStatus.Failed, -> {
-        updateJobStatus(key + LAST_JOB_TERMINAL_STATE, syncJobStatus)
+        writeSyncJobStatus(key, syncJobStatus)
       }
-      else -> {
-        throw IllegalArgumentException(
-          "Intermediate state $syncJobStatus is not supported.",
-        )
-      }
+      else -> error("Do not write non-terminal state")
     }
   }
 
-  /**
-   * Retrieves the last sync job status for the specified key.
-   *
-   * @param key The key associated with the sync job status.
-   * @return The last sync job status.
-   */
-  internal suspend fun getLastSyncJobStatus(key: String) =
-    observeSyncJobTerminalState(key + LAST_JOB_TERMINAL_STATE).first()
+  private suspend fun writeSyncJobStatus(key: String, syncJobStatus: SyncJobStatus) {
+    dataStore.edit { preferences ->
+      preferences[stringPreferencesKey(key)] = serializer.serialize(syncJobStatus)
+    }
+  }
 
   internal fun readLastSyncTimestamp(): OffsetDateTime? {
     val millis = runBlocking { dataStore.data.first()[lastSyncTimestampKey] } ?: return null
@@ -118,14 +100,7 @@ internal class FhirDataStore(context: Context) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
   }
 
-  private suspend fun updateJobStatus(key: String, syncJobStatus: SyncJobStatus) {
-    dataStore.edit { preferences ->
-      preferences[stringPreferencesKey(key)] = serializer.serialize(syncJobStatus)
-    }
-  }
-
   companion object {
-    private const val LAST_JOB_TERMINAL_STATE = "LAST_JOB_TERMINAL_STATE"
     private const val FHIR_PREFERENCES_NAME = "FHIR_ENGINE_PREF_DATASTORE"
     private const val LAST_SYNC_TIMESTAMP = "LAST_SYNC_TIMESTAMP"
   }

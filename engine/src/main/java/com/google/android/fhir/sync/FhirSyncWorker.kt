@@ -80,30 +80,17 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         synchronizer.syncState.collect { syncJobStatus ->
           val uniqueWorkerName = inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY)
           when (syncJobStatus) {
-            is SyncJobStatus.Started,
-            is SyncJobStatus.InProgress, -> {
-              setProgress(buildWorkData(syncJobStatus))
-              // As the currentJobStatus is in progress, update the terminal state to unknown.
-              uniqueWorkerName?.let {
-                fhirDataStore.updateSyncJobTerminalState(it, SyncJobStatus.Unknown)
-              }
-            }
             is SyncJobStatus.Finished,
             is SyncJobStatus.Failed, -> {
               // While creating periodicSync request if
               // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
               // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
-              if (uniqueWorkerName == null) {
-                setProgress(buildWorkData(syncJobStatus))
-              } else {
-                fhirDataStore.updateSyncJobTerminalState(uniqueWorkerName, syncJobStatus)
-                fhirDataStore.updateLastSyncJobStatus(uniqueWorkerName, syncJobStatus)
+              if (uniqueWorkerName != null) {
+                fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, syncJobStatus)
               }
               cancel()
             }
-            is SyncJobStatus.Unknown -> {
-              Timber.e("$syncJobStatus is received.")
-            }
+            else -> setProgress(buildWorkData(syncJobStatus))
           }
         }
       }
