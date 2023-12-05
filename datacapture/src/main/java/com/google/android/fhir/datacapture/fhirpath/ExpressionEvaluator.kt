@@ -92,7 +92,7 @@ internal class ExpressionEvaluator(
    * QuestionnaireResponse.item. It is only valid for FHIRPath expressions defined within a
    * Questionnaire item. https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
    */
-  private val questionnaireItemFhirpathSupplement = "qItem"
+  private val questionnaireItemFhirPathSupplement = "qItem"
 
   /** Detects if any item into list is referencing a dependent item in its calculated expression */
   internal fun detectExpressionCyclicDependency(items: List<QuestionnaireItemComponent>) {
