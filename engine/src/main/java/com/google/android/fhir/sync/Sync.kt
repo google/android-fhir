@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync
 
 import android.content.Context
-import android.util.Log
 import androidx.lifecycle.asFlow
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -27,6 +26,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
+import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.RUNNING
 import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
@@ -251,27 +251,38 @@ object Sync {
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
     syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState {
-    Log.d(
-      "PeriodicSync",
-      "$workInfoState, $syncJobStatusFromWorkManager,$syncJobStatusFromDataStore",
-    )
-    return when (syncJobStatusFromWorkManager) {
+  ): SyncState =
+    when (syncJobStatusFromWorkManager) {
       is SyncJobStatus.Started,
       is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
-      is SyncJobStatus.Finished -> Succeeded(syncJobStatusFromDataStore!!)
-      is SyncJobStatus.Failed -> Failed(syncJobStatusFromDataStore!!)
       null -> {
         when (workInfoState) {
           RUNNING -> Running(SyncJobStatus.Started())
           ENQUEUED -> Enqueued
           CANCELLED -> Cancelled
-          SUCCEEDED -> Succeeded(SyncJobStatus.Finished())
+          SUCCEEDED -> {
+            syncJobStatusFromDataStore?.let {
+              return when (it) {
+                is SyncJobStatus.Finished -> Succeeded(it)
+                else -> error("Error message here")
+              }
+            }
+            Succeeded(SyncJobStatus.Finished())
+          }
+          FAILED -> {
+            syncJobStatusFromDataStore?.let {
+              return when (it) {
+                is SyncJobStatus.Failed -> Failed(it)
+                else -> error("Error message here")
+              }
+            }
+            error("Error message here")
+          }
           else -> error("Error message here")
         }
       }
+      else -> error("Error message here")
     }
-  }
 
   /**
    * Maps the [lastSyncJobStatus] to a specific [Result] based on the provided status.
