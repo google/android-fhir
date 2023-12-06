@@ -1,0 +1,11 @@
+# see https://docs.gradle.org/current/userguide/platforms.html
+
+[versions]
+glide = "4.16.0"
+
+[libraries]
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
+
+[bundles]
+
+[plugins]

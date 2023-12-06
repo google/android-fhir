@@ -18,7 +18,6 @@ package com.google.android.fhir.codelabs.engine
 
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.SearchResult
 import com.google.android.fhir.codelabs.engine.databinding.PatientListItemViewBinding
 import org.hl7.fhir.r4.model.Patient
 
@@ -29,12 +28,10 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
   private val genderTextView: TextView = binding.gender
   private val cityTextView = binding.city
 
-  fun bind(patientItem: SearchResult<Patient>) {
+  fun bind(patientItem: Patient) {
     nameTextView.text =
-      patientItem.resource.name.first().let {
-        it.given.joinToString(separator = " ") + " " + it.family
-      }
-    genderTextView.text = patientItem.resource.gender.display
-    cityTextView.text = patientItem.resource.address.singleOrNull()?.city
+      patientItem.name.first().let { it.given.joinToString(separator = " ") + " " + it.family }
+    genderTextView.text = patientItem.gender.display
+    cityTextView.text = patientItem.address.singleOrNull()?.city
   }
 }
