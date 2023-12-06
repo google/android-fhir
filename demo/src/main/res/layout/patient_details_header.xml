@@ -70,11 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:paddingStart="2dp"
-            android:drawablePadding="2dp"
-            android:drawableStart="@drawable/ic_baseline_add_24"
             android:text="@string/complete_survey"
-            android:textAppearance="?attr/textAppearanceBody2"
         />
   </LinearLayout>
 </FrameLayout>

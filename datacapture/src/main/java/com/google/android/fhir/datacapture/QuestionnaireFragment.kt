@@ -293,6 +293,8 @@ class QuestionnaireFragment : Fragment() {
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
+  fun clearAllAnswers() = viewModel.clearAllAnswers()
+
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
 
@@ -352,10 +354,10 @@ class QuestionnaireFragment : Fragment() {
      * user, etc. is "in context" at the time the questionnaire response is being completed:
      * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
      *
-     * @param launchContexts list of serialized resources
+     * @param launchContextMap map of launchContext name and serialized resources
      */
-    fun setQuestionnaireLaunchContexts(launchContexts: List<String>) = apply {
-      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS to launchContexts)
+    fun setQuestionnaireLaunchContextMap(launchContextMap: Map<String, String>) = apply {
+      args.add(EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP to launchContextMap)
     }
 
     /**
@@ -454,9 +456,10 @@ class QuestionnaireFragment : Fragment() {
      */
     internal const val EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING = "questionnaire-response"
 
-    /** A list of JSON encoded strings extra for each questionnaire context. */
-    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS =
-      "questionnaire-launch-contexts"
+    /**
+     * A map of launchContext name and JSON encoded strings extra for each questionnaire context.
+     */
+    internal const val EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP = "questionnaire-launch-contexts"
 
     /**
      * A [URI][android.net.Uri] extra for streaming a JSON encoded questionnaire response.

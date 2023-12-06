@@ -1,0 +1,467 @@
+{
+  "resourceType": "Bundle",
+  "id": "generate-questionnaire",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "generate-questionnaire",
+        "instantiatesCanonical": [
+          "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/generate-questionnaire|1.0.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "OPA-Patient1"
+        },
+        "action": [
+          {
+            "title": "Prior Auth Route One",
+            "condition": [
+              {
+                "kind": "applicability",
+                "expression": {
+                  "language": "text/cql.identifier",
+                  "expression": "Claim Is Applicable"
+                }
+              }
+            ],
+            "resource": {
+              "reference": "RequestGroup/route-one"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "route-one",
+        "instantiatesCanonical": [
+          "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/route-one|1.0.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "OPA-Patient1"
+        },
+        "action": [
+          {
+            "title": "Facility Information"
+          },
+          {
+            "title": "Beneficiary Information"
+          },
+          {
+            "title": "Operating Physician Information"
+          },
+          {
+            "title": "Attending Physician Information"
+          }
+        ]
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Questionnaire",
+        "id": "generate-questionnaire",
+        "item": [
+          {
+            "linkId": "1",
+            "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/PAClaim#Claim",
+            "text": "Prior Auth Claim",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "1.1",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/PAClaim#Claim.id",
+                "text": "Claim Id",
+                "type": "string",
+                "required": false
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "1.2",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/PAClaim#Claim.status",
+                "text": "Claim.status",
+                "type": "string",
+                "required": false,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueString": "active"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "linkId": "2",
+            "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOrganization#Organization",
+            "text": "Facility Information",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "2.1",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOrganization#Organization.name",
+                "text": "Name",
+                "type": "string",
+                "required": false,
+                "initial": [
+                  {
+                    "valueString": "Acme Clinic"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "2.2",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOrganization#Organization.identifier.system",
+                "text": "Organization.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://npi.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "2.3",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOrganization#Organization.identifier.value",
+                "text": "Facility NPI",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "1407071236"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "2.4",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOrganization#Organization.identifier.system",
+                "text": "Organization.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://ptan.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "2.5",
+                "text": "An error occurred during item creation: Could not resolve expression reference 'FacilityPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'.",
+                "type": "display"
+              }
+            ]
+          },
+          {
+            "linkId": "3",
+            "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient",
+            "text": "Beneficiary Information",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "3.1",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.name.given",
+                "text": "First Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Peter"
+                  }
+                ]
+              },
+              {
+                "linkId": "3.2",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.name.family",
+                "text": "Last Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Chalmers"
+                  }
+                ]
+              },
+              {
+                "linkId": "3.3",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.birthDate",
+                "text": "Date of Birth",
+                "type": "date",
+                "required": true,
+                "initial": [
+                  {
+                    "valueDate": "1974-12-25"
+                  }
+                ]
+              },
+              {
+                "linkId": "3.4",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.gender",
+                "text": "Gender",
+                "type": "choice",
+                "required": true,
+                "answerOption": [
+                  {
+                    "valueCoding": {
+                      "system": "http://hl7.org/fhir/administrative-gender",
+                      "code": "male",
+                      "display": "Male"
+                    }
+                  },
+                  {
+                    "valueCoding": {
+                      "system": "http://hl7.org/fhir/administrative-gender",
+                      "code": "female",
+                      "display": "Female"
+                    }
+                  },
+                  {
+                    "valueCoding": {
+                      "system": "http://terminology.hl7.org/CodeSystem/v3-NullFlavor",
+                      "code": "UNK",
+                      "display": "unknown"
+                    }
+                  }
+                ],
+                "initial": [
+                  {
+                    "valueString": "male"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "3.5",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.identifier.system",
+                "text": "Patient.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://medicare.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "3.6",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOnePatient#Patient.identifier.value",
+                "text": "Medicare ID",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "525697298M"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "linkId": "4",
+            "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner",
+            "text": "Operation Physician Information",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "4.1",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner.name.given",
+                "text": "First Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Fielding"
+                  }
+                ]
+              },
+              {
+                "linkId": "4.2",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner.name.family",
+                "text": "Last Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Kathy"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "4.3",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner.identifier.system",
+                "text": "Practitioner.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://npi.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "4.4",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner.identifier.value",
+                "text": "NPI",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "1245319599"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "4.5",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneOperating#Practitioner.identifier.system",
+                "text": "Practitioner.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://ptan.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "4.6",
+                "text": "An error occurred during item creation: Could not resolve expression reference 'OperatingPhysicianPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'.",
+                "type": "display"
+              }
+            ]
+          },
+          {
+            "linkId": "5",
+            "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner",
+            "text": "Attending Physician Information",
+            "type": "group",
+            "item": [
+              {
+                "linkId": "5.1",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner.name.given",
+                "text": "First Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Ronald"
+                  }
+                ]
+              },
+              {
+                "linkId": "5.2",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner.name.family",
+                "text": "Last Name",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "Bone"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "5.3",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner.identifier.system",
+                "text": "Practitioner.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://npi.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "5.4",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner.identifier.value",
+                "text": "NPI",
+                "type": "string",
+                "required": true,
+                "initial": [
+                  {
+                    "valueString": "9941339108"
+                  }
+                ]
+              },
+              {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-hidden",
+                    "valueBoolean": true
+                  }
+                ],
+                "linkId": "5.5",
+                "definition": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/RouteOneAttending#Practitioner.identifier.system",
+                "text": "Practitioner.identifier.system",
+                "type": "url",
+                "required": true,
+                "readOnly": true,
+                "initial": [
+                  {
+                    "valueUri": "http://ptan.org"
+                  }
+                ]
+              },
+              {
+                "linkId": "5.6",
+                "text": "An error occurred during item creation: Could not resolve expression reference 'AttendingPhysicianPTAN' in library 'OutpatientPriorAuthorizationPrepopulation'.",
+                "type": "display"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

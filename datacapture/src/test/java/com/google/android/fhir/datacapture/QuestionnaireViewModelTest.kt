@@ -25,7 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_ENABLE_REVIEW_PAGE
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_JSON_STRING
-import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS
+import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_READ_ONLY
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_CANCEL_BUTTON
@@ -3873,6 +3873,103 @@ class QuestionnaireViewModelTest {
     assertResourceEquals(value, expectedResponse)
   }
 
+  @Test
+  fun `clearAllAnswers clears all answers in questionnaire response`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val questionnaireResponseString =
+      """
+           {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "item": [
+                    {
+                      "linkId": "1.1",
+                      "text": "First Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "1.2",
+                      "text": "Second Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """
+        .trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """
+        .trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.clearAllAnswers()
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
@@ -4400,7 +4497,7 @@ class QuestionnaireViewModelTest {
                 Extension(
                   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
                   Expression().apply {
-                    this.expression = "Observation?subject={{%patient.id}}"
+                    this.expression = "Observation?subject=Patient/{{%patient.id}}"
                     this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
                   },
                 ),
@@ -4410,8 +4507,8 @@ class QuestionnaireViewModelTest {
       }
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
     state.set(
-      EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_JSON_STRINGS,
-      listOf(printer.encodeResourceToString(patient)),
+      EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP,
+      mapOf("patient" to printer.encodeResourceToString(patient)),
     )
 
     val viewModel = QuestionnaireViewModel(context, state)

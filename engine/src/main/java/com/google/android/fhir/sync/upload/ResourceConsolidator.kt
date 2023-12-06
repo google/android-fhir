@@ -16,6 +16,22 @@
 
 package com.google.android.fhir.sync.upload
 
+/*
+ * Copyright 2023 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Bundle
@@ -36,19 +52,31 @@ import timber.log.Timber
 internal fun interface ResourceConsolidator {
 
   /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
+  suspend fun consolidate(uploadSyncResult: UploadSyncResult)
 }
 
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource) {
-    database.deleteUpdates(localChangeToken)
-    when (response) {
-      is Bundle -> updateVersionIdAndLastUpdated(response)
-      else -> updateVersionIdAndLastUpdated(response)
+  override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
+    when (uploadSyncResult) {
+      is UploadSyncResult.Success -> {
+        database.deleteUpdates(
+          LocalChangeToken(uploadSyncResult.localChanges.flatMap { it.token.ids }),
+        )
+        uploadSyncResult.responseResources.forEach {
+          when (it) {
+            is Bundle -> updateVersionIdAndLastUpdated(it)
+            else -> updateVersionIdAndLastUpdated(it)
+          }
+        }
+      }
+      is UploadSyncResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
+      }
     }
-  }
 
   private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
     when (bundle.type) {

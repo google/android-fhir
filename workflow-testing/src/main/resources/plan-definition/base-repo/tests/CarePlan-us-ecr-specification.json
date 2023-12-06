@@ -1,0 +1,39 @@
+{
+  "resourceType": "CarePlan",
+  "id": "us-ecr-specification",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "us-ecr-specification",
+      "instantiatesCanonical": [
+        "http://ersd.aimsplatform.org/fhir/PlanDefinition/us-ecr-specification"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "helloworld-patient-1"
+      },
+      "encounter": {
+        "reference": "helloworld-patient-1-encounter-1"
+      }
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://ersd.aimsplatform.org/fhir/PlanDefinition/us-ecr-specification"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "helloworld-patient-1"
+  },
+  "encounter": {
+    "reference": "helloworld-patient-1-encounter-1"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/us-ecr-specification"
+      }
+    }
+  ]
+}

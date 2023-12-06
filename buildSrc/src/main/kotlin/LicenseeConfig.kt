@@ -22,7 +22,15 @@ fun Project.configureLicensee() {
   apply(plugin = "app.cash.licensee")
   configure<app.cash.licensee.LicenseeExtension> {
     allow("Apache-2.0")
+    allow("BSD-2-Clause")
+    allow("BSD-3-Clause")
     allow("MIT")
+
+    ignoreDependencies("com.ibm.icu", "icu4j") {
+      because(
+        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+      )
+    }
 
     // Occasionally, dependencies may add their licenses via a direct URL instead of an SPDX id.
     nonStandardLicenseUrls.forEach { allowUrl(it) }
@@ -33,7 +41,7 @@ fun Project.configureLicensee() {
     ignoreDependencies("org.jacoco", "org.jacoco.agent") {
       because("JaCoCo is used in tests only, so it is not distributed with our library")
     }
-    allowDependency("org.javassist", "javassist", "3.20.0-GA") {
+    allowDependency("org.javassist", "javassist", "3.29.0-GA") {
       because("Multi-licensed under Apache. https://github.com/jboss-javassist/javassist")
     }
 
@@ -107,10 +115,14 @@ fun Project.configureLicensee() {
     // Utilities
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
     allowDependency("com.google.android.gms", "play-services-base", "17.4.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-base", "18.0.1") { because("") }
+
+    allowDependency("com.google.android.odml", "image", "1.0.0-beta1") { because("") }
 
     // More utility classes
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
     allowDependency("com.google.android.gms", "play-services-basement", "17.4.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-basement", "18.0.0") { because("") }
 
     // https://developers.google.com/android/reference/com/google/android/gms/common/package-summary
     allowDependency("com.google.android.gms", "play-services-clearcut", "17.0.0") { because("") }
@@ -125,12 +137,16 @@ fun Project.configureLicensee() {
 
     // Tasks API Android https://developers.google.com/android/guides/tasks
     allowDependency("com.google.android.gms", "play-services-tasks", "17.2.0") { because("") }
+    allowDependency("com.google.android.gms", "play-services-tasks", "18.0.1") { because("") }
 
     // Barcode Scanning https://developers.google.com/ml-kit/vision/barcode-scanning
     allowDependency("com.google.mlkit", "barcode-scanning", "16.1.1") { because("") }
 
     // MLKit Common https://developers.google.com/ml-kit/vision/barcode-scanning
     allowDependency("com.google.mlkit", "common", "17.1.1") { because("") }
+    allowDependency("com.google.mlkit", "common", "18.0.0") { because("") }
+
+    allowDependency("com.google.mlkit", "camera", "16.0.0-beta3") { because("") }
 
     // Object Detection https://developers.google.com/ml-kit/vision/object-detection
     allowDependency("com.google.mlkit", "object-detection", "16.2.3") { because("") }
@@ -144,10 +160,13 @@ fun Project.configureLicensee() {
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-common", "16.3.0") { because("") }
+    allowDependency("com.google.mlkit", "vision-common", "17.0.0") { because("") }
 
     // Vision Common
     // https://developers.google.com/android/reference/com/google/mlkit/vision/common/package-summary
     allowDependency("com.google.mlkit", "vision-internal-vkp", "18.0.0") { because("") }
+
+    allowDependency("com.google.mlkit", "vision-interfaces", "16.0.0") { because("") }
 
     // Glide
     allowDependency("com.github.bumptech.glide", "glide", "4.14.2") {
@@ -167,6 +186,11 @@ fun Project.configureLicensee() {
     // Glide GIF Decoder
     allowDependency("com.github.bumptech.glide", "gifdecoder", "4.14.2") {
       because("BSD, part MIT and Apache 2.0. https://github.com/bumptech/glide#license")
+    }
+
+    // ICU4C License
+    allowDependency("com.ibm.icu", "icu4j", "72.1") {
+      because("BSD, part MIT and Apache 2.0. https://github.com/unicode-org/icu/blob/main/LICENSE")
     }
   }
 }

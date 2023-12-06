@@ -1,0 +1,1113 @@
+{
+  "resourceType": "PlanDefinition",
+  "id": "us-ecr-specification",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/us/ecr/StructureDefinition/ersd-plandefinition"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "normalReportingDuration",
+        "language": "text/fhirpath",
+        "expression": "14"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "encounterStartDate",
+        "language": "text/fhirpath",
+        "expression": "{{context.encounterStartDate}}"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "encounterEndDate",
+        "language": "text/fhirpath",
+        "expression": "{{context.encounterEndDate}}"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "lastReportSubmissionDate",
+        "language": "text/fhirpath",
+        "expression": "{{context.lastReportSubmissionDate}}"
+      }
+    }
+  ],
+  "url": "http://ersd.aimsplatform.org/fhir/PlanDefinition/us-ecr-specification",
+  "version": "2.0.0",
+  "name": "US_eCR_Specification",
+  "title": "US eCR Specification",
+  "type": {
+    "coding": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/plan-definition-type",
+        "code": "workflow-definition",
+        "display": "Workflow Definition"
+      }
+    ]
+  },
+  "status": "active",
+  "experimental": true,
+  "date": "2020-07-31T12:32:29.858-05:00",
+  "publisher": "eCR",
+  "contact": [
+    {
+      "name": "HL7 International - Public Health",
+      "telecom": [
+        {
+          "system": "url",
+          "value": "http://www.hl7.org/Special/committees/pher"
+        }
+      ]
+    }
+  ],
+  "description": "An example ersd PlanDefinition",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US",
+          "display": "United States of America"
+        }
+      ],
+      "text": "United States of America"
+    }
+  ],
+  "effectivePeriod": {
+    "start": "2020-12-01"
+  },
+  "relatedArtifact": [
+    {
+      "type": "depends-on",
+      "label": "RCTC Value Set Library of Trigger Codes",
+      "resource": "http://ersd.aimsplatform.org/fhir/Library/rctc"
+    }
+  ],
+  "action": [
+    {
+      "id": "start-workflow",
+      "description": "This action represents the start of the reporting workflow in response to the encounter-start event.",
+      "textEquivalent": "Start the reporting workflow in response to an encounter-start event",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "initiate-reporting-workflow",
+              "display": "Initiate a reporting workflow"
+            }
+          ]
+        }
+      ],
+      "trigger": [
+        {
+          "id": "encounter-start",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-named-eventtype-extension",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-triggerdefinition-namedevents",
+                    "code": "encounter-start",
+                    "display": "Indicates the start of an encounter"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "named-event",
+          "name": "encounter-start"
+        }
+      ],
+      "input": [
+        {
+          "id": "patient",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+              "valueString": "Patient/{{context.patientId}}"
+            }
+          ],
+          "type": "Patient"
+        },
+        {
+          "id": "encounter",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+              "valueString": "Encounter/{{context.encounterId}}"
+            }
+          ],
+          "type": "Encounter"
+        }
+      ],
+      "relatedAction": [
+        {
+          "actionId": "check-for-immediate-reporting",
+          "relationship": "before-start",
+          "offsetDuration": {
+            "value": 1,
+            "system": "http://unitsofmeasure.org",
+            "code": "h"
+          }
+        }
+      ]
+    },
+    {
+      "id": "check-for-immediate-reporting",
+      "description": "This action represents the start of the check suspected disorder reporting workflow in response to the encounter-start event.",
+      "textEquivalent": "Check suspected disorders for immediate reportability and setup jobs for future reportability checks.",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "execute-reporting-workflow"
+            }
+          ]
+        }
+      ],
+      "action": [
+        {
+          "id": "is-encounter-immediately-reportable",
+          "description": "This action represents the check for suspected disorder reportability to create the patients eICR.",
+          "textEquivalent": "Check Trigger Codes based on Suspected Reportable and Lab Order Test Names Value set.",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "check-trigger-codes"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Suspected Disorder?",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%suspectedDisorderConditions.exists() or %suspectedDisorderLabOrders.exists()"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "suspectedDisorderConditions",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "Condition?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "Condition",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/sdtc"
+                }
+              ]
+            },
+            {
+              "id": "suspectedDisorderLabOrders",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "ServiceRequest?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "ServiceRequest",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/lotc"
+                }
+              ]
+            }
+          ],
+          "relatedAction": [
+            {
+              "actionId": "create-eicr",
+              "relationship": "before-start"
+            }
+          ]
+        },
+        {
+          "id": "continue-check-reportable",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "evaluate-condition"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter In Progress and Within Normal Reporting Duration or 72h or less after end of encounter?",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%inprogressencounter.where((status = 'in-progress' and %encounterStartDate + 1 day * %normalReportingDuration >= now()) or (status = 'finished' and %encounterEndDate + 72 hours >= now())).select(true)"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "inprogressencounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ],
+          "relatedAction": [
+            {
+              "actionId": "check-reportable",
+              "relationship": "before-start",
+              "offsetDuration": {
+                "value": 6,
+                "comparator": "<=",
+                "system": "http://unitsofmeasure.org",
+                "code": "h"
+              }
+            }
+          ]
+        },
+        {
+          "id": "terminate-late-encounter",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "terminate-reporting-workflow"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter Late",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%terminatedencounter.where((status = 'in-progress' and %encounterStartDate + 1 day * %normalReportingDuration < now()) or (status = 'finished' and %encounterEndDate + 72 hours < now())).select(true)"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "terminatedencounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ]
+        },
+        {
+          "id": "is-late-encounter-completed",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "complete-reporting"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter Complete",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%lateCompletedEncounter.exists(status = 'finished')"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "lateCompletedEncounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "check-reportable",
+      "description": "This action represents the check for suspected reportability of the eICR.",
+      "textEquivalent": "Check Reportability and setup jobs for future reportability checks.",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "execute-reporting-workflow"
+            }
+          ]
+        }
+      ],
+      "action": [
+        {
+          "id": "is-encounter-reportable",
+          "description": "This action represents the check for reportability to create the patients eICR.",
+          "textEquivalent": "Check Trigger Codes based on RCTC Value sets.",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "check-trigger-codes"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter Reportable and Within Normal Reporting Duration?",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "(%encounterStartDate + 1 day * %normalReportingDuration >= now()) and (%conditions.exists() or %encounters.exists() or %immunizations.exists() or %labOrders.exists() or %labTests.exists() or %labResults.exists() or %medicationAdministrations.exists() or %medicationOrders.exists() or %medicationDispenses.exists())"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "conditions",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "Condition?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "Condition",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/dxtc"
+                }
+              ]
+            },
+            {
+              "id": "encounters",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter",
+              "codeFilter": [
+                {
+                  "path": "reasonCode",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/dxtc"
+                }
+              ]
+            },
+            {
+              "id": "immunizations",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "Immunization?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "Immunization",
+              "codeFilter": [
+                {
+                  "path": "vaccineCode",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/mrtc"
+                }
+              ]
+            },
+            {
+              "id": "labOrders",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "ServiceRequest?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "ServiceRequest",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/lotc"
+                }
+              ]
+            },
+            {
+              "id": "labTests",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "Observation?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "Observation",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/lotc"
+                }
+              ]
+            },
+            {
+              "id": "diagnosticOrders",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "DiagnosticReport?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "DiagnosticReport",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/lotc"
+                }
+              ]
+            },
+            {
+              "id": "medicationOrders",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "MedicationRequest?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "MedicationRequest",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/mrtc"
+                }
+              ]
+            },
+            {
+              "id": "medicationDispenses",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "MedicationDispense?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "MedicationDispense",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/mrtc"
+                }
+              ]
+            },
+            {
+              "id": "medicationAdministrations",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-fhirquerypattern-extension",
+                  "valueString": "MedicationAdministration?patient=Patient/{{context.patientId}}"
+                }
+              ],
+              "type": "MedicationAdministration",
+              "codeFilter": [
+                {
+                  "path": "medication",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/mrtc"
+                }
+              ]
+            },
+            {
+              "id": "labResults",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "labTests"
+                }
+              ],
+              "type": "Observation",
+              "codeFilter": [
+                {
+                  "path": "value",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/ostc"
+                }
+              ]
+            },
+            {
+              "id": "diagnosticResults",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "diagnosticOrders"
+                }
+              ],
+              "type": "DiagnosticReport",
+              "codeFilter": [
+                {
+                  "path": "code",
+                  "valueSet": "http://ersd.aimsplatform.org/fhir/ValueSet/ostc"
+                }
+              ]
+            }
+          ],
+          "relatedAction": [
+            {
+              "actionId": "create-eicr",
+              "relationship": "before-start"
+            }
+          ]
+        },
+        {
+          "id": "check-update-eicr",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "evaluate-condition"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Most recent eICR sent over 72 hours ago?",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%lastReportSubmissionDate < now() - 72 hours"
+              }
+            }
+          ],
+          "relatedAction": [
+            {
+              "actionId": "create-eicr",
+              "relationship": "before-start"
+            }
+          ]
+        },
+        {
+          "id": "is-encounter-in-progress",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "evaluate-condition"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter In Progress and Within Normal Reporting Duration or 72h or less after end of encounter?",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%inprogressencounter.where(status = 'in-progress' and %encounterStartDate + 1 day * %normalReportingDuration >= now() or (status = 'finished' and %encounterEndDate + 72 hours >= now())).exists()"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "inprogressencounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ],
+          "relatedAction": [
+            {
+              "actionId": "check-reportable",
+              "relationship": "before-start",
+              "offsetDuration": {
+                "value": 6,
+                "comparator": "<=",
+                "system": "http://unitsofmeasure.org",
+                "code": "h"
+              }
+            }
+          ]
+        },
+        {
+          "id": "terminate-encounter",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "terminate-reporting-workflow"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter Late",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%termencounter.where((status = 'in-progress' and %encounterStartDate + 1 day * %normalReportingDuration < now()) or (status = 'finished' and %encounterEndDate + 72 hours < now())).select(true)"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "termencounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ]
+        },
+        {
+          "id": "is-encounter-completed",
+          "code": [
+            {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+                  "code": "complete-reporting"
+                }
+              ]
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                    "valueExpression": {
+                      "language": "text/cql-identifier",
+                      "expression": "Is Encounter Complete",
+                      "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                    }
+                  }
+                ],
+                "language": "text/fhirpath",
+                "expression": "%completedEncounter.exists(status = 'finished')"
+              }
+            }
+          ],
+          "input": [
+            {
+              "id": "completedEncounter",
+              "extension": [
+                {
+                  "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+                  "valueString": "encounter"
+                }
+              ],
+              "type": "Encounter"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "create-eicr",
+      "description": "This action represents the creation of the eICR. It subsequently calls validate.",
+      "textEquivalent": "Create eICR",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "create-report"
+            }
+          ]
+        }
+      ],
+      "input": [
+        {
+          "id": "patientdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "patient"
+            }
+          ],
+          "type": "Patient",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+          ]
+        },
+        {
+          "id": "conditiondata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "conditions"
+            }
+          ],
+          "type": "Condition",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition"
+          ]
+        },
+        {
+          "id": "encounterdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "encounter"
+            }
+          ],
+          "type": "Encounter",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-encounter"
+          ]
+        },
+        {
+          "id": "mrdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "medicationOrders"
+            }
+          ],
+          "type": "MedicationRequest",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-medicationrequest"
+          ]
+        },
+        {
+          "id": "immzdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "immunizations"
+            }
+          ],
+          "type": "Immunization",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-immunization"
+          ]
+        },
+        {
+          "id": "labResultdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "labResults"
+            }
+          ],
+          "type": "Observation",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-observation-lab"
+          ]
+        },
+        {
+          "id": "labOrderdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "labOrders"
+            }
+          ],
+          "type": "ServiceRequest",
+          "profile": [
+            "http://hl7.org/fhir/StructureDefinition/ServiceRequest"
+          ]
+        },
+        {
+          "id": "diagnosticResultdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "diagnosticResults"
+            }
+          ],
+          "type": "DiagnosticReport",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
+          ]
+        },
+        {
+          "id": "diagnosticOrderdata",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "diagnosticOrders"
+            }
+          ],
+          "type": "DiagnosticReport",
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-diagnosticreport-lab"
+          ]
+        }
+      ],
+      "output": [
+        {
+          "id": "eicrreport",
+          "type": "Bundle",
+          "profile": [
+            "http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle"
+          ]
+        }
+      ],
+      "relatedAction": [
+        {
+          "actionId": "validate-eicr",
+          "relationship": "before-start"
+        }
+      ]
+    },
+    {
+      "id": "validate-eicr",
+      "description": "This action represents the validation of the eICR. It subsequently calls route-and-send.",
+      "textEquivalent": "Validate eICR",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "validate-report"
+            }
+          ]
+        }
+      ],
+      "input": [
+        {
+          "id": "generatedeicrreport",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "eicrreport"
+            }
+          ],
+          "type": "Bundle",
+          "profile": [
+            "http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle"
+          ]
+        }
+      ],
+      "output": [
+        {
+          "id": "valideicrreport",
+          "type": "Bundle",
+          "profile": [
+            "http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle"
+          ]
+        }
+      ],
+      "relatedAction": [
+        {
+          "actionId": "route-and-send-eicr",
+          "relationship": "before-start"
+        }
+      ]
+    },
+    {
+      "id": "route-and-send-eicr",
+      "description": "This action represents the routing and sending of the eICR.",
+      "textEquivalent": "Route and send eICR",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "submit-report"
+            }
+          ]
+        }
+      ],
+      "input": [
+        {
+          "id": "validatedeicrreport",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-relateddata-extension",
+              "valueString": "valideicrreport"
+            }
+          ],
+          "type": "Bundle",
+          "profile": [
+            "http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle"
+          ]
+        }
+      ],
+      "output": [
+        {
+          "id": "submittedeicrreport",
+          "type": "Bundle",
+          "profile": [
+            "http://hl7.org/fhir/us/ecr/StructureDefinition/eicr-document-bundle"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "encounter-modified",
+      "description": "This action represents the start of the reporting workflow in response to the encounter-modified event",
+      "textEquivalent": "Start the reporting workflow in response to an encounter-modified event",
+      "code": [
+        {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-plandefinition-actions",
+              "code": "initiate-reporting-workflow",
+              "display": "Initiate a reporting workflow"
+            }
+          ]
+        }
+      ],
+      "trigger": [
+        {
+          "id": "encounter-modified-trigger",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-named-eventtype-extension",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/us/ecr/CodeSystem/us-ph-triggerdefinition-namedevents",
+                    "code": "encounter-modified",
+                    "display": "Indicates modifications to data elements of an encounter"
+                  }
+                ]
+              }
+            }
+          ],
+          "type": "named-event",
+          "name": "encounter-modified"
+        }
+      ],
+      "condition": [
+        {
+          "kind": "applicability",
+          "expression": {
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/us/ecr/StructureDefinition/us-ph-alternative-expression-extension",
+                "valueExpression": {
+                  "language": "text/cql-identifier",
+                  "expression": "Is Encounter Longer Than Normal Reporting Duration?",
+                  "reference": "http://ersd.aimsplatform.org/fhir/Library/RuleFilters|2.1.0"
+                }
+              }
+            ],
+            "language": "text/fhirpath",
+            "expression": "%encounter.where(period.start + 1 day * %normalReportingDuration < now()).select(true)"
+          }
+        }
+      ],
+      "relatedAction": [
+        {
+          "actionId": "create-eicr",
+          "relationship": "before-start"
+        }
+      ]
+    }
+  ]
+}

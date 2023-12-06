@@ -32,6 +32,7 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -135,6 +136,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -158,6 +160,7 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
             timestamp = Instant.now(),
@@ -178,6 +181,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -201,6 +205,7 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.UPDATE,
             payload =
               diff(
@@ -233,6 +238,7 @@ class PerResourcePatchGeneratorTest {
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
             timestamp = Instant.now(),
@@ -314,6 +320,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -324,6 +331,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -349,6 +357,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -357,6 +366,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)

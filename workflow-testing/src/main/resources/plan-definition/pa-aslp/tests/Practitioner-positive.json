@@ -1,0 +1,67 @@
+{
+    "resourceType": "Practitioner",
+    "id": "Practitioner-positive",
+    "meta": {
+        "profile": [
+            "http://hl7.org/fhir/us/davinci-crd/StructureDefinition/profile-practitioner"
+        ]
+    },
+    "identifier": [
+        {
+            "system": "http://hl7.org/fhir/sid/us-npi",
+            "value": "9941339108"
+        },
+        {
+            "system": "http://www.acme.org/practitioners",
+            "value": "25456"
+        }
+    ],
+    "name": [
+        {
+            "family": "Careful",
+            "given": [
+                "Adam"
+            ],
+            "prefix": [
+                "Dr"
+            ]
+        }
+    ],
+    "address": [
+        {
+            "use": "home",
+            "line": [
+                "1003 Healthcare Drive"
+            ],
+            "city": "Amherst",
+            "state": "MA",
+            "postalCode": "01002"
+        }
+    ],
+    "qualification": [
+        {
+            "identifier": [
+                {
+                    "system": "http://example.org/UniversityIdentifier",
+                    "value": "12345"
+                }
+            ],
+            "code": {
+                "coding": [
+                    {
+                        "system": "http://terminology.hl7.org/CodeSystem/v2-0360",
+                        "code": "BS",
+                        "display": "Bachelor of Science"
+                    }
+                ],
+                "text": "Bachelor of Science"
+            },
+            "period": {
+                "start": "1995"
+            },
+            "issuer": {
+                "display": "Example University"
+            }
+        }
+    ]
+}

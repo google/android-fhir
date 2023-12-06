@@ -26,7 +26,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.workflow.FhirOperatorBuilder
+import com.google.android.fhir.workflow.FhirOperator
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
@@ -61,7 +61,7 @@ class F_CqlEvaluatorBenchmark {
         val patientImmunizationHistory =
           jsonParser.parseResource(open("/immunity-check/ImmunizationHistory.json")) as Bundle
         val fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
-        val knowledgeManager = KnowledgeManager.createInMemory(context)
+        val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
         val lib = jsonParser.parseResource(open("/immunity-check/ImmunityCheck.json")) as Library
 
         runBlocking {
@@ -75,10 +75,10 @@ class F_CqlEvaluatorBenchmark {
           )
         }
 
-        FhirOperatorBuilder(context)
-          .withFhirContext(fhirContext)
-          .withFhirEngine(fhirEngine)
-          .withIgManager(knowledgeManager)
+        FhirOperator.Builder(context)
+          .fhirContext(fhirContext)
+          .fhirEngine(fhirEngine)
+          .knowledgeManager(knowledgeManager)
           .build()
       }
 
