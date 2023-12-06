@@ -30,6 +30,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
@@ -478,7 +479,26 @@ class QuestionnaireUiEspressoTest {
     }
   }
 
-  private fun buildFragmentFromQuestionnaire(fileName: String, isReviewMode: Boolean = false) {
+  @Test
+  @SdkSuppress(minSdkVersion = 33)
+  fun clearAllAnswers_shouldClearDraftAnswer() {
+    val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
+    // Add month and day. No need to add slashes as they are added automatically
+    onView(withId(R.id.text_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+
+    questionnaireFragment.clearAllAnswers()
+
+    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+      assertThat((view as TextInputEditText).text.toString()).isEmpty()
+    }
+  }
+
+  private fun buildFragmentFromQuestionnaire(
+    fileName: String,
+    isReviewMode: Boolean = false,
+  ): QuestionnaireFragment {
     val questionnaireJsonString = readFileFromAssets(fileName)
     val questionnaireFragment =
       QuestionnaireFragment.builder()
@@ -491,6 +511,7 @@ class QuestionnaireUiEspressoTest {
         add(R.id.container_holder, questionnaireFragment)
       }
     }
+    return questionnaireFragment
   }
 
   private fun buildFragmentFromQuestionnaire(
