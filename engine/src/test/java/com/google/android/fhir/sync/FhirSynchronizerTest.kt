@@ -82,14 +82,14 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started(),
-          SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-          SyncJobStatus.Finished(),
-        )
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[3])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[4]).isInstanceOf(SyncJobStatus.Finished::class.java)
 
       assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
     }
@@ -112,14 +112,12 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started(),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-          SyncJobStatus.Failed(exceptions = listOf(error)),
-        )
-
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }
@@ -137,13 +135,12 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started(),
-          SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.Failed(exceptions = listOf(error)),
-        )
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }
