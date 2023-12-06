@@ -24,6 +24,7 @@ import com.google.android.fhir.datacapture.extensions.variableExpressions
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.ExpressionNode
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -325,9 +326,9 @@ internal class ExpressionEvaluator(
         val expressionNode = extractExpressionNode(fhirPath)
         val evaluatedResult =
           evaluateToString(
-            expressionNode,
-            launchContextMap[extractResourceType(expressionNode)],
-            launchContextMap,
+            expression = expressionNode,
+            data = launchContextMap[extractResourceType(expressionNode)],
+            contextMap = launchContextMap,
           )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
@@ -437,16 +438,26 @@ internal class ExpressionEvaluator(
       }
 
       evaluateToBase(
-          questionnaireResponse,
-          null,
-          expression.expression,
-          dependentVariables,
+          questionnaireResponse = questionnaireResponse,
+          questionnaireResponseItem = null,
+          expression = expression.expression,
+          contextMap = dependentVariables,
         )
         .firstOrNull()
     } catch (exception: FHIRException) {
       Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
       null
     }
+}
+
+/**
+ * Extract [ResourceType] string representation from constant or name property of given
+ * [ExpressionNode].
+ */
+private fun extractResourceType(expressionNode: ExpressionNode): String? {
+  // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
+  // expression vs an expression that is valid, but does not return one resource only.
+  return expressionNode.constant?.primitiveValue()?.substring(1) ?: expressionNode.name?.lowercase()
 }
 
 /** Pair of a [Questionnaire.QuestionnaireItemComponent] with its evaluated answers */

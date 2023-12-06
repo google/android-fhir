@@ -253,10 +253,10 @@ object ResourceMapper {
     questionnaireItem.initialExpression
       ?.let {
         evaluateToBase(
-            null,
-            null,
-            it.expression,
-            launchContexts,
+            questionnaireResponse = null,
+            questionnaireResponseItem = null,
+            expression = it.expression,
+            contextMap = launchContexts,
           )
           .firstOrNull()
       }

@@ -45,7 +45,14 @@ internal fun evaluateToString(
   expression: ExpressionNode,
   data: Resource?,
   contextMap: Map<String, Base?>,
-) = fhirPathEngine.evaluateToString(contextMap, null, null, data, expression)
+) =
+  fhirPathEngine.evaluateToString(
+    /* appInfo = */ contextMap,
+    /* focusResource = */ null,
+    /* rootResource = */ null,
+    /* base = */ data,
+    /* node = */ expression,
+  )
 
 /**
  * Evaluates the expression and returns the boolean result. The resources [QuestionnaireResponse]
@@ -70,6 +77,14 @@ internal fun evaluateToBoolean(
   )
 }
 
+/**
+ * Evaluates the expression and returns the list of [Base]. The resources [QuestionnaireResponse]
+ * and [QuestionnaireResponseItemComponent] are passed as fhirPath supplements as defined in fhir
+ * specs https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements. All other
+ * constants are passed as contextMap
+ *
+ * %resource = [QuestionnaireResponse], %context = [QuestionnaireResponseItemComponent]
+ */
 internal fun evaluateToBase(
   questionnaireResponse: QuestionnaireResponse?,
   questionnaireResponseItem: QuestionnaireResponseItemComponent?,
@@ -77,27 +92,24 @@ internal fun evaluateToBase(
   contextMap: Map<String, Base?> = mapOf(),
 ): List<Base> {
   return fhirPathEngine.evaluate(
-    contextMap,
-    questionnaireResponse,
-    null,
-    questionnaireResponseItem,
-    expression,
+    /* appContext = */ contextMap,
+    /* focusResource = */ questionnaireResponse,
+    /* rootResource = */ null,
+    /* base = */ questionnaireResponseItem,
+    /* path = */ expression,
   )
 }
 
+/** Evaluates the given expression and returns list of [Base] */
 internal fun evaluateToBase(type: Type, expression: String): List<Base> {
   return fhirPathEngine.evaluate(
-    type,
-    expression,
+    /* base = */ type,
+    /* path = */ expression,
   )
 }
 
+/** Evaluates the given list of [Base] elements and returns boolean result */
 internal fun convertToBoolean(items: List<Base>) = fhirPathEngine.convertToBoolean(items)
 
+/** Parse the given expression into [ExpressionNode] */
 internal fun extractExpressionNode(fhirPath: String) = fhirPathEngine.parse(fhirPath)
-
-internal fun extractResourceType(expressionNode: ExpressionNode): String? {
-  // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
-  // expression vs an expression that is valid, but does not return one resource only.
-  return expressionNode.constant?.primitiveValue()?.substring(1) ?: expressionNode.name?.lowercase()
-}
