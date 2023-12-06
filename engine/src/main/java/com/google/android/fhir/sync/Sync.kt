@@ -255,34 +255,39 @@ object Sync {
     when (syncJobStatusFromWorkManager) {
       is SyncJobStatus.Started,
       is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
-      null -> {
-        when (workInfoState) {
-          RUNNING -> Running(SyncJobStatus.Started())
-          ENQUEUED -> Enqueued
-          CANCELLED -> Cancelled
-          SUCCEEDED -> {
-            syncJobStatusFromDataStore?.let {
-              return when (it) {
-                is SyncJobStatus.Finished -> Succeeded(it)
-                else -> error("Error message here")
-              }
-            }
-            Succeeded(SyncJobStatus.Finished())
-          }
-          FAILED -> {
-            syncJobStatusFromDataStore?.let {
-              return when (it) {
-                is SyncJobStatus.Failed -> Failed(it)
-                else -> error("Error message here")
-              }
-            }
-            error("Error message here")
-          }
-          else -> error("Error message here")
-        }
-      }
+      null -> handleNullWorkManagerStatus(workInfoState, syncJobStatusFromDataStore)
       else -> error("Error message here")
     }
+
+  private fun handleNullWorkManagerStatus(
+    workInfoState: WorkInfo.State,
+    syncJobStatusFromDataStore: SyncJobStatus?,
+  ): SyncState =
+    when (workInfoState) {
+      RUNNING -> Running(SyncJobStatus.Started())
+      ENQUEUED -> Enqueued
+      CANCELLED -> Cancelled
+      SUCCEEDED,
+      FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
+      else -> error("Error message here")
+    }
+
+  private fun handleFinishedOrFailedState(
+    workInfoState: WorkInfo.State,
+    syncJobStatusFromDataStore: SyncJobStatus?,
+  ): SyncState =
+    syncJobStatusFromDataStore?.let {
+      when (it) {
+        is SyncJobStatus.Finished -> Succeeded(it)
+        is SyncJobStatus.Failed -> Failed(it)
+        else -> error("Error message here")
+      }
+    }
+      ?: when (workInfoState) {
+        SUCCEEDED -> Succeeded(SyncJobStatus.Finished())
+        FAILED -> error("Error message here")
+        else -> error("Error message here")
+      }
 
   /**
    * Maps the [lastSyncJobStatus] to a specific [Result] based on the provided status.
