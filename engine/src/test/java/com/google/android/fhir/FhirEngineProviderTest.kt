@@ -109,10 +109,10 @@ class FhirEngineProviderTest {
                 CacheConfiguration(
                   cacheDir = File("sample-dir", "http_cache"),
                   // $0.05 worth of phone storage in 2020
-                  maxSize = 50L * 1024L * 1024L // 50 MiB
-                )
-            )
-          )
+                  maxSize = 50L * 1024L * 1024L, // 50 MiB
+                ),
+            ),
+          ),
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
