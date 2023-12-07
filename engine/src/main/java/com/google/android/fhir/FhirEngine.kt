@@ -19,9 +19,9 @@ package com.google.android.fhir
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
+import com.google.android.fhir.sync.upload.IUploader
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -63,7 +63,7 @@ interface FhirEngine {
    */
   suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    uploader: IUploader,
   ): Flow<SyncUploadProgress>
 
   /**

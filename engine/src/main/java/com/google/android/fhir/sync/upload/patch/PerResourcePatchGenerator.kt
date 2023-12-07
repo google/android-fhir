@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
+import com.google.android.fhir.LocalChangeToken
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -86,6 +87,7 @@ internal object PerResourcePatchGenerator : PatchGenerator {
       payload = payload,
       versionId = localChanges.first().versionId,
       timestamp = localChanges.last().timestamp,
+      token = LocalChangeToken(localChanges.flatMap { it.token.ids }),
     )
 
   /** Update a JSON object with a JSON patch (RFC 6902). */

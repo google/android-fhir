@@ -29,13 +29,17 @@ import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
+import com.google.android.fhir.sync.upload.IUploader
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import java.time.OffsetDateTime
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -127,38 +131,49 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    uploader: IUploader,
   ): Flow<SyncUploadProgress> = flow {
     val resourceConsolidator = DefaultResourceConsolidator(database)
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
 
-    emit(
+    var lastSyncUploadProgress: SyncUploadProgress
+    lastSyncUploadProgress =
       SyncUploadProgress(
         remaining = localChangeFetcher.total,
         initialTotal = localChangeFetcher.total,
-      ),
-    )
+      )
+    emit(lastSyncUploadProgress)
 
-    while (localChangeFetcher.hasNext()) {
-      val localChanges = localChangeFetcher.next()
-      val uploadSyncResult = upload(localChanges)
-
-      resourceConsolidator.consolidate(uploadSyncResult)
-      when (uploadSyncResult) {
-        is UploadSyncResult.Success -> emit(localChangeFetcher.getProgress())
-        is UploadSyncResult.Failure -> {
-          with(localChangeFetcher.getProgress()) {
-            emit(
-              SyncUploadProgress(
-                remaining = remaining,
-                initialTotal = initialTotal,
-                uploadError = uploadSyncResult.syncError,
-              ),
-            )
+    val job =
+      CoroutineScope(Dispatchers.IO).launch {
+        uploader.uploadRequestResultFlows.collect {
+          resourceConsolidator.consolidate(it)
+          when (it) {
+            is UploadRequestResult.Success -> {
+              lastSyncUploadProgress = localChangeFetcher.getProgress()
+              emit(lastSyncUploadProgress)
+            }
+            is UploadRequestResult.Failure -> {
+              with(localChangeFetcher.getProgress()) {
+                lastSyncUploadProgress =
+                  SyncUploadProgress(
+                    remaining = remaining,
+                    initialTotal = initialTotal,
+                    uploadError = it.syncError,
+                  )
+                emit(lastSyncUploadProgress)
+              }
+              return@collect
+            }
           }
-          break
         }
       }
+
+    while (localChangeFetcher.hasNext()) {
+      uploader.upload(localChangeFetcher.next())
     }
+
+    job.cancel()
+    // Store lastSyncUploadProgress in datastore
   }
 }

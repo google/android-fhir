@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
 import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 
@@ -34,6 +35,7 @@ data class Patch(
   val type: Type,
   /** json string with local changes */
   val payload: String,
+  val token: LocalChangeToken,
 ) {
   enum class Type(val value: Int) {
     INSERT(1), // create a new resource. payload is the entire resource json.

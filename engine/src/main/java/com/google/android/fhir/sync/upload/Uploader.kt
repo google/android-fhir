@@ -17,12 +17,13 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.patch.PerResourcePatchGenerator
 import com.google.android.fhir.sync.upload.request.TransactionBundleGenerator
 import com.google.android.fhir.sync.upload.request.UploadRequest
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.OperationOutcome
@@ -38,42 +39,41 @@ import timber.log.Timber
  * 4. processing the responses from the server and consolidate any changes (i.e. updates resource
  *    IDs).
  */
-internal class Uploader(private val dataSource: DataSource) {
+internal class Uploader(private val dataSource: DataSource) : IUploader {
   private val patchGenerator = PerResourcePatchGenerator
   private val requestGenerator = TransactionBundleGenerator.getDefault()
 
-  suspend fun upload(localChanges: List<LocalChange>): UploadSyncResult {
-    val patches = patchGenerator.generate(localChanges)
-    val requests = requestGenerator.generateUploadRequests(patches)
-    val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
+  private val _uploadRequestResultFlows = MutableSharedFlow<UploadRequestResult>()
+  override val uploadRequestResultFlows: Flow<UploadRequestResult>
+    get() = _uploadRequestResultFlows
 
-    val successfulResponses = mutableListOf<Resource>()
-
-    for (uploadRequest in requests) {
-      when (val result = handleUploadRequest(uploadRequest)) {
-        is UploadRequestResult.Success -> successfulResponses.add(result.resource)
-        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
+  override suspend fun upload(localChanges: List<LocalChange>) {
+    patchGenerator.generate(localChanges).forEach {
+      val request = requestGenerator.generateUploadRequests(listOf(it))[0]
+      when (val result = handleUploadRequest(request)) {
+        is UploadResponse.Success ->
+          _uploadRequestResultFlows.emit(UploadRequestResult.Success(it.token, result.resource))
+        is UploadResponse.Failure ->
+          _uploadRequestResultFlows.emit(UploadRequestResult.Failure(result.exception, it.token))
       }
     }
-
-    return UploadSyncResult.Success(localChanges, successfulResponses)
   }
 
-  private suspend fun handleUploadRequest(uploadRequest: UploadRequest): UploadRequestResult {
+  private suspend fun handleUploadRequest(uploadRequest: UploadRequest): UploadResponse {
     return try {
       val response = dataSource.upload(uploadRequest)
       when {
         response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE ->
-          UploadRequestResult.Success(response)
+          UploadResponse.Success(response)
         response is OperationOutcome && response.issue.isNotEmpty() ->
-          UploadRequestResult.Failure(
+          UploadResponse.Failure(
             ResourceSyncException(
               uploadRequest.resource.resourceType,
               FHIRException(response.issueFirstRep.diagnostics),
             ),
           )
         else ->
-          UploadRequestResult.Failure(
+          UploadResponse.Failure(
             ResourceSyncException(
               uploadRequest.resource.resourceType,
               FHIRException("Unknown response for ${uploadRequest.resource.resourceType}"),
@@ -82,23 +82,13 @@ internal class Uploader(private val dataSource: DataSource) {
       }
     } catch (e: Exception) {
       Timber.e(e)
-      UploadRequestResult.Failure(ResourceSyncException(ResourceType.Bundle, e))
+      UploadResponse.Failure(ResourceSyncException(ResourceType.Bundle, e))
     }
   }
 
-  private sealed class UploadRequestResult {
-    data class Success(val resource: Resource) : UploadRequestResult()
+  private sealed class UploadResponse {
+    data class Success(val resource: Resource) : UploadResponse()
 
-    data class Failure(val exception: ResourceSyncException) : UploadRequestResult()
+    data class Failure(val exception: ResourceSyncException) : UploadResponse()
   }
-}
-
-sealed class UploadSyncResult {
-  data class Success(
-    val localChanges: List<LocalChange>,
-    val responseResources: List<Resource>,
-  ) : UploadSyncResult()
-
-  data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
-    UploadSyncResult()
 }
