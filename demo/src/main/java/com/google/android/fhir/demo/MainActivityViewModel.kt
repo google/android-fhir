@@ -60,11 +60,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             ),
         )
         .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect {
-          if (it.currentJobState != null) {
-            _pollState.emit(it.currentJobState!!)
-          }
-        }
+        .collect { _pollState.emit(it.currentJobState) }
     }
   }
 
@@ -79,7 +75,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
       viewModelScope.launch {
         Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
           .shareIn(this, SharingStarted.Eagerly, 0)
-          .collect { result -> result?.let { _pollState.emit(it) } }
+          .collect { result -> result.let { _pollState.emit(it) } }
       }
   }
 

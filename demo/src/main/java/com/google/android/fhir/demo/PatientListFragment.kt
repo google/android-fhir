@@ -173,12 +173,13 @@ class PatientListFragment : Fragment() {
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          else -> {
-            Timber.i("Sync: Unknown state.")
+          is SyncState.Enqueued -> {
+            Timber.i("Sync: Enqueued")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
+          SyncState.Cancelled -> TODO()
         }
       }
     }

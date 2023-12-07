@@ -18,8 +18,6 @@ package com.google.android.fhir.sync
 
 import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
@@ -44,15 +42,5 @@ class FhirDataStoreTest {
       }
     }
     editJob.join()
-  }
-
-  @Test
-  fun getLastSyncJobStatus() = runBlocking {
-    val key = "key"
-    val collectedValues = mutableListOf<SyncJobStatus>()
-    val editJob = launch { fhirDataStore.writeTerminalSyncJobStatus(key, SyncJobStatus.Finished()) }
-    collectedValues.add(fhirDataStore.observeTerminalSyncJobStatus(key).filterNotNull().first())
-    editJob.join()
-    assertTrue(collectedValues.first() is SyncJobStatus.Finished)
   }
 }
