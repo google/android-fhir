@@ -58,7 +58,7 @@ fun initHelpViews(
   helpTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   isHelpCardInitiallyVisible: Boolean,
-  helpCardStateChangedCallback: (Int, String) -> Unit,
+  helpCardStateChangedCallback: (Boolean, String) -> Unit,
 ) {
   val helpCardItem = questionnaireItem.item.firstOrNull { it.isHelpCode }
   helpCardView.visibility = if (isHelpCardInitiallyVisible) VISIBLE else GONE
@@ -72,11 +72,11 @@ fun initHelpViews(
     helpCardView.visibility =
       when (helpCardView.visibility) {
         VISIBLE -> {
-          helpCardStateChangedCallback.invoke(GONE, helpCardItem!!.linkId)
+          helpCardStateChangedCallback.invoke(false, helpCardItem!!.linkId)
           GONE
         }
         else -> {
-          helpCardStateChangedCallback.invoke(VISIBLE, helpCardItem!!.linkId)
+          helpCardStateChangedCallback.invoke(true, helpCardItem!!.linkId)
           VISIBLE
         }
       }

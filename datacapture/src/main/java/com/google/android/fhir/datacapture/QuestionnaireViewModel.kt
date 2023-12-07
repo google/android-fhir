@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
-import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -258,8 +257,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     MutableStateFlow(mutableSetOf())
 
   /** Callback to save the help card state. */
-  private val helpCardStateChangedCallback: (Int, String) -> Unit = { shouldBeVisible, linkId ->
-    if (shouldBeVisible == View.VISIBLE) {
+  private val helpCardStateChangedCallback: (Boolean, String) -> Unit = { shouldBeVisible, linkId ->
+    if (shouldBeVisible) {
       openedHelpCardSet.update { it.apply { add(linkId) } }
     } else {
       openedHelpCardSet.update { it.apply { remove(linkId) } }
