@@ -254,7 +254,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /** Tracks which help card has been opened. */
-  private val openedHelpCardList: MutableStateFlow<ArrayList<String>> = MutableStateFlow(arrayListOf())
+  private val openedHelpCardList: MutableStateFlow<ArrayList<String>> =
+    MutableStateFlow(arrayListOf())
 
   /** Callback to save the help card state. */
   private val helpCardStateChangedCallback: (Int, String) -> Unit = { shouldBeVisible, linkId ->
@@ -792,13 +793,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   )
               },
             questionViewTextConfiguration =
-            QuestionTextConfiguration(
-              showAsterisk = showAsterisk,
-              showRequiredText = showRequiredText,
-              showOptionalText = showOptionalText,
-            ),
+              QuestionTextConfiguration(
+                showAsterisk = showAsterisk,
+                showRequiredText = showRequiredText,
+                showOptionalText = showOptionalText,
+              ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
-            helpCardStateChangedCallback = helpCardStateChangedCallback
+            helpCardStateChangedCallback = helpCardStateChangedCallback,
           ),
         ),
       )

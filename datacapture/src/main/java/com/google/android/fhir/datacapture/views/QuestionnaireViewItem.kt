@@ -79,7 +79,7 @@ data class QuestionnaireViewItem(
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
   val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
-  val helpCardStateChangedCallback: (Int, String) -> Unit
+  val helpCardStateChangedCallback: (Int, String) -> Unit,
 ) {
 
   /**
