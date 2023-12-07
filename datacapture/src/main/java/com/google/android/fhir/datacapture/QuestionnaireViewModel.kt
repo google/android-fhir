@@ -260,13 +260,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Callback to save the help card state. */
   private val helpCardStateChangedCallback: (Int, String) -> Unit = { shouldBeVisible, linkId ->
     if (shouldBeVisible == View.VISIBLE) {
-      val newState = openedHelpCardSet.value
-      newState.add(linkId)
-      openedHelpCardSet.value = newState
+      openedHelpCardSet.update { it.apply { add(linkId) } }
     } else {
-      val newState = openedHelpCardSet.value
-      newState.remove(linkId)
-      openedHelpCardSet.value = newState
+      openedHelpCardSet.update { it.apply { remove(linkId) } }
     }
   }
 
