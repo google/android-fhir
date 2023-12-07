@@ -101,8 +101,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     // await/join is needed to collect states completely
     kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    setProgress(output)
-
     Timber.d("Received result from worker $result and sending output $output")
 
     /**
