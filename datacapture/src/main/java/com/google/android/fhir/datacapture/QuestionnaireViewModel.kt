@@ -254,19 +254,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /** Tracks which help card has been opened. */
-  private val openedHelpCardList: MutableStateFlow<ArrayList<String>> =
-    MutableStateFlow(arrayListOf())
+  private val openedHelpCardSet: MutableStateFlow<MutableSet<String>> =
+    MutableStateFlow(mutableSetOf())
 
   /** Callback to save the help card state. */
   private val helpCardStateChangedCallback: (Int, String) -> Unit = { shouldBeVisible, linkId ->
     if (shouldBeVisible == View.VISIBLE) {
-      val newState = openedHelpCardList.value
+      val newState = openedHelpCardSet.value
       newState.add(linkId)
-      openedHelpCardList.value = newState
+      openedHelpCardSet.value = newState
     } else {
-      val newState = openedHelpCardList.value
+      val newState = openedHelpCardSet.value
       newState.remove(linkId)
-      openedHelpCardList.value = newState
+      openedHelpCardSet.value = newState
     }
   }
 
@@ -773,7 +773,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val items = buildList {
       val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
       val isHelpCard = itemHelpCard != null
-      val isHelpCardOpen = openedHelpCardList.value.any { it == itemHelpCard?.linkId }
+      val isHelpCardOpen = openedHelpCardSet.value.any { it == itemHelpCard?.linkId }
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
