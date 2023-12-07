@@ -49,6 +49,8 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
       questionnaireItem = questionnaireViewItem.questionnaireItem,
+      isHelpCardInitiallyVisible = questionnaireViewItem.isHelpCardOpen,
+      helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     // CQF expression takes precedence over static question text

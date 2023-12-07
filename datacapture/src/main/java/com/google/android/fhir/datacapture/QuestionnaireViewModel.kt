@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture
 
 import android.app.Application
 import android.net.Uri
+import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
@@ -38,6 +39,7 @@ import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
+import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -250,6 +252,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Toggles review mode. */
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
+
+  /** Tracks which help card has been opened. */
+  private val openedHelpCardList: MutableStateFlow<ArrayList<String>> = MutableStateFlow(arrayListOf())
+
+  /** Callback to save the help card state. */
+  private val helpCardStateChangedCallback: (Int, String) -> Unit = { shouldBeVisible, linkId ->
+    if (shouldBeVisible == View.VISIBLE) {
+      val newState = openedHelpCardList.value
+      newState.add(linkId)
+      openedHelpCardList.value = newState
+    } else {
+      val newState = openedHelpCardList.value
+      newState.remove(linkId)
+      openedHelpCardList.value = newState
+    }
+  }
 
   /**
    * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
@@ -752,6 +770,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
     val items = buildList {
+      val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
+      val isHelpCard = itemHelpCard != null
+      val isHelpCardOpen = openedHelpCardList.value.any { it == itemHelpCard?.linkId }
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
@@ -771,11 +792,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   )
               },
             questionViewTextConfiguration =
-              QuestionTextConfiguration(
-                showAsterisk = showAsterisk,
-                showRequiredText = showRequiredText,
-                showOptionalText = showOptionalText,
-              ),
+            QuestionTextConfiguration(
+              showAsterisk = showAsterisk,
+              showRequiredText = showRequiredText,
+              showOptionalText = showOptionalText,
+            ),
+            isHelpCardOpen = isHelpCard && isHelpCardOpen,
+            helpCardStateChangedCallback = helpCardStateChangedCallback
           ),
         ),
       )

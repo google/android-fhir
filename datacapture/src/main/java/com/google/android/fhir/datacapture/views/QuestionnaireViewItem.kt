@@ -21,6 +21,7 @@ import android.text.Spanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -77,6 +78,8 @@ data class QuestionnaireViewItem(
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
+  val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
+  val helpCardStateChangedCallback: (Int, String) -> Unit
 ) {
 
   /**
