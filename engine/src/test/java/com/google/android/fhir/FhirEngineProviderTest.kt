@@ -20,7 +20,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import java.lang.IllegalStateException
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -116,7 +115,7 @@ class FhirEngineProviderTest {
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
-      assertThat(this.httpCache?.cacheDir).isEqualTo("sample-dir${File.separator}httpcache")
+      assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
     }
   }
 }
