@@ -52,7 +52,7 @@ internal class SyncJobStatusSerializer {
           serializer.fromJson(stateData, Class.forName(stateType)) as? SyncJobStatus
         }
       } else {
-        error("Not allowed")
+        error("Corrupt state type : $stateType")
       }
     }
   }

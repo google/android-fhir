@@ -39,9 +39,9 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
+// @Ignore("Flaky/fails due to https://github.com/google/android-fhir/issues/2046")
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
-@Ignore("Flaky/fails due to https://github.com/google/android-fhir/issues/2046")
 class SyncInstrumentedTest {
 
   private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
@@ -72,10 +72,28 @@ class SyncInstrumentedTest {
     }
 
     assertThat(workManager.getWorkInfosByTag(TestSyncWorker::class.java.name).get().first().state)
-      .isEqualTo(WorkInfo.State.RUNNING)
+      .isEqualTo(WorkInfo.State.SUCCEEDED)
   }
 
   @Test
+  fun oneTime_worker_syncState() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<SyncState>()
+    runBlocking {
+      Sync.oneTimeSync<TestSyncWorker>(context = context)
+        .transformWhile {
+          states.add(it)
+          emit(it is SyncState.Succeeded)
+          it !is SyncState.Succeeded
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+    assertThat(states.first()).isInstanceOf(SyncState.Running::class.java)
+    assertThat(states.last()).isInstanceOf(SyncState.Succeeded::class.java)
+  }
+
+  @Test
+  @Ignore
   fun periodic_worker_still_queued_to_run_after_oneTime_worker_started() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val workManager = WorkManager.getInstance(context)

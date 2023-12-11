@@ -256,7 +256,7 @@ object Sync {
       is SyncJobStatus.Started,
       is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
       null -> handleNullWorkManagerStatus(workInfoState, syncJobStatusFromDataStore)
-      else -> error("Error message here")
+      else -> error("Inconsistent syncJobStatus: $syncJobStatusFromWorkManager.")
     }
 
   private fun handleNullWorkManagerStatus(
@@ -269,7 +269,7 @@ object Sync {
       CANCELLED -> Cancelled
       SUCCEEDED,
       FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
-      else -> error("Error message here")
+      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
     }
 
   private fun handleFinishedOrFailedState(
@@ -280,13 +280,13 @@ object Sync {
       when (it) {
         is SyncJobStatus.Finished -> Succeeded(it)
         is SyncJobStatus.Failed -> Failed(it)
-        else -> error("Error message here")
+        else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
       }
     }
       ?: when (workInfoState) {
         SUCCEEDED -> Succeeded(SyncJobStatus.Finished())
-        FAILED -> error("Error message here")
-        else -> error("Error message here")
+        FAILED -> error("WorkInfo.State is $workInfoState")
+        else -> error("Inconsistent WorkInfo.State: $workInfoState.")
       }
 
   /**
@@ -306,7 +306,7 @@ object Sync {
       when (it) {
         is SyncJobStatus.Finished -> Result.Succeeded(it.timestamp)
         is SyncJobStatus.Failed -> Result.Failed(it.exceptions, lastSyncJobStatus.timestamp)
-        else -> error("Can't have")
+        else -> error("Inconsistent terminal syncJobStatus : $lastSyncJobStatus")
       }
     }
 }
