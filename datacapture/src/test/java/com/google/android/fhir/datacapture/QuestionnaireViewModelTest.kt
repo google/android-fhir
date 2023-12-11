@@ -3873,6 +3873,103 @@ class QuestionnaireViewModelTest {
     assertResourceEquals(value, expectedResponse)
   }
 
+  @Test
+  fun `clearAllAnswers clears all answers in questionnaire response`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val questionnaireResponseString =
+      """
+           {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "item": [
+                    {
+                      "linkId": "1.1",
+                      "text": "First Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "1.2",
+                      "text": "Second Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """
+        .trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """
+        .trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.clearAllAnswers()
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
