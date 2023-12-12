@@ -280,6 +280,43 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
+  fun `should generate a single update patch with three elements of two adds and one remove`() {
+    val expectedPatch = readJsonArrayFromFile("/update_careplan_patch.json")
+    val updatePatch1 = readJsonArrayFromFile("/update_careplan_patch_1.json")
+    val updatePatch2 = readJsonArrayFromFile("/update_careplan_patch_2.json")
+
+    val updatedLocalChange1 =
+      LocalChange(
+        resourceType = "CarePlan",
+        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+        type = LocalChange.Type.UPDATE,
+        payload = updatePatch1.toString(),
+        timestamp = Instant.now(),
+        token = LocalChangeToken(listOf(1)),
+      )
+
+    val updatedLocalChange2 =
+      LocalChange(
+        resourceType = "CarePlan",
+        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+        type = LocalChange.Type.UPDATE,
+        payload = updatePatch2.toString(),
+        timestamp = Instant.now(),
+        token = LocalChangeToken(listOf(1)),
+      )
+
+    val patches =
+      PerResourcePatchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
+
+    with(patches.single()) {
+      assertThat(type).isEqualTo(Patch.Type.UPDATE)
+      assertThat(resourceId).isEqualTo("131b5257-a8b3-435a-8cb3-4cb1296be24a")
+      assertThat(resourceType).isEqualTo("CarePlan")
+      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), expectedPatch)
+    }
+  }
+
+  @Test
   fun `should generate a single delete patch if the resource is updated and deleted`() {
     val remoteMeta =
       Meta().apply {
