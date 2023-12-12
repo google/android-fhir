@@ -421,6 +421,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  /** Clears all the answers from the questionnaire response by iterating through each item. */
+  fun clearAllAnswers() {
+    questionnaireResponse.allItems.forEach { it.answer = emptyList() }
+    draftAnswerMap.clear()
+    modifiedQuestionnaireResponseItemSet.clear()
+    responseItemToAnswersMapForDisabledQuestionnaireItem.clear()
+    modificationCount.update { it + 1 }
+  }
+
   /**
    * Validates entire questionnaire and return the validation results. As a side effect, it triggers
    * the UI update to show errors in case there are any validation errors.

@@ -52,7 +52,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Switch to Java 17 from Eclipse Temurin distro
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: 17
         distribution: temurin

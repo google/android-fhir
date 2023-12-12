@@ -300,6 +300,8 @@ class QuestionnaireFragment : Fragment() {
    */
   fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
+  fun clearAllAnswers() = viewModel.clearAllAnswers()
+
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
 
