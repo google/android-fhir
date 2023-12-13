@@ -35,18 +35,16 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
-// @Ignore("Flaky/fails due to https://github.com/google/android-fhir/issues/2046")
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncInstrumentedTest {
 
   private val context: Context = InstrumentationRegistry.getInstrumentation().targetContext
 
-  class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
+  open class TestSyncWorker(appContext: Context, workerParams: WorkerParameters) :
     FhirSyncWorker(appContext, workerParams) {
 
     override fun getFhirEngine(): FhirEngine = TestFhirEngineImpl
@@ -93,7 +91,36 @@ class SyncInstrumentedTest {
   }
 
   @Test
-  @Ignore
+  fun periodic_worker_periodicSyncState() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val workManager = WorkManager.getInstance(context)
+    val states = mutableListOf<PeriodicSyncState>()
+    // run and wait for periodic worker to finish
+    runBlocking {
+      Sync.periodicSync<TestSyncWorker>(
+          context = context,
+          periodicSyncConfiguration =
+            PeriodicSyncConfiguration(
+              syncConstraints = Constraints.Builder().build(),
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+            ),
+        )
+        .transformWhile {
+          states.add(it)
+          emit(it)
+          it.currentJobState !is SyncState.Enqueued
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+
+    assertThat(states.first().currentJobState).isInstanceOf(SyncState.Running::class.java)
+    assertThat(states.first().lastJobState).isInstanceOf(Result.Succeeded::class.java)
+
+    assertThat(states.last().currentJobState).isInstanceOf(SyncState.Enqueued::class.java)
+    assertThat(states.last().lastJobState).isInstanceOf(Result.Succeeded::class.java)
+  }
+
+  @Test
   fun periodic_worker_still_queued_to_run_after_oneTime_worker_started() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val workManager = WorkManager.getInstance(context)
@@ -109,7 +136,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.currentJobState !is SyncState.Succeeded
+          it.currentJobState !is SyncState.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
