@@ -19,5 +19,5 @@ dependencies {
   implementation("com.spotify.ruler:ruler-gradle-plugin:1.4.0")
 
   implementation("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.0")
-  implementation("com.squareup:kotlinpoet:1.15.2")
+  implementation("com.squareup:kotlinpoet:1.15.3")
 }

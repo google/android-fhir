@@ -39,6 +39,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
@@ -2293,6 +2294,81 @@ class MoreQuestionnaireItemComponentsTest {
       }
 
     assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return empty list for empty response item list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+    val result =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(result.size).isEqualTo(0)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and response list`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(2)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and repeated response list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
+  }
+
+  @Test
+  fun `should return non empty list for out of order questionnaire item and response item`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "3" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "3" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
   }
 
   private val displayCategoryExtensionWithInstructionsCode =
