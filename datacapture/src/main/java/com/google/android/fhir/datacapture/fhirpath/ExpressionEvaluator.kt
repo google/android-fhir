@@ -232,8 +232,8 @@ internal class ExpressionEvaluator(
       }
     }
     return variablesMap.apply {
-      put(questionnaireFhirpathSupplement, questionnaire)
-      put(questionnaireItemFhirpathSupplement, questionnaireItem)
+      put(questionnaireFhirPathSupplement, questionnaire)
+      put(questionnaireItemFhirPathSupplement, questionnaireItem)
     }
   }
 
@@ -294,7 +294,7 @@ internal class ExpressionEvaluator(
       questionnaireLaunchContextMap
         ?.toMutableMap()
         .takeIf { !it.isNullOrEmpty() }
-        ?.also { it.put(questionnaireFhirpathSupplement, questionnaire) }
+        ?.also { it.put(questionnaireFhirPathSupplement, questionnaire) }
         ?.let { evaluateXFhirEnhancement(expression, it) }
         ?: emptySequence()
 
