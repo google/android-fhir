@@ -26,7 +26,9 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.testing.TestDataSourceImpl
+import com.google.android.fhir.testing.TestDownloadFailingManagerImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
+import com.google.android.fhir.testing.TestFailingDatasource
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
@@ -38,6 +40,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
 
+/**
+ * Note : If you are running these tests on a local machine in Android Studio, make sure to clear
+ * the storage and cache of the `com.google.android.fhir.test` app on the emulator/device before
+ * running each test individually.
+ */
 @OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class SyncInstrumentedTest {
@@ -54,6 +61,13 @@ class SyncInstrumentedTest {
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+  }
+
+  class TestSyncWorkerForDownloadFailing(appContext: Context, workerParams: WorkerParameters) :
+    TestSyncWorker(appContext, workerParams) {
+    override fun getDataSource(): DataSource = TestFailingDatasource
+
+    override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadFailingManagerImpl()
   }
 
   @Test
@@ -91,9 +105,25 @@ class SyncInstrumentedTest {
   }
 
   @Test
+  fun oneTime_worker_failedSyncState() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<SyncState>()
+    runBlocking {
+      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(context = context)
+        .transformWhile {
+          states.add(it)
+          emit(it is SyncState.Failed)
+          it !is SyncState.Failed
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+    assertThat(states.first()).isInstanceOf(SyncState.Running::class.java)
+    assertThat(states.last()).isInstanceOf(SyncState.Failed::class.java)
+  }
+
+  @Test
   fun periodic_worker_periodicSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
-    val workManager = WorkManager.getInstance(context)
     val states = mutableListOf<PeriodicSyncState>()
     // run and wait for periodic worker to finish
     runBlocking {
@@ -114,10 +144,37 @@ class SyncInstrumentedTest {
     }
 
     assertThat(states.first().currentJobState).isInstanceOf(SyncState.Running::class.java)
-    assertThat(states.first().lastJobState).isInstanceOf(Result.Succeeded::class.java)
-
+    assertThat(states.first().lastJobState).isNull()
     assertThat(states.last().currentJobState).isInstanceOf(SyncState.Enqueued::class.java)
     assertThat(states.last().lastJobState).isInstanceOf(Result.Succeeded::class.java)
+  }
+
+  @Test
+  fun periodic_worker_failedPeriodicSyncState() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<PeriodicSyncState>()
+    // run and wait for periodic worker to finish
+    runBlocking {
+      Sync.periodicSync<TestSyncWorkerForDownloadFailing>(
+          context = context,
+          periodicSyncConfiguration =
+            PeriodicSyncConfiguration(
+              syncConstraints = Constraints.Builder().build(),
+              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+            ),
+        )
+        .transformWhile {
+          states.add(it)
+          emit(it)
+          it.currentJobState !is SyncState.Enqueued
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+
+    assertThat(states.first().currentJobState).isInstanceOf(SyncState.Running::class.java)
+    assertThat(states.first().lastJobState).isNull()
+    assertThat(states.last().currentJobState).isInstanceOf(SyncState.Enqueued::class.java)
+    assertThat(states.last().lastJobState).isInstanceOf(Result.Failed::class.java)
   }
 
   @Test

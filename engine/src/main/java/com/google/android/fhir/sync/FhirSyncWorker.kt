@@ -90,7 +90,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
               }
               cancel()
             }
-            else -> setProgress(buildWorkData(syncJobStatus))
+            else -> {
+              setProgress(buildWorkData(syncJobStatus))
+            }
           }
         }
       }

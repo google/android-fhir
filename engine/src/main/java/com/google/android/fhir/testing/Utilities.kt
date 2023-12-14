@@ -135,6 +135,12 @@ open class TestDownloadManagerImpl(
   }
 }
 
+class TestDownloadFailingManagerImpl : TestDownloadManagerImpl() {
+  override suspend fun processResponse(response: Resource): Collection<Resource> {
+    error("Download is failed.")
+  }
+}
+
 object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()
 

@@ -151,6 +151,7 @@ object Sync {
         lastJobState = mapSyncJobStatusToResult(syncJobStatusFromDataStore),
         currentJobState =
           createSyncState(
+            WorkRequest.PERIODIC,
             workerInfoSyncJobStatusPairFromWorkManager.first,
             workerInfoSyncJobStatusPairFromWorkManager.second,
             syncJobStatusFromDataStore,
@@ -182,6 +183,7 @@ object Sync {
       syncJobStatusFromDataStore,
       ->
       createSyncState(
+        WorkRequest.ONE_TIME,
         workerInfoSyncJobStatusPairFromWorkManager.first,
         workerInfoSyncJobStatusPairFromWorkManager.second,
         syncJobStatusFromDataStore,
@@ -248,16 +250,24 @@ object Sync {
   }
 
   private fun createSyncState(
+    workRequest: WorkRequest,
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
     syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState =
-    when (syncJobStatusFromWorkManager) {
+  ): SyncState {
+    return when (syncJobStatusFromWorkManager) {
       is SyncJobStatus.Started,
       is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
-      null -> handleNullWorkManagerStatus(workInfoState, syncJobStatusFromDataStore)
+      null -> {
+        when (workRequest) {
+          WorkRequest.ONE_TIME ->
+            handleNullWorkManagerStatusForOneTimeSync(workInfoState, syncJobStatusFromDataStore)
+          WorkRequest.PERIODIC -> handleNullWorkManagerStatusForPeriodicSync(workInfoState)
+        }
+      }
       else -> error("Inconsistent syncJobStatus: $syncJobStatusFromWorkManager.")
     }
+  }
 
   private fun handleNullWorkManagerStatus(
     workInfoState: WorkInfo.State,
@@ -270,6 +280,49 @@ object Sync {
       SUCCEEDED,
       FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
       else -> error("Inconsistent WorkInfo.State: $workInfoState.")
+    }
+
+  /**
+   * Only call this API when `syncJobStatusFromWorkManager` is null. In one-time sync, `WorkInfo`
+   * has the following possible states: [WorkInfo.State.ENQUEUED], [WorkInfo.State.RUNNING],
+   * [WorkInfo.State.SUCCEEDED], [WorkInfo.State.FAILED], [WorkInfo.State.CANCELLED]. More details
+   * about these states can be found here
+   * https://developer.android.com/guide/background/persistent/how-to/states#one-time_work_states
+   * Create a [SyncState] from `syncJobStatusFromDataStore` if it is not null; otherwise, create it
+   * from [WorkInfo.State].
+   */
+  private fun handleNullWorkManagerStatusForOneTimeSync(
+    workInfoState: WorkInfo.State,
+    syncJobStatusFromDataStore: SyncJobStatus?,
+  ): SyncState {
+    syncJobStatusFromDataStore?.let {
+      return handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
+    }
+    return when (workInfoState) {
+      RUNNING -> Running(SyncJobStatus.Started())
+      ENQUEUED -> Enqueued
+      CANCELLED -> Cancelled
+      SUCCEEDED,
+      FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
+      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
+    }
+  }
+
+  /**
+   * Only call this API when syncJobStatusFromWorkManager is null. In periodic sync, the WorkInfo
+   * has only three possible states: [WorkInfo.State.RUNNING], [WorkInfo.State.ENQUEUED],
+   * [WorkInfo.State.CANCELLED]. More details about these states can be found here
+   * [https://developer.android.com/guide/background/persistent/how-to/states] (Note:
+   * syncJobStatusFromDataStore is updated as lastSynJobStatus, which is the terminalSyncJobStatus.)
+   */
+  private fun handleNullWorkManagerStatusForPeriodicSync(
+    workInfoState: WorkInfo.State,
+  ): SyncState =
+    when (workInfoState) {
+      RUNNING -> Running(SyncJobStatus.Started())
+      ENQUEUED -> Enqueued
+      CANCELLED -> Cancelled
+      else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
     }
 
   private fun handleFinishedOrFailedState(
@@ -305,8 +358,13 @@ object Sync {
     lastSyncJobStatus?.let {
       when (it) {
         is SyncJobStatus.Finished -> Result.Succeeded(it.timestamp)
-        is SyncJobStatus.Failed -> Result.Failed(it.exceptions, lastSyncJobStatus.timestamp)
+        is SyncJobStatus.Failed -> Result.Failed(lastSyncJobStatus.timestamp)
         else -> error("Inconsistent terminal syncJobStatus : $lastSyncJobStatus")
       }
     }
+
+  private enum class WorkRequest {
+    ONE_TIME,
+    PERIODIC,
+  }
 }

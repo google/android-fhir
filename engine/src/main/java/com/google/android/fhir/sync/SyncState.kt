@@ -68,11 +68,6 @@ sealed class Result(val timestamp: OffsetDateTime) {
   /** Represents a successful synchronization result. */
   class Succeeded(timestamp: OffsetDateTime) : Result(timestamp)
 
-  /**
-   * Represents a failed synchronization result.
-   *
-   * @property exceptions The list of exceptions that occurred during the synchronization failure.
-   */
-  class Failed(val exceptions: List<ResourceSyncException>, timestamp: OffsetDateTime) :
-    Result(timestamp)
+  /** Represents a failed synchronization result. */
+  class Failed(timestamp: OffsetDateTime) : Result(timestamp)
 }
