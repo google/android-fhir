@@ -29,7 +29,8 @@ import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
@@ -211,15 +212,32 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource> {
+  override suspend fun searchForwardReferencedResources(
+    query: SearchQuery,
+  ): List<ForwardIncludeSearchResult> {
     return db.withTransaction {
       resourceDao
-        .getReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
         .map {
-          IndexedIdAndResource(
+          ForwardIncludeSearchResult(
             it.matchingIndex,
-            typeAndIdOfBaseResourceOnWhichThisMatched = it.idOfBaseResourceOnWhichThisMatchedRev,
-            uuidOfBaseResourceOnWhichThisMatched = it.idOfBaseResourceOnWhichThisMatchedInc,
+            it.baseResourceUUID,
+            iParser.parseResource(it.serializedResource) as Resource,
+          )
+        }
+    }
+  }
+
+  override suspend fun searchReverseReferencedResources(
+    query: SearchQuery,
+  ): List<ReverseIncludeSearchResult> {
+    return db.withTransaction {
+      resourceDao
+        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          ReverseIncludeSearchResult(
+            it.matchingIndex,
+            it.baseResourceTypeAndId,
             iParser.parseResource(it.serializedResource) as Resource,
           )
         }

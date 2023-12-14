@@ -2277,7 +2277,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2320,7 +2320,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2371,7 +2371,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2429,7 +2429,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2444,7 +2444,7 @@ class SearchTest {
         )
         UNION ALL
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2495,7 +2495,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
@@ -2534,7 +2534,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+        SELECT  rie.index_name, rie.index_value, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
@@ -2588,7 +2588,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+        SELECT  rie.index_name, rie.index_value, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
@@ -2662,7 +2662,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
@@ -2678,7 +2678,7 @@ class SearchTest {
           )
           UNION ALL
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+          SELECT  rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid

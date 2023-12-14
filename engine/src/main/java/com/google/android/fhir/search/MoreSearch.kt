@@ -54,7 +54,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
     if (forwardIncludes.isEmpty() || baseResources.isEmpty()) {
       null
     } else {
-      database.searchReferencedResources(
+      database.searchForwardReferencedResources(
         getIncludeQuery(includeIds = baseResources.map { it.uuid }),
       )
     }
@@ -62,7 +62,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
     if (revIncludes.isEmpty() || baseResources.isEmpty()) {
       null
     } else {
-      database.searchReferencedResources(
+      database.searchReverseReferencedResources(
         getRevIncludeQuery(
           includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
         ),
@@ -75,16 +75,15 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
       included =
         includedResources
           ?.asSequence()
-          ?.filter { it.uuidOfBaseResourceOnWhichThisMatched == uuid }
-          ?.groupBy({ it.matchingIndex }, { it.resource }),
+          ?.filter { it.baseResourceUUID == uuid }
+          ?.groupBy({ it.searchIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
           ?.asSequence()
           ?.filter {
-            it.typeAndIdOfBaseResourceOnWhichThisMatched ==
-              "${baseResource.fhirType()}/${baseResource.logicalId}"
+            it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource }),
+          ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
     )
   }
 }
@@ -136,7 +135,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
       val filterQuery = generateFilterQuery(it)
       val (join, order) = it.search.getSortOrder(otherTable = "re")
       """
-      SELECT  rie.index_name, rie.index_value, rie.resourceUuid, re.serializedResource
+      SELECT  rie.index_name, rie.index_value, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceUuid = rie.resourceUuid
@@ -195,7 +194,7 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
       val (join, order) = it.search.getSortOrder(otherTable = "re")
 
       """
-      SELECT  rie.index_name, rie.index_name, rie.resourceUuid, re.serializedResource
+      SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceType||"/"||re.resourceId = rie.index_value

@@ -230,9 +230,14 @@ internal abstract class ResourceDao {
   abstract suspend fun getResources(query: SupportSQLiteQuery): List<SerializedResourceWithUuid>
 
   @RawQuery
-  abstract suspend fun getReferencedResources(
+  abstract suspend fun getForwardReferencedResources(
     query: SupportSQLiteQuery,
-  ): List<IndexedIdAndSerializedResource>
+  ): List<ForwardIncludeSearchResponse>
+
+  @RawQuery
+  abstract suspend fun getReverseReferencedResources(
+    query: SupportSQLiteQuery,
+  ): List<ReverseIncludeSearchResponse>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
@@ -423,14 +428,35 @@ internal data class IndexedIdAndSerializedResource(
   val serializedResource: String,
 )
 
+internal class ForwardIncludeSearchResponse(
+  @ColumnInfo(name = "index_name") val matchingIndex: String,
+  @ColumnInfo(name = "resourceUuid") val baseResourceUUID: UUID,
+  val serializedResource: String,
+)
+
+internal class ReverseIncludeSearchResponse(
+  @ColumnInfo(name = "index_name") val matchingIndex: String,
+  @ColumnInfo(name = "index_value") val baseResourceTypeAndId: String,
+  val serializedResource: String,
+)
+
 /**
- * Data class representing an included or revIncluded [Resource], index on which the match was done
- * and the id of the base [Resource] for which this [Resource] has been included.
+ * Data class representing a forward included [Resource], index on which the match was done and the
+ * uuid of the base [Resource] for which this [Resource] has been included.
  */
-internal data class IndexedIdAndResource(
-  val matchingIndex: String,
-  val typeAndIdOfBaseResourceOnWhichThisMatched: String?,
-  val uuidOfBaseResourceOnWhichThisMatched: UUID?,
+internal data class ForwardIncludeSearchResult(
+  val searchIndex: String,
+  val baseResourceUUID: UUID,
+  val resource: Resource,
+)
+
+/**
+ * Data class representing a reverse included [Resource], index on which the match was done and the
+ * type and logical id of the base [Resource] for which this [Resource] has been included.
+ */
+internal data class ReverseIncludeSearchResult(
+  val searchIndex: String,
+  val baseResourceTypeWithId: String,
   val resource: Resource,
 )
 
