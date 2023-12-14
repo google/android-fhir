@@ -283,13 +283,8 @@ object Sync {
     }
 
   /**
-   * Only call this API when `syncJobStatusFromWorkManager` is null. In one-time sync, `WorkInfo`
-   * has the following possible states: [WorkInfo.State.ENQUEUED], [WorkInfo.State.RUNNING],
-   * [WorkInfo.State.SUCCEEDED], [WorkInfo.State.FAILED], [WorkInfo.State.CANCELLED]. More details
-   * about these states can be found here
-   * https://developer.android.com/guide/background/persistent/how-to/states#one-time_work_states
-   * Create a [SyncState] from `syncJobStatusFromDataStore` if it is not null; otherwise, create it
-   * from [WorkInfo.State].
+   * Only call this API when `syncJobStatusFromWorkManager` is null. Create a [SyncState] from
+   * `syncJobStatusFromDataStore` if it is not null; otherwise, create it from [WorkInfo.State].
    */
   private fun handleNullWorkManagerStatusForOneTimeSync(
     workInfoState: WorkInfo.State,
@@ -309,11 +304,9 @@ object Sync {
   }
 
   /**
-   * Only call this API when syncJobStatusFromWorkManager is null. In periodic sync, the WorkInfo
-   * has only three possible states: [WorkInfo.State.RUNNING], [WorkInfo.State.ENQUEUED],
-   * [WorkInfo.State.CANCELLED]. More details about these states can be found here
-   * [https://developer.android.com/guide/background/persistent/how-to/states] (Note:
-   * syncJobStatusFromDataStore is updated as lastSynJobStatus, which is the terminalSyncJobStatus.)
+   * Only call this API when syncJobStatusFromWorkManager is null. Create a [SyncState] from
+   * [WorkInfo.State]. (Note: syncJobStatusFromDataStore is updated as lastSynJobStatus, which is
+   * the terminalSyncJobStatus.)
    */
   private fun handleNullWorkManagerStatusForPeriodicSync(
     workInfoState: WorkInfo.State,
