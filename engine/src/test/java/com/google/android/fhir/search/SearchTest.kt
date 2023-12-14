@@ -17,10 +17,12 @@
 package com.google.android.fhir.search
 
 import android.os.Build
+import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
+import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
@@ -2285,9 +2287,16 @@ class SearchTest {
           """
           .trimIndent(),
       )
-    // TODO : Find way to check the uuids
+
     assertThat(query.args)
-      .containsAtLeast("Patient", "general-practitioner", "Practitioner")
+      .comparingElementsUsing(ArgsComparator)
+      .containsExactly(
+        "Patient",
+        "general-practitioner",
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
+        "Practitioner",
+      )
       .inOrder()
   }
 
@@ -2326,11 +2335,13 @@ class SearchTest {
           .trimIndent(),
       )
 
-    // TODO : Find way to check the uuids
     assertThat(query.args)
-      .containsAtLeast(
+      .comparingElementsUsing(ArgsComparator)
+      .containsExactly(
         "Patient",
         "general-practitioner",
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
         "Practitioner",
         "Practitioner",
         "active",
@@ -2377,11 +2388,13 @@ class SearchTest {
           .trimIndent(),
       )
 
-    // TODO : Find way to check the uuids
     assertThat(query.args)
-      .containsAtLeast(
+      .comparingElementsUsing(ArgsComparator)
+      .containsExactly(
         "Patient",
         "general-practitioner",
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
         "Practitioner",
         "Practitioner",
         "active",
@@ -2448,17 +2461,21 @@ class SearchTest {
           .trimIndent(),
       )
 
-    // TODO : Find way to check the uuids
     assertThat(query.args)
-      .containsAtLeast(
+      .comparingElementsUsing(ArgsComparator)
+      .containsExactly(
         "Patient",
         "general-practitioner",
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
         "Practitioner",
         "Practitioner",
         "active",
         "true",
         "Patient",
         "organization",
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
+        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
         "Organization",
         "Organization",
         "active",
@@ -2472,7 +2489,7 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply { revInclude<Condition>(Condition.SUBJECT) }
-        .getRevIncludeQuery(listOf("pa01", "pa02"))
+        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
 
     assertThat(query.query)
       .isEqualTo(
@@ -2490,7 +2507,7 @@ class SearchTest {
       )
 
     assertThat(query.args)
-      .containsExactly("Condition", "subject", "pa01", "pa02", "Condition")
+      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02", "Condition")
       .inOrder()
   }
 
@@ -2511,7 +2528,7 @@ class SearchTest {
             )
           }
         }
-        .getRevIncludeQuery(listOf("pa01", "pa02"))
+        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
 
     assertThat(query.query)
       .isEqualTo(
@@ -2536,8 +2553,8 @@ class SearchTest {
       .containsExactly(
         "Condition",
         "subject",
-        "pa01",
-        "pa02",
+        "Patient/pa01",
+        "Patient/pa02",
         "Condition",
         "Condition",
         "code",
@@ -2565,7 +2582,7 @@ class SearchTest {
             sort(Condition.RECORDED_DATE, Order.DESCENDING)
           }
         }
-        .getRevIncludeQuery(listOf("pa01", "pa02"))
+        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
 
     assertThat(query.query)
       .isEqualTo(
@@ -2576,7 +2593,7 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
         LEFT JOIN DateIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date'LEFT JOIN DateTimeIndexEntity c
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date' LEFT JOIN DateTimeIndexEntity c
         ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
@@ -2593,8 +2610,8 @@ class SearchTest {
       .containsExactly(
         "Condition",
         "subject",
-        "pa01",
-        "pa02",
+        "Patient/pa01",
+        "Patient/pa02",
         "Condition",
         "Condition",
         "code",
@@ -2639,7 +2656,7 @@ class SearchTest {
             sort(Condition.RECORDED_DATE, Order.DESCENDING)
           }
         }
-        .getRevIncludeQuery(listOf("pa01", "pa02"))
+        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
 
     assertThat(query.query)
       .isEqualTo(
@@ -2650,7 +2667,7 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'date'LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'date' LEFT JOIN DateTimeIndexEntity c
           ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'date'
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
@@ -2666,7 +2683,7 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date'LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date' LEFT JOIN DateTimeIndexEntity c
           ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
@@ -2683,8 +2700,8 @@ class SearchTest {
       .containsExactly(
         "Encounter",
         "subject",
-        "pa01",
-        "pa02",
+        "Patient/pa01",
+        "Patient/pa02",
         "Encounter",
         "Encounter",
         "status",
@@ -2692,8 +2709,8 @@ class SearchTest {
         "http://hl7.org/fhir/encounter-status",
         "Condition",
         "subject",
-        "pa01",
-        "pa02",
+        "Patient/pa01",
+        "Patient/pa02",
         "Condition",
         "Condition",
         "code",
@@ -2706,5 +2723,20 @@ class SearchTest {
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
+
+    /**
+     * Custom implementation to equality check values of [com.google.common.truth.IterableSubject].
+     */
+    val ArgsComparator: Correspondence<Any, Any> =
+      Correspondence.from(
+        { a, b ->
+          if (a is ByteArray && b is ByteArray) {
+            a.contentEquals(b)
+          } else {
+            a == b
+          }
+        },
+        "",
+      )
   }
 }

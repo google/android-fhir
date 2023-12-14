@@ -26,8 +26,8 @@ import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.ResourceAndUUID
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -202,11 +202,11 @@ internal class DatabaseImpl(
 
   override suspend fun <R : Resource> search(
     query: SearchQuery,
-  ): List<ResourceAndUUID<R>> {
+  ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { ResourceAndUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
+        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
         .distinctBy { it.uuid }
     }
   }

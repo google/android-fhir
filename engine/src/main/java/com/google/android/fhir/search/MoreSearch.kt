@@ -235,9 +235,10 @@ private fun Search.getSortOrder(otherTable: String): Pair<String, String> {
     sortTableNames.forEachIndexed { index, sortTableName ->
       val tableAlias = 'b' + index
 
+      if (index > 0) sortJoinStatement += " "
       sortJoinStatement +=
         //  spotless:off
-        """
+      """
       LEFT JOIN ${sortTableName.tableName} $tableAlias
       ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = '${sort.paramName}'
       """.trim()

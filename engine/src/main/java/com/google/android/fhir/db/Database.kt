@@ -94,7 +94,7 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceAndUUID<R>>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceWithUUID<R>>
 
   suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
 
@@ -184,7 +184,7 @@ internal interface Database {
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }
 
-data class ResourceAndUUID<R>(
+data class ResourceWithUUID<R>(
   val uuid: UUID,
   val resource: R,
 )

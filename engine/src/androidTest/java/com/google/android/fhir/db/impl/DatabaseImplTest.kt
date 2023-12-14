@@ -3636,7 +3636,7 @@ class DatabaseImplTest {
 
     val practitioners = listOf(gp01, gp02, gp03, gp04)
 
-    database.insertRemote(*(patients + practitioners).shuffled().toTypedArray())
+    database.insertRemote(*(patients + practitioners).toTypedArray())
 
     val result =
       Search(ResourceType.Patient)
@@ -3798,7 +3798,7 @@ class DatabaseImplTest {
       }
 
     val encounters = listOf(enc1_1, enc1_2, enc1_3, enc1_4, enc2_1, enc2_2, enc2_3, enc2_4)
-    database.insertRemote(*(patients + encounters).shuffled().toTypedArray())
+    database.insertRemote(*(patients + encounters).toTypedArray())
 
     val result =
       Search(ResourceType.Patient)
