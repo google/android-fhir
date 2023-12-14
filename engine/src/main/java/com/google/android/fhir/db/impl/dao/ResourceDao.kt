@@ -417,17 +417,6 @@ internal abstract class ResourceDao {
   }
 }
 
-/**
- * Data class representing the value returned by [getReferencedResources]. The optional fields may
- * or may not contain values based on the search query.
- */
-internal data class IndexedIdAndSerializedResource(
-  @ColumnInfo(name = "index_name") val matchingIndex: String,
-  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
-  @ColumnInfo(name = "resourceUuid") val idOfBaseResourceOnWhichThisMatchedInc: UUID?,
-  val serializedResource: String,
-)
-
 internal class ForwardIncludeSearchResponse(
   @ColumnInfo(name = "index_name") val matchingIndex: String,
   @ColumnInfo(name = "resourceUuid") val baseResourceUUID: UUID,
