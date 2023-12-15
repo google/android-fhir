@@ -26,9 +26,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.WorkInfo.State.FAILED
 import androidx.work.WorkInfo.State.RUNNING
-import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngineProvider
@@ -269,19 +267,6 @@ object Sync {
     }
   }
 
-  private fun handleNullWorkManagerStatus(
-    workInfoState: WorkInfo.State,
-    syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState =
-    when (workInfoState) {
-      RUNNING -> Running(SyncJobStatus.Started())
-      ENQUEUED -> Enqueued
-      CANCELLED -> Cancelled
-      SUCCEEDED,
-      FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
-      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
-    }
-
   /**
    * Only call this API when `syncJobStatusFromWorkManager` is null. Create a [SyncState] from
    * `syncJobStatusFromDataStore` if it is not null; otherwise, create it from [WorkInfo.State].
@@ -289,19 +274,21 @@ object Sync {
   private fun handleNullWorkManagerStatusForOneTimeSync(
     workInfoState: WorkInfo.State,
     syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState {
+  ): SyncState =
     syncJobStatusFromDataStore?.let {
-      return handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
+      when (it) {
+        is SyncJobStatus.Finished -> Succeeded(it)
+        is SyncJobStatus.Failed -> Failed(it)
+        else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
+      }
     }
-    return when (workInfoState) {
-      RUNNING -> Running(SyncJobStatus.Started())
-      ENQUEUED -> Enqueued
-      CANCELLED -> Cancelled
-      SUCCEEDED,
-      FAILED, -> handleFinishedOrFailedState(workInfoState, syncJobStatusFromDataStore)
-      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
-    }
-  }
+      ?: when (workInfoState) {
+        RUNNING -> Running(SyncJobStatus.Started())
+        ENQUEUED -> Enqueued
+        CANCELLED -> Cancelled
+        // syncJobStatusFromDataStore should not be null for SUCCEEDED, FAILED.
+        else -> error("Inconsistent WorkInfo.State: $workInfoState.")
+      }
 
   /**
    * Only call this API when syncJobStatusFromWorkManager is null. Create a [SyncState] from
@@ -317,23 +304,6 @@ object Sync {
       CANCELLED -> Cancelled
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
     }
-
-  private fun handleFinishedOrFailedState(
-    workInfoState: WorkInfo.State,
-    syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState =
-    syncJobStatusFromDataStore?.let {
-      when (it) {
-        is SyncJobStatus.Finished -> Succeeded(it)
-        is SyncJobStatus.Failed -> Failed(it)
-        else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
-      }
-    }
-      ?: when (workInfoState) {
-        SUCCEEDED -> Succeeded(SyncJobStatus.Finished())
-        FAILED -> error("WorkInfo.State is $workInfoState")
-        else -> error("Inconsistent WorkInfo.State: $workInfoState.")
-      }
 
   /**
    * Maps the [lastSyncJobStatus] to a specific [Result] based on the provided status.
