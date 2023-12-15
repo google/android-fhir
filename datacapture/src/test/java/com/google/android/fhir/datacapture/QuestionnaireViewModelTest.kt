@@ -4680,7 +4680,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath supplement context`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %context`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4732,7 +4732,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath supplement questionnaire`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %questionnaire`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4784,7 +4784,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath supplement qItem`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %qItem`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {

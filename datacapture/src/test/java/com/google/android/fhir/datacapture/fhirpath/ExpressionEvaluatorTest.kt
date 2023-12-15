@@ -472,40 +472,41 @@ class ExpressionEvaluatorTest {
     }
 
   @Test
-  fun `should return not null value with expression for qItem fhirpath supplement`() = runBlocking {
-    val questionnaire =
-      Questionnaire().apply {
-        id = "a-questionnaire"
+  fun `should return not null value with expression for %qItem fhirpath supplement`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
 
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "a-item"
-            text = "a question"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            addExtension().apply {
-              url = EXTENSION_VARIABLE_URL
-              setValue(
-                Expression().apply {
-                  name = "M"
-                  language = "text/fhirpath"
-                  expression = "%qItem.text"
-                },
-              )
-            }
-          },
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-item"
+              text = "a question"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              addExtension().apply {
+                url = EXTENSION_VARIABLE_URL
+                setValue(
+                  Expression().apply {
+                    name = "M"
+                    language = "text/fhirpath"
+                    expression = "%qItem.text"
+                  },
+                )
+              }
+            },
+          )
+        }
+
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+      val result =
+        expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
+          questionnaire.item[0].variableExpressions.last(),
+          questionnaire.item[0],
         )
-      }
 
-    val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
-
-    val result =
-      expressionEvaluator.evaluateQuestionnaireItemVariableExpression(
-        questionnaire.item[0].variableExpressions.last(),
-        questionnaire.item[0],
-      )
-
-    assertThat((result as Type).asStringValue()).isEqualTo("a question")
-  }
+      assertThat((result as Type).asStringValue()).isEqualTo("a question")
+    }
 
   @Test
   fun `should return not null value with expression dependent on answers of items for questionnaire item level`() =
@@ -700,7 +701,7 @@ class ExpressionEvaluatorTest {
     }
 
   @Test
-  fun `evaluateCalculatedExpressions should return list of calculated values with fhirpath supplement variables`() =
+  fun `evaluateCalculatedExpressions should return list of calculated values with fhirpath supplement %questionnaire`() =
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
@@ -717,7 +718,7 @@ class ExpressionEvaluatorTest {
                 setValue(
                   Expression().apply {
                     this.language = "text/fhirpath"
-                    this.expression = "%questionnaire.identifier.first().value + ' ' + %qItem.text"
+                    this.expression = "%questionnaire.identifier.first().value"
                   },
                 )
               }
@@ -733,7 +734,44 @@ class ExpressionEvaluatorTest {
           null,
         )
 
-      assertThat(result.first().second.first().asStringValue()).isEqualTo("Questionnaire A Reason")
+      assertThat(result.first().second.first().asStringValue()).isEqualTo("Questionnaire A")
+    }
+
+  @Test
+  fun `evaluateCalculatedExpressions should return list of calculated values with fhirpath supplement %qItem`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          identifier = listOf(Identifier().apply { value = "Questionnaire A" })
+
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-questionnaire-reason"
+              text = "Reason"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              addExtension().apply {
+                url = EXTENSION_CALCULATED_EXPRESSION_URL
+                setValue(
+                  Expression().apply {
+                    this.language = "text/fhirpath"
+                    this.expression = "'Question = ' + %qItem.text"
+                  },
+                )
+              }
+            },
+          )
+        }
+
+      val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+      val result =
+        expressionEvaluator.evaluateCalculatedExpressions(
+          questionnaire.item.elementAt(0),
+          null,
+        )
+
+      assertThat(result.first().second.first().asStringValue()).isEqualTo("Question = Reason")
     }
 
   @Test

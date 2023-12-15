@@ -267,7 +267,7 @@ class EnablementEvaluatorTest {
   }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with context fhirpath supplement literal`() =
+  fun `evaluate() should evaluate enableWhenExpression with %context fhirpath supplement literal`() =
     runBlocking {
       @Language("JSON")
       val questionnaireJson =
@@ -348,7 +348,7 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with questionnaire fhirpath supplement literal`() =
+  fun `evaluate() should evaluate enableWhenExpression with %questionnaire fhirpath supplement`() =
     runBlocking {
       @Language("JSON")
       val questionnaireJson =
@@ -417,7 +417,7 @@ class EnablementEvaluatorTest {
     }
 
   @Test
-  fun `evaluate() should evaluate enableWhenExpression with qItem fhirpath supplement literal`() =
+  fun `evaluate() should evaluate enableWhenExpression with %qItem fhirpath supplement`() =
     runBlocking {
       @Language("JSON")
       val questionnaireJson =
