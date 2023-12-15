@@ -18,21 +18,21 @@ package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.upload.patch.Patch
-import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Generator that generates [UploadRequest]s from the [Patch]es present in the
- * [List<[PatchGeneratorOutput]>]. Any implementation of this generator is expected to output
- * [List<[UploadRequestGeneratorOutput]>] which maps [UploadRequest] to the corresponding
- * [LocalChange]s it was generated from.
+ * [List<[PatchMapping]>]. Any implementation of this generator is expected to output
+ * [List<[UploadRequestMapping]>] which maps [UploadRequest] to the corresponding [LocalChange]s it
+ * was generated from.
  */
 internal interface UploadRequestGenerator {
-  /** Generates a list of [UploadRequestGeneratorOutput] from the [PatchGeneratorOutput]s */
+  /** Generates a list of [UploadRequestMapping] from the [PatchMapping]s */
   fun generateUploadRequests(
-    patches: List<PatchGeneratorOutput>,
-  ): List<UploadRequestGeneratorOutput>
+    mappedPatches: List<PatchMapping>,
+  ): List<UploadRequestMapping>
 }
 
 /** Mode to decide the type of [UploadRequest] that needs to be generated */
@@ -63,16 +63,16 @@ internal object UploadRequestGeneratorFactory {
     }
 }
 
-internal sealed class UploadRequestGeneratorOutput(
+internal sealed class UploadRequestMapping(
   open val generatedRequest: UploadRequest,
 )
 
-internal data class UrlUploadRequestGeneratorOutput(
+internal data class UrlUploadRequestMapping(
   val localChanges: List<LocalChange>,
   override val generatedRequest: UrlUploadRequest,
-) : UploadRequestGeneratorOutput(generatedRequest)
+) : UploadRequestMapping(generatedRequest)
 
-internal data class BundleUploadRequestGeneratorOutput(
+internal data class BundleUploadRequestMapping(
   val splitLocalChanges: List<List<LocalChange>>,
   override val generatedRequest: BundleUploadRequest,
-) : UploadRequestGeneratorOutput(generatedRequest)
+) : UploadRequestMapping(generatedRequest)

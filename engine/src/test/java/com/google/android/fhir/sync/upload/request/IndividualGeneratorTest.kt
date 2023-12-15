@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
@@ -43,7 +43,7 @@ class IndividualGeneratorTest {
   fun `should create a POST request for insert`() = runTest {
     val generator = UrlRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
     val patchOutput =
-      PatchGeneratorOutput(
+      PatchMapping(
         localChanges = listOf(insertionLocalChange),
         generatedPatch = insertionLocalChange.toPatch(),
       )
@@ -66,7 +66,7 @@ class IndividualGeneratorTest {
   fun `should create a PUT request for insert`() = runTest {
     val generator = UrlRequestGenerator.getDefault()
     val patchOutput =
-      PatchGeneratorOutput(
+      PatchMapping(
         localChanges = listOf(insertionLocalChange),
         generatedPatch = insertionLocalChange.toPatch(),
       )
@@ -87,7 +87,7 @@ class IndividualGeneratorTest {
   @Test
   fun `should create a PATCH request for update`() = runTest {
     val patchOutput =
-      PatchGeneratorOutput(
+      PatchMapping(
         localChanges = listOf(updateLocalChange),
         generatedPatch = updateLocalChange.toPatch(),
       )
@@ -110,7 +110,7 @@ class IndividualGeneratorTest {
   @Test
   fun `should create a DELETE request for delete`() = runTest {
     val patchOutput =
-      PatchGeneratorOutput(
+      PatchMapping(
         localChanges = listOf(deleteLocalChange),
         generatedPatch = deleteLocalChange.toPatch(),
       )
@@ -129,7 +129,7 @@ class IndividualGeneratorTest {
   fun `should return multiple requests in order`() = runTest {
     val patchOutputList =
       listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
-        PatchGeneratorOutput(listOf(it), it.toPatch())
+        PatchMapping(listOf(it), it.toPatch())
       }
     val generator = UrlRequestGenerator.Factory.getDefault()
     val result = generator.generateUploadRequests(patchOutputList)

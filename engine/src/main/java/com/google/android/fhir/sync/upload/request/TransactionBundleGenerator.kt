@@ -18,7 +18,7 @@ package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.upload.patch.Patch
-import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
 
 /** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
@@ -30,11 +30,11 @@ internal class TransactionBundleGenerator(
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(
-    patches: List<PatchGeneratorOutput>,
-  ): List<BundleUploadRequestGeneratorOutput> {
-    return patches.chunked(generatedBundleSize).map { patchList ->
+    mappedPatches: List<PatchMapping>,
+  ): List<BundleUploadRequestMapping> {
+    return mappedPatches.chunked(generatedBundleSize).map { patchList ->
       generateBundleRequest(patchList).let { mappedBundleRequest ->
-        BundleUploadRequestGeneratorOutput(
+        BundleUploadRequestMapping(
           splitLocalChanges = mappedBundleRequest.first,
           generatedRequest = mappedBundleRequest.second,
         )
@@ -43,7 +43,7 @@ internal class TransactionBundleGenerator(
   }
 
   private fun generateBundleRequest(
-    patches: List<PatchGeneratorOutput>,
+    patches: List<PatchMapping>,
   ): Pair<List<List<LocalChange>>, BundleUploadRequest> {
     val splitLocalChanges = mutableListOf<List<LocalChange>>()
     val bundleRequest =

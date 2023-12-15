@@ -19,8 +19,8 @@ package com.google.android.fhir.sync.upload.patch
 import com.google.android.fhir.LocalChange
 
 /**
- * Generates [Patch]es from [LocalChange]s and output [List<[PatchGeneratorOutput]>] to keep a
- * mapping of the [LocalChange]s to their corresponding generated [Patch]
+ * Generates [Patch]es from [LocalChange]s and output [List<[PatchMapping]>] to keep a mapping of
+ * the [LocalChange]s to their corresponding generated [Patch]
  *
  * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
  * together with other components in the upload package to fulfill a specific upload strategy.
@@ -34,7 +34,7 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  fun generate(localChanges: List<LocalChange>): List<PatchGeneratorOutput>
+  fun generate(localChanges: List<LocalChange>): List<PatchMapping>
 }
 
 internal object PatchGeneratorFactory {
@@ -61,7 +61,7 @@ internal sealed class PatchGeneratorMode {
  * those changes. This class should be used by any implementation of [PatchGenerator] to output the
  * [Patch] in this format.
  */
-internal data class PatchGeneratorOutput(
+internal data class PatchMapping(
   val localChanges: List<LocalChange>,
   val generatedPatch: Patch,
 )

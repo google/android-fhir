@@ -121,7 +121,7 @@ class UploaderTest {
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
       with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(2)
         assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -129,7 +129,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -213,7 +213,7 @@ class UploaderTest {
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
       with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -221,7 +221,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient2Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -229,7 +229,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[2]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -382,7 +382,7 @@ class UploaderTest {
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
       with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(2)
         assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -390,7 +390,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -473,7 +473,7 @@ class UploaderTest {
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
       with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -481,7 +481,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient2Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -489,7 +489,7 @@ class UploaderTest {
       }
 
       with(result.uploadResponses[2]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponse::class.java)
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)

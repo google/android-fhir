@@ -53,8 +53,8 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         )
         uploadSyncResult.uploadResponses.forEach {
           when (it) {
-            is BundleComponentUploadResponse -> updateVersionIdAndLastUpdated(it.output)
-            is ResourceUploadResponse -> updateVersionIdAndLastUpdated(it.output)
+            is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
           }
         }
       }

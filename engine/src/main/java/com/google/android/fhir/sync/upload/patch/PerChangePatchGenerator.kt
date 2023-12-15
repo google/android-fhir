@@ -25,9 +25,9 @@ import com.google.android.fhir.LocalChange
  * maintain an audit trail.
  */
 internal object PerChangePatchGenerator : PatchGenerator {
-  override fun generate(localChanges: List<LocalChange>): List<PatchGeneratorOutput> =
+  override fun generate(localChanges: List<LocalChange>): List<PatchMapping> =
     localChanges.map {
-      PatchGeneratorOutput(
+      PatchMapping(
         localChanges = listOf(it),
         generatedPatch =
           Patch(

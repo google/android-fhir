@@ -20,7 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.sync.upload.patch.Patch
-import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -31,10 +31,10 @@ internal class UrlRequestGenerator(
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(
-    patches: List<PatchGeneratorOutput>,
-  ): List<UrlUploadRequestGeneratorOutput> =
-    patches.map {
-      UrlUploadRequestGeneratorOutput(
+    mappedPatches: List<PatchMapping>,
+  ): List<UrlUploadRequestMapping> =
+    mappedPatches.map {
+      UrlUploadRequestMapping(
         localChanges = it.localChanges,
         generatedRequest = getUrlRequestForPatch(it.generatedPatch),
       )

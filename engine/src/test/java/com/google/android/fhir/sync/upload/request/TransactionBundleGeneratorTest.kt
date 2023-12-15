@@ -20,7 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.sync.upload.patch.PatchGeneratorOutput
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
@@ -51,7 +51,7 @@ class TransactionBundleGeneratorTest {
     runBlocking {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
-          PatchGeneratorOutput(listOf(it), it.toPatch())
+          PatchMapping(listOf(it), it.toPatch())
         }
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
@@ -75,7 +75,7 @@ class TransactionBundleGeneratorTest {
       val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
-          PatchGeneratorOutput(listOf(it), it.toPatch())
+          PatchMapping(listOf(it), it.toPatch())
         }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
@@ -119,7 +119,7 @@ class TransactionBundleGeneratorTest {
         )
       val patches =
         listOf(
-          PatchGeneratorOutput(
+          PatchMapping(
             localChanges = listOf(localChange),
             generatedPatch = localChange.toPatch(),
           ),
@@ -147,7 +147,7 @@ class TransactionBundleGeneratorTest {
         )
       val patches =
         listOf(
-          PatchGeneratorOutput(
+          PatchMapping(
             localChanges = listOf(localChange),
             generatedPatch = localChange.toPatch(),
           ),
@@ -185,7 +185,7 @@ class TransactionBundleGeneratorTest {
             token = LocalChangeToken(listOf(2L)),
           ),
         )
-      val patches = localChanges.map { PatchGeneratorOutput(listOf(it), it.toPatch()) }
+      val patches = localChanges.map { PatchMapping(listOf(it), it.toPatch()) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
