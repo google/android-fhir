@@ -109,26 +109,26 @@ internal object PerResourcePatchGenerator : PatchGenerator {
   private fun mergePatches(firstPatch: String, secondPatch: String): String {
     // TODO: validate patches are RFC 6902 compliant JSON patches
     val objectMapper = ObjectMapper()
-    val patchNode1: JsonNode = JsonLoader.fromString(firstPatch)
-    val patchNode2: JsonNode = JsonLoader.fromString(secondPatch)
+    val firstPatchNode: JsonNode = JsonLoader.fromString(firstPatch)
+    val secondPatchNode: JsonNode = JsonLoader.fromString(secondPatch)
     val mergedOperations = hashMapOf<String, MutableList<JsonNode>>()
 
-    patchNode1.forEach { op ->
-      val path = op.get("path").asText()
-      mergedOperations.getOrPut(path) { mutableListOf() }.add(op)
+    firstPatchNode.forEach { patchNode ->
+      val path = patchNode.get("path").asText()
+      mergedOperations.getOrPut(path) { mutableListOf() }.add(patchNode)
     }
 
-    patchNode2.forEach { op ->
-      val path = op.get("path").asText()
-      val opType = op.get("op").asText()
+    secondPatchNode.forEach { patchNode ->
+      val path = patchNode.get("path").asText()
+      val opType = patchNode.get("op").asText()
       when (opType) {
         "replace",
-        "remove", -> mergedOperations[path] = mutableListOf(op)
-        "add" -> mergedOperations.getOrPut(path) { mutableListOf() }.add(op)
+        "remove", -> mergedOperations[path] = mutableListOf(patchNode)
+        "add" -> mergedOperations.getOrPut(path) { mutableListOf() }.add(patchNode)
       }
     }
     val mergedNode = objectMapper.createArrayNode()
-    mergedOperations.values.forEach { ops -> ops.forEach { mergedNode.add(it) } }
+    mergedOperations.values.flatten().forEach(mergedNode::add)
     return objectMapper.writeValueAsString(mergedNode)
   }
 }
