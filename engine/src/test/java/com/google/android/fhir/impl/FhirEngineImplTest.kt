@@ -32,6 +32,7 @@ import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertResourceEquals
@@ -326,8 +327,12 @@ class FhirEngineImplTest {
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
         UploadSyncResult.Success(
-          it,
-          listOf(),
+          listOf(
+            ResourceUploadResponseMapping(
+              it,
+              TEST_PATIENT_1,
+            ),
+          ),
         )
       }
       .collect { emittedProgress.add(it) }
