@@ -431,7 +431,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `should return not null value with expression for questionnaire fhirpath supplement`() =
+  fun `should return not null value with expression for %questionnaire fhirpath supplement`() =
     runBlocking {
       val questionnaire =
         Questionnaire().apply {
