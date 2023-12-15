@@ -2281,7 +2281,6 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
-          
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           )
           """
@@ -2324,11 +2323,10 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
-          
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+          WHERE resourceType = ? AND index_name = ? AND index_value = ?
           )
           )
           """
@@ -2376,11 +2374,11 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           LEFT JOIN StringIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'given'
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+          WHERE resourceType = ? AND index_name = ? AND index_value = ?
           )
           ORDER BY b.index_value DESC
           )
@@ -2391,6 +2389,7 @@ class SearchTest {
     assertThat(query.args)
       .comparingElementsUsing(ArgsComparator)
       .containsExactly(
+        "given",
         "Patient",
         "general-practitioner",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
@@ -2434,11 +2433,11 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'given'
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         ORDER BY b.index_value DESC
         )
@@ -2449,11 +2448,11 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'name'
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?  
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
         ORDER BY b.index_value DESC
         )
@@ -2464,6 +2463,7 @@ class SearchTest {
     assertThat(query.args)
       .comparingElementsUsing(ArgsComparator)
       .containsExactly(
+        "given",
         "Patient",
         "general-practitioner",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
@@ -2472,6 +2472,7 @@ class SearchTest {
         "Practitioner",
         "active",
         "true",
+        "name",
         "Patient",
         "organization",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
@@ -2499,7 +2500,6 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
-          
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           )
           """
@@ -2538,11 +2538,10 @@ class SearchTest {
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
-        
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
                 """
@@ -2593,12 +2592,13 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
         LEFT JOIN DateIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date' LEFT JOIN DateTimeIndexEntity c
-        ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
+        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+        LEFT JOIN DateTimeIndexEntity c
+        ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         ORDER BY b.index_from DESC, c.index_from DESC
         )
@@ -2608,6 +2608,8 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
+        "recorded-date",
+        "recorded-date",
         "Condition",
         "subject",
         "Patient/pa01",
@@ -2667,12 +2669,13 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'date' LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'date'
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+          LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
           )
           ORDER BY b.index_from DESC, c.index_from DESC
           )
@@ -2683,12 +2686,13 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = 'recorded-date' LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = 'recorded-date'
+          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+          LEFT JOIN DateTimeIndexEntity c
+          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?) 
+          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
           )
           ORDER BY b.index_from DESC, c.index_from DESC
           )
@@ -2698,6 +2702,8 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
+        "date",
+        "date",
         "Encounter",
         "subject",
         "Patient/pa01",
@@ -2707,6 +2713,8 @@ class SearchTest {
         "status",
         "arrived",
         "http://hl7.org/fhir/encounter-status",
+        "recorded-date",
+        "recorded-date",
         "Condition",
         "subject",
         "Patient/pa01",

@@ -132,14 +132,15 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
 
   return revIncludes
     .map {
-      val filterQuery = generateFilterQuery(it)
       val (join, order) = it.search.getSortOrder(otherTable = "re")
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
       """
       SELECT  rie.index_name, rie.index_value, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceUuid = rie.resourceUuid
-      $join
+      ${join.query}
       WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString) AND re.resourceType = ?
       ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
       $order
@@ -149,6 +150,9 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     .joinToString("\nUNION ALL\n") {
       StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
     }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
     .let { SearchQuery(it, args) }
 }
 
@@ -190,15 +194,15 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
 
   return forwardIncludes
     .map {
-      val filterQuery = generateFilterQuery(it)
       val (join, order) = it.search.getSortOrder(otherTable = "re")
-
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
       """
       SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceType||"/"||re.resourceId = rie.index_value
-      $join
+      ${join.query}
       WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString) AND re.resourceType = ?
       ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
       $order
@@ -208,13 +212,20 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
     .joinToString("\nUNION ALL\n") {
       StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
     }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
     .let { SearchQuery(it, args) }
 }
 
-private fun Search.getSortOrder(otherTable: String): Pair<String, String> {
+private fun Search.getSortOrder(
+  otherTable: String,
+  isReferencedSearch: Boolean = false,
+): Pair<SearchQuery, String> {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
-  if (count != null) {
+  val args = mutableListOf<Any>()
+  if (isReferencedSearch && count != null) {
     Timber.e("count not supported for [rev]include search.")
   }
   sort?.let { sort ->
@@ -229,20 +240,20 @@ private fun Search.getSortOrder(otherTable: String): Pair<String, String> {
           listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
-    sortJoinStatement = ""
 
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-
-      if (index > 0) sortJoinStatement += " "
-      sortJoinStatement +=
-        //  spotless:off
+    sortJoinStatement =
+      sortTableNames
+        .mapIndexed { index, sortTableName ->
+          val tableAlias = 'b' + index
+          //  spotless:off
       """
       LEFT JOIN ${sortTableName.tableName} $tableAlias
-      ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = '${sort.paramName}'
-      """.trim()
-      //  spotless:on
-    }
+      ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+      """
+        //  spotless:on
+        }
+        .joinToString(separator = "\n")
+    sortTableNames.forEach { _ -> args.add(sort.paramName) }
 
     sortTableNames.forEachIndexed { index, sortTableName ->
       val tableAlias = 'b' + index
@@ -257,7 +268,7 @@ private fun Search.getSortOrder(otherTable: String): Pair<String, String> {
         }
     }
   }
-  return Pair(sortJoinStatement, sortOrderStatement)
+  return Pair(SearchQuery(sortJoinStatement, args), sortOrderStatement)
 }
 
 private fun Search.getFilterQueries() =
@@ -274,49 +285,10 @@ internal fun Search.getQuery(
   isCount: Boolean = false,
   nestedContext: NestedContext? = null,
 ): SearchQuery {
-  var sortJoinStatement = ""
-  var sortOrderStatement = ""
-  val sortArgs = mutableListOf<Any>()
-  sort?.let { sort ->
-    val sortTableNames =
-      when (sort) {
-        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
-        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
-        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
-        // with timezone info). Any data field in any resource will only have index records in one
-        // of the two tables. So we simply sort by both in the SQL query.
-        is DateClientParam ->
-          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
-        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
-      }
-    sortJoinStatement = ""
-
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-
-      sortJoinStatement +=
-        //  spotless:off
-      """
-      LEFT JOIN ${sortTableName.tableName} $tableAlias
-      ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
-      """
-      //  spotless:on
-      sortArgs += sort.paramName
-    }
-
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-      sortOrderStatement +=
-        if (index == 0) {
-          """
-            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
-                    """
-            .trimIndent()
-        } else {
-          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
-        }
-    }
-  }
+  val (join, order) = getSortOrder(otherTable = "a")
+  val sortJoinStatement = join.query
+  val sortOrderStatement = order
+  val sortArgs = join.args
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
