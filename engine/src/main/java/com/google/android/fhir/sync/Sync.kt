@@ -31,11 +31,11 @@ import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
-import com.google.android.fhir.sync.SyncState.Cancelled
-import com.google.android.fhir.sync.SyncState.Enqueued
-import com.google.android.fhir.sync.SyncState.Failed
-import com.google.android.fhir.sync.SyncState.Running
-import com.google.android.fhir.sync.SyncState.Succeeded
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Cancelled
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Enqueued
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Failed
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Running
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Succeeded
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
@@ -59,12 +59,12 @@ object Sync {
    * the same [FhirSyncWorker] to retrieve the status of the job.
    *
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
-   * @return a [Flow] of [SyncState]
+   * @return a [Flow] of [CurrentSyncJobStatus]
    */
   inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
-  ): Flow<SyncState> {
+  ): Flow<CurrentSyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
     val flow = getWorkerInfo(context, uniqueWorkName)
     val oneTimeWorkRequest =
@@ -165,14 +165,14 @@ object Sync {
    * @param context The Android application context.
    * @param workName The name of the one-time sync work.
    * @param syncJobProgressStateFlow A flow representing the progress of the sync job.
-   * @return A flow of [SyncState] combining the sync job states.
+   * @return A flow of [CurrentSyncJobStatus] combining the sync job states.
    */
   @PublishedApi
   internal fun combineSyncStateForOneTimeSync(
     context: Context,
     workName: String,
     workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
-  ): Flow<SyncState> {
+  ): Flow<CurrentSyncJobStatus> {
     val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
 
@@ -205,7 +205,7 @@ object Sync {
       oneTimeWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+          .putString(UNIQUE_WORK_NAME, uniqueWorkName)
           .build(),
       )
     }
@@ -235,7 +235,7 @@ object Sync {
       periodicWorkRequestBuilder.setInputData(
         Data.Builder()
           .putInt(MAX_RETRIES_ALLOWED, it.maxRetries)
-          .putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName)
+          .putString(UNIQUE_WORK_NAME, uniqueWorkName)
           .build(),
       )
     }
@@ -252,7 +252,7 @@ object Sync {
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
     syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState {
+  ): CurrentSyncJobStatus {
     return when (syncJobStatusFromWorkManager) {
       is SyncJobStatus.Started,
       is SyncJobStatus.InProgress, -> Running(syncJobStatusFromWorkManager)
@@ -268,16 +268,17 @@ object Sync {
   }
 
   /**
-   * Only call this API when `syncJobStatusFromWorkManager` is null. Create a [SyncState] from
-   * `syncJobStatusFromDataStore` if it is not null; otherwise, create it from [WorkInfo.State].
+   * Only call this API when `syncJobStatusFromWorkManager` is null. Create a [CurrentSyncJobStatus]
+   * from `syncJobStatusFromDataStore` if it is not null; otherwise, create it from
+   * [WorkInfo.State].
    */
   private fun handleNullWorkManagerStatusForOneTimeSync(
     workInfoState: WorkInfo.State,
     syncJobStatusFromDataStore: SyncJobStatus?,
-  ): SyncState =
+  ): CurrentSyncJobStatus =
     syncJobStatusFromDataStore?.let {
       when (it) {
-        is SyncJobStatus.Finished -> Succeeded(it)
+        is SyncJobStatus.Succeeded -> Succeeded(it)
         is SyncJobStatus.Failed -> Failed(it)
         else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
       }
@@ -291,13 +292,13 @@ object Sync {
       }
 
   /**
-   * Only call this API when syncJobStatusFromWorkManager is null. Create a [SyncState] from
-   * [WorkInfo.State]. (Note: syncJobStatusFromDataStore is updated as lastSynJobStatus, which is
-   * the terminalSyncJobStatus.)
+   * Only call this API when syncJobStatusFromWorkManager is null. Create a [CurrentSyncJobStatus]
+   * from [WorkInfo.State]. (Note: syncJobStatusFromDataStore is updated as lastSynJobStatus, which
+   * is the terminalSyncJobStatus.)
    */
   private fun handleNullWorkManagerStatusForPeriodicSync(
     workInfoState: WorkInfo.State,
-  ): SyncState =
+  ): CurrentSyncJobStatus =
     when (workInfoState) {
       RUNNING -> Running(SyncJobStatus.Started())
       ENQUEUED -> Enqueued
@@ -306,12 +307,13 @@ object Sync {
     }
 
   /**
-   * Maps the [lastSyncJobStatus] to a specific [Result] based on the provided status.
+   * Maps the [lastSyncJobStatus] to a specific [LastSyncJobStatus] based on the provided status.
    *
    * @param lastSyncJobStatus The last synchronization job status of type [SyncJobStatus].
-   * @return The mapped [Result] based on the provided [lastSyncJobStatus]:
-   * - [Result.Succeeded] with the timestamp if the last job status is [SyncJobStatus.Finished].
-   * - [Result.Failed] with exceptions and timestamp if the last job status is
+   * @return The mapped [LastSyncJobStatus] based on the provided [lastSyncJobStatus]:
+   * - [LastSyncJobStatus.Succeeded] with the timestamp if the last job status is
+   *   [SyncJobStatus.Succeeded].
+   * - [LastSyncJobStatus.Failed] with exceptions and timestamp if the last job status is
    *   [SyncJobStatus.Failed].
    * - `null` if the last job status is neither Finished nor Failed.
    */
@@ -320,8 +322,8 @@ object Sync {
   ) =
     lastSyncJobStatus?.let {
       when (it) {
-        is SyncJobStatus.Finished -> Result.Succeeded(it.timestamp)
-        is SyncJobStatus.Failed -> Result.Failed(lastSyncJobStatus.timestamp)
+        is SyncJobStatus.Succeeded -> LastSyncJobStatus.Succeeded(it.timestamp)
+        is SyncJobStatus.Failed -> LastSyncJobStatus.Failed(lastSyncJobStatus.timestamp)
         else -> error("Inconsistent terminal syncJobStatus : $lastSyncJobStatus")
       }
     }

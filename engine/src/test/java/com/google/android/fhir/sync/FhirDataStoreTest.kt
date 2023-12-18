@@ -35,9 +35,9 @@ class FhirDataStoreTest {
   fun observeSyncJobTerminalState() = runBlocking {
     val key = "key"
     val editJob = launch {
-      fhirDataStore.writeTerminalSyncJobStatus(key, SyncJobStatus.Finished())
+      fhirDataStore.writeTerminalSyncJobStatus(key, SyncJobStatus.Succeeded())
       fhirDataStore.observeTerminalSyncJobStatus(key).collect {
-        assertTrue(it is SyncJobStatus.Finished)
+        assertTrue(it is SyncJobStatus.Succeeded)
         this.cancel()
       }
     }

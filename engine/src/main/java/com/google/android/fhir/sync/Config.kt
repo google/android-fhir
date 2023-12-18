@@ -34,8 +34,7 @@ typealias ParamMap = Map<String, String>
 /** Constant for the Greater Than Search Prefix */
 @PublishedApi internal const val GREATER_THAN_PREFIX = "gt"
 
-@PublishedApi
-internal const val SYNC_STATUS_PREFERENCES_DATASTORE_KEY = "sync_status_preferences_datastore_key"
+@PublishedApi internal const val UNIQUE_WORK_NAME = "unique_work_name"
 
 val defaultRetryConfiguration =
   RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3)

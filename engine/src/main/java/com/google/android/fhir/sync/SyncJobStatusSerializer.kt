@@ -32,7 +32,7 @@ internal class SyncJobStatusSerializer {
 
   private val allowedSyncJobStatusPackages =
     listOf(
-      "com.google.android.fhir.sync.SyncJobStatus\$Finished",
+      "com.google.android.fhir.sync.SyncJobStatus\$Succeeded",
       "com.google.android.fhir.sync.SyncJobStatus\$Failed",
     )
 

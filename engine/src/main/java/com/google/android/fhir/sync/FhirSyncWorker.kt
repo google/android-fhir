@@ -78,7 +78,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
             dataSource = dataSource,
             patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
             requestGenerator =
-            UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
           ),
         ),
         DownloadConfiguration(
@@ -92,9 +92,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       CoroutineScope(Dispatchers.IO).launch {
         val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
         synchronizer.syncState.collect { syncJobStatus ->
-          val uniqueWorkerName = inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY)
+          val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
           when (syncJobStatus) {
-            is SyncJobStatus.Finished,
+            is SyncJobStatus.Succeeded,
             is SyncJobStatus.Failed, -> {
               // While creating periodicSync request if
               // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
@@ -125,7 +125,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
     return when (result) {
-      is SyncJobStatus.Finished -> Result.success(output)
+      is SyncJobStatus.Succeeded -> Result.success(output)
       else -> {
         if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }

@@ -44,8 +44,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.SyncJobStatus
-import com.google.android.fhir.sync.SyncState
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -157,29 +157,29 @@ class PatientListFragment : Fragment() {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
-          is SyncState.Running -> {
+          is CurrentSyncJobStatus.Running -> {
             Timber.i("Sync: ${it::class.java.simpleName} with data ${it.currentJob}")
             fadeInTopBanner(it)
           }
-          is SyncState.Succeeded -> {
+          is CurrentSyncJobStatus.Succeeded -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.succeededJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is SyncState.Failed -> {
+          is CurrentSyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.failedJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is SyncState.Enqueued -> {
+          is CurrentSyncJobStatus.Enqueued -> {
             Timber.i("Sync: Enqueued")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          SyncState.Cancelled -> TODO()
+          CurrentSyncJobStatus.Cancelled -> TODO()
         }
       }
     }
@@ -212,7 +212,7 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
-  private fun fadeInTopBanner(state: SyncState) {
+  private fun fadeInTopBanner(state: CurrentSyncJobStatus) {
     if (topBanner.visibility != View.VISIBLE) {
       syncStatus.text = resources.getString(R.string.syncing).uppercase()
       syncPercent.text = ""
@@ -221,7 +221,9 @@ class PatientListFragment : Fragment() {
       topBanner.visibility = View.VISIBLE
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
-    } else if (state is SyncState.Running && state.currentJob is SyncJobStatus.InProgress) {
+    } else if (
+      state is CurrentSyncJobStatus.Running && state.currentJob is SyncJobStatus.InProgress
+    ) {
       val inProgressState = state.currentJob as? SyncJobStatus.InProgress
       val progress =
         inProgressState
@@ -235,8 +237,8 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun fadeOutTopBanner(state: SyncState) {
-    if (state is SyncState.Succeeded) syncPercent.text = ""
+  private fun fadeOutTopBanner(state: CurrentSyncJobStatus) {
+    if (state is CurrentSyncJobStatus.Succeeded) syncPercent.text = ""
     syncProgress.visibility = View.GONE
 
     if (topBanner.visibility == View.VISIBLE) {

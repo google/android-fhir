@@ -77,7 +77,7 @@ internal class FhirDataStore(context: Context) {
     syncJobStatus: SyncJobStatus,
   ) {
     when (syncJobStatus) {
-      is SyncJobStatus.Finished,
+      is SyncJobStatus.Succeeded,
       is SyncJobStatus.Failed, -> {
         writeSyncJobStatus(key, syncJobStatus)
       }

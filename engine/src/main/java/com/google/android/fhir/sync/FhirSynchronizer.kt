@@ -61,6 +61,7 @@ internal class FhirSynchronizer(
 
   private val _syncState = MutableSharedFlow<SyncJobStatus>()
   val syncState: SharedFlow<SyncJobStatus> = _syncState
+
   private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 
   private suspend fun setSyncState(result: SyncResult): SyncJobStatus {
@@ -69,7 +70,7 @@ internal class FhirSynchronizer(
 
     val state =
       when (result) {
-        is SyncResult.Success -> SyncJobStatus.Finished()
+        is SyncResult.Success -> SyncJobStatus.Succeeded()
         is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
       }
 
@@ -123,7 +124,7 @@ internal class FhirSynchronizer(
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
     fhirEngine.syncUpload(localChangesFetchMode, uploadConfiguration.uploader::upload).collect {
-        progress ->
+      progress ->
       progress.uploadError?.let { exceptions.add(it) }
         ?: setSyncState(
           SyncJobStatus.InProgress(

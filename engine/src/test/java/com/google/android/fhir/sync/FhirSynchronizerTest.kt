@@ -88,9 +88,9 @@ class FhirSynchronizerTest {
         .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
       assertThat(emittedValues[3])
         .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
-      assertThat(emittedValues[4]).isInstanceOf(SyncJobStatus.Finished::class.java)
+      assertThat(emittedValues[4]).isInstanceOf(SyncJobStatus.Succeeded::class.java)
 
-      assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
+      assertThat(SyncJobStatus.Succeeded::class.java).isEqualTo(result::class.java)
     }
 
   @Test

@@ -18,6 +18,12 @@ package com.google.android.fhir.sync
 
 import java.time.OffsetDateTime
 
+/**
+ * Sealed class representing different states of a synchronization operation. These states do not
+ * represent [WorkInfo.State], whereas [CurrentSyncJobStatus] combines [WorkInfo.State] and
+ * [SyncJobStatus] in one-time and periodic sync. For more details, see [CurrentSyncJobStatus] and
+ * [PeriodicSyncState].
+ */
 sealed class SyncJobStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()
 
@@ -32,7 +38,7 @@ sealed class SyncJobStatus {
   ) : SyncJobStatus()
 
   /** Sync job finished successfully. */
-  class Finished : SyncJobStatus()
+  class Succeeded : SyncJobStatus()
 
   /** Sync job failed. */
   data class Failed(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
