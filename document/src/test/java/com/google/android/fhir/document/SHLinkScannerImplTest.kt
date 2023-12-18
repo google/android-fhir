@@ -36,6 +36,8 @@ class SHLinkScannerImplTest {
   private lateinit var shLinkScannerImpl: SHLinkScannerImpl
   private val successCallback = mock<(SHLinkScanData) -> Unit>()
   private val failCallback = mock<(Error) -> Unit>()
+  private val failedInvocation = 0
+  private val successfulInvocation = 1
 
   @Before
   fun setUp() {
@@ -49,10 +51,10 @@ class SHLinkScannerImplTest {
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
 
-    verify(scannerUtils, times(1)).setup()
-    verify(scannerUtils, times(1)).releaseScanner()
-    verify(successCallback, times(1)).invoke(anyOrNull())
-    verify(failCallback, times(0)).invoke(anyOrNull())
+    verify(scannerUtils, times(successfulInvocation)).setup()
+    verify(scannerUtils, times(successfulInvocation)).releaseScanner()
+    verify(successCallback, times(successfulInvocation)).invoke(anyOrNull())
+    verify(failCallback, times(failedInvocation)).invoke(anyOrNull())
   }
 
   @Test
@@ -61,10 +63,14 @@ class SHLinkScannerImplTest {
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
 
-    verify(scannerUtils, times(0)).setup()
-    verify(scannerUtils, times(0)).releaseScanner()
-    verify(successCallback, times(0)).invoke(anyOrNull())
-    verify(failCallback, times(1)).invoke(argThat { message == "Camera permission not granted" })
+    verify(scannerUtils, times(failedInvocation)).setup()
+    verify(scannerUtils, times(failedInvocation)).releaseScanner()
+    verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
+    verify(
+        failCallback,
+        times(successfulInvocation),
+      )
+      .invoke(argThat { message == "Camera permission not granted" })
   }
 
   @Test
@@ -74,9 +80,13 @@ class SHLinkScannerImplTest {
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
 
-    verify(scannerUtils, times(1)).setup()
-    verify(scannerUtils, times(0)).releaseScanner()
-    verify(successCallback, times(0)).invoke(anyOrNull())
-    verify(failCallback, times(1)).invoke(argThat { message == "Scanner setup failed" })
+    verify(scannerUtils, times(successfulInvocation)).setup()
+    verify(scannerUtils, times(failedInvocation)).releaseScanner()
+    verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
+    verify(
+        failCallback,
+        times(successfulInvocation),
+      )
+      .invoke(argThat { message == "Scanner setup failed" })
   }
 }

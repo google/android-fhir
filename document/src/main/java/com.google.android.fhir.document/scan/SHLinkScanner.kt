@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.document.scan
 
+/* The SHLink Scanner interface handles the scanning of Smart Health Link QR codes */
 interface SHLinkScanner {
 
   /* Scans a SHL and returns an initialised SHLData object through the callback */

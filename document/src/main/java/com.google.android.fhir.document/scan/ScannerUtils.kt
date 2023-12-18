@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.view.SurfaceHolder
 import androidx.core.app.ActivityCompat
+import androidx.core.util.isNotEmpty
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.Detector
 import com.google.android.gms.vision.barcode.Barcode
@@ -63,6 +64,7 @@ class ScannerUtils(
     surfaceHolder.addCallback(surfaceCallback)
   }
 
+  /* Manages camera operations based on changes in the SurfaceView */
   private val surfaceCallback =
     object : SurfaceHolder.Callback {
       override fun surfaceCreated(holder: SurfaceHolder) {
@@ -89,7 +91,7 @@ class ScannerUtils(
       }
 
       override fun surfaceDestroyed(holder: SurfaceHolder) {
-        stopScanning()
+        cameraSource.stop()
       }
     }
 
@@ -101,6 +103,7 @@ class ScannerUtils(
       object : Detector.Processor<Barcode> {
         override fun release() {
           // Scanner has been closed
+          releaseScanner()
         }
 
         var scanSucceeded = false
@@ -109,9 +112,8 @@ class ScannerUtils(
           if (scanSucceeded) {
             return
           }
-
           val barcodes = detections.detectedItems
-          if (barcodes.size() == 1) {
+          if (barcodes.isNotEmpty()) {
             val scannedValue = barcodes.valueAt(0).rawValue
             scannedData = SHLinkScanData(scannedValue)
             scanSucceeded = true
@@ -122,10 +124,6 @@ class ScannerUtils(
     return scannedData ?: throw Error("No valid scan data found")
   }
 
-  private fun stopScanning() {
-    cameraSource.stop()
-  }
-
   /* Check if camera permissions have been accepted */
   internal fun hasCameraPermission(): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
@@ -133,7 +131,7 @@ class ScannerUtils(
 
   /* Stop scanning and release resources */
   fun releaseScanner() {
-    stopScanning()
+    cameraSource.stop()
     cameraSource.release()
     barcodeDetector.release()
   }

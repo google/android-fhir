@@ -47,15 +47,5 @@ data class SHLinkScanData(
   val versionNumber: String,
   val ipsDoc: IPSDocument?,
 ) {
-  constructor() : this("", "", "", "", "", "", "", "", null)
-
   constructor(scannedValue: String) : this(scannedValue, "", "", "", "", "", "", "", null)
-
-  constructor(
-    fullLink: String,
-    extractedJson: String,
-    manifestUrl: String,
-    key: String,
-    flag: String,
-  ) : this(fullLink, extractedJson, manifestUrl, key, "", flag, "", "", null)
 }

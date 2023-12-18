@@ -46,6 +46,7 @@ class EncryptionUtilsTest {
     val encryptionKey = EncryptionUtils.generateRandomKey()
     val contentJson = Gson().toJson(minimalBundleString)
     val contentEncrypted = EncryptionUtils.encrypt(contentJson, encryptionKey)
-    Assert.assertEquals(contentEncrypted.split('.').size, 5)
+    val expectedJWETokenParts = 5
+    Assert.assertEquals(contentEncrypted.split('.').size, expectedJWETokenParts)
   }
 }
