@@ -28,10 +28,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
-<<<<<<< HEAD
 import retrofit2.http.GET
-=======
->>>>>>> upstream/master
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
