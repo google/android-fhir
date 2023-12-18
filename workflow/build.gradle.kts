@@ -76,7 +76,6 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  testImplementation(project(mapOf("path" to ":knowledge")))
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -94,19 +93,16 @@ dependencies {
   api(Dependencies.HapiFhir.guavaCaching)
 
   implementation(Dependencies.Androidx.coreKtx)
-
   implementation(Dependencies.Cql.evaluator)
   implementation(Dependencies.Cql.evaluatorFhirJackson)
-  implementation(Dependencies.timber)
-
   implementation(Dependencies.HapiFhir.guavaCaching)
-
   implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
+  implementation(Dependencies.androidFhirKnowledge)
+  implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
-  implementation(project(":engine")) { exclude(module = "truth") }
-  implementation(project(":knowledge"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
@@ -114,6 +110,7 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
+  testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
 
   constraints {

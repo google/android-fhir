@@ -86,6 +86,7 @@ configurations {
     exclude(module = "jakarta.xml.bind-api")
     exclude(module = "hapi-fhir-caching-caffeine")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(module = "jcl-over-slf4j")
   }
 }
 
@@ -140,6 +141,7 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockWebServer)

@@ -20,21 +20,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.google.android.fhir.SearchResult
 import com.google.android.fhir.codelabs.engine.databinding.PatientListItemViewBinding
 import org.hl7.fhir.r4.model.Patient
 
 class PatientItemRecyclerViewAdapter :
-  ListAdapter<SearchResult<Patient>, PatientItemViewHolder>(PatientItemDiffCallback()) {
+  ListAdapter<Patient, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
-  class PatientItemDiffCallback : DiffUtil.ItemCallback<SearchResult<Patient>>() {
-    override fun areItemsTheSame(oldItem: SearchResult<Patient>, newItem: SearchResult<Patient>) =
-      oldItem.equals(newItem)
+  class PatientItemDiffCallback : DiffUtil.ItemCallback<Patient>() {
+    override fun areItemsTheSame(oldItem: Patient, newItem: Patient) = oldItem.id == newItem.id
 
     override fun areContentsTheSame(
-      oldItem: SearchResult<Patient>,
-      newItem: SearchResult<Patient>,
-    ) = oldItem.equals(newItem)
+      oldItem: Patient,
+      newItem: Patient,
+    ) = oldItem.equalsDeep(newItem)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {

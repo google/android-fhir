@@ -18,14 +18,17 @@ package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.db.impl.dao.diff
-import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.updateLocalChange
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.HumanName
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -46,85 +49,24 @@ class TransactionBundleGeneratorTest {
   @Test
   fun `generateUploadRequests() should return single Transaction Bundle with 3 entries`() =
     runBlocking {
-      val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val patches =
-        listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Patch.Type.INSERT,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    },
-                  )
-                },
-              ),
-            timestamp = Instant.now(),
-          ),
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Patch.Type.UPDATE,
-            payload =
-              diff(
-                  jsonParser,
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Jane")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Janet")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                )
-                .toString(),
-            timestamp = Instant.now(),
-          ),
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-003",
-            type = Patch.Type.DELETE,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-003"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Roe"
-                    },
-                  )
-                },
-              ),
-            timestamp = Instant.now(),
-          ),
-        )
+        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
+          PatchMapping(listOf(it), it.toPatch())
+        }
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
 
       assertThat(result).hasSize(1)
-      val bundleUploadRequest = result[0]
-      assertThat(bundleUploadRequest.resource.type).isEqualTo(Bundle.BundleType.TRANSACTION)
-      assertThat(bundleUploadRequest.resource.entry).hasSize(3)
-      assertThat(bundleUploadRequest.resource.entry.map { it.request.method })
-        .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
-        .inOrder()
+      with(result[0].generatedRequest.resource) {
+        assertThat(type).isEqualTo(Bundle.BundleType.TRANSACTION)
+        assertThat(entry).hasSize(3)
+        assertThat(entry.map { it.request.method })
+          .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
+          .inOrder()
+      }
+
+      assertThat(result[0].splitLocalChanges).hasSize(3)
+      assertThat(result[0].splitLocalChanges.all { it.size == 1 }).isTrue()
     }
 
   @Test
@@ -132,75 +74,9 @@ class TransactionBundleGeneratorTest {
     runBlocking {
       val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val patches =
-        listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Patch.Type.INSERT,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    },
-                  )
-                },
-              ),
-            timestamp = Instant.now(),
-          ),
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Patch.Type.UPDATE,
-            payload =
-              diff(
-                  jsonParser,
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Jane")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                  Patient().apply {
-                    id = "Patient-002"
-                    addName(
-                      HumanName().apply {
-                        addGiven("Janet")
-                        family = "Doe"
-                      },
-                    )
-                  },
-                )
-                .toString(),
-            versionId = "v-p002-01",
-            timestamp = Instant.now(),
-          ),
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-003",
-            type = Patch.Type.DELETE,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-003"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Roe"
-                    },
-                  )
-                },
-              ),
-            versionId = "v-p003-01",
-            timestamp = Instant.now(),
-          ),
-        )
+        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
+          PatchMapping(listOf(it), it.toPatch())
+        }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -208,90 +84,113 @@ class TransactionBundleGeneratorTest {
           1,
           true,
         )
-      val result = generator.generateUploadRequests(patches)
-
-      // Exactly 3 Requests are generated
-      assertThat(result).hasSize(3)
-      // Each Request is of type Bundle
-      assertThat(result.all { it.resource.type == Bundle.BundleType.TRANSACTION }).isTrue()
-      // Each Bundle has exactly 1 entry
-      assertThat(result.all { it.resource.entry.size == 1 }).isTrue()
-      assertThat(result.map { it.resource.entry.first().request.method })
-        .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
-        .inOrder()
-      assertThat(result.map { it.resource.entry.first().request.ifMatch })
-        .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
-        .inOrder()
+      with(generator.generateUploadRequests(patches)) {
+        // Exactly 3 Requests are generated
+        assertThat(this).hasSize(3)
+        // Each Request is of type Bundle
+        assertThat(all { it.generatedRequest.resource.type == Bundle.BundleType.TRANSACTION })
+          .isTrue()
+        // Each Bundle has exactly 1 entry
+        assertThat(all { it.generatedRequest.resource.entry.size == 1 }).isTrue()
+        assertThat(map { it.generatedRequest.resource.entry.first().request.method })
+          .containsExactly(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, Bundle.HTTPVerb.DELETE)
+          .inOrder()
+        assertThat(map { it.generatedRequest.resource.entry.first().request.ifMatch })
+          .containsExactly(null, "W/\"v-p002-01\"", "W/\"v-p003-01\"")
+          .inOrder()
+        // Each Bundle request is mapped to 1 LocalChange
+        assertThat(all { it.splitLocalChanges.size == 1 }).isTrue()
+        assertThat(all { it.splitLocalChanges[0].size == 1 }).isTrue()
+      }
     }
 
   @Test
   fun `generate() should return Bundle Entry without if-match when useETagForUpload is false`() =
     runBlocking {
+      val localChange =
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-002",
+          type = LocalChange.Type.UPDATE,
+          payload = "[]",
+          versionId = "patient-002-version-1",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1L)),
+        )
       val patches =
         listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Patch.Type.UPDATE,
-            payload = "[]",
-            versionId = "patient-002-version-1",
-            timestamp = Instant.now(),
+          PatchMapping(
+            localChanges = listOf(localChange),
+            generatedPatch = localChange.toPatch(),
           ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
-      assertThat(result.first().resource.entry.first().request.ifMatch).isNull()
+      assertThat(result.first().generatedRequest.resource.entry.first().request.ifMatch).isNull()
+      assertThat(result.first().splitLocalChanges.size).isEqualTo(1)
+      assertThat(result.first().splitLocalChanges[0].size).isEqualTo(1)
     }
 
   @Test
   fun `generate() should return Bundle Entry with if-match when useETagForUpload is true`() =
     runBlocking {
+      val localChange =
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-002",
+          type = LocalChange.Type.UPDATE,
+          payload = "[]",
+          versionId = "patient-002-version-1",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1L)),
+        )
       val patches =
         listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-002",
-            type = Patch.Type.UPDATE,
-            payload = "[]",
-            versionId = "patient-002-version-1",
-            timestamp = Instant.now(),
+          PatchMapping(
+            localChanges = listOf(localChange),
+            generatedPatch = localChange.toPatch(),
           ),
         )
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
-      assertThat(result.first().resource.entry.first().request.ifMatch)
+      assertThat(result.first().generatedRequest.resource.entry.first().request.ifMatch)
         .isEqualTo("W/\"patient-002-version-1\"")
+      assertThat(result.first().splitLocalChanges.size).isEqualTo(1)
+      assertThat(result.first().splitLocalChanges[0].size).isEqualTo(1)
     }
 
   @Test
   fun `generate() should return Bundle Entry without if-match when the LocalChangeEntity has no versionId`() =
     runBlocking {
-      val patches =
+      val localChanges =
         listOf(
-          Patch(
+          LocalChange(
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-002",
-            type = Patch.Type.UPDATE,
+            type = LocalChange.Type.UPDATE,
             payload = "[]",
             versionId = "",
             timestamp = Instant.now(),
+            token = LocalChangeToken(listOf(1L)),
           ),
-          Patch(
+          LocalChange(
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-003",
-            type = Patch.Type.UPDATE,
+            type = LocalChange.Type.UPDATE,
             payload = "[]",
             versionId = null,
             timestamp = Instant.now(),
+            token = LocalChangeToken(listOf(2L)),
           ),
         )
+      val patches = localChanges.map { PatchMapping(listOf(it), it.toPatch()) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
-      assertThat(result.first().resource.entry[0].request.ifMatch).isNull()
-      assertThat(result.first().resource.entry[1].request.ifMatch).isNull()
+      assertThat(result.first().generatedRequest.resource.entry[0].request.ifMatch).isNull()
+      assertThat(result.first().generatedRequest.resource.entry[1].request.ifMatch).isNull()
     }
 
   @Test

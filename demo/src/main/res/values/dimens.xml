@@ -22,5 +22,6 @@
     <dimen name="text_margin">20dp</dimen>
     <dimen name="small_text_margin">2dp</dimen>
     <dimen name="status_margin">5dp</dimen>
-  <dimen name="header_height">170dp</dimen>
+    <dimen name="header_height">170dp</dimen>
+    <dimen name="patient_count_start_margin">65dp</dimen>
 </resources>

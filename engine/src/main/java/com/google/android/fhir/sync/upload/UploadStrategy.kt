@@ -35,46 +35,12 @@ private constructor(
   internal val patchGeneratorMode: PatchGeneratorMode,
   internal val requestGeneratorMode: UploadRequestGeneratorMode,
 ) {
-  object SingleChangePut :
-    UploadStrategy(
-      LocalChangesFetchMode.EarliestChange,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
-    )
-
-  object SingleChangePost :
-    UploadStrategy(
-      LocalChangesFetchMode.EarliestChange,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
-    )
-
-  object SingleResourcePut :
-    UploadStrategy(
-      LocalChangesFetchMode.PerResource,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
-    )
-
-  object SingleResourcePost :
-    UploadStrategy(
-      LocalChangesFetchMode.PerResource,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
-    )
 
   object AllChangesBundlePut :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerChange,
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
-    )
-
-  object AllChangesBundlePost :
-    UploadStrategy(
-      LocalChangesFetchMode.AllChanges,
-      PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
     )
 
   object AllChangesSquashedBundlePut :
@@ -84,10 +50,50 @@ private constructor(
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
     )
 
-  object AllChangesSquashedBundlePost :
+  /**
+   * All the [UploadStrategy]s below this line are still in progress and not available as of now. As
+   * and when an [UploadStrategy] is implemented, it should be moved above this comment section and
+   * made non private.
+   */
+  private object AllChangesSquashedBundlePost :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerResource,
+      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
+    )
+
+  private object SingleChangePut :
+    UploadStrategy(
+      LocalChangesFetchMode.EarliestChange,
+      PatchGeneratorMode.PerChange,
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+    )
+
+  private object SingleChangePost :
+    UploadStrategy(
+      LocalChangesFetchMode.EarliestChange,
+      PatchGeneratorMode.PerChange,
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+    )
+
+  private object SingleResourcePut :
+    UploadStrategy(
+      LocalChangesFetchMode.PerResource,
+      PatchGeneratorMode.PerResource,
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+    )
+
+  private object SingleResourcePost :
+    UploadStrategy(
+      LocalChangesFetchMode.PerResource,
+      PatchGeneratorMode.PerResource,
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+    )
+
+  private object AllChangesBundlePost :
+    UploadStrategy(
+      LocalChangesFetchMode.AllChanges,
+      PatchGeneratorMode.PerChange,
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
     )
 }
