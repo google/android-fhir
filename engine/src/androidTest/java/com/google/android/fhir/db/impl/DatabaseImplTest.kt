@@ -40,6 +40,7 @@ import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
@@ -553,12 +554,14 @@ class DatabaseImplTest {
           .first { it.resourceId == "remote-patient-3" }
           .let {
             UploadSyncResult.Success(
-              listOf(it),
               listOf(
-                Patient().apply {
-                  id = it.resourceId
-                  meta = remoteMeta
-                },
+                ResourceUploadResponseMapping(
+                  listOf(it),
+                  Patient().apply {
+                    id = it.resourceId
+                    meta = remoteMeta
+                  },
+                ),
               ),
             )
           }

@@ -115,6 +115,7 @@ object Dependencies {
 
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
+    const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
   }
 
   object Room {
@@ -158,6 +159,9 @@ object Dependencies {
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
   const val xerces = "xerces:xercesImpl:${Versions.xerces}"
+
+  const val zxing = "com.google.zxing:core:${Versions.zxing}"
+  const val nimbus = "com.nimbusds:nimbus-jose-jwt:${Versions.nimbus}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -245,12 +249,16 @@ object Dependencies {
     const val jsonAssert = "1.5.1"
     const val material = "1.9.0"
     const val retrofit = "2.9.0"
+    const val gsonConverter = "2.1.0"
     const val sqlcipher = "4.5.4"
     const val timber = "5.0.1"
     const val truth = "1.1.5"
     const val woodstox = "6.5.1"
     const val xerces = "2.12.2"
     const val xmlUnit = "2.9.1"
+
+    const val zxing = "3.4.1"
+    const val nimbus = "9.31"
 
     // Test dependencies
     object AndroidxTest {
