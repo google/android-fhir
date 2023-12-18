@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -58,9 +59,8 @@ class FhirSynchronizerTest {
     fhirSynchronizer =
       FhirSynchronizer(
         TestFhirEngineImpl,
-        uploader,
-        downloader,
-        conflictResolver,
+        UploadConfiguration(uploader),
+        DownloadConfiguration(downloader, conflictResolver),
         fhirDataStore,
       )
   }
@@ -72,7 +72,6 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            listOf(),
             listOf(),
           ),
         )
@@ -102,7 +101,6 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            listOf(),
             listOf(),
           ),
         )
