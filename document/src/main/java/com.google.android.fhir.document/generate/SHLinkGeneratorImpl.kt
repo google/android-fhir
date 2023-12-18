@@ -139,7 +139,6 @@ internal class SHLinkGeneratorImpl(
     key: String,
     managementToken: String,
   ) {
-
     try {
       val contentEncrypted = encryptionUtility.encrypt(file, key)
       val authorization = "Bearer $managementToken"

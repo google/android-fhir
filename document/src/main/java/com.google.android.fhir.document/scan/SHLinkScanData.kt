@@ -50,6 +50,7 @@ data class SHLinkScanData(
   constructor() : this("", "", "", "", "", "", "", "", null)
 
   constructor(scannedValue: String) : this(scannedValue, "", "", "", "", "", "", "", null)
+
   constructor(
     fullLink: String,
     extractedJson: String,

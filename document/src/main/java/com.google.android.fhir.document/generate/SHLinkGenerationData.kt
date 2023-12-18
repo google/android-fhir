@@ -26,12 +26,9 @@ import java.time.Instant
  * information. For official documentation and specifications, see
  * [SHL Documentation](https://docs.smarthealthit.org/smart-health-links/).
  *
- * @property label A label describing the SHL data.
-<<<<<<< HEAD
- * @property expirationTime The expiration time of the SHL data.
-=======
- * @property expirationTime The expiration time of the SHL data, if any.
->>>>>>> upstream/master
+ * @property label A label describing the SHL data. <<<<<<< HEAD
+ * @property expirationTime The expiration time of the SHL data. =======
+ * @property expirationTime The expiration time of the SHL data, if any. >>>>>>> upstream/master
  * @property ipsDoc The IPS document linked to by the SHL.
  */
 data class SHLinkGenerationData(

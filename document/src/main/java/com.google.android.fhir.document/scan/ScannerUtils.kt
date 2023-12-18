@@ -57,6 +57,7 @@ class ScannerUtils(
         .setAutoFocusEnabled(true)
         .build()
   }
+
   /* Set up SurfaceHolder callbacks for camera preview */
   private fun setSurfaceCallbacks() {
     surfaceHolder.addCallback(surfaceCallback)
