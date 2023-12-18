@@ -1,0 +1,51 @@
+{
+  "resourceType": "ActivityDefinition",
+  "id": "SendMessageActivity",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationactivity"
+    ]
+  },
+  "kind": "CommunicationRequest",
+  "profile": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+  "intent": "proposal",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "publishable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    }
+  ],
+  "url": "http://example.org/ActivityDefinition/SendMessageActivity",
+  "name": "SendMessageActivity",
+  "title": "ActivityDefinition SendMessageActivity",
+  "status": "draft",
+  "experimental": true,
+  "publisher": "Example",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "code": "001",
+          "system": "http://unstats.un.org/unsd/methods/m49/m49.htm",
+          "display": "World"
+        }
+      ]
+    }
+  ],
+  "version": "0.1.0",
+  "description": "Example Activity Definition for a recommendation to send a message",
+  "code": {
+    "coding": [
+      {
+        "code": "send-message",
+        "system": "http://hl7.org/fhir/uv/cpg/CodeSystem/cpg-activity-type",
+        "display": "Send a message"
+      }
+    ]
+  },
+  "doNotPerform": false
+}

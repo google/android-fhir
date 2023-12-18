@@ -75,7 +75,9 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {}
+  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {
+    // Add code to display Toast when sync job  is complete
+  }
 
   private fun initMenu() {
     (requireActivity() as MenuHost).addMenuProvider(

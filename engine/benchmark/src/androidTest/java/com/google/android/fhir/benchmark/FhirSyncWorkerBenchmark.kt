@@ -21,6 +21,7 @@ import androidx.benchmark.junit4.BenchmarkRule
 import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
@@ -35,6 +36,7 @@ import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -87,6 +89,8 @@ class FhirSyncWorkerBenchmark {
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+
+    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
   }
 
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :
@@ -127,7 +131,9 @@ class FhirSyncWorkerBenchmark {
 
   @Test fun oneTimeSync_10patients() = oneTimeSync(10, 5, 5)
 
-  @Test fun oneTimeSync_50patients() = oneTimeSync(50, 5, 5)
+  @Test
+  @SdkSuppress // TODO https://github.com/google/android-fhir/issues/2235 FIXME
+  fun oneTimeSync_50patients() = oneTimeSync(50, 5, 5)
 
   private fun oneTimeSync(numberPatients: Int, numberObservations: Int, numberEncounters: Int) =
     runBlocking {

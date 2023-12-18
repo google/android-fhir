@@ -1,3 +1,4 @@
+import Dependencies.forceGuava
 import Dependencies.forceHapiVersion
 import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
@@ -50,25 +51,23 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations {
   all {
     removeIncompatibleDependencies()
+    forceGuava()
     forceHapiVersion()
     forceJacksonVersion()
   }
 }
 
 dependencies {
+  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
   androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.Cql.engineJackson)
-  androidTestImplementation(Dependencies.Cql.evaluator)
-  androidTestImplementation(Dependencies.Cql.evaluatorBuilder)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-  androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
   androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.mockWebServer)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
+  androidTestImplementation(Dependencies.junit)
+  androidTestImplementation(Dependencies.mockWebServer)
+  androidTestImplementation(Dependencies.truth)
 
   androidTestImplementation(project(":engine"))
   // for test json files only

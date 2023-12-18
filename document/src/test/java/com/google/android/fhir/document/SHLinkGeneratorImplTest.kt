@@ -21,6 +21,10 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.generate.EncryptionUtils
 import com.google.android.fhir.document.generate.SHLinkGenerationData
 import com.google.android.fhir.document.generate.SHLinkGeneratorImpl
+<<<<<<< HEAD
+=======
+import java.time.Instant
+>>>>>>> upstream/master
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
@@ -87,14 +91,22 @@ class SHLinkGeneratorImplTest {
     mockWebServer.enqueue(postPayloadResponse)
   }
 
+<<<<<<< HEAD
   private fun assertCommonFunctionality(
+=======
+  private suspend fun assertCommonFunctionality(
+>>>>>>> upstream/master
     shLinkGenerationData: SHLinkGenerationData,
     passcode: String,
     optionalViewer: String,
     expectedExp: String? = null,
     expectedFlag: String? = null,
     expectedLabel: String? = null,
+<<<<<<< HEAD
   ) = runTest {
+=======
+  ) {
+>>>>>>> upstream/master
     val result =
       shLinkGeneratorImpl.generateSHLink(
         shLinkGenerationData,
@@ -111,10 +123,18 @@ class SHLinkGeneratorImplTest {
     val parts = result.split("#shlink:/")
     assertTrue(parts.size == 2)
 
+<<<<<<< HEAD
     val base64EncodedSection = parts[1]
     val decodedBytes = Base64.decode(base64EncodedSection, Base64.URL_SAFE)
     val decodedString = String(decodedBytes, Charsets.UTF_8)
     val decodedJSON = JSONObject(decodedString)
+=======
+    val decodedJSON =
+      with(parts[1]) {
+        val decodedString = String(Base64.decode(this, Base64.URL_SAFE), Charsets.UTF_8)
+        JSONObject(decodedString)
+      }
+>>>>>>> upstream/master
 
     expectedExp?.let {
       assertTrue(decodedJSON.has("exp"))
@@ -143,112 +163,203 @@ class SHLinkGeneratorImplTest {
   }
 
   @Test
+<<<<<<< HEAD
   fun testGenerateSHLinkWithExp() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "2023-11-01", mockIPSDocument),
+=======
+  fun testGenerateSHLinkWithExp() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", Instant.parse("2023-11-01T00:00:00.00Z"), mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       "1698796800",
       null,
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithoutExp() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithoutExp() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       null,
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithPasscode() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithPasscode() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "passcode",
       "",
       null,
       "P",
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithoutPasscode() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithoutPasscode() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       "",
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithLabel() =
     assertCommonFunctionality(
       SHLinkGenerationData("label", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithLabel() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("label", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       null,
       "label",
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithoutLabel() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithoutLabel() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       null,
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithOptionalViewer() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithOptionalViewer() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "viewerUrl",
       null,
       null,
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithoutOptionalViewer() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithoutOptionalViewer() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       null,
       null,
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithAllFeatures() =
     assertCommonFunctionality(
       SHLinkGenerationData("label", "2023-11-01", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithAllFeatures() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("label", Instant.parse("2023-11-01T00:00:00.00Z"), mockIPSDocument),
+>>>>>>> upstream/master
       "passcode",
       "viewerUrl",
       "1698796800",
       "P",
       "label",
     )
+<<<<<<< HEAD
 
   @Test
   fun testGenerateSHLinkWithNoFeatures() =
     assertCommonFunctionality(
       SHLinkGenerationData("", "", mockIPSDocument),
+=======
+  }
+
+  @Test
+  fun testGenerateSHLinkWithNoFeatures() = runTest {
+    assertCommonFunctionality(
+      SHLinkGenerationData("", null, mockIPSDocument),
+>>>>>>> upstream/master
       "",
       "",
       null,
       null,
       null,
     )
+<<<<<<< HEAD
+=======
+  }
+>>>>>>> upstream/master
 }

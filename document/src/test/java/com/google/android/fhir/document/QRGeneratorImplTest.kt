@@ -81,6 +81,7 @@ class QRGeneratorImplTest {
   }
 
   @Test
+<<<<<<< HEAD
   fun testUpdateImageViewOnMainThread() {
     val qrCodeBitmap = mock(Bitmap::class.java)
     qrGeneratorImpl.updateImageViewOnMainThread(qrView, qrCodeBitmap)
@@ -88,6 +89,8 @@ class QRGeneratorImplTest {
   }
 
   @Test
+=======
+>>>>>>> upstream/master
   fun testGenerateQRCodeWithNullBitmap() {
     val content = "content"
     `when`(qrGeneratorUtils.createQRCodeBitmap(content)).thenReturn(null)

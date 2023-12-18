@@ -17,6 +17,7 @@
 package com.google.android.fhir.document.generate
 
 import com.google.android.fhir.document.IPSDocument
+import java.time.Instant
 
 /**
  * Represents a SHL data structure, which stores information needed to generate a SHL.
@@ -26,11 +27,15 @@ import com.google.android.fhir.document.IPSDocument
  * [SHL Documentation](https://docs.smarthealthit.org/smart-health-links/).
  *
  * @property label A label describing the SHL data.
+<<<<<<< HEAD
  * @property expirationTime The expiration time of the SHL data.
+=======
+ * @property expirationTime The expiration time of the SHL data, if any.
+>>>>>>> upstream/master
  * @property ipsDoc The IPS document linked to by the SHL.
  */
 data class SHLinkGenerationData(
   val label: String,
-  val expirationTime: String,
+  val expirationTime: Instant?,
   val ipsDoc: IPSDocument,
 )

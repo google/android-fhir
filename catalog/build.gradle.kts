@@ -1,3 +1,5 @@
+import Dependencies.forceGuava
+
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -40,6 +42,8 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
+configurations { all { forceGuava() } }
+
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
@@ -56,6 +60,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
 
   implementation(project(path = ":datacapture"))
+  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
 
   testImplementation(Dependencies.junit)

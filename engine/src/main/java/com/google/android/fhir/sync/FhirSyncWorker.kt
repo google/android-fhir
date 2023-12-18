@@ -25,7 +25,10 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.sync.upload.Uploader
+import com.google.android.fhir.sync.upload.patch.PatchGeneratorFactory
+import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorFactory
 import com.google.gson.ExclusionStrategy
 import com.google.gson.FieldAttributes
 import com.google.gson.GsonBuilder
@@ -33,7 +36,6 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -45,6 +47,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   abstract fun getDownloadWorkManager(): DownloadWorkManager
 
   abstract fun getConflictResolver(): ConflictResolver
+
+  abstract fun getUploadStrategy(): UploadStrategy
 
   private val gson =
     GsonBuilder()
@@ -66,11 +70,27 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           ),
         )
 
-    val flow = MutableSharedFlow<SyncJobStatus>()
+    val synchronizer =
+      FhirSynchronizer(
+        applicationContext,
+        getFhirEngine(),
+        UploadConfiguration(
+          Uploader(
+            dataSource = dataSource,
+            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+            requestGenerator =
+              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+          ),
+        ),
+        DownloadConfiguration(
+          DownloaderImpl(dataSource, getDownloadWorkManager()),
+          getConflictResolver(),
+        ),
+      )
 
     val job =
       CoroutineScope(Dispatchers.IO).launch {
-        flow.collect {
+        synchronizer.syncState.collect {
           // now send Progress to work manager so caller app can listen
           setProgress(buildWorkData(it))
 
@@ -80,17 +100,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         }
       }
 
-    Timber.v("Subscribed to flow for progress")
-    val result =
-      FhirSynchronizer(
-          applicationContext,
-          getFhirEngine(),
-          Uploader(dataSource),
-          DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver(),
-        )
-        .apply { subscribe(flow) }
-        .synchronize()
+    val result = synchronizer.synchronize()
     val output = buildWorkData(result)
 
     // await/join is needed to collect states completely
@@ -105,15 +115,10 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
      * [RetryConfiguration.maxRetries] set by user.
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    return when {
-      result is SyncJobStatus.Finished -> {
-        Result.success(output)
-      }
-      retries > runAttemptCount -> {
-        Result.retry()
-      }
+    return when (result) {
+      is SyncJobStatus.Finished -> Result.success(output)
       else -> {
-        Result.failure(output)
+        if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }
     }
   }

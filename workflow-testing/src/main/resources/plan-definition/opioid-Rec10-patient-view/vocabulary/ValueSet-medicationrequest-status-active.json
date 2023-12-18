@@ -1,0 +1,41 @@
+{
+  "resourceType": "ValueSet",
+  "id": "medicationrequest-status-active",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/medicationrequest-status-active",
+  "version": "0.0.1",
+  "name": "Valueset_medicationrequest_status_active",
+  "title": "ValueSet - Medication Request Status Active",
+  "status": "active",
+  "experimental": true,
+  "publisher": "Alphora",
+  "description": "The prescription is 'actionable', but not all actions that are implied by it have occurred yet.",
+  "expansion": {
+    "timestamp": "2021-05-18T13:47:55-07:00",
+    "contains": [
+      {
+        "system": "http://hl7.org/fhir/CodeSystem/medicationrequest-status",
+        "code": "active",
+        "display": "Active"
+      }
+    ]
+  }
+}

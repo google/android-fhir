@@ -19,9 +19,8 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.ResourceType
-import timber.log.Timber
 
 /**
  * Represents a mechanism to consolidate resources after they are uploaded.
@@ -36,36 +35,35 @@ import timber.log.Timber
 internal fun interface ResourceConsolidator {
 
   /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource)
+  suspend fun consolidate(uploadSyncResult: UploadSyncResult)
 }
 
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(localChangeToken: LocalChangeToken, response: Resource) {
-    database.deleteUpdates(localChangeToken)
-    when (response) {
-      is Bundle -> updateVersionIdAndLastUpdated(response)
-      else -> updateVersionIdAndLastUpdated(response)
-    }
-  }
-
-  private suspend fun updateVersionIdAndLastUpdated(bundle: Bundle) {
-    when (bundle.type) {
-      Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        bundle.entry.forEach {
-          when {
-            it.hasResource() -> updateVersionIdAndLastUpdated(it.resource)
-            it.hasResponse() -> updateVersionIdAndLastUpdated(it.response)
+  override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
+    when (uploadSyncResult) {
+      is UploadSyncResult.Success -> {
+        database.deleteUpdates(
+          LocalChangeToken(
+            uploadSyncResult.uploadResponses.flatMap {
+              it.localChanges.flatMap { localChange -> localChange.token.ids }
+            },
+          ),
+        )
+        uploadSyncResult.uploadResponses.forEach {
+          when (it) {
+            is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
           }
         }
       }
-      else -> {
-        // Leave it for now.
-        Timber.i("Received request to update meta values for ${bundle.type}")
+      is UploadSyncResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
       }
     }
-  }
 
   private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
     if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
@@ -80,7 +78,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: Resource) {
+  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       database.updateVersionIdAndLastUpdated(
         resource.id,

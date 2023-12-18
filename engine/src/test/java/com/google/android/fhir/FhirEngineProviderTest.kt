@@ -19,7 +19,7 @@ package com.google.android.fhir
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import java.lang.IllegalStateException
+import java.io.File
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -93,6 +93,29 @@ class FhirEngineProviderTest {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_configureOkHttpCache_shouldHaveOkHttpCache() {
+    val config =
+      FhirEngineConfiguration(
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(
+              httpCache =
+                CacheConfiguration(
+                  cacheDir = File("sample-dir", "http_cache"),
+                  // $0.05 worth of phone storage in 2020
+                  maxSize = 50L * 1024L * 1024L, // 50 MiB
+                ),
+            ),
+          ),
+      )
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
+      assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
     }
   }
 }

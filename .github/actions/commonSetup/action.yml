@@ -8,13 +8,12 @@ runs:
       with:
         distribution: temurin
         java-version: "17"
-    - name: Make files executable
-      shell: bash
-      run: chmod +x ./gradlew
 
     - name: "Setup Gradle"
       uses: gradle/gradle-build-action@v2
       with:
+        # See https://github.com/marketplace/actions/gradle-build-action#enable-dependency-graph-generation-for-a-workflow
+        dependency-graph: generate-and-submit
         # Limit the size of the cache entry.
         # These directories contain instrumented/transformed dependency jars which can be reconstructed relatively quickly.
         gradle-home-cache-excludes: |

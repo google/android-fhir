@@ -32,6 +32,7 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.Date
+import java.util.UUID
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
@@ -54,10 +55,17 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(insertionLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.INSERT)
-      assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(payload).isEqualTo(jsonParser.encodeResourceToString(patient))
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.INSERT)
+        assertThat(resourceId).isEqualTo(patient.logicalId)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(payload).isEqualTo(jsonParser.encodeResourceToString(patient))
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(insertionLocalChange)
+      }
     }
   }
 
@@ -78,11 +86,18 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.UPDATE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(updateLocalChange1)
+      }
     }
   }
 
@@ -100,11 +115,18 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(deleteLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.DELETE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertThat(payload).isEmpty()
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.DELETE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertThat(payload).isEmpty()
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(deleteLocalChange)
+      }
     }
   }
 
@@ -120,10 +142,17 @@ class PerResourcePatchGeneratorTest {
       PerResourcePatchGenerator.generate(listOf(insertionLocalChange, updateLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.INSERT)
-      assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(payload).isEqualTo(patientString)
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.INSERT)
+        assertThat(resourceId).isEqualTo(patient.logicalId)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(payload).isEqualTo(patientString)
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(2)
+        assertThat(this).containsExactly(insertionLocalChange, updateLocalChange)
+      }
     }
   }
 
@@ -135,6 +164,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -158,6 +188,7 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
             timestamp = Instant.now(),
@@ -178,6 +209,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -201,6 +233,7 @@ class PerResourcePatchGeneratorTest {
             id = 2,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.UPDATE,
             payload =
               diff(
@@ -233,6 +266,7 @@ class PerResourcePatchGeneratorTest {
             id = 3,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
             timestamp = Instant.now(),
@@ -265,11 +299,18 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.UPDATE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      }
+
+      with(localChanges) {
+        assertThat(size).isEqualTo(2)
+        assertThat(this).containsExactly(updateLocalChange1, updateLocalChange2)
+      }
     }
   }
 
@@ -296,11 +337,18 @@ class PerResourcePatchGeneratorTest {
       )
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.DELETE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertThat(payload).isEmpty()
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.DELETE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertThat(payload).isEmpty()
+      }
+
+      with(localChanges) {
+        assertThat(size).isEqualTo(3)
+        assertThat(this).containsExactly(updateLocalChange1, updateLocalChange2, deleteLocalChange)
+      }
     }
   }
 
@@ -314,6 +362,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.DELETE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -324,6 +373,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -349,6 +399,7 @@ class PerResourcePatchGeneratorTest {
             resourceId = "Patient-001",
             type = LocalChangeEntity.Type.UPDATE,
             payload = "",
+            resourceUuid = UUID.randomUUID(),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -357,6 +408,7 @@ class PerResourcePatchGeneratorTest {
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceId = "Patient-001",
+            resourceUuid = UUID.randomUUID(),
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)

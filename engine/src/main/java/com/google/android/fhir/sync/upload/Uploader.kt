@@ -20,15 +20,19 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.patch.PerResourcePatchGenerator
-import com.google.android.fhir.sync.upload.request.TransactionBundleGenerator
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import com.google.android.fhir.sync.upload.patch.PatchGenerator
+import com.google.android.fhir.sync.upload.request.BundleUploadRequestMapping
+import com.google.android.fhir.sync.upload.request.UploadRequestGenerator
+import com.google.android.fhir.sync.upload.request.UploadRequestMapping
+import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
+import java.lang.IllegalStateException
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.instance.model.api.IBase
+import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.ResourceType
 import timber.log.Timber
 
 /**
@@ -41,68 +45,129 @@ import timber.log.Timber
  */
 internal class Uploader(
   private val dataSource: DataSource,
+  private val patchGenerator: PatchGenerator,
+  private val requestGenerator: UploadRequestGenerator,
 ) {
-  private val patchGenerator = PerResourcePatchGenerator
-  private val requestGenerator = TransactionBundleGenerator.getDefault()
-
-  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadState> = flow {
-    val patches = patchGenerator.generate(localChanges)
-    val requests = requestGenerator.generateUploadRequests(patches)
+  suspend fun upload(localChanges: List<LocalChange>): UploadSyncResult {
+    val mappedPatches = patchGenerator.generate(localChanges)
+    val mappedRequests = requestGenerator.generateUploadRequests(mappedPatches)
     val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
-    val total = requests.size
-    emit(UploadState.Started(total))
-    requests.forEachIndexed { index, uploadRequest ->
-      try {
-        val response = dataSource.upload(uploadRequest)
-        emit(
-          getUploadResult(uploadRequest.resource.resourceType, response, token, total, index + 1),
-        )
-      } catch (e: Exception) {
-        Timber.e(e)
-        emit(UploadState.Failure(ResourceSyncException(ResourceType.Bundle, e)))
+
+    val successfulMappedResponses = mutableListOf<SuccessfulUploadResponseMapping>()
+
+    for (mappedRequest in mappedRequests) {
+      when (val result = handleUploadRequest(mappedRequest)) {
+        is UploadRequestResult.Success ->
+          successfulMappedResponses.addAll(result.successfulUploadResponsMappings)
+        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
+      }
+    }
+    return UploadSyncResult.Success(successfulMappedResponses)
+  }
+
+  private fun handleUploadResponse(
+    mappedUploadRequest: UploadRequestMapping,
+    response: Resource,
+  ): UploadRequestResult {
+    val responsesList =
+      when {
+        mappedUploadRequest is UrlUploadRequestMapping && response is DomainResource ->
+          listOf(ResourceUploadResponseMapping(mappedUploadRequest.localChanges, response))
+        mappedUploadRequest is BundleUploadRequestMapping &&
+          response is Bundle &&
+          response.type == Bundle.BundleType.TRANSACTIONRESPONSE ->
+          handleBundleUploadResponse(mappedUploadRequest, response)
+        else ->
+          throw IllegalStateException(
+            "Unknown mapping for request and response. Request Type: ${mappedUploadRequest.javaClass}, Response Type: ${response.resourceType}",
+          )
+      }
+    return UploadRequestResult.Success(responsesList)
+  }
+
+  private fun handleBundleUploadResponse(
+    mappedUploadRequest: BundleUploadRequestMapping,
+    bundleResponse: Bundle,
+  ): List<SuccessfulUploadResponseMapping> {
+    require(mappedUploadRequest.splitLocalChanges.size == bundleResponse.entry.size)
+    return mappedUploadRequest.splitLocalChanges.mapIndexed { index, localChanges ->
+      val bundleEntry = bundleResponse.entry[index]
+      when {
+        bundleEntry.hasResource() && bundleEntry.resource is DomainResource ->
+          ResourceUploadResponseMapping(localChanges, bundleEntry.resource as DomainResource)
+        bundleEntry.hasResponse() ->
+          BundleComponentUploadResponseMapping(localChanges, bundleEntry.response)
+        else ->
+          throw IllegalStateException(
+            "Unknown response: $bundleEntry for Bundle Request at index $index",
+          )
       }
     }
   }
 
-  private fun getUploadResult(
-    requestResourceType: ResourceType,
-    response: Resource,
-    localChangeToken: LocalChangeToken,
-    total: Int,
-    completed: Int,
-  ) =
-    when {
-      response is Bundle && response.type == Bundle.BundleType.TRANSACTIONRESPONSE -> {
-        UploadState.Success(localChangeToken, response, total, completed)
+  private suspend fun handleUploadRequest(
+    mappedUploadRequest: UploadRequestMapping,
+  ): UploadRequestResult {
+    return try {
+      val response = dataSource.upload(mappedUploadRequest.generatedRequest)
+      when {
+        response is OperationOutcome && response.issue.isNotEmpty() ->
+          UploadRequestResult.Failure(
+            ResourceSyncException(
+              mappedUploadRequest.generatedRequest.resource.resourceType,
+              FHIRException(response.issueFirstRep.diagnostics),
+            ),
+          )
+        (response is DomainResource || response is Bundle) &&
+          (response !is IBaseOperationOutcome) ->
+          handleUploadResponse(mappedUploadRequest, response)
+        else ->
+          UploadRequestResult.Failure(
+            ResourceSyncException(
+              mappedUploadRequest.generatedRequest.resource.resourceType,
+              FHIRException(
+                "Unknown response for ${mappedUploadRequest.generatedRequest.resource.resourceType}",
+              ),
+            ),
+          )
       }
-      response is OperationOutcome && response.issue.isNotEmpty() -> {
-        UploadState.Failure(
-          ResourceSyncException(
-            requestResourceType,
-            FHIRException(response.issueFirstRep.diagnostics),
-          ),
-        )
-      }
-      else -> {
-        UploadState.Failure(
-          ResourceSyncException(
-            requestResourceType,
-            FHIRException("Unknown response for ${response.resourceType}"),
-          ),
-        )
-      }
+    } catch (e: Exception) {
+      Timber.e(e)
+      UploadRequestResult.Failure(
+        ResourceSyncException(mappedUploadRequest.generatedRequest.resource.resourceType, e),
+      )
     }
+  }
+
+  private sealed class UploadRequestResult {
+    data class Success(
+      val successfulUploadResponsMappings: List<SuccessfulUploadResponseMapping>,
+    ) : UploadRequestResult()
+
+    data class Failure(val exception: ResourceSyncException) : UploadRequestResult()
+  }
 }
 
-internal sealed class UploadState {
-  data class Started(val total: Int) : UploadState()
-
+sealed class UploadSyncResult {
   data class Success(
-    val localChangeToken: LocalChangeToken,
-    val resource: Resource,
-    val total: Int,
-    val completed: Int,
-  ) : UploadState()
+    val uploadResponses: List<SuccessfulUploadResponseMapping>,
+  ) : UploadSyncResult()
 
-  data class Failure(val syncError: ResourceSyncException) : UploadState()
+  data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
+    UploadSyncResult()
 }
+
+sealed class SuccessfulUploadResponseMapping(
+  open val localChanges: List<LocalChange>,
+  open val output: IBase,
+)
+
+internal data class ResourceUploadResponseMapping(
+  override val localChanges: List<LocalChange>,
+  override val output: DomainResource,
+) : SuccessfulUploadResponseMapping(localChanges, output)
+
+internal data class BundleComponentUploadResponseMapping(
+  override val localChanges: List<LocalChange>,
+  override val output: Bundle.BundleEntryResponseComponent,
+) : SuccessfulUploadResponseMapping(localChanges, output)

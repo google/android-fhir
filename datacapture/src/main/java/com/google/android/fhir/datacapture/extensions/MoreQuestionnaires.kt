@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The StructureMap url in the
@@ -64,73 +67,54 @@ internal fun Questionnaire.findVariableExpression(variableName: String): Express
  */
 internal fun validateLaunchContextExtensions(launchContextExtensions: List<Extension>) =
   launchContextExtensions.forEach { launchExtension ->
-    validateLaunchContextExtension(
-      Extension().apply {
-        addExtension(launchExtension.extension.firstOrNull { it.url == "name" })
-        addExtension(launchExtension.extension.firstOrNull { it.url == "type" })
-      },
-    )
+    validateLaunchContextExtension(launchExtension)
   }
 
 /**
- * Checks that the extension:name extension exists and its value contains a valid code from
- * [QuestionnaireLaunchContextSet]
+ * Verifies the existence of extension:name and extension:type with valid name system and type
+ * values.
  */
 private fun validateLaunchContextExtension(launchExtension: Extension) {
-  check(launchExtension.extension.size == 2) {
-    "The extension:name or extension:type extension is missing in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT"
-  }
-
-  val isValidExtension =
-    QuestionnaireLaunchContextSet.values().any {
-      launchExtension.equalsDeep(
-        Extension().apply {
-          addExtension(
-            Extension().apply {
-              url = "name"
-              setValue(
-                Coding().apply {
-                  code = it.code
-                  display = it.display
-                  system = it.system
-                },
-              )
-            },
-          )
-          addExtension(
-            Extension().apply {
-              url = "type"
-              setValue(CodeType().setValue(it.resourceType))
-            },
-          )
-        },
+  val nameCoding =
+    launchExtension.getExtensionByUrl("name")?.value as? Coding
+      ?: error(
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
       )
+
+  val typeCodeType =
+    launchExtension.getExtensionByUrl("type")?.value as? CodeType
+      ?: error(
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+
+  val isValidResourceType =
+    try {
+      ResourceType.fromCode(typeCodeType.value) != null
+    } catch (exception: FHIRException) {
+      false
     }
-  if (!isValidExtension) {
+
+  if (nameCoding.system != EXTENSION_LAUNCH_CONTEXT || !isValidResourceType) {
     error(
-      "The extension:name extension and/or extension:type extension do not follow the format " +
-        "specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
     )
   }
 }
 
 /**
- * The set of supported launch contexts, as per: http://hl7.org/fhir/uv/sdc/ValueSet/launchContext
+ * Filters the provided launch contexts by matching the keys with the `code` values found in the
+ * "name" extensions.
  */
-private enum class QuestionnaireLaunchContextSet(
-  val code: String,
-  val display: String,
-  val system: String,
-  val resourceType: String,
-) {
-  PATIENT("patient", "Patient", EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  ENCOUNTER("encounter", "Encounter", EXTENSION_LAUNCH_CONTEXT, "Encounter"),
-  LOCATION("location", "Location", EXTENSION_LAUNCH_CONTEXT, "Location"),
-  USER_AS_PATIENT("user", "User", EXTENSION_LAUNCH_CONTEXT, "Patient"),
-  USER_AS_PRACTITIONER("user", "User", EXTENSION_LAUNCH_CONTEXT, "Practitioner"),
-  USER_AS_PRACTITIONER_ROLE("user", "User", EXTENSION_LAUNCH_CONTEXT, "PractitionerRole"),
-  USER_AS_RELATED_PERSON("user", "User", EXTENSION_LAUNCH_CONTEXT, "RelatedPerson"),
-  STUDY("study", "ResearchStudy", EXTENSION_LAUNCH_CONTEXT, "ResearchStudy"),
+internal fun filterByCodeInNameExtension(
+  launchContexts: Map<String, Resource>,
+  launchContextExtensions: List<Extension>,
+): Map<String, Resource> {
+  val nameCodes =
+    launchContextExtensions
+      .mapNotNull { extension -> (extension.getExtensionByUrl("name").value as? Coding)?.code }
+      .toSet()
+
+  return launchContexts.filterKeys { nameCodes.contains(it) }
 }
 
 /**

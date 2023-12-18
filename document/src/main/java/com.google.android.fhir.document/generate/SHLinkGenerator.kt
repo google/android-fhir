@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.document.generate
 
+/* The SHLink Generator interface handles the generation of Smart Health Links */
 interface SHLinkGenerator {
 
   /* Returns the newly generated SHLink */
