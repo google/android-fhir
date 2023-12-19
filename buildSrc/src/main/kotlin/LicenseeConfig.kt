@@ -132,6 +132,14 @@ fun Project.configureLicensee() {
       because("")
     }
 
+    allowDependency("com.google.android.gms", "play-services-vision", "20.1.3") { because("") }
+
+    allowDependency("com.google.android.gms", "play-services-vision-common", "19.1.3") {
+      because("")
+    }
+
+    allowDependency("com.google.android.gms", "play-services-flags", "17.0.0") { because("") }
+
     // Play Services Phenotype
     allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
 

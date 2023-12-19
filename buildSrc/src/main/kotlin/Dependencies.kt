@@ -162,6 +162,7 @@ object Dependencies {
 
   const val zxing = "com.google.zxing:core:${Versions.zxing}"
   const val nimbus = "com.nimbusds:nimbus-jose-jwt:${Versions.nimbus}"
+  const val vision = "com.google.android.gms:play-services-vision:${Versions.vision}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -259,6 +260,7 @@ object Dependencies {
 
     const val zxing = "3.4.1"
     const val nimbus = "9.31"
+    const val vision = "20.1.3"
 
     // Test dependencies
     object AndroidxTest {

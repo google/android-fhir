@@ -43,6 +43,7 @@ dependencies {
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
+  implementation(Dependencies.vision)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
