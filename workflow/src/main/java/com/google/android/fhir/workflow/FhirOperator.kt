@@ -25,6 +25,8 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.repositories.KnowledgeRepository
+import org.hl7.fhir.instance.model.api.IBaseBundle
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CanonicalType
@@ -32,9 +34,12 @@ import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.PlanDefinition
+import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
+import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
@@ -162,20 +167,33 @@ internal constructor(
     start: String,
     end: String,
     reportType: String,
-    subjectId: String?,
-    practitioner: String?,
+    subjectId: String? = null,
+    practitioner: String? = null,
   ): MeasureReport {
+    val subjects =
+      if (!practitioner.isNullOrBlank()) {
+        if (practitioner.indexOf("/") == -1) {
+          listOf("Practitioner/$practitioner")
+        } else {
+          listOf(practitioner)
+        }
+      } else {
+        listOf(subjectId)
+      }
+
     val measure = Eithers.forLeft3<CanonicalType, IdType, Measure>(CanonicalType(measureUrl))
-    return measureProcessor.evaluateMeasure(
-      /* measure = */ measure,
-      /* periodStart = */ start,
-      /* periodEnd = */ end,
-      /* reportType = */ reportType,
-      /* subjectIds = */ listOf(
-        subjectId,
-      ), // https://github.com/cqframework/clinical-reasoning/issues/358
-      /* additionalData = */ null,
-    )
+
+    val report = measureProcessor.evaluateMeasure(measure, start, end, reportType, subjects, null)
+
+    // add subject reference for non-individual reportTypes
+    if (report.type.name == MeasureReportType.SUMMARY.name) {
+      if (!practitioner.isNullOrBlank()) {
+        report.setSubject(Reference(practitioner))
+      } else if (!subjectId.isNullOrBlank()) {
+        report.setSubject(Reference(subjectId))
+      }
+    }
+    return report
   }
 
   /**
@@ -191,11 +209,6 @@ internal constructor(
   )
   fun generateCarePlan(planDefinitionId: String, subject: String): IBaseResource {
     return generateCarePlan(planDefinitionId, subject, encounterId = null)
-  }
-
-  @WorkerThread
-  fun generateCarePlan(planDefinition: CanonicalType, subject: String): IBaseResource {
-    return generateCarePlan(planDefinition, subject, encounterId = null)
   }
 
   /**
@@ -239,7 +252,18 @@ internal constructor(
   fun generateCarePlan(
     planDefinition: CanonicalType,
     subject: String,
-    encounterId: String?,
+    encounterId: String? = null,
+    practitionerId: String? = null,
+    organizationId: String? = null,
+    userType: IBaseDatatype? = null,
+    userLanguage: IBaseDatatype? = null,
+    userTaskContext: IBaseDatatype? = null,
+    setting: IBaseDatatype? = null,
+    settingContext: IBaseDatatype? = null,
+    parameters: IBaseParameters? = null,
+    useServerData: Boolean? = null,
+    bundle: IBaseBundle? = null,
+    prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       /* id = */ null,
@@ -247,17 +271,55 @@ internal constructor(
       /* planDefinition = */ null,
       /* subject = */ subject,
       /* encounterId = */ encounterId,
-      /* practitionerId = */ null,
-      /* organizationId = */ null,
-      /* userType = */ null,
-      /* userLanguage = */ null,
-      /* userTaskContext = */ null,
-      /* setting = */ null,
-      /* settingContext = */ null,
-      /* parameters = */ null,
-      /* useServerData = */ null,
-      /* bundle = */ null,
-      /* prefetchData = */ null,
+      /* practitionerId = */ practitionerId,
+      /* organizationId = */ organizationId,
+      /* userType = */ userType,
+      /* userLanguage = */ userLanguage,
+      /* userTaskContext = */ userTaskContext,
+      /* setting = */ setting,
+      /* settingContext = */ settingContext,
+      /* parameters = */ parameters,
+      /* useServerData = */ useServerData,
+      /* bundle = */ bundle,
+      /* prefetchData = */ prefetchData,
+      libraryProcessor,
+    ) as IBaseResource
+  }
+
+  @WorkerThread
+  fun generateCarePlan(
+    planDefinition: PlanDefinition,
+    subject: String,
+    encounterId: String? = null,
+    practitionerId: String? = null,
+    organizationId: String? = null,
+    userType: IBaseDatatype? = null,
+    userLanguage: IBaseDatatype? = null,
+    userTaskContext: IBaseDatatype? = null,
+    setting: IBaseDatatype? = null,
+    settingContext: IBaseDatatype? = null,
+    parameters: IBaseParameters? = null,
+    useServerData: Boolean? = null,
+    bundle: IBaseBundle? = null,
+    prefetchData: IBaseParameters? = null,
+  ): IBaseResource {
+    return planDefinitionProcessor.apply(
+      /* id = */ null,
+      /* canonical = */ null,
+      /* planDefinition = */ planDefinition,
+      /* subject = */ subject,
+      /* encounterId = */ encounterId,
+      /* practitionerId = */ practitionerId,
+      /* organizationId = */ organizationId,
+      /* userType = */ userType,
+      /* userLanguage = */ userLanguage,
+      /* userTaskContext = */ userTaskContext,
+      /* setting = */ setting,
+      /* settingContext = */ settingContext,
+      /* parameters = */ parameters,
+      /* useServerData = */ useServerData,
+      /* bundle = */ bundle,
+      /* prefetchData = */ prefetchData,
       libraryProcessor,
     ) as IBaseResource
   }
