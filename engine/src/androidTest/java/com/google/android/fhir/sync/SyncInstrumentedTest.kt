@@ -124,7 +124,7 @@ class SyncInstrumentedTest {
   @Test
   fun periodic_worker_periodicSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
-    val states = mutableListOf<PeriodicSyncState>()
+    val states = mutableListOf<PeriodicSyncJobStatus>()
     // run and wait for periodic worker to finish
     runBlocking {
       Sync.periodicSync<TestSyncWorker>(
@@ -138,23 +138,24 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentJobState !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
 
-    assertThat(states.first().currentJobState)
+    assertThat(states.first().currentSyncJobStatus)
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
-    assertThat(states.first().lastJobState).isNull()
-    assertThat(states.last().currentJobState)
+    assertThat(states.first().lastSyncJobStatus).isNull()
+    assertThat(states.last().currentSyncJobStatus)
       .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
-    assertThat(states.last().lastJobState).isInstanceOf(LastSyncJobStatus.Succeeded::class.java)
+    assertThat(states.last().lastSyncJobStatus)
+      .isInstanceOf(LastSyncJobStatus.Succeeded::class.java)
   }
 
   @Test
   fun periodic_worker_failedPeriodicSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
-    val states = mutableListOf<PeriodicSyncState>()
+    val states = mutableListOf<PeriodicSyncJobStatus>()
     // run and wait for periodic worker to finish
     runBlocking {
       Sync.periodicSync<TestSyncWorkerForDownloadFailing>(
@@ -168,17 +169,17 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentJobState !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
 
-    assertThat(states.first().currentJobState)
+    assertThat(states.first().currentSyncJobStatus)
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
-    assertThat(states.first().lastJobState).isNull()
-    assertThat(states.last().currentJobState)
+    assertThat(states.first().lastSyncJobStatus).isNull()
+    assertThat(states.last().currentSyncJobStatus)
       .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
-    assertThat(states.last().lastJobState).isInstanceOf(LastSyncJobStatus.Failed::class.java)
+    assertThat(states.last().lastSyncJobStatus).isInstanceOf(LastSyncJobStatus.Failed::class.java)
   }
 
   @Test
@@ -197,7 +198,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.currentJobState !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }

@@ -26,6 +26,7 @@ import androidx.work.Constraints
 import com.google.android.fhir.demo.data.DemoFhirSyncWorker
 import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.PeriodicSyncJobStatus
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.time.format.DateTimeFormatter
@@ -49,6 +50,10 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   val pollState: Flow<CurrentSyncJobStatus>
     get() = _pollState
 
+  private val _pollPeriodicSyncJobStatus = MutableSharedFlow<PeriodicSyncJobStatus>()
+  val pollPeriodicSyncJobStatus: Flow<PeriodicSyncJobStatus>
+    get() = _pollPeriodicSyncJobStatus
+
   init {
     viewModelScope.launch {
       Sync.periodicSync<DemoFhirSyncWorker>(
@@ -60,7 +65,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
             ),
         )
         .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it.currentJobState) }
+        .collect { _pollPeriodicSyncJobStatus.emit(it) }
     }
   }
 

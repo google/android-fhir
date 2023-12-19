@@ -45,6 +45,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
 import com.google.android.fhir.sync.CurrentSyncJobStatus
+import com.google.android.fhir.sync.LastSyncJobStatus
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -158,17 +159,17 @@ class PatientListFragment : Fragment() {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
           is CurrentSyncJobStatus.Running -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data ${it.currentJob}")
+            Timber.i("Sync: ${it::class.java.simpleName} with data ${it.inProgressSyncJob}")
             fadeInTopBanner(it)
           }
           is CurrentSyncJobStatus.Succeeded -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.succeededJob.timestamp}")
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.succeededSyncJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           is CurrentSyncJobStatus.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.failedJob.timestamp}")
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.failedSyncJob.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
@@ -180,6 +181,25 @@ class PatientListFragment : Fragment() {
             fadeOutTopBanner(it)
           }
           CurrentSyncJobStatus.Cancelled -> TODO()
+        }
+      }
+    }
+
+    lifecycleScope.launch {
+      mainActivityViewModel.pollPeriodicSyncJobStatus.collect {
+        Timber.d("onViewCreated: pollState Got status $it")
+        if (it.currentSyncJobStatus is CurrentSyncJobStatus.Running) {
+          Timber.i(
+            "Sync: ${it.currentSyncJobStatus::class.java.simpleName} with data ${it.currentSyncJobStatus}",
+          )
+          fadeInTopBanner(it.currentSyncJobStatus)
+        } else {
+          it.lastSyncJobStatus?.let {
+            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
+            fadeOutTopBanner(it)
+          }
         }
       }
     }
@@ -222,9 +242,9 @@ class PatientListFragment : Fragment() {
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
     } else if (
-      state is CurrentSyncJobStatus.Running && state.currentJob is SyncJobStatus.InProgress
+      state is CurrentSyncJobStatus.Running && state.inProgressSyncJob is SyncJobStatus.InProgress
     ) {
-      val inProgressState = state.currentJob as? SyncJobStatus.InProgress
+      val inProgressState = state.inProgressSyncJob as? SyncJobStatus.InProgress
       val progress =
         inProgressState
           ?.let { it.completed.toDouble().div(it.total) }
@@ -238,12 +258,18 @@ class PatientListFragment : Fragment() {
   }
 
   private fun fadeOutTopBanner(state: CurrentSyncJobStatus) {
-    if (state is CurrentSyncJobStatus.Succeeded) syncPercent.text = ""
-    syncProgress.visibility = View.GONE
+    fadeOutTopBanner(state::class.java.simpleName.uppercase())
+  }
 
+  private fun fadeOutTopBanner(state: LastSyncJobStatus) {
+    fadeOutTopBanner(state::class.java.simpleName.uppercase())
+  }
+
+  private fun fadeOutTopBanner(statusText: String) {
+    syncPercent.text = ""
+    syncProgress.visibility = View.GONE
     if (topBanner.visibility == View.VISIBLE) {
-      "${resources.getString(R.string.sync).uppercase()} ${state::class.java.simpleName.uppercase()}"
-        .also { syncStatus.text = it }
+      "${resources.getString(R.string.sync).uppercase()} $statusText".also { syncStatus.text = it }
 
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
       topBanner.startAnimation(animation)

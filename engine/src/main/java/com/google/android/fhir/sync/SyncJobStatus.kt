@@ -22,7 +22,7 @@ import java.time.OffsetDateTime
  * Sealed class representing different states of a synchronization operation. These states do not
  * represent [WorkInfo.State], whereas [CurrentSyncJobStatus] combines [WorkInfo.State] and
  * [SyncJobStatus] in one-time and periodic sync. For more details, see [CurrentSyncJobStatus] and
- * [PeriodicSyncState].
+ * [PeriodicSyncJobStatus].
  */
 sealed class SyncJobStatus {
   val timestamp: OffsetDateTime = OffsetDateTime.now()

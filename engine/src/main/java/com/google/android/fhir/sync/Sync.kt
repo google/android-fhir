@@ -86,13 +86,13 @@ object Sync {
    *
    * @param periodicSyncConfiguration configuration to determine the sync frequency and retry
    *   mechanism
-   * @return a [Flow] of [PeriodicSyncState]
+   * @return a [Flow] of [PeriodicSyncJobStatus]
    */
   @ExperimentalCoroutinesApi
   inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration,
-  ): Flow<PeriodicSyncState> {
+  ): Flow<PeriodicSyncJobStatus> {
     val uniqueWorkName = "${W::class.java.name}-periodicSync"
     val flow = getWorkerInfo(context, uniqueWorkName)
     val periodicWorkRequest =
@@ -107,7 +107,8 @@ object Sync {
   }
 
   /** Gets the worker info for the [FhirSyncWorker] */
-  fun getWorkerInfo(context: Context, workName: String) =
+  @PublishedApi
+  internal fun getWorkerInfo(context: Context, workName: String) =
     WorkManager.getInstance(context)
       .getWorkInfosForUniqueWorkLiveData(workName)
       .asFlow()
@@ -130,14 +131,14 @@ object Sync {
    * @param context The Android application context.
    * @param workName The name of the periodic sync work.
    * @param syncJobProgressStateFlow A flow representing the progress of the sync job.
-   * @return A flow of [PeriodicSyncState] combining the sync job states.
+   * @return A flow of [PeriodicSyncJobStatus] combining the sync job states.
    */
   @PublishedApi
   internal fun combineSyncStateForPeriodicSync(
     context: Context,
     workName: String,
     workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
-  ): Flow<PeriodicSyncState> {
+  ): Flow<PeriodicSyncJobStatus> {
     val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
 
@@ -145,9 +146,9 @@ object Sync {
       workerInfoSyncJobStatusPairFromWorkManager,
       syncJobStatusFromDataStore,
       ->
-      PeriodicSyncState(
-        lastJobState = mapSyncJobStatusToResult(syncJobStatusFromDataStore),
-        currentJobState =
+      PeriodicSyncJobStatus(
+        lastSyncJobStatus = mapSyncJobStatusToResult(syncJobStatusFromDataStore),
+        currentSyncJobStatus =
           createSyncState(
             WorkRequest.PERIODIC,
             workerInfoSyncJobStatusPairFromWorkManager.first,

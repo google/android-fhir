@@ -34,23 +34,23 @@ sealed class CurrentSyncJobStatus {
   /**
    * State indicating that the synchronization operation is running.
    *
-   * @param currentJob The current status of the synchronization job.
+   * @param inProgressSyncJob The current status of the synchronization job.
    */
-  data class Running(val currentJob: SyncJobStatus) : CurrentSyncJobStatus()
+  data class Running(val inProgressSyncJob: SyncJobStatus) : CurrentSyncJobStatus()
 
   /**
    * State indicating that the synchronization operation succeeded.
    *
-   * @param succeededJob The status of the succeeded synchronization job.
+   * @param succeededSyncJob The status of the succeeded synchronization job.
    */
-  class Succeeded(val succeededJob: SyncJobStatus) : CurrentSyncJobStatus()
+  class Succeeded(val succeededSyncJob: SyncJobStatus) : CurrentSyncJobStatus()
 
   /**
    * State indicating that the synchronization operation failed.
    *
-   * @param failedJob The status of the failed synchronization job.
+   * @param failedSyncJob The status of the failed synchronization job.
    */
-  data class Failed(val failedJob: SyncJobStatus) : CurrentSyncJobStatus()
+  data class Failed(val failedSyncJob: SyncJobStatus) : CurrentSyncJobStatus()
 
   /** State indicating that the synchronization operation is canceled. */
   object Cancelled : CurrentSyncJobStatus()
@@ -61,13 +61,14 @@ sealed class CurrentSyncJobStatus {
  * of [WorkInfo.State] and [SyncJobStatus]. See [CurrentSyncJobStatus] and [LastSyncJobStatus] for
  * more details.
  *
- * @property lastJobState The result of the last synchronization job [LastSyncJobStatus]. It only
- *   represents terminal states.
- * @property currentJobState The current state of the synchronization job [CurrentSyncJobStatus].
+ * @property lastSyncJobStatus The result of the last synchronization job [LastSyncJobStatus]. It
+ *   only represents terminal states.
+ * @property currentSyncJobStatus The current state of the synchronization job
+ *   [CurrentSyncJobStatus].
  */
-data class PeriodicSyncState(
-  val lastJobState: LastSyncJobStatus?,
-  val currentJobState: CurrentSyncJobStatus,
+data class PeriodicSyncJobStatus(
+  val lastSyncJobStatus: LastSyncJobStatus?,
+  val currentSyncJobStatus: CurrentSyncJobStatus,
 )
 
 /**
