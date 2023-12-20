@@ -31,7 +31,7 @@ if (kokoroRun == true) {
 // NECESSARY force of the Jackson to run generateSearchParams in the new version of HAPI (6.8)
 buildscript {
   dependencies {
-    classpath("com.fasterxml.jackson.core:jackson-core:2.15.3")
+    classpath("com.fasterxml.jackson.core:jackson-core:2.16.0")
     classpath("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
     classpath("com.fasterxml.jackson.core:jackson-databind:2.16.0")
     classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.0")
