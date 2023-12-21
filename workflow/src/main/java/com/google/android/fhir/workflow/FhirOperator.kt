@@ -31,7 +31,6 @@ import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.PlanDefinition
@@ -170,28 +169,29 @@ internal constructor(
     subjectId: String? = null,
     practitioner: String? = null,
   ): MeasureReport {
-    val subjects =
+    val subject =
       if (!practitioner.isNullOrBlank()) {
-        if (practitioner.indexOf("/") == -1) {
-          listOf("Practitioner/$practitioner")
-        } else {
-          listOf(practitioner)
-        }
+        checkAndAddType(practitioner, "Practitioner")
+      } else if (!subjectId.isNullOrBlank()) {
+        checkAndAddType(subjectId, "Patient")
       } else {
-        listOf(subjectId)
+        // List of null is required to run population-level measures
+        null
       }
 
-    val measure = Eithers.forLeft3<CanonicalType, IdType, Measure>(CanonicalType(measureUrl))
-
-    val report = measureProcessor.evaluateMeasure(measure, start, end, reportType, subjects, null)
+    val report =
+      measureProcessor.evaluateMeasure(
+        /* measure = */ Eithers.forLeft3(CanonicalType(measureUrl)),
+        /* periodStart = */ start,
+        /* periodEnd = */ end,
+        /* reportType = */ reportType,
+        /* subjectIds = */ listOf(subject),
+        /* additionalData = */ null,
+      )
 
     // add subject reference for non-individual reportTypes
-    if (report.type.name == MeasureReportType.SUMMARY.name) {
-      if (!practitioner.isNullOrBlank()) {
-        report.setSubject(Reference(practitioner))
-      } else if (!subjectId.isNullOrBlank()) {
-        report.setSubject(Reference(subjectId))
-      }
+    if (report.type.name == MeasureReportType.SUMMARY.name && !subject.isNullOrBlank()) {
+      report.setSubject(Reference(subject))
     }
     return report
   }
@@ -322,6 +322,11 @@ internal constructor(
       /* prefetchData = */ prefetchData,
       libraryProcessor,
     ) as IBaseResource
+  }
+
+  /** Checks if the Resource ID contains a type and if not, adds a default type */
+  fun checkAndAddType(id: String, defaultType: String): String {
+    return if (id.indexOf("/") == -1) "$defaultType/$id" else id
   }
 
   class Builder(private val applicationContext: Context) {
