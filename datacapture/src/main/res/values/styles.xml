@@ -107,7 +107,7 @@
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
-        <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
+        <item name="questionnaireButtonStyle">Questionnaire.ButtonStyle
         </item>
         <item name="questionnaireErrorTextStyle">
             @style/Questionnaire.ErrorStyle
