@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
@@ -130,7 +130,7 @@ fun Type.valueOrCalculateValue(): Type {
       .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
       ?.let { extension ->
         val expression = (extension.value as Expression).expression
-        fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
+        evaluateToBase(this, expression).singleOrNull()?.let { it as Type }
       }
       ?: this
   } else {
