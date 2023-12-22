@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 
 /** Displays `localizedText` if it is not null or empty, or hides the [TextView]. */
 fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
@@ -58,9 +59,9 @@ fun initHelpViews(
   helpTextView: TextView,
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   isHelpCardInitiallyVisible: Boolean,
-  helpCardStateChangedCallback: (Boolean, String) -> Unit,
+  helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit,
 ) {
-  val helpCardItem = questionnaireItem.item.firstOrNull { it.isHelpCode }
+  val helpCardItem = questionnaireItem.item.firstOrNull { it.isHelpCode } ?: return
   helpCardView.visibility = if (isHelpCardInitiallyVisible) VISIBLE else GONE
   helpButton.visibility =
     if (questionnaireItem.hasHelpButton) {
@@ -72,11 +73,11 @@ fun initHelpViews(
     helpCardView.visibility =
       when (helpCardView.visibility) {
         VISIBLE -> {
-          helpCardStateChangedCallback.invoke(false, helpCardItem!!.linkId)
+          helpCardStateChangedCallback.invoke(false, helpCardItem)
           GONE
         }
         else -> {
-          helpCardStateChangedCallback.invoke(true, helpCardItem!!.linkId)
+          helpCardStateChangedCallback.invoke(true, helpCardItem)
           VISIBLE
         }
       }

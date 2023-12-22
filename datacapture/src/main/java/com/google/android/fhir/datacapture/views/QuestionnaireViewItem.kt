@@ -28,6 +28,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /**
@@ -79,7 +80,7 @@ data class QuestionnaireViewItem(
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
   val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
-  val helpCardStateChangedCallback: (Boolean, String) -> Unit = { _, _ -> },
+  val helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit = { _, _ -> },
 ) {
 
   /**

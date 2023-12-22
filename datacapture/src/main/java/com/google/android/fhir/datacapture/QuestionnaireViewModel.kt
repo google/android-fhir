@@ -253,17 +253,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /** Tracks which help card has been opened. */
-  private val openedHelpCardSet: MutableStateFlow<MutableSet<String>> =
+  private val openedHelpCardSet: MutableStateFlow<MutableSet<QuestionnaireItemComponent>> =
     MutableStateFlow(mutableSetOf())
 
   /** Callback to save the help card state. */
-  private val helpCardStateChangedCallback: (Boolean, String) -> Unit = { shouldBeVisible, linkId ->
-    if (shouldBeVisible) {
-      openedHelpCardSet.update { it.apply { add(linkId) } }
-    } else {
-      openedHelpCardSet.update { it.apply { remove(linkId) } }
+  private val helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit =
+    { shouldBeVisible, linkId ->
+      if (shouldBeVisible) {
+        openedHelpCardSet.update { it.apply { add(linkId) } }
+      } else {
+        openedHelpCardSet.update { it.apply { remove(linkId) } }
+      }
     }
-  }
 
   /**
    * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
@@ -768,7 +769,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val items = buildList {
       val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
       val isHelpCard = itemHelpCard != null
-      val isHelpCardOpen = openedHelpCardSet.value.any { it == itemHelpCard?.linkId }
+      val isHelpCardOpen = openedHelpCardSet.value.contains(itemHelpCard)
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
