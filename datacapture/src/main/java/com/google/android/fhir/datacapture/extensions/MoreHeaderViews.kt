@@ -61,7 +61,6 @@ fun initHelpViews(
   isHelpCardInitiallyVisible: Boolean,
   helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit,
 ) {
-  val helpCardItem = questionnaireItem.item.firstOrNull { it.isHelpCode } ?: return
   helpCardView.visibility = if (isHelpCardInitiallyVisible) VISIBLE else GONE
   helpButton.visibility =
     if (questionnaireItem.hasHelpButton) {
@@ -69,7 +68,9 @@ fun initHelpViews(
     } else {
       GONE
     }
+  val helpCardItem = questionnaireItem.item.firstOrNull { it.isHelpCode }
   helpButton.setOnClickListener {
+    if (helpCardItem == null) return@setOnClickListener
     helpCardView.visibility =
       when (helpCardView.visibility) {
         VISIBLE -> {
