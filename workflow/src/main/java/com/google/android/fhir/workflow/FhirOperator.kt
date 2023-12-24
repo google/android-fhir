@@ -168,6 +168,7 @@ internal constructor(
     reportType: String,
     subjectId: String? = null,
     practitioner: String? = null,
+    additionalData: IBaseBundle? = null,
   ): MeasureReport {
     val subject =
       if (!practitioner.isNullOrBlank()) {
@@ -186,7 +187,7 @@ internal constructor(
         /* periodEnd = */ end,
         /* reportType = */ reportType,
         /* subjectIds = */ listOf(subject),
-        /* additionalData = */ null,
+        /* additionalData = */ additionalData,
       )
 
     // add subject reference for non-individual reportTypes
