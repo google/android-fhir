@@ -26,6 +26,8 @@ import com.google.android.fhir.sync.upload.request.UploadRequestGenerator
 import com.google.android.fhir.sync.upload.request.UploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
 import java.lang.IllegalStateException
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
@@ -48,22 +50,12 @@ internal class Uploader(
   private val patchGenerator: PatchGenerator,
   private val requestGenerator: UploadRequestGenerator,
 ) {
-  suspend fun upload(localChanges: List<LocalChange>): UploadSyncResult {
-    val mappedPatches = patchGenerator.generate(localChanges)
-    val mappedRequests = requestGenerator.generateUploadRequests(mappedPatches)
-    val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
-
-    val successfulMappedResponses = mutableListOf<SuccessfulUploadResponseMapping>()
-
-    for (mappedRequest in mappedRequests) {
-      when (val result = handleUploadRequest(mappedRequest)) {
-        is UploadRequestResult.Success ->
-          successfulMappedResponses.addAll(result.successfulUploadResponsMappings)
-        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
-      }
-    }
-    return UploadSyncResult.Success(successfulMappedResponses)
-  }
+  suspend fun upload(localChanges: List<LocalChange>) =
+    localChanges
+      .let { patchGenerator.generate(it) }
+      .let { requestGenerator.generateUploadRequests(it) }
+      .asFlow()
+      .map { handleUploadRequest(it) }
 
   private fun handleUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
@@ -108,6 +100,14 @@ internal class Uploader(
   private suspend fun handleUploadRequest(
     mappedUploadRequest: UploadRequestMapping,
   ): UploadRequestResult {
+    val mappedLocalChangeToken =
+      LocalChangeToken(
+        when (mappedUploadRequest) {
+          is BundleUploadRequestMapping ->
+            mappedUploadRequest.splitLocalChanges.flatMap { it.flatMap { it.token.ids } }
+          is UrlUploadRequestMapping -> mappedUploadRequest.localChanges.flatMap { it.token.ids }
+        },
+      )
     return try {
       val response = dataSource.upload(mappedUploadRequest.generatedRequest)
       when {
@@ -117,6 +117,7 @@ internal class Uploader(
               mappedUploadRequest.generatedRequest.resource.resourceType,
               FHIRException(response.issueFirstRep.diagnostics),
             ),
+            mappedLocalChangeToken,
           )
         (response is DomainResource || response is Bundle) &&
           (response !is IBaseOperationOutcome) ->
@@ -129,23 +130,28 @@ internal class Uploader(
                 "Unknown response for ${mappedUploadRequest.generatedRequest.resource.resourceType}",
               ),
             ),
+            mappedLocalChangeToken,
           )
       }
     } catch (e: Exception) {
       Timber.e(e)
       UploadRequestResult.Failure(
         ResourceSyncException(mappedUploadRequest.generatedRequest.resource.resourceType, e),
+        mappedLocalChangeToken,
       )
     }
   }
+}
 
-  private sealed class UploadRequestResult {
-    data class Success(
-      val successfulUploadResponsMappings: List<SuccessfulUploadResponseMapping>,
-    ) : UploadRequestResult()
+sealed class UploadRequestResult {
+  data class Success(
+    val successfulUploadResponseMappings: List<SuccessfulUploadResponseMapping>,
+  ) : UploadRequestResult()
 
-    data class Failure(val exception: ResourceSyncException) : UploadRequestResult()
-  }
+  data class Failure(
+    val uploadError: ResourceSyncException,
+    val localChangeToken: LocalChangeToken,
+  ) : UploadRequestResult()
 }
 
 sealed class UploadSyncResult {

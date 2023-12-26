@@ -33,7 +33,7 @@ import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.android.fhir.sync.download.UrlDownloadRequest
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.request.BundleUploadRequest
 import com.google.android.fhir.sync.upload.request.UploadRequest
 import com.google.android.fhir.sync.upload.request.UrlUploadRequest
@@ -158,12 +158,14 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: suspend (List<LocalChange>) -> UploadSyncResult,
+    upload: suspend (List<LocalChange>) -> Flow<UploadRequestResult>,
   ): Flow<SyncUploadProgress> = flow {
     emit(SyncUploadProgress(1, 1))
-    when (val result = upload(getLocalChanges(ResourceType.Patient, "123"))) {
-      is UploadSyncResult.Success -> emit(SyncUploadProgress(0, 1))
-      is UploadSyncResult.Failure -> emit(SyncUploadProgress(1, 1, result.syncError))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect {
+      when (it) {
+        is UploadRequestResult.Success -> emit(SyncUploadProgress(0, 1))
+        is UploadRequestResult.Failure -> emit(SyncUploadProgress(1, 1, it.uploadError))
+      }
     }
   }
 
