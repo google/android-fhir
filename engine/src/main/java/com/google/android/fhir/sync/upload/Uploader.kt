@@ -27,7 +27,7 @@ import com.google.android.fhir.sync.upload.request.UploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
 import java.lang.IllegalStateException
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.transformWhile
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
@@ -55,7 +55,12 @@ internal class Uploader(
       .let { patchGenerator.generate(it) }
       .let { requestGenerator.generateUploadRequests(it) }
       .asFlow()
-      .map { handleUploadRequest(it) }
+      .transformWhile {
+        with(handleUploadRequest(it)) {
+          emit(this)
+          this !is UploadRequestResult.Failure
+        }
+      }
 
   private fun handleUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
