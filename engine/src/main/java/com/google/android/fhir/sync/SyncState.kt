@@ -41,16 +41,16 @@ sealed class CurrentSyncJobStatus {
   /**
    * State indicating that the synchronization operation succeeded.
    *
-   * @param succeededSyncJob The status of the succeeded synchronization job.
+   * @param timestamp The timestamp when the synchronization result occurred.
    */
-  class Succeeded(val succeededSyncJob: SyncJobStatus) : CurrentSyncJobStatus()
+  class Succeeded(val timestamp: OffsetDateTime) : CurrentSyncJobStatus()
 
   /**
    * State indicating that the synchronization operation failed.
    *
-   * @param failedSyncJob The status of the failed synchronization job.
+   * @param timestamp The timestamp when the synchronization result occurred.
    */
-  data class Failed(val failedSyncJob: SyncJobStatus) : CurrentSyncJobStatus()
+  class Failed(val timestamp: OffsetDateTime) : CurrentSyncJobStatus()
 
   /** State indicating that the synchronization operation is canceled. */
   object Cancelled : CurrentSyncJobStatus()

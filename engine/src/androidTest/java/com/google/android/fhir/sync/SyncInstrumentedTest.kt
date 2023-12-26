@@ -138,7 +138,7 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Succeeded
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -147,7 +147,7 @@ class SyncInstrumentedTest {
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.first().lastSyncJobStatus).isNull()
     assertThat(states.last().currentSyncJobStatus)
-      .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
+      .isInstanceOf(CurrentSyncJobStatus.Succeeded::class.java)
     assertThat(states.last().lastSyncJobStatus)
       .isInstanceOf(LastSyncJobStatus.Succeeded::class.java)
   }
@@ -169,7 +169,7 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Failed
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -178,7 +178,7 @@ class SyncInstrumentedTest {
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.first().lastSyncJobStatus).isNull()
     assertThat(states.last().currentSyncJobStatus)
-      .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
+      .isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
     assertThat(states.last().lastSyncJobStatus).isInstanceOf(LastSyncJobStatus.Failed::class.java)
   }
 
@@ -198,7 +198,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Succeeded
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }

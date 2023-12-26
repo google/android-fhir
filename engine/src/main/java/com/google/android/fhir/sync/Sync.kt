@@ -43,6 +43,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.mapNotNull
 
@@ -141,7 +142,6 @@ object Sync {
   ): Flow<PeriodicSyncJobStatus> {
     val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
       FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
-
     return combine(workerInfoSyncJobStatusPairFromWorkManagerFlow, syncJobStatusInDataStoreFlow) {
       workerInfoSyncJobStatusPairFromWorkManager,
       syncJobStatusFromDataStore,
@@ -261,7 +261,8 @@ object Sync {
         when (workRequest) {
           WorkRequest.ONE_TIME ->
             handleNullWorkManagerStatusForOneTimeSync(workInfoState, syncJobStatusFromDataStore)
-          WorkRequest.PERIODIC -> handleNullWorkManagerStatusForPeriodicSync(workInfoState)
+          WorkRequest.PERIODIC ->
+            handleNullWorkManagerStatusForPeriodicSync(workInfoState, syncJobStatusFromDataStore)
         }
       }
       else -> error("Inconsistent syncJobStatus: $syncJobStatusFromWorkManager.")
@@ -279,8 +280,8 @@ object Sync {
   ): CurrentSyncJobStatus =
     syncJobStatusFromDataStore?.let {
       when (it) {
-        is SyncJobStatus.Succeeded -> Succeeded(it)
-        is SyncJobStatus.Failed -> Failed(it)
+        is SyncJobStatus.Succeeded -> Succeeded(it.timestamp)
+        is SyncJobStatus.Failed -> Failed(it.timestamp)
         else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
       }
     }
@@ -305,6 +306,29 @@ object Sync {
       ENQUEUED -> Enqueued
       CANCELLED -> Cancelled
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
+    }
+
+  private fun handleNullWorkManagerStatusForPeriodicSync(
+    workInfoState: WorkInfo.State,
+    syncJobStatusFromDataStore: SyncJobStatus?,
+  ): CurrentSyncJobStatus =
+    when (workInfoState) {
+      RUNNING -> Running(SyncJobStatus.Started())
+      ENQUEUED -> {
+        syncJobStatusFromDataStore?.let { mapDataStoreSyncJobStatusToCurrentSyncJobStatus(it) }
+          ?: Enqueued
+      }
+      CANCELLED -> Cancelled
+      else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
+    }
+
+  private fun mapDataStoreSyncJobStatusToCurrentSyncJobStatus(
+    syncJobStatusFromDataStore: SyncJobStatus,
+  ) =
+    when (syncJobStatusFromDataStore) {
+      is SyncJobStatus.Succeeded -> Succeeded(syncJobStatusFromDataStore.timestamp)
+      is SyncJobStatus.Failed -> Failed(syncJobStatusFromDataStore.timestamp)
+      else -> error("Inconsistent syncJobStatus in the dataStore : $syncJobStatusFromDataStore.")
     }
 
   /**
