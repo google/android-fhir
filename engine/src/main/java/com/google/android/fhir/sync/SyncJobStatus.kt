@@ -125,8 +125,8 @@ internal class SyncJobStatusSerializer {
 
   private val allowedSyncJobStatusPackages =
     listOf(
-      "com.google.android.fhir.sync.SyncJobStatus\$Succeeded",
-      "com.google.android.fhir.sync.SyncJobStatus\$Failed",
+      AllowedSyncJobStatus.SUCCEEDED.allowedPackage,
+      AllowedSyncJobStatus.FAILED.allowedPackage,
     )
 
   /**
@@ -173,4 +173,9 @@ internal class SyncJobStatusSerializer {
     private const val STATE_TYPE = "STATE_TYPE"
     private const val STATE = "STATE"
   }
+}
+
+private enum class AllowedSyncJobStatus(val allowedPackage: String) {
+  SUCCEEDED(SyncJobStatus.Succeeded::class.java.name),
+  FAILED(SyncJobStatus.Failed::class.java.name),
 }
