@@ -51,7 +51,7 @@ class NumberSearchParameterizedTest(
 
   private val baseQuery: String =
     """
-    SELECT a.serializedResource
+    SELECT a.resourceUuid, a.serializedResource
     FROM ResourceEntity a
     WHERE a.resourceType = ?
     AND a.resourceUuid IN (
