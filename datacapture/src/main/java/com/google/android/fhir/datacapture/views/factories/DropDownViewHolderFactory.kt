@@ -48,6 +48,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: Context
+      private var isDropdownEditable = true
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
@@ -97,29 +98,34 @@ internal object DropDownViewHolderFactory :
               null,
             )
           }
+
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
-            val selectedItem = adapter.getItem(position)
-            autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
-            autoCompleteTextView.setCompoundDrawablesRelative(
-              adapter.getItem(position)?.answerOptionImage,
-              null,
-              null,
-              null,
-            )
-            val selectedAnswer =
-              questionnaireViewItem.enabledAnswerOptions
-                .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
-                ?.value
-
-            if (selectedAnswer == null) {
-              questionnaireViewItem.clearAnswer()
-            } else {
-              questionnaireViewItem.setAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(selectedAnswer),
+            if (isDropdownEditable) {
+              val selectedItem = adapter.getItem(position)
+              autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
+              autoCompleteTextView.setCompoundDrawablesRelative(
+                adapter.getItem(position)?.answerOptionImage,
+                null,
+                null,
+                null,
               )
+
+              isDropdownEditable = false
+              val selectedAnswer =
+                questionnaireViewItem.enabledAnswerOptions
+                  .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
+                  ?.value
+
+              if (selectedAnswer == null) {
+                questionnaireViewItem.clearAnswer()
+              } else {
+                questionnaireViewItem.setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(selectedAnswer),
+                )
+              }
             }
           }
 
@@ -137,6 +143,8 @@ internal object DropDownViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
+        autoCompleteTextView.isEnabled = isDropdownEditable
+        autoCompleteTextView.isClickable = true
       }
 
       private fun cleanupOldState() {
