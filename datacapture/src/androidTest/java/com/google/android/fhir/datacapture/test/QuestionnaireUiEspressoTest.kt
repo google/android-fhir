@@ -214,7 +214,6 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    clickOnText("AM")
     clickOnText("6")
     clickOnText("10")
     clickOnText("OK")
