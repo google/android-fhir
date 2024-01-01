@@ -159,8 +159,10 @@ internal object QuantityViewHolderFactory :
         editable?.toString()?.let { decimal = it.toBigDecimalOrNull() }
         unitDropDown?.let { unit = it }
 
-        if (decimal == null) {
+        if (decimal == null && unit == null) {
           questionnaireViewItem.clearAnswer()
+        } else if (decimal == null) {
+          questionnaireViewItem.setDraftAnswer(unit)
         } else if (unit == null) {
           questionnaireViewItem.setDraftAnswer(decimal)
         } else {
