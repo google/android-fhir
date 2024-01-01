@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,33 +292,77 @@ class QuestionnaireResponseValidatorTest {
   }
 
   @Test
-  fun `validation passes if questionnaire response matches questionnaire`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      context,
-    )
-  }
-
-  @Test
-  fun `validation fails if questionnaire response does not match questionnaire`() {
-    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
-      Questionnaire().apply { url = "questionnaire-1" },
-      QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
-      "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)",
-      context,
-    )
-  }
-
-  @Test
   fun `validation passes if questionnaire response does not specify questionnaire`() {
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse(),
+      context,
+    )
+  }
+
+  @Test
+  fun `validation passes if questionnaire response references questionnaire id`() {
+    val questionnaire = Questionnaire().apply { id = "12345" }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply { this.questionnaire = "Questionnaire/12345" }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context,
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun `validation passes if questionnaire response references questionnaire id part only`() {
+    val questionnaire = Questionnaire().apply { id = "12345" }
+    val questionnaireResponse = QuestionnaireResponse().apply { this.questionnaire = "12345" }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context,
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun `validation passes if questionnaire response references questionnaire url`() {
+    val questionnaire = Questionnaire().apply { url = "http://fhir.org/Questionnaire/12345" }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply { this.questionnaire = "http://fhir.org/Questionnaire/12345" }
+
+    val result =
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        questionnaire,
+        questionnaireResponse,
+        context,
+      )
+    assertThat(result).isEmpty()
+  }
+
+  @Test
+  fun `validation fails if questionnaire response reference does not match questionnaire id`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply { id = "12345" },
+      QuestionnaireResponse().apply { questionnaire = "Questionnaire/789" },
+      "Mismatching Questionnaire (id/url=12345/null) and QuestionnaireResponse (for Questionnaire Questionnaire/789)",
+      context,
+    )
+  }
+
+  @Test
+  fun `validation fails if questionnaire response reference does not match questionnaire url`() {
+    assertException_validateQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply {
+        id = "12345"
+        url = "http://fhir.org/Questionnaire/12345"
+      },
+      QuestionnaireResponse().apply { questionnaire = "http://fhir.org/Questionnaire/789" },
+      "Mismatching Questionnaire (id/url=12345/http://fhir.org/Questionnaire/12345) and QuestionnaireResponse (for Questionnaire http://fhir.org/Questionnaire/789)",
       context,
     )
   }

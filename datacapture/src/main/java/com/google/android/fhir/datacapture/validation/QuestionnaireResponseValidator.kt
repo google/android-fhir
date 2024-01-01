@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,9 +63,11 @@ object QuestionnaireResponseValidator {
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
-        questionnaire.url == questionnaireResponse.questionnaire,
+        questionnaireResponse.questionnaire == questionnaire.url ||
+        questionnaireResponse.questionnaire == questionnaire.id ||
+        questionnaireResponse.questionnaire.endsWith("/${questionnaire.id}"),
     ) {
-      "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
+      "Mismatching Questionnaire (id/url=${questionnaire.id}/${questionnaire.url}) and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
 
     val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
