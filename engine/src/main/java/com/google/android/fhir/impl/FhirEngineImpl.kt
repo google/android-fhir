@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
-import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
@@ -67,7 +67,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
-    return DatastoreUtil(context).readLastSyncTimestamp()
+    return FhirEngineProvider.getFhirDataStore(context).readLastSyncTimestamp()
   }
 
   override suspend fun clearDatabase() {
