@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -165,19 +165,18 @@ class PatientListFragment : Fragment() {
           is CurrentSyncJobStatus.Succeeded -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
             fadeOutTopBanner(it)
           }
           is CurrentSyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
             fadeOutTopBanner(it)
           }
           is CurrentSyncJobStatus.Enqueued -> {
             Timber.i("Sync: Enqueued")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
           CurrentSyncJobStatus.Cancelled -> TODO()
@@ -196,25 +195,28 @@ class PatientListFragment : Fragment() {
             fadeInTopBanner(it.currentSyncJobStatus)
           }
           is CurrentSyncJobStatus.Succeeded -> {
+            val lastSyncTimestamp =
+              (it.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
             Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at ${(it.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp}",
+              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp",
             )
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
             fadeOutTopBanner(it.currentSyncJobStatus)
           }
           is CurrentSyncJobStatus.Failed -> {
+            val lastSyncTimestamp =
+              (it.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
             Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at ${(it.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp}",
+              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
             )
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
+            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
             fadeOutTopBanner(it.currentSyncJobStatus)
           }
           is CurrentSyncJobStatus.Enqueued -> {
             Timber.i("Sync: Enqueued")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it.currentSyncJobStatus)
           }
           CurrentSyncJobStatus.Cancelled -> TODO()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ internal class FhirDataStore(context: Context) {
       name = FHIR_PREFERENCES_NAME,
     )
   private val dataStore = context.dataStore
-  private val serializer = SyncJobStatusSerializer()
+  private val serializer = SyncJobStatus.SyncJobStatusSerializer()
   private val syncJobStatusFlowMap = mutableMapOf<String, Flow<SyncJobStatus?>>()
   private val lastSyncTimestampKey by lazy { stringPreferencesKey(LAST_SYNC_TIMESTAMP) }
 

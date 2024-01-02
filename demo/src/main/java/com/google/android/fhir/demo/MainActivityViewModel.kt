@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.google.android.fhir.sync.PeriodicSyncConfiguration
 import com.google.android.fhir.sync.PeriodicSyncJobStatus
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.InternalCoroutinesApi
@@ -85,13 +86,14 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   }
 
   /** Emits last sync time. */
-  fun updateLastSyncTimestamp() {
+  fun updateLastSyncTimestamp(lastSync: OffsetDateTime? = null) {
     val formatter =
       DateTimeFormatter.ofPattern(
         if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12,
       )
     _lastSyncTimestampLiveData.value =
-      Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
+      lastSync?.let { it.toLocalDateTime()?.format(formatter) ?: "" }
+        ?: Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
   }
 
   companion object {
