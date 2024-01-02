@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,14 +107,6 @@ object Dependencies {
     const val jaxbAnnotationsBase =
       "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
     const val jsr310Base = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
-
-    const val annotations = "$annotationsBase:${Versions.jackson}"
-    const val bom = "$bomBase:${Versions.jackson}"
-    const val core = "$coreBase:${Versions.jacksonCore}"
-    const val databind = "$databindBase:${Versions.jackson}"
-    const val dataformatXml = "$dataformatXmlBase:${Versions.jackson}"
-    const val jaxbAnnotations = "$jaxbAnnotationsBase:${Versions.jackson}"
-    const val jsr310 = "$jsr310Base:${Versions.jackson}"
   }
 
   object Kotlin {
