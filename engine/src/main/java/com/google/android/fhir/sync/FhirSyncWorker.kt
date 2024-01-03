@@ -81,7 +81,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
               dataSource = dataSource,
               patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
               requestGenerator =
-              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+                UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
             ),
           ),
           DownloadConfiguration(
