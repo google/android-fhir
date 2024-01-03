@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,6 +37,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -60,65 +62,67 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
-    val dataSource =
-      getDataSource()
-        ?: return Result.failure(
-          buildWorkData(
-            IllegalStateException(
-              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
+    mutex.withLock {
+      val dataSource =
+        getDataSource()
+          ?: return Result.failure(
+            buildWorkData(
+              IllegalStateException(
+                "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
+              ),
             ),
+          )
+
+      val synchronizer =
+        FhirSynchronizer(
+          applicationContext,
+          getFhirEngine(),
+          UploadConfiguration(
+            Uploader(
+              dataSource = dataSource,
+              patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+              requestGenerator =
+                UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+            ),
+          ),
+          DownloadConfiguration(
+            DownloaderImpl(dataSource, getDownloadWorkManager()),
+            getConflictResolver(),
           ),
         )
 
-    val synchronizer =
-      FhirSynchronizer(
-        applicationContext,
-        getFhirEngine(),
-        UploadConfiguration(
-          Uploader(
-            dataSource = dataSource,
-            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
-            requestGenerator =
-              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
-          ),
-        ),
-        DownloadConfiguration(
-          DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver(),
-        ),
-      )
+      val job =
+        CoroutineScope(Dispatchers.IO).launch {
+          synchronizer.syncState.collect {
+            // now send Progress to work manager so caller app can listen
+            setProgress(buildWorkData(it))
 
-    val job =
-      CoroutineScope(Dispatchers.IO).launch {
-        synchronizer.syncState.collect {
-          // now send Progress to work manager so caller app can listen
-          setProgress(buildWorkData(it))
-
-          if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
-            this@launch.cancel()
+            if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
+              this@launch.cancel()
+            }
           }
         }
-      }
 
-    val result = synchronizer.synchronize()
-    val output = buildWorkData(result)
+      val result = synchronizer.synchronize()
+      val output = buildWorkData(result)
 
-    // await/join is needed to collect states completely
-    kotlin.runCatching { job.join() }.onFailure(Timber::w)
+      // await/join is needed to collect states completely
+      kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    setProgress(output)
+      setProgress(output)
 
-    Timber.d("Received result from worker $result and sending output $output")
+      Timber.d("Received result from worker $result and sending output $output")
 
-    /**
-     * In case of failure, we can check if its worth retrying and do retry based on
-     * [RetryConfiguration.maxRetries] set by user.
-     */
-    val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    return when (result) {
-      is SyncJobStatus.Finished -> Result.success(output)
-      else -> {
-        if (retries > runAttemptCount) Result.retry() else Result.failure(output)
+      /**
+       * In case of failure, we can check if its worth retrying and do retry based on
+       * [RetryConfiguration.maxRetries] set by user.
+       */
+      val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
+      return when (result) {
+        is SyncJobStatus.Finished -> Result.success(output)
+        else -> {
+          if (retries > runAttemptCount) Result.retry() else Result.failure(output)
+        }
       }
     }
   }
@@ -147,5 +151,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")
 
     override fun shouldSkipClass(clazz: Class<*>?) = false
+  }
+
+  companion object {
+    private val mutex = Mutex()
   }
 }
