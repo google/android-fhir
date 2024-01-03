@@ -18,6 +18,10 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.os.Handler
+import android.os.Looper
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -129,6 +133,22 @@ internal object DropDownViewHolderFactory :
             }
           }
 
+        autoCompleteTextView.addTextChangedListener(object : TextWatcher {
+          override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {}
+
+          override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {}
+
+          override fun afterTextChanged(editable: Editable?) {
+            if (editable.isNullOrBlank()) {
+              Handler(Looper.getMainLooper()).postDelayed({
+                if (autoCompleteTextView.isPopupShowing.not()) {
+                  autoCompleteTextView.showDropDown()
+                }
+              }, 100)
+            }
+          }
+        })
+
         displayValidationResult(questionnaireViewItem.validationResult)
       }
 
@@ -144,7 +164,6 @@ internal object DropDownViewHolderFactory :
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
         autoCompleteTextView.isEnabled = isDropdownEditable
-        autoCompleteTextView.isClickable = true
       }
 
       private fun cleanupOldState() {
