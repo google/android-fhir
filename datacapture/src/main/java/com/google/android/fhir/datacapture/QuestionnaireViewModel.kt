@@ -74,7 +74,12 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.StringType
 import timber.log.Timber
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
+import java.util.Locale
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -119,6 +124,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val questionnaireResponse: QuestionnaireResponse
 
   init {
+      questionnaire.addItem(getTimestampItem("launch-timestamp"))
+      questionnaire.addItem(getTimestampItem("submission-timestamp"))
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
         if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
@@ -154,6 +161,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
+    addTimeStampValue(questionnaireResponse.item, "launch-timestamp")
     questionnaireResponse.packRepeatedGroups()
   }
 
@@ -418,8 +426,36 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
           .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
+      addTimeStampValue(item, "submission-timestamp")
     }
   }
+    private fun Date.toTimeZoneString(): String {
+        val simpleDateFormat =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+                .withZone(ZoneId.systemDefault())
+        return simpleDateFormat.format(this.toInstant())
+    }
+
+    private fun addTimeStampValue(items: List<QuestionnaireResponseItemComponent>, itemLinkId : String) {
+        items.forEach { item ->
+            if (item.linkId == itemLinkId) {
+                item.answer = arrayListOf<QuestionnaireResponseItemAnswerComponent?>().apply {
+                    add(QuestionnaireResponseItemAnswerComponent().apply {
+                        value = StringType(Date().toTimeZoneString())
+                    })
+                }
+            }
+        }
+    }
+
+    private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent {
+        val item = QuestionnaireItemComponent().apply {
+            linkId = linkIdVal
+            readOnly = true
+            type = Questionnaire.QuestionnaireItemType.STRING
+        }
+        return item
+    }
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
