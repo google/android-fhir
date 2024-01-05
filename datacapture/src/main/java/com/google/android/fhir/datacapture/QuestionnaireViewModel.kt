@@ -67,7 +67,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Element
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -429,12 +431,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       addTimeStampValue(item, "submission-timestamp")
     }
   }
-    private fun Date.toTimeZoneString(): String {
-        val simpleDateFormat =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
-                .withZone(ZoneId.systemDefault())
-        return simpleDateFormat.format(this.toInstant())
-    }
 
     private fun addTimeStampValue(items: List<QuestionnaireResponseItemComponent>, itemLinkId : String) {
         items.forEach { item ->
@@ -448,13 +444,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
     }
 
+    private fun Date.toTimeZoneString(): String {
+        val simpleDateFormat =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
+                .withZone(ZoneId.systemDefault())
+        return simpleDateFormat.format(this.toInstant())
+    }
+
     private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent {
-        val item = QuestionnaireItemComponent().apply {
+        return QuestionnaireItemComponent().apply {
             linkId = linkIdVal
             readOnly = true
             type = Questionnaire.QuestionnaireItemType.STRING
+            extension.add(Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-hidden", BooleanType(true)))
         }
-        return item
     }
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
