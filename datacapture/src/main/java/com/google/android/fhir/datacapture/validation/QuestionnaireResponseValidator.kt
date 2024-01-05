@@ -64,8 +64,7 @@ object QuestionnaireResponseValidator {
     require(
       questionnaireResponse.questionnaire == null ||
         questionnaireResponse.questionnaire == questionnaire.url ||
-        questionnaireResponse.questionnaire == questionnaire.id ||
-        questionnaireResponse.questionnaire.endsWith("/${questionnaire.id}"),
+        questionnaireResponse.questionnaire == questionnaire.id),
     ) {
       "Mismatching Questionnaire (id/url=${questionnaire.id}/${questionnaire.url}) and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
