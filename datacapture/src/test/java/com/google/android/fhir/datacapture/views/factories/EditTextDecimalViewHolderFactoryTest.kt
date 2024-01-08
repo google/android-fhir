@@ -450,19 +450,23 @@ class EditTextDecimalViewHolderFactoryTest {
 
   @Test
   fun `bind again should remove previous text`() {
-    val questionnaireViewItem =
+    viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent(),
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "1.1.1.1",
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString(),
       )
-    viewHolder.bind(questionnaireViewItem)
-    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
-      setText("1.1.1.1")
-      clearFocus()
-    }
-    viewHolder.itemView.clearFocus()
+      .isEqualTo("1.1.1.1")
 
     viewHolder.bind(
       QuestionnaireViewItem(

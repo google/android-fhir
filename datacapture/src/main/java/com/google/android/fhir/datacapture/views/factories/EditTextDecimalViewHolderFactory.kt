@@ -47,18 +47,15 @@ internal object EditTextDecimalViewHolderFactory :
       ) {
         val questionnaireItemViewItemDecimalAnswer =
           questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
-
         val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
 
-        val decimalStringToDisplay = questionnaireItemViewItemDecimalAnswer ?: draftAnswer
-
-        if (decimalStringToDisplay.isNullOrEmpty()) {
+        if (questionnaireItemViewItemDecimalAnswer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
           textInputEditText.setText("")
         } else if (
           questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() !=
             textInputEditText.text.toString().toDoubleOrNull()
         ) {
-          textInputEditText.setText(decimalStringToDisplay)
+          textInputEditText.setText(questionnaireItemViewItemDecimalAnswer)
         } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
           textInputEditText.setText(draftAnswer)
         }
