@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -133,21 +133,37 @@ internal object DropDownViewHolderFactory :
             }
           }
 
-        autoCompleteTextView.addTextChangedListener(object : TextWatcher {
-          override fun beforeTextChanged(charSequence: CharSequence?, start: Int, count: Int, after: Int) {}
+        autoCompleteTextView.addTextChangedListener(
+          object : TextWatcher {
+            override fun beforeTextChanged(
+              charSequence: CharSequence?,
+              start: Int,
+              count: Int,
+              after: Int,
+            ) {}
 
-          override fun onTextChanged(charSequence: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun onTextChanged(
+              charSequence: CharSequence?,
+              start: Int,
+              before: Int,
+              count: Int,
+            ) {}
 
-          override fun afterTextChanged(editable: Editable?) {
-            if (editable.isNullOrBlank()) {
-              Handler(Looper.getMainLooper()).postDelayed({
-                if (autoCompleteTextView.isPopupShowing.not()) {
-                  autoCompleteTextView.showDropDown()
-                }
-              }, 100)
+            override fun afterTextChanged(editable: Editable?) {
+              if (editable.isNullOrBlank()) {
+                Handler(Looper.getMainLooper())
+                  .postDelayed(
+                    {
+                      if (autoCompleteTextView.isPopupShowing.not()) {
+                        autoCompleteTextView.showDropDown()
+                      }
+                    },
+                    100,
+                  )
+              }
             }
-          }
-        })
+          },
+        )
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
