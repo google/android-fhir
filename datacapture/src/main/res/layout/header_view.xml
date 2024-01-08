@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    style="?attr/questionnaireQuestionHeaderStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    style="?attr/questionnaireQuestionHeaderStyle"
 >
 
     <TextView
@@ -24,53 +24,53 @@
         style="?attr/questionnaireQuestionTextStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/helpButton"
         app:layout_constraintStart_toEndOf="@id/prefix"
         app:layout_constraintTop_toTopOf="parent"
+        tools:text="Choose one of the options below sample question"
     />
 
-    <LinearLayout
-        android:id="@+id/helpContainer"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/help_container_margin_top"
-        android:orientation="horizontal"
+    <Button
+        android:id="@+id/helpButton"
+        style="?attr/questionnaireHelpButtonStyle"
+        android:layout_width="@dimen/help_button_width"
+        android:layout_height="@dimen/help_button_height"
+        android:layout_gravity="center_vertical"
+        android:layout_marginStart="@dimen/help_button_margin_start"
+        android:layout_marginEnd="@dimen/help_button_margin_start"
+        android:layout_weight=".3"
+        android:visibility="gone"
+        app:icon="@drawable/ic_help_48px"
+        app:layout_constraintBottom_toBottomOf="@id/question"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/question"
-        app:layout_constraintStart_toStartOf="parent"
-    >
+        app:layout_constraintTop_toTopOf="@id/question"
+        tools:visibility="visible"
+    />
 
-        <TextView
-            android:id="@+id/hint"
-            style="?attr/questionnaireSubtitleTextStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight=".7"
-            android:layout_gravity="center_vertical"
-            tools:text="Sample helper text"
-        />
-        <Button
-            style="?attr/questionnaireHelpButtonStyle"
-            android:id="@+id/helpButton"
-            android:layout_width="@dimen/help_button_width"
-            android:layout_height="@dimen/help_button_height"
-            android:layout_gravity="center_vertical"
-            android:layout_weight=".3"
-            android:layout_marginStart="@dimen/help_button_margin_start"
-            app:icon="@drawable/ic_help_48px"
-        />
-    </LinearLayout>
+    <TextView
+        android:id="@+id/hint"
+        style="?attr/questionnaireSubtitleTextStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/question"
+        app:layout_constraintWidth_default="wrap"
+        tools:text="Sample helper text"
+    />
 
     <TextView
         android:id="@+id/required_optional_text"
         style="?attr/questionnaireSubtitleTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/help_container_margin_top"
         android:layout_gravity="center_vertical"
+        android:layout_marginTop="@dimen/help_container_margin_top"
         android:visibility="gone"
-        app:layout_constraintTop_toBottomOf="@id/helpContainer"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hint"
         tools:text="Sample helper text"
+        tools:visibility="visible"
     />
 
     <TextView
@@ -78,12 +78,12 @@
         style="?attr/questionnaireErrorTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/error_text_at_header_margin_top"
         android:layout_gravity="center_vertical"
-        app:layout_constraintTop_toBottomOf="@id/required_optional_text"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:text="Sample error text"
+        android:layout_marginTop="@dimen/error_text_at_header_margin_top"
         android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/required_optional_text"
+        tools:text="Sample error text"
     />
 
     <com.google.android.material.card.MaterialCardView
@@ -93,15 +93,17 @@
         android:layout_marginTop="@dimen/help_card_margin_top"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/helpContainer"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/question"
     >
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="?attr/colorSurfaceVariant"
             android:orientation="vertical"
         >
+
             <TextView
                 style="?attr/questionnaireHelpHeaderStyle"
                 android:layout_width="wrap_content"
@@ -111,13 +113,14 @@
                 android:layout_marginBottom="@dimen/help_header_margin_bottom"
                 android:text="@string/help"
             />
+
             <TextView
                 android:id="@+id/helpText"
                 style="?attr/questionnaireHelpTextStyle"
-                android:layout_marginHorizontal="@dimen/help_text_margin_horizontal"
-                android:layout_marginBottom="@dimen/help_text_margin_bottom"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/help_text_margin_horizontal"
+                android:layout_marginBottom="@dimen/help_text_margin_bottom"
                 tools:text="Sample helper text"
             />
         </LinearLayout>
