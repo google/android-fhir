@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -446,5 +446,39 @@ class EditTextDecimalViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
       .isNull()
+  }
+
+  @Test
+  fun `bind again should remove previous text`() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    viewHolder.bind(questionnaireViewItem)
+    viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).apply {
+      setText("1.1.1.1")
+      clearFocus()
+    }
+    viewHolder.itemView.clearFocus()
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString(),
+      )
+      .isEqualTo("")
   }
 }

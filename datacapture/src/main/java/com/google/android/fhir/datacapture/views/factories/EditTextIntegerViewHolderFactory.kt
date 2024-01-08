@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,8 +70,12 @@ internal object EditTextIntegerViewHolderFactory :
         // is different from what the user is typing. We compare the two fields as integers to
         // avoid shifting focus if the text values are different, but their integer representation
         // is the same (e.g. "001" compared to "1")
-        if ((text?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull())) {
+        if (text.isNullOrEmpty()) {
+          textInputEditText.setText("")
+        } else if (answer?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull()) {
           textInputEditText.setText(text)
+        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
+          textInputEditText.setText(draftAnswer)
         }
 
         // Update error message if draft answer present

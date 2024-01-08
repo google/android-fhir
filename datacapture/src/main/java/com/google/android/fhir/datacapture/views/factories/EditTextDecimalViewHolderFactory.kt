@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,11 +52,15 @@ internal object EditTextDecimalViewHolderFactory :
 
         val decimalStringToDisplay = questionnaireItemViewItemDecimalAnswer ?: draftAnswer
 
-        if (
-          decimalStringToDisplay?.toDoubleOrNull() !=
+        if (decimalStringToDisplay.isNullOrEmpty()) {
+          textInputEditText.setText("")
+        } else if (
+          questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() !=
             textInputEditText.text.toString().toDoubleOrNull()
         ) {
           textInputEditText.setText(decimalStringToDisplay)
+        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
+          textInputEditText.setText(draftAnswer)
         }
         // Update error message if draft answer present
         if (draftAnswer != null) {
