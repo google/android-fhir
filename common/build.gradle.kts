@@ -1,3 +1,5 @@
+import Dependencies.removeIncompatibleDependencies
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -17,20 +19,10 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    exclude(module = "hapi-fhir-caching-caffeine")
-    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
-
-    resolutionStrategy { force("com.google.guava:guava:32.1.3-android") }
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  // REVERT to DEPENDENCIES LATER
-  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.10.0")
-  api("ca.uhn.hapi.fhir:hapi-fhir-caching-guava:6.10.0")
+  api(Dependencies.HapiFhir.structuresR4)
 
   implementation(Dependencies.fhirUcum)
 
@@ -39,4 +31,10 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+    }
+  }
 }
