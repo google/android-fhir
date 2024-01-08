@@ -68,7 +68,9 @@ inline fun <reified R : Resource> Search.has(
  * }
  * ```
  *
- * **NOTE**: [include] doesn't support order OR count.
+ * **NOTE**:
+ * * [include] doesn't support count.
+ * * Multiple includes of the same resource type do not guarantee the order of returned resources.
  */
 inline fun <reified R : Resource> Search.include(
   referenceParam: ReferenceClientParam,
@@ -99,7 +101,9 @@ inline fun <reified R : Resource> Search.include(
  * }
  * ```
  *
- * **NOTE**: [include] doesn't support order OR count.
+ * **NOTE**:
+ * * [include] doesn't support count.
+ * * Multiple includes of the same resource type do not guarantee the order of returned resources.
  */
 fun Search.include(
   resourceType: ResourceType,
@@ -129,7 +133,10 @@ fun Search.include(
  * }
  * ```
  *
- * **NOTE**: [revInclude] doesn't support order OR count.
+ * **NOTE**:
+ * * [revInclude] doesn't support count.
+ * * Multiple revIncludes of the same resource type do not guarantee the order of returned
+ *   resources.
  */
 inline fun <reified R : Resource> Search.revInclude(
   referenceParam: ReferenceClientParam,
@@ -160,7 +167,10 @@ inline fun <reified R : Resource> Search.revInclude(
  * }
  * ```
  *
- * **NOTE**: [revInclude] doesn't support order OR count.
+ * **NOTE**:
+ * * [revInclude] doesn't support count.
+ * * Multiple revIncludes of the same resource type do not guarantee the order of returned
+ *   resources.
  */
 fun Search.revInclude(
   resourceType: ResourceType,
