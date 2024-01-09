@@ -1,6 +1,4 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
@@ -69,9 +67,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
+    removeIncompatibleDependencies()
   }
 }
 
@@ -118,6 +114,13 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {

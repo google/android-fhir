@@ -1,6 +1,3 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -86,14 +83,7 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations {
-  all {
-    removeIncompatibleDependencies()
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
@@ -132,6 +122,13 @@ dependencies {
   testImplementation(Dependencies.xmlUnit)
   testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {

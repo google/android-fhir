@@ -1,4 +1,4 @@
-import Dependencies.forceGuava
+import Dependencies.removeIncompatibleDependencies
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
@@ -56,12 +56,7 @@ android {
   kotlin { jvmToolchain(11) }
 }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    forceGuava()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
