@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ interface FhirEngine {
    */
   suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    upload: (suspend (List<LocalChange>) -> Flow<UploadSyncResult>),
   ): Flow<SyncUploadProgress>
 
   /**

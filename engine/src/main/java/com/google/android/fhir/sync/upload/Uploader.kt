@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,8 @@ import com.google.android.fhir.sync.upload.request.BundleUploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UploadRequestGenerator
 import com.google.android.fhir.sync.upload.request.UploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
-import java.lang.IllegalStateException
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
@@ -48,21 +49,21 @@ internal class Uploader(
   private val patchGenerator: PatchGenerator,
   private val requestGenerator: UploadRequestGenerator,
 ) {
-  suspend fun upload(localChanges: List<LocalChange>): UploadSyncResult {
+  suspend fun upload(localChanges: List<LocalChange>): Flow<UploadSyncResult> = flow {
     val mappedPatches = patchGenerator.generate(localChanges)
     val mappedRequests = requestGenerator.generateUploadRequests(mappedPatches)
     val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
 
-    val successfulMappedResponses = mutableListOf<SuccessfulUploadResponseMapping>()
-
     for (mappedRequest in mappedRequests) {
       when (val result = handleUploadRequest(mappedRequest)) {
         is UploadRequestResult.Success ->
-          successfulMappedResponses.addAll(result.successfulUploadResponsMappings)
-        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
+          emit(UploadSyncResult.Success(result.successfulUploadResponseMappings))
+        is UploadRequestResult.Failure -> {
+          emit(UploadSyncResult.Failure(result.exception, token))
+          return@flow
+        }
       }
     }
-    return UploadSyncResult.Success(successfulMappedResponses)
   }
 
   private fun handleUploadResponse(
@@ -141,7 +142,7 @@ internal class Uploader(
 
   private sealed class UploadRequestResult {
     data class Success(
-      val successfulUploadResponsMappings: List<SuccessfulUploadResponseMapping>,
+      val successfulUploadResponseMappings: List<SuccessfulUploadResponseMapping>,
     ) : UploadRequestResult()
 
     data class Failure(val exception: ResourceSyncException) : UploadRequestResult()

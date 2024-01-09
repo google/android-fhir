@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.flow.singleOrNull
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
@@ -117,6 +118,7 @@ class UploaderTest {
             bundleUploadRequestGenerator,
           )
           .upload(databaseLocalChanges)
+          .singleOrNull()
 
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
@@ -209,6 +211,7 @@ class UploaderTest {
             bundleUploadRequestGenerator,
           )
           .upload(databaseLocalChanges)
+          .singleOrNull()
 
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
       with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
@@ -246,6 +249,7 @@ class UploaderTest {
           bundleUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -269,6 +273,7 @@ class UploaderTest {
           bundleUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -282,6 +287,7 @@ class UploaderTest {
           bundleUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -296,6 +302,7 @@ class UploaderTest {
             bundleUploadRequestGenerator,
           )
           .upload(localChanges)
+          .singleOrNull()
 
       assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
     }
@@ -309,6 +316,7 @@ class UploaderTest {
           bundleUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -365,32 +373,33 @@ class UploaderTest {
             },
           )
         }
-      val result =
-        Uploader(
-            UrlRequestDataSource {
-              when (it.resource.logicalId) {
-                patient1Id -> updatedPatient1
-                patient2Id -> patient2
-                else -> throw IllegalArgumentException("Unknown patient ID")
-              }
-            },
-            perResourcePatchGenerator,
-            urlUploadRequestGenerator,
-          )
-          .upload(databaseLocalChanges)
+      val result = mutableListOf<UploadSyncResult>()
+      Uploader(
+          UrlRequestDataSource {
+            when (it.resource.logicalId) {
+              patient1Id -> updatedPatient1
+              patient2Id -> patient2
+              else -> throw IllegalArgumentException("Unknown patient ID")
+            }
+          },
+          perResourcePatchGenerator,
+          urlUploadRequestGenerator,
+        )
+        .upload(databaseLocalChanges)
+        .collect { result.add(it) }
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+      assertThat(result).hasSize(2)
+
+      with((result.first() as UploadSyncResult.Success).uploadResponses.singleOrNull()) {
+        assertThat(this!!).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(2)
         assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
         assertThat((output as Patient).id).isEqualTo(patient1Id)
       }
 
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+      with((result.last() as UploadSyncResult.Success).uploadResponses.singleOrNull()) {
+        assertThat(this!!).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -450,46 +459,46 @@ class UploaderTest {
             },
           )
         }
-      val result =
-        Uploader(
-            UrlRequestDataSource {
-              when (it.httpVerb) {
-                HttpVerb.PUT -> {
-                  when (it.resource.logicalId) {
-                    patient1Id -> updatedPatient1
-                    patient2Id -> patient2
-                    else -> throw IllegalArgumentException("Unknown patient ID")
-                  }
+      val result = mutableListOf<UploadSyncResult>()
+      Uploader(
+          UrlRequestDataSource {
+            when (it.httpVerb) {
+              HttpVerb.PUT -> {
+                when (it.resource.logicalId) {
+                  patient1Id -> updatedPatient1
+                  patient2Id -> patient2
+                  else -> throw IllegalArgumentException("Unknown patient ID")
                 }
-                HttpVerb.PATCH -> updatedPatient1
-                else -> throw IllegalArgumentException("Unknown patient ID")
               }
-            },
-            perChangePatchGenerator,
-            urlUploadRequestGenerator,
-          )
-          .upload(databaseLocalChanges)
+              HttpVerb.PATCH -> updatedPatient1
+              else -> throw IllegalArgumentException("Unknown patient ID")
+            }
+          },
+          perChangePatchGenerator,
+          urlUploadRequestGenerator,
+        )
+        .upload(databaseLocalChanges)
+        .collect { result.add(it) }
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+      assertThat(result).hasSize(3)
+      with((result[0] as UploadSyncResult.Success).uploadResponses.singleOrNull()) {
+        assertThat(this!!).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)
         assertThat((output as Patient).id).isEqualTo(patient1Id)
       }
 
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+      with((result[1] as UploadSyncResult.Success).uploadResponses.singleOrNull()) {
+        assertThat(this!!).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient2Id)
         assertThat(output).isInstanceOf(Patient::class.java)
         assertThat((output as Patient).id).isEqualTo(patient2Id)
       }
 
-      with(result.uploadResponses[2]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+      with((result[2] as UploadSyncResult.Success).uploadResponses.singleOrNull()) {
+        assertThat(this!!).isInstanceOf(ResourceUploadResponseMapping::class.java)
         assertThat(localChanges).hasSize(1)
         assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
         assertThat(output).isInstanceOf(Patient::class.java)
@@ -506,6 +515,7 @@ class UploaderTest {
           urlUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -529,6 +539,7 @@ class UploaderTest {
           urlUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -542,6 +553,7 @@ class UploaderTest {
           urlUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }
@@ -555,6 +567,7 @@ class UploaderTest {
           urlUploadRequestGenerator,
         )
         .upload(localChanges)
+        .singleOrNull()
 
     assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,12 +158,17 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: suspend (List<LocalChange>) -> UploadSyncResult,
+    upload: suspend (List<LocalChange>) -> Flow<UploadSyncResult>,
   ): Flow<SyncUploadProgress> = flow {
     emit(SyncUploadProgress(1, 1))
-    when (val result = upload(getLocalChanges(ResourceType.Patient, "123"))) {
-      is UploadSyncResult.Success -> emit(SyncUploadProgress(0, 1))
-      is UploadSyncResult.Failure -> emit(SyncUploadProgress(1, 1, result.syncError))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect {
+      when (it) {
+        is UploadSyncResult.Success -> emit(SyncUploadProgress(0, 1))
+        is UploadSyncResult.Failure -> {
+          emit(SyncUploadProgress(1, 1, it.syncError))
+          return@collect
+        }
+      }
     }
   }
 

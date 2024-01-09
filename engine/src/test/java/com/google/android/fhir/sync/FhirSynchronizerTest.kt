@@ -28,7 +28,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -71,8 +70,10 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
+          flowOf(
+            UploadSyncResult.Success(
+              listOf(),
+            ),
           ),
         )
 
@@ -100,8 +101,10 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
+          flowOf(
+            UploadSyncResult.Success(
+              listOf(),
+            ),
           ),
         )
 
@@ -126,7 +129,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
       `when`(uploader.upload(any()))
-        .thenReturn(UploadSyncResult.Failure(error, LocalChangeToken(listOf())))
+        .thenReturn(flowOf(UploadSyncResult.Failure(error, LocalChangeToken(listOf()))))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
       backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
