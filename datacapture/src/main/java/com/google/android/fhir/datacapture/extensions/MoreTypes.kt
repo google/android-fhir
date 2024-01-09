@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
@@ -130,7 +130,7 @@ fun Type.valueOrCalculateValue(): Type {
   } else {
     this.cqfCalculatedValueExpression?.let { expression ->
       try {
-        fhirPathEngine.evaluate(this, expression.expression).singleOrNull() as? Type
+        evaluateToBase(this, expression.expression).singleOrNull() as? Type
       } catch (e: FHIRException) {
         Timber.w("Could not evaluate expression with FHIRPathEngine", e)
         null

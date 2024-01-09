@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package com.google.android.fhir.db
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -94,9 +95,11 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceWithUUID<R>>
 
-  suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
+  suspend fun searchForwardReferencedResources(query: SearchQuery): List<ForwardIncludeSearchResult>
+
+  suspend fun searchReverseReferencedResources(query: SearchQuery): List<ReverseIncludeSearchResult>
 
   suspend fun count(query: SearchQuery): Long
 
@@ -183,3 +186,8 @@ internal interface Database {
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }
+
+data class ResourceWithUUID<R>(
+  val uuid: UUID,
+  val resource: R,
+)
