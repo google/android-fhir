@@ -40,7 +40,7 @@ object CqlBuilder : Loadable() {
   /**
    * Compiles a CQL InputStream to ELM
    *
-   * @param cqlText the CQL Library
+   * @param cqlText the CQL Library's input stream
    * @return a [CqlTranslator] object that contains the elm representation of the library inside it.
    */
   fun compile(cqlText: InputStream): CqlTranslator {
