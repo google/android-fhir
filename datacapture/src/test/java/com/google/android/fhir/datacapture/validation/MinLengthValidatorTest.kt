@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -139,7 +139,10 @@ class MinLengthValidatorTest {
         this.value = Quantity(1234567.89)
       }
 
-    val validationResult = MaxLengthValidator.validate(requirement, answer, context)
+    val validationResult =
+      MaxLengthValidator.validate(requirement, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -158,7 +161,9 @@ class MinLengthValidatorTest {
           testComponent.requirement,
           testComponent.answer,
           context,
-        )
+        ) { extension, expression ->
+          CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+        }
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -173,7 +178,9 @@ class MinLengthValidatorTest {
           testComponent.requirement,
           testComponent.answer,
           context,
-        )
+        ) { extension, expression ->
+          CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+        }
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)

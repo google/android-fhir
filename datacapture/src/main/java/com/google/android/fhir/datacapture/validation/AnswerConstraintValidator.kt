@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,11 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent] against a particular
@@ -39,6 +42,7 @@ internal interface AnswerConstraintValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
+    evaluateExtensionCqfCalculatedValue: (Extension, Expression) -> Type?,
   ): Result
 
   /**

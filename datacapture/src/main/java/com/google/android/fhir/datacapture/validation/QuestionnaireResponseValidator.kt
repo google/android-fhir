@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,10 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
-import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
-import com.google.android.fhir.datacapture.extensions.isCqfCalculatedValue
-import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.Type
 
@@ -76,13 +70,6 @@ object QuestionnaireResponseValidator {
     }
 
     val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
-    val expressionEvaluator =
-      ExpressionEvaluator(
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap,
-        launchContextMap,
-      )
 
     validateQuestionnaireResponseItems(
       questionnaire.item,
@@ -94,25 +81,16 @@ object QuestionnaireResponseValidator {
         questionnaireItemParentMap,
         launchContextMap,
       ),
-      expressionEvaluator,
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap,
+      ),
       linkIdToValidationResultMap,
     )
 
     return linkIdToValidationResultMap
-  }
-
-  private fun ExpressionEvaluator.resolveCqfCalculatedValue(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    expression: Expression,
-  ): Type? {
-    if (!expression.isFhirPath) {
-      throw UnsupportedOperationException("${expression.language} not supported yet")
-    }
-
-    return evaluateExpression(questionnaireItem, questionnaireResponseItem, expression)
-      .singleOrNull()
-      ?.let { it as Type }
   }
 
   private fun validateQuestionnaireResponseItems(
@@ -143,23 +121,6 @@ object QuestionnaireResponseValidator {
         )
 
       if (enabled) {
-        // Evaluate cqf-calculatedValues
-        questionnaireItem.extension
-          .filter { it.hasValue() && it.value.isCqfCalculatedValue }
-          .forEach { extension ->
-            extension.value.cqfCalculatedValueExpression?.let { expression ->
-              val previousValueExtensions = extension.value.extension
-              val evaluatedValue =
-                expressionEvaluator.resolveCqfCalculatedValue(
-                  questionnaireItem,
-                  questionnaireResponseItem,
-                  expression,
-                )
-              evaluatedValue?.setExtension(previousValueExtensions)
-              if (evaluatedValue != null) extension.setValue(evaluatedValue)
-            }
-          }
-
         validateQuestionnaireResponseItem(
           questionnaireItem,
           questionnaireResponseItem,
@@ -217,7 +178,13 @@ object QuestionnaireResponseValidator {
             questionnaireItem,
             questionnaireResponseItem.answer,
             context,
-          ),
+          ) { _, expression ->
+            expressionEvaluator.evaluateExpressionValue(
+              questionnaireItem,
+              questionnaireResponseItem,
+              expression,
+            )
+          },
         )
       }
     }

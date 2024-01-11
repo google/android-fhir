@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,9 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -39,7 +37,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
-import timber.log.Timber
 
 /**
  * Returns the string representation of a [PrimitiveType].
@@ -97,11 +94,13 @@ private fun getDisplayString(type: Type, context: Context): String? =
     else -> (type as? PrimitiveType<*>)?.valueAsString
   }
 
+/**
+ * Returns the string representation when type is of [PrimitiveType] or [Quantity], otherwise null
+ */
 private fun getValueString(type: Type): String? =
   when (type) {
-    is StringType -> type.getLocalizedText() ?: type.valueAsString
-    is Quantity -> type.takeIf { it.hasValue() }?.value?.toString()
-    else -> (type as? PrimitiveType<*>)?.valueAsString
+    is Quantity -> type.value?.toString()
+    else -> (type as? PrimitiveType<*>)?.asStringValue()
   }
 
 /** Converts StringType to toUriType. */
@@ -124,30 +123,10 @@ internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
 
-fun Type.valueOrCalculateValue(): Type {
-  return if (getValueString(this) != null) {
-    this
-  } else {
-    this.cqfCalculatedValueExpression?.let { expression ->
-      try {
-        evaluateToBase(this, expression.expression).singleOrNull() as? Type
-      } catch (e: FHIRException) {
-        Timber.w("Could not evaluate expression with FHIRPathEngine", e)
-        null
-      }
-    }
-      ?: this
-  }
-}
-
-internal val Type.isCqfCalculatedValue
-  get() = this.hasExtension(EXTENSION_CQF_CALCULATED_VALUE_URL)
+internal fun Type.hasValue(): Boolean = !getValueString(this).isNullOrBlank()
 
 internal val Type.cqfCalculatedValueExpression
-  get() =
-    this.takeIf { isCqfCalculatedValue }
-      ?.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL)
-      ?.value as? Expression
+  get() = this.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL)?.value as? Expression
 
 internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
   "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"

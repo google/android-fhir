@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -292,13 +292,17 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     return null
   }
 
-/** The inclusive lower bound on the range of allowed answer values. */
 internal val Questionnaire.QuestionnaireItemComponent.minValue
-  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.valueOrCalculateValue()
+  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value
 
-/** The inclusive upper bound on the range of allowed answer values. */
+internal val Questionnaire.QuestionnaireItemComponent.minValueCqfCalculatedValueExpression
+  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+
 internal val Questionnaire.QuestionnaireItemComponent.maxValue
-  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.valueOrCalculateValue()
+  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value
+
+internal val Questionnaire.QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
+  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
 //                                                                                                //

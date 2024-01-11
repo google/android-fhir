@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -160,7 +160,10 @@ class RegexValidatorTest {
     val response =
       QuestionnaireResponseItemAnswerComponent().apply { this.value = Quantity(1234567.89) }
 
-    val validationResult = RegexValidator.validate(requirement, response, context)
+    val validationResult =
+      RegexValidator.validate(requirement, response, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -179,7 +182,9 @@ class RegexValidatorTest {
           testComponent.requirement,
           testComponent.answer,
           context,
-        )
+        ) { extension, expression ->
+          CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+        }
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -194,7 +199,9 @@ class RegexValidatorTest {
           testComponent.requirement,
           testComponent.answer,
           context,
-        )
+        ) { extension, expression ->
+          CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+        }
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,12 +22,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -53,6 +56,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param enabledAnswerOptions the enabled answer options in [questionnaireItem]
+ * @param minAnswerValue the inclusive lower bound on the range of allowed answer values
+ * @param maxAnswerValue the inclusive upper bound on the range of allowed answer values.
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
@@ -71,6 +76,8 @@ data class QuestionnaireViewItem(
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
+  val minAnswerValue: Type? = questionnaireItem.minValue,
+  val maxAnswerValue: Type? = questionnaireItem.maxValue,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,13 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.hasValue
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] against a constraint
@@ -36,20 +40,39 @@ internal open class AnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
     (
-      Extension,
+      /*extensionValue*/
+      Type,
+      /*answer*/
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     ) -> Boolean,
-  val messageGenerator: (Extension, Context) -> String,
+  val messageGenerator: (Type, Context) -> String,
 ) : AnswerConstraintValidator {
   override fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
+    evaluateExtensionCqfCalculatedValue: (Extension, Expression) -> Type?,
   ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
-      if (predicate(extension, answer)) {
-        return AnswerConstraintValidator.Result(false, messageGenerator(extension, context))
+      val extensionValueType =
+        extension.value.let {
+          it.cqfCalculatedValueExpression?.let { expression ->
+            evaluateExtensionCqfCalculatedValue(extension, expression)
+          }
+            ?: it
+        }
+
+      // Only checks constraint if both extension and answer have a value
+      if (
+        extensionValueType.hasValue() &&
+          answer.value.hasValue() &&
+          predicate(extensionValueType, answer)
+      ) {
+        return AnswerConstraintValidator.Result(
+          false,
+          messageGenerator(extensionValueType, context),
+        )
       }
     }
     return AnswerConstraintValidator.Result(true, null)

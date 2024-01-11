@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,19 +30,20 @@ import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvalu
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
-import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
-import com.google.android.fhir.datacapture.extensions.isCqfCalculatedValue
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
-import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.minValue
+import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
@@ -68,15 +69,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
@@ -574,23 +572,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private fun resolveExpression(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    expression: Expression,
-  ): Base? {
-    if (!expression.isFhirPath) {
-      throw UnsupportedOperationException("${expression.language} not supported yet")
-    }
-    return expressionEvaluator
-      .evaluateExpression(
-        questionnaireItem,
-        questionnaireResponseItem,
-        expression,
-      )
-      .singleOrNull()
-  }
-
   private fun removeDisabledAnswers(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
@@ -681,27 +662,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     )
   }
 
-  private fun resolveCqfCalculatedValueExpressions(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-  ) {
-    questionnaireItem.extension
-      .filter { it.hasValue() && it.value.isCqfCalculatedValue }
-      .forEach { extension ->
-        val currentExtensionValue = extension.value
-        val currentExtensionValueExtensions = currentExtensionValue.extension
-        val evaluatedCqfCalculatedValue =
-          currentExtensionValue.cqfCalculatedValueExpression?.let {
-            resolveExpression(questionnaireItem, questionnaireResponseItem, it) as? Type
-          }
-        // add previous extensions to the evaluated value
-        evaluatedCqfCalculatedValue?.setExtension(currentExtensionValueExtensions)
-        if (evaluatedCqfCalculatedValue != null) {
-          extension.setValue(evaluatedCqfCalculatedValue)
-        }
-      }
-  }
-
   /**
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
    * questionnaire response items.
@@ -740,9 +700,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     restoreFromDisabledQuestionnaireItemAnswersCache(questionnaireResponseItem)
 
-    // Evaluate cqf-calculatedValues
-    resolveCqfCalculatedValueExpressions(questionnaireItem, questionnaireResponseItem)
-
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
       if (
@@ -754,14 +711,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItem,
           questionnaireResponseItem.answer,
           context = this@QuestionnaireViewModel.getApplication(),
-        )
+        ) { _, expression ->
+          expressionEvaluator.evaluateExpressionValue(
+            questionnaireItem,
+            questionnaireResponseItem,
+            expression,
+          )
+        }
       } else {
         NotValidated
       }
 
     // Set question text dynamically from CQL expression
     questionnaireItem.textElement.cqfExpression?.let { expression ->
-      resolveExpression(questionnaireItem, questionnaireResponseItem, expression)
+      expressionEvaluator
+        .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
         ?.primitiveValue()
         ?.let { questionnaireResponseItem.text = it }
     }
@@ -789,6 +753,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
             enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+            minAnswerValue =
+              questionnaireItem.minValueCqfCalculatedValueExpression?.let {
+                expressionEvaluator.evaluateExpressionValue(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  it,
+                )
+              }
+                ?: questionnaireItem.minValue,
+            maxAnswerValue =
+              questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
+                expressionEvaluator.evaluateExpressionValue(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  it,
+                )
+              }
+                ?: questionnaireItem.maxValue,
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {

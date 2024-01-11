@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,11 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.extensions.isHidden
+import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 internal object QuestionnaireResponseItemValidator {
 
@@ -45,6 +48,7 @@ internal object QuestionnaireResponseItemValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context,
+    expressionValueEvaluator: (Extension, Expression) -> Type?,
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
@@ -54,7 +58,11 @@ internal object QuestionnaireResponseItemValidator {
       }
     val questionnaireResponseItemAnswerConstraintValidationResult =
       answerConstraintValidators.flatMap { validator ->
-        answers.map { answer -> validator.validate(questionnaireItem, answer, context) }
+        answers.map { answer ->
+          validator.validate(questionnaireItem, answer, context) { extension, expression ->
+            expressionValueEvaluator.invoke(extension, expression)
+          }
+        }
       }
 
     return if (

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,7 +67,9 @@ class MinValueValidatorTest {
         questionnaireItem,
         answer,
         InstrumentationRegistry.getInstrumentation().context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.errorMessage).isEqualTo("Minimum value allowed is:10")
@@ -91,7 +93,9 @@ class MinValueValidatorTest {
         questionnaireItem,
         answer,
         InstrumentationRegistry.getInstrumentation().context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -129,7 +133,9 @@ class MinValueValidatorTest {
         questionnaireItem,
         answer,
         InstrumentationRegistry.getInstrumentation().context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -137,7 +143,7 @@ class MinValueValidatorTest {
 
   @Test
   fun `should return invalid result with correct min allowed value if contains both value and cqf-calculatedValue`() {
-    val threeDaysAgo = LocalDate.now().minusDays(3)
+    val sevenDaysAgo = LocalDate.now().minusDays(7)
 
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -147,12 +153,12 @@ class MinValueValidatorTest {
             this.setValue(
               DateType().apply {
                 value =
-                  Date.from(threeDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                  Date.from(sevenDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
                 addExtension(
                   Extension(
                     EXTENSION_CQF_CALCULATED_VALUE_URL,
                     Expression().apply {
-                      expression = "today() - 7 'days'"
+                      expression = "today() - 3 'days'"
                       language = "text/fhirpath"
                     },
                   ),
@@ -171,9 +177,97 @@ class MinValueValidatorTest {
           }
       }
 
-    val validationResult = MinValueValidator.validate(questionnaireItem, answer, context)
+    val validationResult =
+      MinValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage).isEqualTo("Minimum value allowed is:$threeDaysAgo")
+    assertThat(validationResult.errorMessage)
+      .isEqualTo("Minimum value allowed is:${LocalDate.now().minusDays(3)}")
+  }
+
+  @Test
+  fun `should return valid result and removes constraint for an answer value when minValue cqf-calculatedValue evaluates to empty`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "yesterday()" // invalid FHIRPath expression
+                      },
+                    ),
+                  )
+              },
+            )
+          },
+        )
+      }
+
+    val twoDaysAgo =
+      Date.from(
+        LocalDate.now().minusDays(2).atStartOfDay().atZone(ZoneId.systemDefault()).toInstant(),
+      )
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = DateType(twoDaysAgo) }
+
+    val validationResult =
+      MinValueValidator.validate(
+        questionnaireItem,
+        answer,
+        InstrumentationRegistry.getInstrumentation().context,
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
+  }
+
+  @Test
+  fun `should return valid result and removes constraint for an answer with an empty value`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MIN_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "today()"
+                      },
+                    ),
+                  )
+              },
+            )
+          },
+        )
+      }
+
+    val answer = QuestionnaireResponseItemAnswerComponent().apply { value = DateType() }
+
+    val validationResult =
+      MinValueValidator.validate(
+        questionnaireItem,
+        answer,
+        InstrumentationRegistry.getInstrumentation().context,
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 }

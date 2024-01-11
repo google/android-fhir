@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -77,7 +77,9 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult).isEqualTo(Valid)
   }
@@ -119,7 +121,9 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
@@ -141,7 +145,9 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      )
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid

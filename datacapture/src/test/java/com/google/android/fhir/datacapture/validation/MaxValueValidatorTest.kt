@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
@@ -63,7 +64,10 @@ class MaxValueValidatorTest {
         value = IntegerType(200001)
       }
 
-    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
+    val validationResult =
+      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.errorMessage).isEqualTo("Maximum value allowed is:200000")
@@ -85,7 +89,10 @@ class MaxValueValidatorTest {
         value = IntegerType(501)
       }
 
-    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
+    val validationResult =
+      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -119,7 +126,10 @@ class MaxValueValidatorTest {
         value = DateType().apply { value = Date() }
       }
 
-    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
+    val validationResult =
+      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isFalse()
     assertThat(validationResult.errorMessage)
@@ -158,9 +168,97 @@ class MaxValueValidatorTest {
         value = DateType().apply { value = Date() }
       }
 
-    val validationResult = MaxValueValidator.validate(questionnaireItem, answer, context)
+    val validationResult =
+      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
 
     assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage).isEqualTo("Maximum value allowed is:$tenDaysAgo")
+    assertThat(validationResult.errorMessage)
+      .isEqualTo("Maximum value allowed is:${LocalDate.now().minusDays(7)}")
+  }
+
+  @Test
+  fun `should return valid result and removes constraint for an answer value when maxValue cqf-calculatedValue evaluates to empty`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "yesterday()" // invalid FHIRPath expression
+                      },
+                    ),
+                  )
+              },
+            )
+          },
+        )
+      }
+
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+        value = DateType(Date())
+      }
+
+    val validationResult =
+      MaxValueValidator.validate(
+        questionnaireItem,
+        answer,
+        InstrumentationRegistry.getInstrumentation().context,
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
+  }
+
+  @Test
+  fun `should return valid result and removes constraint for an answer with an empty value`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          Extension().apply {
+            url = MAX_VALUE_EXTENSION_URL
+            this.setValue(
+              DateType().apply {
+                extension =
+                  listOf(
+                    Extension(
+                      EXTENSION_CQF_CALCULATED_VALUE_URL,
+                      Expression().apply {
+                        language = "text/fhirpath"
+                        expression = "today()"
+                      },
+                    ),
+                  )
+              },
+            )
+          },
+        )
+      }
+
+    val answer =
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = DateType() }
+
+    val validationResult =
+      MaxValueValidator.validate(
+        questionnaireItem,
+        answer,
+        InstrumentationRegistry.getInstrumentation().context,
+      ) { extension, expression ->
+        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      }
+
+    assertThat(validationResult.isValid).isTrue()
+    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.maxValue
-import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.sliderStepValue
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -52,8 +50,8 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val answer = questionnaireViewItem.answers.singleOrNull()
-        val minValue = getMinValue(questionnaireViewItem.questionnaireItem.minValue)
-        val maxValue = getMaxValue(questionnaireViewItem.questionnaireItem.maxValue)
+        val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
+        val maxValue = getMaxValue(questionnaireViewItem.maxAnswerValue)
         if (minValue >= maxValue) {
           throw IllegalStateException("minValue $minValue must be smaller than maxValue $maxValue")
         }
