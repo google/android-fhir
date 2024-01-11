@@ -23,29 +23,24 @@ Otherwise, an error is thrown.
  */
 class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) : SHLinkScanner {
 
-  private var successfulCallback: ((SHLinkScanData) -> Unit)? = null
-  private var failCallback: ((Error) -> Unit)? = null
-
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
   ) {
-    this.successfulCallback = successCallback
-    this.failCallback = failCallback
-
-    return if (scannerUtils.hasCameraPermission()) {
+    if (scannerUtils.hasCameraPermission()) {
       try {
         // Open camera and scan qr code
         val shLinkScanData = scannerUtils.setup()
         scannerUtils.releaseScanner()
-        successCallback.invoke(shLinkScanData)
+        successCallback(shLinkScanData)
       } catch (error: Error) {
         // There was an error trying to scan the QR code
-        failCallback.invoke(error)
+        failCallback(error)
       }
-    } else {
+    }
+    else {
       val error = Error("Camera permission not granted")
-      failCallback.invoke(error)
+      failCallback(error)
     }
   }
 }
