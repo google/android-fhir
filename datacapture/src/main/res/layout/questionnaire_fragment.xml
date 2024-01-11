@@ -69,84 +69,76 @@
         style="?attr/questionnaireBottomNavContainerDividerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/bottom_nav_scrollView"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_container"
     />
 
-    <HorizontalScrollView
-        android:id="@+id/bottom_nav_scrollView"
+    <LinearLayout
+        android:id="@+id/bottom_nav_container"
+        style="?attr/questionnaireBottomNavContainerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
     >
 
-    <LinearLayout
-            android:id="@+id/bottom_nav_container"
-            style="?attr/questionnaireBottomNavContainerStyle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-        >
-
         <Button
-                android:id="@+id/cancel_questionnaire"
-                style="?attr/questionnaireCancelButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-                android:layout_marginVertical="@dimen/action_button_margin_vertical"
-                android:text="@string/cancel_questionnaire"
-            />
+            android:id="@+id/cancel_questionnaire"
+            style="?attr/questionnaireCancelButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/cancel_questionnaire"
+        />
 
         <View
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-            />
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+        />
 
         <Button
-                android:id="@+id/pagination_previous_button"
-                style="?attr/questionnaireButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-                android:layout_marginVertical="@dimen/action_button_margin_vertical"
-                android:text="@string/button_pagination_previous"
-            />
+            android:id="@+id/pagination_previous_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/button_pagination_previous"
+        />
 
         <Button
-                android:id="@+id/pagination_next_button"
-                style="?attr/questionnaireButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-                android:layout_marginVertical="@dimen/action_button_margin_vertical"
-                android:text="@string/button_pagination_next"
-            />
+            android:id="@+id/pagination_next_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/button_pagination_next"
+        />
 
         <Button
-                android:id="@+id/review_mode_button"
-                style="?attr/questionnaireButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-                android:layout_marginVertical="@dimen/action_button_margin_vertical"
-                android:text="@string/button_review"
-            />
+            android:id="@+id/review_mode_button"
+            style="?attr/questionnaireButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/button_review"
+        />
 
         <Button
-                android:id="@+id/submit_questionnaire"
-                style="?attr/questionnaireSubmitButtonStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
-                android:layout_marginVertical="@dimen/action_button_margin_vertical"
-                android:text="@string/submit_questionnaire"
-            />
+            android:id="@+id/submit_questionnaire"
+            style="?attr/questionnaireSubmitButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
+            android:layout_marginVertical="@dimen/action_button_margin_vertical"
+            android:text="@string/submit_questionnaire"
+        />
 
     </LinearLayout>
-    </HorizontalScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
