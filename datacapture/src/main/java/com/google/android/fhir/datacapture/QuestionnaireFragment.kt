@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -193,7 +193,8 @@ class QuestionnaireFragment : Fragment() {
               paginationPreviousButton.visibility = View.VISIBLE
               paginationPreviousButton.isEnabled = displayMode.pagination.hasPreviousPage
               paginationNextButton.visibility = View.VISIBLE
-              paginationNextButton.visibility =  if (displayMode.pagination.hasNextPage) View.VISIBLE else View.GONE
+              paginationNextButton.visibility =
+                if (displayMode.pagination.hasNextPage) View.VISIBLE else View.GONE
             } else {
               paginationPreviousButton.visibility = View.GONE
               paginationNextButton.visibility = View.GONE
