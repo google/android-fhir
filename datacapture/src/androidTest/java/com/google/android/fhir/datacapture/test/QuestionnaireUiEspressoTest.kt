@@ -106,7 +106,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun shouldHideNextButtonOnLastPage() {
+  fun shouldHideNextButtonIfDisabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
     clickOnText("Next")
@@ -118,7 +118,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun shouldDisplayNextButtonIfNotLastPage() {
+  fun shouldDisplayNextButtonIfEnabled() {
     buildFragmentFromQuestionnaire("/layout_paginated.json", true)
 
     onView(withId(R.id.pagination_next_button))
