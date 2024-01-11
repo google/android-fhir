@@ -1,5 +1,3 @@
-import Dependencies.forceGuava
-
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -41,8 +39,6 @@ android {
   }
   kotlin { jvmToolchain(11) }
 }
-
-configurations { all { forceGuava() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
