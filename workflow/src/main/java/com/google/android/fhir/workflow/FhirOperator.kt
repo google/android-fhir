@@ -82,7 +82,7 @@ internal constructor(
    * @return a Parameters resource that contains an evaluation result for each expression requested.
    */
   @WorkerThread
-  fun evaluateLibrary(libraryUrl: String, expressions: Set<String>): IBaseParameters {
+  fun evaluateLibrary(libraryUrl: String, expressions: Set<String>?): IBaseParameters {
     return evaluateLibrary(libraryUrl, null, null, expressions)
   }
 
@@ -101,7 +101,7 @@ internal constructor(
   fun evaluateLibrary(
     libraryUrl: String,
     patientId: String,
-    expressions: Set<String>,
+    expressions: Set<String>?,
   ): IBaseParameters {
     return evaluateLibrary(libraryUrl, patientId, null, expressions)
   }
@@ -143,7 +143,7 @@ internal constructor(
     libraryUrl: String,
     patientId: String?,
     parameters: Parameters?,
-    expressions: Set<String>,
+    expressions: Set<String>?,
   ): IBaseParameters {
     return libraryProcessor.evaluate(
       /* url = */ libraryUrl,
