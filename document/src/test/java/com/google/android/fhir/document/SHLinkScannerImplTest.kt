@@ -89,4 +89,18 @@ class SHLinkScannerImplTest {
       )
       .invoke(argThat { message == "Scanner setup failed" })
   }
+
+  @Test
+  fun testScanSHLQRCodeSuccessWithData() {
+    `when`(scannerUtils.hasCameraPermission()).thenReturn(true)
+    val mockSHLinkScanData = SHLinkScanData("MockScanData")
+    `when`(scannerUtils.setup()).thenReturn(mockSHLinkScanData)
+
+    shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
+
+    verify(scannerUtils, times(successfulInvocation)).setup()
+    verify(scannerUtils, times(successfulInvocation)).releaseScanner()
+    verify(successCallback, times(successfulInvocation)).invoke(mockSHLinkScanData)
+    verify(failCallback, times(failedInvocation)).invoke(anyOrNull())
+  }
 }
