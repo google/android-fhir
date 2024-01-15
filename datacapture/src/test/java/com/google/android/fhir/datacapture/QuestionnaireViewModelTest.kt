@@ -1705,6 +1705,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.pages = viewModel.getQuestionnairePages()
     viewModel.runViewModelBlocking {
       viewModel.goToNextPage()
       assertThat(

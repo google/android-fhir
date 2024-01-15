@@ -1,31 +1,58 @@
 {
   "resourceType": "Questionnaire",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "q1",
+        "language": "text/fhirpath",
+        "expression": "%resource.descendants().where(linkId='7cc2e8a9-197a-42ea-9431-ba01eefc6511').answer.value"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "q1-boolean-safe",
+        "language": "text/fhirpath",
+        "expression": "iif(%q1-boolean.exists(), %q1-boolean, false)"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "basic-questions-exists",
+        "language": "text/fhirpath",
+        "expression": "%q1-boolean.exists() and %q2-boolean.exists() and %q3-boolean.exists() and %q4-boolean.exists() and %q5a-boolean.exists() and %q6a-boolean.exists() and %q6b-boolean.exists() and (%q6c-boolean.exists() or %q7-boolean.exists())"
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/variable",
+      "valueExpression": {
+        "name": "low-risk",
+        "language": "text/fhirpath",
+        "expression": "((%q1-boolean or %q1-boolean.not()) or (%q2-boolean or %q2-boolean.not())) and (%moderate-risk-helper.not() and %high-risk-helper.not() and %severe-risk-helper.not())"
+      }
+    }
+  ],
   "item": [
     {
       "linkId": "a-birthdate",
       "text": "Birth Date",
-      "type": "date",
+      "type": "boolean",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
           "valueExpression": {
             "language": "text/fhirpath",
-            "expression": "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
+            "expression": "%q1"
           }
         }
       ]
     },
     {
-      "linkId": "a-age-years",
-      "text": "Age years",
-      "type": "quantity",
-      "initial": [{
-        "valueQuantity": {
-          "unit": "years",
-          "system": "http://unitsofmeasure.org",
-          "code": "years"
-        }
-      }]
+      "linkId": "7cc2e8a9-197a-42ea-9431-ba01eefc6511",
+      "text": "In the past month, have you wished you were dead or wished you could go to sleep and not wake up?",
+      "type": "boolean"
     }
   ]
 }

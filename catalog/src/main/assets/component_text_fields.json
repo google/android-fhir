@@ -4,6 +4,12 @@
     {
       "linkId": "1",
       "type": "string",
+      "readOnly": true,
+      "initial": [
+        {
+          "valueString": "whatyoo"
+        }
+      ],
       "item": [
         {
           "linkId": "1.1",

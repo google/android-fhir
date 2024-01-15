@@ -1382,7 +1382,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
-    assertThat(item2.isReferencedBy(item1)).isTrue()
+    assertThat(item2.isExpressionReferencedBy(item1)).isTrue()
   }
 
   @Test
@@ -1399,7 +1399,7 @@ class MoreQuestionnaireItemComponentsTest {
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
-    assertThat(item2.isReferencedBy(item1)).isFalse()
+    assertThat(item2.isExpressionReferencedBy(item1)).isFalse()
   }
 
   @Test
