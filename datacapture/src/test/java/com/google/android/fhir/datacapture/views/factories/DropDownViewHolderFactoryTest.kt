@@ -22,6 +22,8 @@ import android.widget.FrameLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.identifierString
+import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -83,6 +85,42 @@ class DropDownViewHolderFactoryTest {
     assertThat(selectedItem.answerOptionString).isEqualTo("Test Code")
   }
 
+  @Test
+  fun `should populate dropdown with display values in a sorted way`() {
+    val answerOption1 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().setCode("Patient/1").setDisplay("Brenda")
+      }
+    val answerOption2 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().setCode("Patient/2").setDisplay("Annet")
+      }
+    val answerOption3 =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().setCode("Patient/3").setDisplay("Cindy")
+      }
+
+    val expected = QuestionnaireViewItem(
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addAnswerOption(answerOption1)
+        addAnswerOption(answerOption2)
+        addAnswerOption(answerOption3)
+      },
+      QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+      validationResult = NotValidated,
+      answersChangedCallback = { _, _, _, _ -> },
+    )
+    val answerOptionList = expected.enabledAnswerOptions.map {
+      DropDownAnswerOption(
+        it.value.identifierString(parent.context),
+        it.value.displayString(parent.context),
+        it.itemAnswerOptionImage(parent.context),
+      )
+    }
+      .sortedBy { it.answerOptionString }
+      .toMutableList()
+    assertThat(answerOptionList).isEqualTo(listOf(DropDownAnswerOption("Patient/2","Annet",null),DropDownAnswerOption("Patient/1","Brenda",null),DropDownAnswerOption("Patient/3","Cindy",null)))
+  }
   @Test
   fun `should populate dropdown with display for reference value type`() {
     val answerOption =

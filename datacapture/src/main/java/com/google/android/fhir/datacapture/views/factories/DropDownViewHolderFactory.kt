@@ -72,6 +72,7 @@ internal object DropDownViewHolderFactory :
                 it.itemAnswerOptionImage(context),
               )
             }
+            .sortedBy { it.answerOptionString }
             .toMutableList()
         answerOptionList.add(
           0,
