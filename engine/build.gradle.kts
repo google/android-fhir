@@ -1,6 +1,3 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
 import codegen.GenerateSearchParamsTask
 import java.net.URL
 
@@ -87,10 +84,9 @@ configurations {
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
-
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
+    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(module = "jcl-over-slf4j")
   }
 }
 
@@ -145,11 +141,19 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {

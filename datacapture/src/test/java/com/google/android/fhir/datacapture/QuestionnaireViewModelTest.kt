@@ -81,6 +81,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
@@ -3874,6 +3875,103 @@ class QuestionnaireViewModelTest {
     assertResourceEquals(value, expectedResponse)
   }
 
+  @Test
+  fun `clearAllAnswers clears all answers in questionnaire response`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val questionnaireResponseString =
+      """
+           {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "item": [
+                    {
+                      "linkId": "1.1",
+                      "text": "First Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "1.2",
+                      "text": "Second Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """
+        .trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """
+        .trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.clearAllAnswers()
+    val value = viewModel.getQuestionnaireResponse()
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+        as QuestionnaireResponse
+
+    assertResourceEquals(value, expectedResponse)
+  }
+
   // ==================================================================== //
   //                                                                      //
   //               Questionnaire Response with Nested Items               //
@@ -4583,7 +4681,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath supplement context`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %context`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4631,6 +4729,109 @@ class QuestionnaireViewModelTest {
             .single { it.questionnaireItem.linkId == "b" }
         assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
           .containsExactly("Code 1-b", "Code 2-b")
+      }
+    }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %questionnaire`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          this.identifier = listOf(Identifier().apply { value = "A" })
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two")),
+                )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Q2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "'Questionnaire = ' + %questionnaire.identifier.value"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    },
+                  ),
+                )
+            },
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Questionnaire = A")
+      }
+    }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %qItem`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two")),
+                )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Q2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "'Id of item = ' + %qItem.linkId"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    },
+                  ),
+                )
+            },
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Id of item = b")
       }
     }
 

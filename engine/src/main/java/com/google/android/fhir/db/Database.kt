@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,13 @@ package com.google.android.fhir.db
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -93,9 +95,11 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceWithUUID<R>>
 
-  suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
+  suspend fun searchForwardReferencedResources(query: SearchQuery): List<ForwardIncludeSearchResult>
+
+  suspend fun searchReverseReferencedResources(query: SearchQuery): List<ReverseIncludeSearchResult>
 
   suspend fun count(query: SearchQuery): Long
 
@@ -105,6 +109,12 @@ internal interface Database {
    */
   suspend fun getAllLocalChanges(): List<LocalChange>
 
+  /**
+   * Retrieves all [LocalChange]s for the [Resource] which has the [LocalChange] with the oldest
+   * [LocalChange.timestamp]
+   */
+  suspend fun getAllChangesForEarliestChangedResource(): List<LocalChange>
+
   /** Retrieves the count of [LocalChange]s stored in the database. */
   suspend fun getLocalChangesCount(): Int
 
@@ -113,6 +123,18 @@ internal interface Database {
 
   /** Remove the [LocalChangeEntity] s with matching resource ids. */
   suspend fun deleteUpdates(resources: List<Resource>)
+
+  /**
+   * Updates the [ResourceEntity.serializedResource] and [ResourceEntity.resourceId] corresponding
+   * to the updatedResource. Updates all the [LocalChangeEntity] for this updated resource as well
+   * as all the [LocalChangeEntity] referring to this resource in their [LocalChangeEntity.payload]
+   * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
+   * updated resource.
+   */
+  suspend fun updateResourceAndReferences(
+    currentResourceId: String,
+    updatedResource: Resource,
+  )
 
   /** Runs the block as a database transaction. */
   suspend fun withTransaction(block: suspend () -> Unit)
@@ -140,6 +162,18 @@ internal interface Database {
   suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
+   * Retrieve a list of [LocalChange] for [ResourceEntity] with given UUID, which can be used to
+   * purge resource from database. If there is no local change for [ResourceEntity.resourceUuid],
+   * return an empty list.
+   *
+   * @param resourceUuid The resource UUID [ResourceEntity.resourceUuid]
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   *   [Resource.id] . If there is no local change for given [resourceType] and
+   *   [ResourceEntity.resourceUuid], return empty list.
+   */
+  suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
+
+  /**
    * Purge resource from database based on resource type and id without any deletion of data from
    * the server.
    *
@@ -152,3 +186,8 @@ internal interface Database {
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 }
+
+data class ResourceWithUUID<R>(
+  val uuid: UUID,
+  val resource: R,
+)

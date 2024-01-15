@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
+import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
@@ -36,6 +37,7 @@ import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.LinkedList
@@ -88,6 +90,8 @@ class FhirSyncWorkerBenchmark {
     override fun getDownloadWorkManager(): DownloadWorkManager = BenchmarkTestDownloadManagerImpl()
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+
+    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
   }
 
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :
@@ -135,7 +139,12 @@ class FhirSyncWorkerBenchmark {
   private fun oneTimeSync(numberPatients: Int, numberObservations: Int, numberEncounters: Int) =
     runBlocking {
       val context: Context = ApplicationProvider.getApplicationContext()
-      val worker = TestListenableWorkerBuilder<BenchmarkTestOneTimeSyncWorker>(context).build()
+      val inputData =
+        Data.Builder()
+          .putString("sync_status_preferences_datastore_key", "BenchmarkTestOneTimeSyncWorker")
+          .build()
+      val worker =
+        TestListenableWorkerBuilder<BenchmarkTestOneTimeSyncWorker>(context, inputData).build()
       setupMockServerDispatcher(numberPatients, numberObservations, numberEncounters)
       benchmarkRule.measureRepeated {
         runBlocking {

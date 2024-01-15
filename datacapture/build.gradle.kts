@@ -1,6 +1,4 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
@@ -59,9 +57,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
+    removeIncompatibleDependencies()
   }
 }
 
@@ -82,12 +78,11 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.Glide.glide)
+  implementation(libs.glide)
   implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
@@ -96,6 +91,7 @@ dependencies {
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
 
@@ -108,6 +104,13 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {

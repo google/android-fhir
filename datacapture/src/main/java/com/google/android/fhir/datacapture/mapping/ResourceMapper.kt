@@ -28,7 +28,8 @@ import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.extensions.zipByLinkId
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -252,7 +253,13 @@ object ResourceMapper {
 
     questionnaireItem.initialExpression
       ?.let {
-        fhirPathEngine.evaluate(launchContexts, null, null, null, it.expression).firstOrNull()
+        evaluateToBase(
+            questionnaireResponse = null,
+            questionnaireResponseItem = null,
+            expression = it.expression,
+            contextMap = launchContexts,
+          )
+          .firstOrNull()
       }
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
@@ -282,31 +289,17 @@ object ResourceMapper {
     extractionResult: MutableList<Resource>,
     profileLoader: ProfileLoader,
   ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (
-      questionnaireItemListIterator.hasNext() && questionnaireResponseItemListIterator.hasNext()
-    ) {
-      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      var currentQuestionnaireItem = questionnaireItemListIterator.next()
-      // Find the next questionnaire item with the same link ID. This is necessary because some
-      // questionnaire items that are disabled might not have corresponding questionnaire response
-      // items.
-      while (
-        questionnaireItemListIterator.hasNext() &&
-          currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId
-      ) {
-        currentQuestionnaireItem = questionnaireItemListIterator.next()
-      }
-      if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinition(
-          currentQuestionnaireItem,
-          currentQuestionnaireResponseItem,
-          extractionContext,
-          extractionResult,
-          profileLoader,
-        )
-      }
+    questionnaireItemList.zipByLinkId(questionnaireResponseItemList) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      extractByDefinition(
+        questionnaireItem,
+        questionnaireResponseItem,
+        extractionContext,
+        extractionResult,
+        profileLoader,
+      )
     }
   }
 

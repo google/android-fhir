@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -49,6 +49,8 @@ class FhirSynchronizerTest {
 
   @Mock private lateinit var conflictResolver: ConflictResolver
 
+  @Mock private lateinit var fhirDataStore: FhirDataStore
+
   private lateinit var fhirSynchronizer: FhirSynchronizer
 
   @Before
@@ -56,11 +58,10 @@ class FhirSynchronizerTest {
     MockitoAnnotations.openMocks(this)
     fhirSynchronizer =
       FhirSynchronizer(
-        ApplicationProvider.getApplicationContext(),
         TestFhirEngineImpl,
-        uploader,
-        downloader,
-        conflictResolver,
+        UploadConfiguration(uploader),
+        DownloadConfiguration(downloader, conflictResolver),
+        fhirDataStore,
       )
   }
 
@@ -71,7 +72,6 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            LocalChangeToken(listOf()),
             listOf(),
           ),
         )
@@ -81,16 +81,16 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started,
-          SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-          SyncJobStatus.Finished,
-        )
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[3])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[4]).isInstanceOf(SyncJobStatus.Succeeded::class.java)
 
-      assertThat(SyncJobStatus.Finished::class.java).isEqualTo(result::class.java)
+      assertThat(SyncJobStatus.Succeeded::class.java).isEqualTo(result::class.java)
     }
 
   @Test
@@ -101,7 +101,6 @@ class FhirSynchronizerTest {
       `when`(uploader.upload(any()))
         .thenReturn(
           UploadSyncResult.Success(
-            LocalChangeToken(listOf()),
             listOf(),
           ),
         )
@@ -111,14 +110,12 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started,
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1),
-          SyncJobStatus.Failed(exceptions = listOf(error)),
-        )
-
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }
@@ -136,13 +133,12 @@ class FhirSynchronizerTest {
 
       val result = fhirSynchronizer.synchronize()
 
-      assertThat(emittedValues)
-        .containsExactly(
-          SyncJobStatus.Started,
-          SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10),
-          SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0),
-          SyncJobStatus.Failed(exceptions = listOf(error)),
-        )
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }

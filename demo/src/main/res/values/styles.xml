@@ -67,7 +67,7 @@
 
     </style>
 
-    <style name="AppCard" parent="Widget.MaterialComponents.CardView">
+    <style name="AppCard" parent="Widget.Material3.CardView.Outlined">
         <item name="cardElevation">8dp</item>
     </style>
 
@@ -79,16 +79,21 @@
     </style>
 
     <style name="AppTheme.PatientDetails.headline">
-        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
-        <item name="android:textSize">24sp</item>
+        <item
+            name="android:textAppearance"
+        >?attr/textAppearanceHeadlineSmall</item>
         <item name="android:textStyle">normal</item>
     </style>
 
     <style name="AppTheme.PatientDetails.Subtitle2">
-        <item name="android:textAppearance">?attr/textAppearanceSubtitle2</item>
+        <item
+            name="android:textAppearance"
+        >?attr/textAppearanceTitleSmall</item>
     </style>
 
     <style name="AppTheme.PatientDetails.body2">
-        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+        <item
+            name="android:textAppearance"
+        >?attr/textAppearanceBodyMedium</item>
     </style>
 </resources>

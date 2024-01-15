@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,16 +25,20 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.repositories.KnowledgeRepository
+import org.hl7.fhir.instance.model.api.IBaseBundle
+import org.hl7.fhir.instance.model.api.IBaseDatatype
 import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
+import org.hl7.fhir.r4.model.PlanDefinition
+import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
+import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
@@ -162,20 +166,35 @@ internal constructor(
     start: String,
     end: String,
     reportType: String,
-    subjectId: String?,
-    practitioner: String?,
+    subjectId: String? = null,
+    practitioner: String? = null,
+    additionalData: IBaseBundle? = null,
   ): MeasureReport {
-    val measure = Eithers.forLeft3<CanonicalType, IdType, Measure>(CanonicalType(measureUrl))
-    return measureProcessor.evaluateMeasure(
-      /* measure = */ measure,
-      /* periodStart = */ start,
-      /* periodEnd = */ end,
-      /* reportType = */ reportType,
-      /* subjectIds = */ listOf(
-        subjectId,
-      ), // https://github.com/cqframework/clinical-reasoning/issues/358
-      /* additionalData = */ null,
-    )
+    val subject =
+      if (!practitioner.isNullOrBlank()) {
+        checkAndAddType(practitioner, "Practitioner")
+      } else if (!subjectId.isNullOrBlank()) {
+        checkAndAddType(subjectId, "Patient")
+      } else {
+        // List of null is required to run population-level measures
+        null
+      }
+
+    val report =
+      measureProcessor.evaluateMeasure(
+        /* measure = */ Eithers.forLeft3(CanonicalType(measureUrl)),
+        /* periodStart = */ start,
+        /* periodEnd = */ end,
+        /* reportType = */ reportType,
+        /* subjectIds = */ listOf(subject),
+        /* additionalData = */ additionalData,
+      )
+
+    // add subject reference for non-individual reportTypes
+    if (report.type.name == MeasureReportType.SUMMARY.name && !subject.isNullOrBlank()) {
+      report.setSubject(Reference(subject))
+    }
+    return report
   }
 
   /**
@@ -185,8 +204,12 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
-  fun generateCarePlan(planDefinitionId: String, patientId: String): IBaseResource {
-    return generateCarePlan(planDefinitionId, patientId, encounterId = null)
+  @Deprecated(
+    "Use generateCarePlan with the planDefinition's url instead.",
+    ReplaceWith("this.generateCarePlan(CanonicalType, String)"),
+  )
+  fun generateCarePlan(planDefinitionId: String, subject: String): IBaseResource {
+    return generateCarePlan(planDefinitionId, subject, encounterId = null)
   }
 
   /**
@@ -196,16 +219,20 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
+  @Deprecated(
+    "Use generateCarePlan with the planDefinition's url instead.",
+    ReplaceWith("this.generateCarePlan(CanonicalType, String, String)"),
+  )
   fun generateCarePlan(
     planDefinitionId: String,
-    patientId: String,
+    subject: String,
     encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
       /* id = */ IdType("PlanDefinition", planDefinitionId),
       /* canonical = */ null,
       /* planDefinition = */ null,
-      /* subject = */ patientId,
+      /* subject = */ subject,
       /* encounterId = */ encounterId,
       /* practitionerId = */ null,
       /* organizationId = */ null,
@@ -220,6 +247,87 @@ internal constructor(
       /* prefetchData = */ null,
       libraryProcessor,
     ) as IBaseResource
+  }
+
+  @WorkerThread
+  fun generateCarePlan(
+    planDefinition: CanonicalType,
+    subject: String,
+    encounterId: String? = null,
+    practitionerId: String? = null,
+    organizationId: String? = null,
+    userType: IBaseDatatype? = null,
+    userLanguage: IBaseDatatype? = null,
+    userTaskContext: IBaseDatatype? = null,
+    setting: IBaseDatatype? = null,
+    settingContext: IBaseDatatype? = null,
+    parameters: IBaseParameters? = null,
+    useServerData: Boolean? = null,
+    bundle: IBaseBundle? = null,
+    prefetchData: IBaseParameters? = null,
+  ): IBaseResource {
+    return planDefinitionProcessor.apply(
+      /* id = */ null,
+      /* canonical = */ planDefinition,
+      /* planDefinition = */ null,
+      /* subject = */ subject,
+      /* encounterId = */ encounterId,
+      /* practitionerId = */ practitionerId,
+      /* organizationId = */ organizationId,
+      /* userType = */ userType,
+      /* userLanguage = */ userLanguage,
+      /* userTaskContext = */ userTaskContext,
+      /* setting = */ setting,
+      /* settingContext = */ settingContext,
+      /* parameters = */ parameters,
+      /* useServerData = */ useServerData,
+      /* bundle = */ bundle,
+      /* prefetchData = */ prefetchData,
+      libraryProcessor,
+    ) as IBaseResource
+  }
+
+  @WorkerThread
+  fun generateCarePlan(
+    planDefinition: PlanDefinition,
+    subject: String,
+    encounterId: String? = null,
+    practitionerId: String? = null,
+    organizationId: String? = null,
+    userType: IBaseDatatype? = null,
+    userLanguage: IBaseDatatype? = null,
+    userTaskContext: IBaseDatatype? = null,
+    setting: IBaseDatatype? = null,
+    settingContext: IBaseDatatype? = null,
+    parameters: IBaseParameters? = null,
+    useServerData: Boolean? = null,
+    bundle: IBaseBundle? = null,
+    prefetchData: IBaseParameters? = null,
+  ): IBaseResource {
+    return planDefinitionProcessor.apply(
+      /* id = */ null,
+      /* canonical = */ null,
+      /* planDefinition = */ planDefinition,
+      /* subject = */ subject,
+      /* encounterId = */ encounterId,
+      /* practitionerId = */ practitionerId,
+      /* organizationId = */ organizationId,
+      /* userType = */ userType,
+      /* userLanguage = */ userLanguage,
+      /* userTaskContext = */ userTaskContext,
+      /* setting = */ setting,
+      /* settingContext = */ settingContext,
+      /* parameters = */ parameters,
+      /* useServerData = */ useServerData,
+      /* bundle = */ bundle,
+      /* prefetchData = */ prefetchData,
+      libraryProcessor,
+    ) as IBaseResource
+  }
+
+  /** Checks if the Resource ID contains a type and if not, adds a default type */
+  fun checkAndAddType(id: String, defaultType: String): String {
+    return if (id.indexOf("/") == -1) "$defaultType/$id" else id
   }
 
   class Builder(private val applicationContext: Context) {
