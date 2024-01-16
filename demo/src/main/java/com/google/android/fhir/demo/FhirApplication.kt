@@ -40,7 +40,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
   override fun onCreate() {
     super.onCreate()
-    // Added this comment to create a test PR
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
