@@ -23,19 +23,10 @@ import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScannerOptions
 import com.google.mlkit.vision.barcode.BarcodeScanning
 
-class ScannerUtils(
-  context: Context,
-  lifecycleOwner: LifecycleOwner,
+internal class ScannerUtils(
+  private val cameraManager: CameraManager,
+  private val barcodeDetectorManager: BarcodeDetectorManager
 ) {
-
-  private val cameraManager = CameraManager(context, lifecycleOwner)
-  private val barcodeDetectorManager: BarcodeDetectorManager by lazy {
-    BarcodeDetectorManager(
-      BarcodeScanning.getClient(
-        BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build(),
-      ),
-    )
-  }
 
   fun setup(): SHLinkScanData {
     val imageAnalysis =

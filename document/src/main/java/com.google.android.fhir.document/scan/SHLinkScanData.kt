@@ -42,7 +42,7 @@ data class SHLinkScanData(
   val manifestUrl: String,
   val key: String,
   val label: String,
-  val flag: String,
+  val flags: String,
   val expirationTime: String,
   val versionNumber: String,
   val ipsDoc: IPSDocument?,
