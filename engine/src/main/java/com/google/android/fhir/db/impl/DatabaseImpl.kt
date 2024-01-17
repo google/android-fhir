@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,8 +27,10 @@ import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
@@ -199,23 +201,43 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+  override suspend fun <R : Resource> search(
+    query: SearchQuery,
+  ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { iParser.parseResource(it) as R }
-        .distinctBy { it.id }
+        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
+        .distinctBy { it.uuid }
     }
   }
 
-  override suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource> {
+  override suspend fun searchForwardReferencedResources(
+    query: SearchQuery,
+  ): List<ForwardIncludeSearchResult> {
     return db.withTransaction {
       resourceDao
-        .getReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
         .map {
-          IndexedIdAndResource(
+          ForwardIncludeSearchResult(
             it.matchingIndex,
-            it.idOfBaseResourceOnWhichThisMatchedInc ?: it.idOfBaseResourceOnWhichThisMatchedRev!!,
+            it.baseResourceUUID,
+            iParser.parseResource(it.serializedResource) as Resource,
+          )
+        }
+    }
+  }
+
+  override suspend fun searchReverseReferencedResources(
+    query: SearchQuery,
+  ): List<ReverseIncludeSearchResult> {
+    return db.withTransaction {
+      resourceDao
+        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          ReverseIncludeSearchResult(
+            it.matchingIndex,
+            it.baseResourceTypeAndId,
             iParser.parseResource(it.serializedResource) as Resource,
           )
         }
