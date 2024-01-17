@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import com.google.android.fhir.document.scan.ScannerUtils
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mock
+import org.mockito.Mockito.inOrder
+import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
@@ -67,9 +69,9 @@ class SHLinkScannerImplTest {
     verify(scannerUtils, times(failedInvocation)).releaseScanner()
     verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
     verify(
-        failCallback,
-        times(successfulInvocation),
-      )
+      failCallback,
+      times(successfulInvocation),
+    )
       .invoke(argThat { message == "Camera permission not granted" })
   }
 
@@ -84,9 +86,9 @@ class SHLinkScannerImplTest {
     verify(scannerUtils, times(failedInvocation)).releaseScanner()
     verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
     verify(
-        failCallback,
-        times(successfulInvocation),
-      )
+      failCallback,
+      times(successfulInvocation),
+    )
       .invoke(argThat { message == "Scanner setup failed" })
   }
 
@@ -102,5 +104,18 @@ class SHLinkScannerImplTest {
     verify(scannerUtils, times(successfulInvocation)).releaseScanner()
     verify(successCallback, times(successfulInvocation)).invoke(mockSHLinkScanData)
     verify(failCallback, times(failedInvocation)).invoke(anyOrNull())
+  }
+
+  @Test
+  fun testCallbacksInvocationOrder() {
+    `when`(scannerUtils.hasCameraPermission()).thenReturn(true)
+
+    shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
+
+    val inOrder = inOrder(scannerUtils, successCallback, failCallback)
+    inOrder.verify(scannerUtils).setup()
+    inOrder.verify(scannerUtils).releaseScanner()
+    inOrder.verify(successCallback).invoke(anyOrNull())
+    inOrder.verify(failCallback, never()).invoke(anyOrNull())
   }
 }

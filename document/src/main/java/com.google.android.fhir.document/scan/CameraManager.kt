@@ -1,79 +1,54 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document.scan
 
-import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.view.SurfaceHolder
-import androidx.core.app.ActivityCompat
-import com.google.android.gms.vision.CameraSource
-import java.io.IOException
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
+// CameraManager.kt
 class CameraManager(
   private val context: Context,
-  private val surfaceHolder: SurfaceHolder,
-  private val cameraCallback: (String) -> Unit
+  private val lifecycleOwner: LifecycleOwner,
+  val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor(),
 ) {
-
-  private lateinit var cameraSource: CameraSource
-
-  fun setup() {
-    initializeCameraSource()
-    setSurfaceCallbacks()
-    startScanning()
+  fun bindCamera(imageAnalysis: ImageAnalysis) {
+    val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
+    cameraProviderFuture.addListener(
+      {
+        val cameraProvider = cameraProviderFuture.get()
+        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+        cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, imageAnalysis)
+      },
+      ContextCompat.getMainExecutor(context),
+    )
   }
 
-  private fun initializeCameraSource() {
-    cameraSource =
-      CameraSource.Builder(context, null)
-        .setRequestedPreviewSize(1920, 1080)
-        .setAutoFocusEnabled(true)
-        .build()
+  fun releaseExecutor() {
+    cameraExecutor.shutdown()
   }
 
-  private fun setSurfaceCallbacks() {
-    surfaceHolder.addCallback(surfaceCallback)
-  }
-
-  private val surfaceCallback =
-    object : SurfaceHolder.Callback {
-      override fun surfaceCreated(holder: SurfaceHolder) {
-        try {
-          if (hasCameraPermission()) {
-            if (
-              ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA,
-              ) != PackageManager.PERMISSION_GRANTED
-            ) {
-              return
-            }
-            cameraSource.start(holder)
-          }
-        } catch (e: IOException) {
-          e.printStackTrace()
-          throw Error("Failed to start camera")
-        }
-      }
-
-      override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        // Not necessary
-      }
-
-      override fun surfaceDestroyed(holder: SurfaceHolder) {
-        cameraSource.stop()
-      }
-    }
-
-  private fun startScanning() {
-    // Implementation for scanning logic goes here
-  }
-
-  private fun hasCameraPermission(): Boolean {
+  internal fun hasCameraPermission(): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
-  }
-
-  fun releaseScanner() {
-    cameraSource.stop()
-    cameraSource.release()
   }
 }

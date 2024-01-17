@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ object Dependencies {
   object Androidx {
     const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
     const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
+    const val camera = "androidx.camera:camera-camera2:${Versions.Androidx.camera}"
+    const val cameraLifecycle =
+      "androidx.camera:camera-lifecycle:${Versions.Androidx.cameraLifecycle}"
     const val constraintLayout =
       "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.Androidx.coreKtx}"
@@ -162,7 +165,6 @@ object Dependencies {
 
   const val zxing = "com.google.zxing:core:${Versions.zxing}"
   const val nimbus = "com.nimbusds:nimbus-jose-jwt:${Versions.nimbus}"
-  const val vision = "com.google.android.gms:play-services-vision:${Versions.vision}"
 
   // Dependencies for testing go here
   object AndroidxTest {
@@ -203,6 +205,8 @@ object Dependencies {
     object Androidx {
       const val activity = "1.7.2"
       const val appCompat = "1.6.1"
+      const val camera = "1.3.1"
+      const val cameraLifecycle = "1.3.1"
       const val constraintLayout = "2.1.4"
       const val coreKtx = "1.10.1"
       const val datastorePref = "1.0.0"

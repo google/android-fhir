@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,123 +16,56 @@
 
 package com.google.android.fhir.document.scan
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import android.view.SurfaceHolder
-import androidx.core.app.ActivityCompat
-import androidx.core.util.isNotEmpty
-import com.google.android.gms.vision.CameraSource
-import com.google.android.gms.vision.Detector
-import com.google.android.gms.vision.barcode.Barcode
-import com.google.android.gms.vision.barcode.BarcodeDetector
-import java.io.IOException
+import androidx.camera.core.ImageAnalysis
+import androidx.lifecycle.LifecycleOwner
+import com.google.mlkit.vision.barcode.Barcode
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
 
 class ScannerUtils(
-  private val context: Context,
-  private val surfaceHolder: SurfaceHolder,
+  context: Context,
+  lifecycleOwner: LifecycleOwner,
 ) {
 
-  private lateinit var cameraSource: CameraSource
-  private lateinit var barcodeDetector: BarcodeDetector
+  private val cameraManager = CameraManager(context, lifecycleOwner)
+  private val barcodeDetectorManager: BarcodeDetectorManager by lazy {
+    BarcodeDetectorManager(
+      BarcodeScanning.getClient(
+        BarcodeScannerOptions.Builder().setBarcodeFormats(Barcode.FORMAT_QR_CODE).build(),
+      ),
+    )
+  }
 
-  /* Setup the camera and barcode scanners */
   fun setup(): SHLinkScanData {
-    initializeBarcodeDetector()
-    initializeCameraSource()
-    setSurfaceCallbacks()
-    return startScanning()
-  }
-
-  /* Initialize the BarcodeDetector with the specified barcode format */
-  private fun initializeBarcodeDetector() {
-    barcodeDetector =
-      BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
-  }
-
-  /* Initialize the CameraSource with the barcode detector */
-  private fun initializeCameraSource() {
-    cameraSource =
-      CameraSource.Builder(context, barcodeDetector)
-        .setRequestedPreviewSize(1920, 1080)
-        .setAutoFocusEnabled(true)
+    val imageAnalysis =
+      ImageAnalysis.Builder()
+        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
         .build()
-  }
 
-  /* Set up SurfaceHolder callbacks for camera preview */
-  private fun setSurfaceCallbacks() {
-    surfaceHolder.addCallback(surfaceCallback)
-  }
+    var scannedData: SHLinkScanData? = null
 
-  /* Manages camera operations based on changes in the SurfaceView */
-  private val surfaceCallback =
-    object : SurfaceHolder.Callback {
-      override fun surfaceCreated(holder: SurfaceHolder) {
-        try {
-          if (hasCameraPermission()) {
-            if (
-              ActivityCompat.checkSelfPermission(
-                context,
-                Manifest.permission.CAMERA,
-              ) != PackageManager.PERMISSION_GRANTED
-            ) {
-              return
-            }
-            cameraSource.start(holder)
-          }
-        } catch (e: IOException) {
-          e.printStackTrace()
-          throw Error("Failed to start camera")
+    imageAnalysis.setAnalyzer(cameraManager.cameraExecutor) { imageProxy ->
+      barcodeDetectorManager.processImage(imageProxy) { result ->
+        // Handle the scanned value as needed
+        val scannedValue = result?.displayValue
+        if (scannedValue != null) {
+          scannedData = SHLinkScanData(scannedValue)
         }
-      }
-
-      override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
-        // Not necessary
-      }
-
-      override fun surfaceDestroyed(holder: SurfaceHolder) {
-        cameraSource.stop()
       }
     }
 
-  /* Start scanning and return scanned SHL or throw an error */
-  private fun startScanning(): SHLinkScanData {
-    var scannedData: SHLinkScanData? = null
+    cameraManager.bindCamera(imageAnalysis)
 
-    barcodeDetector.setProcessor(
-      object : Detector.Processor<Barcode> {
-        override fun release() {
-          // Scanner has been closed
-          releaseScanner()
-        }
-
-        var scanSucceeded = false
-
-        override fun receiveDetections(detections: Detector.Detections<Barcode>) {
-          if (scanSucceeded) {
-            return
-          }
-          val barcodes = detections.detectedItems
-          if (barcodes.isNotEmpty()) {
-            val scannedValue = barcodes.valueAt(0).rawValue
-            scannedData = SHLinkScanData(scannedValue)
-            scanSucceeded = true
-          }
-        }
-      },
-    )
     return scannedData ?: throw Error("No valid scan data found")
   }
 
-  /* Check if camera permissions have been accepted */
   internal fun hasCameraPermission(): Boolean {
-    return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+    return cameraManager.hasCameraPermission()
   }
 
-  /* Stop scanning and release resources */
   fun releaseScanner() {
-    cameraSource.stop()
-    cameraSource.release()
-    barcodeDetector.release()
+    cameraManager.releaseExecutor()
+    barcodeDetectorManager.releaseBarcodeScanner()
   }
 }

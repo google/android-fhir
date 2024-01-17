@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,8 +37,7 @@ class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) : SHLinkScanner 
         // There was an error trying to scan the QR code
         failCallback(error)
       }
-    }
-    else {
+    } else {
       val error = Error("Camera permission not granted")
       failCallback(error)
     }

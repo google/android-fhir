@@ -33,14 +33,11 @@ android {
 }
 
 dependencies {
-  val camerax_version = "1.4.0-alpha03"
-  implementation("androidx.camera:camera-camera2:${camerax_version}")
-  implementation("androidx.camera:camera-lifecycle:${camerax_version}")
-  implementation("androidx.camera:camera-view:${camerax_version}")
-  implementation("com.google.mlkit:barcode-scanning:17.0.3")
-
-  implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.appCompat)
+  implementation(Dependencies.Androidx.camera)
+  implementation(Dependencies.Androidx.cameraLifecycle)
+  implementation(Dependencies.Androidx.coreKtx)
+  implementation(Dependencies.Mlkit.barcodeScanning)
   implementation(Dependencies.material)
   implementation(Dependencies.androidFhirEngine)
   implementation(Dependencies.Retrofit.coreRetrofit)
@@ -49,7 +46,6 @@ dependencies {
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
-  implementation(Dependencies.vision)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 

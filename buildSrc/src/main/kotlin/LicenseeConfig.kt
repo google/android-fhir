@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,14 +131,6 @@ fun Project.configureLicensee() {
     allowDependency("com.google.android.gms", "play-services-mlkit-barcode-scanning", "16.1.4") {
       because("")
     }
-
-    allowDependency("com.google.android.gms", "play-services-vision", "20.1.3") { because("") }
-
-    allowDependency("com.google.android.gms", "play-services-vision-common", "19.1.3") {
-      because("")
-    }
-
-    allowDependency("com.google.android.gms", "play-services-flags", "17.0.0") { because("") }
 
     // Play Services Phenotype
     allowDependency("com.google.android.gms", "play-services-phenotype", "17.0.0") { because("") }
