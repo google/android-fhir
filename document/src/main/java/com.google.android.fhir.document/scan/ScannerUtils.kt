@@ -16,16 +16,11 @@
 
 package com.google.android.fhir.document.scan
 
-import android.content.Context
 import androidx.camera.core.ImageAnalysis
-import androidx.lifecycle.LifecycleOwner
-import com.google.mlkit.vision.barcode.Barcode
-import com.google.mlkit.vision.barcode.BarcodeScannerOptions
-import com.google.mlkit.vision.barcode.BarcodeScanning
 
-internal class ScannerUtils(
+class ScannerUtils(
   private val cameraManager: CameraManager,
-  private val barcodeDetectorManager: BarcodeDetectorManager
+  private val barcodeDetectorManager: BarcodeDetectorManager,
 ) {
 
   fun setup(): SHLinkScanData {
