@@ -69,9 +69,9 @@ class SHLinkScannerImplTest {
     verify(scannerUtils, times(failedInvocation)).releaseScanner()
     verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
     verify(
-      failCallback,
-      times(successfulInvocation),
-    )
+        failCallback,
+        times(successfulInvocation),
+      )
       .invoke(argThat { message == "Camera permission not granted" })
   }
 
@@ -86,9 +86,9 @@ class SHLinkScannerImplTest {
     verify(scannerUtils, times(failedInvocation)).releaseScanner()
     verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
     verify(
-      failCallback,
-      times(successfulInvocation),
-    )
+        failCallback,
+        times(successfulInvocation),
+      )
       .invoke(argThat { message == "Scanner setup failed" })
   }
 
