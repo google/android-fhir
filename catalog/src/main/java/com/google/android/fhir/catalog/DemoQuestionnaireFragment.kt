@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -137,7 +137,13 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .apply {
+                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                    .LOCATION_WIDGET_PROVIDER,
+                )
+                setQuestionnaire(args.questionnaireJsonStringKey!!)
+              }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }

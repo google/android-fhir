@@ -70,6 +70,13 @@ object Releases {
       override val version = "0.1.0-beta3"
       override val name = "Android FHIR Structured Data Capture - Barcode Extensions (contrib)"
     }
+
+    object LocationWidget : LibraryArtifact {
+      override val artifactId = "contrib-locationwidget"
+      override val version = "0.1.0-alpha01"
+      override val name =
+        "Android FHIR Structured Data Capture - Location Widget Extensions (contrib)"
+    }
   }
 
   object Knowledge : LibraryArtifact {
