@@ -192,8 +192,8 @@ class QuestionnaireFragment : Fragment() {
             if (displayMode.pagination.isPaginated) {
               paginationPreviousButton.visibility =
                 if (displayMode.pagination.hasPreviousPage) View.VISIBLE else View.GONE
-              paginationNextButton.visibility = View.VISIBLE
-              paginationNextButton.isEnabled = displayMode.pagination.hasNextPage
+              paginationNextButton.visibility =
+                if (displayMode.pagination.hasNextPage) View.VISIBLE else View.GONE
             } else {
               paginationPreviousButton.visibility = View.GONE
               paginationNextButton.visibility = View.GONE
