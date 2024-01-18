@@ -1,4 +1,3 @@
-import Dependencies.forceGuava
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
@@ -46,12 +45,7 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
-configurations {
-  all {
-    removeIncompatibleDependencies()
-    forceGuava()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
@@ -74,4 +68,10 @@ dependencies {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
   }
   androidTestImplementation(project(":workflow-testing"))
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      androidTestImplementation(libName, constraints)
+    }
+  }
 }
