@@ -184,8 +184,8 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  private fun getThemeId(title: String): Int {
-    return if (
+  private fun getThemeId(title: String) =
+    if (
       componentListViewModel.isComponent(requireContext(), title) ||
         behaviorListViewModel.isBehavior(requireContext(), title)
     ) {
@@ -195,7 +195,6 @@ class DemoQuestionnaireFragment : Fragment() {
     } else {
       R.style.Theme_Androidfhir_PaginatedLayout
     }
-  }
 
   private fun getMenu(): Int? =
     if (
