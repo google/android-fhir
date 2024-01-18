@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.contrib.views.locationwidget
 
 import android.view.View
-import android.widget.Toast
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.uiControlControlCode
 import com.google.android.fhir.datacapture.views.GroupHeaderView
@@ -47,7 +46,6 @@ object LocationWidgetViewHolderFactory :
           locationWidgetButton.setOnClickListener {
             CurrentLocationDialogFragment()
               .show(supportFragmentManager, CurrentLocationDialogFragment::class.java.simpleName)
-            Toast.makeText(it.context, "Load Locations!!!", Toast.LENGTH_LONG).show()
           }
         }
       }
