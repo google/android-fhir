@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,7 +81,9 @@ data class QuestionnaireViewItem(
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
   val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
-  val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit = { _, _ -> },
+  val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
+    { _, _ ->
+    },
 ) {
 
   fun getQuestionnaireResponseItem(): QuestionnaireResponseItemComponent = questionnaireResponseItem
