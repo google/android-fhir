@@ -253,16 +253,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /** Tracks which help card has been opened. */
-  private val openedHelpCardSet: MutableStateFlow<MutableSet<QuestionnaireItemComponent>> =
-    MutableStateFlow(mutableSetOf())
+  private val openedHelpCardSet: MutableSet<QuestionnaireItemComponent> = mutableSetOf()
 
   /** Callback to save the help card state. */
   private val helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit =
     { shouldBeVisible, linkId ->
       if (shouldBeVisible) {
-        openedHelpCardSet.update { it.apply { add(linkId) } }
+        openedHelpCardSet.add(questionnaireResponseItem)
       } else {
-        openedHelpCardSet.update { it.apply { remove(linkId) } }
+        openedHelpCardSet.remove(questionnaireResponseItem)
       }
     }
 
