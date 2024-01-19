@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,11 +253,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
   /** Tracks which help card has been opened. */
-  private val openedHelpCardSet: MutableSet<QuestionnaireItemComponent> = mutableSetOf()
+  private val openedHelpCardSet: MutableSet<QuestionnaireResponseItemComponent> = mutableSetOf()
 
   /** Callback to save the help card state. */
-  private val helpCardStateChangedCallback: (Boolean, QuestionnaireItemComponent) -> Unit =
-    { shouldBeVisible, linkId ->
+  private val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
+    { shouldBeVisible, questionnaireResponseItem ->
       if (shouldBeVisible) {
         openedHelpCardSet.add(questionnaireResponseItem)
       } else {
@@ -768,7 +768,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val items = buildList {
       val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
       val isHelpCard = itemHelpCard != null
-      val isHelpCardOpen = openedHelpCardSet.value.contains(itemHelpCard)
+      val isHelpCardOpen = openedHelpCardSet.contains(questionnaireResponseItem)
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(

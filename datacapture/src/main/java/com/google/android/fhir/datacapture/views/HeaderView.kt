@@ -49,6 +49,7 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
       questionnaireItem = questionnaireViewItem.questionnaireItem,
+      questionnaireResponseItem = questionnaireViewItem.getQuestionnaireResponseItem(),
       isHelpCardInitiallyVisible = questionnaireViewItem.isHelpCardOpen,
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
