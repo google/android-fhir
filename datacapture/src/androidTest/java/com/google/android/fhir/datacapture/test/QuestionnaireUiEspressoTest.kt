@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -98,6 +98,30 @@ class QuestionnaireUiEspressoTest {
 
     clickOnText("No")
     onView(withId(R.id.review_mode_button))
+      .check(
+        ViewAssertions.matches(
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
+      )
+  }
+
+  @Test
+  fun shouldHideNextButtonIfDisabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    clickOnText("Next")
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+  }
+
+  @Test
+  fun shouldDisplayNextButtonIfEnabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    onView(withId(R.id.pagination_next_button))
       .check(
         ViewAssertions.matches(
           ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
@@ -503,6 +527,7 @@ class QuestionnaireUiEspressoTest {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
+        .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
