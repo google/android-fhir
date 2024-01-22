@@ -106,6 +106,30 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun shouldHideNextButtonIfDisabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    clickOnText("Next")
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+  }
+
+  @Test
+  fun shouldDisplayNextButtonIfEnabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
+      )
+  }
+
+  @Test
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
@@ -502,6 +526,7 @@ class QuestionnaireUiEspressoTest {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
+        .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
