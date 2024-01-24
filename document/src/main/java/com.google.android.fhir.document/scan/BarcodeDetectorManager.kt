@@ -20,14 +20,11 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
 
-// BarcodeDetectorManager.kt
 class BarcodeDetectorManager(
   private val barcodeScanner: BarcodeScanner,
 ) {
   fun processImage(imageProxy: ImageProxy, onResult: (Barcode?) -> Unit) {
-    // Extracting image data from planes
     val data = ByteArray(imageProxy.planes[0].buffer.capacity())
-
     val rotationDegrees = imageProxy.imageInfo.rotationDegrees
     val inputImage =
       com.google.mlkit.vision.common.InputImage.fromByteArray(
@@ -35,16 +32,14 @@ class BarcodeDetectorManager(
         imageProxy.width,
         imageProxy.height,
         rotationDegrees,
-        com.google.mlkit.vision.common.InputImage
-          .IMAGE_FORMAT_NV21, // Adjust based on your image format
+        com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21,
       )
 
     barcodeScanner
       .process(inputImage)
       .addOnSuccessListener { barcodes ->
-        // Handle barcode results
         if (barcodes.isNotEmpty()) {
-          val result = barcodes[0]
+          val result = barcodes.single()
           onResult(result)
         } else {
           onResult(null)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,35 @@
 
 package com.google.android.fhir.document
 
+import com.google.android.fhir.document.scan.BarcodeDetectorManager
+import com.google.mlkit.vision.barcode.BarcodeScanner
+import org.junit.After
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito.verify
+import org.mockito.MockitoAnnotations
+
 class BarcodeDetectorManagerTest {
 
+  @Mock private lateinit var barcodeScanner: BarcodeScanner
+
+  private lateinit var barcodeDetectorManager: BarcodeDetectorManager
+
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    barcodeDetectorManager = BarcodeDetectorManager(barcodeScanner)
+  }
+
+  @After
+  fun tearDown() {
+    barcodeDetectorManager.releaseBarcodeScanner()
+  }
+
+  @Test
+  fun releaseBarcodeScanner() {
+    barcodeDetectorManager.releaseBarcodeScanner()
+    verify(barcodeScanner).close()
+  }
 }
