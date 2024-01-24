@@ -16,22 +16,28 @@
 
 package com.google.android.fhir.document.scan
 
+import androidx.camera.core.ImageAnalysis
+
 /*
 Implementation of the SHLinkScanner interface.
 Calls successfulCallback with a newly instantiated SHLinkScanData if a SHL is successfully scanned.
 Otherwise, an error is thrown.
  */
-class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) : SHLinkScanner {
+class SHLinkScannerImpl(
+  private val cameraManager: CameraManager,
+  private val barcodeDetectorManager: BarcodeDetectorManager,
+  private val imageAnalysis: ImageAnalysis,
+) : SHLinkScanner {
 
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
   ) {
-    if (scannerUtils.hasCameraPermission()) {
+    if (cameraManager.hasCameraPermission()) {
       try {
         // Open camera and scan qr code
-        val shLinkScanData = scannerUtils.setup()
-        scannerUtils.releaseScanner()
+        val shLinkScanData = scan()
+        releaseScanner()
         successCallback(shLinkScanData)
       } catch (error: Error) {
         // There was an error trying to scan the QR code
@@ -41,5 +47,33 @@ class SHLinkScannerImpl(private val scannerUtils: ScannerUtils) : SHLinkScanner 
       val error = Error("Camera permission not granted")
       failCallback(error)
     }
+  }
+
+  private fun scan(): SHLinkScanData {
+    // val imageAnalysis =
+    //   ImageAnalysis.Builder()
+    //     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+    //     .build()
+
+    var scannedData: SHLinkScanData? = null
+
+    imageAnalysis.setAnalyzer(cameraManager.cameraExecutor) { imageProxy ->
+      barcodeDetectorManager.processImage(imageProxy) { result ->
+        // Handle the scanned value as needed
+        val scannedValue = result?.displayValue
+        if (scannedValue != null) {
+          scannedData = SHLinkScanData(scannedValue)
+        }
+      }
+    }
+
+    cameraManager.bindCamera(imageAnalysis)
+
+    return scannedData ?: throw Error("No valid scan data found")
+  }
+
+  private fun releaseScanner() {
+    cameraManager.releaseExecutor()
+    barcodeDetectorManager.releaseBarcodeScanner()
   }
 }

@@ -26,7 +26,6 @@ import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-// CameraManager.kt
 class CameraManager(
   private val context: Context,
   private val lifecycleOwner: LifecycleOwner,

@@ -16,4 +16,39 @@
 
 package com.google.android.fhir.document
 
-class CameraManagerTest
+import android.content.Context
+import androidx.lifecycle.LifecycleOwner
+import com.google.android.fhir.document.scan.CameraManager
+import java.util.concurrent.ExecutorService
+import org.junit.Before
+import org.junit.Test
+import org.mockito.Mock
+import org.mockito.Mockito
+import org.mockito.MockitoAnnotations
+
+class CameraManagerTest {
+
+  private lateinit var cameraManager: CameraManager
+
+  @Mock private lateinit var context: Context
+
+  @Mock private lateinit var lifecycleOwner: LifecycleOwner
+
+  @Mock private lateinit var cameraExecutor: ExecutorService
+
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    cameraManager = CameraManager(context, lifecycleOwner, cameraExecutor)
+  }
+
+  @Test fun canBindCameraToLifecycle() {}
+
+  @Test
+  fun releaseExecutorCanCorrectlyShutdownCameraExecutor() {
+    cameraManager.releaseExecutor()
+    Mockito.verify(cameraExecutor).shutdown()
+  }
+
+  /* Do I need permission checks here?? Maybe in ScannerUtils tests */
+}

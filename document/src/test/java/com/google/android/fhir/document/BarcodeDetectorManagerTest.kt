@@ -16,18 +16,24 @@
 
 package com.google.android.fhir.document
 
+import androidx.camera.core.ImageProxy
 import com.google.android.fhir.document.scan.BarcodeDetectorManager
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class BarcodeDetectorManagerTest {
 
   @Mock private lateinit var barcodeScanner: BarcodeScanner
+
+  @Mock private lateinit var imageProxy: ImageProxy
 
   private lateinit var barcodeDetectorManager: BarcodeDetectorManager
 

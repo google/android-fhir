@@ -31,8 +31,10 @@ import org.junit.runner.RunWith
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class QRGeneratorUtilsTest {
   private lateinit var context: Context
   private lateinit var qrGeneratorUtils: QRGeneratorUtils
@@ -76,7 +78,7 @@ class QRGeneratorUtilsTest {
     val resourceId = R.drawable.smart_logo
     `when`(ContextCompat.getDrawable(context, resourceId)).thenReturn(drawable)
 
-    val qrCodeBitmap = qrGeneratorUtils.createQRCodeBitmap("TestContent")
+    val qrCodeBitmap = qrGeneratorUtils.createQRCodeBitmap("Test")
     val logoBitmap: Bitmap = qrGeneratorUtils.createLogoBitmap(qrCodeBitmap)
     assertEquals((qrCodeBitmap.width * 0.4).toInt(), logoBitmap.width)
   }
