@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.document
 
+import android.content.Context
 import androidx.camera.core.ImageAnalysis
 import com.google.android.fhir.document.scan.BarcodeDetectorManager
 import com.google.android.fhir.document.scan.CameraManager
@@ -26,24 +27,26 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+import org.mockito.Mockito.inOrder
+import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest = Config.NONE)
+@Config(manifest= Config.NONE)
 class SHLinkScannerImplTest {
 
   @Mock private lateinit var cameraManager: CameraManager
-
   @Mock private lateinit var barcodeDetectorManager: BarcodeDetectorManager
-  private val imageAnalysis: ImageAnalysis = Mockito.mock(ImageAnalysis::class.java)
+  @Mock private lateinit var imageAnalysis: ImageAnalysis
   private lateinit var shLinkScannerImpl: SHLinkScannerImpl
   private val successCallback = mock<(SHLinkScanData) -> Unit>()
   private val failCallback = mock<(Error) -> Unit>()

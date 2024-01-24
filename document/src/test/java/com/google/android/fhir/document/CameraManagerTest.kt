@@ -50,5 +50,4 @@ class CameraManagerTest {
     Mockito.verify(cameraExecutor).shutdown()
   }
 
-  /* Do I need permission checks here?? Maybe in ScannerUtils tests */
 }
