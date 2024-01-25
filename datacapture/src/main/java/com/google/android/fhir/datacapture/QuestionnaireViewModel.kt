@@ -68,6 +68,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
@@ -120,14 +121,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied.",
           )
       }
+    // Add timestamp questionnaire items
+    questionnaire.addItem(getTimestampItem("launch-timestamp"))
+    questionnaire.addItem(getTimestampItem("submission-timestamp"))
   }
 
   /** The current questionnaire response as questions are being answered. */
   private val questionnaireResponse: QuestionnaireResponse
 
   init {
-      questionnaire.addItem(getTimestampItem("launch-timestamp"))
-      questionnaire.addItem(getTimestampItem("submission-timestamp"))
     when {
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI) -> {
         if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
@@ -437,7 +439,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             if (item.linkId == itemLinkId) {
                 item.answer = arrayListOf<QuestionnaireResponseItemAnswerComponent?>().apply {
                     add(QuestionnaireResponseItemAnswerComponent().apply {
-                        value = StringType(Date().toTimeZoneString())
+                        value = DateTimeType(Date().toTimeZoneString())
                     })
                 }
             }
@@ -455,7 +457,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         return QuestionnaireItemComponent().apply {
             linkId = linkIdVal
             readOnly = true
-            type = Questionnaire.QuestionnaireItemType.STRING
+            type = Questionnaire.QuestionnaireItemType.DATETIME
             extension.add(Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-hidden", BooleanType(true)))
         }
     }
