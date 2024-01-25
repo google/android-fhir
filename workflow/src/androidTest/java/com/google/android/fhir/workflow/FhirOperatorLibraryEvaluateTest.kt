@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,5 +131,28 @@ class FhirOperatorLibraryEvaluateTest {
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+  }
+
+  @Test
+  fun evaluateImmunityCheck_shouldReturn_allEvaluatedVariables() = runBlocking {
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json") as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
+
+    // Load Library that checks if Patient has taken a vaccine
+    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+
+    // Evaluates a specific Patient
+    val results =
+      fhirOperator.evaluateLibrary(
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = null,
+      ) as Parameters
+
+    assertThat(results.hasParameter("CompletedImmunization")).isTrue()
+    assertThat(results.hasParameter("GetFinalDose")).isTrue()
+    assertThat(results.hasParameter("Patient")).isTrue()
   }
 }
