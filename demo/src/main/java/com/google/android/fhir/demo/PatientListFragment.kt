@@ -38,6 +38,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -152,7 +153,7 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(true)
+    (activity as MainActivity).setDrawerEnabled(false)
 
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
@@ -233,9 +234,7 @@ class PatientListFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        // hide the soft keyboard when the navigation drawer is shown on the screen.
-        searchView.clearFocus()
-        (requireActivity() as MainActivity).openNavigationDrawer()
+        NavHostFragment.findNavController(this).navigateUp()
         true
       }
       else -> false

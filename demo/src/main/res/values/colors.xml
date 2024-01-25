@@ -87,4 +87,9 @@
     <color name="onSurfaceVariant_neutral_variant_80">#C4C7C5</color>
 
     <color name="outline_neutral_variant_60">#8E918F</color>
+
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="dashboard_cardview_textcolor">#4D4D4D</color>
+
 </resources>
