@@ -37,6 +37,7 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import timber.log.Timber
 
 /**
@@ -392,6 +393,12 @@ class QuestionnaireFragment : Fragment() {
     fun showOptionalText(value: Boolean) = apply { args.add(EXTRA_SHOW_OPTIONAL_TEXT to value) }
 
     /**
+     * A [Boolean] extra to include [QuestionnaireItemComponent] containing timestamps for
+     * Questionnaire launch and submission time.
+     */
+    fun includeTimestampQuestionnaireItems(value: Boolean) = apply { args.add(EXTRA_INCLUDE_TIMESTAMP_ITEMS to value) }
+
+    /**
      * A matcher to provide [QuestionnaireItemViewHolderFactoryMatcher]s for custom
      * [Questionnaire.QuestionnaireItemType]. The application needs to provide a
      * [QuestionnaireItemViewHolderFactoryMatchersProviderFactory] in the [DataCaptureConfig] so
@@ -508,6 +515,12 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
 
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
+
+    /**
+     * A [Boolean] extra to include [QuestionnaireItemComponent] containing timestamps for
+     * Questionnaire launch and submission time.
+     */
+    internal const val EXTRA_INCLUDE_TIMESTAMP_ITEMS = "add-timestamp-items"
 
     fun builder() = Builder()
   }
