@@ -28,6 +28,7 @@ import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -52,6 +53,21 @@ interface RetrofitSHLService {
     @Body contentEncrypted: String,
     @Header("Authorization") authorization: String,
   ): Response<ResponseBody>
+
+  /* POST request to the SHL's manifest url to get the list of files associated with the link */
+  @POST
+  @Headers("Content-Type: application/smart-health-card")
+  suspend fun getFilesFromManifest(
+    @Url path: String,
+    @Body jsonData: String,
+  ): Response<ResponseBody>
+
+  /* GET request if files are stored in an external "location" */
+  @GET
+  suspend fun getFromLocation(
+    @Url path: String,
+  ): Response<ResponseBody>
+
 
   class Builder(
     private val baseUrl: String,
