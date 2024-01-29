@@ -18,26 +18,23 @@ package com.google.android.fhir.document.scan
 
 import android.content.Context
 import android.content.pm.PackageManager
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.CameraProvider
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 class CameraManager(
   private val context: Context,
-  private val lifecycleOwner: LifecycleOwner,
   val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor(),
 ) {
-  fun bindCamera(imageAnalysis: ImageAnalysis) {
+  private var cameraProvider: CameraProvider? = null
+
+  fun bindCamera() {
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     cameraProviderFuture.addListener(
       {
-        val cameraProvider = cameraProviderFuture.get()
-        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-        cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, imageAnalysis)
+        cameraProvider = cameraProviderFuture.get()
       },
       ContextCompat.getMainExecutor(context),
     )
@@ -49,5 +46,9 @@ class CameraManager(
 
   internal fun hasCameraPermission(): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+  }
+
+  fun getCameraProvider(): CameraProvider? {
+    return cameraProvider
   }
 }

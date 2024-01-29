@@ -35,7 +35,7 @@ class SHLinkScannerImpl(
   ) {
     if (cameraManager.hasCameraPermission()) {
       try {
-        // Open camera and scan qr code
+        // Open camera and scan
         val shLinkScanData = scan()
         releaseScanner()
         successCallback(shLinkScanData)
@@ -50,16 +50,10 @@ class SHLinkScannerImpl(
   }
 
   private fun scan(): SHLinkScanData {
-    // val imageAnalysis =
-    //   ImageAnalysis.Builder()
-    //     .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-    //     .build()
-
     var scannedData: SHLinkScanData? = null
 
     imageAnalysis.setAnalyzer(cameraManager.cameraExecutor) { imageProxy ->
       barcodeDetectorManager.processImage(imageProxy) { result ->
-        // Handle the scanned value as needed
         val scannedValue = result?.displayValue
         if (scannedValue != null) {
           scannedData = SHLinkScanData(scannedValue)
@@ -67,7 +61,7 @@ class SHLinkScannerImpl(
       }
     }
 
-    cameraManager.bindCamera(imageAnalysis)
+    cameraManager.bindCamera()
 
     return scannedData ?: throw Error("No valid scan data found")
   }
