@@ -53,7 +53,7 @@ class UploaderTest {
   fun `bundle upload for per resource patch should output responses mapped correctly to the local changes`() =
     runTest {
       val updatedPatient1 =
-        patient.copy().apply {
+        patient1.copy().apply {
           addName(
             HumanName().apply {
               addGiven("John")
@@ -107,7 +107,7 @@ class UploaderTest {
   fun `bundle upload for per change patch should output responses mapped correctly to the local changes`() =
     runTest {
       val updatedPatient1 =
-        patient.copy().apply {
+        patient1.copy().apply {
           addName(
             HumanName().apply {
               addGiven("John")
@@ -122,7 +122,7 @@ class UploaderTest {
               Bundle().apply {
                 type = Bundle.BundleType.TRANSACTIONRESPONSE
                 addEntry(
-                  Bundle.BundleEntryComponent().apply { resource = patient },
+                  Bundle.BundleEntryComponent().apply { resource = patient1 },
                 )
                 addEntry(
                   Bundle.BundleEntryComponent().apply { resource = patient2 },
@@ -257,7 +257,7 @@ class UploaderTest {
   fun `url upload for per resource patch should output responses mapped correctly to the local changes`() =
     runTest {
       val updatedPatient1 =
-        patient.copy().apply {
+        patient1.copy().apply {
           addName(
             HumanName().apply {
               addGiven("John")
@@ -311,7 +311,7 @@ class UploaderTest {
   fun `url upload for per change patch should output responses mapped correctly to the local changes`() =
     runTest {
       val updatedPatient1 =
-        patient.copy().apply {
+        patient1.copy().apply {
           addName(
             HumanName().apply {
               addGiven("John")
@@ -446,6 +446,72 @@ class UploaderTest {
     assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
+  @Test
+  fun `bundle upload for per resource patch with bundleSize 1 should output responses mapped correctly to the local changes`() =
+    runTest {
+      val updatedPatient1 =
+        patient1.copy().apply {
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Nucleus"
+            },
+          )
+        }
+
+      val result =
+        Uploader(
+            BundleDataSource {
+              when (it.resource.entry[0].resource.logicalId) {
+                patient1Id ->
+                  Bundle().apply {
+                    type = Bundle.BundleType.TRANSACTIONRESPONSE
+                    addEntry(
+                      Bundle.BundleEntryComponent().apply { resource = patient1 },
+                    )
+                  }
+                patient2Id ->
+                  Bundle().apply {
+                    type = Bundle.BundleType.TRANSACTIONRESPONSE
+                    addEntry(
+                      Bundle.BundleEntryComponent().apply { resource = patient2 },
+                    )
+                  }
+                else -> throw IllegalArgumentException("Unknown patient ID")
+              }
+            },
+            perResourcePatchGenerator,
+            bundleUploadRequestGeneratorWithUnityBundleSize,
+          )
+          .upload(localChangesToTestSuccess)
+          .toList()
+
+      // With BundleUploadRequestGenerator and bundleSize=1, each patch is mapped to a bundle
+      // request. So we observe 2 results.
+      assertThat(result).hasSize(2)
+      assertThat(result.all { it is UploadRequestResult.Success }).isTrue()
+      with((result.first() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(2)
+          assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
+      }
+      with((result.last() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient2Id)
+        }
+      }
+    }
+
   companion object {
     private val perResourcePatchGenerator =
       PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource)
@@ -459,9 +525,14 @@ class UploaderTest {
         UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
       )
 
+    private val bundleUploadRequestGeneratorWithUnityBundleSize =
+      UploadRequestGeneratorFactory.byMode(
+        UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH, 1),
+      )
+
     const val patient1Id = "Patient-001"
     const val patient2Id = "Patient-002"
-    val patient =
+    val patient1 =
       Patient().apply {
         id = patient1Id
         addName(
@@ -484,7 +555,7 @@ class UploaderTest {
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
                 .newJsonParser()
-                .encodeResourceToString(patient),
+                .encodeResourceToString(patient1),
             timestamp = Instant.now(),
           )
           .toLocalChange()
@@ -500,7 +571,7 @@ class UploaderTest {
           payload =
             FhirContext.forCached(FhirVersionEnum.R4)
               .newJsonParser()
-              .encodeResourceToString(patient),
+              .encodeResourceToString(patient1),
           timestamp = Instant.now(),
           versionId = null,
           token = LocalChangeToken(listOf(1)),

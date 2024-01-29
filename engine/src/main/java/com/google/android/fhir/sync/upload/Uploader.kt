@@ -52,7 +52,10 @@ internal class Uploader(
   suspend fun upload(localChanges: List<LocalChange>) =
     localChanges
       .let { patchGenerator.generate(it) }
-      .let { requestGenerator.generateUploadRequests(it) }
+      .let {
+        val requests = requestGenerator.generateUploadRequests(it)
+        requests
+      }
       .asFlow()
       .transformWhile {
         with(handleUploadRequest(it)) {

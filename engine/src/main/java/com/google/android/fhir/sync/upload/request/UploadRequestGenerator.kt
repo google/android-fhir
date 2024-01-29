@@ -45,6 +45,7 @@ internal sealed class UploadRequestGeneratorMode {
   data class BundleRequest(
     val httpVerbToUseForCreate: Bundle.HTTPVerb,
     val httpVerbToUseForUpdate: Bundle.HTTPVerb,
+    val bundleSize: Int = 500,
   ) : UploadRequestGeneratorMode()
 }
 
@@ -59,6 +60,7 @@ internal object UploadRequestGeneratorFactory {
         TransactionBundleGenerator.getGenerator(
           mode.httpVerbToUseForCreate,
           mode.httpVerbToUseForUpdate,
+          mode.bundleSize,
         )
     }
 }

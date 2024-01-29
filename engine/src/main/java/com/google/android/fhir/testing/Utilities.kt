@@ -221,14 +221,14 @@ object TestFailingDatasource : DataSource {
   }
 }
 
-class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+class BundleDataSource(val onPostBundle: suspend (BundleUploadRequest) -> Resource) : DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest): Resource {
     TODO("Not yet implemented")
   }
 
   override suspend fun upload(request: UploadRequest) =
-    onPostBundle((request as BundleUploadRequest).resource)
+    onPostBundle((request as BundleUploadRequest))
 }
 
 class UrlRequestDataSource(val onUrlRequestSend: suspend (UrlUploadRequest) -> Resource) :
