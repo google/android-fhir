@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.patch.PatchGenerator
@@ -65,7 +64,7 @@ internal class Uploader(
   private fun handleUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
     response: Resource,
-  ): UploadRequestResult {
+  ): UploadRequestResult.Success {
     val responsesList =
       when {
         mappedUploadRequest is UrlUploadRequestMapping && response is DomainResource ->
@@ -105,44 +104,36 @@ internal class Uploader(
   private suspend fun handleUploadRequest(
     mappedUploadRequest: UploadRequestMapping,
   ): UploadRequestResult {
-    val mappedLocalChangeToken =
-      LocalChangeToken(
-        when (mappedUploadRequest) {
-          is BundleUploadRequestMapping ->
-            mappedUploadRequest.splitLocalChanges.flatMap { it.flatMap { it.token.ids } }
-          is UrlUploadRequestMapping -> mappedUploadRequest.localChanges.flatMap { it.token.ids }
-        },
-      )
     return try {
       val response = dataSource.upload(mappedUploadRequest.generatedRequest)
       when {
         response is OperationOutcome && response.issue.isNotEmpty() ->
           UploadRequestResult.Failure(
+            mappedUploadRequest.localChanges,
             ResourceSyncException(
               mappedUploadRequest.generatedRequest.resource.resourceType,
               FHIRException(response.issueFirstRep.diagnostics),
             ),
-            mappedLocalChangeToken,
           )
         (response is DomainResource || response is Bundle) &&
           (response !is IBaseOperationOutcome) ->
           handleUploadResponse(mappedUploadRequest, response)
         else ->
           UploadRequestResult.Failure(
+            mappedUploadRequest.localChanges,
             ResourceSyncException(
               mappedUploadRequest.generatedRequest.resource.resourceType,
               FHIRException(
                 "Unknown response for ${mappedUploadRequest.generatedRequest.resource.resourceType}",
               ),
             ),
-            mappedLocalChangeToken,
           )
       }
     } catch (e: Exception) {
       Timber.e(e)
       UploadRequestResult.Failure(
+        mappedUploadRequest.localChanges,
         ResourceSyncException(mappedUploadRequest.generatedRequest.resource.resourceType, e),
-        mappedLocalChangeToken,
       )
     }
   }
@@ -154,18 +145,9 @@ sealed class UploadRequestResult {
   ) : UploadRequestResult()
 
   data class Failure(
+    val localChanges: List<LocalChange>,
     val uploadError: ResourceSyncException,
-    val localChangeToken: LocalChangeToken,
   ) : UploadRequestResult()
-}
-
-sealed class UploadSyncResult {
-  data class Success(
-    val uploadResponses: List<SuccessfulUploadResponseMapping>,
-  ) : UploadSyncResult()
-
-  data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
-    UploadSyncResult()
 }
 
 sealed class SuccessfulUploadResponseMapping(

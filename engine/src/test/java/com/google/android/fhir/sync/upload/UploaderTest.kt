@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,7 @@ import com.google.common.truth.Truth.assertThat
 import java.net.ConnectException
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Bundle
@@ -51,46 +52,6 @@ class UploaderTest {
   @Test
   fun `bundle upload for per resource patch should output responses mapped correctly to the local changes`() =
     runTest {
-      val patient1Id = "Patient-001"
-      val patient2Id = "Patient-002"
-      val patient2 = Patient().apply { id = patient2Id }
-      val databaseLocalChanges =
-        listOf(
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(1)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient2Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient2),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(2)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.UPDATE,
-            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(3)),
-          ),
-        )
-
       val updatedPatient1 =
         patient.copy().apply {
           addName(
@@ -116,70 +77,35 @@ class UploaderTest {
             perResourcePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(databaseLocalChanges)
+          .upload(localChangesToTestSuccess)
+          .toList()
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(2)
-        assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
-      }
-
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient2Id)
+      // With BundleUploadRequestGenerator, all patches will be squashed into 1 request (default
+      // bundleSize = 500). So only 1 result will be observed.
+      assertThat(result).hasSize(1)
+      assertThat(result.first()).isInstanceOf(UploadRequestResult.Success::class.java)
+      with((result.first() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(2)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(2)
+          assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
+        with(this.last()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient2Id)
+        }
       }
     }
 
   @Test
   fun `bundle upload for per change patch should output responses mapped correctly to the local changes`() =
     runTest {
-      val patient1Id = "Patient-001"
-      val patient2Id = "Patient-002"
-      val patient2 = Patient().apply { id = patient2Id }
-      val databaseLocalChanges =
-        listOf(
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(1)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient2Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient2),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(2)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.UPDATE,
-            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(3)),
-          ),
-        )
-
       val updatedPatient1 =
         patient.copy().apply {
           addName(
@@ -189,6 +115,7 @@ class UploaderTest {
             },
           )
         }
+
       val result =
         Uploader(
             BundleDataSource {
@@ -208,32 +135,35 @@ class UploaderTest {
             perChangePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(databaseLocalChanges)
+          .upload(localChangesToTestSuccess)
+          .toList()
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
-      }
-
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient2Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient2Id)
-      }
-
-      with(result.uploadResponses[2]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
+      // With BundleUploadRequestGenerator, all patches will be squashed into 1 request (default
+      // bundleSize = 500). So only 1 result will be observed.
+      assertThat(result).hasSize(1)
+      assertThat(result.first()).isInstanceOf(UploadRequestResult.Success::class.java)
+      with((result.first() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(3)
+        with(this[0]) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
+        with(this[1]) {
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient2Id)
+        }
+        with(this[2]) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
       }
     }
 
@@ -245,9 +175,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -268,9 +200,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -281,9 +215,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -295,9 +231,11 @@ class UploaderTest {
             perResourcePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(localChanges)
+          .upload(localChangesToTestFail)
+          .toList()
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+      assertThat(result).hasSize(1)
+      assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
     }
 
   @Test
@@ -308,54 +246,16 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
   fun `url upload for per resource patch should output responses mapped correctly to the local changes`() =
     runTest {
-      val patient1Id = "Patient-001"
-      val patient2Id = "Patient-002"
-      val patient2 = Patient().apply { id = patient2Id }
-      val databaseLocalChanges =
-        listOf(
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(1)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient2Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient2),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(2)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.UPDATE,
-            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(3)),
-          ),
-        )
-
       val updatedPatient1 =
         patient.copy().apply {
           addName(
@@ -365,6 +265,7 @@ class UploaderTest {
             },
           )
         }
+
       val result =
         Uploader(
             UrlRequestDataSource {
@@ -377,70 +278,38 @@ class UploaderTest {
             perResourcePatchGenerator,
             urlUploadRequestGenerator,
           )
-          .upload(databaseLocalChanges)
+          .upload(localChangesToTestSuccess)
+          .toList()
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(2)
-        assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
+      // With UrlUploadRequestGenerator, patch-per-resource is mapped to one url request. So total
+      // of 2 results will be observed.
+      assertThat(result).hasSize(2)
+      assertThat(result.all { it is UploadRequestResult.Success }).isTrue()
+      with((result.first() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(2)
+          assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
       }
-
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient2Id)
+      with((result.last() as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient2Id)
+        }
       }
     }
 
   @Test
   fun `url upload for per change patch should output responses mapped correctly to the local changes`() =
     runTest {
-      val patient1Id = "Patient-001"
-      val patient2Id = "Patient-002"
-      val patient2 = Patient().apply { id = patient2Id }
-      val databaseLocalChanges =
-        listOf(
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(1)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient2Id,
-            type = LocalChange.Type.INSERT,
-            payload =
-              FhirContext.forCached(FhirVersionEnum.R4)
-                .newJsonParser()
-                .encodeResourceToString(patient2),
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(2)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.UPDATE,
-            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(3)),
-          ),
-        )
-
       val updatedPatient1 =
         patient.copy().apply {
           addName(
@@ -450,6 +319,7 @@ class UploaderTest {
             },
           )
         }
+
       val result =
         Uploader(
             UrlRequestDataSource {
@@ -468,32 +338,41 @@ class UploaderTest {
             perChangePatchGenerator,
             urlUploadRequestGenerator,
           )
-          .upload(databaseLocalChanges)
+          .upload(localChangesToTestSuccess)
+          .toList()
 
-      assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
-      with(result.uploadResponses[0]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
+      // With UrlUploadRequestGenerator, patch-per-resource is mapped to one url request. So total
+      // of 2 results will be observed.
+      assertThat(result).hasSize(3)
+      assertThat(result.all { it is UploadRequestResult.Success }).isTrue()
+      with((result[0] as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
       }
-
-      with(result.uploadResponses[1]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient2Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient2Id)
+      with((result[1] as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient2Id)
+        }
       }
-
-      with(result.uploadResponses[2]) {
-        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(1)
-        assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
-        assertThat(output).isInstanceOf(Patient::class.java)
-        assertThat((output as Patient).id).isEqualTo(patient1Id)
+      with((result[2] as UploadRequestResult.Success).successfulUploadResponseMappings) {
+        assertThat(this).hasSize(1)
+        with(this.first()) {
+          assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+          assertThat(localChanges).hasSize(1)
+          assertThat(localChanges[0].resourceId).isEqualTo(patient1Id)
+          assertThat(output).isInstanceOf(Patient::class.java)
+          assertThat((output as Patient).id).isEqualTo(patient1Id)
+        }
       }
     }
 
@@ -505,9 +384,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -528,9 +409,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -541,9 +424,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   @Test
@@ -554,9 +439,11 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChanges)
+        .upload(localChangesToTestFail)
+        .toList()
 
-    assertThat(result).isInstanceOf(UploadSyncResult.Failure::class.java)
+    assertThat(result).hasSize(1)
+    assertThat(result.first()).isInstanceOf(UploadRequestResult.Failure::class.java)
   }
 
   companion object {
@@ -571,9 +458,12 @@ class UploaderTest {
       UploadRequestGeneratorFactory.byMode(
         UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
       )
+
+    const val patient1Id = "Patient-001"
+    const val patient2Id = "Patient-002"
     val patient =
       Patient().apply {
-        id = "Patient-001"
+        id = patient1Id
         addName(
           HumanName().apply {
             addGiven("John")
@@ -581,13 +471,15 @@ class UploaderTest {
           },
         )
       }
-    val localChanges =
+
+    val patient2 = Patient().apply { id = patient2Id }
+    val localChangesToTestFail =
       listOf(
         LocalChangeEntity(
             id = 1,
             resourceType = ResourceType.Patient.name,
             resourceUuid = UUID.randomUUID(),
-            resourceId = "Patient-001",
+            resourceId = patient1Id,
             type = LocalChangeEntity.Type.INSERT,
             payload =
               FhirContext.forCached(FhirVersionEnum.R4)
@@ -597,6 +489,43 @@ class UploaderTest {
           )
           .toLocalChange()
           .apply { LocalChangeToken(listOf(1)) },
+      )
+
+    val localChangesToTestSuccess =
+      listOf(
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = patient1Id,
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(patient),
+          timestamp = Instant.now(),
+          versionId = null,
+          token = LocalChangeToken(listOf(1)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = patient2Id,
+          type = LocalChange.Type.INSERT,
+          payload =
+            FhirContext.forCached(FhirVersionEnum.R4)
+              .newJsonParser()
+              .encodeResourceToString(patient2),
+          timestamp = Instant.now(),
+          versionId = null,
+          token = LocalChangeToken(listOf(2)),
+        ),
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = patient1Id,
+          type = LocalChange.Type.UPDATE,
+          payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
+          timestamp = Instant.now(),
+          versionId = null,
+          token = LocalChangeToken(listOf(3)),
+        ),
       )
   }
 }

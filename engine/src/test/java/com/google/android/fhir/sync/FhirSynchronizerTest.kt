@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 package com.google.android.fhir.sync
 
 import androidx.test.core.app.ApplicationProvider
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
@@ -70,9 +69,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
-          ),
+          flowOf(UploadRequestResult.Success(listOf())),
         )
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -99,9 +96,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
-          ),
+          flowOf(UploadRequestResult.Success(listOf())),
         )
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -127,7 +122,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
       `when`(uploader.upload(any()))
-        .thenReturn(UploadSyncResult.Failure(error, LocalChangeToken(listOf())))
+        .thenReturn(flowOf(UploadRequestResult.Failure(listOf(), error)))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
       backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }

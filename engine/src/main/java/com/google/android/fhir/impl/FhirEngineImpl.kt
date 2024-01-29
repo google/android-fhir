@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,9 @@ import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -139,26 +141,29 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       ),
     )
 
-    var failed = false
-    while (!failed && localChangeFetcher.hasNext()) {
+    while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
-      upload(localChanges).collect {
-        resourceConsolidator.consolidate(it)
-        when (it) {
-          is UploadRequestResult.Success -> emit(localChangeFetcher.getProgress())
-          is UploadRequestResult.Failure -> {
-            failed = true
-            with(localChangeFetcher.getProgress()) {
-              emit(
-                SyncUploadProgress(
-                  remaining = remaining,
-                  initialTotal = initialTotal,
-                  uploadError = it.uploadError,
-                ),
-              )
+      val uploadRequestResult =
+        upload(localChanges)
+          .onEach { result ->
+            resourceConsolidator.consolidate(result)
+            if (result is UploadRequestResult.Success) {
+              emit(localChangeFetcher.getProgress())
             }
           }
+          .firstOrNull { it is UploadRequestResult.Failure }
+
+      if (uploadRequestResult is UploadRequestResult.Failure) {
+        with(localChangeFetcher.getProgress()) {
+          emit(
+            SyncUploadProgress(
+              remaining = remaining,
+              initialTotal = initialTotal,
+              uploadError = uploadRequestResult.uploadError,
+            ),
+          )
         }
+        break
       }
     }
   }
