@@ -26,6 +26,7 @@ import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 import retrofit2.Response
 import timber.log.Timber
@@ -36,12 +37,12 @@ class SHLinkDecoderImpl(
   private val apiService: RetrofitSHLService,
 ) : SHLinkDecoder {
 
-  private lateinit var shLinkScanData: SHLinkScanData
+  // private lateinit var shLinkScanData: SHLinkScanData
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
-    constructShlObj()
-    val bundle = postToServer(jsonData)
+    val shLinkScanData = constructShlObj()
+    val bundle = shLinkScanData?.let { postToServer(jsonData, it) }
     return if (bundle != null) {
       IPSDocument(bundle, ArrayList(), Patient()) // change this construction
     } else {
@@ -49,19 +50,23 @@ class SHLinkDecoderImpl(
     }
   }
 
-  private suspend fun postToServer(jsonData: String): Bundle? = coroutineScope {
-    try {
-      val response = apiService.getFilesFromManifest(shLinkScanData.manifestUrl, jsonData)
-      response.handleApiResponse()?.let { responseBody ->
-        return@coroutineScope decodeResponseBody(responseBody)
+  private suspend fun postToServer(jsonData: String, shLinkScanData: SHLinkScanData): Bundle? =
+    coroutineScope {
+      try {
+        val response = apiService.getFilesFromManifest(shLinkScanData.manifestUrl, jsonData)
+        response.handleApiResponse()?.let { responseBody ->
+          return@coroutineScope decodeResponseBody(responseBody, shLinkScanData)
+        }
+      } catch (err: Error) {
+        Timber.e("Error posting to the manifest: $err")
+        null
       }
-    } catch (err: Error) {
-      Timber.e("Error posting to the manifest: $err")
-      null
     }
-  }
 
-  private suspend fun decodeResponseBody(responseBody: String): Bundle {
+  private suspend fun decodeResponseBody(
+    responseBody: String,
+    shLinkScanData: SHLinkScanData,
+  ): Bundle {
     val jsonObject = JSONObject(responseBody)
     val embeddedArray =
       jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
@@ -84,10 +89,13 @@ class SHLinkDecoderImpl(
           }
           .toTypedArray()
       }
-    return decodeEmbeddedArray(embeddedArray)
+    return decodeEmbeddedArray(embeddedArray, shLinkScanData)
   }
 
-  private fun decodeEmbeddedArray(embeddedArray: Array<String>): Bundle {
+  private fun decodeEmbeddedArray(
+    embeddedArray: Array<String>,
+    shLinkScanData: SHLinkScanData,
+  ): Bundle {
     var healthData = ""
     for (elem in embeddedArray) {
       val decodedShc = shLinkScanData.key.let { readSHLinkUtils.decodeShc(elem, it) }
@@ -106,21 +114,29 @@ class SHLinkDecoderImpl(
     return parser.parseResource(healthData) as Bundle
   }
 
-  private fun constructShlObj() {
+  private fun constructShlObj(): SHLinkScanData? {
     shLinkScanDataInput?.fullLink?.let { fullLink ->
       val extractedJson = readSHLinkUtils.extractUrl(fullLink)
       val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
-      val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+      try {
+        if (decodedJson != null) {
+          print("Decoded JSON: $decodedJson")
+          val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
 
-      shLinkScanData =
-        SHLinkScanData(
-          shLinkScanDataInput.fullLink,
-          extractedJson,
-          jsonObject.optString("url", ""),
-          key = jsonObject.optString("key", ""),
-          flag = jsonObject.optString("flag", ""),
-        )
+          return SHLinkScanData(
+            shLinkScanDataInput.fullLink,
+            extractedJson,
+            jsonObject.optString("url", ""),
+            key = jsonObject.optString("key", ""),
+            flag = jsonObject.optString("flag", ""),
+          )
+        }
+      } catch (e: JSONException) {
+        Timber.e(e, "Error creating JSONObject from decodedJson: $decodedJson")
+        return null
+      }
     }
+    return null
   }
 }
 
