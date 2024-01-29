@@ -1,7 +1,21 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document.decode
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import com.nimbusds.jose.JWEDecrypter
 import com.nimbusds.jose.JWEObject
 import com.nimbusds.jose.crypto.DirectDecrypter
@@ -19,11 +33,9 @@ class ReadSHLinkUtils {
   }
 
   // Decodes the extracted url from Base64Url to a byte array
-  @RequiresApi(Build.VERSION_CODES.O)
   fun decodeUrl(extractedUrl: String): ByteArray {
     return Base64.getUrlDecoder().decode(extractedUrl.toByteArray())
   }
-
 
   // returns a string of the data in the verifiableCredential field in the returned JSON
   fun extractVerifiableCredential(jsonString: String): String {
@@ -41,7 +53,6 @@ class ReadSHLinkUtils {
 
   // Decodes and decompresses the payload in the JWE token
   // @RequiresApi(Build.VERSION_CODES.O)
-  @RequiresApi(Build.VERSION_CODES.O)
   fun decodeAndDecompressPayload(token: String): String {
     val tokenParts = token.split('.')
     val decoded = Base64.getUrlDecoder().decode(tokenParts[1])
@@ -64,13 +75,11 @@ class ReadSHLinkUtils {
     return decompressedBytes.toByteArray().decodeToString()
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
   fun decodeShc(responseBody: String, key: String): String {
     val jweObject = JWEObject.parse(responseBody)
     val decodedKey: ByteArray = Base64.getUrlDecoder().decode(key)
     val decrypter: JWEDecrypter = DirectDecrypter(decodedKey)
     jweObject.decrypt(decrypter)
-    println(jweObject.payload.toString().trim())
     return jweObject.payload.toString()
   }
 }

@@ -1,7 +1,21 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.document.decode
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.IPSDocument
@@ -13,6 +27,7 @@ import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Patient
 import org.json.JSONArray
 import org.json.JSONObject
+import retrofit2.Response
 import timber.log.Timber
 
 class SHLinkDecoderImpl(
@@ -24,7 +39,6 @@ class SHLinkDecoderImpl(
   private lateinit var shLinkScanData: SHLinkScanData
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
-  @RequiresApi(Build.VERSION_CODES.O)
   override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
     constructShlObj()
     val bundle = postToServer(jsonData)
@@ -35,40 +49,11 @@ class SHLinkDecoderImpl(
     }
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
   private suspend fun postToServer(jsonData: String): Bundle? = coroutineScope {
     try {
       val response = apiService.getFilesFromManifest(shLinkScanData.manifestUrl, jsonData)
-      return@coroutineScope if (response.isSuccessful) {
-        val responseBody = response.body()?.string()
-        if (!responseBody.isNullOrBlank()) {
-          val jsonObject = JSONObject(responseBody)
-          val embeddedArray = jsonObject.getJSONArray("files").let { jsonArray : JSONArray ->
-            (0 until jsonArray.length()).mapNotNull { i ->
-              val fileObject = jsonArray.getJSONObject(i)
-              if (fileObject.has("embedded")) {
-                fileObject.getString("embedded")
-              } else {
-                fileObject.getString("location").let {
-                  val responseFromLocation = apiService.getFromLocation(it)
-                  val responseBodyFromLocation = responseFromLocation.body()?.string()
-                  if (!responseBodyFromLocation.isNullOrBlank()) {
-                    responseBodyFromLocation
-                  } else {
-                    null
-                  }
-                }
-              }
-            }.toTypedArray()
-          }
-          decodeEmbeddedArray(embeddedArray)
-        } else {
-          Timber.e("Empty response body")
-          null
-        }
-      } else {
-        Timber.e("HTTP Error: ${response.code()}")
-        null
+      response.handleApiResponse()?.let { responseBody ->
+        return@coroutineScope decodeResponseBody(responseBody)
       }
     } catch (err: Error) {
       Timber.e("Error posting to the manifest: $err")
@@ -76,7 +61,32 @@ class SHLinkDecoderImpl(
     }
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
+  private suspend fun decodeResponseBody(responseBody: String): Bundle {
+    val jsonObject = JSONObject(responseBody)
+    val embeddedArray =
+      jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
+        (0 until jsonArray.length())
+          .mapNotNull { i ->
+            val fileObject = jsonArray.getJSONObject(i)
+            if (fileObject.has("embedded")) {
+              fileObject.getString("embedded")
+            } else {
+              fileObject.getString("location").let {
+                val responseFromLocation = apiService.getFromLocation(it)
+                val responseBodyFromLocation = responseFromLocation.body()?.string()
+                if (!responseBodyFromLocation.isNullOrBlank()) {
+                  responseBodyFromLocation
+                } else {
+                  null
+                }
+              }
+            }
+          }
+          .toTypedArray()
+      }
+    return decodeEmbeddedArray(embeddedArray)
+  }
+
   private fun decodeEmbeddedArray(embeddedArray: Array<String>): Bundle {
     var healthData = ""
     for (elem in embeddedArray) {
@@ -96,20 +106,31 @@ class SHLinkDecoderImpl(
     return parser.parseResource(healthData) as Bundle
   }
 
-  @RequiresApi(Build.VERSION_CODES.O)
   private fun constructShlObj() {
     shLinkScanDataInput?.fullLink?.let { fullLink ->
       val extractedJson = readSHLinkUtils.extractUrl(fullLink)
       val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
       val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
 
-      shLinkScanData = SHLinkScanData(
-        shLinkScanDataInput.fullLink,
-        extractedJson,
-        jsonObject.optString("url", ""),
-        key = jsonObject.optString("key", ""),
-        flag = jsonObject.optString("flag", "")
-      )
+      shLinkScanData =
+        SHLinkScanData(
+          shLinkScanDataInput.fullLink,
+          extractedJson,
+          jsonObject.optString("url", ""),
+          key = jsonObject.optString("key", ""),
+          flag = jsonObject.optString("flag", ""),
+        )
+    }
+  }
+}
+
+private fun <T> Response<T>.handleApiResponse(): String? {
+  return this.let {
+    if (it.isSuccessful) {
+      it.toString()
+    } else {
+      Timber.e("HTTP Error: ${it.code()}")
+      null
     }
   }
 }
