@@ -102,7 +102,7 @@
         android:clickable="true"
         android:focusable="true"
         android:layout_marginTop="@dimen/serach_patient_cardview_margin_top"
-        android:layout_marginVertical="@dimen/serach_patient_cardview_vertical_margin"
+        android:layout_marginVertical="@dimen/search_patient_cardview_vertical_margin"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="@dimen/cardView_radius_corner"
     >
