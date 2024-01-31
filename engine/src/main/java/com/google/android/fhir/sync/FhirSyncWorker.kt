@@ -37,8 +37,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 /** A WorkManager Worker that handles periodic sync. */
@@ -62,76 +60,74 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
-    mutex.withLock {
-      val dataSource =
-        getDataSource()
-          ?: return Result.failure(
-            buildWorkData(
-              IllegalStateException(
-                "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
-              ),
-            ),
-          )
-
-      val synchronizer =
-        FhirSynchronizer(
-          getFhirEngine(),
-          UploadConfiguration(
-            Uploader(
-              dataSource = dataSource,
-              patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
-              requestGenerator =
-                UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+    val dataSource =
+      getDataSource()
+        ?: return Result.failure(
+          buildWorkData(
+            IllegalStateException(
+              "FhirEngineConfiguration.ServerConfiguration is not set. Call FhirEngineProvider.init to initialize with appropriate configuration.",
             ),
           ),
-          DownloadConfiguration(
-            DownloaderImpl(dataSource, getDownloadWorkManager()),
-            getConflictResolver(),
-          ),
-          FhirEngineProvider.getFhirDataStore(applicationContext),
         )
 
-      val job =
-        CoroutineScope(Dispatchers.IO).launch {
-          val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
-          synchronizer.syncState.collect { syncJobStatus ->
-            val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
-            when (syncJobStatus) {
-              is SyncJobStatus.Succeeded,
-              is SyncJobStatus.Failed, -> {
-                // While creating periodicSync request if
-                // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
-                // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
-                if (uniqueWorkerName != null) {
-                  fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, syncJobStatus)
-                }
-                cancel()
+    val synchronizer =
+      FhirSynchronizer(
+        getFhirEngine(),
+        UploadConfiguration(
+          Uploader(
+            dataSource = dataSource,
+            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+            requestGenerator =
+              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+          ),
+        ),
+        DownloadConfiguration(
+          DownloaderImpl(dataSource, getDownloadWorkManager()),
+          getConflictResolver(),
+        ),
+        FhirEngineProvider.getFhirDataStore(applicationContext),
+      )
+
+    val job =
+      CoroutineScope(Dispatchers.IO).launch {
+        val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
+        synchronizer.syncState.collect { syncJobStatus ->
+          val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
+          when (syncJobStatus) {
+            is SyncJobStatus.Succeeded,
+            is SyncJobStatus.Failed, -> {
+              // While creating periodicSync request if
+              // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
+              // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
+              if (uniqueWorkerName != null) {
+                fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, syncJobStatus)
               }
-              else -> {
-                setProgress(buildWorkData(syncJobStatus))
-              }
+              cancel()
+            }
+            else -> {
+              setProgress(buildWorkData(syncJobStatus))
             }
           }
         }
+      }
 
-      val result = synchronizer.synchronize()
-      val output = buildWorkData(result)
+    val result = synchronizer.synchronize()
+    val output = buildWorkData(result)
 
-      // await/join is needed to collect states completely
-      kotlin.runCatching { job.join() }.onFailure(Timber::w)
+    // await/join is needed to collect states completely
+    kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-      Timber.d("Received result from worker $result and sending output $output")
+    Timber.d("Received result from worker $result and sending output $output")
 
-      /**
-       * In case of failure, we can check if its worth retrying and do retry based on
-       * [RetryConfiguration.maxRetries] set by user.
-       */
-      val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-      return when (result) {
-        is SyncJobStatus.Succeeded -> Result.success(output)
-        else -> {
-          if (retries > runAttemptCount) Result.retry() else Result.failure(output)
-        }
+    /**
+     * In case of failure, we can check if its worth retrying and do retry based on
+     * [RetryConfiguration.maxRetries] set by user.
+     */
+    val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
+    return when (result) {
+      is SyncJobStatus.Succeeded -> Result.success(output)
+      else -> {
+        if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }
     }
   }
@@ -160,9 +156,5 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     override fun shouldSkipField(field: FieldAttributes) = field.name.equals("exceptions")
 
     override fun shouldSkipClass(clazz: Class<*>?) = false
-  }
-
-  companion object {
-    private val mutex = Mutex()
   }
 }

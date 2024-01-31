@@ -23,6 +23,7 @@ import com.google.android.fhir.sync.upload.UploadSyncResult
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
+import java.lang.IllegalStateException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
@@ -55,6 +56,7 @@ class FhirSynchronizerTest {
 
   @Before
   fun setUp() {
+    FhirSynchronizer.setMutexOwner(Object())
     MockitoAnnotations.openMocks(this)
     fhirSynchronizer =
       FhirSynchronizer(
@@ -141,5 +143,34 @@ class FhirSynchronizerTest {
       assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
+    }
+
+  @Test
+  fun `re-synchronize should emit IllegalStateException on trying to acquire mutex lock`() =
+    runTest(UnconfinedTestDispatcher()) {
+      `when`(downloader.download())
+        .thenReturn(
+          flowOf(DownloadState.Success(listOf(), 0, 0)),
+        )
+      `when`(uploader.upload(any()))
+        .thenReturn(
+          UploadSyncResult.Success(
+            listOf(),
+          ),
+        )
+
+      backgroundScope.launch {
+        fhirSynchronizer.syncState.collect {
+          if (it is SyncJobStatus.Started) {
+            try {
+              fhirSynchronizer.synchronize()
+            } catch (e: Exception) {
+              assertThat(e).isInstanceOf(IllegalStateException::class.java)
+            }
+          }
+        }
+      }
+
+      val result = fhirSynchronizer.synchronize()
     }
 }
