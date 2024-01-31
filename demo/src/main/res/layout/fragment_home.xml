@@ -97,7 +97,7 @@
         android:id="@+id/item_search"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/serach_patient_cardview_horizontal_margin"
+        android:layout_marginHorizontal="@dimen/search_patient_cardview_horizontal_margin"
         android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true"
