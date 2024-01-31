@@ -149,8 +149,10 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 0, 0)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
+          flowOf(
+            UploadRequestResult.Success(
+              listOf(),
+            ),
           ),
         )
       val fhirSynchronizerWithDelayInDownload =
