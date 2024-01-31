@@ -29,12 +29,22 @@ class ReadSHLinkUtils {
 
   // Extracts the part of the link after the 'shlink:/'
   fun extractUrl(scannedData: String): String {
-    return scannedData.substringAfterLast("shlink:/")
+    if (scannedData.contains("shlink:/")) {
+      return scannedData.substringAfterLast("shlink:/")
+    }
+    throw IllegalArgumentException("Not a valid SHLink")
   }
 
   // Decodes the extracted url from Base64Url to a byte array
   fun decodeUrl(extractedUrl: String): ByteArray {
-    return Base64.getUrlDecoder().decode(extractedUrl.toByteArray())
+    if (extractedUrl.isEmpty()) {
+      throw IllegalArgumentException("Not a valid Base64 encoded string")
+    }
+    try {
+      return Base64.getUrlDecoder().decode(extractedUrl.toByteArray())
+    } catch (err: IllegalArgumentException) {
+      throw IllegalArgumentException("Not a valid Base64 encoded string")
+    }
   }
 
   // returns a string of the data in the verifiableCredential field in the returned JSON
@@ -51,35 +61,51 @@ class ReadSHLinkUtils {
     return ""
   }
 
-  // Decodes and decompresses the payload in the JWE token
+  // Decodes and decompresses the payload in a JWT token
   // @RequiresApi(Build.VERSION_CODES.O)
   fun decodeAndDecompressPayload(token: String): String {
-    val tokenParts = token.split('.')
-    val decoded = Base64.getUrlDecoder().decode(tokenParts[1])
-    val inflater = Inflater(true)
-    inflater.setInput(decoded)
-    val initialBufferSize = 100000
-    val decompressedBytes = ByteArrayOutputStream(initialBufferSize)
-    val buffer = ByteArray(8192)
-
     try {
-      while (!inflater.finished()) {
-        val length = inflater.inflate(buffer)
-        decompressedBytes.write(buffer, 0, length)
+      val tokenParts = token.split('.')
+      if (tokenParts.size < 2) {
+        throw Error("Invalid JWT token passed in")
       }
-      decompressedBytes.close()
-    } catch (e: DataFormatException) {
-      e.printStackTrace()
+      val decoded = Base64.getUrlDecoder().decode(tokenParts[1])
+      val inflater = Inflater(true)
+      inflater.setInput(decoded)
+      val initialBufferSize = 100000
+      val decompressedBytes = ByteArrayOutputStream(initialBufferSize)
+      val buffer = ByteArray(8192)
+
+      try {
+        while (!inflater.finished()) {
+          val length = inflater.inflate(buffer)
+          decompressedBytes.write(buffer, 0, length)
+        }
+        decompressedBytes.close()
+      } catch (e: DataFormatException) {
+        throw Error("$e.printStackTrace()")
+      }
+      inflater.end()
+      return decompressedBytes.toByteArray().decodeToString()
     }
-    inflater.end()
-    return decompressedBytes.toByteArray().decodeToString()
+    catch (err: Error) {
+      throw Error("Invalid JWT token passed in: $err")
+    }
   }
 
   fun decodeShc(responseBody: String, key: String): String {
-    val jweObject = JWEObject.parse(responseBody)
-    val decodedKey: ByteArray = Base64.getUrlDecoder().decode(key)
-    val decrypter: JWEDecrypter = DirectDecrypter(decodedKey)
-    jweObject.decrypt(decrypter)
-    return jweObject.payload.toString()
+    try {
+      if (responseBody.isEmpty() or key.isEmpty()) {
+        throw IllegalArgumentException("The provided strings should not be empty")
+      }
+      val jweObject = JWEObject.parse(responseBody)
+      val decodedKey: ByteArray = Base64.getUrlDecoder().decode(key)
+      val decrypter: JWEDecrypter = DirectDecrypter(decodedKey)
+      jweObject.decrypt(decrypter)
+      return jweObject.payload.toString()
+    }
+    catch (err: Exception) {
+      throw Exception("JWE decryption failed: $err")
+    }
   }
 }

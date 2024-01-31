@@ -18,6 +18,7 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.document.decode.ReadSHLinkUtils
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -28,10 +29,26 @@ class ReadSHLinkUtilsTest {
   private val readSHLinkUtils = ReadSHLinkUtils()
 
   @Test
-  fun testExtractUrl() {
+  fun testExtractUrlWithValidSHL() {
     val scannedData = "shlink:/example-url"
     val result = readSHLinkUtils.extractUrl(scannedData)
     assertEquals("example-url", result)
+  }
+
+  @Test
+  fun testExtractUrlWithInvalidSHL() {
+    val scannedData = "invalidSHL"
+    assertThrows(IllegalArgumentException::class.java) {
+      readSHLinkUtils.extractUrl(scannedData)
+    }
+  }
+
+  @Test
+  fun testExtractUrlWithEmptySHL() {
+    val scannedData = ""
+    assertThrows(IllegalArgumentException::class.java) {
+      readSHLinkUtils.extractUrl(scannedData)
+    }
   }
 
   @Test
@@ -39,6 +56,22 @@ class ReadSHLinkUtilsTest {
     val extractedUrl = "aGVsbG8="
     val result = readSHLinkUtils.decodeUrl(extractedUrl)
     assertTrue(result.contentEquals("hello".toByteArray()))
+  }
+
+  @Test
+  fun testDecodeUrlWithInvalidBase64() {
+    val extractedUrl = "aGsbG8="
+    assertThrows(IllegalArgumentException::class.java) {
+      readSHLinkUtils.decodeUrl(extractedUrl)
+    }
+  }
+
+  @Test
+  fun testDecodeUrlWithEmptyInput() {
+    val extractedUrl = ""
+    assertThrows(IllegalArgumentException::class.java) {
+      readSHLinkUtils.decodeUrl(extractedUrl)
+    }
   }
 
   @Test
@@ -51,6 +84,34 @@ class ReadSHLinkUtilsTest {
       "{\"iss\":\"DinoChiesa.github.io\",\"sub\":\"idris\",\"aud\":\"kina\",\"iat\":1691158997,\"exp\":1691159597,\"aaa\":true}",
       result.trim(),
     )
+  }
+
+  @Test
+  fun testDecodeShcWithEmptyResponse() {
+    val responseBody = ""
+    val key = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDg"
+    assertThrows(Exception::class.java) {
+      readSHLinkUtils.decodeShc(responseBody, key)
+    }
+  }
+
+  @Test
+  fun testDecodeShcWithEmptyKey() {
+    val responseBody = "eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..OgGwTWbECJk9tQc4.PUxr0STCtKQ6DmdPqPtJtTowTBxdprFykeZ2WUOUw234_TtdGWLJ0hzfuWjZXDyBpa55TXwvSwobpcbut9Cdl2nATA0_j1nW0-A32uAwH0qEE1ELV5G0IQVT5AqKJRTCMGpy0mWH.qATmrk-UdwCOaT1TY6GEJg"
+    val key = ""
+    assertThrows(Exception::class.java) {
+      readSHLinkUtils.decodeShc(responseBody, key)
+    }
+  }
+
+  @Test
+  fun testDecodeShcWithInvalidKey() {
+    val responseBody =
+      "eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..OgGwTWbECJk9tQc4.PUxr0STCtKQ6DmdPqPtJtTowTBxdprFykeZ2WUOUw234_TtdGWLJ0hzfuWjZXDyBpa55TXwvSwobpcbut9Cdl2nATA0_j1nW0-A32uAwH0qEE1ELV5G0IQVT5AqKJRTCMGpy0mWH.qATmrk-UdwCOaT1TY6GEJg"
+    val key = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDb"
+    assertThrows(Exception::class.java) {
+      readSHLinkUtils.decodeShc(responseBody, key)
+    }
   }
 
   @Test
@@ -67,4 +128,33 @@ class ReadSHLinkUtilsTest {
       readSHLinkUtils.extractVerifiableCredential(jsonStringWithoutCredential)
     assertEquals("", resultWithoutCredential)
   }
+
+  @Test
+  fun jwtsCanBeDecodedAndDecompressedIntoData() {
+    val jwt =
+      "eyJ6aXAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pZJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
+    val expectedData =
+      "{\"iss\":\"https://spec.smarthealth.cards/examples/issuer\",\"nbf\":1649020324.265,\"vc\":{\"type\":[\"https://smarthealth.cards#health-card\",\"https://smarthealth.cards#health-card\",\"https://smarthealth.cards#immunization\"],\"credentialSubject\":{\"fhirVersion\":\"4.0.1\",\"fhirBundle\":{\"resourceType\":\"Bundle\",\"type\":\"collection\",\"entry\":[{\"fullUrl\":\"resource:0\",\"resource\":{\"resourceType\":\"Patient\",\"name\":[{\"family\":\"Brown\",\"given\":[\"Oliver\"]}],\"birthDate\":\"2017-01-04\"}},{\"fullUrl\":\"resource:1\",\"resource\":{\"resourceType\":\"Immunization\",\"status\":\"completed\",\"vaccineCode\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/sid/cvx\",\"code\":\"08\"}]},\"patient\":{\"reference\":\"resource:0\"},\"occurrenceDateTime\":\"2017-01-04\",\"performer\":[{\"actor\":{\"display\":\"Meriter Hospital\"}}]}}]}}}}\n"
+    val decoded = readSHLinkUtils.decodeAndDecompressPayload(jwt)
+    assertEquals(decoded.trim(), expectedData.trim())
+  }
+
+  @Test
+  fun emptyJWTShouldThrowAnErrorWhenAttemptingToDecode() {
+    val jwt = ""
+    assertThrows(Error::class.java) {
+      readSHLinkUtils.decodeAndDecompressPayload(jwt)
+    }
+  }
+
+  @Test
+  fun invalidJWTShouldThrowAnErrorWhenAttemptingToDecode() {
+    val jwt =
+      "XAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pHJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
+    assertThrows(Error::class.java) {
+      readSHLinkUtils.decodeAndDecompressPayload(jwt)
+    }
+  }
+
+
 }

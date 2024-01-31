@@ -42,7 +42,10 @@ class SHLinkDecoderImpl(
 
   override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
     val shLinkScanData = constructShlObj()
+    println("EHUFHEHFEHK")
+    println(shLinkScanData)
     val bundle = shLinkScanData?.let { postToServer(jsonData, it) }
+    println(bundle)
     return if (bundle != null) {
       IPSDocument(bundle, ArrayList(), Patient()) // change this construction
     } else {
@@ -117,6 +120,8 @@ class SHLinkDecoderImpl(
   private fun constructShlObj(): SHLinkScanData? {
     shLinkScanDataInput?.fullLink?.let { fullLink ->
       val extractedJson = readSHLinkUtils.extractUrl(fullLink)
+      println(fullLink)
+      println(readSHLinkUtils.extractUrl(fullLink))
       val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
       try {
         if (decodedJson != null) {
