@@ -30,7 +30,7 @@
     <dimen name="cardView_radius_corner">10dp</dimen>
     <dimen name="new_patient_padding">30dp</dimen>
     <dimen name="new_patient_horizontal_margin">20dp</dimen>
-    <dimen name="serach_patient_cardview_horizontal_margin">8dp</dimen>
+    <dimen name="search_patient_cardview_horizontal_margin">8dp</dimen>
     <dimen name="search_patient_cardview_vertical_margin">6dp</dimen>
     <dimen name="search_patient_cardview_margin_top">10dp</dimen>
     <dimen name="dashboard_text_fontSize">20sp</dimen>
