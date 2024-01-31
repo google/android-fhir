@@ -54,9 +54,11 @@ class FhirSynchronizerTest {
 
   private lateinit var fhirSynchronizer: FhirSynchronizer
 
+  private val mutexOwner = Object()
+
   @Before
   fun setUp() {
-    FhirSynchronizer.setMutexOwner(Object())
+    FhirSynchronizer.setMutexOwner(mutexOwner)
     MockitoAnnotations.openMocks(this)
     fhirSynchronizer =
       FhirSynchronizer(
@@ -166,6 +168,9 @@ class FhirSynchronizerTest {
               fhirSynchronizer.synchronize()
             } catch (e: Exception) {
               assertThat(e).isInstanceOf(IllegalStateException::class.java)
+              assertThat(e.localizedMessage).isNotNull()
+              assertThat(e.localizedMessage)
+                .isEqualTo("This mutex is already locked by the specified owner: $mutexOwner")
             }
           }
         }
