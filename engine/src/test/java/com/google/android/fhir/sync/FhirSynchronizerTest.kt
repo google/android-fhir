@@ -144,6 +144,10 @@ class FhirSynchronizerTest {
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
     }
 
+  /**
+   * If you encounter flakiness in this test, consider increasing the delay time in the downloader
+   * object.
+   */
   @Test
   fun `synchronize multiple invocations should execute in order`() =
     runTest(UnconfinedTestDispatcher()) {
