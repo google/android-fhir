@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,30 +35,30 @@ import org.hl7.fhir.r4.model.ResourceType
 internal fun interface ResourceConsolidator {
 
   /** Consolidates the local change token with the provided response from the FHIR server. */
-  suspend fun consolidate(uploadSyncResult: UploadSyncResult)
+  suspend fun consolidate(uploadRequestResult: UploadRequestResult)
 }
 
 /** Default implementation of [ResourceConsolidator] that uses the database to aid consolidation. */
 internal class DefaultResourceConsolidator(private val database: Database) : ResourceConsolidator {
 
-  override suspend fun consolidate(uploadSyncResult: UploadSyncResult) =
-    when (uploadSyncResult) {
-      is UploadSyncResult.Success -> {
+  override suspend fun consolidate(uploadRequestResult: UploadRequestResult) =
+    when (uploadRequestResult) {
+      is UploadRequestResult.Success -> {
         database.deleteUpdates(
           LocalChangeToken(
-            uploadSyncResult.uploadResponses.flatMap {
+            uploadRequestResult.successfulUploadResponseMappings.flatMap {
               it.localChanges.flatMap { localChange -> localChange.token.ids }
             },
           ),
         )
-        uploadSyncResult.uploadResponses.forEach {
+        uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
             is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
             is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
           }
         }
       }
-      is UploadSyncResult.Failure -> {
+      is UploadRequestResult.Failure -> {
         /* For now, do nothing (we do not delete the local changes from the database as they were
         not uploaded successfully. In the future, add consolidation required if upload fails.
          */
