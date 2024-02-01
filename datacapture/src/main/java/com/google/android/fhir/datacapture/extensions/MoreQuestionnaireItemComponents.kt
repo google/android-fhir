@@ -183,7 +183,7 @@ val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
       ?.let { it.value as Expression }
   }
 
-val Questionnaire.QuestionnaireItemComponent.uiControlControlCode: String?
+val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
   get() {
     val codeableConcept =
       this.extension
@@ -207,7 +207,7 @@ val Questionnaire.QuestionnaireItemComponent.uiControlControlCode: String?
  * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
  */
 val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
-  get() = ItemControlTypes.values().firstOrNull { it.extensionCode == uiControlControlCode }
+  get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
 
 /**
  * The desired orientation for the list of choices.

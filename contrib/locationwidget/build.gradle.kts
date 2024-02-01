@@ -71,4 +71,5 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.fragmentTesting)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
+  androidTestImplementation(Dependencies.truth)
 }

@@ -17,8 +17,8 @@
 package com.google.android.fhir.datacapture.contrib.views.locationwidget
 
 import android.view.View
+import com.google.android.fhir.datacapture.extensions.itemControlCode
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.extensions.uiControlControlCode
 import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
@@ -56,7 +56,7 @@ object LocationWidgetViewHolderFactory :
     }
 
   fun matcher(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Boolean {
-    return questionnaireItem.uiControlControlCode == LOCATION_WIDGET_UI_CONTROL_CODE
+    return questionnaireItem.itemControlCode == LOCATION_WIDGET_UI_CONTROL_CODE
   }
 
   private const val LOCATION_WIDGET_UI_CONTROL_CODE = "location-widget"

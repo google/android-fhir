@@ -32,7 +32,6 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-// TODO: Remove dialog and replace with a progressbar indicator in UI
 class CurrentLocationDialogFragment : DialogFragment(R.layout.fragment_current_location) {
   private val locationServicesClient by lazy {
     LocationServices.getFusedLocationProviderClient(requireContext())
