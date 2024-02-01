@@ -561,7 +561,7 @@ private fun ByteArray.decodeToBitmap(): Bitmap? {
  *
  * See http://hl7.org/fhir/R4/extension-questionnaire-unit.html.
  */
-val Questionnaire.QuestionnaireItemComponent.unit: Coding?
+internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
   get() {
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null

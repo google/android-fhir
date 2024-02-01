@@ -17,12 +17,10 @@
 package com.google.android.fhir.datacapture.contrib.views.locationwidget
 
 import android.view.View
-import android.widget.TextView
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
-import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -46,13 +44,11 @@ object LocationGpsCoordinateViewHolderFactory :
       private lateinit var header: HeaderView
       protected lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
-      private var unitTextView: TextView? = null
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
-        unitTextView = itemView.findViewById(R.id.unit_text_view)
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -126,11 +122,6 @@ object LocationGpsCoordinateViewHolderFactory :
             autoCompleteTextView.text.toString().toDoubleOrNull()
         ) {
           autoCompleteTextView.setText(questionnaireItemViewItemDecimalAnswer)
-        }
-
-        unitTextView?.apply {
-          text = questionnaireViewItem.questionnaireItem.unit?.code
-          visibility = if (text.isNullOrEmpty()) View.GONE else View.VISIBLE
         }
       }
 
