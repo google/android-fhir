@@ -395,6 +395,17 @@ class QuestionnaireFragment : Fragment() {
     /**
      * A [Boolean] extra to include [QuestionnaireItemComponent] containing timestamps for
      * Questionnaire launch and submission time.
+     *
+     * A sample timestamp item will look like
+     * {
+     *   "linkId": "launch-time-stamp",
+     *   "answer": [
+     *     {
+     *       "valueDateTime": "2024-02-01T12:00:00.000+05:00"
+     *     }
+     *   ]
+     * }
+     *
      */
     fun includeTimestampQuestionnaireItems(value: Boolean) = apply { args.add(EXTRA_INCLUDE_TIMESTAMP_ITEMS to value) }
 

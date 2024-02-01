@@ -127,11 +127,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
       }
     // Add timestamp questionnaire items
-    getTimestampItem("launch-timestamp")?.let {
-        questionnaire.addItem(it)
-    }
-    getTimestampItem("submission-timestamp")?.let {
-        questionnaire.addItem(it)
+    if (shouldAddTimestampItems) {
+      questionnaire.addItem(getTimestampItem(LAUNCH_TIMESTAMP_LINK_ID))
+      questionnaire.addItem(getTimestampItem(SUBMISSION_TIMESTAMP_LINK_ID))
     }
   }
 
@@ -174,7 +172,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    addTimeStampValue(questionnaireResponse.item, "launch-timestamp")
+    if (shouldAddTimestampItems)
+      addTimeStampValue(questionnaireResponse.item, LAUNCH_TIMESTAMP_LINK_ID)
     questionnaireResponse.packRepeatedGroups()
   }
 
@@ -439,22 +438,21 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
           .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
-      addTimeStampValue(item, "submission-timestamp")
+      if (shouldAddTimestampItems)
+        addTimeStampValue(item, SUBMISSION_TIMESTAMP_LINK_ID)
     }
   }
 
     private fun addTimeStampValue(items: List<QuestionnaireResponseItemComponent>, itemLinkId : String) {
-        if (shouldAddTimestampItems) {
-            items.forEach { item ->
-                if (item.linkId == itemLinkId) {
-                    item.answer = arrayListOf<QuestionnaireResponseItemAnswerComponent?>().apply {
-                        add(QuestionnaireResponseItemAnswerComponent().apply {
-                            value = DateTimeType(Date().toTimeZoneString())
-                        })
-                    }
-                }
-            }
-        }
+          items.forEach { item ->
+              if (item.linkId == itemLinkId) {
+                  item.answer = arrayListOf<QuestionnaireResponseItemAnswerComponent?>().apply {
+                      add(QuestionnaireResponseItemAnswerComponent().apply {
+                          value = DateTimeType(Date().toTimeZoneString())
+                      })
+                  }
+              }
+          }
     }
 
     private fun Date.toTimeZoneString(): String {
@@ -464,14 +462,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         return simpleDateFormat.format(this.toInstant())
     }
 
-    private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent? = if (shouldAddTimestampItems)
+    private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent =
         QuestionnaireItemComponent().apply {
             linkId = linkIdVal
             readOnly = true
             type = Questionnaire.QuestionnaireItemType.DATETIME
             extension.add(Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-hidden", BooleanType(true)))
-        } else
-          null
+        }
+
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
@@ -971,6 +969,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     ) {
       block()
     }
+  }
+
+  companion object {
+    /**
+     *  [QuestionnaireItemComponent] Link ID for launch time stamp
+     */
+    internal const val LAUNCH_TIMESTAMP_LINK_ID = "launch-timestamp"
+    /**
+     *  [QuestionnaireItemComponent] Link ID for submission time stamp
+     */
+    internal const val SUBMISSION_TIMESTAMP_LINK_ID = "submission-timestamp"
   }
 }
 
