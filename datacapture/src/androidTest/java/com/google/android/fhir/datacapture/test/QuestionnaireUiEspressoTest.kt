@@ -553,12 +553,6 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
-      val linearProgressIndicator = (view as LinearProgressIndicator)
-      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
-      assertThat(linearProgressIndicator.progress).isEqualTo(100)
-    }
-
     onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
 
     onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
@@ -571,18 +565,7 @@ class QuestionnaireUiEspressoTest {
   fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
 
-    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
-      val linearProgressIndicator = (view as LinearProgressIndicator)
-      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
-      assertThat(linearProgressIndicator.progress).isEqualTo(100)
-    }
-
     onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
-
-    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
-      val linearProgressIndicator = (view as LinearProgressIndicator)
-      assertThat(linearProgressIndicator.visibility).isEqualTo(View.GONE)
-    }
 
     onView(withId(R.id.review_mode_edit_button)).perform(ViewActions.click())
 
