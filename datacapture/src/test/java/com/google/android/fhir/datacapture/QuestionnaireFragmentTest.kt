@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertEquals
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
@@ -137,6 +138,37 @@ class QuestionnaireFragmentTest {
       .isEqualTo(View.VISIBLE)
     assertThat(view.findViewById<Button>(R.id.submit_questionnaire).visibility)
       .isEqualTo(View.VISIBLE)
+  }
+
+  @Test
+  fun `questionnaire submit button text should be editable`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val customButtonText = "Apply"
+    val scenario =
+      launchFragmentInContainer<QuestionnaireFragment>(
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(questionnaireJson)
+          .setSubmitButtonText(customButtonText)
+          .buildArgs(),
+      )
+
+    scenario.moveToState(Lifecycle.State.RESUMED)
+
+    val button =
+      scenario.withFragment { this.requireView().findViewById<Button>(R.id.submit_questionnaire) }
+
+    val buttonText = button.text.toString()
+    assertEquals(buttonText, customButtonText)
   }
 
   @Test

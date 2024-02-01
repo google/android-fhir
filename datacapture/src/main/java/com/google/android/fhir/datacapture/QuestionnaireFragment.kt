@@ -103,21 +103,28 @@ class QuestionnaireFragment : Fragment() {
         .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
     }
 
-    view.findViewById<Button>(R.id.submit_questionnaire).setOnClickListener {
-      viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
-        if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
-          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
-        } else {
-          val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
-          errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
-          QuestionnaireValidationErrorMessageDialogFragment()
-            .show(
-              requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG,
-            )
+    view
+      .findViewById<Button>(R.id.submit_questionnaire)
+      .apply {
+        text =
+          requireArguments()
+            .getString(EXTRA_SUBMIT_BUTTON_TEXT, getString(R.string.submit_questionnaire))
+      }
+      .setOnClickListener {
+        viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
+          if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
+            setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+          } else {
+            val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+            errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+            QuestionnaireValidationErrorMessageDialogFragment()
+              .show(
+                requireActivity().supportFragmentManager,
+                QuestionnaireValidationErrorMessageDialogFragment.TAG,
+              )
+          }
         }
       }
-    }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =
@@ -425,6 +432,9 @@ class QuestionnaireFragment : Fragment() {
      */
     fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
 
+    /** To accept a configurable text for the submit button */
+    fun setSubmitButtonText(text: String) = apply { args.add(EXTRA_SUBMIT_BUTTON_TEXT to text) }
+
     /**
      * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is true.
      */
@@ -526,6 +536,8 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
 
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
+
+    internal const val EXTRA_SUBMIT_BUTTON_TEXT = "submit-button-text"
 
     /**
      * A [Boolean] extra to include [QuestionnaireItemComponent] containing timestamps for
