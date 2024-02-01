@@ -147,22 +147,17 @@ internal class FhirEngineImpl(private val database: Database, private val contex
         upload(localChanges)
           .onEach { result ->
             resourceConsolidator.consolidate(result)
-            if (result is UploadRequestResult.Success) {
-              emit(localChangeFetcher.getProgress())
-            }
+            val newProgress =
+              when (result) {
+                is UploadRequestResult.Success -> localChangeFetcher.getProgress()
+                is UploadRequestResult.Failure ->
+                  localChangeFetcher.getProgress().copy(uploadError = result.uploadError)
+              }
+            emit(newProgress)
           }
           .firstOrNull { it is UploadRequestResult.Failure }
 
       if (uploadRequestResult is UploadRequestResult.Failure) {
-        with(localChangeFetcher.getProgress()) {
-          emit(
-            SyncUploadProgress(
-              remaining = remaining,
-              initialTotal = initialTotal,
-              uploadError = uploadRequestResult.uploadError,
-            ),
-          )
-        }
         break
       }
     }

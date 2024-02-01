@@ -61,7 +61,7 @@ internal class Uploader(
         }
       }
 
-  private fun handleUploadResponse(
+  private fun handleSuccessfulUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
     response: Resource,
   ): UploadRequestResult.Success {
@@ -117,7 +117,7 @@ internal class Uploader(
           )
         (response is DomainResource || response is Bundle) &&
           (response !is IBaseOperationOutcome) ->
-          handleUploadResponse(mappedUploadRequest, response)
+          handleSuccessfulUploadResponse(mappedUploadRequest, response)
         else ->
           UploadRequestResult.Failure(
             mappedUploadRequest.localChanges,
