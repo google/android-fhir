@@ -54,6 +54,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -552,21 +553,23 @@ class DatabaseImplTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
-        it
-          .first { it.resourceId == "remote-patient-3" }
-          .let {
-            UploadSyncResult.Success(
-              listOf(
-                ResourceUploadResponseMapping(
-                  listOf(it),
-                  Patient().apply {
-                    id = it.resourceId
-                    meta = remoteMeta
-                  },
+        flow {
+          it
+            .first { it.resourceId == "remote-patient-3" }
+            .let {
+              UploadSyncResult.Success(
+                listOf(
+                  ResourceUploadResponseMapping(
+                    listOf(it),
+                    Patient().apply {
+                      id = it.resourceId
+                      meta = remoteMeta
+                    },
+                  ),
                 ),
-              ),
-            )
-          }
+              )
+            }
+        }
       }
       .collect()
     val selectedEntity = database.selectEntity(ResourceType.Patient, "remote-patient-3")

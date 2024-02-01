@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -326,14 +327,18 @@ class FhirEngineImplTest {
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
-        UploadSyncResult.Success(
-          listOf(
-            ResourceUploadResponseMapping(
-              it,
-              TEST_PATIENT_1,
+        flow {
+          emit(
+            UploadSyncResult.Success(
+              listOf(
+                ResourceUploadResponseMapping(
+                  it,
+                  TEST_PATIENT_1,
+                ),
+              ),
             ),
-          ),
-        )
+          )
+        }
       }
       .collect { emittedProgress.add(it) }
 
@@ -356,10 +361,14 @@ class FhirEngineImplTest {
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
-        UploadSyncResult.Failure(
-          uploadError,
-          LocalChangeToken(it.flatMap { it.token.ids }),
-        )
+        flow {
+          emit(
+            UploadSyncResult.Failure(
+              uploadError,
+              LocalChangeToken(it.flatMap { it.token.ids }),
+            ),
+          )
+        }
       }
       .collect { emittedProgress.add(it) }
 

@@ -35,7 +35,9 @@ import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadSyncResult
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -127,7 +129,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    upload: (suspend (List<LocalChange>) -> Flow<UploadSyncResult>),
   ): Flow<SyncUploadProgress> = flow {
     val resourceConsolidator = DefaultResourceConsolidator(database)
     val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
@@ -141,23 +143,28 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
     while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
-      val uploadSyncResult = upload(localChanges)
 
-      resourceConsolidator.consolidate(uploadSyncResult)
-      when (uploadSyncResult) {
-        is UploadSyncResult.Success -> emit(localChangeFetcher.getProgress())
-        is UploadSyncResult.Failure -> {
-          with(localChangeFetcher.getProgress()) {
-            emit(
-              SyncUploadProgress(
-                remaining = remaining,
-                initialTotal = initialTotal,
-                uploadError = uploadSyncResult.syncError,
-              ),
-            )
+      val uploadSyncResult =
+        upload(localChanges)
+          .onEach { result ->
+            resourceConsolidator.consolidate(result)
+            if (result is UploadSyncResult.Success) {
+              emit(localChangeFetcher.getProgress())
+            }
           }
-          break
+          .firstOrNull { it is UploadSyncResult.Failure }
+
+      if (uploadSyncResult is UploadSyncResult.Failure) {
+        with(localChangeFetcher.getProgress()) {
+          emit(
+            SyncUploadProgress(
+              remaining = remaining,
+              initialTotal = initialTotal,
+              uploadError = uploadSyncResult.syncError,
+            ),
+          )
         }
+        break
       }
     }
   }

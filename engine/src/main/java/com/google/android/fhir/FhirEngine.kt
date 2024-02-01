@@ -63,7 +63,7 @@ interface FhirEngine {
    */
   suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    upload: (suspend (List<LocalChange>) -> Flow<UploadSyncResult>),
   ): Flow<SyncUploadProgress>
 
   /**
