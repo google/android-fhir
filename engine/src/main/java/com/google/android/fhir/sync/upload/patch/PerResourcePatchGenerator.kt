@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
+import com.google.android.fhir.sameResource
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -35,8 +36,7 @@ internal object PerResourcePatchGenerator : PatchGenerator {
 
   override fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
     return localChanges
-      .groupBy { it.resourceType to it.resourceId }
-      .values
+      .splitOnContiguous { localChange1, localChange2 -> localChange1.sameResource(localChange2) }
       .mapNotNull { resourceLocalChanges ->
         mergeLocalChangesForSingleResource(resourceLocalChanges)?.let { patch ->
           PatchMapping(
@@ -122,5 +122,17 @@ internal object PerResourcePatchGenerator : PatchGenerator {
       .map { this.optJSONObject(it) }
       .associateBy { it.optString("op") to it.optString("path") }
       .toMutableMap()
+  }
+}
+
+fun <T> List<T>.splitOnContiguous(predicate: (T, T) -> Boolean): List<List<T>> {
+  return fold(mutableListOf<MutableList<T>>()) { acc, item ->
+    acc.also {
+      if (it.isEmpty() || !predicate(it.last().last(), item)) {
+        it.add(mutableListOf())
+      }
+      it.last().add(item)
+    }
+    acc
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -106,10 +106,13 @@ class UploaderTest {
               Bundle().apply {
                 type = Bundle.BundleType.TRANSACTIONRESPONSE
                 addEntry(
-                  Bundle.BundleEntryComponent().apply { resource = updatedPatient1 },
+                  Bundle.BundleEntryComponent().apply { resource = patient },
                 )
                 addEntry(
                   Bundle.BundleEntryComponent().apply { resource = patient2 },
+                )
+                addEntry(
+                  Bundle.BundleEntryComponent().apply { resource = updatedPatient1 },
                 )
               }
             },
@@ -119,11 +122,11 @@ class UploaderTest {
           .upload(databaseLocalChanges)
 
       assertThat(result).isInstanceOf(UploadSyncResult.Success::class.java)
-      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(2) }
+      with(result as UploadSyncResult.Success) { assertThat(uploadResponses).hasSize(3) }
       with(result.uploadResponses[0]) {
         assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
-        assertThat(localChanges).hasSize(2)
-        assertThat(localChanges.all { it.resourceId == patient1Id }).isTrue()
+        assertThat(localChanges).hasSize(1)
+        assertThat(localChanges.first().resourceId == patient1Id).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
         assertThat((output as Patient).id).isEqualTo(patient1Id)
       }
@@ -134,6 +137,14 @@ class UploaderTest {
         assertThat(localChanges.all { it.resourceId == patient2Id }).isTrue()
         assertThat(output).isInstanceOf(Patient::class.java)
         assertThat((output as Patient).id).isEqualTo(patient2Id)
+      }
+
+      with(result.uploadResponses[2]) {
+        assertThat(this).isInstanceOf(ResourceUploadResponseMapping::class.java)
+        assertThat(localChanges).hasSize(1)
+        assertThat(localChanges.first().resourceId == patient1Id).isTrue()
+        assertThat(output).isInstanceOf(Patient::class.java)
+        assertThat((output as Patient).id).isEqualTo(patient1Id)
       }
     }
 
@@ -335,6 +346,15 @@ class UploaderTest {
           ),
           LocalChange(
             resourceType = ResourceType.Patient.name,
+            resourceId = patient1Id,
+            type = LocalChange.Type.UPDATE,
+            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
+            timestamp = Instant.now(),
+            versionId = null,
+            token = LocalChangeToken(listOf(3)),
+          ),
+          LocalChange(
+            resourceType = ResourceType.Patient.name,
             resourceId = patient2Id,
             type = LocalChange.Type.INSERT,
             payload =
@@ -344,15 +364,6 @@ class UploaderTest {
             timestamp = Instant.now(),
             versionId = null,
             token = LocalChangeToken(listOf(2)),
-          ),
-          LocalChange(
-            resourceType = ResourceType.Patient.name,
-            resourceId = patient1Id,
-            type = LocalChange.Type.UPDATE,
-            payload = "[{\"op\":\"replace\",\"path\":\"/name/0/family\",\"value\":\"Nucleus\"}]",
-            timestamp = Instant.now(),
-            versionId = null,
-            token = LocalChangeToken(listOf(3)),
           ),
         )
 
