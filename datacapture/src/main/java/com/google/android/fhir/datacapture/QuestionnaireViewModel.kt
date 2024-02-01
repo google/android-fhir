@@ -44,6 +44,7 @@ import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
+import com.google.android.fhir.datacapture.extensions.toTimeZoneString
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
@@ -453,13 +454,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                   }
               }
           }
-    }
-
-    private fun Date.toTimeZoneString(): String {
-        val simpleDateFormat =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
-                .withZone(ZoneId.systemDefault())
-        return simpleDateFormat.format(this.toInstant())
     }
 
     private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent =
