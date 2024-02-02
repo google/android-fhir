@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ internal sealed class UploadRequestGeneratorMode {
   data class BundleRequest(
     val httpVerbToUseForCreate: Bundle.HTTPVerb,
     val httpVerbToUseForUpdate: Bundle.HTTPVerb,
+    val bundleSize: Int = 500,
   ) : UploadRequestGeneratorMode()
 }
 
@@ -59,20 +60,22 @@ internal object UploadRequestGeneratorFactory {
         TransactionBundleGenerator.getGenerator(
           mode.httpVerbToUseForCreate,
           mode.httpVerbToUseForUpdate,
+          mode.bundleSize,
         )
     }
 }
 
 internal sealed class UploadRequestMapping(
+  open val localChanges: List<LocalChange>,
   open val generatedRequest: UploadRequest,
 )
 
 internal data class UrlUploadRequestMapping(
-  val localChanges: List<LocalChange>,
+  override val localChanges: List<LocalChange>,
   override val generatedRequest: UrlUploadRequest,
-) : UploadRequestMapping(generatedRequest)
+) : UploadRequestMapping(localChanges, generatedRequest)
 
 internal data class BundleUploadRequestMapping(
   val splitLocalChanges: List<List<LocalChange>>,
   override val generatedRequest: BundleUploadRequest,
-) : UploadRequestMapping(generatedRequest)
+) : UploadRequestMapping(localChanges = splitLocalChanges.flatten(), generatedRequest)
