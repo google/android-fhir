@@ -177,6 +177,9 @@ class DemoQuestionnaireFragment : Fragment() {
                 .encodeResourceToString(Patient().apply { id = "P1" })
                 .let { mapOf("patient" to it) },
             )
+            .setSubmitButtonText(
+              getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+            )
             .build(),
           QUESTIONNAIRE_FRAGMENT_TAG,
         )
