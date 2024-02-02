@@ -186,14 +186,13 @@ class DemoQuestionnaireFragment : Fragment() {
 
   private fun getThemeId(title: String) =
     if (
-      componentListViewModel.isComponent(requireContext(), title) ||
+      layoutListViewModel.isPaginatedLayout(requireContext(), title) ||
+        componentListViewModel.isComponent(requireContext(), title) ||
         behaviorListViewModel.isBehavior(requireContext(), title)
     ) {
-      R.style.Theme_Androidfhir_Component
-    } else if (layoutListViewModel.isDefaultLayout(requireContext(), title)) {
-      R.style.Theme_Androidfhir_DefaultLayout
-    } else {
       R.style.Theme_Androidfhir_PaginatedLayout
+    } else {
+      R.style.Theme_Androidfhir_DefaultLayout
     }
 
   private fun getMenu(): Int? =
@@ -236,11 +235,4 @@ class DemoQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
   }
-}
-
-enum class WorkflowType {
-  COMPONENT,
-  DEFAULT,
-  PAGINATED,
-  BEHAVIOR,
 }

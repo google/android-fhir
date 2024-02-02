@@ -76,41 +76,12 @@
     </style>
 
     <style name="Theme.MyQuestionnaire.DefaultLayout">
-        <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Layout.SubmitButtonStyle
-        </item>
     </style>
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item name="questionnaireQuestionTextStyle">
             @style/TextAppearance.Material3.HeadlineMedium
         </item>
-        <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Layout.SubmitButtonStyle
-        </item>
-    </style>
-
-    <style name="Theme.MyQuestionnaire.PaginatedLayout.Component">
-        <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Component.SubmitButtonStyle
-        </item>
-    </style>
-
-    <style
-        name="App.Layout.SubmitButtonStyle"
-        parent="Questionnaire.SubmitButtonStyle"
-    >
-        <item name="android:visibility">visible</item>
-    </style>
-
-    <style
-        name="App.Component.SubmitButtonStyle"
-        parent="Questionnaire.SubmitButtonStyle"
-    >
-        <item name="android:visibility">gone</item>
     </style>
 
     <style
