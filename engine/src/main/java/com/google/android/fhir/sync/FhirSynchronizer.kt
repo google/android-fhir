@@ -25,6 +25,8 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.hl7.fhir.r4.model.ResourceType
 
 enum class SyncOperation {
@@ -78,19 +80,26 @@ internal class FhirSynchronizer(
     return state
   }
 
+  /**
+   * Manages the sequential execution of downloading and uploading for coordinated operation. This
+   * function is coroutine-safe, ensuring that multiple invocations will not interfere with each
+   * other.
+   */
   suspend fun synchronize(): SyncJobStatus {
-    setSyncState(SyncJobStatus.Started())
+    mutex.withLock {
+      setSyncState(SyncJobStatus.Started())
 
-    return listOf(download(), upload())
-      .filterIsInstance<SyncResult.Error>()
-      .flatMap { it.exceptions }
-      .let {
-        if (it.isEmpty()) {
-          setSyncState(SyncResult.Success())
-        } else {
-          setSyncState(SyncResult.Error(it))
+      return listOf(download(), upload())
+        .filterIsInstance<SyncResult.Error>()
+        .flatMap { it.exceptions }
+        .let {
+          if (it.isEmpty()) {
+            setSyncState(SyncResult.Success())
+          } else {
+            setSyncState(SyncResult.Error(it))
+          }
         }
-      }
+    }
   }
 
   private suspend fun download(): SyncResult {
@@ -140,5 +149,9 @@ internal class FhirSynchronizer(
     } else {
       SyncResult.Error(exceptions)
     }
+  }
+
+  companion object {
+    private val mutex = Mutex()
   }
 }
