@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -141,7 +141,12 @@ internal object AutoCompleteViewHolderFactory :
 
         val chip = Chip(chipContainer.context, null, R.attr.questionnaireChipStyle)
         chip.id = View.generateViewId()
-        chip.text = answer.valueCoding.display
+        chip.text =
+          if (answer.valueCoding.display.isNullOrBlank()) {
+            answer.valueCoding.code
+          } else {
+            answer.valueCoding.display
+          }
         chip.isCloseIconVisible = true
         chip.isClickable = true
         chip.isCheckable = false
@@ -172,7 +177,12 @@ internal object AutoCompleteViewHolderFactory :
           addNewChipIfNotPresent(answer)
         } else {
           (chipContainer[0] as Chip).apply {
-            text = answer.valueCoding.display
+            text =
+              if (answer.valueCoding.display.isNullOrBlank()) {
+                answer.valueCoding.code
+              } else {
+                answer.valueCoding.display
+              }
             tag = answer
           }
         }
