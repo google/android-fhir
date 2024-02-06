@@ -87,13 +87,6 @@
         >@style/DarkTheme.MyQuestionnaire.PaginatedLayout</item>
   </style>
 
-  <style name="Theme.Androidfhir.Component">
-    <!-- Customize theme for questionnaires in this application. -->
-    <item
-            name="questionnaire_theme"
-        >@style/DarkTheme.MyQuestionnaire.PaginatedLayout.Component</item>
-  </style>
-
     <style name="DarkTheme.MyQuestionnaire" parent="Theme.MyQuestionnaire">
       <item name="colorPrimary">@color/primary_blue_80</item>
       <item name="colorOnPrimary">@color/onPrimary_blue_20</item>
@@ -142,27 +135,12 @@
     </style>
 
   <style name="DarkTheme.MyQuestionnaire.DefaultLayout">
-    <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Layout.SubmitButtonStyle
-    </item>
   </style>
 
   <style name="DarkTheme.MyQuestionnaire.PaginatedLayout">
     <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.HeadlineMedium
-    </item>
-    <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Layout.SubmitButtonStyle
-    </item>
-  </style>
-
-  <style name="DarkTheme.MyQuestionnaire.PaginatedLayout.Component">
-    <item
-            name="questionnaireSubmitButtonStyle"
-        >@style/App.Component.SubmitButtonStyle
     </item>
   </style>
 </resources>
