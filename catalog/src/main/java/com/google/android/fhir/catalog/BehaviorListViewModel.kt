@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.catalog
 
 import android.app.Application
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
@@ -31,7 +32,6 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
     @DrawableRes val iconId: Int,
     @StringRes val textId: Int,
     val questionnaireFileName: String,
-    val workFlow: WorkflowType = WorkflowType.BEHAVIOR,
   ) {
     CALCULATED_EXPRESSION(
       R.drawable.ic_calculations_behavior,
@@ -64,4 +64,7 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       "behavior_dynamic_question_text.json",
     ),
   }
+
+  fun isBehavior(context: Context, title: String) =
+    getBehaviorList().map { context.getString(it.textId) }.contains(title)
 }
