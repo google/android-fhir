@@ -532,7 +532,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
-  fun progressBar_shouldProgress_withPaginatedQuestionnaire() {
+  fun progressBar_shouldBeVisible_withPaginatedQuestionnaire() {
     buildFragmentFromQuestionnaire("/layout_paginated.json")
 
     onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
@@ -540,6 +540,11 @@ class QuestionnaireUiEspressoTest {
       assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
       assertThat(linearProgressIndicator.progress).isEqualTo(50)
     }
+  }
+
+  @Test
+  fun progressBar_shouldProgress_onPaginationNext() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json")
 
     onView(withId(R.id.pagination_next_button)).perform(ViewActions.click())
 
