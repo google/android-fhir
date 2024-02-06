@@ -26,7 +26,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
-import org.hl7.fhir.r4.model.Bundle
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
@@ -44,8 +43,8 @@ import org.robolectric.RobolectricTestRunner
 class SHLinkDecoderImplTest {
   private lateinit var shLinkDecoderImpl: SHLinkDecoderImpl
 
-
   @Mock private lateinit var readSHLinkUtils: ReadSHLinkUtils
+
   @Mock private lateinit var shLinkScanData: SHLinkScanData
 
   private val mockWebServer = MockWebServer()
@@ -56,15 +55,15 @@ class SHLinkDecoderImplTest {
       .build()
   }
 
-  private val manifestFileResponse = JSONObject().apply {
-    val filesArray = JSONArray().apply {
-      val fileObject = JSONObject().apply {
-        put("embedded","embeddedData1")
-      }
-      put(fileObject)
+  private val manifestFileResponse =
+    JSONObject().apply {
+      val filesArray =
+        JSONArray().apply {
+          val fileObject = JSONObject().apply { put("embedded", "embeddedData1") }
+          put(fileObject)
+        }
+      put("files", filesArray)
     }
-    put("files", filesArray)
-  }
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
@@ -93,7 +92,6 @@ class SHLinkDecoderImplTest {
   fun testDecodeSHLinkToDocumentWithEmbeddedAndNoVC() = runBlocking {
     val jsonData = "test json data"
     val testBundleString = "{\"resourceType\" : \"Bundle\"}"
-    val testBundle = parser.parseResource(testBundleString) as Bundle
     `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
     `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
 

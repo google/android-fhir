@@ -44,8 +44,6 @@ dependencies {
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.mockitoKotlin)

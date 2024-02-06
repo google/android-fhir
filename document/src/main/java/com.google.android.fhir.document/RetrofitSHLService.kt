@@ -18,7 +18,6 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.remote.GzipUploadInterceptor
-import com.google.android.fhir.sync.remote.HttpLogger
 import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
@@ -74,10 +73,6 @@ interface RetrofitSHLService {
   ) {
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
 
-    fun setHttpLogger(httpLogger: HttpLogger) = apply {
-      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
-    }
-
     fun build(): RetrofitSHLService {
       val client =
         OkHttpClient.Builder()
@@ -98,25 +93,5 @@ interface RetrofitSHLService {
         .build()
         .create(RetrofitSHLService::class.java)
     }
-
-    /* Maybe move these to different class */
-    private fun HttpLogger.toOkHttpLoggingInterceptor() =
-      HttpLoggingInterceptor(log).apply {
-        level = configuration.level.toOkhttpLogLevel()
-        configuration.headersToIgnore?.forEach { this.redactHeader(it) }
-      }
-
-    private fun HttpLogger.Level.toOkhttpLogLevel() =
-      when (this) {
-        HttpLogger.Level.NONE -> HttpLoggingInterceptor.Level.NONE
-        HttpLogger.Level.BASIC -> HttpLoggingInterceptor.Level.BASIC
-        HttpLogger.Level.HEADERS -> HttpLoggingInterceptor.Level.HEADERS
-        HttpLogger.Level.BODY -> HttpLoggingInterceptor.Level.BODY
-      }
-  }
-
-  companion object {
-    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(baseUrl, networkConfiguration)
   }
 }

@@ -27,7 +27,7 @@ import org.json.JSONObject
 
 class ReadSHLinkUtils {
 
-  // Extracts the part of the link after the 'shlink:/'
+  /* Extracts the part of the link after the 'shlink:/' */
   fun extractUrl(scannedData: String): String {
     if (scannedData.contains("shlink:/")) {
       return scannedData.substringAfterLast("shlink:/")
@@ -35,7 +35,7 @@ class ReadSHLinkUtils {
     throw IllegalArgumentException("Not a valid SHLink")
   }
 
-  // Decodes the extracted url from Base64Url to a byte array
+  /* Decodes the extracted url from Base64Url to a byte array */
   fun decodeUrl(extractedUrl: String): ByteArray {
     if (extractedUrl.isEmpty()) {
       throw IllegalArgumentException("Not a valid Base64 encoded string")
@@ -47,7 +47,7 @@ class ReadSHLinkUtils {
     }
   }
 
-  // returns a string of the data in the verifiableCredential field in the returned JSON
+  /* Returns a string of data found in the verifiableCredential field in the given JSON */
   fun extractVerifiableCredential(jsonString: String): String {
     val jsonObject = JSONObject(jsonString)
     if (jsonObject.has("verifiableCredential")) {
@@ -61,8 +61,7 @@ class ReadSHLinkUtils {
     return ""
   }
 
-  // Decodes and decompresses the payload in a JWT token
-  // @RequiresApi(Build.VERSION_CODES.O)
+  /* Decodes and decompresses the payload in a JWT token */
   fun decodeAndDecompressPayload(token: String): String {
     try {
       val tokenParts = token.split('.')
@@ -87,12 +86,12 @@ class ReadSHLinkUtils {
       }
       inflater.end()
       return decompressedBytes.toByteArray().decodeToString()
-    }
-    catch (err: Error) {
+    } catch (err: Error) {
       throw Error("Invalid JWT token passed in: $err")
     }
   }
 
+  /* Decodes and decompresses the embedded health data from a JWE token into a string */
   fun decodeShc(responseBody: String, key: String): String {
     try {
       if (responseBody.isEmpty() or key.isEmpty()) {
@@ -103,8 +102,7 @@ class ReadSHLinkUtils {
       val decrypter: JWEDecrypter = DirectDecrypter(decodedKey)
       jweObject.decrypt(decrypter)
       return jweObject.payload.toString()
-    }
-    catch (err: Exception) {
+    } catch (err: Exception) {
       throw Exception("JWE decryption failed: $err")
     }
   }

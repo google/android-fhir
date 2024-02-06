@@ -73,24 +73,27 @@ class SHLinkDecoderImpl(
     shLinkScanData: SHLinkScanData,
   ): Bundle {
     val jsonObject = JSONObject(responseBody)
-    val embeddedArray = jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
-      (0 until jsonArray.length()).mapNotNull { i ->
-          val fileObject = jsonArray.getJSONObject(i)
-          if (fileObject.has("embedded")) {
-            fileObject.getString("embedded")
-          } else {
-            fileObject.getString("location").let {
-              val responseFromLocation = apiService.getFromLocation(it)
-              val responseBodyFromLocation = responseFromLocation.body()?.string()
-              if (!responseBodyFromLocation.isNullOrBlank()) {
-                responseBodyFromLocation
-              } else {
-                null
+    val embeddedArray =
+      jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
+        (0 until jsonArray.length())
+          .mapNotNull { i ->
+            val fileObject = jsonArray.getJSONObject(i)
+            if (fileObject.has("embedded")) {
+              fileObject.getString("embedded")
+            } else {
+              fileObject.getString("location").let {
+                val responseFromLocation = apiService.getFromLocation(it)
+                val responseBodyFromLocation = responseFromLocation.body()?.string()
+                if (!responseBodyFromLocation.isNullOrBlank()) {
+                  responseBodyFromLocation
+                } else {
+                  null
+                }
               }
             }
           }
-        }.toTypedArray()
-    }
+          .toTypedArray()
+      }
     return decodeEmbeddedArray(embeddedArray, shLinkScanData)
   }
 
@@ -100,9 +103,7 @@ class SHLinkDecoderImpl(
   ): Bundle {
     var healthData = ""
     for (elem in embeddedArray) {
-      val decodedShc = shLinkScanData.key.let {
-        readSHLinkUtils.decodeShc(elem, it)
-      }
+      val decodedShc = shLinkScanData.key.let { readSHLinkUtils.decodeShc(elem, it) }
       if (decodedShc != "") {
         val toDecode = readSHLinkUtils.extractVerifiableCredential(decodedShc)
         if (toDecode.isEmpty()) {

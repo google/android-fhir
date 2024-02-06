@@ -18,8 +18,9 @@ package com.google.android.fhir.document.decode
 
 import com.google.android.fhir.document.IPSDocument
 
+/* The SHLinkDecoder interface handles the decoding of SHLs */
 interface SHLinkDecoder {
 
-  /* */
+  /* Decode and decompress a SHL into an IPSDocument object */
   suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument?
 }
