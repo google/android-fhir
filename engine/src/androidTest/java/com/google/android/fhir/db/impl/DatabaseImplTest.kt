@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -54,6 +54,7 @@ import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -555,14 +556,16 @@ class DatabaseImplTest {
         it
           .first { it.resourceId == "remote-patient-3" }
           .let {
-            UploadSyncResult.Success(
-              listOf(
-                ResourceUploadResponseMapping(
-                  listOf(it),
-                  Patient().apply {
-                    id = it.resourceId
-                    meta = remoteMeta
-                  },
+            flowOf(
+              UploadRequestResult.Success(
+                listOf(
+                  ResourceUploadResponseMapping(
+                    listOf(it),
+                    Patient().apply {
+                      id = it.resourceId
+                      meta = remoteMeta
+                    },
+                  ),
                 ),
               ),
             )
