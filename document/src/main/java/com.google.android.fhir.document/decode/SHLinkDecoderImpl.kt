@@ -40,7 +40,7 @@ class SHLinkDecoderImpl(
 
   override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
     val shLinkScanData = constructShlObj()
-    val bundle = shLinkScanData?.let { postToServer(jsonData, it) }
+    val bundle = shLinkScanData.let { postToServer(jsonData, it) }
     return if (bundle != null) {
       IPSDocument(bundle, ArrayList(), Patient()) // change this construction
     } else {
@@ -55,16 +55,13 @@ class SHLinkDecoderImpl(
         if (response.isSuccessful) {
           val responseBody = response.body()?.string()
           responseBody?.let {
-            val res = decodeResponseBody(it, shLinkScanData)
-            return@coroutineScope res
+            return@coroutineScope decodeResponseBody(it, shLinkScanData)
           }
         } else {
-          Timber.e("HTTP Error: ${response.code()}")
-          null
+          throw(Error("HTTP Error: ${response.code()}"))
         }
       } catch (err: Throwable) {
-        Timber.e("Error posting to the manifest: $err")
-        null
+        throw(Error("Error posting to the manifest: $err"))
       }
     }
 
@@ -87,7 +84,7 @@ class SHLinkDecoderImpl(
                 if (!responseBodyFromLocation.isNullOrBlank()) {
                   responseBodyFromLocation
                 } else {
-                  null
+                  throw(IllegalArgumentException("No data found at the given location"))
                 }
               }
             }
@@ -119,24 +116,27 @@ class SHLinkDecoderImpl(
     return parser.parseResource(healthData) as Bundle
   }
 
-  private fun constructShlObj(): SHLinkScanData? {
-    shLinkScanDataInput?.fullLink?.let { fullLink ->
-      val extractedJson = readSHLinkUtils.extractUrl(fullLink)
-      val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
-      try {
-        val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
-        return SHLinkScanData(
-          shLinkScanDataInput.fullLink,
-          extractedJson,
-          jsonObject.optString("url", ""),
-          key = jsonObject.optString("key", ""),
-          flag = jsonObject.optString("flag", ""),
-        )
-      } catch (exception: JSONException) {
-        Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
-        throw exception
+  private fun constructShlObj(): SHLinkScanData {
+      shLinkScanDataInput?.fullLink?.let { fullLink ->
+        if (fullLink.isEmpty()) {
+          throw(IllegalArgumentException("Provided SHLinkScanData object's fullLink is empty"))
+        }
+        val extractedJson = readSHLinkUtils.extractUrl(fullLink)
+        val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
+        try {
+          val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+          return SHLinkScanData(
+            shLinkScanDataInput.fullLink,
+            extractedJson,
+            jsonObject.optString("url", ""),
+            key = jsonObject.optString("key", ""),
+            flag = jsonObject.optString("flag", ""),
+          )
+        } catch (exception: JSONException) {
+          Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
+          throw exception
+        }
       }
-    }
-    return null
+    throw(NullPointerException("Provided SHLinkScanData object's fullLink has not been initialised"))
   }
 }
