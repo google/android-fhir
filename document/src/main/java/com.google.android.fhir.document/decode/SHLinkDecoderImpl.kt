@@ -58,10 +58,10 @@ class SHLinkDecoderImpl(
             return@coroutineScope decodeResponseBody(it, shLinkScanData)
           }
         } else {
-          throw(Error("HTTP Error: ${response.code()}"))
+          throw (Error("HTTP Error: ${response.code()}"))
         }
       } catch (err: Throwable) {
-        throw(Error("Error posting to the manifest: $err"))
+        throw (Error("Error posting to the manifest: $err"))
       }
     }
 
@@ -84,7 +84,7 @@ class SHLinkDecoderImpl(
                 if (!responseBodyFromLocation.isNullOrBlank()) {
                   responseBodyFromLocation
                 } else {
-                  throw(IllegalArgumentException("No data found at the given location"))
+                  throw (IllegalArgumentException("No data found at the given location"))
                 }
               }
             }
@@ -117,26 +117,28 @@ class SHLinkDecoderImpl(
   }
 
   private fun constructShlObj(): SHLinkScanData {
-      shLinkScanDataInput?.fullLink?.let { fullLink ->
-        if (fullLink.isEmpty()) {
-          throw(IllegalArgumentException("Provided SHLinkScanData object's fullLink is empty"))
-        }
-        val extractedJson = readSHLinkUtils.extractUrl(fullLink)
-        val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
-        try {
-          val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
-          return SHLinkScanData(
-            shLinkScanDataInput.fullLink,
-            extractedJson,
-            jsonObject.optString("url", ""),
-            key = jsonObject.optString("key", ""),
-            flag = jsonObject.optString("flag", ""),
-          )
-        } catch (exception: JSONException) {
-          Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
-          throw exception
-        }
+    shLinkScanDataInput?.fullLink?.let { fullLink ->
+      if (fullLink.isEmpty()) {
+        throw (IllegalArgumentException("Provided SHLinkScanData object's fullLink is empty"))
       }
-    throw(NullPointerException("Provided SHLinkScanData object's fullLink has not been initialised"))
+      val extractedJson = readSHLinkUtils.extractUrl(fullLink)
+      val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
+      try {
+        val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+        return SHLinkScanData(
+          shLinkScanDataInput.fullLink,
+          extractedJson,
+          jsonObject.optString("url", ""),
+          key = jsonObject.optString("key", ""),
+          flag = jsonObject.optString("flag", ""),
+        )
+      } catch (exception: JSONException) {
+        Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
+        throw exception
+      }
+    }
+    throw (NullPointerException(
+      "Provided SHLinkScanData object's fullLink has not been initialised",
+    ))
   }
 }

@@ -93,7 +93,8 @@ class SHLinkDecoderImplTest {
 
   @Test
   fun testDecodeSHLinkToDocumentWithEmbeddedAndNoVC() = runBlocking {
-    val mockResponse = MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
+    val mockResponse =
+      MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
     mockWebServer.enqueue(mockResponse)
 
     val jsonData = "test json data"
@@ -115,7 +116,8 @@ class SHLinkDecoderImplTest {
 
   @Test
   fun testDecodeSHLinkToDocumentWithLocationAndNoVC() = runBlocking {
-    val mockResponse = MockResponse().setResponseCode(200).setBody(manifestFileResponseWithLocation.toString())
+    val mockResponse =
+      MockResponse().setResponseCode(200).setBody(manifestFileResponseWithLocation.toString())
     mockWebServer.enqueue(mockResponse)
 
     val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody(getLocationResponse)
@@ -143,7 +145,8 @@ class SHLinkDecoderImplTest {
 
   @Test
   fun testDecodeSHLinkToDocumentWithNoDataAtLocation() = runBlocking {
-    val mockResponse = MockResponse().setResponseCode(200).setBody(manifestFileResponseWithLocation.toString())
+    val mockResponse =
+      MockResponse().setResponseCode(200).setBody(manifestFileResponseWithLocation.toString())
     mockWebServer.enqueue(mockResponse)
 
     val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody(getLocationResponse)
@@ -178,7 +181,10 @@ class SHLinkDecoderImplTest {
     val result = runCatching { shLinkDecoderImpl.decodeSHLinkToDocument(jsonData) }
     assertTrue(result.isFailure)
     assertEquals(IllegalArgumentException::class, result.exceptionOrNull()!!::class)
-    assertEquals("Provided SHLinkScanData object's fullLink is empty", result.exceptionOrNull()!!.message)
+    assertEquals(
+      "Provided SHLinkScanData object's fullLink is empty",
+      result.exceptionOrNull()!!.message,
+    )
   }
 
   @Test
@@ -189,12 +195,16 @@ class SHLinkDecoderImplTest {
     val result = runCatching { shLinkDecoderImpl.decodeSHLinkToDocument(jsonData) }
     assertTrue(result.isFailure)
     assertEquals(NullPointerException::class, result.exceptionOrNull()!!::class)
-    assertEquals("Provided SHLinkScanData object's fullLink has not been initialised", result.exceptionOrNull()!!.message)
+    assertEquals(
+      "Provided SHLinkScanData object's fullLink has not been initialised",
+      result.exceptionOrNull()!!.message,
+    )
   }
 
   @Test
   fun testDecodeSHLinkToDocumentWithUnsuccessfulManifestPost() = runBlocking {
-    val mockResponse = MockResponse().setResponseCode(500).setBody(manifestFileResponseWithLocation.toString())
+    val mockResponse =
+      MockResponse().setResponseCode(500).setBody(manifestFileResponseWithLocation.toString())
     mockWebServer.enqueue(mockResponse)
 
     val jsonData = "test json data"
@@ -212,7 +222,8 @@ class SHLinkDecoderImplTest {
 
   @Test
   fun testDecodeEmbeddedArrayWithVerifiableCredential() = runBlocking {
-    val mockResponse = MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
+    val mockResponse =
+      MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
     mockWebServer.enqueue(mockResponse)
 
     val jsonData = "test json data"
@@ -222,8 +233,12 @@ class SHLinkDecoderImplTest {
     `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
     `when`(shLinkScanData.fullLink).thenReturn("fullLink")
     `when`(readSHLinkUtils.decodeShc("embeddedData", "")).thenReturn(testBundleString)
-    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("verifiableCredentialData")
-    `when`(readSHLinkUtils.decodeAndDecompressPayload("verifiableCredentialData")).thenReturn("{\"vc\": {\"credentialSubject\":{\"fhirBundle\":{\"resourceType\":\"Bundle\"}}}}")
+    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString))
+      .thenReturn("verifiableCredentialData")
+    `when`(readSHLinkUtils.decodeAndDecompressPayload("verifiableCredentialData"))
+      .thenReturn(
+        "{\"vc\": {\"credentialSubject\":{\"fhirBundle\":{\"resourceType\":\"Bundle\"}}}}",
+      )
 
     val result = shLinkDecoderImpl.decodeSHLinkToDocument(jsonData)
     assertNotNull(result)
@@ -232,5 +247,4 @@ class SHLinkDecoderImplTest {
     val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
     assertEquals("/fullLink", recordedRequestGetManifest.path)
   }
-
 }
