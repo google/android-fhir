@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.Patient
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
-import retrofit2.Response
 import timber.log.Timber
 
 class SHLinkDecoderImpl(
@@ -37,15 +36,11 @@ class SHLinkDecoderImpl(
   private val apiService: RetrofitSHLService,
 ) : SHLinkDecoder {
 
-  // private lateinit var shLinkScanData: SHLinkScanData
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
     val shLinkScanData = constructShlObj()
-    println("EHUFHEHFEHK")
-    println(shLinkScanData)
     val bundle = shLinkScanData?.let { postToServer(jsonData, it) }
-    println(bundle)
     return if (bundle != null) {
       IPSDocument(bundle, ArrayList(), Patient()) // change this construction
     } else {
@@ -56,11 +51,18 @@ class SHLinkDecoderImpl(
   private suspend fun postToServer(jsonData: String, shLinkScanData: SHLinkScanData): Bundle? =
     coroutineScope {
       try {
-        val response = apiService.getFilesFromManifest(shLinkScanData.manifestUrl, jsonData)
-        response.handleApiResponse()?.let { responseBody ->
-          return@coroutineScope decodeResponseBody(responseBody, shLinkScanData)
+        val response = apiService.getFilesFromManifest(shLinkScanData.fullLink, jsonData)
+        if (response.isSuccessful) {
+          val responseBody = response.body()?.string()
+          responseBody?.let {
+            val res = decodeResponseBody(it, shLinkScanData)
+            return@coroutineScope res
+          }
+        } else {
+          Timber.e("HTTP Error: ${response.code()}")
+          null
         }
-      } catch (err: Error) {
+      } catch (err: Throwable) {
         Timber.e("Error posting to the manifest: $err")
         null
       }
@@ -71,27 +73,24 @@ class SHLinkDecoderImpl(
     shLinkScanData: SHLinkScanData,
   ): Bundle {
     val jsonObject = JSONObject(responseBody)
-    val embeddedArray =
-      jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
-        (0 until jsonArray.length())
-          .mapNotNull { i ->
-            val fileObject = jsonArray.getJSONObject(i)
-            if (fileObject.has("embedded")) {
-              fileObject.getString("embedded")
-            } else {
-              fileObject.getString("location").let {
-                val responseFromLocation = apiService.getFromLocation(it)
-                val responseBodyFromLocation = responseFromLocation.body()?.string()
-                if (!responseBodyFromLocation.isNullOrBlank()) {
-                  responseBodyFromLocation
-                } else {
-                  null
-                }
+    val embeddedArray = jsonObject.getJSONArray("files").let { jsonArray: JSONArray ->
+      (0 until jsonArray.length()).mapNotNull { i ->
+          val fileObject = jsonArray.getJSONObject(i)
+          if (fileObject.has("embedded")) {
+            fileObject.getString("embedded")
+          } else {
+            fileObject.getString("location").let {
+              val responseFromLocation = apiService.getFromLocation(it)
+              val responseBodyFromLocation = responseFromLocation.body()?.string()
+              if (!responseBodyFromLocation.isNullOrBlank()) {
+                responseBodyFromLocation
+              } else {
+                null
               }
             }
           }
-          .toTypedArray()
-      }
+        }.toTypedArray()
+    }
     return decodeEmbeddedArray(embeddedArray, shLinkScanData)
   }
 
@@ -101,7 +100,9 @@ class SHLinkDecoderImpl(
   ): Bundle {
     var healthData = ""
     for (elem in embeddedArray) {
-      val decodedShc = shLinkScanData.key.let { readSHLinkUtils.decodeShc(elem, it) }
+      val decodedShc = shLinkScanData.key.let {
+        readSHLinkUtils.decodeShc(elem, it)
+      }
       if (decodedShc != "") {
         val toDecode = readSHLinkUtils.extractVerifiableCredential(decodedShc)
         if (toDecode.isEmpty()) {
@@ -120,38 +121,21 @@ class SHLinkDecoderImpl(
   private fun constructShlObj(): SHLinkScanData? {
     shLinkScanDataInput?.fullLink?.let { fullLink ->
       val extractedJson = readSHLinkUtils.extractUrl(fullLink)
-      println(fullLink)
-      println(readSHLinkUtils.extractUrl(fullLink))
       val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
       try {
-        if (decodedJson != null) {
-          print("Decoded JSON: $decodedJson")
-          val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
-
-          return SHLinkScanData(
-            shLinkScanDataInput.fullLink,
-            extractedJson,
-            jsonObject.optString("url", ""),
-            key = jsonObject.optString("key", ""),
-            flag = jsonObject.optString("flag", ""),
-          )
-        }
-      } catch (e: JSONException) {
-        Timber.e(e, "Error creating JSONObject from decodedJson: $decodedJson")
-        return null
+        val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+        return SHLinkScanData(
+          shLinkScanDataInput.fullLink,
+          extractedJson,
+          jsonObject.optString("url", ""),
+          key = jsonObject.optString("key", ""),
+          flag = jsonObject.optString("flag", ""),
+        )
+      } catch (exception: JSONException) {
+        Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
+        throw exception
       }
     }
     return null
-  }
-}
-
-private fun <T> Response<T>.handleApiResponse(): String? {
-  return this.let {
-    if (it.isSuccessful) {
-      it.toString()
-    } else {
-      Timber.e("HTTP Error: ${it.code()}")
-      null
-    }
   }
 }

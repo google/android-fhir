@@ -16,14 +16,21 @@
 
 package com.google.android.fhir.document
 
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.document.decode.ReadSHLinkUtils
 import com.google.android.fhir.document.decode.SHLinkDecoderImpl
 import com.google.android.fhir.document.scan.SHLinkScanData
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
+import org.hl7.fhir.r4.model.Bundle
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.After
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,25 +44,37 @@ import org.robolectric.RobolectricTestRunner
 class SHLinkDecoderImplTest {
   private lateinit var shLinkDecoderImpl: SHLinkDecoderImpl
 
+
   @Mock private lateinit var readSHLinkUtils: ReadSHLinkUtils
   @Mock private lateinit var shLinkScanData: SHLinkScanData
 
   private val mockWebServer = MockWebServer()
-  private val baseUrl = "/shl/"
+  private val baseUrl = ""
 
   private val apiService by lazy {
     RetrofitSHLService.Builder(mockWebServer.url(baseUrl).toString(), NetworkConfiguration())
       .build()
   }
 
+  private val manifestFileResponse = JSONObject().apply {
+    val filesArray = JSONArray().apply {
+      val fileObject = JSONObject().apply {
+        put("embedded","embeddedData1")
+      }
+      put(fileObject)
+    }
+    put("files", filesArray)
+  }
+
+  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    // val shLinkScanData = SHLinkScanData("shlink:/fullLink", "extractedJson", "url", "key", "flag")
     shLinkDecoderImpl = SHLinkDecoderImpl(shLinkScanData, readSHLinkUtils, apiService)
 
-    val manifestResponse = MockResponse().setResponseCode(200).setBody("{'files': []}")
-    mockWebServer.enqueue(manifestResponse)
+    val mockResponse = MockResponse().setResponseCode(200).setBody(manifestFileResponse.toString())
+    mockWebServer.enqueue(mockResponse)
   }
 
   @After
@@ -68,5 +87,25 @@ class SHLinkDecoderImplTest {
     shLinkDecoderImpl.decodeSHLinkToDocument("{}")
     `when`(readSHLinkUtils.extractUrl(anyString())).thenReturn("url")
     `when`(readSHLinkUtils.decodeUrl(anyString())).thenReturn(null)
+  }
+
+  @Test
+  fun testDecodeSHLinkToDocumentWithEmbeddedAndNoVC() = runBlocking {
+    val jsonData = "test json data"
+    val testBundleString = "{\"resourceType\" : \"Bundle\"}"
+    val testBundle = parser.parseResource(testBundleString) as Bundle
+    `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
+    `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
+
+    `when`(shLinkScanData.fullLink).thenReturn("fullLink")
+    `when`(shLinkScanData.manifestUrl).thenReturn("url")
+    `when`(shLinkScanData.flag).thenReturn("flag")
+    `when`(shLinkScanData.key).thenReturn("key")
+
+    `when`(readSHLinkUtils.decodeShc("embeddedData1", "")).thenReturn(testBundleString)
+    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
+
+    val result = shLinkDecoderImpl.decodeSHLinkToDocument(jsonData)
+    assertNotNull(result)
   }
 }
