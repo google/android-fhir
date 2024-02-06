@@ -45,6 +45,9 @@ import org.hl7.fhir.r4.model.Patient
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
+  private val componentListViewModel: ComponentListViewModel by viewModels()
+  private val behaviorListViewModel: BehaviorListViewModel by viewModels()
+  private val layoutListViewModel: LayoutListViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
   private var isErrorState = false
   private lateinit var infoCard: MaterialCardView
@@ -56,7 +59,7 @@ class DemoQuestionnaireFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
-    requireContext().setTheme(getThemeId())
+    requireContext().setTheme(getThemeId(args.questionnaireTitleKey))
     return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
   }
 
@@ -190,21 +193,28 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  private fun getThemeId(): Int {
-    return when (args.workflow) {
-      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
-      WorkflowType.COMPONENT,
-      WorkflowType.BEHAVIOR, -> R.style.Theme_Androidfhir_Component
-      WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
+  private fun getThemeId(title: String) =
+    if (
+      layoutListViewModel.isPaginatedLayout(requireContext(), title) ||
+        componentListViewModel.isComponent(requireContext(), title) ||
+        behaviorListViewModel.isBehavior(requireContext(), title)
+    ) {
+      R.style.Theme_Androidfhir_PaginatedLayout
+    } else {
+      R.style.Theme_Androidfhir_DefaultLayout
     }
-  }
 
-  private fun getMenu(): Int? {
-    return when (args.workflow) {
-      WorkflowType.COMPONENT -> R.menu.component_menu
-      else -> null
+  private fun getMenu(): Int? =
+    if (
+      componentListViewModel.isComponent(
+        requireContext(),
+        args.questionnaireTitleKey!!,
+      )
+    ) {
+      R.menu.component_menu
+    } else {
+      null
     }
-  }
 
   private fun onSubmitQuestionnaireClick() {
     val questionnaireFragment =
@@ -234,11 +244,4 @@ class DemoQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
   }
-}
-
-enum class WorkflowType {
-  COMPONENT,
-  DEFAULT,
-  PAGINATED,
-  BEHAVIOR,
 }
