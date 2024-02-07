@@ -17,9 +17,8 @@
 package com.google.android.fhir.document
 
 import com.google.android.fhir.document.decode.ReadSHLinkUtils
-import org.junit.Assert.assertEquals
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertThrows
-import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -36,7 +35,7 @@ class ReadSHLinkUtilsTest {
   fun `test extractUrl with a valid SHL`() {
     val scannedData = "shlink:/example-url"
     val result = readSHLinkUtils.extractUrl(scannedData)
-    assertEquals("example-url", result)
+    assertThat(result).isEqualTo("example-url")
   }
 
   @Test
@@ -55,7 +54,7 @@ class ReadSHLinkUtilsTest {
   fun `test that decodeUrl successfully decodes a Base64 encoded input string`() {
     val extractedUrl = "aGVsbG8="
     val result = readSHLinkUtils.decodeUrl(extractedUrl)
-    assertTrue(result.contentEquals("hello".toByteArray()))
+    assertThat(result).isEqualTo("hello".toByteArray())
   }
 
   @Test
@@ -73,9 +72,8 @@ class ReadSHLinkUtilsTest {
   @Test
   fun `test that decodeShc can successfully decrypt an SHL with it's given key`() {
     val result = readSHLinkUtils.decodeShc(responseBody, key)
-    assertEquals(
+    assertThat(result.trim()).isEqualTo(
       "{\"iss\":\"DinoChiesa.github.io\",\"sub\":\"idris\",\"aud\":\"kina\",\"iat\":1691158997,\"exp\":1691159597,\"aaa\":true}",
-      result.trim(),
     )
   }
 
@@ -101,7 +99,7 @@ class ReadSHLinkUtilsTest {
   fun `test extractVerifiableCredential successfully extracts the data from a JSON string`() {
     val jsonStringWithCredential = "{\"verifiableCredential\": [\"credentialData\"]}"
     val resultWithCredential = readSHLinkUtils.extractVerifiableCredential(jsonStringWithCredential)
-    assertEquals("credentialData", resultWithCredential)
+    assertThat(resultWithCredential).isEqualTo("credentialData")
   }
 
   @Test
@@ -109,7 +107,7 @@ class ReadSHLinkUtilsTest {
     val jsonStringWithoutCredential = "{}"
     val resultWithoutCredential =
       readSHLinkUtils.extractVerifiableCredential(jsonStringWithoutCredential)
-    assertEquals("", resultWithoutCredential)
+    assertThat(resultWithoutCredential).isEqualTo("")
   }
 
   @Test
@@ -119,7 +117,7 @@ class ReadSHLinkUtilsTest {
     val expectedData =
       "{\"iss\":\"https://spec.smarthealth.cards/examples/issuer\",\"nbf\":1649020324.265,\"vc\":{\"type\":[\"https://smarthealth.cards#health-card\",\"https://smarthealth.cards#health-card\",\"https://smarthealth.cards#immunization\"],\"credentialSubject\":{\"fhirVersion\":\"4.0.1\",\"fhirBundle\":{\"resourceType\":\"Bundle\",\"type\":\"collection\",\"entry\":[{\"fullUrl\":\"resource:0\",\"resource\":{\"resourceType\":\"Patient\",\"name\":[{\"family\":\"Brown\",\"given\":[\"Oliver\"]}],\"birthDate\":\"2017-01-04\"}},{\"fullUrl\":\"resource:1\",\"resource\":{\"resourceType\":\"Immunization\",\"status\":\"completed\",\"vaccineCode\":{\"coding\":[{\"system\":\"http://hl7.org/fhir/sid/cvx\",\"code\":\"08\"}]},\"patient\":{\"reference\":\"resource:0\"},\"occurrenceDateTime\":\"2017-01-04\",\"performer\":[{\"actor\":{\"display\":\"Meriter Hospital\"}}]}}]}}}}\n"
     val decoded = readSHLinkUtils.decodeAndDecompressPayload(jwt)
-    assertEquals(decoded.trim(), expectedData.trim())
+    assertThat(expectedData.trim()).isEqualTo(decoded.trim())
   }
 
   @Test
