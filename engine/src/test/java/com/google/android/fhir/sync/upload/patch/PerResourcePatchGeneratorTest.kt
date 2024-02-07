@@ -343,7 +343,7 @@ class PerResourcePatchGeneratorTest {
     val patches =
       PerResourcePatchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
 
-    with(patches.single()) {
+    with(patches.single().generatedPatch) {
       assertThat(type).isEqualTo(Patch.Type.UPDATE)
       assertThat(resourceId).isEqualTo("131b5257-a8b3-435a-8cb3-4cb1296be24a")
       assertThat(resourceType).isEqualTo("CarePlan")
