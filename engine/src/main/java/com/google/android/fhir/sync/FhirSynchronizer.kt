@@ -80,6 +80,11 @@ internal class FhirSynchronizer(
     return state
   }
 
+  /**
+   * Manages the sequential execution of downloading and uploading for coordinated operation. This
+   * function is coroutine-safe, ensuring that multiple invocations will not interfere with each
+   * other.
+   */
   suspend fun synchronize(): SyncJobStatus {
     mutex.withLock {
       setSyncState(SyncJobStatus.Started())

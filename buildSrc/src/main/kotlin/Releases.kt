@@ -48,7 +48,7 @@ object Releases {
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "0.1.0-beta05-preview7-SNAPSHOT"
+    override val version = "1.0.0"
     override val name = "Android FHIR Engine Library"
   }
 
