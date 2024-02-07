@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 package com.google.android.fhir.sync
 
-import android.content.Context
-import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
@@ -27,6 +25,8 @@ import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.hl7.fhir.r4.model.ResourceType
 
 enum class SyncOperation {
@@ -44,19 +44,25 @@ private sealed class SyncResult {
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
+internal data class UploadConfiguration(
+  val uploader: Uploader,
+)
+
+internal class DownloadConfiguration(
+  val downloader: Downloader,
+  val conflictResolver: ConflictResolver,
+)
+
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
-  context: Context,
   private val fhirEngine: FhirEngine,
-  private val uploader: Uploader,
-  private val downloader: Downloader,
-  private val conflictResolver: ConflictResolver,
+  private val uploadConfiguration: UploadConfiguration,
+  private val downloadConfiguration: DownloadConfiguration,
+  private val datastoreUtil: FhirDataStore,
 ) {
 
   private val _syncState = MutableSharedFlow<SyncJobStatus>()
   val syncState: SharedFlow<SyncJobStatus> = _syncState
-
-  private val datastoreUtil = DatastoreUtil(context)
 
   private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
 
@@ -66,7 +72,7 @@ internal class FhirSynchronizer(
 
     val state =
       when (result) {
-        is SyncResult.Success -> SyncJobStatus.Finished
+        is SyncResult.Success -> SyncJobStatus.Succeeded()
         is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
       }
 
@@ -74,26 +80,33 @@ internal class FhirSynchronizer(
     return state
   }
 
+  /**
+   * Manages the sequential execution of downloading and uploading for coordinated operation. This
+   * function is coroutine-safe, ensuring that multiple invocations will not interfere with each
+   * other.
+   */
   suspend fun synchronize(): SyncJobStatus {
-    setSyncState(SyncJobStatus.Started)
+    mutex.withLock {
+      setSyncState(SyncJobStatus.Started())
 
-    return listOf(download(), upload())
-      .filterIsInstance<SyncResult.Error>()
-      .flatMap { it.exceptions }
-      .let {
-        if (it.isEmpty()) {
-          setSyncState(SyncResult.Success())
-        } else {
-          setSyncState(SyncResult.Error(it))
+      return listOf(download(), upload())
+        .filterIsInstance<SyncResult.Error>()
+        .flatMap { it.exceptions }
+        .let {
+          if (it.isEmpty()) {
+            setSyncState(SyncResult.Success())
+          } else {
+            setSyncState(SyncResult.Error(it))
+          }
         }
-      }
+    }
   }
 
   private suspend fun download(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    fhirEngine.syncDownload(conflictResolver) {
+    fhirEngine.syncDownload(downloadConfiguration.conflictResolver) {
       flow {
-        downloader.download().collect {
+        downloadConfiguration.downloader.download().collect {
           when (it) {
             is DownloadState.Started -> {
               setSyncState(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, it.total))
@@ -119,7 +132,8 @@ internal class FhirSynchronizer(
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
     val localChangesFetchMode = LocalChangesFetchMode.AllChanges
-    fhirEngine.syncUpload(localChangesFetchMode, uploader::upload).collect { progress ->
+    fhirEngine.syncUpload(localChangesFetchMode, uploadConfiguration.uploader::upload).collect {
+      progress ->
       progress.uploadError?.let { exceptions.add(it) }
         ?: setSyncState(
           SyncJobStatus.InProgress(
@@ -135,5 +149,9 @@ internal class FhirSynchronizer(
     } else {
       SyncResult.Error(exceptions)
     }
+  }
+
+  companion object {
+    private val mutex = Mutex()
   }
 }
