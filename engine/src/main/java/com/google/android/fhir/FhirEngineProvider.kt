@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ package com.google.android.fhir
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.sync.DataSource
+import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
+import java.io.File
 import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
@@ -31,7 +33,8 @@ object FhirEngineProvider {
   /**
    * Initializes the [FhirEngine] singleton with a custom Configuration.
    *
-   * This method throws [IllegalStateException] if it is called multiple times
+   * This method throws [IllegalStateException] if it is called multiple times. It throws
+   * [NullPointerException] if [FhirEngineConfiguration.context] is null.
    */
   @Synchronized
   fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
@@ -56,6 +59,12 @@ object FhirEngineProvider {
   @JvmStatic // needed for mockito
   internal fun getDataSource(context: Context): DataSource? {
     return getOrCreateFhirService(context).remoteDataSource
+  }
+
+  @PublishedApi
+  @Synchronized
+  internal fun getFhirDataStore(context: Context): FhirDataStore {
+    return getOrCreateFhirService(context).fhirDataStore
   }
 
   @Synchronized
@@ -161,4 +170,14 @@ data class NetworkConfiguration(
   val writeTimeOut: Long = 10,
   /** Compresses requests when uploading to a server that supports gzip. */
   val uploadWithGzip: Boolean = false,
+  /** Cache setting to enable Cache-Control Header */
+  val httpCache: CacheConfiguration? = null,
+)
+
+/** Cache configuration wrapper */
+data class CacheConfiguration(
+  /** Cache directory eg: File(application.cacheDir, "http_cache") */
+  val cacheDir: File,
+  /** Cache size in bits eg: 50L * 1024L * 1024L // 50 MiB */
+  val maxSize: Long,
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,10 @@ import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.android.fhir.sync.download.UrlDownloadRequest
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.request.BundleUploadRequest
 import com.google.android.fhir.sync.upload.request.UploadRequest
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
 import com.google.common.truth.Truth.assertThat
 import java.net.SocketTimeoutException
 import java.time.Instant
@@ -110,7 +111,12 @@ object TestDataSourceImpl : DataSource {
     }
 
   override suspend fun upload(request: UploadRequest): Resource {
-    return Bundle().apply { type = Bundle.BundleType.TRANSACTIONRESPONSE }
+    return Bundle().apply {
+      type = Bundle.BundleType.TRANSACTIONRESPONSE
+      addEntry(
+        Bundle.BundleEntryComponent().apply { resource = Patient().apply { id = "123" } },
+      )
+    }
   }
 }
 
@@ -152,12 +158,14 @@ object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
-    upload: suspend (List<LocalChange>) -> UploadSyncResult,
+    upload: suspend (List<LocalChange>) -> Flow<UploadRequestResult>,
   ): Flow<SyncUploadProgress> = flow {
     emit(SyncUploadProgress(1, 1))
-    when (val result = upload(getLocalChanges(ResourceType.Patient, "123"))) {
-      is UploadSyncResult.Success -> emit(SyncUploadProgress(0, 1))
-      is UploadSyncResult.Failure -> emit(SyncUploadProgress(1, 1, result.syncError))
+    upload(getLocalChanges(ResourceType.Patient, "123")).collect {
+      when (it) {
+        is UploadRequestResult.Success -> emit(SyncUploadProgress(0, 1))
+        is UploadRequestResult.Failure -> emit(SyncUploadProgress(1, 1, it.uploadError))
+      }
     }
   }
 
@@ -183,7 +191,7 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{ 'resourceType' : 'Patient', 'id' : '123' }",
+        payload = "{ 'resourceType' : '$type', 'id' : '$id' }",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now(),
@@ -213,12 +221,23 @@ object TestFailingDatasource : DataSource {
   }
 }
 
-class BundleDataSource(val onPostBundle: suspend (Bundle) -> Resource) : DataSource {
+class BundleDataSource(val onPostBundle: suspend (BundleUploadRequest) -> Resource) : DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest): Resource {
     TODO("Not yet implemented")
   }
 
   override suspend fun upload(request: UploadRequest) =
-    onPostBundle((request as BundleUploadRequest).resource)
+    onPostBundle((request as BundleUploadRequest))
+}
+
+class UrlRequestDataSource(val onUrlRequestSend: suspend (UrlUploadRequest) -> Resource) :
+  DataSource {
+
+  override suspend fun download(downloadRequest: DownloadRequest): Resource {
+    TODO("Not yet implemented")
+  }
+
+  override suspend fun upload(request: UploadRequest) =
+    onUrlRequestSend((request as UrlUploadRequest))
 }

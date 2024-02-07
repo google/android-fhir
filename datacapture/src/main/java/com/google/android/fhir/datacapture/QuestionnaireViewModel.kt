@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,7 @@ import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
+import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -251,6 +252,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Toggles review mode. */
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
 
+  /** Tracks which help card has been opened. */
+  private val openedHelpCardSet: MutableSet<QuestionnaireResponseItemComponent> = mutableSetOf()
+
+  /** Callback to save the help card state. */
+  private val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
+    { shouldBeVisible, questionnaireResponseItem ->
+      if (shouldBeVisible) {
+        openedHelpCardSet.add(questionnaireResponseItem)
+      } else {
+        openedHelpCardSet.remove(questionnaireResponseItem)
+      }
+    }
+
   /**
    * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
    * [QuestionnaireResponseItemComponent]s that have not been modified by the user will not be
@@ -419,6 +433,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
     }
+  }
+
+  /** Clears all the answers from the questionnaire response by iterating through each item. */
+  fun clearAllAnswers() {
+    questionnaireResponse.allItems.forEach { it.answer = emptyList() }
+    draftAnswerMap.clear()
+    modifiedQuestionnaireResponseItemSet.clear()
+    responseItemToAnswersMapForDisabledQuestionnaireItem.clear()
+    modificationCount.update { it + 1 }
   }
 
   /**
@@ -743,6 +766,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
     val items = buildList {
+      val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
+      val isHelpCard = itemHelpCard != null
+      val isHelpCardOpen = openedHelpCardSet.contains(questionnaireResponseItem)
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
@@ -767,6 +793,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 showRequiredText = showRequiredText,
                 showOptionalText = showOptionalText,
               ),
+            isHelpCardOpen = isHelpCard && isHelpCardOpen,
+            helpCardStateChangedCallback = helpCardStateChangedCallback,
           ),
         ),
       )

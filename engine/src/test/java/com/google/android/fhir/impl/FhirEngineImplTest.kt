@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
@@ -32,8 +31,9 @@ import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -350,9 +350,15 @@ class FhirEngineImplTest {
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
         localChanges.addAll(it)
-        UploadSyncResult.Success(
-          it,
-          listOf(),
+        flowOf(
+          UploadRequestResult.Success(
+            listOf(
+              ResourceUploadResponseMapping(
+                it,
+                TEST_PATIENT_1,
+              ),
+            ),
+          ),
         )
       }
       .collect { emittedProgress.add(it) }
@@ -376,9 +382,11 @@ class FhirEngineImplTest {
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
       .syncUpload(LocalChangesFetchMode.AllChanges) {
-        UploadSyncResult.Failure(
-          uploadError,
-          LocalChangeToken(it.flatMap { it.token.ids }),
+        flowOf(
+          UploadRequestResult.Failure(
+            it,
+            uploadError,
+          ),
         )
       }
       .collect { emittedProgress.add(it) }
