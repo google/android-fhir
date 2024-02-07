@@ -92,7 +92,7 @@ class SHLinkDecoderImplTest {
   }
 
   @Test
-  fun testDecodeSHLinkToDocumentWithEmbeddedAndNoVC() = runBlocking {
+  fun `test decodeSHLinkToDocument with embedded data and no verifiable content`() = runBlocking {
     val mockResponse =
       MockResponse()
         .setResponseCode(200)
@@ -123,96 +123,91 @@ class SHLinkDecoderImplTest {
       )
     assertNotNull(result)
     assertNotNull(result!!.document)
-    //
-    // val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
-    // println("Request URL: ${recordedRequestGetManifest.requestUrl}")
-    // println("Request Method: ${recordedRequestGetManifest.method}")
-    // println("Request Headers: ${recordedRequestGetManifest.headers}")
-    // println("Request Body: ${recordedRequestGetManifest.body.readUtf8()}")
-    // assertEquals("/fullLink", recordedRequestGetManifest.path)
   }
 
   @Test
-  fun testDecodeSHLinkToDocumentWithLocationAndNoVC() = runBlocking {
-    val mockResponse =
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(
-          "{\n" +
-            "    \"files\": [\n" +
-            "        {\n" +
-            "            \"contentType\": \"application/smart-health-card\",\n" +
-            "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
-            "        }\n" +
-            "    ]\n" +
-            "}",
-        )
-    mockWebServer.enqueue(mockResponse)
+  fun `test decodeSHLinkToDocument with externally stored data and no verifiable content`() =
+    runBlocking {
+      val mockResponse =
+        MockResponse()
+          .setResponseCode(200)
+          .setBody(
+            "{\n" +
+              "    \"files\": [\n" +
+              "        {\n" +
+              "            \"contentType\": \"application/smart-health-card\",\n" +
+              "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
+              "        }\n" +
+              "    ]\n" +
+              "}",
+          )
+      mockWebServer.enqueue(mockResponse)
 
-    val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody(getLocationResponse)
-    mockWebServer.enqueue(mockGetLocationResponse)
+      val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody(getLocationResponse)
+      mockWebServer.enqueue(mockGetLocationResponse)
 
-    val testBundleString = "{\"resourceType\" : \"Bundle\"}"
+      val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
-    `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
-    `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
-    `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
-    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
+      `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
+      `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
+      `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
+      `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
 
-    val result = shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
-    assertNotNull(result)
-    assertNotNull(result!!.document)
+      val result = shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
+      assertNotNull(result)
+      assertNotNull(result!!.document)
 
-    val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
-    assertThat(recordedRequestGetManifest.path)
-      .isEqualTo("/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc")
+      val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
+      assertThat(recordedRequestGetManifest.path)
+        .isEqualTo("/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc")
 
-    val recordedRequestGetLocation: RecordedRequest = mockWebServer.takeRequest()
-    assertTrue(
-      recordedRequestGetLocation.path!!.contains(
-        "/shl/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=",
-      ),
-    )
-  }
-
-  @Test
-  fun testDecodeSHLinkToDocumentWithNoDataAtLocation() = runBlocking {
-    val mockResponse =
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(
-          "{\n" +
-            "    \"files\": [\n" +
-            "        {\n" +
-            "            \"contentType\": \"application/smart-health-card\",\n" +
-            "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
-            "        }\n" +
-            "    ]\n" +
-            "}",
-        )
-    mockWebServer.enqueue(mockResponse)
-
-    val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody("")
-    mockWebServer.enqueue(mockGetLocationResponse)
-
-    val testBundleString = "{\"resourceType\" : \"Bundle\"}"
-
-    `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
-    `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
-    `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
-    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
-
-    val result = runCatching {
-      shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
+      val recordedRequestGetLocation: RecordedRequest = mockWebServer.takeRequest()
+      assertTrue(
+        recordedRequestGetLocation.path!!.contains(
+          "/shl/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=",
+        ),
+      )
     }
-    assertTrue(result.isFailure)
-    assertEquals(Error::class, result.exceptionOrNull()!!::class)
-  }
 
   @Test
-  fun testDecodeSHLinkToDocumentWithEmptyFullLink() = runBlocking {
+  fun `test decodeSHLinkToDocument with no data stored at the external location provided`() =
+    runBlocking {
+      val mockResponse =
+        MockResponse()
+          .setResponseCode(200)
+          .setBody(
+            "{\n" +
+              "    \"files\": [\n" +
+              "        {\n" +
+              "            \"contentType\": \"application/smart-health-card\",\n" +
+              "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
+              "        }\n" +
+              "    ]\n" +
+              "}",
+          )
+      mockWebServer.enqueue(mockResponse)
+
+      val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody("")
+      mockWebServer.enqueue(mockGetLocationResponse)
+
+      val testBundleString = "{\"resourceType\" : \"Bundle\"}"
+
+      `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
+      `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
+      `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
+      `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
+
+      val result = runCatching {
+        shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
+      }
+      assertTrue(result.isFailure)
+      assertEquals(Error::class, result.exceptionOrNull()!!::class)
+    }
+
+  @Test
+  fun `test decodeSHLinkToDocument with an invalid SHL passed in`() = runBlocking {
     val result = runCatching {
-      shLinkDecoderImpl.decodeSHLinkToDocument("fullLink", exampleJsonData)
+      shLinkDecoderImpl.decodeSHLinkToDocument("invalidLink", exampleJsonData)
     }
     assertTrue(result.isFailure)
     assertEquals(IllegalArgumentException::class, result.exceptionOrNull()!!::class)
@@ -223,7 +218,7 @@ class SHLinkDecoderImplTest {
   }
 
   @Test
-  fun testDecodeSHLinkToDocumentWithoutAFullLink() = runBlocking {
+  fun `test decodeSHLinkToDocument with an empty SHL passed in`() = runBlocking {
     val result = runCatching { shLinkDecoderImpl.decodeSHLinkToDocument("", exampleJsonData) }
     assertTrue(result.isFailure)
     assertEquals(IllegalArgumentException::class, result.exceptionOrNull()!!::class)
@@ -234,7 +229,7 @@ class SHLinkDecoderImplTest {
   }
 
   @Test
-  fun testDecodeSHLinkToDocumentWithUnsuccessfulManifestPost() = runBlocking {
+  fun `test decodeSHLinkToDocument with an unsuccessful POST to the manifest URL`() = runBlocking {
     val mockResponse =
       MockResponse().setResponseCode(500).setBody(manifestFileResponseWithLocation.toString())
     mockWebServer.enqueue(mockResponse)
@@ -252,7 +247,7 @@ class SHLinkDecoderImplTest {
   }
 
   @Test
-  fun testDecodeEmbeddedArrayWithVerifiableCredential() = runBlocking {
+  fun `test decodeSHLinkToDocument with embedded data and verifiable content`() = runBlocking {
     val mockResponse =
       MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
     mockWebServer.enqueue(mockResponse)

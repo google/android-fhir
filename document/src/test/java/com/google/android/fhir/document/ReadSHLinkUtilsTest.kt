@@ -33,45 +33,45 @@ class ReadSHLinkUtilsTest {
   private val key = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDg"
 
   @Test
-  fun testExtractUrlWithValidSHL() {
+  fun `test extractUrl with a valid SHL`() {
     val scannedData = "shlink:/example-url"
     val result = readSHLinkUtils.extractUrl(scannedData)
     assertEquals("example-url", result)
   }
 
   @Test
-  fun testExtractUrlWithInvalidSHL() {
+  fun `test extractUrl with an invalid SHL`() {
     val scannedData = "invalidSHL"
     assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.extractUrl(scannedData) }
   }
 
   @Test
-  fun testExtractUrlWithEmptySHL() {
+  fun `test extractUrl with an empty SHL`() {
     val scannedData = ""
     assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.extractUrl(scannedData) }
   }
 
   @Test
-  fun testDecodeUrl() {
+  fun `test that decodeUrl successfully decodes a Base64 encoded input string`() {
     val extractedUrl = "aGVsbG8="
     val result = readSHLinkUtils.decodeUrl(extractedUrl)
     assertTrue(result.contentEquals("hello".toByteArray()))
   }
 
   @Test
-  fun testDecodeUrlWithInvalidBase64() {
+  fun `test that decodeUrl throws an error when decoding an invalid Base64 encoded input string`() {
     val extractedUrl = "aGsbG8="
     assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.decodeUrl(extractedUrl) }
   }
 
   @Test
-  fun testDecodeUrlWithEmptyInput() {
+  fun `test that decodeUrl throws an error when decoding an empty input string`() {
     val extractedUrl = ""
     assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.decodeUrl(extractedUrl) }
   }
 
   @Test
-  fun testDecodeShc() {
+  fun `test that decodeShc can successfully decrypt an SHL with it's given key`() {
     val result = readSHLinkUtils.decodeShc(responseBody, key)
     assertEquals(
       "{\"iss\":\"DinoChiesa.github.io\",\"sub\":\"idris\",\"aud\":\"kina\",\"iat\":1691158997,\"exp\":1691159597,\"aaa\":true}",
@@ -80,32 +80,32 @@ class ReadSHLinkUtilsTest {
   }
 
   @Test
-  fun testDecodeShcWithEmptyResponse() {
+  fun `test that decodeShc unsuccessfully decrypts an empty string`() {
     val responseBody = ""
     assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, key) }
   }
 
   @Test
-  fun testDecodeShcWithEmptyKey() {
+  fun `test that decodeShc unsuccessfully decrypts an SHL with an empty key`() {
     val key = ""
     assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, key) }
   }
 
   @Test
-  fun testDecodeShcWithInvalidKey() {
+  fun `test that decodeShc unsuccessfully decrypts an SHL with an invalid key`() {
     val invalidKey = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDb"
     assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, invalidKey) }
   }
 
   @Test
-  fun testExtractVerifiableCredential() {
+  fun `test extractVerifiableCredential successfully extracts the data from a JSON string`() {
     val jsonStringWithCredential = "{\"verifiableCredential\": [\"credentialData\"]}"
     val resultWithCredential = readSHLinkUtils.extractVerifiableCredential(jsonStringWithCredential)
     assertEquals("credentialData", resultWithCredential)
   }
 
   @Test
-  fun testExtractVerifiableCredentialWithEmptyJson() {
+  fun `test extractVerifiableCredential successfully extracts the data from an empty JSON string`() {
     val jsonStringWithoutCredential = "{}"
     val resultWithoutCredential =
       readSHLinkUtils.extractVerifiableCredential(jsonStringWithoutCredential)
@@ -113,7 +113,7 @@ class ReadSHLinkUtilsTest {
   }
 
   @Test
-  fun jwtsCanBeDecodedAndDecompressedIntoData() {
+  fun `test that jwts can be decoded and decompressed into JSON data`() {
     val jwt =
       "eyJ6aXAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pZJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
     val expectedData =
@@ -123,13 +123,13 @@ class ReadSHLinkUtilsTest {
   }
 
   @Test
-  fun emptyJWTShouldThrowAnErrorWhenAttemptingToDecode() {
+  fun `test that empty jwts throw an error when attempting to decode and decompress them`() {
     val jwt = ""
     assertThrows(Error::class.java) { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
   }
 
   @Test
-  fun invalidJWTShouldThrowAnErrorWhenAttemptingToDecode() {
+  fun `test that invalid jwts throw an error when attempting to decode and decompress them`() {
     val jwt =
       "XAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pHJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
     assertThrows(Error::class.java) { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
