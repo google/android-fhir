@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.catalog
 
 import android.app.Application
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
@@ -46,7 +47,6 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * answer the required questions, an error may be displayed on the particular question.
      */
     val questionnaireFileWithValidation: String? = null,
-    val workflow: WorkflowType = WorkflowType.COMPONENT,
   ) {
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
@@ -172,4 +172,10 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
       ViewItem.ComponentItem(Component.INITIAL_VALUE),
     )
+
+  fun isComponent(context: Context, title: String) =
+    viewItemList
+      .filterIsInstance<ViewItem.ComponentItem>()
+      .map { context.getString(it.component.textId) }
+      .contains(title)
 }

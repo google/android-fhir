@@ -24,7 +24,7 @@ import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
 import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -250,7 +250,7 @@ internal class EnabledAnswerOptionsEvaluator(
           val (expression, toggleOptions) = it
           val evaluationResult =
             if (expression.isFhirPath) {
-              fhirPathEngine.convertToBoolean(
+              convertToBoolean(
                 expressionEvaluator.evaluateExpression(
                   item,
                   questionnaireResponseItem,
