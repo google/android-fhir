@@ -22,5 +22,5 @@ import com.google.android.fhir.document.IPSDocument
 interface SHLinkDecoder {
 
   /* Decode and decompress a SHL into an IPSDocument object */
-  suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument?
+  suspend fun decodeSHLinkToDocument(fullLink: String, jsonData: String): IPSDocument?
 }

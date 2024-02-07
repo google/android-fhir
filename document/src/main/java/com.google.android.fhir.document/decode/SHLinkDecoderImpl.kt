@@ -21,37 +21,38 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.document.IPSDocument
 import com.google.android.fhir.document.RetrofitSHLService
 import com.google.android.fhir.document.scan.SHLinkScanData
-import java.nio.charset.StandardCharsets
 import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Patient
 import org.json.JSONArray
-import org.json.JSONException
 import org.json.JSONObject
-import timber.log.Timber
 
 class SHLinkDecoderImpl(
-  private val shLinkScanDataInput: SHLinkScanData?,
   private val readSHLinkUtils: ReadSHLinkUtils,
   private val apiService: RetrofitSHLService,
 ) : SHLinkDecoder {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
-  override suspend fun decodeSHLinkToDocument(jsonData: String): IPSDocument? {
-    val shLinkScanData = constructShlObj()
-    val bundle = shLinkScanData.let { postToServer(jsonData, it) }
+  /* */
+  override suspend fun decodeSHLinkToDocument(fullLink: String, jsonData: String): IPSDocument? {
+    val shLinkScanData = SHLinkScanData().create(fullLink)
+    val bundle = postToServer(jsonData, shLinkScanData)
     return if (bundle != null) {
-      IPSDocument(bundle, ArrayList(), Patient()) // change this construction
+      IPSDocument.create(bundle)
     } else {
       null
     }
   }
 
+  /* */
   private suspend fun postToServer(jsonData: String, shLinkScanData: SHLinkScanData): Bundle? =
     coroutineScope {
       try {
-        val response = apiService.getFilesFromManifest(shLinkScanData.fullLink, jsonData)
+        val response =
+          apiService.getFilesFromManifest(
+            shLinkScanData.manifestUrl.substringAfterLast("shl/"),
+            JSONObject(jsonData),
+          )
         if (response.isSuccessful) {
           val responseBody = response.body()?.string()
           responseBody?.let {
@@ -65,6 +66,7 @@ class SHLinkDecoderImpl(
       }
     }
 
+  /* */
   private suspend fun decodeResponseBody(
     responseBody: String,
     shLinkScanData: SHLinkScanData,
@@ -79,7 +81,8 @@ class SHLinkDecoderImpl(
               fileObject.getString("embedded")
             } else {
               fileObject.getString("location").let {
-                val responseFromLocation = apiService.getFromLocation(it)
+                val responseFromLocation =
+                  apiService.getFromLocation("file/${it.substringAfterLast("/")}")
                 val responseBodyFromLocation = responseFromLocation.body()?.string()
                 if (!responseBodyFromLocation.isNullOrBlank()) {
                   responseBodyFromLocation
@@ -94,51 +97,28 @@ class SHLinkDecoderImpl(
     return decodeEmbeddedArray(embeddedArray, shLinkScanData)
   }
 
+  /* */
   private fun decodeEmbeddedArray(
     embeddedArray: Array<String>,
     shLinkScanData: SHLinkScanData,
   ): Bundle {
     var healthData = ""
-    for (elem in embeddedArray) {
-      val decodedShc = shLinkScanData.key.let { readSHLinkUtils.decodeShc(elem, it) }
+    for (element in embeddedArray) {
+      val decodedShc = shLinkScanData.key.let { readSHLinkUtils.decodeShc(element, it) }
       if (decodedShc != "") {
         val toDecode = readSHLinkUtils.extractVerifiableCredential(decodedShc)
         if (toDecode.isEmpty()) {
           healthData = decodedShc
           break
         }
-        val obj = JSONObject(readSHLinkUtils.decodeAndDecompressPayload(toDecode))
-        val doc =
-          obj.getJSONObject("vc").getJSONObject("credentialSubject").getJSONObject("fhirBundle")
-        return parser.parseResource(doc.toString()) as Bundle
+        val document =
+          JSONObject(readSHLinkUtils.decodeAndDecompressPayload(toDecode))
+            .getJSONObject("vc")
+            .getJSONObject("credentialSubject")
+            .getJSONObject("fhirBundle")
+        return parser.parseResource(document.toString()) as Bundle
       }
     }
     return parser.parseResource(healthData) as Bundle
-  }
-
-  private fun constructShlObj(): SHLinkScanData {
-    shLinkScanDataInput?.fullLink?.let { fullLink ->
-      if (fullLink.isEmpty()) {
-        throw (IllegalArgumentException("Provided SHLinkScanData object's fullLink is empty"))
-      }
-      val extractedJson = readSHLinkUtils.extractUrl(fullLink)
-      val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
-      try {
-        val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
-        return SHLinkScanData(
-          shLinkScanDataInput.fullLink,
-          extractedJson,
-          jsonObject.optString("url", ""),
-          key = jsonObject.optString("key", ""),
-          flag = jsonObject.optString("flag", ""),
-        )
-      } catch (exception: JSONException) {
-        Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
-        throw exception
-      }
-    }
-    throw (NullPointerException(
-      "Provided SHLinkScanData object's fullLink has not been initialised",
-    ))
   }
 }

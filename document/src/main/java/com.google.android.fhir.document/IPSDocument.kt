@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.document
 
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 
 /**
@@ -36,8 +35,15 @@ import org.hl7.fhir.r4.model.Resource
 data class IPSDocument(
   val document: Bundle,
   val titles: ArrayList<Title>,
-  val patient: Patient,
-)
+) {
+  constructor(bundle: Bundle) : this(bundle, arrayListOf())
+
+  companion object {
+    fun create(bundle: Bundle): IPSDocument {
+      return IPSDocument(bundle)
+    }
+  }
+}
 
 /**
  * Represents a title, which corresponds to a section present in the IPS document.

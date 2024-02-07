@@ -17,6 +17,11 @@
 package com.google.android.fhir.document.scan
 
 import com.google.android.fhir.document.IPSDocument
+import com.google.android.fhir.document.decode.ReadSHLinkUtils
+import java.nio.charset.StandardCharsets
+import org.json.JSONException
+import org.json.JSONObject
+import timber.log.Timber
 
 /**
  * Represents a SHL data structure, which stores information related to SHL content required for the
@@ -47,6 +52,30 @@ data class SHLinkScanData(
   val versionNumber: String,
   val ipsDoc: IPSDocument?,
 ) {
+  fun create(fullLink: String): SHLinkScanData {
+    val readSHLinkUtils = ReadSHLinkUtils()
+    val extractedJson = readSHLinkUtils.extractUrl(fullLink)
+    val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
+
+    try {
+      val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+      return SHLinkScanData(
+        fullLink,
+        extractedJson,
+        jsonObject.optString("url", ""),
+        jsonObject.optString("key", ""),
+        jsonObject.optString("label", ""),
+        jsonObject.optString("flag", ""),
+        jsonObject.optString("expirationTime", ""),
+        jsonObject.optString("versionNumber", ""),
+        null,
+      )
+    } catch (exception: JSONException) {
+      Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
+      throw exception
+    }
+  }
+
   constructor() : this("", "", "", "", "", "", "", "", null)
 
   constructor(scannedValue: String) : this(scannedValue, "", "", "", "", "", "", "", null)

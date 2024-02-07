@@ -52,6 +52,7 @@ dependencies {
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockWebServer)
+  testImplementation(Dependencies.truth)
 
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.Espresso.espressoCore)
