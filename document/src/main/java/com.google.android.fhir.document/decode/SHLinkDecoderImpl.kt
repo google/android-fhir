@@ -33,7 +33,16 @@ class SHLinkDecoderImpl(
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
-  /* */
+  /**
+   * Decodes a Smart Health Link (SHL) to an [IPSDocument] object by creating a new [SHLinkScanData]
+   * object and posting the provided JSON data to its manifest URL.
+   *
+   * @param fullLink The full Smart Health Link.
+   * @param jsonData The JSON data to be posted to the manifest. The JSON must contain a 'recipient'
+   *   and, if the P flag is present in the SHL payload, a passcode. For example: `{"recipient":
+   *   "Example SHL Client", "passcode": "123"}`
+   * @return An [IPSDocument] object if decoding is successful, otherwise null.
+   */
   override suspend fun decodeSHLinkToDocument(fullLink: String, jsonData: String): IPSDocument? {
     val shLinkScanData = SHLinkScanData().create(fullLink)
     val bundle = postToServer(jsonData, shLinkScanData)
@@ -44,7 +53,15 @@ class SHLinkDecoderImpl(
     }
   }
 
-  /* */
+  /**
+   * Posts the JSON data to the Smart Health Link's manifest URL. If successful, the response body,
+   * which will be a list of files, is decoded.
+   *
+   * @param jsonData The JSON data to be posted to the manifest.
+   * @param shLinkScanData The SHLinkScanData object containing information about the SHL.
+   * @return A FHIR Bundle representing the IPS Document.
+   * @throws Error if there's an issue posting to the manifest or decoding the response.
+   */
   private suspend fun postToServer(jsonData: String, shLinkScanData: SHLinkScanData): Bundle? =
     coroutineScope {
       try {
@@ -66,7 +83,15 @@ class SHLinkDecoderImpl(
       }
     }
 
-  /* */
+  /**
+   * Decodes the response body, handling both embedded files and files stored in an external
+   * location.
+   *
+   * @param responseBody The response body from the manifest request.
+   * @param shLinkScanData The SHLinkScanData object containing information about the SHL.
+   * @return A FHIR Bundle representing the IPS Document.
+   * @throws IllegalArgumentException if no data is found at the given location.
+   */
   private suspend fun decodeResponseBody(
     responseBody: String,
     shLinkScanData: SHLinkScanData,
@@ -97,7 +122,13 @@ class SHLinkDecoderImpl(
     return decodeEmbeddedArray(embeddedArray, shLinkScanData)
   }
 
-  /* */
+  /**
+   * Decodes each element in the array and returns the FHIR Bundle stored inside.
+   *
+   * @param embeddedArray An array of encrypted data elements.
+   * @param shLinkScanData The SHLinkScanData object containing information about the SHL.
+   * @return A FHIR Bundle representing the IPS Document.
+   */
   private fun decodeEmbeddedArray(
     embeddedArray: Array<String>,
     shLinkScanData: SHLinkScanData,

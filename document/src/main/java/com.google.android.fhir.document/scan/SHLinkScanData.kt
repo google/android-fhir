@@ -53,9 +53,8 @@ data class SHLinkScanData(
   val ipsDoc: IPSDocument?,
 ) {
   fun create(fullLink: String): SHLinkScanData {
-    val readSHLinkUtils = ReadSHLinkUtils()
-    val extractedJson = readSHLinkUtils.extractUrl(fullLink)
-    val decodedJson = readSHLinkUtils.decodeUrl(extractedJson)
+    val extractedJson = ReadSHLinkUtils.extractUrl(fullLink)
+    val decodedJson = ReadSHLinkUtils.decodeUrl(extractedJson)
 
     try {
       val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))

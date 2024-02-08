@@ -24,7 +24,7 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class ReadSHLinkUtilsTest {
-  private val readSHLinkUtils = ReadSHLinkUtils()
+  private val readSHLinkUtils = ReadSHLinkUtils
 
   private val responseBody =
     "eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiZGlyIn0..OgGwTWbECJk9tQc4.PUxr0STCtKQ6DmdPqPtJtTowTBxdprFykeZ2WUOUw234_TtdGWLJ0hzfuWjZXDyBpa55TXwvSwobpcbut9Cdl2nATA0_j1nW0-A32uAwH0qEE1ELV5G0IQVT5AqKJRTCMGpy0mWH.qATmrk-UdwCOaT1TY6GEJg"
@@ -42,7 +42,7 @@ class ReadSHLinkUtilsTest {
     val scannedData = "invalidSHL"
     val result = runCatching { readSHLinkUtils.extractUrl(scannedData) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
   }
 
   @Test
@@ -50,7 +50,7 @@ class ReadSHLinkUtilsTest {
     val scannedData = ""
     val result = runCatching { readSHLinkUtils.extractUrl(scannedData) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
   }
 
   @Test
@@ -65,7 +65,7 @@ class ReadSHLinkUtilsTest {
     val extractedUrl = "aGsbG8="
     val result = runCatching { readSHLinkUtils.decodeUrl(extractedUrl) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
   }
 
   @Test
@@ -73,15 +73,16 @@ class ReadSHLinkUtilsTest {
     val extractedUrl = ""
     val result = runCatching { readSHLinkUtils.decodeUrl(extractedUrl) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
   }
 
   @Test
   fun `test that decodeShc can successfully decrypt an SHL with it's given key`() {
     val result = readSHLinkUtils.decodeShc(responseBody, key)
-    assertThat(result.trim()).isEqualTo(
-      "{\"iss\":\"DinoChiesa.github.io\",\"sub\":\"idris\",\"aud\":\"kina\",\"iat\":1691158997,\"exp\":1691159597,\"aaa\":true}",
-    )
+    assertThat(result.trim())
+      .isEqualTo(
+        "{\"iss\":\"DinoChiesa.github.io\",\"sub\":\"idris\",\"aud\":\"kina\",\"iat\":1691158997,\"exp\":1691159597,\"aaa\":true}",
+      )
   }
 
   @Test
@@ -89,7 +90,7 @@ class ReadSHLinkUtilsTest {
     val responseBody = ""
     val result = runCatching { readSHLinkUtils.decodeShc(responseBody, key) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
   }
 
   @Test
@@ -97,7 +98,7 @@ class ReadSHLinkUtilsTest {
     val key = ""
     val result = runCatching { readSHLinkUtils.decodeShc(responseBody, key) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
   }
 
   @Test
@@ -105,7 +106,7 @@ class ReadSHLinkUtilsTest {
     val invalidKey = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDb"
     val result = runCatching { readSHLinkUtils.decodeShc(responseBody, invalidKey) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
   }
 
   @Test
@@ -124,7 +125,7 @@ class ReadSHLinkUtilsTest {
   }
 
   @Test
-  fun `test that jwts can be decoded and decompressed into JSON data`() {
+  fun `test that JWTs can be decoded and decompressed into JSON data`() {
     val jwt =
       "eyJ6aXAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pZJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
     val expectedData =
@@ -134,19 +135,19 @@ class ReadSHLinkUtilsTest {
   }
 
   @Test
-  fun `test that empty jwts throw an error when attempting to decode and decompress them`() {
+  fun `test that empty JWTs throw an error when attempting to decode and decompress them`() {
     val jwt = ""
     val result = runCatching { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
   }
 
   @Test
-  fun `test that invalid jwts throw an error when attempting to decode and decompress them`() {
+  fun `test that invalid JWTs throw an error when attempting to decode and decompress them`() {
     val jwt =
       "XAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pHJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
     val result = runCatching { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
     assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class.java)
+    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
   }
 }

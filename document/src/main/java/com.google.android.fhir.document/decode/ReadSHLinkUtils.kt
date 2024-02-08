@@ -25,7 +25,7 @@ import java.util.zip.DataFormatException
 import java.util.zip.Inflater
 import org.json.JSONObject
 
-class ReadSHLinkUtils {
+object ReadSHLinkUtils {
 
   /* Extracts the part of the link after the 'shlink:/' */
   fun extractUrl(scannedData: String): String {
