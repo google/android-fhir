@@ -113,6 +113,14 @@ class MoreTypesTest {
   }
 
   @Test
+  fun equals_differentReferences_shouldReturnFalse() {
+    assertThat(
+        equals(Reference("Location/123"), Reference("Location/abc")),
+      )
+      .isFalse()
+  }
+
+  @Test
   fun compareTo_int_shouldReturnPositiveValue() {
     val integerValue = IntegerType()
     integerValue.value = 20
