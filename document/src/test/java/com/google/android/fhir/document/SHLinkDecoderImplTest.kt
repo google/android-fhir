@@ -77,6 +77,11 @@ class SHLinkDecoderImplTest {
   private val exampleSHL =
     "shlink:/eyJsYWJlbCI6IkN1c3RvbSBEYXRhc2V0IDExIiwidXJsIjoiaHR0cHM6Ly9hcGkudmF4eC5saW5rL2FwaS9zaGwveFJ4M2Q0QzNROE0wbnhaejZmc1ZYdGYyLW5QTDlwUXdBb2RRZVVYNzFqYyIsImZsYWciOiIiLCJrZXkiOiI0RXNvSFF3WXdTLU8wVW43WkNBQXlSMnQ2TVJ3WjJpSndLMFlZTnBNcEZFIn0"
   private val exampleJsonData = "{\"passcode\": \"\", \"recipient\": \"Example SHL Client\"}"
+  private val filesWithEmbedded =
+    "{\"files\": [{\"contentType\": \"application/smart-health-card\", \"embedded\": \"embeddedData\"}]}"
+  private val filesWithLocation =
+    "{\"files\": [{\"contentType\": \"application/smart-health-card\", \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=...\"}]}"
+  private val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
   @Before
   fun setUp() {
@@ -91,23 +96,8 @@ class SHLinkDecoderImplTest {
 
   @Test
   fun `test decodeSHLinkToDocument with embedded data and no verifiable content`() = runBlocking {
-    val mockResponse =
-      MockResponse()
-        .setResponseCode(200)
-        .setBody(
-          "{\n" +
-            "    \"files\": [\n" +
-            "        {\n" +
-            "            \"contentType\": \"application/smart-health-card\",\n" +
-            "            \"embedded\": \"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwiY29udGVudFR5cGUiOiJhcHBsaWNhdGlvbi9zbWFydC1oZWFsdGgtY2FyZCJ9..1r1opfOWe6C8z9hw.ogAcofRDaoXMC2r1EUUWgzD5BhcgNOB63Sxb_9TF5NsT2hWmXIf9IjaEAe4ThCus1CzL-u3JGLF0_D85B8ZLKTSRgKL4AEdh9baxFSKu0LySdcS6Qigi_mvVGvztyUjFUY40WKfsSY2F2_6vD82itPWoh-j-2X5L2dnMgYWwGIrXMSx8p7N5VDOqrvrzswaaQ6hSS506a4Mbn0FdDWkDMm1P50QWyImEN_LkGH3mA926b4Cusmd2ImW8cvBKpP_vuCrSm_NHeDi0yl8SgZBq-absSSOLxdyoq_xnRISd6CXMXChIzxeOGeLvAtWQSWYEDCG75nCuLxplZN675MG0uFHPhh2jJIo6pXGUdldHrzzVlPp0UUEViHMkL8wGQNYOpl2-IdOhEddAGXNL-YCPh2I_n7uWWZ2CtOBrGS-BydYhQzl15BP2jBghgXaZqbl6dz-58WNAShvNCtJXTQu0EUQj4pIwOehd_kD0spDYol7KTSjAsg2Hwa2Vsn58KN1MqjoU0Srzhc4i9nXQNLmwzJJvr2Ub_dzrekvD3Lr9QtSvZf7bcZFenJeq8t_G-fHKj-Wpc-VGWM_di06jp0AnvB6aLkQFV1Lm5p0Deh-D1Zk15oQOyn02ZMH3zz162cL2rTBqBPMw6P7wY53HfAmi6w-1IDGhyEFCKgTjhHAdoN5olJ4tte1RRGbMQqjkyWY9M-DMLduZq8ztMu90qhe_4lGm7jADQWHtVmg0ZPAbVa6VBL-vTKhcKAmUCbshz8iZCC-83K_-3aRnYVZSEu7MgpcwedFwEvdMN__vhKjpFMowaDkBTeUjU_RGmVFSpLtFUgU1Io0p3qJkdZnRPAKHxMIrDxHGMyEdiJnzBlGkdoIfiiPOZNxhWjaWH-yQtklFabntNnacDkbiQGmBHsTe_je9svO4BpDqhped-DL3igFfLOjktW-QfK8kP5Ha7unb3ZhO8-ip2BJrAr1dvicQ6bTiAE4L.1Zwx0ZU-8ja9BIrgZKPHUw\",\n" +
-            "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
-            "        }\n" +
-            "    ]\n" +
-            "}",
-        )
+    val mockResponse = MockResponse().setResponseCode(200).setBody(filesWithEmbedded)
     mockWebServer.enqueue(mockResponse)
-
-    val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
     `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
     `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
@@ -126,25 +116,11 @@ class SHLinkDecoderImplTest {
   @Test
   fun `test decodeSHLinkToDocument with externally stored data and no verifiable content`() =
     runBlocking {
-      val mockResponse =
-        MockResponse()
-          .setResponseCode(200)
-          .setBody(
-            "{\n" +
-              "    \"files\": [\n" +
-              "        {\n" +
-              "            \"contentType\": \"application/smart-health-card\",\n" +
-              "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
-              "        }\n" +
-              "    ]\n" +
-              "}",
-          )
+      val mockResponse = MockResponse().setResponseCode(200).setBody(filesWithLocation)
       mockWebServer.enqueue(mockResponse)
 
       val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody(getLocationResponse)
       mockWebServer.enqueue(mockGetLocationResponse)
-
-      val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
       `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
       `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
@@ -175,21 +151,12 @@ class SHLinkDecoderImplTest {
         MockResponse()
           .setResponseCode(200)
           .setBody(
-            "{\n" +
-              "    \"files\": [\n" +
-              "        {\n" +
-              "            \"contentType\": \"application/smart-health-card\",\n" +
-              "            \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=qo1dHKcLGGQ7Vu0uReyLlX-Q2vITloIZyrddMaoL93g\"\n" +
-              "        }\n" +
-              "    ]\n" +
-              "}",
+            filesWithLocation,
           )
       mockWebServer.enqueue(mockResponse)
 
       val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody("")
       mockWebServer.enqueue(mockGetLocationResponse)
-
-      val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
       `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
       `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
@@ -244,8 +211,6 @@ class SHLinkDecoderImplTest {
     val mockResponse =
       MockResponse().setResponseCode(200).setBody(manifestFileResponseWithEmbedded.toString())
     mockWebServer.enqueue(mockResponse)
-
-    val testBundleString = "{\"resourceType\" : \"Bundle\"}"
 
     `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
     `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
