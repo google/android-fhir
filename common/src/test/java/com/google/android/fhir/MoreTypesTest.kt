@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -105,12 +105,11 @@ class MoreTypesTest {
   }
 
   @Test
-  fun equals_reference_shouldThrowException() {
-    val exception =
-      assertThrows(NotImplementedError::class.java) { equals(Reference(), Reference()) }
-
-    assertThat(exception.message)
-      .isEqualTo("Comparison for type ${Reference::class.java} not supported.")
+  fun equals_reference_shouldReturnTrue() {
+    assertThat(
+        equals(Reference("Location/123"), Reference("Location/123")),
+      )
+      .isTrue()
   }
 
   @Test
