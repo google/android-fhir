@@ -37,14 +37,14 @@ class SHLinkDecoderImpl(
    * Decodes a Smart Health Link (SHL) to an [IPSDocument] object by creating a new [SHLinkScanData]
    * object and posting the provided JSON data to its manifest URL.
    *
-   * @param fullLink The full Smart Health Link.
+   * @param shLink The full Smart Health Link.
    * @param jsonData The JSON data to be posted to the manifest. The JSON must contain a 'recipient'
    *   and, if the P flag is present in the SHL payload, a passcode. For example: `{"recipient":
    *   "Example SHL Client", "passcode": "123"}`
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
-  override suspend fun decodeSHLinkToDocument(fullLink: String, jsonData: String): IPSDocument? {
-    val shLinkScanData = SHLinkScanData().create(fullLink)
+  override suspend fun decodeSHLinkToDocument(shLink: String, jsonData: String): IPSDocument? {
+    val shLinkScanData = SHLinkScanData().create(shLink)
     val bundle = postToServer(jsonData, shLinkScanData)
     return if (bundle != null) {
       IPSDocument.create(bundle)
