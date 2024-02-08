@@ -16,11 +16,11 @@
 
 package com.google.android.fhir.document.decode
 
+import android.util.Base64
 import com.nimbusds.jose.JWEDecrypter
 import com.nimbusds.jose.JWEObject
 import com.nimbusds.jose.crypto.DirectDecrypter
 import java.io.ByteArrayOutputStream
-import java.util.Base64
 import java.util.zip.DataFormatException
 import java.util.zip.Inflater
 import org.json.JSONObject
@@ -41,7 +41,7 @@ object ReadSHLinkUtils {
       throw IllegalArgumentException("Not a valid Base64 encoded string")
     }
     try {
-      return Base64.getUrlDecoder().decode(extractedUrl.toByteArray())
+      return Base64.decode(extractedUrl.toByteArray(), Base64.URL_SAFE)
     } catch (err: IllegalArgumentException) {
       throw IllegalArgumentException("Not a valid Base64 encoded string")
     }
@@ -68,7 +68,7 @@ object ReadSHLinkUtils {
       if (tokenParts.size < 2) {
         throw Error("Invalid JWT token passed in")
       }
-      val decoded = Base64.getUrlDecoder().decode(tokenParts[1])
+      val decoded = Base64.decode(tokenParts[1], Base64.URL_SAFE)
       val inflater = Inflater(true)
       inflater.setInput(decoded)
       val initialBufferSize = 100000
@@ -98,7 +98,7 @@ object ReadSHLinkUtils {
         throw IllegalArgumentException("The provided strings should not be empty")
       }
       val jweObject = JWEObject.parse(responseBody)
-      val decodedKey: ByteArray = Base64.getUrlDecoder().decode(key)
+      val decodedKey: ByteArray = Base64.decode(key, Base64.URL_SAFE)
       val decrypter: JWEDecrypter = DirectDecrypter(decodedKey)
       jweObject.decrypt(decrypter)
       return jweObject.payload.toString()
