@@ -28,7 +28,7 @@ import org.json.JSONObject
 
 class SHLinkDecoderImpl(
   private val readSHLinkUtils: ReadSHLinkUtils,
-  private val apiService: RetrofitSHLService,
+  private val retrofitSHLService: RetrofitSHLService,
 ) : SHLinkDecoder {
 
   private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
@@ -66,7 +66,7 @@ class SHLinkDecoderImpl(
     coroutineScope {
       try {
         val response =
-          apiService.getFilesFromManifest(
+          retrofitSHLService.getFilesFromManifest(
             shLinkScanData.manifestUrl.substringAfterLast("shl/"),
             JSONObject(jsonData),
           )
@@ -107,7 +107,7 @@ class SHLinkDecoderImpl(
             } else {
               fileObject.getString("location").let {
                 val responseFromLocation =
-                  apiService.getFromLocation("file/${it.substringAfterLast("/")}")
+                  retrofitSHLService.getFromLocation("file/${it.substringAfterLast("/")}")
                 val responseBodyFromLocation = responseFromLocation.body()?.string()
                 if (!responseBodyFromLocation.isNullOrBlank()) {
                   responseBodyFromLocation

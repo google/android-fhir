@@ -48,7 +48,7 @@ class SHLinkDecoderImplTest {
   private val mockWebServer = MockWebServer()
   private val baseUrl = "/shl/"
 
-  private val apiService by lazy {
+  private val shlRetrofitService by lazy {
     RetrofitSHLService.Builder(mockWebServer.url(baseUrl).toString(), NetworkConfiguration())
       .build()
   }
@@ -81,7 +81,7 @@ class SHLinkDecoderImplTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    shLinkDecoderImpl = SHLinkDecoderImpl(readSHLinkUtils, apiService)
+    shLinkDecoderImpl = SHLinkDecoderImpl(readSHLinkUtils, shlRetrofitService)
   }
 
   @After
