@@ -192,8 +192,8 @@ internal object QuantityViewHolderFactory :
           }
             ?: questionnaireViewItem.draftAnswer?.let { if (it is Coding) it else null }
               ?: questionnaireViewItem.questionnaireItem
-              .takeIf { it.hasInitial() }
-              ?.initialFirstRep
+              .initial
+              ?.firstOrNull()
               ?.valueQuantity
               ?.toCoding()
         unitAutoCompleteTextView.setText(unit?.display ?: "")
