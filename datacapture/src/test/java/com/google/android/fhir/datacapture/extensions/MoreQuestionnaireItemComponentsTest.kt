@@ -1566,6 +1566,46 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `unitOption should return list with de-duplicated coding when multiple initial values of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "mo"
+              this.unit = "months"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mo", "months"))))
+  }
+
+  @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {

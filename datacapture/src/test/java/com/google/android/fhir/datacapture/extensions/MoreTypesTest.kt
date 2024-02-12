@@ -213,7 +213,7 @@ class MoreTypesTest {
         this.unit = "years"
         this.system = "http://unit.org"
       }
-    val result = quantity.toCoding()
+    val result = quantity.toCodingUnit()
     assertThat(result.equalsDeep(Coding("http://unit.org", "yr", "years")))
   }
 

@@ -124,8 +124,11 @@ internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
 
-/** Converts Quantity to Coding. */
-internal fun Quantity.toCoding(): Coding {
+/**
+ * Converts Quantity to Coding type. The resulting Coding properties are equivalent of Coding.system
+ * = Quantity.system Coding.code = Quantity.code Coding.display = Quantity.unit
+ */
+internal fun Quantity.toCodingUnit(): Coding {
   return Coding(this.system, this.code, this.unit)
 }
 

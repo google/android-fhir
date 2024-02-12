@@ -28,7 +28,7 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.extensions.toCoding
+import com.google.android.fhir.datacapture.extensions.toCodingUnit
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -187,15 +187,12 @@ internal object QuantityViewHolderFactory :
         }
 
         val unit =
-          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.let {
-            Coding(it.system, it.code, it.unit)
-          }
+          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.toCodingUnit()
             ?: questionnaireViewItem.draftAnswer?.let { if (it is Coding) it else null }
-              ?: questionnaireViewItem.questionnaireItem
-              .initial
+              ?: questionnaireViewItem.questionnaireItem.initial
               ?.firstOrNull()
               ?.valueQuantity
-              ?.toCoding()
+              ?.toCodingUnit()
         unitAutoCompleteTextView.setText(unit?.display ?: "")
 
         val unitAdapter =

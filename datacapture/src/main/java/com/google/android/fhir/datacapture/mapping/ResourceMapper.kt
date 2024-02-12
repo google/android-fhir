@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
-import com.google.android.fhir.datacapture.extensions.toCoding
+import com.google.android.fhir.datacapture.extensions.toCodingUnit
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
@@ -743,7 +743,7 @@ private fun Base.asExpectedType(
   return when {
     questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
       asExpectedReferenceType()
-    this is Enumeration<*> -> toCoding()
+    this is Enumeration<*> -> toCodingUnit()
     this is IdType -> StringType(idPart)
     else -> this as Type
   }
