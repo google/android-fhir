@@ -58,6 +58,7 @@ dependencies {
   implementation(project(path = ":datacapture"))
   implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
+  implementation(project(path = ":contrib:locationwidget"))
 
   testImplementation(Dependencies.junit)
 }
