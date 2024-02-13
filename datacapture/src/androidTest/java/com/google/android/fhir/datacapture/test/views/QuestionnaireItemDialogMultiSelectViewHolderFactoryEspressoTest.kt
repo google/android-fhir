@@ -35,6 +35,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_OPTION_EXCLUSIVE_URL
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.test.TestActivity
 import com.google.android.fhir.datacapture.test.utilities.assertQuestionnaireResponseAtIndex
@@ -52,6 +53,7 @@ import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.StringSubject
 import com.google.common.truth.Truth.assertThat
 import org.hamcrest.Matchers.not
+import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
@@ -93,6 +95,62 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
 
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 1")
+    clickOnText("Coding 3")
+    clickOnText("Coding 5")
+    clickOnText("Save")
+
+    assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3", "Coding 5")
+  }
+
+  @Test
+  fun multipleChoice_selectMultiple_selectExclusive_clickSave_shouldSaveOnlyExclusiveOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          }),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 1")
+    clickOnText("Coding 3")
+    clickOnText("Coding 5")
+    clickOnText("Coding Exclusive")
+    clickOnText("Save")
+
+    assertDisplayedText().isEqualTo("Coding Exclusive")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding Exclusive")
+  }
+
+  @Test
+  fun multipleChoice_selectExclusive_selectMultiple_clickSave_shouldSaveWithoutExclusiveOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          }),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding Exclusive")
+    clickOnText("Coding 1")
     clickOnText("Coding 3")
     clickOnText("Coding 5")
     clickOnText("Save")
