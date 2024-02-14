@@ -49,7 +49,7 @@ class BarcodeDetectorManagerTest {
   }
 
   @Test
-  fun releaseBarcodeScanner() {
+  fun `test the barcode scanner can be correctly closed`() {
     barcodeDetectorManager.releaseBarcodeScanner()
     verify(barcodeScanner).close()
   }

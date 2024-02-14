@@ -24,30 +24,46 @@ import androidx.core.content.ContextCompat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+/**
+ * A class handling the device's camera operations needed to start and stop the camera.
+ *
+ * @param context The context in which the CameraManager is instantiated.
+ * @param cameraExecutor The executor service used for camera operations.
+ */
 class CameraManager(
   private val context: Context,
   val cameraExecutor: ExecutorService = Executors.newSingleThreadExecutor(),
 ) {
   private var cameraProvider: CameraProvider? = null
 
+  /** Initializes the camera provider by binding it to the given context. */
   fun bindCamera() {
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
     cameraProviderFuture.addListener(
-      {
-        cameraProvider = cameraProviderFuture.get()
-      },
+      { cameraProvider = cameraProviderFuture.get() },
       ContextCompat.getMainExecutor(context),
     )
   }
 
+  /** Shuts down the camera executor service. */
   fun releaseExecutor() {
     cameraExecutor.shutdown()
   }
 
+  /**
+   * Checks if the app has the required camera permission.
+   *
+   * @return True if the camera permission is granted, false otherwise.
+   */
   internal fun hasCameraPermission(): Boolean {
     return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
   }
 
+  /**
+   * Gets the CameraProvider instance.
+   *
+   * @return The CameraProvider instance or null if not initialized.
+   */
   fun getCameraProvider(): CameraProvider? {
     return cameraProvider
   }

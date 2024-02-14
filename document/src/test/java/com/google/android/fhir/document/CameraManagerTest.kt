@@ -32,25 +32,21 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
-@Config(manifest= Config.NONE)
+@Config(manifest = Config.NONE)
 class CameraManagerTest {
 
-  @Mock
-  private lateinit var mockContext: Context
+  @Mock private lateinit var mockContext: Context
 
-  @Mock
-  private lateinit var mockCameraProviderFuture: ListenableFuture<ProcessCameraProvider>
+  @Mock private lateinit var mockCameraProviderFuture: ListenableFuture<ProcessCameraProvider>
 
-  @Mock
-  private lateinit var mockCameraProvider: ProcessCameraProvider
+  @Mock private lateinit var mockCameraProvider: ProcessCameraProvider
 
   private lateinit var cameraManager: CameraManager
 
   @Before
   fun setup() {
     MockitoAnnotations.openMocks(this)
-    Mockito.`when`(mockContext.packageManager)
-      .thenReturn(Mockito.mock(PackageManager::class.java))
+    Mockito.`when`(mockContext.packageManager).thenReturn(Mockito.mock(PackageManager::class.java))
     Mockito.`when`(ProcessCameraProvider.getInstance(mockContext))
       .thenReturn(mockCameraProviderFuture)
 
@@ -69,7 +65,8 @@ class CameraManagerTest {
 
   @Test
   fun `bindCamera does not set CameraProvider when unsuccessful`() {
-    Mockito.`when`(mockCameraProviderFuture.get()).thenThrow(RuntimeException("Failed to get CameraProvider"))
+    Mockito.`when`(mockCameraProviderFuture.get())
+      .thenThrow(RuntimeException("Failed to get CameraProvider"))
 
     cameraManager.bindCamera()
     val result = cameraManager.getCameraProvider()
@@ -81,5 +78,4 @@ class CameraManagerTest {
     cameraManager.releaseExecutor()
     // Mockito.verify(cameraExecutor).shutdown()
   }
-
 }

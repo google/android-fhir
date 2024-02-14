@@ -19,8 +19,7 @@ package com.google.android.fhir.document.scan
 import androidx.camera.core.ImageAnalysis
 
 /**
- * Implementation of the [SHLinkScanner] interface. Calls [successCallback] with a newly instantiated
- * [SHLinkScanData] if a Smart Health Link (SHL) is successfully scanned. Otherwise, an error is thrown.
+ * Implementation of the [SHLinkScanner] interface.
  *
  * @param cameraManager The manager for handling camera-related operations.
  * @param barcodeDetectorManager The manager for handling barcode detection operations.
@@ -56,8 +55,7 @@ class SHLinkScannerImpl(
         failCallback(error)
       }
     } else {
-      val error = Error("Camera permission not granted")
-      failCallback(error)
+      failCallback(Error("Camera permission not granted"))
     }
   }
 
@@ -69,7 +67,6 @@ class SHLinkScannerImpl(
    */
   private fun scan(): SHLinkScanData {
     var scannedData: SHLinkScanData? = null
-
     imageAnalysis.setAnalyzer(cameraManager.cameraExecutor) { imageProxy ->
       barcodeDetectorManager.processImage(imageProxy) { result ->
         val scannedValue = result?.displayValue
@@ -78,9 +75,7 @@ class SHLinkScannerImpl(
         }
       }
     }
-
     cameraManager.bindCamera()
-
     return scannedData ?: throw Error("No valid scan data found")
   }
 

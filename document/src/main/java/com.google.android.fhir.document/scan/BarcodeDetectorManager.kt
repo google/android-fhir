@@ -20,10 +20,23 @@ import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
 
+/**
+ * A class handling the detection and scanning of SHL QR codes by a device's camera.
+ *
+ * @param barcodeScanner The instance of BarcodeScanner used for scanning.
+ */
 class BarcodeDetectorManager(
   private val barcodeScanner: BarcodeScanner,
 ) {
+
+  /**
+   * Processes the image using the provided [ImageProxy] and performs barcode scanning.
+   *
+   * @param imageProxy The ImageProxy containing the captured image.
+   * @param onResult Callback function to handle the scanning result.
+   */
   fun processImage(imageProxy: ImageProxy, onResult: (Barcode?) -> Unit) {
+    // Extract the data from the ImageProxy and create an InputImage from this data
     val data = ByteArray(imageProxy.planes[0].buffer.capacity())
     val rotationDegrees = imageProxy.imageInfo.rotationDegrees
     val inputImage =
@@ -35,24 +48,29 @@ class BarcodeDetectorManager(
         com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21,
       )
 
+    // Process the input image using the barcode scanner
     barcodeScanner
       .process(inputImage)
       .addOnSuccessListener { barcodes ->
+        // If barcodes are detected, pass the result to the callback
         if (barcodes.isNotEmpty()) {
           val result = barcodes.single()
           onResult(result)
         } else {
+          // If no barcode is detected, pass null to the callback
           onResult(null)
         }
       }
       .addOnFailureListener {
-        // Handle failure
+        // Handle failure by passing null to the callback
         onResult(null)
       }
       .addOnCompleteListener { imageProxy.close() }
   }
 
+  /** Closes the [barcodeScanner]. */
   fun releaseBarcodeScanner() {
+    // Closes the BarcodeScanner to release associated resources
     barcodeScanner.close()
   }
 }
