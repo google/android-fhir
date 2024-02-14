@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Parameters
 import org.junit.Before
 import org.junit.Rule
@@ -131,6 +132,58 @@ class FhirOperatorLibraryEvaluateTest {
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+  }
+
+  @Test
+  fun evaluateImmunityCheckWithAdditionalData() = runBlocking {
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json") as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
+
+    // Load Library that checks if Patient has taken a vaccine
+    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.install(copy("/immunity-check/FhirHelpers.json"))
+
+    val location =
+      """
+          {
+              "resourceType": "Location",
+              "id": "nairobi-047",
+              "status": "active",
+              "name": "Arundel mobile clinic",
+              "mode": "instance",
+              "physicalType": {
+                "coding": [ {
+                  "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+                  "code": "bu",
+                  "display": "Arundel mobile clinic"
+                } ]
+            }
+          }
+        """
+        .trimIndent()
+
+    val additionalDataBundle =
+      Bundle().apply {
+        addEntry(
+          Bundle.BundleEntryComponent().apply {
+            resource = jsonParser.parseResource(location) as Location
+          },
+        )
+      }
+
+    // Evaluates a specific Patient
+    val results =
+      fhirOperator.evaluateLibrary(
+        "http://localhost/Library/ImmunityCheck|1.0.0",
+        "d4d35004-24f8-40e4-8084-1ad75924514f",
+        null,
+        additionalDataBundle,
+        null,
+      ) as Parameters
+
+    assertThat(results.hasParameter("GetFinalDoseWithLocationData")).isTrue()
   }
 
   @Test

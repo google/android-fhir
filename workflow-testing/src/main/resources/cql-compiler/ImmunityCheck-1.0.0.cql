@@ -19,3 +19,9 @@ define "GetSingleDose":
     where exists(I.protocolApplied)
       and exists(I.protocolApplied.doseNumber.value)
       and not exists(I.protocolApplied.seriesDoses.value)
+
+define "GetFinalDoseWithLocationData":
+  [Immunization] I
+     with [Location] L
+        such that I.location.reference.value = 'Location/'+ L.id
+            and I.protocolApplied.doseNumber.value = I.protocolApplied.seriesDoses.value
