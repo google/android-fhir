@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.patch.PatchGenerator
@@ -26,6 +25,8 @@ import com.google.android.fhir.sync.upload.request.UploadRequestGenerator
 import com.google.android.fhir.sync.upload.request.UploadRequestMapping
 import com.google.android.fhir.sync.upload.request.UrlUploadRequestMapping
 import java.lang.IllegalStateException
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.transformWhile
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.instance.model.api.IBase
 import org.hl7.fhir.instance.model.api.IBaseOperationOutcome
@@ -48,27 +49,22 @@ internal class Uploader(
   private val patchGenerator: PatchGenerator,
   private val requestGenerator: UploadRequestGenerator,
 ) {
-  suspend fun upload(localChanges: List<LocalChange>): UploadSyncResult {
-    val mappedPatches = patchGenerator.generate(localChanges)
-    val mappedRequests = requestGenerator.generateUploadRequests(mappedPatches)
-    val token = LocalChangeToken(localChanges.flatMap { it.token.ids })
-
-    val successfulMappedResponses = mutableListOf<SuccessfulUploadResponseMapping>()
-
-    for (mappedRequest in mappedRequests) {
-      when (val result = handleUploadRequest(mappedRequest)) {
-        is UploadRequestResult.Success ->
-          successfulMappedResponses.addAll(result.successfulUploadResponsMappings)
-        is UploadRequestResult.Failure -> return UploadSyncResult.Failure(result.exception, token)
+  suspend fun upload(localChanges: List<LocalChange>) =
+    localChanges
+      .let { patchGenerator.generate(it) }
+      .let { requestGenerator.generateUploadRequests(it) }
+      .asFlow()
+      .transformWhile {
+        with(handleUploadRequest(it)) {
+          emit(this)
+          this !is UploadRequestResult.Failure
+        }
       }
-    }
-    return UploadSyncResult.Success(successfulMappedResponses)
-  }
 
-  private fun handleUploadResponse(
+  private fun handleSuccessfulUploadResponse(
     mappedUploadRequest: UploadRequestMapping,
     response: Resource,
-  ): UploadRequestResult {
+  ): UploadRequestResult.Success {
     val responsesList =
       when {
         mappedUploadRequest is UrlUploadRequestMapping && response is DomainResource ->
@@ -113,6 +109,7 @@ internal class Uploader(
       when {
         response is OperationOutcome && response.issue.isNotEmpty() ->
           UploadRequestResult.Failure(
+            mappedUploadRequest.localChanges,
             ResourceSyncException(
               mappedUploadRequest.generatedRequest.resource.resourceType,
               FHIRException(response.issueFirstRep.diagnostics),
@@ -120,9 +117,10 @@ internal class Uploader(
           )
         (response is DomainResource || response is Bundle) &&
           (response !is IBaseOperationOutcome) ->
-          handleUploadResponse(mappedUploadRequest, response)
+          handleSuccessfulUploadResponse(mappedUploadRequest, response)
         else ->
           UploadRequestResult.Failure(
+            mappedUploadRequest.localChanges,
             ResourceSyncException(
               mappedUploadRequest.generatedRequest.resource.resourceType,
               FHIRException(
@@ -134,27 +132,22 @@ internal class Uploader(
     } catch (e: Exception) {
       Timber.e(e)
       UploadRequestResult.Failure(
+        mappedUploadRequest.localChanges,
         ResourceSyncException(mappedUploadRequest.generatedRequest.resource.resourceType, e),
       )
     }
   }
-
-  private sealed class UploadRequestResult {
-    data class Success(
-      val successfulUploadResponsMappings: List<SuccessfulUploadResponseMapping>,
-    ) : UploadRequestResult()
-
-    data class Failure(val exception: ResourceSyncException) : UploadRequestResult()
-  }
 }
 
-sealed class UploadSyncResult {
+sealed class UploadRequestResult {
   data class Success(
-    val uploadResponses: List<SuccessfulUploadResponseMapping>,
-  ) : UploadSyncResult()
+    val successfulUploadResponseMappings: List<SuccessfulUploadResponseMapping>,
+  ) : UploadRequestResult()
 
-  data class Failure(val syncError: ResourceSyncException, val localChangeToken: LocalChangeToken) :
-    UploadSyncResult()
+  data class Failure(
+    val localChanges: List<LocalChange>,
+    val uploadError: ResourceSyncException,
+  ) : UploadRequestResult()
 }
 
 sealed class SuccessfulUploadResponseMapping(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -226,12 +226,18 @@ internal abstract class ResourceDao {
     resourceUuid: UUID,
   ): ResourceEntity?
 
-  @RawQuery abstract suspend fun getResources(query: SupportSQLiteQuery): List<String>
+  @RawQuery
+  abstract suspend fun getResources(query: SupportSQLiteQuery): List<SerializedResourceWithUuid>
 
   @RawQuery
-  abstract suspend fun getReferencedResources(
+  abstract suspend fun getForwardReferencedResources(
     query: SupportSQLiteQuery,
-  ): List<IndexedIdAndSerializedResource>
+  ): List<ForwardIncludeSearchResponse>
+
+  @RawQuery
+  abstract suspend fun getReverseReferencedResources(
+    query: SupportSQLiteQuery,
+  ): List<ReverseIncludeSearchResponse>
 
   @RawQuery abstract suspend fun countResources(query: SupportSQLiteQuery): Long
 
@@ -411,23 +417,39 @@ internal abstract class ResourceDao {
   }
 }
 
-/**
- * Data class representing the value returned by [getReferencedResources]. The optional fields may
- * or may-not contain values based on the search query.
- */
-internal data class IndexedIdAndSerializedResource(
+internal class ForwardIncludeSearchResponse(
   @ColumnInfo(name = "index_name") val matchingIndex: String,
-  @ColumnInfo(name = "index_value") val idOfBaseResourceOnWhichThisMatchedRev: String?,
-  @ColumnInfo(name = "resourceId") val idOfBaseResourceOnWhichThisMatchedInc: String?,
+  @ColumnInfo(name = "resourceUuid") val baseResourceUUID: UUID,
+  val serializedResource: String,
+)
+
+internal class ReverseIncludeSearchResponse(
+  @ColumnInfo(name = "index_name") val matchingIndex: String,
+  @ColumnInfo(name = "index_value") val baseResourceTypeAndId: String,
   val serializedResource: String,
 )
 
 /**
- * Data class representing an included or revIncluded [Resource], index on which the match was done
- * and the id of the base [Resource] for which this [Resource] has been included.
+ * Data class representing a forward included [Resource], index on which the match was done and the
+ * uuid of the base [Resource] for which this [Resource] has been included.
  */
-internal data class IndexedIdAndResource(
-  val matchingIndex: String,
-  val idOfBaseResourceOnWhichThisMatched: String,
+internal data class ForwardIncludeSearchResult(
+  val searchIndex: String,
+  val baseResourceUUID: UUID,
   val resource: Resource,
+)
+
+/**
+ * Data class representing a reverse included [Resource], index on which the match was done and the
+ * type and logical id of the base [Resource] for which this [Resource] has been included.
+ */
+internal data class ReverseIncludeSearchResult(
+  val searchIndex: String,
+  val baseResourceTypeWithId: String,
+  val resource: Resource,
+)
+
+internal data class SerializedResourceWithUuid(
+  @ColumnInfo(name = "resourceUuid") val uuid: UUID,
+  val serializedResource: String,
 )

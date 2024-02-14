@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,10 @@ package com.google.android.fhir.sync.upload.patch
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
-import org.json.JSONArray
-import org.json.JSONObject
 
 /**
  * Generates a [Patch] for all [LocalChange]es made to a single FHIR resource.
@@ -103,24 +102,40 @@ internal object PerResourcePatchGenerator : PatchGenerator {
     return patchJson.apply(resourceJson).toString()
   }
 
-  /** Merge two JSON patch strings by concatenating their elements into a new JSON array. */
+  /**
+   * Merges two JSON patches represented as strings.
+   *
+   * This function combines operations from two JSON patch arrays into a single patch array. The
+   * merging rules are as follows:
+   * - "replace" and "remove" operations from the second patch will overwrite any existing
+   *   operations for the same path.
+   * - "add" operations from the second patch will be added to the list of operations for that path,
+   *   even if operations already exist for that path.
+   * - The function does not handle other operation types like "move", "copy", or "test".
+   */
   private fun mergePatches(firstPatch: String, secondPatch: String): String {
     // TODO: validate patches are RFC 6902 compliant JSON patches
-    val firstMap = JSONArray(firstPatch).patchMergeMap()
-    val secondMap = JSONArray(secondPatch).patchMergeMap()
-    firstMap.putAll(secondMap)
-    return JSONArray(firstMap.values).toString()
-  }
+    val objectMapper = ObjectMapper()
+    val firstPatchNode: JsonNode = JsonLoader.fromString(firstPatch)
+    val secondPatchNode: JsonNode = JsonLoader.fromString(secondPatch)
+    val mergedOperations = hashMapOf<String, MutableList<JsonNode>>()
 
-  /**
-   * Creates a mutable map from operation type (e.g. add/remove) + property path to the entire
-   * operation containing the updated value. Two such maps can be merged using `Map.putAll()` to
-   * yield a minimal set of operations equivalent to individual patches.
-   */
-  private fun JSONArray.patchMergeMap(): MutableMap<Pair<String, String>, JSONObject> {
-    return (0 until this.length())
-      .map { this.optJSONObject(it) }
-      .associateBy { it.optString("op") to it.optString("path") }
-      .toMutableMap()
+    firstPatchNode.forEach { patchNode ->
+      val path = patchNode.get("path").asText()
+      mergedOperations.getOrPut(path) { mutableListOf() }.add(patchNode)
+    }
+
+    secondPatchNode.forEach { patchNode ->
+      val path = patchNode.get("path").asText()
+      val opType = patchNode.get("op").asText()
+      when (opType) {
+        "replace",
+        "remove", -> mergedOperations[path] = mutableListOf(patchNode)
+        "add" -> mergedOperations.getOrPut(path) { mutableListOf() }.add(patchNode)
+      }
+    }
+    val mergedNode = objectMapper.createArrayNode()
+    mergedOperations.values.flatten().forEach(mergedNode::add)
+    return objectMapper.writeValueAsString(mergedNode)
   }
 }
