@@ -160,6 +160,70 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   }
 
   @Test
+  fun multipleChoice_multipleOptionExclusive_selectMultiple_selectExclusive1_selectExclusive2_clickSave_shouldSaveOnlyLastSelectedExclusiveOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive 1" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          })
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive 2" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          }),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding 1")
+    clickOnText("Coding 3")
+    clickOnText("Coding Exclusive 1")
+    clickOnText("Coding Exclusive 2")
+    clickOnText("Save")
+
+    assertDisplayedText().isEqualTo("Coding Exclusive 2")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding Exclusive 2")
+  }
+
+  @Test
+  fun multipleChoice_multipleOptionExclusive_selectExclusive1_selectExclusive2_selectMultiple_clickSave_shouldSaveWithoutAnyExclusiveOption() {
+    var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive 1" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          })
+          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive 2" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          }),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    clickOnTextInDialog("Coding Exclusive 1")
+    clickOnTextInDialog("Coding Exclusive 2")
+    clickOnText("Coding 1")
+    clickOnText("Coding 3")
+    clickOnText("Save")
+
+    assertDisplayedText().isEqualTo("Coding 1, Coding 3")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3")
+  }
+
+  @Test
   fun multipleChoice_SelectNothing_clickSave_shouldSaveNothing() {
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -420,6 +484,85 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     onView(withId(R.id.add_another)).perform(click())
     onView(withId(R.id.add_another)).perform(delayMainThread())
     onView(withId(R.id.add_another)).check(matches(isDisplayed()))
+  }
+
+  @Test
+  @SdkSuppress(minSdkVersion = 33)
+  fun selectOther_selectExclusive_shouldHideAddAnotherAnswer() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8",
+      ).addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().apply { display = "Coding Exclusive" }
+        extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+      })
+
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(9))
+    clickOnTextInDialog("Other")
+    clickOnTextInDialog("Coding Exclusive")
+    onView(withId(R.id.add_another)).check(doesNotExist())
+  }
+
+  @Test
+  @SdkSuppress(minSdkVersion = 33)
+  fun selectOther_clickAddAnotherAnswer_selectExclusive_shouldHideAddAnotherAnswerWithEditText() {
+    val questionnaireItem =
+      answerOptions(
+        true,
+        "Coding 1",
+        "Coding 2",
+        "Coding 3",
+        "Coding 4",
+        "Coding 5",
+        "Coding 6",
+        "Coding 7",
+        "Coding 8",
+      ).addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value = Coding().apply { display = "Coding Exclusive" }
+        extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+      })
+
+    questionnaireItem.addExtension(openChoiceType)
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem,
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    runOnUI { viewHolder.bind(questionnaireViewItem) }
+
+    endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
+    onView(withId(R.id.recycler_view))
+      .perform(RecyclerViewActions.scrollToPosition<RecyclerView.ViewHolder>(9))
+    clickOnTextInDialog("Other")
+    onView(withId(R.id.add_another)).perform(delayMainThread())
+    onView(withId(R.id.add_another)).perform(click())
+    clickOnTextInDialog("Coding Exclusive")
+    onView(withId(R.id.add_another)).check(doesNotExist())
+    onView(withId(R.id.edit_text)).check(doesNotExist())
   }
 
   @Test
