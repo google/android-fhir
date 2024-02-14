@@ -18,10 +18,13 @@ package com.google.android.fhir.document.scan
 
 import androidx.camera.core.ImageAnalysis
 
-/*
-Implementation of the SHLinkScanner interface.
-Calls successfulCallback with a newly instantiated SHLinkScanData if a SHL is successfully scanned.
-Otherwise, an error is thrown.
+/**
+ * Implementation of the [SHLinkScanner] interface. Calls [successCallback] with a newly instantiated
+ * [SHLinkScanData] if a Smart Health Link (SHL) is successfully scanned. Otherwise, an error is thrown.
+ *
+ * @param cameraManager The manager for handling camera-related operations.
+ * @param barcodeDetectorManager The manager for handling barcode detection operations.
+ * @param imageAnalysis The [ImageAnalysis] object for processing camera images.
  */
 class SHLinkScannerImpl(
   private val cameraManager: CameraManager,
@@ -29,6 +32,15 @@ class SHLinkScannerImpl(
   private val imageAnalysis: ImageAnalysis,
 ) : SHLinkScanner {
 
+  /**
+   * Scans a SHL QR code and calls [successCallback] with the newly instantiated [SHLinkScanData] if
+   * successful. Otherwise, invokes [failCallback] with an [Error].
+   *
+   * @param successCallback Callback function invoked when the SHL QR code is successfully scanned.
+   *   It provides a newly instantiated [SHLinkScanData] object.
+   * @param failCallback Callback function invoked when an error occurs during the scanning process.
+   *   It provides an [Error] object with details about the failure.
+   */
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
@@ -49,6 +61,12 @@ class SHLinkScannerImpl(
     }
   }
 
+  /**
+   * Scans the SHL QR code using camera and barcode detection.
+   *
+   * @return The newly instantiated [SHLinkScanData] if a valid SHL QR code is scanned.
+   * @throws Error if no valid scan data is found.
+   */
   private fun scan(): SHLinkScanData {
     var scannedData: SHLinkScanData? = null
 
@@ -66,6 +84,9 @@ class SHLinkScannerImpl(
     return scannedData ?: throw Error("No valid scan data found")
   }
 
+  /**
+   * Releases resources associated with the scanner, including camera executor and barcode scanner.
+   */
   private fun releaseScanner() {
     cameraManager.releaseExecutor()
     barcodeDetectorManager.releaseBarcodeScanner()
