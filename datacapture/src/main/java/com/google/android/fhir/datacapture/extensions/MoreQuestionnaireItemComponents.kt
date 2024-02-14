@@ -182,13 +182,7 @@ val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
       ?.let { it.value as Expression }
   }
 
-/**
- * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
- * extension, or `null`.
- *
- * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
- */
-val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
   get() {
     val codeableConcept =
       this.extension
@@ -196,16 +190,23 @@ val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
         ?.value as CodeableConcept?
-    val code =
-      codeableConcept
-        ?.coding
-        ?.firstOrNull {
-          it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
-            it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
-        }
-        ?.code
-    return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
+    return codeableConcept
+      ?.coding
+      ?.firstOrNull {
+        it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
+          it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
+      }
+      ?.code
   }
+
+/**
+ * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
+ * extension, or `null`.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
+ */
+val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+  get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
 
 /**
  * The desired orientation for the list of choices.
