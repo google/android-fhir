@@ -180,7 +180,11 @@ class PatientListFragment : Fragment() {
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             fadeOutTopBanner(it)
           }
-          CurrentSyncJobStatus.Cancelled -> TODO()
+          CurrentSyncJobStatus.Cancelled -> {
+            Timber.i("Sync: Cancelled")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            fadeOutTopBanner(it)
+          }
         }
       }
     }
@@ -220,7 +224,11 @@ class PatientListFragment : Fragment() {
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
             fadeOutTopBanner(it.currentSyncJobStatus)
           }
-          CurrentSyncJobStatus.Cancelled -> TODO()
+          CurrentSyncJobStatus.Cancelled -> {
+            Timber.i("Sync: Cancelled")
+            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            fadeOutTopBanner(it.currentSyncJobStatus)
+          }
         }
       }
     }

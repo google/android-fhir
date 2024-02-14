@@ -39,7 +39,7 @@ data class PeriodicSyncJobStatus(
 
 /**
  * Sealed class representing the result of a synchronization operation. These are terminal states of
- * the sync operation, representing [Succeeded] and [Failed].
+ * the sync operation, representing [Succeeded], [Failed], and [Cancelled].
  *
  * @property timestamp The timestamp when the synchronization result occurred.
  */
@@ -114,6 +114,9 @@ sealed class SyncJobStatus {
   /** Sync job failed. */
   data class Failed(val exceptions: List<ResourceSyncException>) : SyncJobStatus()
 
+  /** Sync job canceled. */
+  object Cancelled : SyncJobStatus()
+
   /** Helper class for serializing and deserializing [SyncJobStatus] objects. */
   internal class SyncJobStatusSerializer {
     private val serializer =
@@ -126,6 +129,7 @@ sealed class SyncJobStatus {
       listOf(
         AllowedSyncJobStatus.SUCCEEDED.allowedPackage,
         AllowedSyncJobStatus.FAILED.allowedPackage,
+        AllowedSyncJobStatus.CANCELLED.allowedPackage
       )
 
     /**
@@ -177,5 +181,6 @@ sealed class SyncJobStatus {
   private enum class AllowedSyncJobStatus(val allowedPackage: String) {
     SUCCEEDED(SyncJobStatus.Succeeded::class.java.name),
     FAILED(SyncJobStatus.Failed::class.java.name),
+    CANCELLED(SyncJobStatus.Cancelled::class.java.name)
   }
 }

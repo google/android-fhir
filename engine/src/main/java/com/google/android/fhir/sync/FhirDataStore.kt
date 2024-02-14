@@ -78,7 +78,8 @@ internal class FhirDataStore(context: Context) {
   ) {
     when (syncJobStatus) {
       is SyncJobStatus.Succeeded,
-      is SyncJobStatus.Failed, -> {
+      is SyncJobStatus.Failed,
+      is SyncJobStatus.Cancelled-> {
         writeSyncJobStatus(key, syncJobStatus)
       }
       else -> error("Do not write non-terminal state")
