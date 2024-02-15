@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,11 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
     FhirEngineProvider.init(FhirEngineConfiguration())
 
     dataCaptureConfig =
-      DataCaptureConfig(xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } })
+      DataCaptureConfig(
+        xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } },
+        questionnaireItemViewHolderFactoryMatchersProviderFactory =
+          ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory,
+      )
 
     CoroutineScope(Dispatchers.IO).launch {
       assets
