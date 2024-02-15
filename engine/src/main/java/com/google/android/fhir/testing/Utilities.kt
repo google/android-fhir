@@ -191,7 +191,7 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{ 'resourceType' : '$type', 'id' : '$id' }",
+        payload = """{ "resourceType" : "$type", "id" : "$id" }""",
         token = LocalChangeToken(listOf()),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now(),
