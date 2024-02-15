@@ -144,6 +144,37 @@ internal constructor(
    * @param libraryUrl the url of the Library to evaluate
    * @param patientId the Id of the patient to be evaluated, if applicable
    * @param parameters list of parameters to be passed to the CQL library, if applicable
+   * @param expressions names of expressions in the Library to evaluate. If null the result contains
+   *   all evaluations or variables in library.
+   * @return a Parameters resource that contains an evaluation result for each expression requested.
+   *   Or if expressions param is null then result contains all evaluations or variables in given
+   *   library.
+   */
+  @WorkerThread
+  fun evaluateLibrary(
+    libraryUrl: String,
+    patientId: String?,
+    parameters: Parameters?,
+    expressions: Set<String>?,
+  ): IBaseParameters {
+    return evaluateLibrary(
+      libraryUrl,
+      patientId,
+      parameters,
+      null,
+      expressions,
+    )
+  }
+
+  /**
+   * The function evaluates a FHIR library against the database.
+   *
+   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
+   * from a worker thread or it may throw [BlockingMainThreadException] exception.
+   *
+   * @param libraryUrl the url of the Library to evaluate
+   * @param patientId the Id of the patient to be evaluated, if applicable
+   * @param parameters list of parameters to be passed to the CQL library, if applicable
    * @param additionalData Bundle of additional resources to be passed to the CQL library, if
    *   applicable
    * @param expressions names of expressions in the Library to evaluate. If null the result contains
@@ -165,37 +196,6 @@ internal constructor(
       /* patientId = */ patientId,
       /* parameters = */ parameters,
       /* additionalData = */ additionalData,
-      /* expressions = */ expressions,
-    )
-  }
-
-  /**
-   * The function evaluates a FHIR library against the database.
-   *
-   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
-   * from a worker thread or it may throw [BlockingMainThreadException] exception.
-   *
-   * @param libraryUrl the url of the Library to evaluate
-   * @param patientId the Id of the patient to be evaluated, if applicable
-   * @param parameters list of parameters to be passed to the CQL library, if applicable
-   * @param expressions names of expressions in the Library to evaluate. If null the result contains
-   *   all evaluations or variables in library.
-   * @return a Parameters resource that contains an evaluation result for each expression requested.
-   *   Or if expressions param is null then result contains all evaluations or variables in given
-   *   library.
-   */
-  @WorkerThread
-  fun evaluateLibrary(
-    libraryUrl: String,
-    patientId: String?,
-    parameters: Parameters?,
-    expressions: Set<String>?,
-  ): IBaseParameters {
-    return libraryProcessor.evaluate(
-      /* url = */ libraryUrl,
-      /* patientId = */ patientId,
-      /* parameters = */ parameters,
-      /* additionalData = */ null,
       /* expressions = */ expressions,
     )
   }
