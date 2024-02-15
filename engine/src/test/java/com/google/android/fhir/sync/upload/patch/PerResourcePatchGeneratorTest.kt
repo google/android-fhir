@@ -32,10 +32,17 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.Date
+import java.util.LinkedList
 import java.util.UUID
+import org.hl7.fhir.r4.model.CarePlan
+import org.hl7.fhir.r4.model.Encounter
+import org.hl7.fhir.r4.model.Group
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
@@ -515,5 +522,939 @@ class PerResourcePatchGeneratorTest {
       token = LocalChangeToken(listOf(currentChangeId + 1)),
       timestamp = Instant.now(),
     )
+  }
+
+  @Test
+  fun test_observation_findOutgoingReferences() {
+    val observation =
+      FhirContext.forR4Cached()
+        .newJsonParser()
+        .parseResource(
+          """
+      {
+        "resourceType" : "Observation",
+        "id" : "f206",
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Observation</b><a name=\"f206\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Observation &quot;f206&quot; </p></div><p><b>status</b>: final</p><p><b>code</b>: Blood culture <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (acmelabs.org#104177; <a href=\"https://loinc.org/\">LOINC</a>#600-7 &quot;Bacteria identified in Blood by Culture&quot;)</span></p><p><b>subject</b>: <span title=\"  No identifier could be provided to this observation  \"><a href=\"patient-example-f201-roel.html\">Patient/f201: Roel</a> &quot;Roel&quot;</span></p><p><b>issued</b>: 11 Mar 2013, 8:28:00 pm</p><p><b>performer</b>: <a href=\"practitioner-example-f202-lm.html\">Practitioner/f202: Luigi Maas</a> &quot;Luigi Maas&quot;</p><p><b>value</b>: Staphylococcus aureus <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#3092008)</span></p><p><b>interpretation</b>: Positive <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.1.0/CodeSystem-v3-ObservationInterpretation.html\">ObservationInterpretation</a>#POS)</span></p><p><b>method</b>: <span title=\"  BodySite not relevant  \">Blood culture for bacteria, including anaerobic screen <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#104177005)</span></span></p></div>"
+        },
+        "status" : "final",
+        "code" : {
+          "coding" : [{
+            "system" : "http://acmelabs.org",
+            "code" : "104177",
+            "display" : "Blood culture"
+          },
+          {
+            "system" : "http://loinc.org",
+            "code" : "600-7",
+            "display" : "Bacteria identified in Blood by Culture"
+          }]
+        },
+        "subject" : {
+          "reference" : "Patient/f201",
+          "display" : "Roel"
+        },
+        "issued" : "2013-03-11T10:28:00+01:00",
+        "performer" : [{
+          "reference" : "Practitioner/f202",
+          "display" : "Luigi Maas"
+        }],
+        "valueCodeableConcept" : {
+          "coding" : [{
+            "system" : "http://snomed.info/sct",
+            "code" : "3092008",
+            "display" : "Staphylococcus aureus"
+          }]
+        },
+        "interpretation" : [{
+          "coding" : [{
+            "system" : "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
+            "code" : "POS"
+          }]
+        }],
+        "method" : {
+          "coding" : [{
+            "system" : "http://snomed.info/sct",
+            "code" : "104177005",
+            "display" : "Blood culture for bacteria, including anaerobic screen"
+          }]
+        }
+      }
+    """
+            .trimIndent(),
+        ) as Resource
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(
+          listOf(createInsertLocalChange(observation)),
+        )
+        .single()
+        .findOutgoingReferences()
+    assertThat(result).containsExactly("Patient/f201", "Practitioner/f202")
+  }
+
+  @Test
+  fun test_group_findOutgoingReferences() {
+    val group =
+      FhirContext.forR4Cached()
+        .newJsonParser()
+        .parseResource(
+          """
+      {
+  "resourceType" : "Group",
+  "id" : "102",
+  "text" : {
+    "status" : "additional",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>Selected Patients</p>\n      <ul>\n        <li>Patient Donald DUCK @ Acme Healthcare, Inc. MR = 654321</li>\n        <li>Patient Donald D DUCK @ Acme Healthcare, Inc. MR = 123456</li>\n        <li>Patient Simon Notsowell @ Acme Healthcare, Inc. MR = 123457, DECEASED</li>\n        <li>Patient Sandy Notsowell @ Acme Healthcare, Inc. MR = 123458, DECEASED</li>\n      </ul>\n    </div>"
+  },
+  "type" : "person",
+  "membership" : "enumerated",
+  "member" : [{
+    "entity" : {
+      "reference" : "Patient/pat1"
+    },
+    "period" : {
+      "start" : "2014-10-08"
+    }
+  },
+  {
+    "entity" : {
+      "reference" : "Patient/pat2"
+    },
+    "period" : {
+      "start" : "2015-04-02"
+    },
+    "inactive" : true
+  },
+  {
+    "entity" : {
+      "reference" : "Patient/pat3"
+    },
+    "period" : {
+      "start" : "2015-08-06"
+    }
+  },
+  {
+    "entity" : {
+      "reference" : "Patient/pat4"
+    },
+    "period" : {
+      "start" : "2015-08-06"
+    }
+  }],
+  "characteristic" : [{
+    "code" : {
+      "coding" : [{
+        "system" : "http://example.org",
+        "code" : "attributed-to"
+      }],
+      "text" : "Patients primarily attributed to"
+    },
+    "valueReference" : {
+      "reference" : "Practitioner/123"
+    },
+    "exclude" : false
+  }]
+}
+    """
+            .trimIndent(),
+        ) as Resource
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(
+          listOf(createInsertLocalChange(group)),
+        )
+        .single()
+        .findOutgoingReferences()
+    assertThat(result)
+      .containsExactly(
+        "Patient/pat1",
+        "Patient/pat2",
+        "Patient/pat3",
+        "Patient/pat4",
+        "Practitioner/123",
+      )
+  }
+
+  @Test
+  fun test_careplan_insertpatch_findOutgoingReferences() {
+    val group =
+      FhirContext.forR4Cached()
+        .newJsonParser()
+        .parseResource(
+          """{
+  "resourceType": "CarePlan",
+  "id": "gpvisit",
+  "text": {
+    "status": "additional",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>  Represents the flow of a patient within a practice. The plan is created when\n        they arrive and represents the 'care' of the patient over the course of that encounter.\n        They first see the nurse for basic observations (BP, pulse, temp) then the doctor for\n        the consultation and finally the nurse again for a tetanus immunization. As the plan is\n        updated (e.g. a new activity added), different versions of the plan exist, and workflow timings\n        for reporting can be gained by examining the plan history. This example is the version after\n        seeing the doctor, and waiting for the nurse.The plan can either be created 'ad hoc' and modified as\n        the parient progresses, or start with a standard template (which can, of course, be altered to suit the patient.</p>\n    </div>"
+  },
+  "contained": [
+    {
+      "resourceType": "Condition",
+      "id": "p1",
+      "clinicalStatus": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+            "code": "active"
+          }
+        ]
+      },
+      "verificationStatus": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+            "code": "confirmed"
+          }
+        ]
+      },
+      "code": {
+        "text": "Overseas encounter"
+      },
+      "subject": {
+        "reference": "Patient/100",
+        "display": "Peter James Chalmers"
+      }
+    },
+    {
+      "resourceType": "CareTeam",
+      "id": "careteam",
+      "participant": [
+        {
+          "id": "part1",
+          "role": [
+            {
+              "coding": [
+                {
+                  "system": "http://example.org/local",
+                  "code": "nur"
+                }
+              ],
+              "text": "nurse"
+            }
+          ],
+          "member": {
+            "reference": "Practitioner/13",
+            "display": "Nurse Nancy"
+          }
+        },
+        {
+          "id": "part2",
+          "role": [
+            {
+              "coding": [
+                {
+                  "system": "http://example.org/local",
+                  "code": "doc"
+                }
+              ],
+              "text": "doctor"
+            }
+          ],
+          "member": {
+            "reference": "Practitioner/14",
+            "display": "Doctor Dave"
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "Goal",
+      "id": "goal",
+      "lifecycleStatus": "planned",
+      "description": {
+        "text": "Complete consultation"
+      },
+      "subject": {
+        "reference": "Patient/100",
+        "display": "Peter James Chalmers"
+      }
+    }
+  ],
+  "status": "active",
+  "intent": "plan",
+  "subject": {
+    "reference": "Patient/100",
+    "display": "Peter James Chalmers"
+  },
+  "period": {
+    "start": "2013-01-01T10:30:00+00:00"
+  },
+  "careTeam": [
+    {
+      "reference": "#careteam"
+    }
+  ],
+  "addresses": [
+    {
+      "reference": "#p1",
+      "display": "obesity"
+    }
+  ],
+  "goal": [
+    {
+      "reference": "#goal"
+    }
+  ],
+  "activity": [
+    {
+      "outcomeReference": [
+        {
+          "reference": "Encounter/example"
+        }
+      ],
+      "detail": {
+        "kind": "Appointment",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/local",
+              "code": "nursecon"
+            }
+          ],
+          "text": "Nurse Consultation"
+        },
+        "status": "completed",
+        "doNotPerform": false,
+        "scheduledPeriod": {
+          "start": "2013-01-01T10:38:00+00:00",
+          "end": "2013-01-01T10:50:00+00:00"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/13",
+            "display": "Nurse Nancy"
+          }
+        ]
+      }
+    },
+    {
+      "detail": {
+        "kind": "Appointment",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/local",
+              "code": "doccon"
+            }
+          ],
+          "text": "Doctor Consultation"
+        },
+        "status": "scheduled",
+        "doNotPerform": false,
+        "performer": [
+          {
+            "reference": "Practitioner/14",
+            "display": "Doctor Dave"
+          }
+        ]
+      }
+    }
+  ]
+}
+                    """
+            .trimIndent(),
+        ) as Resource
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(
+          listOf(createInsertLocalChange(group)),
+        )
+        .single()
+        .findOutgoingReferences()
+    assertThat(result)
+      .containsExactly(
+        "Patient/100",
+        "Practitioner/13",
+        "Practitioner/14",
+        "Patient/100",
+        "Patient/100",
+        "#careteam",
+        "#p1",
+        "#goal",
+        "Encounter/example",
+        "Practitioner/13",
+        "Practitioner/14",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun test_careplan_updatepatch_findOutgoingReferences() {
+    val group =
+      FhirContext.forR4Cached()
+        .newJsonParser()
+        .parseResource(
+          """{
+  "resourceType": "CarePlan",
+  "id": "gpvisit",
+  "text": {
+    "status": "additional",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>  Represents the flow of a patient within a practice. The plan is created when\n        they arrive and represents the 'care' of the patient over the course of that encounter.\n        They first see the nurse for basic observations (BP, pulse, temp) then the doctor for\n        the consultation and finally the nurse again for a tetanus immunization. As the plan is\n        updated (e.g. a new activity added), different versions of the plan exist, and workflow timings\n        for reporting can be gained by examining the plan history. This example is the version after\n        seeing the doctor, and waiting for the nurse.The plan can either be created 'ad hoc' and modified as\n        the parient progresses, or start with a standard template (which can, of course, be altered to suit the patient.</p>\n    </div>"
+  },
+  "contained": [
+    {
+      "resourceType": "Condition",
+      "id": "p1",
+      "clinicalStatus": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
+            "code": "active"
+          }
+        ]
+      },
+      "verificationStatus": {
+        "coding": [
+          {
+            "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
+            "code": "confirmed"
+          }
+        ]
+      },
+      "code": {
+        "text": "Overseas encounter"
+      },
+      "subject": {
+        "reference": "Patient/100",
+        "display": "Peter James Chalmers"
+      }
+    },
+    {
+      "resourceType": "CareTeam",
+      "id": "careteam",
+      "participant": [
+        {
+          "id": "part1",
+          "role": [
+            {
+              "coding": [
+                {
+                  "system": "http://example.org/local",
+                  "code": "nur"
+                }
+              ],
+              "text": "nurse"
+            }
+          ],
+          "member": {
+            "reference": "Practitioner/13",
+            "display": "Nurse Nancy"
+          }
+        },
+        {
+          "id": "part2",
+          "role": [
+            {
+              "coding": [
+                {
+                  "system": "http://example.org/local",
+                  "code": "doc"
+                }
+              ],
+              "text": "doctor"
+            }
+          ],
+          "member": {
+            "reference": "Practitioner/14",
+            "display": "Doctor Dave"
+          }
+        }
+      ]
+    },
+    {
+      "resourceType": "Goal",
+      "id": "goal",
+      "lifecycleStatus": "planned",
+      "description": {
+        "text": "Complete consultation"
+      },
+      "subject": {
+        "reference": "Patient/100",
+        "display": "Peter James Chalmers"
+      }
+    }
+  ],
+  "status": "active",
+  "intent": "plan",
+  "subject": {
+    "reference": "Patient/100",
+    "display": "Peter James Chalmers"
+  },
+  "period": {
+    "start": "2013-01-01T10:30:00+00:00"
+  },
+  "careTeam": [
+    {
+      "reference": "#careteam"
+    }
+  ],
+  "addresses": [
+    {
+      "reference": "#p1",
+      "display": "obesity"
+    }
+  ],
+  "goal": [
+    {
+      "reference": "#goal"
+    }
+  ],
+  "activity": [
+    {
+      "outcomeReference": [
+        {
+          "reference": "Encounter/example"
+        }
+      ],
+      "detail": {
+        "kind": "Appointment",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/local",
+              "code": "nursecon"
+            }
+          ],
+          "text": "Nurse Consultation"
+        },
+        "status": "completed",
+        "doNotPerform": false,
+        "scheduledPeriod": {
+          "start": "2013-01-01T10:38:00+00:00",
+          "end": "2013-01-01T10:50:00+00:00"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/13",
+            "display": "Nurse Nancy"
+          }
+        ]
+      }
+    },
+    {
+      "detail": {
+        "kind": "Appointment",
+        "code": {
+          "coding": [
+            {
+              "system": "http://example.org/local",
+              "code": "doccon"
+            }
+          ],
+          "text": "Doctor Consultation"
+        },
+        "status": "scheduled",
+        "doNotPerform": false,
+        "performer": [
+          {
+            "reference": "Practitioner/14",
+            "display": "Doctor Dave"
+          }
+        ]
+      }
+    }
+  ]
+}
+                    """
+            .trimIndent(),
+        ) as Resource
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(
+          listOf(createUpdateLocalChange(CarePlan().apply { id = "gpvisit" }, group, 1)),
+        )
+        .single()
+        .also { println(it) }
+        .findOutgoingReferences()
+    assertThat(result)
+      .containsExactly(
+        "Patient/100",
+        "Practitioner/13",
+        "Practitioner/14",
+        "Patient/100",
+        "Patient/100",
+        "#careteam",
+        "#p1",
+        "#goal",
+        "Encounter/example",
+        "Practitioner/13",
+        "Practitioner/14",
+      )
+  }
+
+  @Test
+  fun test_createReferenceAdjacencyList() {
+    val localChanges = LinkedList<LocalChange>()
+
+    var group =
+      Group()
+        .apply {
+          id = "group-1"
+          type = Group.GroupType.PERSON
+        }
+        .also { localChanges.add(createInsertLocalChange(it)) }
+
+    // pa-01
+    Patient().apply { id = "patient-1" }.also { localChanges.add(createInsertLocalChange(it)) }
+    Encounter()
+      .apply {
+        id = "encounter-1"
+        subject = Reference("Patient/patient-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-1"
+        subject = Reference("Patient/patient-1")
+        encounter = Reference("Encounter/encounter-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
+
+    // pa-02
+    Patient().apply { id = "patient-2" }.also { localChanges.add(createInsertLocalChange(it)) }
+    Encounter()
+      .apply {
+        id = "encounter-2"
+        subject = Reference("Patient/patient-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-2"
+        subject = Reference("Patient/patient-2")
+        encounter = Reference("Encounter/encounter-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
+
+    // pa-03
+    Patient().apply { id = "patient-3" }.also { localChanges.add(createInsertLocalChange(it)) }
+
+    Encounter()
+      .apply {
+        id = "encounter-3"
+        subject = Reference("Patient/patient-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-3"
+        subject = Reference("Patient/patient-3")
+        encounter = Reference("Encounter/encounter-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(localChanges)
+        .createReferenceAdjacencyList(
+          localChanges.map { "${it.resourceType}/${it.resourceId}" }.toSet(),
+        )
+
+    assertThat(result)
+      .isEqualTo(
+        mutableMapOf(
+          "Group/group-1" to listOf("Patient/patient-1", "Patient/patient-2", "Patient/patient-3"),
+          "Patient/patient-1" to emptyList(),
+          "Patient/patient-2" to emptyList(),
+          "Patient/patient-3" to emptyList(),
+          "Encounter/encounter-1" to listOf("Patient/patient-1"),
+          "Encounter/encounter-2" to listOf("Patient/patient-2"),
+          "Encounter/encounter-3" to listOf("Patient/patient-3"),
+          "Observation/observation-1" to listOf("Patient/patient-1", "Encounter/encounter-1"),
+          "Observation/observation-2" to listOf("Patient/patient-2", "Encounter/encounter-2"),
+          "Observation/observation-3" to listOf("Patient/patient-3", "Encounter/encounter-3"),
+        ),
+      )
+  }
+
+  @Test
+  fun test_createReferenceAdjacencyList_WithUpdate() {
+    val localChanges = LinkedList<LocalChange>()
+
+    var group =
+      Group()
+        .apply {
+          id = "group-1"
+          type = Group.GroupType.PERSON
+        }
+        .also { localChanges.add(createInsertLocalChange(it)) }
+
+    // pa-01
+    Patient()
+      .apply { id = "patient-1" }
+      .also {
+        localChanges.add(
+          createUpdateLocalChange(
+            it,
+            it.copy().apply { active = true },
+            1,
+          ),
+        )
+      }
+    Encounter()
+      .apply {
+        id = "encounter-1"
+        subject = Reference("Patient/patient-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-1"
+        subject = Reference("Patient/patient-1")
+        encounter = Reference("Encounter/encounter-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
+
+    // pa-02
+    Patient()
+      .apply { id = "patient-2" }
+      .also {
+        localChanges.add(
+          createUpdateLocalChange(
+            it,
+            it.copy().apply { active = true },
+            1,
+          ),
+        )
+      }
+    Encounter()
+      .apply {
+        id = "encounter-2"
+        subject = Reference("Patient/patient-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-2"
+        subject = Reference("Patient/patient-2")
+        encounter = Reference("Encounter/encounter-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
+
+    // pa-03
+    Patient()
+      .apply { id = "patient-3" }
+      .also {
+        localChanges.add(
+          createUpdateLocalChange(
+            it,
+            it.copy().apply { active = true },
+            1,
+          ),
+        )
+      }
+
+    Encounter()
+      .apply {
+        id = "encounter-3"
+        subject = Reference("Patient/patient-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Observation()
+      .apply {
+        id = "observation-3"
+        subject = Reference("Patient/patient-3")
+        encounter = Reference("Encounter/encounter-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
+
+    val result =
+      PerResourcePatchGenerator.generateSquashedChangesMapping(localChanges)
+        .createReferenceAdjacencyList(
+          localChanges
+            .filter { it.type == LocalChange.Type.INSERT }
+            .map { "${it.resourceType}/${it.resourceId}" }
+            .toSet(),
+        )
+
+    assertThat(result)
+      .isEqualTo(
+        mutableMapOf(
+          "Group/group-1" to emptyList(),
+          "Patient/patient-1" to emptyList(),
+          "Patient/patient-2" to emptyList(),
+          "Patient/patient-3" to emptyList(),
+          "Encounter/encounter-1" to emptyList(),
+          "Encounter/encounter-2" to emptyList(),
+          "Encounter/encounter-3" to emptyList(),
+          "Observation/observation-1" to listOf("Encounter/encounter-1"),
+          "Observation/observation-2" to listOf("Encounter/encounter-2"),
+          "Observation/observation-3" to listOf("Encounter/encounter-3"),
+        ),
+      )
+  }
+
+  @Test
+  fun `generate with acyclic references should return the list in topological order`() {
+    val localChanges = LinkedList<LocalChange>()
+
+    var group =
+      Group()
+        .apply {
+          id = "group-1"
+          type = Group.GroupType.PERSON
+        }
+        .also { localChanges.add(createInsertLocalChange(it)) }
+
+    // pa-01
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
+
+    Observation()
+      .apply {
+        id = "observation-1"
+        subject = Reference("Patient/patient-1")
+        encounter = Reference("Encounter/encounter-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Encounter()
+      .apply {
+        id = "encounter-1"
+        subject = Reference("Patient/patient-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Patient().apply { id = "patient-1" }.also { localChanges.add(createInsertLocalChange(it)) }
+
+    // pa-02
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
+
+    Observation()
+      .apply {
+        id = "observation-2"
+        subject = Reference("Patient/patient-2")
+        encounter = Reference("Encounter/encounter-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Encounter()
+      .apply {
+        id = "encounter-2"
+        subject = Reference("Patient/patient-2")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Patient().apply { id = "patient-2" }.also { localChanges.add(createInsertLocalChange(it)) }
+
+    // pa-03
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
+
+    Observation()
+      .apply {
+        id = "observation-3"
+        subject = Reference("Patient/patient-3")
+        encounter = Reference("Encounter/encounter-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Encounter()
+      .apply {
+        id = "encounter-3"
+        subject = Reference("Patient/patient-3")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    Patient().apply { id = "patient-3" }.also { localChanges.add(createInsertLocalChange(it)) }
+
+    val result = PerResourcePatchGenerator.generate(localChanges)
+    assertThat(result.map { it.generatedPatch.resourceId })
+      .containsExactly(
+        "patient-1",
+        "patient-2",
+        "patient-3",
+        "group-1",
+        "encounter-1",
+        "observation-1",
+        "encounter-2",
+        "observation-2",
+        "encounter-3",
+        "observation-3",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `generate with cyclic references should throw exception`() {
+    val localChanges = LinkedList<LocalChange>()
+
+    Patient()
+      .apply {
+        id = "patient-1"
+        addLink(
+          Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/related-1") },
+        )
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    RelatedPerson()
+      .apply {
+        id = "related-1"
+        patient = Reference("Patient/patient-1")
+      }
+      .also { localChanges.add(createInsertLocalChange(it)) }
+
+    val errorMessage =
+      Assert.assertThrows(IllegalStateException::class.java) {
+          PerResourcePatchGenerator.generate(localChanges)
+        }
+        .localizedMessage
+
+    assertThat(errorMessage).isEqualTo("Detected a cycle.")
   }
 }

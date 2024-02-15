@@ -33,7 +33,12 @@ import com.google.android.fhir.LocalChange.Type
 internal object PerResourcePatchGenerator : PatchGenerator {
 
   override fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
-    return localChanges
+    return generateSquashedChangesMapping(localChanges).orderByReferences()
+  }
+
+  @androidx.annotation.VisibleForTesting
+  internal fun generateSquashedChangesMapping(localChanges: List<LocalChange>) =
+    localChanges
       .groupBy { it.resourceType to it.resourceId }
       .values
       .mapNotNull { resourceLocalChanges ->
@@ -44,7 +49,6 @@ internal object PerResourcePatchGenerator : PatchGenerator {
           )
         }
       }
-  }
 
   private fun mergeLocalChangesForSingleResource(localChanges: List<LocalChange>): Patch? {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
@@ -138,4 +142,98 @@ internal object PerResourcePatchGenerator : PatchGenerator {
     mergedOperations.values.flatten().forEach(mergedNode::add)
     return objectMapper.writeValueAsString(mergedNode)
   }
+}
+
+private typealias Node = String
+
+/**
+ * @return - A ordered list of the [PatchMapping]s based on the references to other [PatchMapping]
+ *   if the mappings are acyclic
+ * - throws [IllegalStateException] otherwise
+ */
+@androidx.annotation.VisibleForTesting
+internal fun List<PatchMapping>.orderByReferences(): List<PatchMapping> {
+  // if the resource A has outgoing references (B,C) and these referenced resources are getting
+  // created on device,
+  // then these referenced resources (B,C) needs to go before the resource A so that referential
+  // integrity is retained.
+  val resourceIdToPatchMapping = associateBy { patchMapping ->
+    "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}"
+  }
+
+  val adjacencyList =
+    createReferenceAdjacencyList(
+      resourceIdToPatchMapping.keys
+        .filter { resourceIdToPatchMapping[it]?.generatedPatch?.type == Patch.Type.INSERT }
+        .toSet(),
+    )
+  return createTopologicalOrderedList(adjacencyList).mapNotNull { resourceIdToPatchMapping[it] }
+}
+
+/**
+ * @return A map of [PatchMapping] to all the outgoing references to the other [PatchMapping]s of
+ *   type [Patch.Type.INSERT] .
+ */
+@androidx.annotation.VisibleForTesting
+internal fun List<PatchMapping>.createReferenceAdjacencyList(
+  insertResourceIds: Set<String>,
+): Map<Node, List<Node>> {
+  val adjacencyList = mutableMapOf<Node, List<Node>>()
+  forEach { patchMapping ->
+    adjacencyList[
+      "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}",
+    ] = patchMapping.findOutgoingReferences().filter { insertResourceIds.contains(it) }
+  }
+  return adjacencyList
+}
+
+// if the outgoing reference is to a resource that's just an update and not create, then don't link
+// to it. This may make the sub graphs smaller and also help avoid cyclic dependencies.
+@androidx.annotation.VisibleForTesting
+internal fun PatchMapping.findOutgoingReferences(): List<Node> {
+  val references = mutableListOf<Node>()
+  when (generatedPatch.type) {
+    Patch.Type.INSERT -> {
+      JsonLoader.fromString(generatedPatch.payload).search(references)
+    }
+    Patch.Type.UPDATE -> {
+      JsonLoader.fromString(generatedPatch.payload).forEach {
+        if (it.get("path").asText().endsWith("/reference")) {
+          references.add(it.get("value").asText())
+        } else {
+          it.get("value").search(references)
+        }
+      }
+    }
+    Patch.Type.DELETE -> {
+      // do nothing
+    }
+  }
+  return references
+}
+
+private fun JsonNode.search(reference: MutableList<String>) {
+  if (has("reference") && get("reference").isTextual) {
+    reference.add(get("reference").asText())
+  }
+  elements().forEach { it.search(reference) }
+}
+
+@androidx.annotation.VisibleForTesting
+internal fun createTopologicalOrderedList(adjacencyList: Map<Node, List<Node>>): List<Node> {
+  val stack = ArrayDeque<String>()
+  val visited = mutableSetOf<String>()
+  val currentPath = mutableSetOf<String>()
+
+  fun dfs(key: String) {
+    check(currentPath.add(key)) { "Detected a cycle." }
+    if (visited.add(key)) {
+      adjacencyList[key]?.forEach { dfs(it) }
+      stack.addFirst(key)
+    }
+    currentPath.remove(key)
+  }
+
+  adjacencyList.keys.forEach { dfs(it) }
+  return stack.reversed()
 }
