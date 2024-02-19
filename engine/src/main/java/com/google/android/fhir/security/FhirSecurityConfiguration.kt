@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,12 +27,12 @@ import java.util.EnumSet
  * Configuration for Android FHIR SDK security mechanism.
  *
  * @param lockScreenRequirement The required lock screen policy for apps integrated with Android
- * FHIR SDK
+ *   FHIR SDK
  * @param warningCallback a callback invoked when a screen requirement violation is detected and
  */
 data class FhirSecurityConfiguration(
   val lockScreenRequirement: LockScreenRequirement,
-  val warningCallback: PendingIntent? = null
+  val warningCallback: PendingIntent? = null,
 )
 
 /** Sealed class hierarchy representing a security policy. */
@@ -42,23 +42,25 @@ sealed interface SecurityRequirement
  * The required lock screen policy for apps integrated with Android FHIR SDK.
  *
  * @param complexity: the lock screen complexity of the device. See
- * [SUPPORTED_LOCK_SCREEN_COMPLEXITIES] for the list of supported values.
+ *   [SUPPORTED_LOCK_SCREEN_COMPLEXITIES] for the list of supported values.
  * @param policyViolationActions: a list of actions that the FHIR SDK will trigger when there is a
- * lock screen policy violation.
+ *   lock screen policy violation.
  */
 data class LockScreenRequirement(
   val complexity: LockScreenComplexity,
-  val policyViolationActions: EnumSet<RequirementViolationAction>
+  val policyViolationActions: EnumSet<RequirementViolationAction>,
 ) : SecurityRequirement
 
 /** Supported lock screen password complexity. */
 enum class LockScreenComplexity(val complexity: Int) {
   /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_HIGH]. */
   HIGH(complexity = PASSWORD_COMPLEXITY_HIGH),
+
   /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_LOW]. */
   LOW(complexity = PASSWORD_COMPLEXITY_LOW),
+
   /** This is equivalent to [DevicePolicyManager.PASSWORD_COMPLEXITY_MEDIUM]. */
-  MEDIUM(complexity = PASSWORD_COMPLEXITY_MEDIUM)
+  MEDIUM(complexity = PASSWORD_COMPLEXITY_MEDIUM),
 }
 
 /** Supported security measure when a security policy is violated. */

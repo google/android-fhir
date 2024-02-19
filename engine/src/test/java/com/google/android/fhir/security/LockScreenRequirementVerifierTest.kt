@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,15 +46,15 @@ class LockScreenRequirementVerifierTest {
 
     val verdict =
       lockScreenRequirementVerifier.verify(
-        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
+        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
       )
 
     assertThat(verdict)
       .isEqualTo(
         LockScreenRequirementViolation(
           requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
-          currentComplexity = PASSWORD_COMPLEXITY_LOW
-        )
+          currentComplexity = PASSWORD_COMPLEXITY_LOW,
+        ),
       )
   }
 
@@ -66,7 +66,7 @@ class LockScreenRequirementVerifierTest {
 
       val verdict =
         lockScreenRequirementVerifier.verify(
-          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
+          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
         )
 
       assertThat(verdict).isEqualTo(SecurityRequirementMet)
@@ -79,7 +79,7 @@ class LockScreenRequirementVerifierTest {
 
     val verdict =
       lockScreenRequirementVerifier.verify(
-        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
+        LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
       )
 
     assertThat(verdict).isEqualTo(SecurityRequirementUnsupported)

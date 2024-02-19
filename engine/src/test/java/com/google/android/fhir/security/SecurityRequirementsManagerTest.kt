@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +52,7 @@ class SecurityRequirementsManagerTest {
           context,
           FhirSecurityConfiguration(
             LockScreenRequirement(LOW, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = createWarningCallback(context)
+            warningCallback = createWarningCallback(context),
           ),
         )
         .checkSecurityRequirements()
@@ -68,7 +68,7 @@ class SecurityRequirementsManagerTest {
         context,
         FhirSecurityConfiguration(
           LockScreenRequirement(LOW, EnumSet.noneOf(RequirementViolationAction::class.java)),
-          warningCallback = createWarningCallback(context)
+          warningCallback = createWarningCallback(context),
         ),
       )
     securityRequirementsManager.checkSecurityRequirements()
@@ -85,8 +85,8 @@ class SecurityRequirementsManagerTest {
           context,
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = createWarningCallback(context)
-          )
+            warningCallback = createWarningCallback(context),
+          ),
         )
         .checkSecurityRequirements()
 
@@ -98,8 +98,8 @@ class SecurityRequirementsManagerTest {
         .isEqualTo(
           LockScreenRequirementViolation(
             requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
-            currentComplexity = PASSWORD_COMPLEXITY_LOW
-          )
+            currentComplexity = PASSWORD_COMPLEXITY_LOW,
+          ),
         )
     }
 
@@ -112,7 +112,7 @@ class SecurityRequirementsManagerTest {
           context,
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = createWarningCallback(context)
+            warningCallback = createWarningCallback(context),
           ),
         )
       securityRequirementsManager.checkSecurityRequirements()
@@ -121,8 +121,8 @@ class SecurityRequirementsManagerTest {
         .isEqualTo(
           LockScreenRequirementViolation(
             requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
-            currentComplexity = PASSWORD_COMPLEXITY_LOW
-          )
+            currentComplexity = PASSWORD_COMPLEXITY_LOW,
+          ),
         )
     }
 
@@ -132,7 +132,7 @@ class SecurityRequirementsManagerTest {
         context,
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0
+        /* flags= */ 0,
       )
   }
 }
