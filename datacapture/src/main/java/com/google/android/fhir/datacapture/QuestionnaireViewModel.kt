@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,27 +26,29 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
+import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
-import com.google.android.fhir.datacapture.extensions.answerExpression
+import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
-import com.google.android.fhir.datacapture.extensions.extractAnswerOptions
+import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
+import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isFhirPath
-import com.google.android.fhir.datacapture.extensions.isFlyoverCode
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
-import com.google.android.fhir.datacapture.extensions.isInstructionsCode
 import com.google.android.fhir.datacapture.extensions.isPaginated
-import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.detectExpressionCyclicDependency
-import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator.evaluateCalculatedExpressions
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
+import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
+import com.google.android.fhir.datacapture.extensions.zipByLinkId
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseItemValidator
@@ -54,22 +56,25 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator.checkQuestionnaireResponse
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import org.hl7.fhir.r4.model.Coding
-import org.hl7.fhir.r4.model.Expression
+import kotlinx.coroutines.flow.withIndex
+import org.hl7.fhir.r4.model.Base
+import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
-import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.ValueSet
+import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
@@ -78,6 +83,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val parser: IParser by lazy { FhirContext.forCached(FhirVersionEnum.R4).newJsonParser() }
   private val xFhirQueryResolver: XFhirQueryResolver? by lazy {
     DataCapture.getConfiguration(application).xFhirQueryResolver
+  }
+  private val externalValueSetResolver: ExternalAnswerValueSetResolver? by lazy {
+    DataCapture.getConfiguration(application).valueSetResolverExternal
   }
 
   /** The current questionnaire as questions are being answered. */
@@ -90,7 +98,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING)) {
             Timber.w(
               "Both EXTRA_QUESTIONNAIRE_JSON_URI & EXTRA_QUESTIONNAIRE_JSON_STRING are provided. " +
-                "EXTRA_QUESTIONNAIRE_JSON_URI takes precedence."
+                "EXTRA_QUESTIONNAIRE_JSON_URI takes precedence.",
             )
           }
           val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_URI]!!
@@ -103,7 +111,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         else ->
           error(
-            "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied."
+            "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied.",
           )
       }
   }
@@ -117,13 +125,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING)) {
           Timber.w(
             "Both EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI & EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING are provided. " +
-              "EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI takes precedence."
+              "EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI takes precedence.",
           )
         }
         val uri: Uri = state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI]!!
         questionnaireResponse =
           parser.parseResource(application.contentResolver.openInputStream(uri))
             as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING) -> {
@@ -131,6 +140,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING]!!
         questionnaireResponse =
           parser.parseResource(questionnaireResponseJson) as QuestionnaireResponse
+        addMissingResponseItems(questionnaire.item, questionnaireResponse.item)
         checkQuestionnaireResponse(questionnaire, questionnaireResponse)
       }
       else -> {
@@ -145,6 +155,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
+    questionnaireResponse.packRepeatedGroups()
+  }
+
+  /**
+   * The launch context allows information to be passed into questionnaire based on the context in
+   * which the questionnaire is being evaluated. For example, what patient, what encounter, what
+   * user, etc. is "in context" at the time the questionnaire response is being completed:
+   * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+   */
+  private val questionnaireLaunchContextMap: Map<String, Resource>?
+
+  init {
+    questionnaireLaunchContextMap =
+      if (state.contains(QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP)) {
+
+        val launchContextMapString: Map<String, String> =
+          state[QuestionnaireFragment.EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP]!!
+
+        val launchContextMapResource =
+          launchContextMapString.mapValues { parser.parseResource(it.value) as Resource }
+        questionnaire.questionnaireLaunchContexts?.let { launchContextExtensions ->
+          validateLaunchContextExtensions(launchContextExtensions)
+          filterByCodeInNameExtension(launchContextMapResource, launchContextExtensions)
+        }
+      } else {
+        null
+      }
   }
 
   /** The map from each item in the [Questionnaire] to its parent. */
@@ -187,6 +224,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
+  /** Flag to show/hide cancel button. Default is false */
+  private var shouldShowCancelButton =
+    state[QuestionnaireFragment.EXTRA_SHOW_CANCEL_BUTTON] ?: false
+
+  /** Flag to control whether asterisk text is shown for required questions. */
+  private val showAsterisk = state[QuestionnaireFragment.EXTRA_SHOW_ASTERISK_TEXT] ?: false
+
+  /** Flag to control whether asterisk text is shown for required questions. */
+  private val showRequiredText = state[QuestionnaireFragment.EXTRA_SHOW_REQUIRED_TEXT] ?: true
+
+  /** Flag to control whether optional text is shown. */
+  private val showOptionalText = state[QuestionnaireFragment.EXTRA_SHOW_OPTIONAL_TEXT] ?: false
+
   /** The pages of the questionnaire, or null if the questionnaire is not paginated. */
   @VisibleForTesting var pages: List<QuestionnairePage>? = null
 
@@ -201,6 +251,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
   /** Toggles review mode. */
   private val isInReviewModeFlow = MutableStateFlow(shouldShowReviewPageFirst)
+
+  /** Tracks which help card has been opened. */
+  private val openedHelpCardSet: MutableSet<QuestionnaireResponseItemComponent> = mutableSetOf()
+
+  /** Callback to save the help card state. */
+  private val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
+    { shouldBeVisible, questionnaireResponseItem ->
+      if (shouldBeVisible) {
+        openedHelpCardSet.add(questionnaireResponseItem)
+      } else {
+        openedHelpCardSet.remove(questionnaireResponseItem)
+      }
+    }
 
   /**
    * Contains [QuestionnaireResponseItemComponent]s that have been modified by the user.
@@ -226,7 +289,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private val responseItemToAnswersMapForDisabledQuestionnaireItem =
     mutableMapOf<
-      QuestionnaireResponseItemComponent, List<QuestionnaireResponseItemAnswerComponent>>()
+      QuestionnaireResponseItemComponent,
+      List<QuestionnaireResponseItemAnswerComponent>,
+    >()
 
   /**
    * Map from [QuestionnaireResponseItemComponent] to draft answers, e.g "02/02" for date with
@@ -255,7 +320,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * - the reference to the [Questionnaire.QuestionnaireItemComponent] in the [Questionnaire]
    * - the reference to the [QuestionnaireResponseItemComponent] in the [QuestionnaireResponse]
    * - a [List] of [QuestionnaireResponseItemAnswerComponent] which are the new answers to the
-   * question.
+   *   question.
    * - partial answer, the entered input is not a valid answer
    */
   private val answersChangedCallback:
@@ -263,7 +328,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       QuestionnaireItemComponent,
       QuestionnaireResponseItemComponent,
       List<QuestionnaireResponseItemAnswerComponent>,
-      Any?
+      Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
       // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
@@ -285,21 +350,72 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem)
+      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
 
       modificationCount.update { it + 1 }
     }
 
-  private val answerValueSetMap =
-    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+  private val expressionEvaluator: ExpressionEvaluator =
+    ExpressionEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+    )
+
+  private val enablementEvaluator: EnablementEvaluator =
+    EnablementEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+    )
+
+  private val answerOptionsEvaluator: EnabledAnswerOptionsEvaluator =
+    EnabledAnswerOptionsEvaluator(
+      questionnaire,
+      questionnaireResponse,
+      xFhirQueryResolver,
+      externalValueSetResolver,
+      questionnaireItemParentMap,
+      questionnaireLaunchContextMap,
+    )
 
   /**
-   * The answer expression referencing an x-fhir-query has its evaluated data cached to avoid
-   * reloading resources unnecessarily. The value is updated each time an item with answer
-   * expression is evaluating the latest answer options.
+   * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
+   * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
+   * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
+   * might not contain answers to unanswered or disabled questions. Note : this only applies to
+   * [QuestionnaireItemComponent]s nested under a group.
    */
-  private val answerExpressionMap =
-    mutableMapOf<String, List<Questionnaire.QuestionnaireItemAnswerOptionComponent>>()
+  private fun addMissingResponseItems(
+    questionnaireItems: List<QuestionnaireItemComponent>,
+    responseItems: MutableList<QuestionnaireResponseItemComponent>,
+  ) {
+    // To associate the linkId to QuestionnaireResponseItemComponent, do not use associateBy().
+    // Instead, use groupBy().
+    // This is because a questionnaire response may have multiple
+    // QuestionnaireResponseItemComponents with the same linkId.
+    val responseItemMap = responseItems.groupBy { it.linkId }
+
+    // Clear the response item list, and then add the missing and existing response items back to
+    // the list
+    responseItems.clear()
+
+    questionnaireItems.forEach {
+      if (responseItemMap[it.linkId].isNullOrEmpty()) {
+        responseItems.add(it.createQuestionnaireResponseItem())
+      } else {
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && !it.repeats) {
+          addMissingResponseItems(
+            questionnaireItems = it.item,
+            responseItems = responseItemMap[it.linkId]!!.single().item,
+          )
+        }
+        responseItems.addAll(responseItemMap[it.linkId]!!)
+      }
+    }
+  }
 
   /**
    * Returns current [QuestionnaireResponse] captured by the UI which includes answers of enabled
@@ -307,8 +423,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   fun getQuestionnaireResponse(): QuestionnaireResponse {
     return questionnaireResponse.copy().apply {
-      item = getEnabledResponseItems(this@QuestionnaireViewModel.questionnaire.item, item)
+      // Use the view model's questionnaire and questionnaire response for calculating enabled items
+      // because the calculation relies on references to the questionnaire response items.
+      item =
+        getEnabledResponseItems(
+            this@QuestionnaireViewModel.questionnaire.item,
+            questionnaireResponse.item,
+          )
+          .map { it.copy() }
+      unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
     }
+  }
+
+  /** Clears all the answers from the questionnaire response by iterating through each item. */
+  fun clearAllAnswers() {
+    questionnaireResponse.allItems.forEach { it.answer = emptyList() }
+    draftAnswerMap.clear()
+    modifiedQuestionnaireResponseItemSet.clear()
+    responseItemToAnswersMapForDisabledQuestionnaireItem.clear()
+    modificationCount.update { it + 1 }
   }
 
   /**
@@ -319,7 +452,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     QuestionnaireResponseValidator.validateQuestionnaireResponse(
         questionnaire,
         questionnaireResponse,
-        getApplication()
+        getApplication(),
+        questionnaireItemParentMap,
+        questionnaireLaunchContextMap,
       )
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
@@ -387,32 +522,47 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
+    this.shouldShowSubmitButton = showSubmitButton
+  }
+
+  internal fun setShowCancelButtonFlag(showCancelButton: Boolean) {
+    this.shouldShowCancelButton = showCancelButton
+  }
+
   /** [QuestionnaireState] to be displayed in the UI. */
   internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
         getQuestionnaireState()
       }
+      .withIndex()
+      .onEach {
+        if (it.index == 0) {
+          expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
+          questionnaire.item.flattened().forEach { qItem ->
+            updateDependentQuestionnaireResponseItems(
+              qItem,
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+            )
+          }
+          modificationCount.update { count -> count + 1 }
+        }
+      }
+      .map { it.value }
       .stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        initialValue =
-          getQuestionnaireState()
-            .also { detectExpressionCyclicDependency(questionnaire.item) }
-            .also {
-              questionnaire.item.flattened().forEach {
-                updateDependentQuestionnaireResponseItems(it)
-              }
-            }
+        initialValue = QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode),
       )
 
   private fun updateDependentQuestionnaireResponseItems(
-    updatedQuestionnaireItem: QuestionnaireItemComponent,
+    questionnaireItem: QuestionnaireItemComponent,
+    updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
-    evaluateCalculatedExpressions(
-        updatedQuestionnaireItem,
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap
+    expressionEvaluator
+      .evaluateCalculatedExpressions(
+        questionnaireItem,
+        updatedQuestionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -435,84 +585,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  internal suspend fun resolveAnswerValueSet(
-    uri: String,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // If cache hit, return it
-    if (answerValueSetMap.contains(uri)) {
-      return answerValueSetMap[uri]!!
-    }
+  private fun resolveCqfExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    element: Element,
+  ): List<Base> {
+    val cqfExpression = element.cqfExpression ?: return emptyList()
 
-    val options =
-      if (uri.startsWith("#")) {
-        questionnaire.contained
-          .firstOrNull { resource ->
-            resource.id.equals(uri) &&
-              resource.resourceType == ResourceType.ValueSet &&
-              (resource as ValueSet).hasExpansion()
-          }
-          ?.let { resource ->
-            val valueSet = resource as ValueSet
-            valueSet.expansion.contains
-              .filterNot { it.abstract || it.inactive }
-              .map { component ->
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
-                  Coding(component.system, component.code, component.display)
-                )
-              }
-          }
-      } else {
-        // Ask the client to provide the answers from an external expanded Valueset.
-        DataCapture.getConfiguration(getApplication())
-          .valueSetResolverExternal
-          ?.resolve(uri)
-          ?.map { coding -> Questionnaire.QuestionnaireItemAnswerOptionComponent(coding.copy()) }
-      }
-        ?: emptyList()
-    // save it so that we avoid have cache misses.
-    answerValueSetMap[uri] = options
-    return options
+    if (!cqfExpression.isFhirPath) {
+      throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
+    }
+    return expressionEvaluator.evaluateExpression(
+      questionnaireItem,
+      questionnaireResponseItem,
+      cqfExpression,
+    )
   }
 
-  // TODO persist previous answers in case options are changing and new list does not have selected
-  // answer and FHIRPath in x-fhir-query
-  // https://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements
-  internal suspend fun resolveAnswerExpression(
-    item: QuestionnaireItemComponent,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    // Check cache first for database queries
-    val answerExpression = item.answerExpression ?: return emptyList()
-    if (answerExpression.isXFhirQuery && answerExpressionMap.contains(answerExpression.expression)
-    ) {
-      return answerExpressionMap[answerExpression.expression]!!
-    }
-
-    val options = loadAnswerExpressionOptions(item, answerExpression)
-
-    if (answerExpression.isXFhirQuery) answerExpressionMap[answerExpression.expression] = options
-
-    return options
-  }
-
-  private suspend fun loadAnswerExpressionOptions(
-    item: QuestionnaireItemComponent,
-    expression: Expression,
-  ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
-    val data =
-      if (expression.isXFhirQuery) {
-        checkNotNull(xFhirQueryResolver) {
-          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
-        }
-        xFhirQueryResolver!!.resolve(expression.expression)
-      } else if (expression.isFhirPath) {
-        fhirPathEngine.evaluate(questionnaireResponse, expression.expression)
-      } else {
-        throw UnsupportedOperationException(
-          "${expression.language} not supported for answer-expression yet"
-        )
+  private fun removeDisabledAnswers(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    disabledAnswers: List<QuestionnaireResponseItemAnswerComponent>,
+  ) {
+    val validAnswers =
+      questionnaireResponseItem.answer.filterNot { ans ->
+        disabledAnswers.any { ans.value.equalsDeep(it.value) }
       }
-
-    return item.extractAnswerOptions(data)
+    answersChangedCallback(questionnaireItem, questionnaireResponseItem, validAnswers, null)
   }
 
   /**
@@ -523,7 +622,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * The traverse is carried out in the two lists in tandem.
    */
-  private fun getQuestionnaireState(): QuestionnaireState {
+  private suspend fun getQuestionnaireState(): QuestionnaireState {
     val questionnaireItemList = questionnaire.item
     val questionnaireResponseItemList = questionnaireResponse.item
 
@@ -537,7 +636,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
         getQuestionnaireAdapterItems(
           questionnaireItemList[currentPageIndexFlow.value!!],
-          questionnaireResponseItemList[currentPageIndexFlow.value!!]
+          questionnaireResponseItemList[currentPageIndexFlow.value!!],
         )
       } else {
         getQuestionnaireAdapterItems(questionnaireItemList, questionnaireResponseItemList)
@@ -550,8 +649,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         displayMode =
           DisplayMode.ReviewMode(
             showEditButton = !isReadOnly,
-            showSubmitButton = !isReadOnly && shouldShowSubmitButton
-          )
+            showSubmitButton = !isReadOnly && shouldShowSubmitButton,
+            showCancelButton = !isReadOnly && shouldShowCancelButton,
+          ),
       )
     }
 
@@ -560,25 +660,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       if (!questionnaire.isPaginated) {
         val showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
         val showSubmitButton = shouldShowSubmitButton && !showReviewButton
-        QuestionnairePagination(false, emptyList(), -1, showSubmitButton, showReviewButton)
+        val showCancelButton = shouldShowCancelButton && !showReviewButton
+        QuestionnairePagination(
+          false,
+          emptyList(),
+          -1,
+          showSubmitButton,
+          showCancelButton,
+          showReviewButton,
+        )
       } else {
         val hasNextPage =
           QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndexFlow.value!!)
             .hasNextPage
         val showReviewButton = shouldEnableReviewPage && !hasNextPage
         val showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
+        val showCancelButton = shouldShowCancelButton
         QuestionnairePagination(
           true,
           pages!!,
           currentPageIndexFlow.value!!,
           showSubmitButton,
-          showReviewButton
+          showCancelButton,
+          showReviewButton,
         )
       }
 
     return QuestionnaireState(
       items = questionnaireItemViewItems,
-      displayMode = DisplayMode.EditMode(questionnairePagination)
+      displayMode = DisplayMode.EditMode(questionnairePagination),
     )
   }
 
@@ -586,7 +696,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire items and
    * questionnaire response items.
    */
-  private fun getQuestionnaireAdapterItems(
+  private suspend fun getQuestionnaireAdapterItems(
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireAdapterItem> {
@@ -601,15 +711,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Returns the list of [QuestionnaireViewItem]s generated for the questionnaire item and
    * questionnaire response item.
    */
-  private fun getQuestionnaireAdapterItems(
+  private suspend fun getQuestionnaireAdapterItems(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ): List<QuestionnaireAdapterItem> {
     // Hidden questions should not get QuestionnaireItemViewItem instances
     if (questionnaireItem.isHidden) return emptyList()
     val enabled =
-      EnablementEvaluator(questionnaireResponse)
-        .evaluate(questionnaireItem, questionnaireResponseItem)
+      enablementEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
     // Disabled questions should not get QuestionnaireItemViewItem instances
     if (!enabled) {
       cacheDisabledQuestionnaireItemAnswers(questionnaireResponseItem)
@@ -620,19 +732,43 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     // Determine the validation result, which will be displayed on the item itself
     val validationResult =
-      if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
+      if (
+        modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
           forceValidation ||
           isInReviewModeFlow.value
       ) {
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
           questionnaireResponseItem.answer,
-          this@QuestionnaireViewModel.getApplication()
+          this@QuestionnaireViewModel.getApplication(),
         )
       } else {
         NotValidated
       }
+
+    // Set question text dynamically from CQL expression
+    questionnaireResponseItem.apply {
+      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
+        .firstOrNull()
+        ?.let { text = it.primitiveValue() }
+    }
+    val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
+      answerOptionsEvaluator.evaluate(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
+    if (disabledQuestionnaireResponseAnswers.isNotEmpty()) {
+      removeDisabledAnswers(
+        questionnaireItem,
+        questionnaireResponseItem,
+        disabledQuestionnaireResponseAnswers,
+      )
+    }
+
     val items = buildList {
+      val itemHelpCard = questionnaireItem.item.firstOrNull { it.isHelpCode }
+      val isHelpCard = itemHelpCard != null
+      val isHelpCardOpen = openedHelpCardSet.contains(questionnaireResponseItem)
       // Add an item for the question itself
       add(
         QuestionnaireAdapterItem.Question(
@@ -641,11 +777,26 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireResponseItem,
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
-            resolveAnswerValueSet = { resolveAnswerValueSet(it) },
-            resolveAnswerExpression = { resolveAnswerExpression(it) },
-            draftAnswer = draftAnswerMap[questionnaireResponseItem]
-          )
-        )
+            enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+            draftAnswer = draftAnswerMap[questionnaireResponseItem],
+            enabledDisplayItems =
+              questionnaireItem.item.filter {
+                it.isDisplayItem &&
+                  enablementEvaluator.evaluate(
+                    it,
+                    questionnaireResponseItem,
+                  )
+              },
+            questionViewTextConfiguration =
+              QuestionTextConfiguration(
+                showAsterisk = showAsterisk,
+                showRequiredText = showRequiredText,
+                showOptionalText = showOptionalText,
+              ),
+            isHelpCardOpen = isHelpCard && isHelpCardOpen,
+            helpCardStateChangedCallback = helpCardStateChangedCallback,
+          ),
+        ),
       )
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
@@ -672,13 +823,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
               // questionnaire state for it.
-              questionnaireItemList =
-                questionnaireItem.item.filterNot {
-                  it.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
-                    (it.isInstructionsCode || it.isFlyoverCode || it.isHelpCode)
-                },
+              questionnaireItemList = questionnaireItem.item.filterNot { it.isDisplayItem },
               questionnaireResponseItemList = nestedResponseItemList,
-            )
+            ),
           )
         }
     }
@@ -692,7 +839,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * item to be wrongly evaluated as well.
    */
   private fun cacheDisabledQuestionnaireItemAnswers(
-    questionnaireResponseItem: QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ) {
     if (questionnaireResponseItem.hasAnswer()) {
       responseItemToAnswersMapForDisabledQuestionnaireItem[questionnaireResponseItem] =
@@ -705,7 +852,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * If the questionnaire item was previously disabled, check the cache to restore previous answers.
    */
   private fun restoreFromDisabledQuestionnaireItemAnswersCache(
-    questionnaireResponseItem: QuestionnaireResponseItemComponent
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ) {
     if (responseItemToAnswersMapForDisabledQuestionnaireItem.contains(questionnaireResponseItem)) {
       questionnaireResponseItem.answer =
@@ -717,7 +864,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireItemList: List<QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
   ): List<QuestionnaireResponseItemComponent> {
-    val enablementEvaluator = EnablementEvaluator(questionnaireResponse)
     val responseItemKeys = questionnaireResponseItemList.map { it.linkId }
     return questionnaireItemList
       .asSequence()
@@ -729,58 +875,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireResponseItem,
         )
       }
-      .flatMap { (questionnaireItem, questionnaireResponseItem) ->
-        val isRepeatedGroup =
-          questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-            questionnaireItem.repeats
-        if (isRepeatedGroup) {
-          createRepeatedGroupResponse(questionnaireItem, questionnaireResponseItem)
-        } else {
-          listOf(
-            questionnaireResponseItem.apply {
-              text = questionnaireItem.localizedTextSpanned?.toString()
-              // Nested group items
-              item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
-              // Nested question items
-              answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
-            }
-          )
+      .map { (questionnaireItem, questionnaireResponseItem) ->
+        questionnaireResponseItem.apply {
+          if (text.isNullOrBlank()) {
+            text = questionnaireItem.localizedTextSpanned?.toString()
+          }
+          // Nested group items
+          item = getEnabledResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
+          // Nested question items
+          answer.forEach { it.item = getEnabledResponseItems(questionnaireItem.item, it.item) }
         }
       }
       .toList()
-  }
-
-  /**
-   * Repeated groups need some massaging for their returned data-format; each instance of the group
-   * should be flattened out to be its own item in the parent, rather than an answer to the main
-   * item. See discussion:
-   * http://community.fhir.org/t/questionnaire-repeating-groups-what-is-the-correct-format/2276/3
-   *
-   * For example, if the group contains 2 questions, and the user answered the group 3 times, this
-   * function will return a list with 3 responses; each of those responses will have the linkId of
-   * the provided group, and each will contain an item array with 2 items (the answers to the
-   * individual questions within this particular group instance).
-   */
-  private fun createRepeatedGroupResponse(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-  ): List<QuestionnaireResponseItemComponent> {
-    val individualQuestions = questionnaireItem.item
-    return questionnaireResponseItem.answer.map { repeatedGroupInstance ->
-      val responsesToIndividualQuestions = repeatedGroupInstance.item
-      check(responsesToIndividualQuestions.size == individualQuestions.size) {
-        "Repeated groups responses must have the same # of responses as the group has questions"
-      }
-      QuestionnaireResponseItemComponent().apply {
-        linkId = questionnaireItem.linkId
-        text = questionnaireItem.localizedTextSpanned?.toString()
-        item =
-          getEnabledResponseItems(
-            questionnaireItemList = individualQuestions,
-            questionnaireResponseItemList = responsesToIndividualQuestions,
-          )
-      }
-    }
   }
 
   /**
@@ -795,12 +901,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         ->
         QuestionnairePage(
           index,
-          EnablementEvaluator(questionnaireResponse)
-            .evaluate(
-              questionnaireItem,
-              questionnaireResponseItem,
-            ),
-          questionnaireItem.isHidden
+          enablementEvaluator.evaluate(
+            questionnaireItem,
+            questionnaireResponseItem,
+          ),
+          questionnaireItem.isHidden,
         )
       }
     } else {
@@ -812,7 +917,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
-    if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
+    if (
+      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
         it.item.validationResult is NotValidated
       }
     ) {
@@ -825,7 +931,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       forceValidation = false
     }
 
-    if (currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
+    if (
+      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
         it.item.validationResult is Valid
       }
     ) {
@@ -844,7 +951,15 @@ internal data class QuestionnaireState(
 
 internal sealed class DisplayMode {
   class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
-  data class ReviewMode(val showEditButton: Boolean, val showSubmitButton: Boolean) : DisplayMode()
+
+  data class ReviewMode(
+    val showEditButton: Boolean,
+    val showSubmitButton: Boolean,
+    val showCancelButton: Boolean,
+  ) : DisplayMode()
+
+  // Sentinel displayMode that's used in setting the initial default QuestionnaireState
+  object InitMode : DisplayMode()
 }
 
 /**
@@ -856,6 +971,7 @@ internal data class QuestionnairePagination(
   val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
   val showSubmitButton: Boolean = false,
+  val showCancelButton: Boolean = false,
   val showReviewButton: Boolean = false,
 )
 
@@ -871,26 +987,3 @@ internal val QuestionnairePagination.hasPreviousPage: Boolean
 
 internal val QuestionnairePagination.hasNextPage: Boolean
   get() = pages.any { it.index > currentPageIndex && it.enabled }
-
-/**
- * Returns a list of values built from the elements of `this` and the
- * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
- * applied to each pair of questionnaire item and questionnaire response item.
- *
- * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
- *
- * Although linkIds may appear more than once in questionnaire response, they would not appear more
- * than once within a list of questionnaire response items sharing the same parent.
- */
-private inline fun <T> List<QuestionnaireItemComponent>.zipByLinkId(
-  questionnaireResponseItemList: List<QuestionnaireResponseItemComponent>,
-  transform: (QuestionnaireItemComponent, QuestionnaireResponseItemComponent) -> T
-): List<T> {
-  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
-  return mapNotNull { questionnaireItem ->
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem
-      ->
-      transform(questionnaireItem, questionnaireResponseItem)
-    }
-  }
-}

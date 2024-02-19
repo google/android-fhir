@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import java.io.File
 import java.util.Locale
@@ -41,14 +42,16 @@ import org.hl7.fhir.r4.model.SearchParameter
  * should be regenerated to reflect any change.
  *
  * To do this, replace the content of the file `codegen/src/main/res/search-parameters.json` with
- * the content at `http://www.hl7.org/fhir/search-parameters.json` and run the `main` function in
- * the `codegen` module.
+ * the content at `http://www.hl7.org/fhir/search-parameters.json` and execute the gradle task
+ * `generateSearchParamsTask`. If you are using Android Studio, you can usually find this task in
+ * the Gradle tasks under other. Alternatively, you clean and rebuild the project to ensure changes
+ * take effect.
  */
 internal data class SearchParamDefinition(
   val className: ClassName,
   val name: String,
   val paramTypeCode: String,
-  val path: String
+  val path: String,
 )
 
 internal object SearchParameterRepositoryGenerator {
@@ -63,6 +66,7 @@ internal object SearchParameterRepositoryGenerator {
 
   private val searchParamMap: HashMap<String, MutableList<SearchParamDefinition>> = HashMap()
   private val searchParamDefinitionClass = ClassName(indexPackage, "SearchParamDefinition")
+  private val baseResourceSearchParameters = mutableListOf<SearchParamDefinition>()
 
   fun generate(bundle: Bundle, outputPath: File, testOutputPath: File) {
     for (entry in bundle.entry) {
@@ -78,9 +82,19 @@ internal object SearchParameterRepositoryGenerator {
               className = searchParamDefinitionClass,
               name = searchParameter.name,
               paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
-              path = path.value
-            )
+              path = path.value,
+            ),
           )
+        if (hashMapKey == "Resource") {
+          baseResourceSearchParameters.add(
+            SearchParamDefinition(
+              className = searchParamDefinitionClass,
+              name = searchParameter.name,
+              paramTypeCode = searchParameter.type.toCode().toUpperCase(Locale.US),
+              path = path.value,
+            ),
+          )
+        }
       }
     }
 
@@ -90,12 +104,37 @@ internal object SearchParameterRepositoryGenerator {
       FunSpec.builder("getSearchParamList")
         .addParameter("resource", Resource::class)
         .returns(
-          ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
+          ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass),
         )
         .addModifiers(KModifier.INTERNAL)
         .addKdoc(generatedComment)
-        .beginControlFlow("return when (resource.fhirType())")
+        .beginControlFlow("val resourceSearchParams = when (resource.fhirType())")
 
+    // Function for base resource search parameters
+    val baseParamResourceSpecName = ParameterSpec.builder("resourceName", String::class).build()
+    val getBaseResourceSearchParamListFunction =
+      FunSpec.builder("getBaseResourceSearchParamsList")
+        .addParameter(baseParamResourceSpecName)
+        .apply {
+          addModifiers(KModifier.PRIVATE)
+          returns(
+            ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass),
+          )
+          beginControlFlow("return buildList(capacity = %L)", baseResourceSearchParameters.size)
+          baseResourceSearchParameters.forEach { definition ->
+            addStatement(
+              "add(%T(%S, %T.%L, %P))",
+              definition.className,
+              definition.name,
+              Enumerations.SearchParamType::class,
+              definition.paramTypeCode,
+              "$" + "${baseParamResourceSpecName.name}." + definition.path.substringAfter("."),
+            )
+          }
+          endControlFlow() // end buildList
+        }
+        .build()
+    fileSpec.addFunction(getBaseResourceSearchParamListFunction)
     // Helper function used in SearchParameterRepositoryGeneratedTest
     val testHelperFunctionCodeBlock =
       CodeBlock.builder().addStatement("val resourceList = listOf<%T>(", Resource::class.java)
@@ -114,7 +153,7 @@ internal object SearchParameterRepositoryGenerator {
             .apply {
               addModifiers(KModifier.PRIVATE)
               returns(
-                ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass)
+                ClassName("kotlin.collections", "List").parameterizedBy(searchParamDefinitionClass),
               )
               beginControlFlow("return buildList(capacity = %L)", definitions.size)
               definitions.forEach { definition ->
@@ -124,7 +163,7 @@ internal object SearchParameterRepositoryGenerator {
                   definition.name,
                   Enumerations.SearchParamType::class,
                   definition.paramTypeCode,
-                  definition.path
+                  definition.path,
                 )
               }
               endControlFlow() // end buildList
@@ -140,6 +179,11 @@ internal object SearchParameterRepositoryGenerator {
     }
 
     getSearchParamListFunction.addStatement("else -> emptyList()").endControlFlow()
+    // This will now return the list of search parameter for the resource + search parameters
+    // defined in base resource i.e. _profile, _tag, _id, _security, _lastUpdated, _source
+    getSearchParamListFunction.addStatement(
+      "return resourceSearchParams + getBaseResourceSearchParamsList(resource.fhirType())",
+    )
     fileSpec.addFunction(getSearchParamListFunction.build()).build().writeTo(outputPath)
 
     testHelperFunctionCodeBlock.add(")\n")
@@ -152,15 +196,13 @@ internal object SearchParameterRepositoryGenerator {
             .returns(List::class.parameterizedBy(Resource::class))
             .addCode(testHelperFunctionCodeBlock.build())
             .addKdoc(generatedComment)
-            .build()
+            .build(),
         )
         .build()
     testFile.writeTo(testOutputPath)
   }
 
   /**
-   * @return the resource names mapped to their respective paths in the expression of [searchParam]
-   *
    * @param searchParam the search parameter that needs to be mapped
    *
    * This is necessary because the path expressions are not necessarily grouped by resource type
@@ -168,6 +210,8 @@ internal object SearchParameterRepositoryGenerator {
    * For example an expression of "AllergyIntolerance.code | AllergyIntolerance.reaction.substance |
    * Condition.code" will return "AllergyIntolerance" -> "AllergyIntolerance.code |
    * AllergyIntolerance.reaction.substance" , "Condition" -> "Condition.code"
+   *
+   * @return the resource names mapped to their respective paths in the expression of [searchParam]
    */
   private fun getResourceToPathMap(searchParam: SearchParameter): Map<String, String> {
     // the if block is added because of the issue https://jira.hl7.org/browse/FHIR-22724 and can be
@@ -175,8 +219,7 @@ internal object SearchParameterRepositoryGenerator {
     return if (searchParam.base.size == 1) {
       mapOf(searchParam.base.single().valueAsString to searchParam.expression)
     } else {
-      searchParam
-        .expression
+      searchParam.expression
         .split("|")
         .groupBy { splitString -> splitString.split(".").first().trim().removePrefix("(") }
         .mapValues { it.value.joinToString(" | ") { join -> join.trim() } }

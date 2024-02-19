@@ -2,206 +2,263 @@
   "resourceType": "Bundle",
   "id": "tests-NotReportable-bundle",
   "type": "transaction",
-  "entry": [ {
-    "resource": {
-      "resourceType": "Encounter",
-      "id": "encounter-notreportable",
-      "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Encounter with patient @example</div>"
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Encounter",
+        "id": "encounter-notreportable",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Encounter with patient @example</div>"
+        },
+        "status": "in-progress",
+        "class": {
+          "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
+          "code": "IMP",
+          "display": "inpatient encounter"
+        },
+        "subject": {
+          "reference": "Patient/NotReportable"
+        },
+        "location": [
+          {
+            "location": {
+              "reference": "Location/location-notreportable"
+            }
+          }
+        ]
       },
-      "status": "in-progress",
-      "class": {
-        "system": "http://terminology.hl7.org/CodeSystem/v3-ActCode",
-        "code": "IMP",
-        "display": "inpatient encounter"
-      },
-      "subject": {
-        "reference": "Patient/NotReportable"
-      },
-      "location": [ {
-        "location": {
-          "reference": "Location/location-notreportable"
-        }
-      } ]
-    },
-    "request": {
-      "method": "PUT",
-      "url": "Encounter/encounter-notreportable"
-    }
-  }, {
-    "resource": {
-      "resourceType": "Location",
-      "id": "location-notreportable",
-      "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Location example</div>"
-      },
-      "status": "active",
-      "name": "Good Luck Hospital",
-      "description": "Good Luck Hospital",
-      "mode": "instance",
-      "address": {
-        "line": [ "12345 Main" ],
-        "city": "Houston",
-        "state": "TX",
-        "postalCode": "77011",
-        "country": "USA"
-      },
-      "physicalType": {
-        "coding": [ {
-          "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
-          "code": "bu",
-          "display": "Building"
-        } ]
+      "request": {
+        "method": "PUT",
+        "url": "Encounter/encounter-notreportable"
       }
     },
-    "request": {
-      "method": "PUT",
-      "url": "Location/location-notreportable"
-    }
-  }, {
-    "resource": {
-      "resourceType": "Observation",
-      "id": "observation-notreportable",
-      "meta": {
-        "profile": [ "http://hl7.org/fhir/observation" ]
-      },
-      "status": "final",
-      "code": {
-        "coding": [ {
-          "system": "http://loinc.org",
-          "code": "32774-2",
-          "display": "Chlamydia sp DNA [Presence] in Genital specimen by NAA with probe detection"
-        } ]
-      },
-      "subject": {
-        "reference": "Patient/NotReportable"
-      },
-      "effectiveDateTime": "2019-11-01",
-      "valueCodeableConcept": {
-        "coding": [ {
-          "system": "http://snomed.info/sct",
-          "code": "131194007",
-          "display": "Non-Reactive (qualifier value)"
-        } ]
-      },
-      "interpretation": [ {
-        "coding": [ {
-          "system": "http://hl7.org/fhir/v2/0078",
-          "code": "NEG",
-          "display": "Negative"
-        } ]
-      } ]
-    },
-    "request": {
-      "method": "PUT",
-      "url": "Observation/observation-notreportable"
-    }
-  }, {
-    "resource": {
-      "resourceType": "Organization",
-      "id": "organization-notreportable",
-      "name": "Example Health Clinic",
-      "address": [ {
-        "line": [ "12345 Main" ],
-        "city": "Houston",
-        "state": "TX",
-        "postalCode": "77011"
-      } ]
-    },
-    "request": {
-      "method": "PUT",
-      "url": "Organization/organization-notreportable"
-    }
-  }, {
-    "resource": {
-      "resourceType": "Patient",
-      "id": "NotReportable",
-      "meta": {
-        "profile": [ "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient" ]
-      },
-      "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"/>"
-      },
-      "extension": [ {
-        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
-        "extension": [ {
-          "url": "ombCategory",
-          "valueCoding": {
-            "system": "urn:oid:2.16.840.1.113883.6.238",
-            "code": "2106-3",
-            "display": "White"
-          }
-        }, {
-          "url": "text",
-          "valueString": "White"
-        } ]
-      }, {
-        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
-        "extension": [ {
-          "url": "ombCategory",
-          "valueCoding": {
-            "system": "urn:oid:2.16.840.1.113883.6.238",
-            "code": "2186-5",
-            "display": "Not Hispanic or Latino"
-          }
-        }, {
-          "url": "text",
-          "valueString": "Not Hispanic or Latino"
-        } ]
-      }, {
-        "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
-        "valueCode": "F"
-      }, {
-        "url": "http://hl7.org/fhir/StructureDefinition/patient-genderIdentity",
-        "valueCodeableConcept": {
-          "coding": [ {
-            "system": "http://hl7.org/fhir/gender-identity",
-            "code": "female",
-            "display": "female"
-          } ]
-        }
-      } ],
-      "identifier": [ {
-        "use": "usual",
-        "type": {
-          "coding": [ {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-            "code": "MR",
-            "display": "Medical Record Number"
-          } ]
+    {
+      "resource": {
+        "resourceType": "Location",
+        "id": "location-notreportable",
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Location example</div>"
         },
-        "system": "http://hospital.smarthealthit.org",
-        "value": "1032702"
-      } ],
-      "active": true,
-      "name": [ {
-        "family": "Everywoman",
-        "given": [ "Eve", "L" ]
-      } ],
-      "telecom": [ {
-        "system": "phone",
-        "value": "1-(404)555-1212",
-        "use": "home"
-      }, {
-        "system": "email",
-        "value": "eve.everywoman@example.com"
-      } ],
-      "gender": "female",
-      "birthDate": "1974-11-24",
-      "address": [ {
-        "line": [ "5101 Peachtree St NE" ],
-        "city": "Corpus Christi",
-        "state": "TX",
-        "postalCode": "78412",
-        "country": "US"
-      } ]
+        "status": "active",
+        "name": "Good Luck Hospital",
+        "description": "Good Luck Hospital",
+        "mode": "instance",
+        "address": {
+          "line": [
+            "12345 Main"
+          ],
+          "city": "Houston",
+          "state": "TX",
+          "postalCode": "77011",
+          "country": "USA"
+        },
+        "physicalType": {
+          "coding": [
+            {
+              "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
+              "code": "bu",
+              "display": "Building"
+            }
+          ]
+        }
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Location/location-notreportable"
+      }
     },
-    "request": {
-      "method": "PUT",
-      "url": "Patient/NotReportable"
+    {
+      "resource": {
+        "resourceType": "Observation",
+        "id": "observation-notreportable",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/observation"
+          ]
+        },
+        "status": "final",
+        "code": {
+          "coding": [
+            {
+              "system": "http://loinc.org",
+              "code": "32774-2",
+              "display": "Chlamydia sp DNA [Presence] in Genital specimen by NAA with probe detection"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "Patient/NotReportable"
+        },
+        "effectiveDateTime": "2019-11-01",
+        "valueCodeableConcept": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "131194007",
+              "display": "Non-Reactive (qualifier value)"
+            }
+          ]
+        },
+        "interpretation": [
+          {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/v2/0078",
+                "code": "NEG",
+                "display": "Negative"
+              }
+            ]
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Observation/observation-notreportable"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "organization-notreportable",
+        "name": "Example Health Clinic",
+        "address": [
+          {
+            "line": [
+              "12345 Main"
+            ],
+            "city": "Houston",
+            "state": "TX",
+            "postalCode": "77011"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Organization/organization-notreportable"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "NotReportable",
+        "meta": {
+          "profile": [
+            "http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient"
+          ]
+        },
+        "text": {
+          "status": "generated",
+          "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"/>"
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-race",
+            "extension": [
+              {
+                "url": "ombCategory",
+                "valueCoding": {
+                  "system": "urn:oid:2.16.840.1.113883.6.238",
+                  "code": "2106-3",
+                  "display": "White"
+                }
+              },
+              {
+                "url": "text",
+                "valueString": "White"
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity",
+            "extension": [
+              {
+                "url": "ombCategory",
+                "valueCoding": {
+                  "system": "urn:oid:2.16.840.1.113883.6.238",
+                  "code": "2186-5",
+                  "display": "Not Hispanic or Latino"
+                }
+              },
+              {
+                "url": "text",
+                "valueString": "Not Hispanic or Latino"
+              }
+            ]
+          },
+          {
+            "url": "http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex",
+            "valueCode": "F"
+          },
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/patient-genderIdentity",
+            "valueCodeableConcept": {
+              "coding": [
+                {
+                  "system": "http://hl7.org/fhir/gender-identity",
+                  "code": "female",
+                  "display": "female"
+                }
+              ]
+            }
+          }
+        ],
+        "identifier": [
+          {
+            "use": "usual",
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MR",
+                  "display": "Medical Record Number"
+                }
+              ]
+            },
+            "system": "http://hospital.smarthealthit.org",
+            "value": "1032702"
+          }
+        ],
+        "active": true,
+        "name": [
+          {
+            "family": "Everywoman",
+            "given": [
+              "Eve",
+              "L"
+            ]
+          }
+        ],
+        "telecom": [
+          {
+            "system": "phone",
+            "value": "1-(404)555-1212",
+            "use": "home"
+          },
+          {
+            "system": "email",
+            "value": "eve.everywoman@example.com"
+          }
+        ],
+        "gender": "female",
+        "birthDate": "1974-11-24",
+        "address": [
+          {
+            "line": [
+              "5101 Peachtree St NE"
+            ],
+            "city": "Corpus Christi",
+            "state": "TX",
+            "postalCode": "78412",
+            "country": "US"
+          }
+        ]
+      },
+      "request": {
+        "method": "PUT",
+        "url": "Patient/NotReportable"
+      }
     }
-  } ]
+  ]
 }

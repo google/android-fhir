@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,15 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
 
 /**
  * The StructureMap url in the
@@ -37,6 +43,16 @@ internal val Questionnaire.variableExpressions: List<Expression>
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
 /**
+ * A list of extensions that define the resources that provide context for form processing logic:
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+ */
+internal val Questionnaire.questionnaireLaunchContexts: List<Extension>?
+  get() =
+    this.extension
+      .filter { it.url == EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT }
+      .takeIf { it.isNotEmpty() }
+
+/**
  * Finds the specific variable name [String] at questionnaire [Questionnaire] level
  *
  * @param variableName the [String] to match the variable at questionnaire [Questionnaire] level
@@ -44,6 +60,62 @@ internal val Questionnaire.variableExpressions: List<Expression>
  */
 internal fun Questionnaire.findVariableExpression(variableName: String): Expression? =
   variableExpressions.find { it.name == variableName }
+
+/**
+ * Validates each questionnaire launch context extension matches:
+ * https://build.fhir.org/ig/HL7/sdc/StructureDefinition-sdc-questionnaire-launchContext.html
+ */
+internal fun validateLaunchContextExtensions(launchContextExtensions: List<Extension>) =
+  launchContextExtensions.forEach { launchExtension ->
+    validateLaunchContextExtension(launchExtension)
+  }
+
+/**
+ * Verifies the existence of extension:name and extension:type with valid name system and type
+ * values.
+ */
+private fun validateLaunchContextExtension(launchExtension: Extension) {
+  val nameCoding =
+    launchExtension.getExtensionByUrl("name")?.value as? Coding
+      ?: error(
+        "The extension:name is missing or is not of type Coding in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+
+  val typeCodeType =
+    launchExtension.getExtensionByUrl("type")?.value as? CodeType
+      ?: error(
+        "The extension:type is missing or is not of type CodeType in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+      )
+
+  val isValidResourceType =
+    try {
+      ResourceType.fromCode(typeCodeType.value) != null
+    } catch (exception: FHIRException) {
+      false
+    }
+
+  if (nameCoding.system != EXTENSION_LAUNCH_CONTEXT || !isValidResourceType) {
+    error(
+      "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
+    )
+  }
+}
+
+/**
+ * Filters the provided launch contexts by matching the keys with the `code` values found in the
+ * "name" extensions.
+ */
+internal fun filterByCodeInNameExtension(
+  launchContexts: Map<String, Resource>,
+  launchContextExtensions: List<Extension>,
+): Map<String, Resource> {
+  val nameCodes =
+    launchContextExtensions
+      .mapNotNull { extension -> (extension.getExtensionByUrl("name").value as? Coding)?.code }
+      .toSet()
+
+  return launchContexts.filterKeys { nameCodes.contains(it) }
+}
 
 /**
  * See
@@ -64,6 +136,11 @@ val Questionnaire.isPaginated: Boolean
 internal const val EXTENSION_ENTRY_MODE_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-entryMode"
 
+internal const val EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT =
+  "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
+
+internal const val EXTENSION_LAUNCH_CONTEXT = "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext"
+
 val Questionnaire.entryMode: EntryMode?
   get() {
     val entryMode =
@@ -78,7 +155,8 @@ val Questionnaire.entryMode: EntryMode?
 enum class EntryMode(val value: String) {
   PRIOR_EDIT("prior-edit"),
   RANDOM("random"),
-  SEQUENTIAL("sequential");
+  SEQUENTIAL("sequential"),
+  ;
 
   companion object {
     fun from(type: String?): EntryMode? = values().find { it.value == type }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import android.os.Build
 import android.util.Base64
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.DataCapture
-import com.google.android.fhir.datacapture.mapping.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.testing.TestUrlResolver
 import com.google.common.truth.Truth.assertThat
@@ -34,13 +33,13 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
@@ -74,9 +73,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -97,9 +96,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
                     .setDisplay("Radio Group")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -119,9 +118,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(ItemControlTypes.PHONE_NUMBER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR),
+                ),
+            ),
         )
       }
 
@@ -142,9 +141,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode(ItemControlTypes.DROP_DOWN.extensionCode)
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -165,9 +164,9 @@ class MoreQuestionnaireItemComponentsTest {
                   Coding()
                     .setCode("null-test")
                     .setDisplay("Drop Down")
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -187,9 +186,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -209,9 +208,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -231,9 +230,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -250,8 +249,10 @@ class MoreQuestionnaireItemComponentsTest {
             .setUrl(EXTENSION_ITEM_CONTROL_URL)
             .setValue(
               CodeableConcept()
-                .addCoding(Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM))
-            )
+                .addCoding(
+                  Coding().setCode("random-code").setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -271,9 +272,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -293,9 +294,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.HELP.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -318,11 +319,11 @@ class MoreQuestionnaireItemComponentsTest {
                       .addCoding(
                         Coding()
                           .setCode(DisplayItemControlType.HELP.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                      ),
+                  ),
               )
-            }
+            },
           )
       }
 
@@ -345,11 +346,11 @@ class MoreQuestionnaireItemComponentsTest {
                       .addCoding(
                         Coding()
                           .setCode(DisplayItemControlType.FLYOVER.extensionCode)
-                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                      )
-                  )
+                          .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                      ),
+                  ),
               )
-            }
+            },
           )
       }
 
@@ -369,9 +370,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.HELP.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -391,9 +392,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -412,9 +413,9 @@ class MoreQuestionnaireItemComponentsTest {
                 .addCoding(
                   Coding()
                     .setCode(DisplayItemControlType.PAGE.extensionCode)
-                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM)
-                )
-            )
+                    .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+                ),
+            ),
         )
       }
 
@@ -431,8 +432,8 @@ class MoreQuestionnaireItemComponentsTest {
             .setUrl(EXTENSION_ITEM_CONTROL_URL)
             .setValue(
               CodeableConcept()
-                .addCoding(Coding().setCode(DisplayItemControlType.PAGE.extensionCode))
-            )
+                .addCoding(Coding().setCode(DisplayItemControlType.PAGE.extensionCode)),
+            ),
         )
       }
 
@@ -445,7 +446,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
-          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode)
+          CodeType(ChoiceOrientationTypes.VERTICAL.extensionCode),
         )
       }
     assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.VERTICAL)
@@ -457,7 +458,7 @@ class MoreQuestionnaireItemComponentsTest {
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           EXTENSION_CHOICE_ORIENTATION_URL,
-          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode)
+          CodeType(ChoiceOrientationTypes.HORIZONTAL.extensionCode),
         )
       }
     assertThat(questionnaireItem.choiceOrientation).isEqualTo(ChoiceOrientationTypes.HORIZONTAL)
@@ -679,7 +680,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -698,7 +699,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -717,7 +718,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi")))
               addExtension(Extension("content", StringType("Thông tin bệnh nhân")))
-            }
+            },
           )
         }
       }
@@ -752,7 +753,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -771,7 +772,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi-VN")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -790,7 +791,7 @@ class MoreQuestionnaireItemComponentsTest {
             Extension(ToolingExtensions.EXT_TRANSLATION).apply {
               addExtension(Extension("lang", StringType("vi")))
               addExtension(Extension("content", StringType("Một")))
-            }
+            },
           )
         }
       }
@@ -800,7 +801,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `nested display item without instructions code returns null`() {
+  fun `nested display item without instructions code returns empty spanned`() {
     val questionItemList =
       listOf(
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -812,12 +813,12 @@ class MoreQuestionnaireItemComponentsTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 text = "text"
-              }
+              },
             )
-        }
+        },
       )
 
-    assertThat(questionItemList.first().localizedInstructionsSpanned).isNull()
+    assertThat(questionItemList.first().localizedInstructionsSpanned.toString()).isEmpty()
   }
 
   @Test
@@ -835,14 +836,37 @@ class MoreQuestionnaireItemComponentsTest {
                 text = "subtitle text"
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
     assertThat(questionItemList.first().localizedInstructionsSpanned.toString())
       .isEqualTo("subtitle text")
+  }
+
+  @Test
+  fun `localizedInstructionsSpanned returns spanned for all of the items that have instruction code and type is display`() {
+    val questionItemList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "<strong>instruction-1<strong>"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          linkId = "display-question"
+          text = "instruction-2"
+          extension = listOf(displayCategoryExtensionWithInstructionsCode)
+          type = Questionnaire.QuestionnaireItemType.DISPLAY
+        },
+      )
+    Locale.setDefault(Locale.US)
+
+    assertThat(questionItemList.getLocalizedInstructionsSpanned().toString())
+      .isEqualTo("instruction-1\ninstruction-2")
   }
 
   @Test
@@ -863,14 +887,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -896,14 +920,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -928,14 +952,14 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -978,9 +1002,9 @@ class MoreQuestionnaireItemComponentsTest {
                 Coding().apply {
                   code = "some random code"
                   system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-                }
+                },
               )
-          }
+          },
         )
       }
     val questionnaireItem =
@@ -1001,7 +1025,7 @@ class MoreQuestionnaireItemComponentsTest {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedFlyoverSpanned).isNull()
@@ -1028,11 +1052,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedFlyoverSpanned.toString())
@@ -1057,7 +1081,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1068,11 +1092,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -1088,7 +1112,7 @@ class MoreQuestionnaireItemComponentsTest {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedHelpSpanned).isNull()
@@ -1115,11 +1139,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
 
     assertThat(questionItemList.first().localizedHelpSpanned.toString()).isEqualTo("help text")
@@ -1143,7 +1167,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1154,11 +1178,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.US)
 
@@ -1183,7 +1207,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("phụ đề")))
-                    }
+                    },
                   )
                 }
                 addExtension(
@@ -1193,12 +1217,12 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.HELP.extensionCode
                     }
-                  }
+                  },
                 )
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1210,7 +1234,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(true)) }
-          .isHidden
+          .isHidden,
       )
       .isTrue()
   }
@@ -1220,7 +1244,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, BooleanType(false)) }
-          .isHidden
+          .isHidden,
       )
       .isFalse()
   }
@@ -1230,7 +1254,7 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(
         Questionnaire.QuestionnaireItemComponent()
           .apply { addExtension(EXTENSION_HIDDEN_URL, IntegerType(1)) }
-          .isHidden
+          .isHidden,
       )
       .isFalse()
   }
@@ -1251,10 +1275,10 @@ class MoreQuestionnaireItemComponentsTest {
                     language = "text/fhirpath"
                     expression =
                       "%resource.repeat(item).where(linkId='4.2.1').answer.value.code ='female'"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.enableWhenExpression!!.expression)
@@ -1276,10 +1300,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.enableWhenExpression).isNull()
@@ -1294,7 +1318,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     assertThat(item.calculatedExpression).isNotNull()
@@ -1310,7 +1334,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     assertThat(item.calculatedExpression).isNull()
@@ -1326,14 +1350,14 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "today()"
             this.language = "text/fhirpath"
-          }
+          },
         )
         addExtension(
           EXTENSION_ENABLE_WHEN_EXPRESSION_URL,
           Expression().apply {
             this.expression = "%resource.status == 'draft'"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
 
@@ -1354,7 +1378,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "%resource.item.where(linkId='B')"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
@@ -1371,7 +1395,7 @@ class MoreQuestionnaireItemComponentsTest {
           Expression().apply {
             this.expression = "%resource.item.where(answer.value.empty())"
             this.language = "text/fhirpath"
-          }
+          },
         )
       }
     val item2 = Questionnaire.QuestionnaireItemComponent().apply { linkId = "B" }
@@ -1388,8 +1412,8 @@ class MoreQuestionnaireItemComponentsTest {
           .addItem(
             Questionnaire.QuestionnaireItemComponent()
               .apply { linkId = "C" }
-              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" })
-          )
+              .addItem(Questionnaire.QuestionnaireItemComponent().apply { linkId = "D" }),
+          ),
       )
     assertThat(items.flattened().map { it.linkId }).containsExactly("A", "B", "C", "D")
   }
@@ -1412,7 +1436,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi-VN")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1423,11 +1447,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1452,7 +1476,7 @@ class MoreQuestionnaireItemComponentsTest {
                     Extension(ToolingExtensions.EXT_TRANSLATION).apply {
                       addExtension(Extension("lang", StringType("vi")))
                       addExtension(Extension("content", StringType("gợi ý")))
-                    }
+                    },
                   )
                 }
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
@@ -1463,11 +1487,11 @@ class MoreQuestionnaireItemComponentsTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = "flyover"
                     }
-                  }
+                  },
                 )
-              }
+              },
             )
-        }
+        },
       )
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
@@ -1477,16 +1501,11 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("gender"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.STRING
-          )
-        )
-        .apply {
-          initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-        }
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "gender"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1496,41 +1515,25 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithGroupQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("group-test"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.GROUP
-          )
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-test"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "gender"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+          },
         )
-        .apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("gender"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.STRING
-                )
-              )
-              .apply {
-                initial =
-                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-              }
-          )
 
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("isActive"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.BOOLEAN
-                )
-              )
-              .apply {
-                initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-              }
-          )
-        }
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "isActive"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+          },
+        )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1542,48 +1545,31 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun createQuestionResponseWithNestedQuestions() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("group-test"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.GROUP
-          )
-        )
-        .apply {
-          addItem(
-            Questionnaire.QuestionnaireItemComponent(
-                StringType("gender"),
-                Enumeration(
-                  Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                  Questionnaire.QuestionnaireItemType.STRING
-                )
-              )
-              .apply {
-                initial =
-                  listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-test"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "gender"
+            type = Questionnaire.QuestionnaireItemType.STRING
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
 
-                addItem(
-                  Questionnaire.QuestionnaireItemComponent(
-                      StringType("isActive"),
-                      Enumeration(
-                        Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                        Questionnaire.QuestionnaireItemType.BOOLEAN
-                      )
-                    )
-                    .apply {
-                      initial =
-                        listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
-                    }
-                )
-              }
-          )
-        }
+            addItem(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "isActive"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(BooleanType(true)))
+              },
+            )
+          },
+        )
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
     assertThat((questionResponse.item[0].answer[0].value as StringType).value).isEqualTo("male")
     assertThat(
-        (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue()
+        (questionResponse.item[0].answer[0].item[0].answer[0].value as BooleanType).booleanValue(),
       )
       .isEqualTo(true)
   }
@@ -1591,24 +1577,19 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun `createQuestionResponse should not set answer for quantity type with missing value`() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("age"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.QUANTITY
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "age"
+        type = Questionnaire.QuestionnaireItemType.QUANTITY
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                code = "months"
+                system = "http://unitofmeausre.org"
+              },
+            ),
           )
-        )
-        .apply {
-          initial =
-            listOf(
-              Questionnaire.QuestionnaireItemInitialComponent(
-                Quantity().apply {
-                  code = "months"
-                  system = "http://unitofmeausre.org"
-                }
-              )
-            )
-        }
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
 
@@ -1618,25 +1599,20 @@ class MoreQuestionnaireItemComponentsTest {
   @Test
   fun `createQuestionResponse should set answer with quantity type`() {
     val question =
-      Questionnaire.QuestionnaireItemComponent(
-          StringType("age"),
-          Enumeration(
-            Questionnaire.QuestionnaireItemTypeEnumFactory(),
-            Questionnaire.QuestionnaireItemType.QUANTITY
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "age"
+        type = Questionnaire.QuestionnaireItemType.QUANTITY
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                code = "months"
+                system = "http://unitofmeausre.org"
+                value = BigDecimal("1")
+              },
+            ),
           )
-        )
-        .apply {
-          initial =
-            listOf(
-              Questionnaire.QuestionnaireItemInitialComponent(
-                Quantity().apply {
-                  code = "months"
-                  system = "http://unitofmeausre.org"
-                  value = BigDecimal("1")
-                }
-              )
-            )
-        }
+      }
 
     val questionResponse = question.createQuestionnaireResponseItem()
     val answer = questionResponse.answerFirstRep.value as Quantity
@@ -1651,6 +1627,173 @@ class MoreQuestionnaireItemComponentsTest {
         addExtension(EXTENSION_ENTRY_FORMAT_URL, null)
       }
     assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initial value`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phone"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")))
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() }).containsExactly("000011111")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initial values`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        repeats = true
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222")),
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.value.primitiveValue() })
+      .containsExactly("000011111", "000022222")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for non repeating question initialSelected option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phone"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("b")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should set answer for repeating question initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        repeats = true
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+
+    val responseItem = question.createQuestionnaireResponseItem()
+
+    assertThat(responseItem.answer.map { it.valueCoding.code }).containsExactly("a", "b")
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initial values `() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.STRING
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000011111")),
+            Questionnaire.QuestionnaireItemInitialComponent(StringType("000022222")),
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for non repeating question with multiple initialSelected options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              initialSelected = true
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} can only have multiple initial values for repeating items. See rule que-13 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+          )
+      }
+  }
+
+  @Test
+  fun `createQuestionnaireResponseItem should throw exception for initial and answerOption both specified`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "phones"
+        type = Questionnaire.QuestionnaireItemType.CHOICE
+        initial =
+          listOf(
+            Questionnaire.QuestionnaireItemInitialComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+          )
+        answerOption =
+          listOf(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "a", "A")
+            },
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding("http://abc.com", "b", "B")
+            },
+          )
+      }
+    assertThrows(IllegalArgumentException::class.java) {
+        question.createQuestionnaireResponseItem()
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "Questionnaire item ${question.linkId} has both initial value(s) and has answerOption. See rule que-11 at https://www.hl7.org/fhir/questionnaire-definitions.html#Questionnaire.item.initial.",
+          )
+      }
   }
 
   @Test
@@ -1831,10 +1974,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "%resource.item.where(linkId='diseases').value"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.answerExpression!!.expression)
@@ -1856,13 +1999,62 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.answerExpression).isNull()
+  }
+
+  @Test
+  fun `candidateExpression should return expression`() {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  EXTENSION_CANDIDATE_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%resource.item.where(linkId='diseases').value"
+                  },
+                ),
+              )
+          },
+        )
+
+    assertThat(questionnaire.itemFirstRep.candidateExpression!!.expression)
+      .isEqualTo("%resource.item.where(linkId='diseases').value")
+  }
+
+  @Test
+  fun `candidateExpression should return null for missing extension`() {
+    val questionnaire =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "first-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "today()"
+                  },
+                ),
+              )
+          },
+        )
+
+    assertThat(questionnaire.itemFirstRep.candidateExpression).isNull()
   }
 
   @Test
@@ -1884,15 +2076,15 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("display")))
                   addExtension(Extension("label", StringType("DESCRIPTION")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.choiceColumn!!)
       .containsExactly(
         ChoiceColumn("code", "CODE", false),
-        ChoiceColumn("display", "DESCRIPTION", true)
+        ChoiceColumn("display", "DESCRIPTION", true),
       )
   }
 
@@ -1911,10 +2103,10 @@ class MoreQuestionnaireItemComponentsTest {
                   Expression().apply {
                     language = "text/fhirpath"
                     expression = "today()"
-                  }
-                )
+                  },
+                ),
               )
-          }
+          },
         )
 
     assertThat(questionItem.itemFirstRep.choiceColumn).isEmpty()
@@ -1939,9 +2131,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("display")))
                   addExtension(Extension("label", StringType("DESCRIPTION")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     val answers =
@@ -1972,9 +2164,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("name.family")))
                   addExtension(Extension("label", StringType("FAMILY")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     val answers =
@@ -1990,8 +2182,8 @@ class MoreQuestionnaireItemComponentsTest {
               id = "5678"
               nameFirstRep.family = "Doe"
               nameFirstRep.addGiven("Jane")
-            }
-          )
+            },
+          ),
         )
         .map { it.valueReference }
 
@@ -2016,9 +2208,9 @@ class MoreQuestionnaireItemComponentsTest {
                   addExtension(Extension("path", StringType("name.given")))
                   addExtension(Extension("label", StringType("GIVEN")))
                   addExtension(Extension("forDisplay", BooleanType(true)))
-                }
+                },
               )
-          }
+          },
         )
 
     assertThrows(IllegalArgumentException::class.java) {
@@ -2027,7 +2219,7 @@ class MoreQuestionnaireItemComponentsTest {
       .run {
         assertThat(this.message)
           .isEqualTo(
-            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource."
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource.",
           )
       }
   }
@@ -2051,6 +2243,134 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(questionnaireItem.sliderStepValue).isNull()
   }
 
+  @Test
+  fun `should return entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("yyyymmdd")),
+        )
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("yyyymmdd")
+  }
+
+  @Test
+  fun `should return empty entry format`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+      }
+
+    assertThat(questionnaireItem.entryFormat).isNull()
+  }
+
+  @Test
+  fun `should return valid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(Extension().setUrl(EXTENSION_ENTRY_FORMAT_URL).setValue(StringType("y-MM-dd")))
+      }
+
+    assertThat(questionnaireItem.entryFormat).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return default string for invalid date entry format`() {
+    Locale.setDefault(Locale.forLanguageTag("en_US"))
+
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        type = Questionnaire.QuestionnaireItemType.DATE
+        addExtension(
+          Extension()
+            .setUrl(EXTENSION_ENTRY_FORMAT_URL)
+            .setValue(StringType("This is not a valid date format string!")),
+        )
+      }
+
+    assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return empty list for empty response item list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+    val result =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(result.size).isEqualTo(0)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and response list`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(2)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and repeated response list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
+  }
+
+  @Test
+  fun `should return non empty list for out of order questionnaire item and response item`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "3" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "3" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
@@ -2059,11 +2379,11 @@ class MoreQuestionnaireItemComponentsTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 

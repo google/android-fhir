@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,9 +117,11 @@ object XFhirQueryTranslator {
         this.filter(NumberClientParam(param.name), { value = filterValue.toBigDecimal() })
       }
       Enumerations.SearchParamType.DATE -> {
-        if (!isValidDateOnly(filterValue))
+        if (!isValidDateOnly(filterValue)) {
           this.filter(DateClientParam(param.name), { value = of(DateTimeType(filterValue)) })
-        else this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
+        } else {
+          this.filter(DateClientParam(param.name), { value = of(DateType(filterValue)) })
+        }
       }
       Enumerations.SearchParamType.QUANTITY -> {
         filterValue.toQuantity().let {
@@ -129,7 +131,7 @@ object XFhirQueryTranslator {
               value = it.value
               system = it.system
               unit = it.unit
-            }
+            },
           )
         }
       }
@@ -145,7 +147,7 @@ object XFhirQueryTranslator {
                 TokenFilterValue().apply {
                   tokenFilters.add(TokenParamFilterValueInstance(uri = it.system, code = it.code))
                 }
-            }
+            },
           )
         }
       }
@@ -179,7 +181,7 @@ object XFhirQueryTranslator {
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
-    type: ResourceType
+    type: ResourceType,
   ): List<Pair<SearchParamDefinition, String>> {
     return this.map { (paramKey, paramValue) ->
       val paramDefinition = paramKey.toSearchParamDefinition(type)
@@ -202,11 +204,14 @@ object XFhirQueryTranslator {
   private fun String.toQuantity() =
     this.split("|").let { parts ->
       Quantity(parts.first().toDouble()).apply {
-        if (parts.size == 3) // system exists at index 1 only if all 3 components are specified
-         system = parts.elementAt(1)
+        if (parts.size == 3) {
+          // system exists at index 1 only if all 3 components are specified
+          system = parts.elementAt(1)
+        }
 
-        if (parts.size > 1)
+        if (parts.size > 1) {
           unit = parts.last() // unit exists as last element only for two or more components
+        }
       }
     }
 
@@ -220,8 +225,10 @@ object XFhirQueryTranslator {
   private fun String.toCoding() =
     this.split("|").let { parts ->
       Coding().apply {
-        if (parts.size == 2) // system exists as first element only if both components are specified
-         system = parts.first()
+        if (parts.size == 2) {
+          // system exists as first element only if both components are specified
+          system = parts.first()
+        }
 
         code = parts.last() // code would always be specified and would exists as last element
       }

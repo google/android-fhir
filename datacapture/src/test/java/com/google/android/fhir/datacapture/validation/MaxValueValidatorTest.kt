@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.extensions.EXTENSION_CQF_CALCULATED_VALUE_URL
 import com.google.common.truth.Truth.assertThat
 import java.text.SimpleDateFormat
 import java.time.LocalDate
@@ -53,7 +54,7 @@ class MaxValueValidatorTest {
           Extension().apply {
             this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
-          }
+          },
         )
       }
     val answer =
@@ -75,7 +76,7 @@ class MaxValueValidatorTest {
           Extension().apply {
             this.url = MAX_VALUE_EXTENSION_URL
             this.setValue(IntegerType(200000))
-          }
+          },
         )
       }
     val answer =
@@ -99,9 +100,9 @@ class MaxValueValidatorTest {
             Extension().apply {
               url = MAX_VALUE_EXTENSION_URL
               this.setValue(dateType)
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.value)
@@ -122,18 +123,18 @@ class MaxValueValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today()"
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)
@@ -154,18 +155,18 @@ class MaxValueValidatorTest {
                   extension =
                     listOf(
                       Extension(
-                        CQF_CALCULATED_EXPRESSION_URL,
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
                         Expression().apply {
                           language = "text/fhirpath"
                           expression = "today() + 5 'days' "
-                        }
-                      )
+                        },
+                      ),
                     )
-                }
+                },
               )
-            }
+            },
           )
-        }
+        },
       )
 
     assertThat((MaxValueValidator.getMaxValue(questionItem.first()) as? DateType)?.valueAsString)

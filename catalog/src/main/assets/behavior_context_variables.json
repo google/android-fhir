@@ -1,0 +1,54 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "choice",
+      "text": "Choose an option below?",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "Y",
+            "display": "Yes",
+            "system": "custom"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "N",
+            "display": "No",
+            "system": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "text": "Why 'Yes' was selected?",
+      "type": "string",
+      "linkId": "yes",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+          "valueExpression": {
+            "expression": "%resource.descendants().where(linkId='1').answer.value.display.lower() = %context.linkId",
+            "language": "text/fhirpath"
+          }
+        }
+      ]
+    },
+    {
+      "text": "Here 'No' was selected.",
+      "type": "display",
+      "linkId": "no",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
+          "valueExpression": {
+            "expression": "%resource.descendants().where(linkId='1').answer.value.display.lower() = %context.linkId",
+            "language": "text/fhirpath"
+          }
+        }
+      ]
+    }
+  ]
+}

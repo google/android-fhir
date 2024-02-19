@@ -22,5 +22,16 @@
     <dimen name="text_margin">20dp</dimen>
     <dimen name="small_text_margin">2dp</dimen>
     <dimen name="status_margin">5dp</dimen>
-  <dimen name="header_height">170dp</dimen>
+    <dimen name="header_height">170dp</dimen>
+    <dimen name="patient_count_start_margin">65dp</dimen>
+    <dimen name="dashboard_margin">10dp</dimen>
+    <dimen name="cardView_margin_horizontal">8dp</dimen>
+    <dimen name="cardView_margin_vertical">10dp</dimen>
+    <dimen name="cardView_radius_corner">10dp</dimen>
+    <dimen name="new_patient_padding">30dp</dimen>
+    <dimen name="new_patient_horizontal_margin">20dp</dimen>
+    <dimen name="search_patient_cardview_horizontal_margin">8dp</dimen>
+    <dimen name="search_patient_cardview_vertical_margin">6dp</dimen>
+    <dimen name="search_patient_cardview_margin_top">10dp</dimen>
+    <dimen name="dashboard_text_fontSize">20sp</dimen>
 </resources>

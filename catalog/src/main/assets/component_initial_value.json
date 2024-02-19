@@ -1,0 +1,124 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1.0",
+      "type": "choice",
+      "text": "Initially selected single choice",
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "Y",
+            "display": "Yes",
+            "system": "custom"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "N",
+            "display": "No",
+            "system": "custom"
+          },
+          "initialSelected": true
+        },
+        {
+          "valueCoding": {
+            "code": "unknown",
+            "display": "Unknown",
+            "system": "custom"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "2.0",
+      "type": "choice",
+      "text": "Initially selected multiple choice",
+      "repeats": true,
+      "answerOption": [
+        {
+          "valueCoding": {
+            "code": "1st",
+            "display": "First",
+            "system": "custom"
+          }
+        },
+        {
+          "valueCoding": {
+            "code": "2nd",
+            "display": "Second",
+            "system": "custom"
+          },
+          "initialSelected": true
+        },
+        {
+          "valueCoding": {
+            "code": "3rd",
+            "display": "Third",
+            "system": "custom"
+          },
+          "initialSelected": true
+        }
+      ]
+    },
+    {
+      "linkId": "3.0",
+      "type": "string",
+      "text": "Initially provided text value",
+      "initial": [
+        {
+          "valueString": "Here is a sample text"
+        }
+      ]
+    },
+    {
+      "linkId": "4.0",
+      "type": "boolean",
+      "text": "Initially provided boolean value",
+      "initial": [
+        {
+          "valueBoolean": false
+        }
+      ]
+    },
+    {
+      "linkId": "5.0",
+      "type": "date",
+      "text": "Initially provided date value",
+      "initial": [
+        {
+          "valueDate": "2022-01-22"
+        }
+      ]
+    },
+    {
+      "linkId": "6.0",
+      "type": "quantity",
+      "text": "Initially provided quantity value",
+      "initial": [
+        {
+          "valueQuantity": {
+            "value": 30,
+            "unit": "$",
+            "system": "http://measureunit.org",
+            "code": "USD"
+          }
+        }
+      ]
+    },
+    {
+      "linkId": "7.0",
+      "type": "quantity",
+      "text": "Initially provided quantity unit only",
+      "initial": [
+        {
+          "valueQuantity": {
+            "unit": "$",
+            "system": "http://measureunit.org",
+            "code": "USD"
+          }
+        }
+      ]
+    }
+  ]
+}

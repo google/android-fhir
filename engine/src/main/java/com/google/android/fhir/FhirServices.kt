@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
 import com.google.android.fhir.db.impl.DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported
@@ -30,7 +31,9 @@ import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.security.FhirSecurityConfiguration
 import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.remote.RemoteFhirService
+import com.google.android.fhir.sync.FhirDataStore
+import com.google.android.fhir.sync.remote.FhirHttpDataSource
+import com.google.android.fhir.sync.remote.RetrofitHttpService
 import org.hl7.fhir.r4.model.SearchParameter
 import timber.log.Timber
 
@@ -39,7 +42,8 @@ internal data class FhirServices(
   val parser: IParser,
   val database: Database,
   val securityRequirementsManager: SecurityRequirementsManager,
-  val remoteDataSource: DataSource? = null
+  val remoteDataSource: DataSource? = null,
+  val fhirDataStore: FhirDataStore,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -78,22 +82,27 @@ internal data class FhirServices(
 
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+      val terser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
       val searchParamMap =
         searchParameters?.asMapOfResourceTypeToSearchParamDefinitions() ?: emptyMap()
       val db =
         DatabaseImpl(
           context = context,
           iParser = parser,
+          fhirTerser = terser,
           DatabaseConfig(inMemory, enableEncryption, databaseErrorStrategy),
-          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap))
+          resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl(searchParamMap)),
         )
       val engine = FhirEngineImpl(database = db, context = context)
       val remoteDataSource =
         serverConfiguration?.let {
-          RemoteFhirService.builder(it.baseUrl, it.networkConfiguration)
-            .setAuthenticator(it.authenticator)
-            .setHttpLogger(it.httpLogger)
-            .build()
+          FhirHttpDataSource(
+            fhirHttpService =
+              RetrofitHttpService.builder(it.baseUrl, it.networkConfiguration)
+                .setAuthenticator(it.authenticator)
+                .setHttpLogger(it.httpLogger)
+                .build(),
+          )
         }
       val securityRequirementsManager = SecurityRequirementsManager(context, securityConfiguration)
       return FhirServices(
@@ -101,6 +110,7 @@ internal data class FhirServices(
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource,
+        fhirDataStore = FhirDataStore(context),
         securityRequirementsManager = securityRequirementsManager,
       )
     }

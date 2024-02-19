@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,12 +288,12 @@ class MoreQuestionnaireResponseItemAnswerComponentsTest {
     val list1 =
       listOf(
         createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code1", "Code 1"),
-        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code2", "Code 2")
+        createCodingQuestionnaireResponseItemAnswerComponent("http://abc.org", "code2", "Code 2"),
       )
     val list2 =
       listOf(
         Coding("http://abc.org", "code1", "Code 1"),
-        Coding("http://abc.org", "code2", "Code 2")
+        Coding("http://abc.org", "code2", "Code 2"),
       )
     assertThat(list1.hasDifferentAnswerSet(list2)).isFalse()
   }
@@ -307,7 +307,7 @@ class MoreQuestionnaireResponseItemAnswerComponentsTest {
     val list2 =
       listOf(
         Coding("http://abc.org", "code1", "Code 1"),
-        Coding("http://abc.org", "code2", "Code 2")
+        Coding("http://abc.org", "code2", "Code 2"),
       )
     assertThat(list1.hasDifferentAnswerSet(list2)).isTrue()
   }
@@ -322,7 +322,7 @@ class MoreQuestionnaireResponseItemAnswerComponentsTest {
     val list2 =
       listOf(
         Coding("http://abc.org", "code1", "Code 1"),
-        Coding("http://abc.org", "code4", "Code 4")
+        Coding("http://abc.org", "code4", "Code 4"),
       )
     assertThat(list1.hasDifferentAnswerSet(list2)).isTrue()
   }
@@ -330,7 +330,7 @@ class MoreQuestionnaireResponseItemAnswerComponentsTest {
   private fun createCodingQuestionnaireResponseItemAnswerComponent(
     url: String,
     code: String,
-    display: String
+    display: String,
   ) =
     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
       .setValue(Coding(url, code, display))
