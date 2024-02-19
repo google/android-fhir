@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import com.google.android.fhir.security.SecurityRequirementViolation.EXTRA_LOCK_
 class SecurityRequirementsManager
 constructor(
   private val context: Context,
-  private val securityConfiguration: FhirSecurityConfiguration?,
+  private val securityConfiguration: FhirSecurityConfiguration?
 ) {
 
   private val lockScreenRequirementVerifier = LockScreenRequirementVerifier(context)
@@ -40,7 +40,7 @@ constructor(
       violations.add(lockScreenRequirementVerdict)
     }
 
-    if (violations.isNotEmpty()) {
+    if (violations.isNotEmpty())
       securityConfiguration.warningCallback?.let { callback ->
         val extras = Intent()
         violations.forEach { violation ->
@@ -52,9 +52,8 @@ constructor(
             }
           }
         }
-        callback.send(context, code = 0, extras)
+        callback.send(context, /* code= */ 0, extras)
       }
-    }
   }
 
   /** Gets the latest list of security requirement violations. */

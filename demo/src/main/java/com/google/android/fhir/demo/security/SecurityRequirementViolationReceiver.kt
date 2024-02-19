@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class SecurityRequirementViolationReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent) {
     val lockScreenRequirementViolation =
       intent.getParcelableExtra<LockScreenRequirementViolation>(
-        EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION,
+        EXTRA_LOCK_SCREEN_REQUIREMENT_VIOLATION
       )
     Timber.w("Lock screen violation extra: $lockScreenRequirementViolation")
     if (lockScreenRequirementViolation == null) return
@@ -47,8 +47,7 @@ class SecurityRequirementViolationReceiver : BroadcastReceiver() {
     val notificationManager = context.getSystemService(NotificationManager::class.java)
     // We can't ask notification runtime permission from the background. Let's ask users for the
     // notification running permission when the demo app activity is started.
-    if (
-      Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N &&
         !notificationManager.areNotificationsEnabled()
     ) {
       Timber.w("Can't post notification")
@@ -77,10 +76,10 @@ class SecurityRequirementViolationReceiver : BroadcastReceiver() {
             Intent(DevicePolicyManager.ACTION_SET_NEW_PASSWORD)
               .putExtra(DevicePolicyManager.EXTRA_PASSWORD_COMPLEXITY, requiredComplexity),
             /* flags= */ PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-          ),
+          )
         )
         .setAutoCancel(true)
-        .build(),
+        .build()
     )
   }
 
@@ -93,13 +92,12 @@ class SecurityRequirementViolationReceiver : BroadcastReceiver() {
   private companion object {
     const val NOTIFICATION_ID = 324265
     const val SECURITY_REQUIREMENT_VIOLATION_NOTIFICATION_CHANNEL_ID = "fhir_security"
-
     @RequiresApi(Build.VERSION_CODES.O)
     val securityNotificationChannel =
       NotificationChannel(
         SECURITY_REQUIREMENT_VIOLATION_NOTIFICATION_CHANNEL_ID,
         /* name= */ "Security requirement violation notification",
-        NotificationManager.IMPORTANCE_DEFAULT,
+        NotificationManager.IMPORTANCE_DEFAULT
       )
   }
 }

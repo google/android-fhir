@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ internal interface SecurityRequirementVerifier<R : SecurityRequirement> {
   /** Checks if the given security requirement is fulfilled. */
   suspend fun verify(requirement: R): SecurityRequirementVerdict
 }
-
 /** A class hierarchy for security requirement verdict. */
 interface SecurityRequirementVerdict
 
@@ -48,7 +47,6 @@ data class LockScreenRequirementViolation(val requiredComplexity: Int, val curre
 
   companion object CREATOR : Parcelable.Creator<LockScreenRequirementViolation> {
     override fun createFromParcel(parcel: Parcel) = LockScreenRequirementViolation(parcel)
-
     override fun newArray(size: Int): Array<LockScreenRequirementViolation?> = arrayOfNulls(size)
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,15 +57,15 @@ class SecurityCheckWorkerTest {
         ApplicationProvider.getApplicationContext(),
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0,
+        /* flags= */ 0
       )
     val config =
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = pendingIntent,
-          ),
+            warningCallback = pendingIntent
+          )
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
@@ -87,15 +87,15 @@ class SecurityCheckWorkerTest {
         ApplicationProvider.getApplicationContext(),
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0,
+        /* flags= */ 0
       )
     val config =
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = pendingIntent,
-          ),
+            warningCallback = pendingIntent
+          )
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
@@ -118,15 +118,15 @@ class SecurityCheckWorkerTest {
         ApplicationProvider.getApplicationContext(),
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0,
+        /* flags= */ 0
       )
     val config =
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = pendingIntent,
-          ),
+            warningCallback = pendingIntent
+          )
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
@@ -146,8 +146,8 @@ class SecurityCheckWorkerTest {
       .isEqualTo(
         LockScreenRequirementViolation(
           requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
-          currentComplexity = PASSWORD_COMPLEXITY_LOW,
-        ),
+          currentComplexity = PASSWORD_COMPLEXITY_LOW
+        )
       )
   }
 
@@ -158,15 +158,15 @@ class SecurityCheckWorkerTest {
         ApplicationProvider.getApplicationContext(),
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0,
+        /* flags= */ 0
       )
     val config =
       FhirEngineConfiguration(
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = pendingIntent,
-          ),
+            warningCallback = pendingIntent
+          )
       )
     FhirEngineProvider.init(config)
     shadowOf(context.getSystemService(DevicePolicyManager::class.java))
@@ -179,13 +179,13 @@ class SecurityCheckWorkerTest {
       .doWork()
 
     assertThat(
-        FhirEngineProvider.getSecurityRequirementsManager(context).getLatestViolations().single(),
+        FhirEngineProvider.getSecurityRequirementsManager(context).getLatestViolations().single()
       )
       .isEqualTo(
         LockScreenRequirementViolation(
           requiredComplexity = PASSWORD_COMPLEXITY_HIGH,
-          currentComplexity = PASSWORD_COMPLEXITY_LOW,
-        ),
+          currentComplexity = PASSWORD_COMPLEXITY_LOW
+        )
       )
   }
 }

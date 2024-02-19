@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,11 @@ internal class LockScreenRequirementVerifier(context: Context) :
     } else {
       Timber.w(
         "The current lock screen doesn't the security requirement. " +
-          "Current: ${devicePolicyManager.passwordComplexity}, required: ${requirement.complexity.complexity}.",
+          "Current: ${devicePolicyManager.passwordComplexity}, required: ${requirement.complexity.complexity}."
       )
       LockScreenRequirementViolation(
         requiredComplexity = requirement.complexity.complexity,
-        currentComplexity = devicePolicyManager.passwordComplexity,
+        currentComplexity = devicePolicyManager.passwordComplexity
       )
     }
   }
