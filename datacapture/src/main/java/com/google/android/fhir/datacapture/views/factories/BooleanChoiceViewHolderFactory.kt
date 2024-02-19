@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -55,10 +56,11 @@ internal object BooleanChoiceViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
+        header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
         with(flow) {
           when (choiceOrientation) {
             ChoiceOrientationTypes.HORIZONTAL -> {
@@ -91,7 +93,8 @@ internal object BooleanChoiceViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
+          if (
+            questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
           ) {
             questionnaireViewItem.clearAnswer()
             yesRadioButton.isChecked = false
@@ -99,14 +102,14 @@ internal object BooleanChoiceViewHolderFactory :
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
           }
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
-              false
+          if (
+            questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == false
           ) {
             questionnaireViewItem.clearAnswer()
             noRadioButton.isChecked = false
@@ -114,7 +117,7 @@ internal object BooleanChoiceViewHolderFactory :
             questionnaireViewItem.setAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
-              }
+              },
             )
           }
         }
@@ -130,22 +133,23 @@ internal object BooleanChoiceViewHolderFactory :
       }
 
       private fun RadioButton.setLayoutParamsByOrientation(
-        choiceOrientation: ChoiceOrientationTypes
+        choiceOrientation: ChoiceOrientationTypes,
       ) {
         layoutParams =
-          ViewGroup.LayoutParams(
+          LinearLayout.LayoutParams(
             when (choiceOrientation) {
-              ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+              ChoiceOrientationTypes.HORIZONTAL -> 0
               ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
             },
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            1.0f,
           )
       }
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
+          Valid, -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
             header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }

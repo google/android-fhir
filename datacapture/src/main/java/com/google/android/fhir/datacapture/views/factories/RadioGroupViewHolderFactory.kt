@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,12 +53,13 @@ internal object RadioGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        header.bind(questionnaireItem)
+        header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         // Keep the Flow layout which is the first child
         radioGroup.removeViews(1, radioGroup.childCount - 1)
         val choiceOrientation =
-          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireViewItem.questionnaireItem.choiceOrientation
+            ?: ChoiceOrientationTypes.VERTICAL
         when (choiceOrientation) {
           ChoiceOrientationTypes.HORIZONTAL -> {
             flow.setOrientation(Flow.HORIZONTAL)
@@ -69,7 +70,7 @@ internal object RadioGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireViewItem.answerOption
+        questionnaireViewItem.enabledAnswerOptions
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -80,7 +81,7 @@ internal object RadioGroupViewHolderFactory :
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
+          Valid, -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
             header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
@@ -98,7 +99,7 @@ internal object RadioGroupViewHolderFactory :
       private fun populateViewWithAnswerOption(
         viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes
+        choiceOrientation: ChoiceOrientationTypes,
       ) {
         val radioButtonItem =
           LayoutInflater.from(radioGroup.context).inflate(R.layout.radio_button, null)
@@ -111,7 +112,7 @@ internal object RadioGroupViewHolderFactory :
               answerOption.itemAnswerOptionImage(radioGroup.context),
               null,
               null,
-              null
+              null,
             )
             layoutParams =
               ViewGroup.LayoutParams(
@@ -119,7 +120,7 @@ internal object RadioGroupViewHolderFactory :
                   ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
                   ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
                 },
-                ViewGroup.LayoutParams.WRAP_CONTENT
+                ViewGroup.LayoutParams.WRAP_CONTENT,
               )
             isChecked = isCurrentlySelected
             setOnClickListener { radioButton ->
@@ -149,7 +150,7 @@ internal object RadioGroupViewHolderFactory :
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = answerOption.value
-          }
+          },
         )
       }
     }

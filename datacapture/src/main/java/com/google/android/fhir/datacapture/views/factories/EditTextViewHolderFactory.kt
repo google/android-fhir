@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,15 +21,18 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.NotValidated
-import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -49,12 +52,15 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   private lateinit var header: HeaderView
   protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
+  private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+    unitTextView = itemView.findViewById(R.id.unit_text_view)
+
     textInputEditText.setRawInputType(rawInputType)
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
@@ -80,12 +86,20 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   }
 
   override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-    header.bind(questionnaireViewItem.questionnaireItem)
-    textInputLayout.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
+    header.bind(questionnaireViewItem)
+    with(textInputLayout) {
+      hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
+      helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
+    }
     displayValidationResult(questionnaireViewItem.validationResult)
 
     textInputEditText.removeTextChangedListener(textWatcher)
     updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
+
+    unitTextView?.apply {
+      text = questionnaireViewItem.questionnaireItem.unit?.code
+      visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
+    }
 
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? ->
@@ -95,11 +109,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   private fun displayValidationResult(validationResult: ValidationResult) {
     textInputLayout.error =
-      when (validationResult) {
-        is NotValidated,
-        Valid -> null
-        is Invalid -> validationResult.getSingleStringValidationMessage()
-      }
+      getValidationErrorMessage(textInputLayout.context, questionnaireViewItem, validationResult)
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
 
   fun bindTo(
     patientItem: PatientListViewModel.PatientItem,
-    onItemClicked: (PatientListViewModel.PatientItem) -> Unit
+    onItemClicked: (PatientListViewModel.PatientItem) -> Unit,
   ) {
     this.nameView.text = patientItem.name
     this.ageView.text = getFormattedAge(patientItem, ageView.context.resources)
@@ -51,14 +51,14 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
             RiskProbability.MODERATE.toCode() -> R.color.moderate_risk
             RiskProbability.LOW.toCode() -> R.color.low_risk
             else -> R.color.unknown_risk
-          }
-        )
+          },
+        ),
       )
   }
 
   private fun getFormattedAge(
     patientItem: PatientListViewModel.PatientItem,
-    resources: Resources
+    resources: Resources,
   ): String {
     if (patientItem.dob == null) return ""
     return Period.between(patientItem.dob, LocalDate.now()).let {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,16 @@ internal object MaxDecimalPlacesValidator :
     url = MAX_DECIMAL_URL,
     predicate = {
       extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+      ->
       val maxDecimalPlaces = (extension.value as? IntegerType)?.value
       answer.hasValueDecimalType() &&
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
-    { extension: Extension, context: Context ->
+    messageGenerator = { extension: Extension, context: Context ->
       context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
-    }
+    },
   )
 
 private const val MAX_DECIMAL_URL = "http://hl7.org/fhir/StructureDefinition/maxDecimalPlaces"

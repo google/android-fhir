@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,24 +16,31 @@
 
 package com.google.android.fhir.search
 
+import android.annotation.SuppressLint
+import androidx.annotation.VisibleForTesting
+import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.ConverterException
 import com.google.android.fhir.DateProvider
+import com.google.android.fhir.SearchResult
 import com.google.android.fhir.UcumValue
 import com.google.android.fhir.UnitConverter
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
+import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import timber.log.Timber
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -41,8 +48,44 @@ import org.hl7.fhir.r4.model.Resource
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
-internal suspend fun <R : Resource> Search.execute(database: Database): List<R> {
-  return database.search(getQuery())
+internal suspend fun <R : Resource> Search.execute(database: Database): List<SearchResult<R>> {
+  val baseResources = database.search<R>(getQuery())
+  val includedResources =
+    if (forwardIncludes.isEmpty() || baseResources.isEmpty()) {
+      null
+    } else {
+      database.searchForwardReferencedResources(
+        getIncludeQuery(includeIds = baseResources.map { it.uuid }),
+      )
+    }
+  val revIncludedResources =
+    if (revIncludes.isEmpty() || baseResources.isEmpty()) {
+      null
+    } else {
+      database.searchReverseReferencedResources(
+        getRevIncludeQuery(
+          includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
+        ),
+      )
+    }
+
+  return baseResources.map { (uuid, baseResource) ->
+    SearchResult(
+      baseResource,
+      included =
+        includedResources
+          ?.asSequence()
+          ?.filter { it.baseResourceUUID == uuid }
+          ?.groupBy({ it.searchIndex }, { it.resource }),
+      revIncluded =
+        revIncludedResources
+          ?.asSequence()
+          ?.filter {
+            it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
+          }
+          ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
+    )
+  }
 }
 
 internal suspend fun Search.count(database: Database): Long {
@@ -53,13 +96,138 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
-internal fun Search.getQuery(
-  isCount: Boolean = false,
-  nestedContext: NestedContext? = null
-): SearchQuery {
+@VisibleForTesting
+internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
+  val args = mutableListOf<Any>()
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
+
+  fun generateFilterQuery(nestedSearch: NestedSearch): String {
+    val (param, search) = nestedSearch
+    val resourceToInclude = search.type
+    args.add(resourceToInclude.name)
+    args.add(param.paramName)
+    args.addAll(includeIds)
+    args.add(resourceToInclude.name)
+
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
+
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\n UNION \n"
+          } else {
+            "\n INTERSECT \n"
+          }
+      }
+    }
+    return filterQuery
+  }
+
+  return revIncludes
+    .map {
+      val (join, order) = it.search.getSortOrder(otherTable = "re")
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
+      """
+      SELECT  rie.index_name, rie.index_value, re.serializedResource
+      FROM ResourceEntity re
+      JOIN ReferenceIndexEntity rie
+      ON re.resourceUuid = rie.resourceUuid
+      ${join.query}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString) AND re.resourceType = ?
+      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      $order
+            """
+        .trimIndent()
+    }
+    .joinToString("\nUNION ALL\n") {
+      StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
+    }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
+    .let { SearchQuery(it, args) }
+}
+
+@SuppressLint("RestrictedApi")
+@VisibleForTesting
+internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
+  val args = mutableListOf<Any>()
+  val baseResourceType = type
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
+
+  fun generateFilterQuery(nestedSearch: NestedSearch): String {
+    val (param, search) = nestedSearch
+    val resourceToInclude = search.type
+    args.add(baseResourceType.name)
+    args.add(param.paramName)
+    args.addAll(includeIds.map { convertUUIDToByte(it) })
+    args.add(resourceToInclude.name)
+
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
+
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\nUNION\n"
+          } else {
+            "\nINTERSECT\n"
+          }
+      }
+    }
+    return filterQuery
+  }
+
+  return forwardIncludes
+    .map {
+      val (join, order) = it.search.getSortOrder(otherTable = "re")
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
+      """
+      SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+      FROM ResourceEntity re
+      JOIN ReferenceIndexEntity rie
+      ON re.resourceType||"/"||re.resourceId = rie.index_value
+      ${join.query}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString) AND re.resourceType = ?
+      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      $order
+      """
+        .trimIndent()
+    }
+    .joinToString("\nUNION ALL\n") {
+      StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
+    }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
+    .let { SearchQuery(it, args) }
+}
+
+private fun Search.getSortOrder(
+  otherTable: String,
+  isReferencedSearch: Boolean = false,
+): Pair<SearchQuery, String> {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
-  val sortArgs = mutableListOf<Any>()
+  val args = mutableListOf<Any>()
+  if (isReferencedSearch && count != null) {
+    Timber.e("count not supported for [rev]include search.")
+  }
   sort?.let { sort ->
     val sortTableNames =
       when (sort) {
@@ -72,19 +240,20 @@ internal fun Search.getQuery(
           listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
         else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
       }
-    sortJoinStatement = ""
 
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-
-      sortJoinStatement +=
-        """
-      LEFT JOIN ${sortTableName.tableName} $tableAlias
-      ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+    sortJoinStatement =
+      sortTableNames
+        .mapIndexed { index, sortTableName ->
+          val tableAlias = 'b' + index
+          //  spotless:off
       """
-
-      sortArgs += sort.paramName
-    }
+      LEFT JOIN ${sortTableName.tableName} $tableAlias
+      ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+      """
+        //  spotless:on
+        }
+        .joinToString(separator = "\n")
+    sortTableNames.forEach { _ -> args.add(sort.paramName) }
 
     sortTableNames.forEachIndexed { index, sortTableName ->
       val tableAlias = 'b' + index
@@ -92,32 +261,48 @@ internal fun Search.getQuery(
         if (index == 0) {
           """
             ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
-          """.trimIndent()
+          """
+            .trimIndent()
         } else {
           ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
         }
     }
   }
+  return Pair(SearchQuery(sortJoinStatement, args), sortOrderStatement)
+}
+
+private fun Search.getFilterQueries() =
+  (stringFilterCriteria +
+      quantityFilterCriteria +
+      numberFilterCriteria +
+      referenceFilterCriteria +
+      dateTimeFilterCriteria +
+      tokenFilterCriteria +
+      uriFilterCriteria)
+    .map { it.query(type) }
+
+internal fun Search.getQuery(
+  isCount: Boolean = false,
+  nestedContext: NestedContext? = null,
+): SearchQuery {
+  val (join, order) = getSortOrder(otherTable = "a")
+  val sortJoinStatement = join.query
+  val sortOrderStatement = order
+  val sortArgs = join.args
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
-  val filterQuery =
-    (stringFilterCriteria +
-        quantityFilterCriteria +
-        numberFilterCriteria +
-        referenceFilterCriteria +
-        dateTimeFilterCriteria +
-        tokenFilterCriteria +
-        uriFilterCriteria)
-      .map { it.query(type) }
+  val filterQuery = getFilterQueries()
   filterQuery.forEachIndexed { i, it ->
     filterStatement +=
+      //  spotless:off
       """
       ${if (i == 0) "AND a.resourceUuid IN (" else "a.resourceUuid IN ("}
       ${it.query}
       )
       ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
       """.trimIndent()
+    //  spotless:on
     filterArgs.addAll(it.args)
   }
 
@@ -137,10 +322,12 @@ internal fun Search.getQuery(
     filterArgs.addAll(it.args)
   }
   val whereArgs = mutableListOf<Any>()
+  val nestedArgs = mutableListOf<Any>()
   val query =
     when {
         isCount -> {
-          """ 
+          //  spotless:off
+        """ 
         SELECT COUNT(*)
         FROM ResourceEntity a
         $sortJoinStatement
@@ -149,14 +336,17 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement
         """
+          //  spotless:on
         }
         nestedContext != null -> {
           whereArgs.add(nestedContext.param.paramName)
           val start = "${nestedContext.parentType.name}/".length + 1
-          """
+          nestedArgs.add(nestedContext.parentType.name)
+          //  spotless:off
+        """
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceId IN (
+        WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
@@ -165,10 +355,12 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement)
         """
+          //  spotless:on
         }
         else ->
-          """ 
-        SELECT a.serializedResource
+          //  spotless:off
+        """ 
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
         WHERE a.resourceType = ?
@@ -176,11 +368,12 @@ internal fun Search.getQuery(
         $sortOrderStatement
         $limitStatement
         """
+      //  spotless:on
       }
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, sortArgs + type.name + whereArgs + filterArgs + limitArgs)
+  return SearchQuery(query, nestedArgs + sortArgs + type.name + whereArgs + filterArgs + limitArgs)
 }
 
 private val Order?.sqlString: String
@@ -206,7 +399,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         diffStart,
         diffEnd,
         diffStart,
-        diffEnd
+        diffEnd,
       )
     }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
@@ -217,7 +410,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.EQUAL ->
       ConditionParam(
@@ -225,7 +418,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
@@ -236,7 +429,7 @@ internal fun getConditionParamPair(prefix: ParamPrefixEnum, value: DateType): Co
 
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum,
-  value: DateTimeType
+  value: DateTimeType,
 ): ConditionParam<Long> {
   val start = value.rangeEpochMillis.first
   val end = value.rangeEpochMillis.last
@@ -252,7 +445,7 @@ internal fun getConditionParamPair(
         diffStart,
         diffEnd,
         diffStart,
-        diffEnd
+        diffEnd,
       )
     }
     ParamPrefixEnum.STARTS_AFTER -> ConditionParam("index_from > ?", end)
@@ -263,7 +456,7 @@ internal fun getConditionParamPair(
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.EQUAL ->
       ConditionParam(
@@ -271,7 +464,7 @@ internal fun getConditionParamPair(
         start,
         end,
         start,
-        end
+        end,
       )
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_to > ?", end)
     ParamPrefixEnum.GREATERTHAN_OR_EQUALS -> ConditionParam("index_to >= ?", start)
@@ -286,21 +479,24 @@ internal fun getConditionParamPair(
  */
 internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
-  value: BigDecimal
+  value: BigDecimal,
 ): ConditionParam<Double> {
   // Ends_Before and Starts_After are not used with integer values. see
   // https://www.hl7.org/fhir/search.html#prefix
   require(
     value.scale() > 0 ||
-      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE)
-  ) { "Prefix $prefix not allowed for Integer type" }
+      (prefix != ParamPrefixEnum.STARTS_AFTER && prefix != ParamPrefixEnum.ENDS_BEFORE),
+  ) {
+    "Prefix $prefix not allowed for Integer type"
+  }
   return when (prefix) {
-    ParamPrefixEnum.EQUAL, null -> {
+    ParamPrefixEnum.EQUAL,
+    null, -> {
       val precision = value.getRange()
       ConditionParam(
         "index_value >= ? AND index_value < ?",
         (value - precision).toDouble(),
-        (value + precision).toDouble()
+        (value + precision).toDouble(),
       )
     }
     ParamPrefixEnum.GREATERTHAN -> ConditionParam("index_value > ?", value.toDouble())
@@ -312,7 +508,7 @@ internal fun getConditionParamPair(
       ConditionParam(
         "index_value < ? OR index_value >= ?",
         (value - precision).toDouble(),
-        (value + precision).toDouble()
+        (value + precision).toDouble(),
       )
     }
     ParamPrefixEnum.ENDS_BEFORE -> {
@@ -326,7 +522,7 @@ internal fun getConditionParamPair(
       ConditionParam(
         "index_value >= ? AND index_value <= ?",
         (value - range).toDouble(),
-        (value + range).toDouble()
+        (value + range).toDouble(),
       )
     }
   }
@@ -340,7 +536,7 @@ internal fun getConditionParamPair(
   prefix: ParamPrefixEnum?,
   value: BigDecimal,
   system: String?,
-  unit: String?
+  unit: String?,
 ): ConditionParam<Any> {
   var canonicalizedUnit = unit
   var canonicalizedValue = value
@@ -348,7 +544,7 @@ internal fun getConditionParamPair(
   // Canonicalize the unit if possible. For example, 1 kg will be canonicalized to 1000 g
   if (system == ucumUrl && unit != null) {
     try {
-      val ucumValue = UnitConverter.getCanonicalForm(UcumValue(unit, value))
+      val ucumValue = UnitConverter.getCanonicalFormOrOriginal(UcumValue(unit, value))
       canonicalizedUnit = ucumValue.code
       canonicalizedValue = ucumValue.value
     } catch (exception: ConverterException) {
@@ -422,13 +618,13 @@ private enum class SortTableInfo(val tableName: String, val columnName: String) 
   STRING_SORT_TABLE_INFO("StringIndexEntity", "index_value"),
   NUMBER_SORT_TABLE_INFO("NumberIndexEntity", "index_value"),
   DATE_SORT_TABLE_INFO("DateIndexEntity", "index_from"),
-  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from")
+  DATE_TIME_SORT_TABLE_INFO("DateTimeIndexEntity", "index_from"),
 }
 
 private fun getApproximateDateRange(
   valueRange: LongRange,
   currentRange: LongRange,
-  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT
+  approximationCoefficient: Double = APPROXIMATION_COEFFICIENT,
 ): ApproximateDateRange {
   return ApproximateDateRange(
     (valueRange.first -
@@ -436,7 +632,7 @@ private fun getApproximateDateRange(
       .roundToLong(),
     (valueRange.last +
         approximationCoefficient * (valueRange.last - currentRange.last).absoluteValue)
-      .roundToLong()
+      .roundToLong(),
   )
 }
 

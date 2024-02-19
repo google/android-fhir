@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,24 +27,31 @@ import org.junit.Test
 class FHIRPathEngineHostServicesTest {
 
   @Test
-  fun testFHIRPathHostServices_resolveConstantValueNotPresent_returnsNull() {
+  fun testFHIRPathHostServices_resolveConstantKeyNotPresent_returnsNull() {
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "B", true)
 
-    assertThat(answer).isNull()
+    assertThat(answer).isEmpty()
   }
 
   @Test
-  fun testFHIRPathHostServices_resolveConstantValuePresent_returnsNotNull() {
+  fun testFHIRPathHostServices_resolveConstantKeyAndValuePresent_returnsNotNull() {
     val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to IntegerType(1)), "A", true)
 
-    assertThat((answer as Type).asStringValue()).isEqualTo("1")
+    assertThat((answer?.first() as Type).asStringValue()).isEqualTo("1")
+  }
+
+  @Test
+  fun testFHIRPathHostServices_resolveConstantKeyPresentAndValueNotPresent_returnsNull() {
+    val answer = FHIRPathEngineHostServices.resolveConstant(mapOf("A" to null), "A", true)
+
+    assertThat(answer).isEmpty()
   }
 
   @Test
   fun testFHIRPathHostServices_resolveConstantNullAppContext_returnsNull() {
     val answer = FHIRPathEngineHostServices.resolveConstant(null, "A", true)
 
-    assertThat(answer).isNull()
+    assertThat(answer).isEmpty()
   }
 
   @Test
@@ -82,7 +89,7 @@ class FHIRPathEngineHostServicesTest {
         mapOf<Any, Any>(),
         mutableListOf(),
         "",
-        mutableListOf()
+        mutableListOf(),
       )
     }
   }
@@ -90,7 +97,7 @@ class FHIRPathEngineHostServicesTest {
   @Test
   fun testFHIRPathHostServices_resolveReference_throwsUnsupportedOperationException() {
     assertThrows(UnsupportedOperationException::class.java) {
-      FHIRPathEngineHostServices.resolveReference(mapOf<Any, Any>(), "")
+      FHIRPathEngineHostServices.resolveReference(mapOf<Any, Any>(), "", null)
     }
   }
 

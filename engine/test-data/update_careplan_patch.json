@@ -1,0 +1,77 @@
+[
+  {
+    "op": "replace",
+    "path": "/activity/6/detail/status",
+    "value": "in-progress"
+  },
+  {
+    "op": "add",
+    "path": "/activity/-",
+    "value": {
+      "outcomeReference": [
+        {
+          "reference": "Task/4f26da79-4571-4442-911a-c3a707e3e662",
+          "display": "Viral Load Collection"
+        }
+      ],
+      "detail": {
+        "kind": "Task",
+        "code": {
+          "coding": [
+            {
+              "system": "https://d-tree.org/",
+              "code": "art-client-viral-load-collection"
+            }
+          ]
+        },
+        "status": "in-progress",
+        "scheduledPeriod": {
+          "start": "2023-11-15T11:45:40+02:00",
+          "end": "2023-12-14T11:10:34.227+03:00"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/311015",
+            "display": "John Doe"
+          }
+        ],
+        "description": "Viral Load Collection"
+      }
+    }
+  },
+  {
+    "op": "add",
+    "path": "/activity/-",
+    "value": {
+      "outcomeReference": [
+        {
+          "reference": "Task/6f6e6672-ef2d-4e57-9854-0a04cd0fb001",
+          "display": "Index Case Testing"
+        }
+      ],
+      "detail": {
+        "kind": "Task",
+        "code": {
+          "coding": [
+            {
+              "system": "https://d-tree.org/",
+              "code": "art-client-index-case-testing"
+            }
+          ]
+        },
+        "status": "in-progress",
+        "scheduledPeriod": {
+          "start": "2023-11-15T11:45:40+02:00",
+          "end": "2023-12-14T11:10:34.227+03:00"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/311015",
+            "display": "John Doe"
+          }
+        ],
+        "description": "Index Case Testing"
+      }
+    }
+  }
+]

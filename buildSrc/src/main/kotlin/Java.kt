@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,8 +32,7 @@ import org.gradle.api.JavaVersion
  * limitations under the License.
  */
 
-object Java {
-  val sourceCompatibility = JavaVersion.VERSION_1_8
-  val targetCompatibility = JavaVersion.VERSION_1_8
-  val kotlinJvmTarget = JavaVersion.VERSION_1_8
-}
+/* Delete this file, and the sourceCompatibility and targetCompatibility blocks when we upgrade the
+AGP to 8.1. See: https://kotlinlang.org/docs/gradle-configure-project.html#gradle-java-toolchains-support
+ */
+val javaVersion = JavaVersion.VERSION_11

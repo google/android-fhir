@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.catalog
 
 import android.app.Application
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.lifecycle.AndroidViewModel
@@ -27,12 +28,13 @@ class ComponentListViewModel(application: Application, private val state: SavedS
 
   sealed class ViewItem {
     data class HeaderItem(val header: Header) : ViewItem()
+
     data class ComponentItem(val component: Component) : ViewItem()
   }
 
   enum class Header(@StringRes val textId: Int) {
     WIDGETS(R.string.widgets),
-    MISC_COMPONENTS(R.string.misc_components)
+    MISC_COMPONENTS(R.string.misc_components),
   }
 
   enum class Component(
@@ -44,83 +46,88 @@ class ComponentListViewModel(application: Application, private val state: SavedS
      * Path to the questionnaire json file with some or all required fields. If the user doesn't
      * answer the required questions, an error may be displayed on the particular question.
      */
-    val questionnaireFileWithValidation: String = "",
-    val workflow: WorkflowType = WorkflowType.COMPONENT
+    val questionnaireFileWithValidation: String? = null,
   ) {
     BOOLEAN_CHOICE(
       R.drawable.ic_booleanchoice,
       R.string.component_name_boolean_choice,
       "component_boolean_choice.json",
-      "component_boolean_choice_with_validation.json"
+      "component_boolean_choice_with_validation.json",
     ),
     SINGLE_CHOICE(
       R.drawable.ic_singlechoice,
       R.string.component_name_single_choice,
       "component_single_choice.json",
-      "component_single_choice_with_validation.json"
+      "component_single_choice_with_validation.json",
     ),
     MULTIPLE_CHOICE(
       R.drawable.ic_multiplechoice,
       R.string.component_name_multiple_choice,
       "component_multi_select_choice.json",
-      "component_multi_select_choice_with_validation.json"
+      "component_multi_select_choice_with_validation.json",
     ),
     DROPDOWN(
       R.drawable.ic_group_1278,
       R.string.component_name_dropdown,
       "component_dropdown.json",
-      "component_dropdown_with_validation.json"
+      "component_dropdown_with_validation.json",
     ),
     MODAL(
       R.drawable.ic_modal,
       R.string.component_name_modal,
       "component_modal.json",
-      "component_modal_with_validation.json"
+      "component_modal_with_validation.json",
     ),
     OPEN_CHOICE(
       R.drawable.ic_openchoice,
       R.string.component_name_open_choice,
       "component_open_choice.json",
-      "component_open_choice_with_validation.json"
+      "component_open_choice_with_validation.json",
     ),
     TEXT_FIELD(
       R.drawable.ic_textfield,
       R.string.component_name_text_field,
       "component_text_fields.json",
-      "component_text_fields_with_validation.json"
+      "component_text_fields_with_validation.json",
     ),
     AUTO_COMPLETE(
       R.drawable.ic_autocomplete,
       R.string.component_name_auto_complete,
       "component_auto_complete.json",
-      "component_auto_complete_with_validation.json"
+      "component_auto_complete_with_validation.json",
     ),
     DATE_PICKER(
       R.drawable.ic_datepicker,
       R.string.component_name_date_picker,
       "component_date_picker.json",
-      "component_date_picker_with_validation.json"
+      "component_date_picker_with_validation.json",
     ),
     DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
       R.string.component_name_date_time_picker,
       "component_date_time_picker.json",
-      "component_date_time_picker_with_validation.json"
+      "component_date_time_picker_with_validation.json",
     ),
     SLIDER(
       R.drawable.ic_slider,
       R.string.component_name_slider,
       "component_slider.json",
-      "component_slider_with_validation.json"
+      "component_slider_with_validation.json",
+    ),
+    QUANTITY(
+      R.drawable.ic_unitoptions,
+      R.string.component_name_quantity,
+      "component_quantity.json",
+      "component_quantity_with_validation.json",
     ),
     ATTACHMENT(
       R.drawable.ic_attachment,
       R.string.component_name_attachment,
       "component_attachment.json",
-      "component_attachment_with_validation.json"
+      "component_attachment_with_validation.json",
     ),
     REPEATED_GROUP(
-      R.drawable.ic_textfield,
+      R.drawable.ic_repeatgroups,
       R.string.component_name_repeated_group,
       "component_repeated_group.json",
     ),
@@ -128,13 +135,23 @@ class ComponentListViewModel(application: Application, private val state: SavedS
     ITEM_MEDIA(
       R.drawable.ic_item_media,
       R.string.component_name_item_media,
-      "component_item_media.json"
+      "component_item_media.json",
     ),
     ITEM_ANSWER_MEDIA(
       R.drawable.ic_item_answer_media,
       R.string.component_name_item_answer_media,
-      ""
-    )
+      "",
+    ),
+    INITIAL_VALUE(
+      R.drawable.ic_initial_value_component,
+      R.string.component_name_initial_value,
+      "component_initial_value.json",
+    ),
+    LOCATION_WIDGET(
+      R.drawable.ic_location_on,
+      R.string.component_name_location_widget,
+      "component_location_widget.json",
+    ),
   }
 
   val viewItemList =
@@ -151,11 +168,20 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.DATE_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
+      ViewItem.ComponentItem(Component.QUANTITY),
       ViewItem.ComponentItem(Component.ATTACHMENT),
       ViewItem.ComponentItem(Component.REPEATED_GROUP),
       ViewItem.HeaderItem(Header.MISC_COMPONENTS),
       ViewItem.ComponentItem(Component.HELP),
       ViewItem.ComponentItem(Component.ITEM_MEDIA),
       ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
+      ViewItem.ComponentItem(Component.INITIAL_VALUE),
+      ViewItem.ComponentItem(Component.LOCATION_WIDGET),
     )
+
+  fun isComponent(context: Context, title: String) =
+    viewItemList
+      .filterIsInstance<ViewItem.ComponentItem>()
+      .map { context.getString(it.component.textId) }
+      .contains(title)
 }

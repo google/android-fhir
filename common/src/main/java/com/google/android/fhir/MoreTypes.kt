@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import java.util.Date
 import java.util.Locale
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Type
 
@@ -40,6 +41,7 @@ fun equals(a: Type, b: Type): Boolean {
   // Codes with the same system and code values are considered equal even if they have different
   // display values.
   if (a is Coding && b is Coding) return a.system == b.system && a.code == b.code
+  if (a is Reference && b is Reference) return a.reference == b.reference
 
   throw NotImplementedError("Comparison for type ${a::class.java} not supported.")
 }
@@ -47,7 +49,7 @@ fun equals(a: Type, b: Type): Boolean {
 operator fun Type.compareTo(value: Type): Int {
   if (!this.fhirType().equals(value.fhirType())) {
     throw IllegalArgumentException(
-      "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}"
+      "Cannot compare different data types: ${this.fhirType()} and ${value.fhirType()}",
     )
   }
   when {
@@ -65,12 +67,13 @@ operator fun Type.compareTo(value: Type): Int {
       return this.dateTimeValue().value.compareTo(value.dateTimeValue().value)
     }
     this.fhirType().equals("Quantity") -> {
-      val quantity = UnitConverter.getCanonicalForm(UcumValue((this as Quantity).code, this.value))
+      val quantity =
+        UnitConverter.getCanonicalFormOrOriginal(UcumValue((this as Quantity).code, this.value))
       val anotherQuantity =
-        UnitConverter.getCanonicalForm(UcumValue((value as Quantity).code, value.value))
+        UnitConverter.getCanonicalFormOrOriginal(UcumValue((value as Quantity).code, value.value))
       if (quantity.code != anotherQuantity.code) {
         throw IllegalArgumentException(
-          "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}"
+          "Cannot compare different quantity codes: ${quantity.code} and ${anotherQuantity.code}",
         )
       }
       return quantity.value.compareTo(anotherQuantity.value)
@@ -79,7 +82,6 @@ operator fun Type.compareTo(value: Type): Int {
       throw NotImplementedError()
     }
   }
-  return 0
 }
 
 private fun clearTimeFromDateValue(dateValue: Date): Date {

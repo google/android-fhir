@@ -21,13 +21,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
-    android:layout_marginTop="@dimen/attachment_preview_base_margin"
+    android:layout_marginTop="@dimen/attachment_preview_margin_top"
 >
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/photo_thumbnail"
-        android:layout_width="@dimen/attachment_photo_preview_max_width"
-        android:layout_height="@dimen/attachment_photo_preview_max_height"
+        android:layout_width="@dimen/attachment_preview_photo_and_preview_file_icon_background_width"
+        android:layout_height="@dimen/attachment_preview_photo_and_preview_file_icon_background_height"
         android:contentDescription="@string/cd_photo_preview"
         android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,7 +40,7 @@
         style="?attr/questionnaireAttachmentDividerStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/attachment_preview_base_margin"
+        android:layout_marginTop="@dimen/attachment_preview_divider_margin_top"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/photo_thumbnail"
     />
@@ -50,7 +50,7 @@
         style="?attr/questionnaireAttachmentPreviewTitleStyle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/attachment_preview_base_margin"
+        android:layout_marginHorizontal="@dimen/attachment_preview_title_margin_horizontal"
         app:layout_constraintBottom_toBottomOf="@id/photo_thumbnail"
         app:layout_constraintEnd_toStartOf="@id/photo_delete"
         app:layout_constraintHorizontal_bias="0.0"

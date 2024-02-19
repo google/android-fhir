@@ -1,5 +1,2 @@
 # Owners of the repository
-* @aditya-07 @deepankarb @jingtang10 @jjtswan @kevinmost @ktarasenko @omarismail94 @stevenckngaa @vvikramraj @wantingzhang77 @yigit
-# Owners of SDC library and catalog app
-catalog/ @aditya-07 @deepankarb @jingtang10 @jjtswan @joiskash @kevinmost @ktarasenko @omarismail94 @santosh-pingle @stevenckngaa @vvikramraj @wantingzhang77 @yigit
-datacapture/ @aditya-07 @deepankarb @jingtang10 @jjtswan @joiskash @kevinmost @ktarasenko @omarismail94 @santosh-pingle @stevenckngaa @vvikramraj @wantingzhang77 @yigit
+* @google/android-fhir @santosh-pingle
