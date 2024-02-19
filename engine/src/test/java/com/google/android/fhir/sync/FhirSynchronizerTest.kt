@@ -16,19 +16,19 @@
 
 package com.google.android.fhir.sync
 
-import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Before
 import org.junit.Test
@@ -71,9 +71,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
-          ),
+          flowOf(UploadRequestResult.Success(listOf())),
         )
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -100,9 +98,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
       `when`(uploader.upload(any()))
         .thenReturn(
-          UploadSyncResult.Success(
-            listOf(),
-          ),
+          flowOf(UploadRequestResult.Success(listOf())),
         )
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -126,7 +122,7 @@ class FhirSynchronizerTest {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
       `when`(uploader.upload(any()))
-        .thenReturn(UploadSyncResult.Failure(error, LocalChangeToken(listOf())))
+        .thenReturn(flowOf(UploadRequestResult.Failure(listOf(), error)))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
       backgroundScope.launch { fhirSynchronizer.syncState.collect { emittedValues.add(it) } }
@@ -141,5 +137,68 @@ class FhirSynchronizerTest {
       assertThat(emittedValues[3]).isEqualTo(SyncJobStatus.Failed(exceptions = listOf(error)))
       assertThat(result).isInstanceOf(SyncJobStatus.Failed::class.java)
       assertThat(listOf(error)).isEqualTo((result as SyncJobStatus.Failed).exceptions)
+    }
+
+  /**
+   * If you encounter flakiness in this test, consider increasing the delay time in the downloader
+   * object.
+   */
+  @Test
+  fun `synchronize multiple invocations should execute in order`() =
+    runTest(UnconfinedTestDispatcher()) {
+      `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 0, 0)))
+      `when`(uploader.upload(any()))
+        .thenReturn(
+          flowOf(
+            UploadRequestResult.Success(
+              listOf(),
+            ),
+          ),
+        )
+      val fhirSynchronizerWithDelayInDownload =
+        FhirSynchronizer(
+          TestFhirEngineImpl,
+          UploadConfiguration(uploader),
+          DownloadConfiguration(
+            object : Downloader {
+              override suspend fun download(): Flow<DownloadState> {
+                delay(10)
+                return flowOf(DownloadState.Success(listOf(), 10, 10))
+              }
+            },
+            conflictResolver,
+          ),
+          fhirDataStore,
+        )
+      val emittedValues = mutableListOf<SyncJobStatus>()
+      val jobs =
+        listOf(fhirSynchronizerWithDelayInDownload, fhirSynchronizer).map {
+          backgroundScope.launch { it.syncState.collect { emittedValues.add(it) } }
+          /**
+           * Invoke synchronize() in separate coroutines. First invoke the synchronizer with delay
+           * in download. Then the [fhirSynchronizer]
+           */
+          backgroundScope.launch { it.synchronize() }
+        }
+
+      jobs.forEach { it.join() }
+
+      assertThat(emittedValues).hasSize(10)
+      assertThat(emittedValues[0]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[1])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 10, completed = 10))
+      assertThat(emittedValues[2])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[3])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[4]).isInstanceOf(SyncJobStatus.Succeeded::class.java)
+      assertThat(emittedValues[5]).isInstanceOf(SyncJobStatus.Started::class.java)
+      assertThat(emittedValues[6])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, total = 0, completed = 0))
+      assertThat(emittedValues[7])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 0))
+      assertThat(emittedValues[8])
+        .isEqualTo(SyncJobStatus.InProgress(SyncOperation.UPLOAD, total = 1, completed = 1))
+      assertThat(emittedValues[9]).isInstanceOf(SyncJobStatus.Succeeded::class.java)
     }
 }

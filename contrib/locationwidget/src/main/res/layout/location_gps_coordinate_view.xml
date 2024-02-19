@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="@dimen/item_margin_horizontal"
+    android:layout_marginVertical="@dimen/item_margin_vertical"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/gps_coordinate_padding_horizontal"
+>
+
+
+    <com.google.android.fhir.datacapture.views.HeaderView
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+    <com.google.android.fhir.datacapture.views.MediaView
+        android:id="@+id/item_media"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    />
+
+        <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/text_input_layout"
+        style="?attr/questionnaireTextInputLayoutStyle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+    >
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:id="@+id/autoCompleteTextView"
+            style="@style/Questionnaire.AutoCompleteTextViewOutlinedBoxStyle"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="bottom"
+            android:imeOptions="flagNoExtractUi"
+            android:inputType="none"
+            android:maxLines="1"
+            android:singleLine="true"
+        />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+</LinearLayout>

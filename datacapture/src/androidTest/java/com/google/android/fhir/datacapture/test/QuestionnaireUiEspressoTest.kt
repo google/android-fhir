@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,7 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -98,6 +99,30 @@ class QuestionnaireUiEspressoTest {
 
     clickOnText("No")
     onView(withId(R.id.review_mode_button))
+      .check(
+        ViewAssertions.matches(
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
+      )
+  }
+
+  @Test
+  fun shouldHideNextButtonIfDisabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    clickOnText("Next")
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+  }
+
+  @Test
+  fun shouldDisplayNextButtonIfEnabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    onView(withId(R.id.pagination_next_button))
       .check(
         ViewAssertions.matches(
           ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
@@ -495,6 +520,66 @@ class QuestionnaireUiEspressoTest {
     }
   }
 
+  @Test
+  fun progressBar_shouldBeVisible_withSinglePageQuestionnaire() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+      assertThat(linearProgressIndicator.progress).isEqualTo(100)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeVisible_withPaginatedQuestionnaire() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json")
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+      assertThat(linearProgressIndicator.progress).isEqualTo(50)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldProgress_onPaginationNext() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json")
+
+    onView(withId(R.id.pagination_next_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.progress).isEqualTo(100)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
+
+    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.GONE)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
+
+    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.review_mode_edit_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+    }
+  }
+
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
     isReviewMode: Boolean = false,
@@ -503,6 +588,7 @@ class QuestionnaireUiEspressoTest {
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
+        .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
