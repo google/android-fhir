@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,11 +53,11 @@ internal object CheckBoxGroupViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
+        val questionnaireItem = questionnaireViewItem.questionnaireItem
         val choiceOrientation =
-          questionnaireViewItem.questionnaireItem.choiceOrientation
-            ?: ChoiceOrientationTypes.VERTICAL
+          questionnaireItem.choiceOrientation ?: ChoiceOrientationTypes.VERTICAL
+
+        header.bind(questionnaireItem)
 
         // Keep the Flow layout which is always the first child
         checkboxGroup.removeViews(1, checkboxGroup.childCount - 1)
@@ -71,7 +71,7 @@ internal object CheckBoxGroupViewHolderFactory :
             flow.setWrapMode(Flow.WRAP_NONE)
           }
         }
-        questionnaireViewItem.enabledAnswerOptions
+        questionnaireViewItem.answerOption
           .map { answerOption -> View.generateViewId() to answerOption }
           .onEach { populateViewWithAnswerOption(it.first, it.second, choiceOrientation) }
           .map { it.first }
@@ -91,7 +91,7 @@ internal object CheckBoxGroupViewHolderFactory :
       private fun populateViewWithAnswerOption(
         viewId: Int,
         answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
-        choiceOrientation: ChoiceOrientationTypes,
+        choiceOrientation: ChoiceOrientationTypes
       ) {
         val checkboxLayout =
           LayoutInflater.from(checkboxGroup.context).inflate(R.layout.check_box_view, null)
@@ -103,7 +103,7 @@ internal object CheckBoxGroupViewHolderFactory :
               answerOption.itemAnswerOptionImage(checkboxGroup.context),
               null,
               null,
-              null,
+              null
             )
             isChecked = questionnaireViewItem.isAnswerOptionSelected(answerOption)
             layoutParams =
@@ -112,7 +112,7 @@ internal object CheckBoxGroupViewHolderFactory :
                   ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
                   ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
                 },
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
               )
             setOnClickListener {
               when (isChecked) {
@@ -127,24 +127,24 @@ internal object CheckBoxGroupViewHolderFactory :
                     // if this answer option has optionExclusive extension, then deselect other
                     // answer options.
                     val optionExclusiveIndex = checkboxGroup.indexOfChild(it) - 1
-                    for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
+                    for (i in 0 until questionnaireViewItem.answerOption.size) {
                       if (optionExclusiveIndex == i) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
                       }
                     }
                   } else {
                     // deselect optionExclusive answer option.
-                    for (i in 0 until questionnaireViewItem.enabledAnswerOptions.size) {
-                      if (!questionnaireViewItem.enabledAnswerOptions[i].optionExclusive) {
+                    for (i in 0 until questionnaireViewItem.answerOption.size) {
+                      if (!questionnaireViewItem.answerOption[i].optionExclusive) {
                         continue
                       }
                       (checkboxGroup.getChildAt(i + 1) as CheckBox).isChecked = false
                       newAnswers.removeIf {
-                        it.value.equalsDeep(questionnaireViewItem.enabledAnswerOptions[i].value)
+                        it.value.equalsDeep(questionnaireViewItem.answerOption[i].value)
                       }
                     }
                   }
@@ -154,7 +154,7 @@ internal object CheckBoxGroupViewHolderFactory :
                   questionnaireViewItem.removeAnswer(
                     QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                       value = answerOption.value
-                    },
+                    }
                   )
                 }
               }
@@ -167,7 +167,7 @@ internal object CheckBoxGroupViewHolderFactory :
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid, -> header.showErrorText(isErrorTextVisible = false)
+          Valid -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
             header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }

@@ -57,9 +57,7 @@ Connect your Android device via USB to your host, or
 and click Run (![Run button](images/image2.png "Run button")) in the Android
 Studio toolbar.
 
-<p align="left">
-<img src="images/image5.png" alt="Hello World app" width="500">
-</p>
+![Hello World app](images/image5.png "Hello World app")
 
 As you can see there isn't much here yet, so let's get right into displaying a
 questionnaire in your app!
@@ -182,9 +180,7 @@ Let's run the codelab by clicking Run
 (![Run button](images/image2.png "Run button")) in the Android Studio toolbar.
 You should see something similar to this:
 
-<p align="left">
-<img src="images/image6.png" alt="Questionnaire Rendered in Emulator" width="500">
-</p>
+TODO: Screenshot showing questionnaire rendered in an emulator
 
 Navigate through the questionnaire and try entering some answers. There are a
 few different answer widgets used, including booleans, text, and dates, which

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -103,9 +103,8 @@ internal object AttachmentViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
-        header.bind(questionnaireViewItem)
-        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val questionnaireItem = questionnaireViewItem.questionnaireItem
+        header.bind(questionnaireItem)
         displayOrClearInitialPreview()
         displayTakePhotoButton(questionnaireItem)
         displayUploadButton(questionnaireItem)
@@ -123,7 +122,7 @@ internal object AttachmentViewHolderFactory :
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid, -> errorTextView.visibility = View.GONE
+          Valid -> errorTextView.visibility = View.GONE
           is Invalid -> {
             errorTextView.text = validationResult.getSingleStringValidationMessage()
             errorTextView.visibility = View.VISIBLE
@@ -157,7 +156,7 @@ internal object AttachmentViewHolderFactory :
           displayPreview(
             attachmentType = getMimeType(attachment.contentType),
             attachmentTitle = attachment.title,
-            attachmentByteArray = attachment.data,
+            attachmentByteArray = attachment.data
           )
         }
       }
@@ -195,7 +194,7 @@ internal object AttachmentViewHolderFactory :
 
         context.supportFragmentManager.setFragmentResultListener(
           CameraLauncherFragment.CAMERA_RESULT_KEY,
-          context,
+          context
         ) { _, result ->
           val isSaved = result.getBoolean(CameraLauncherFragment.CAMERA_RESULT_KEY)
           if (!isSaved) return@setFragmentResultListener
@@ -203,7 +202,7 @@ internal object AttachmentViewHolderFactory :
           if (questionnaireItem.isGivenSizeOverLimit(file.length().toBigDecimal())) {
             displayError(
               R.string.max_size_image_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMiBs,
+              questionnaireItem.maxSizeInMiBs
             )
             displaySnackbar(view, R.string.upload_failed)
             file.delete()
@@ -237,7 +236,7 @@ internal object AttachmentViewHolderFactory :
           displayPreview(
             attachmentType = attachmentMimeType,
             attachmentTitle = file.name,
-            attachmentUri = attachmentUri,
+            attachmentUri = attachmentUri
           )
           displaySnackbarOnUpload(view, attachmentMimeType)
           file.delete()
@@ -251,7 +250,7 @@ internal object AttachmentViewHolderFactory :
       private fun onUploadClicked(view: View, questionnaireItem: QuestionnaireItemComponent) {
         context.supportFragmentManager.setFragmentResultListener(
           OpenDocumentLauncherFragment.OPEN_DOCUMENT_RESULT_KEY,
-          context,
+          context
         ) { _, result ->
           val attachmentUri =
             (result.get(OpenDocumentLauncherFragment.OPEN_DOCUMENT_RESULT_KEY)
@@ -262,7 +261,7 @@ internal object AttachmentViewHolderFactory :
           if (questionnaireItem.isGivenSizeOverLimit(attachmentByteArray.size.toBigDecimal())) {
             displayError(
               R.string.max_size_file_above_limit_validation_error_msg,
-              questionnaireItem.maxSizeInMiBs,
+              questionnaireItem.maxSizeInMiBs
             )
             displaySnackbar(view, R.string.upload_failed)
             return@setFragmentResultListener
@@ -294,7 +293,7 @@ internal object AttachmentViewHolderFactory :
           displayPreview(
             attachmentType = attachmentMimeType,
             attachmentTitle = attachmentTitle,
-            attachmentUri = attachmentUri,
+            attachmentUri = attachmentUri
           )
           displaySnackbarOnUpload(view, attachmentMimeType)
         }
@@ -310,7 +309,7 @@ internal object AttachmentViewHolderFactory :
         attachmentType: String,
         attachmentTitle: String,
         attachmentByteArray: ByteArray? = null,
-        attachmentUri: Uri? = null,
+        attachmentUri: Uri? = null
       ) {
         when (attachmentType) {
           MimeType.AUDIO.value -> {
@@ -374,7 +373,7 @@ internal object AttachmentViewHolderFactory :
         clearFilePreview()
         displaySnackbarOnDelete(
           view,
-          getMimeType(questionnaireViewItem.answers.first().valueAttachment.contentType),
+          getMimeType(questionnaireViewItem.answers.first().valueAttachment.contentType)
         )
       }
 
@@ -422,9 +421,9 @@ internal object AttachmentViewHolderFactory :
             listOf(
               context.getString(
                 textResource,
-              ),
-            ),
-          ),
+              )
+            )
+          )
         )
       }
 

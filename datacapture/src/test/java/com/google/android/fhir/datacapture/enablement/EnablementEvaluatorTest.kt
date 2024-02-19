@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,6 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class EnablementEvaluatorTest {
-  val iParser: IParser = FhirContext.forR4Cached().newJsonParser()
-
   @Test
   fun evaluate_noEnableWhen_shouldReturnTrue() {
     assertEnableWhen().isTrue()
@@ -53,13 +51,12 @@ class EnablementEvaluatorTest {
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
         addEnableWhen(Questionnaire.QuestionnaireItemEnableWhenComponent().setQuestion("q2"))
       }
-    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "q1" }
     val questionnaireResponse = QuestionnaireResponse().apply { addItem(questionnaireResponseItem) }
     assertThat(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
-          .evaluate(questionnaireItem, questionnaireResponseItem),
+        EnablementEvaluator(questionnaireResponse)
+          .evaluate(questionnaireItem, questionnaireResponseItem)
       )
       .isFalse()
   }
@@ -71,8 +68,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(IntegerType(123)),
-        ),
+          actual = listOf(IntegerType(123))
+        )
       )
       .isTrue()
   }
@@ -84,8 +81,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isFalse()
   }
@@ -97,8 +94,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(IntegerType(123)),
-        ),
+          actual = listOf(IntegerType(123))
+        )
       )
       .isFalse()
   }
@@ -135,8 +132,7 @@ class EnablementEvaluatorTest {
       ]
 }
 
-            """
-        .trimIndent()
+      """.trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -160,9 +156,10 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      }
-            """
-        .trimIndent()
+      } 
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -176,11 +173,11 @@ class EnablementEvaluatorTest {
         as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
+        EnablementEvaluator(questionnaireResponse)
           .evaluate(
             questionnaireItem,
             questionnaireResponse.item[1],
-          ),
+          )
       )
       .isTrue()
   }
@@ -217,8 +214,7 @@ class EnablementEvaluatorTest {
       ]
 }
 
-            """
-        .trimIndent()
+      """.trimIndent()
 
     @Language("JSON")
     val questionnaireResponseJson =
@@ -242,9 +238,10 @@ class EnablementEvaluatorTest {
             "linkId": "2"
         }
     ]
-      }
-            """
-        .trimIndent()
+      } 
+      """.trimIndent()
+
+    val iParser: IParser = FhirContext.forR4().newJsonParser()
 
     val questionnaire =
       iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
@@ -257,233 +254,14 @@ class EnablementEvaluatorTest {
         as QuestionnaireResponse
 
     assertThat(
-        EnablementEvaluator(questionnaire, questionnaireResponse)
+        EnablementEvaluator(questionnaireResponse)
           .evaluate(
             questionnaireItemComponent,
             questionnaireResponse.item[1],
-          ),
+          )
       )
       .isFalse()
   }
-
-  @Test
-  fun `evaluate() should evaluate enableWhenExpression with %context fhirpath supplement literal`() =
-    runBlocking {
-      @Language("JSON")
-      val questionnaireJson =
-        """
-    {
-      "resourceType": "Questionnaire",
-          "item": [
-            {
-              "linkId": "1",
-              "definition": "http://hl7.org/fhir/StructureDefinition/Patient#Patient.gender",
-              "type": "choice",
-              "text": "Gender"
-            },
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%resource.repeat(item).where(linkId='1').answer.value.code = %context.linkId"
-                  }
-                }
-              ],
-              "linkId" : "female",
-              "text": "Have you had mammogram before?(enableWhenExpression = only when gender is female)",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
-            }
-          ]
-    }
-                """
-          .trimIndent()
-
-      @Language("JSON")
-      val questionnaireResponseJson =
-        """
-    {
-      "resourceType": "QuestionnaireResponse",
-      "item": [
-        {
-          "linkId": "1",
-          "answer": [
-            {
-              "valueCoding": {
-                "system": "http://hl7.org/fhir/administrative-gender",
-                "code": "female",
-                "display": "Female"
-              }
-            }
-          ]
-        },
-        {
-          "linkId": "female"
-        }
-      ]
-    }
-                """
-          .trimIndent()
-
-      val questionnaire =
-        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
-
-      val questionnaireItem: Questionnaire.QuestionnaireItemComponent =
-        questionnaire.item.find { it.linkId == "female" }!!
-
-      val questionnaireResponse =
-        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-          as QuestionnaireResponse
-
-      assertThat(
-          EnablementEvaluator(questionnaire, questionnaireResponse)
-            .evaluate(
-              questionnaireItem,
-              questionnaireResponse.item[1],
-            ),
-        )
-        .isTrue()
-    }
-
-  @Test
-  fun `evaluate() should evaluate enableWhenExpression with %questionnaire fhirpath supplement`() =
-    runBlocking {
-      @Language("JSON")
-      val questionnaireJson =
-        """
-    {
-      "resourceType": "Questionnaire",
-      "subjectType": "Practitioner",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%questionnaire.subjectType='Practitioner'"
-                  }
-                }
-              ],
-              "linkId" : "contribution",
-              "text": "Contribution",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
-            }
-          ]
-    }
-                """
-          .trimIndent()
-
-      @Language("JSON")
-      val questionnaireResponseJson =
-        """
-    {
-      "resourceType": "QuestionnaireResponse",
-      "item": [
-        {
-          "linkId": "contribution",
-          "answer": [
-            {
-              "valueCoding": {
-                "code": "yes",
-                "display": "Yes"
-              }
-            }
-          ]
-        }
-      ]
-    }
-                """
-          .trimIndent()
-
-      val questionnaire =
-        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
-
-      val questionnaireResponse =
-        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-          as QuestionnaireResponse
-
-      assertThat(
-          EnablementEvaluator(questionnaire, questionnaireResponse)
-            .evaluate(
-              questionnaire.item[0],
-              questionnaireResponse.item[0],
-            ),
-        )
-        .isTrue()
-    }
-
-  @Test
-  fun `evaluate() should evaluate enableWhenExpression with %qItem fhirpath supplement`() =
-    runBlocking {
-      @Language("JSON")
-      val questionnaireJson =
-        """
-    {
-      "resourceType": "Questionnaire",
-      "subjectType": "Practitioner",
-          "item": [
-            {
-              "extension": [
-                {
-                  "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-enableWhenExpression",
-                  "valueExpression": {
-                    "language": "text/fhirpath",
-                    "expression": "%qItem.text = 'Contribution'"
-                  }
-                }
-              ],
-              "linkId" : "contribution",
-              "text": "Contribution",
-              "type": "choice",
-              "answerValueSet": "http://hl7.org/fhir/ValueSet/yesnodontknow"
-            }
-          ]
-    }
-                """
-          .trimIndent()
-
-      @Language("JSON")
-      val questionnaireResponseJson =
-        """
-    {
-      "resourceType": "QuestionnaireResponse",
-      "item": [
-        {
-          "linkId": "contribution",
-          "answer": [
-            {
-              "valueCoding": {
-                "code": "yes",
-                "display": "Yes"
-              }
-            }
-          ]
-        }
-      ]
-    }
-                """
-          .trimIndent()
-
-      val questionnaire =
-        iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
-
-      val questionnaireResponse =
-        iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
-          as QuestionnaireResponse
-
-      assertThat(
-          EnablementEvaluator(questionnaire, questionnaireResponse)
-            .evaluate(
-              questionnaire.item[0],
-              questionnaireResponse.item[0],
-            ),
-        )
-        .isTrue()
-    }
 
   @Test
   fun evaluate_expectAnswerDoesNotExist_answerDoesNotExist_shouldReturnTrue() {
@@ -492,8 +270,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isTrue()
   }
@@ -505,8 +283,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = IntegerType(123),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isFalse()
   }
@@ -518,8 +296,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(123), IntegerType(456)),
-        ),
+          actual = listOf(IntegerType(123), IntegerType(456))
+        )
       )
       .isTrue()
   }
@@ -531,8 +309,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(456), IntegerType(789)),
-        ),
+          actual = listOf(IntegerType(456), IntegerType(789))
+        )
       )
       .isFalse()
   }
@@ -544,8 +322,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isFalse()
   }
@@ -557,8 +335,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(123), IntegerType(456)),
-        ),
+          actual = listOf(IntegerType(123), IntegerType(456))
+        )
       )
       .isTrue()
   }
@@ -570,8 +348,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(123), IntegerType(123)),
-        ),
+          actual = listOf(IntegerType(123), IntegerType(123))
+        )
       )
       .isFalse()
   }
@@ -583,8 +361,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(20)),
-        ),
+          actual = listOf(IntegerType(20))
+        )
       )
       .isTrue()
   }
@@ -596,8 +374,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_THAN,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(5)),
-        ),
+          actual = listOf(IntegerType(5))
+        )
       )
       .isFalse()
   }
@@ -609,8 +387,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(10)),
-        ),
+          actual = listOf(IntegerType(10))
+        )
       )
       .isTrue()
   }
@@ -622,8 +400,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.GREATER_OR_EQUAL,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(5)),
-        ),
+          actual = listOf(IntegerType(5))
+        )
       )
       .isFalse()
   }
@@ -635,8 +413,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(5)),
-        ),
+          actual = listOf(IntegerType(5))
+        )
       )
       .isTrue()
   }
@@ -648,8 +426,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_THAN,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(20)),
-        ),
+          actual = listOf(IntegerType(20))
+        )
       )
       .isFalse()
   }
@@ -661,8 +439,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(10)),
-        ),
+          actual = listOf(IntegerType(10))
+        )
       )
       .isTrue()
   }
@@ -674,8 +452,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.LESS_OR_EQUAL,
           expected = IntegerType(10),
-          actual = listOf(IntegerType(20)),
-        ),
+          actual = listOf(IntegerType(20))
+        )
       )
       .isFalse()
   }
@@ -687,13 +465,13 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(),
+          actual = listOf()
         ),
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isFalse()
   }
@@ -705,13 +483,13 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(),
+          actual = listOf()
         ),
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isTrue()
   }
@@ -723,13 +501,13 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(),
+          actual = listOf()
         ),
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(true),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isFalse()
   }
@@ -741,13 +519,13 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(),
+          actual = listOf()
         ),
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EXISTS,
           expected = BooleanType(false),
-          actual = listOf(),
-        ),
+          actual = listOf()
+        )
       )
       .isTrue()
   }
@@ -759,8 +537,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(123)),
-        ),
+          actual = listOf(IntegerType(123))
+        )
       )
       .isTrue()
   }
@@ -772,8 +550,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(456)),
-        ),
+          actual = listOf(IntegerType(456))
+        )
       )
       .isFalse()
   }
@@ -785,8 +563,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(456)),
-        ),
+          actual = listOf(IntegerType(456))
+        )
       )
       .isTrue()
   }
@@ -798,8 +576,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = IntegerType(123),
-          actual = listOf(IntegerType(123)),
-        ),
+          actual = listOf(IntegerType(123))
+        )
       )
       .isFalse()
   }
@@ -811,8 +589,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("otherSystem", "code", "display")),
-        ),
+          actual = listOf(Coding("otherSystem", "code", "display"))
+        )
       )
       .isFalse()
   }
@@ -824,8 +602,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("system", "otherCode", "display")),
-        ),
+          actual = listOf(Coding("system", "otherCode", "display"))
+        )
       )
       .isFalse()
   }
@@ -837,8 +615,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("system", "code", "otherDisplay")),
-        ),
+          actual = listOf(Coding("system", "code", "otherDisplay"))
+        )
       )
       .isTrue()
   }
@@ -850,8 +628,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("otherSystem", "code", "display")),
-        ),
+          actual = listOf(Coding("otherSystem", "code", "display"))
+        )
       )
       .isTrue()
   }
@@ -863,8 +641,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("system", "otherCode", "display")),
-        ),
+          actual = listOf(Coding("system", "otherCode", "display"))
+        )
       )
       .isTrue()
   }
@@ -876,8 +654,8 @@ class EnablementEvaluatorTest {
         EnableWhen(
           operator = Questionnaire.QuestionnaireItemOperator.NOT_EQUAL,
           expected = Coding("system", "code", "display"),
-          actual = listOf(Coding("system", "code", "otherDisplay")),
-        ),
+          actual = listOf(Coding("system", "code", "otherDisplay"))
+        )
       )
       .isFalse()
   }
@@ -889,7 +667,7 @@ class EnablementEvaluatorTest {
    */
   private fun assertEnableWhen(
     behavior: Questionnaire.EnableWhenBehavior? = null,
-    vararg enableWhen: EnableWhen,
+    vararg enableWhen: EnableWhen
   ): BooleanSubject {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -898,13 +676,12 @@ class EnablementEvaluatorTest {
             Questionnaire.QuestionnaireItemEnableWhenComponent()
               .setQuestion("$index") // use the index as linkId
               .setOperator(enableWhen.operator)
-              .setAnswer(enableWhen.expected),
+              .setAnswer(enableWhen.expected)
           )
         }
         behavior?.let { enableBehavior = it }
         type = Questionnaire.QuestionnaireItemType.BOOLEAN
       }
-    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         enableWhen.forEachIndexed { index, enableWhen ->
@@ -914,17 +691,16 @@ class EnablementEvaluatorTest {
               enableWhen.actual.forEach {
                 addAnswer(QuestionnaireResponseItemAnswerComponent().apply { value = it })
               }
-            },
+            }
           )
         }
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "target" }
         )
       }
-
     return assertThat(
-      EnablementEvaluator(questionnaire, questionnaireResponse)
-        .evaluate(questionnaireItem, questionnaireResponse.item.last()),
+      EnablementEvaluator(questionnaireResponse)
+        .evaluate(questionnaireItem, questionnaireResponse.item.last())
     )
   }
 
@@ -937,6 +713,6 @@ class EnablementEvaluatorTest {
   private data class EnableWhen(
     val operator: Questionnaire.QuestionnaireItemOperator,
     val expected: Type,
-    val actual: List<Type>,
+    val actual: List<Type>
   )
 }

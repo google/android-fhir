@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,21 +23,17 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
-import com.google.android.fhir.datacapture.validation.Valid
+import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.material.card.MaterialCardView
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -47,45 +43,13 @@ import org.robolectric.RuntimeEnvironment
 class GroupHeaderViewTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val view = GroupHeaderView(parent.context, null)
 
-  private fun getQuestionnaireViewItemWithQuestionnaireItem(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent =
-      QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-  ): QuestionnaireViewItem {
-    return QuestionnaireViewItem(
-      questionnaireItem = questionnaireItem,
-      questionnaireResponseItem = questionnaireResponseItem,
-      validationResult = Valid,
-      answersChangedCallback = { _, _, _, _ -> },
-    )
-  }
-
-  private fun getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
-    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent>,
-  ): QuestionnaireViewItem {
-    return QuestionnaireViewItem(
-      questionnaireItem = questionnaireItem,
-      questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-      validationResult = Valid,
-      answersChangedCallback = { _, _, _, _ -> },
-      enabledDisplayItems = enabledDisplayItems,
-    )
-  }
-
   @Test
   fun shouldShowPrefix() {
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" },
-      ),
-    )
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { prefix = "Prefix?" })
 
     assertThat(view.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
     assertThat(view.findViewById<TextView>(R.id.prefix).text.toString()).isEqualTo("Prefix?")
@@ -93,11 +57,7 @@ class GroupHeaderViewTest {
 
   @Test
   fun shouldHidePrefix() {
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply { prefix = "" },
-      ),
-    )
+    view.bind(Questionnaire.QuestionnaireItemComponent().apply { prefix = "" })
 
     assertThat(view.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
   }
@@ -105,45 +65,10 @@ class GroupHeaderViewTest {
   @Test
   fun shouldShowQuestion() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          text = "Question?"
-        },
-      ),
-    )
-
-    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
-  }
-
-  @Test
-  fun `should show question from localized text`() {
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          textElement.apply {
-            addExtension(
-              Extension(ToolingExtensions.EXT_TRANSLATION).apply {
-                addExtension(Extension("lang", StringType("en")))
-                addExtension(Extension("content", StringType("Question?")))
-              },
-            )
-          }
-        },
-      ),
-    )
-
-    assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
-  }
-
-  @Test
-  fun `should show question from questionnaire response item derived text`() {
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply { repeats = true },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { text = "Question?" },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        repeats = true
+        text = "Question?"
+      }
     )
 
     assertThat(view.findViewById<TextView>(R.id.question).text.toString()).isEqualTo("Question?")
@@ -151,20 +76,18 @@ class GroupHeaderViewTest {
 
   @Test
   fun `shows instructions`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "subtitle text"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        },
-      )
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
-        Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList,
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "subtitle text"
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.findViewById<TextView>(R.id.hint).isVisible).isTrue()
@@ -174,17 +97,15 @@ class GroupHeaderViewTest {
   @Test
   fun `hides instructions`() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
-            )
-        },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.findViewById<TextView>(R.id.hint).visibility).isEqualTo(View.GONE)
@@ -193,19 +114,17 @@ class GroupHeaderViewTest {
   @Test
   fun `shows helpButton if help code is present`() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "help text"
-                extension = listOf(itemControlExtensionWithHelpCode)
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
-            )
-        },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "help text"
+              extension = listOf(itemControlExtensionWithHelpCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.findViewById<Button>(R.id.helpButton).isVisible).isTrue()
@@ -214,19 +133,17 @@ class GroupHeaderViewTest {
   @Test
   fun `hides helpButton if help code is not present`() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "help text"
-                extension = listOf(displayCategoryExtensionWithInstructionsCode)
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
-            )
-        },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "help text"
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.findViewById<Button>(R.id.helpButton).isVisible).isFalse()
@@ -235,19 +152,17 @@ class GroupHeaderViewTest {
   @Test
   fun `shows helpCardView on help button click`() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "help text"
-                extension = listOf(itemControlExtensionWithHelpCode)
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
-            )
-        },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "help text"
+              extension = listOf(itemControlExtensionWithHelpCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
     view.findViewById<Button>(R.id.helpButton).performClick()
 
@@ -257,19 +172,17 @@ class GroupHeaderViewTest {
   @Test
   fun `hides helpCardView on help button click if help card view was already visible`() {
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          item =
-            listOf(
-              Questionnaire.QuestionnaireItemComponent().apply {
-                linkId = "nested-display-question"
-                text = "help text"
-                extension = listOf(itemControlExtensionWithHelpCode)
-                type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
-            )
-        },
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "help text"
+              extension = listOf(itemControlExtensionWithHelpCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
     view.findViewById<Button>(R.id.helpButton).performClick()
     view.findViewById<Button>(R.id.helpButton).performClick()
@@ -279,20 +192,18 @@ class GroupHeaderViewTest {
 
   @Test
   fun `updates textview for help code Text`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "help text"
-          extension = listOf(itemControlExtensionWithHelpCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        },
-      )
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
-        questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        enabledDisplayItems = itemList,
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "help text"
+              extension = listOf(itemControlExtensionWithHelpCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.findViewById<TextView>(R.id.helpText).text.toString()).isEqualTo("help text")
@@ -300,20 +211,18 @@ class GroupHeaderViewTest {
 
   @Test
   fun `shows headerItem view`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "subtitle text"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        },
-      )
     view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItemAndEnabledDisplayItems(
-        Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
-        itemList,
-      ),
+      Questionnaire.QuestionnaireItemComponent().apply {
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-display-question"
+              text = "subtitle text"
+              extension = listOf(displayCategoryExtensionWithInstructionsCode)
+              type = Questionnaire.QuestionnaireItemType.DISPLAY
+            }
+          )
+      }
     )
 
     assertThat(view.visibility).isEqualTo(View.VISIBLE)
@@ -321,9 +230,7 @@ class GroupHeaderViewTest {
 
   @Test
   fun shouldHideHeaderView() {
-    view.bind(
-      getQuestionnaireViewItemWithQuestionnaireItem(Questionnaire.QuestionnaireItemComponent()),
-    )
+    view.bind(Questionnaire.QuestionnaireItemComponent())
 
     assertThat(view.visibility).isEqualTo(View.GONE)
   }
@@ -336,11 +243,11 @@ class GroupHeaderViewTest {
           coding =
             listOf(
               Coding().apply {
-                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
+                code = INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              },
+              }
             )
-        },
+        }
       )
     }
 
@@ -354,9 +261,9 @@ class GroupHeaderViewTest {
               Coding().apply {
                 code = DisplayItemControlType.HELP.extensionCode
                 system = EXTENSION_ITEM_CONTROL_SYSTEM
-              },
+              }
             )
-        },
+        }
       )
     }
 }

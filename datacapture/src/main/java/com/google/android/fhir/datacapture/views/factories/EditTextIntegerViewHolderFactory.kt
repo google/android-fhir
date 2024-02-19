@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ internal object EditTextIntegerViewHolderFactory :
         if (inputInteger != null) {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(IntegerType(input)),
+              .setValue(IntegerType(input))
           )
         } else {
           questionnaireViewItem.setDraftAnswer(input)
@@ -64,16 +64,10 @@ internal object EditTextIntegerViewHolderFactory :
           questionnaireViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
         val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
 
-        // Update the text on the UI only if the value of the saved answer or draft answer
-        // is different from what the user is typing. We compare the two fields as integers to
-        // avoid shifting focus if the text values are different, but their integer representation
-        // is the same (e.g. "001" compared to "1")
-        if (answer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
-          textInputEditText.setText("")
-        } else if (answer?.toIntOrNull() != textInputEditText.text.toString().toIntOrNull()) {
-          textInputEditText.setText(answer)
-        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
-          textInputEditText.setText(draftAnswer)
+        // Update the text
+        val text = answer ?: draftAnswer
+        if ((text != textInputEditText.text.toString())) {
+          textInputEditText.setText(text)
         }
 
         // Update error message if draft answer present
@@ -82,7 +76,7 @@ internal object EditTextIntegerViewHolderFactory :
             textInputEditText.context.getString(
               R.string.integer_format_validation_error_msg,
               formatInteger(Int.MIN_VALUE),
-              formatInteger(Int.MAX_VALUE),
+              formatInteger(Int.MAX_VALUE)
             )
         }
       }

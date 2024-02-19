@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
   /**
    * Factory helps with testing and should not be set to anything in the regular production flow.
    */
-  private val factoryProducer: (() -> ViewModelProvider.Factory)? = null,
+  private val factoryProducer: (() -> ViewModelProvider.Factory)? = null
 ) : DialogFragment() {
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -72,7 +72,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
           // Use the custom questionnaire theme if it is specified
           R.styleable.QuestionnaireTheme_questionnaire_theme,
           // Otherwise, use the default questionnaire theme
-          R.style.Theme_Questionnaire,
+          R.style.Theme_Questionnaire
         )
       }
 
@@ -82,7 +82,7 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
       .apply {
         findViewById<TextView>(R.id.body).apply {
           val viewModel: QuestionnaireValidationErrorViewModel by
-            activityViewModels(factoryProducer = factoryProducer)
+            activityViewModels(factoryProducer)
           text =
             viewModel.getItemsTextWithValidationErrors().joinToString(separator = "\n") {
               context.getString(R.string.questionnaire_validation_error_item_text_with_bullet, it)
@@ -106,7 +106,7 @@ internal class QuestionnaireValidationErrorViewModel : ViewModel() {
 
   fun setQuestionnaireAndValidation(
     questionnaire: Questionnaire,
-    validation: Map<String, List<ValidationResult>>,
+    validation: Map<String, List<ValidationResult>>
   ) {
     this.questionnaire = questionnaire
     this.validation = validation

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,9 +34,7 @@ import org.robolectric.RuntimeEnvironment
 class DisplayViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = DisplayViewHolderFactory.create(parent)
 
@@ -48,7 +46,7 @@ class DisplayViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -63,7 +61,7 @@ class DisplayViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,84 +15,53 @@
  */
 
 import com.android.build.api.dsl.LibraryExtension
-import com.osacky.flank.gradle.FlankGradleExtension
 import java.util.UUID
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
-fun Project.configureFirebaseTestLabForLibraries() {
+@Suppress("SdCardPath")
+fun Project.configureFirebaseTestLab() {
   apply(plugin = Plugins.BuildPlugins.fladle)
-  configure<FlankGradleExtension> {
-    commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForLibraries)
-    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
-    environmentVariables.set(
-      mapOf(
-        "coverage" to "true",
-        "coverageFilePath" to "/sdcard/Download/",
-        "clearPackageData" to "true",
-      ),
+  configure<com.osacky.flank.gradle.FlankGradleExtension> {
+    projectId.set("android-fhir-instrumeted-tests")
+    debugApk.set(
+      project.provider {
+        "$rootDir/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
+      }
     )
     devices.set(
       listOf(
         mapOf(
           "model" to "Nexus6P",
           "version" to
-            "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
-          "locale" to "en_US",
+            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
+          "locale" to "en_US"
         ),
+        mapOf("model" to "Nexus6P", "version" to "27", "locale" to "en_US"),
         mapOf(
-          "model" to "MediumPhone.arm",
-          "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
-          "locale" to "en_US",
+          "model" to "oriole",
+          "version" to
+            "${this@configureFirebaseTestLab.extensions.getByType(LibraryExtension::class.java).defaultConfig.targetSdk}",
+          "locale" to "en_US"
         ),
-      ),
+      )
     )
-  }
-}
-
-fun Project.configureFirebaseTestLabForMicroBenchmark() {
-  apply(plugin = Plugins.BuildPlugins.fladle)
-  configure<FlankGradleExtension> {
-    commonConfigurationForFirebaseTestLab(this@configureFirebaseTestLabForMicroBenchmark)
-    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/release/*.apk" })
+    instrumentationApk.set(project.provider { "$buildDir/outputs/apk/androidTest/debug/*.apk" })
+    useOrchestrator.set(false)
+    flakyTestAttempts.set(3)
     environmentVariables.set(
-      mapOf(
-        "additionalTestOutputDir" to "/sdcard/Download",
-        "no-isolated-storage" to "true",
-        "clearPackageData" to "true",
-      ),
+      mapOf("coverage" to "true", "coverageFile" to "/sdcard/Download/coverage.ec")
     )
-    devices.set(
-      listOf(
-        mapOf(
-          "model" to "panther",
-          "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
-          "locale" to "en_US",
-        ),
-      ),
+    directoriesToPull.set(listOf("/sdcard/Download"))
+    filesToDownload.set(listOf(".*/sdcard/Download/.*.ec"))
+    resultsBucket.set("android-fhir-build-artifacts")
+    resultsDir.set(
+      if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
+        "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
+      } else {
+        "${project.name}-${UUID.randomUUID()}"
+      }
     )
   }
-}
-
-private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: Project) {
-  projectId.set("android-fhir-instrumeted-tests")
-  debugApk.set(
-    project.provider {
-      "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
-    },
-  )
-  useOrchestrator.set(true)
-  flakyTestAttempts.set(1)
-  maxTestShards.set(10)
-  testTimeout.set("45m")
-  directoriesToPull.set(listOf("/sdcard/Download"))
-  resultsBucket.set("android-fhir-build-artifacts")
-  resultsDir.set(
-    if (project.providers.environmentVariable("KOKORO_BUILD_ARTIFACTS_SUBDIR").isPresent) {
-      "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
-    } else {
-      "${project.name}-${UUID.randomUUID()}"
-    },
-  )
 }

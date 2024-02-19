@@ -7,21 +7,22 @@ plugins {
 configureRuler()
 
 android {
-  namespace = "com.google.android.fhir.catalog"
   compileSdk = Sdk.compileSdk
+
   defaultConfig {
     applicationId = Releases.Catalog.applicationId
     minSdk = Sdk.minSdk
     targetSdk = Sdk.targetSdk
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
+
     testInstrumentationRunner = Dependencies.androidJunitRunner
   }
 
   buildFeatures { viewBinding = true }
 
   buildTypes {
-    release {
+    getByName("release") {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
@@ -30,14 +31,18 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
+
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
   }
 
-  packaging {
+  packagingOptions {
     resources.excludes.addAll(
-      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
     )
   }
-  kotlin { jvmToolchain(11) }
+
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
 }
 
 dependencies {
@@ -56,9 +61,7 @@ dependencies {
   implementation(Dependencies.Navigation.navUiKtx)
 
   implementation(project(path = ":datacapture"))
-  implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
-  implementation(project(path = ":contrib:locationwidget"))
 
   testImplementation(Dependencies.junit)
 }

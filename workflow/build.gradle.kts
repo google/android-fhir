@@ -1,3 +1,4 @@
+import Dependencies.forceHapiVersion
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -14,19 +15,14 @@ publishArtifact(Releases.Workflow)
 createJacocoTestReportTask()
 
 android {
-  namespace = "com.google.android.fhir.workflow"
   compileSdk = Sdk.compileSdk
+
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.minSdkWorkflow
+    targetSdk = Sdk.targetSdk
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
-  }
-
-  sourceSets {
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
-
-    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
   }
 
   // Added this for fixing out of memory issue in running test cases
@@ -36,13 +32,18 @@ android {
   }
 
   buildTypes {
-    release {
+    getByName("release") {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
 
-  packaging {
+  compileOptions {
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
+  }
+
+  packagingOptions {
     resources.excludes.addAll(
       listOf(
         "license.html",
@@ -63,21 +64,25 @@ android {
         "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
-      ),
+      )
     )
   }
+
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
+
   configureJacocoTestOptions()
-  kotlin { jvmToolchain(11) }
-  compileOptions { isCoreLibraryDesugaringEnabled = true }
 }
 
-afterEvaluate { configureFirebaseTestLabForLibraries() }
+afterEvaluate { configureFirebaseTestLab() }
 
-configurations { all { removeIncompatibleDependencies() } }
+configurations {
+  all {
+    removeIncompatibleDependencies()
+    forceHapiVersion()
+  }
+}
 
 dependencies {
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
@@ -87,22 +92,45 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
+  androidTestImplementation(project(":testing"))
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
-  api(Dependencies.HapiFhir.guavaCaching)
 
   implementation(Dependencies.Androidx.coreKtx)
+
+  implementation(Dependencies.Cql.engine)
+  implementation(Dependencies.Cql.engineJackson) // Necessary to import Executable XML/JSON CQL libs
   implementation(Dependencies.Cql.evaluator)
-  implementation(Dependencies.Cql.evaluatorFhirJackson)
-  implementation(Dependencies.HapiFhir.guavaCaching)
+  implementation(Dependencies.Cql.evaluatorBuilder)
+  implementation(Dependencies.Cql.evaluatorDagger)
+  implementation(Dependencies.Cql.evaluatorPlanDef)
+  implementation(Dependencies.Cql.translatorCqlToElm) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorElm) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorElmJackson) // Necessary to import XML/JSON CQL Libs
+  implementation(Dependencies.Cql.translatorModel) // Overrides HAPI's old versions
+  implementation(Dependencies.Cql.translatorModelJackson) // Necessary to import XML/JSON ModelInfos
+
+  // Forces the most recent version of jackson, ignoring what dependencies use.
+  // Remove these lines when HAPI 6.4 becomes available.
+  implementation(Dependencies.Jackson.annotations)
+  implementation(Dependencies.Jackson.bom)
+  implementation(Dependencies.Jackson.core)
+  implementation(Dependencies.Jackson.databind)
+  implementation(Dependencies.Jackson.dataformatXml)
+  implementation(Dependencies.Jackson.jaxbAnnotations)
+  implementation(Dependencies.Jackson.jsr310)
+
+  // Runtime dependency that is required to run FhirPath (also requires minSDK of 26).
+  // Version 3.0 uses java.lang.System.Logger, which is not available on Android
+  // Replace for Guava when this PR gets merged: https://github.com/hapifhir/hapi-fhir/pull/3977
+  implementation(Dependencies.HapiFhir.caffeine)
+
   implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
-  implementation(Dependencies.androidFhirKnowledge)
-  implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
+  implementation(project(":engine"))
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
@@ -110,15 +138,8 @@ dependencies {
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
-  testImplementation(project(mapOf("path" to ":knowledge")))
+  testImplementation(project(":testing"))
   testImplementation(project(":workflow-testing"))
-
-  constraints {
-    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
-      api(libName, constraints)
-      implementation(libName, constraints)
-    }
-  }
 }
 
 tasks.dokkaHtml.configure {
@@ -132,14 +153,14 @@ tasks.dokkaHtml.configure {
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java"),
+          URL("https://github.com/google/android-fhir/tree/master/workflow/src/main/java")
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
         )
       }
       externalDocumentationLink {

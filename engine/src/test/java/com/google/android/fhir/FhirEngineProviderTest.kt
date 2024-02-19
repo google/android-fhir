@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import com.google.android.fhir.security.LockScreenComplexity.HIGH
 import com.google.android.fhir.security.LockScreenRequirement
 import com.google.android.fhir.security.RequirementViolationAction
 import com.google.common.truth.Truth.assertThat
-import java.io.File
 import java.lang.IllegalStateException
 import java.util.EnumSet
 import org.junit.After
@@ -60,11 +59,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(
-      FhirEngineConfiguration(
-        testMode = true,
-      ),
-    )
+    provider.init(FhirEngineConfiguration(testMode = true))
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -73,11 +68,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(
-      FhirEngineConfiguration(
-        testMode = false,
-      ),
-    )
+    provider.init(FhirEngineConfiguration(testMode = false))
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 
@@ -102,36 +93,13 @@ class FhirEngineProviderTest {
         serverConfiguration =
           ServerConfiguration(
             "",
-            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6),
-          ),
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
+          )
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
-    }
-  }
-
-  @Test
-  fun createFhirEngineConfiguration_configureOkHttpCache_shouldHaveOkHttpCache() {
-    val config =
-      FhirEngineConfiguration(
-        serverConfiguration =
-          ServerConfiguration(
-            "",
-            NetworkConfiguration(
-              httpCache =
-                CacheConfiguration(
-                  cacheDir = File("sample-dir", "http_cache"),
-                  // $0.05 worth of phone storage in 2020
-                  maxSize = 50L * 1024L * 1024L, // 50 MiB
-                ),
-            ),
-          ),
-      )
-    with(config.serverConfiguration!!.networkConfiguration) {
-      assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
-      assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
     }
   }
 
@@ -142,7 +110,7 @@ class FhirEngineProviderTest {
         ApplicationProvider.getApplicationContext(),
         /* requestCode= */ 0,
         Intent("TEST_ACTION"),
-        /* flags= */ 0,
+        /* flags= */ 0
       )
 
     val config =
@@ -150,14 +118,14 @@ class FhirEngineProviderTest {
         securityConfiguration =
           FhirSecurityConfiguration(
             LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
-            warningCallback = pendingIntent,
-          ),
+            warningCallback = pendingIntent
+          )
       )
 
     with(config.securityConfiguration) {
       assertThat(this?.lockScreenRequirement)
         .isEqualTo(
-          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
+          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java))
         )
       assertThat(this?.warningCallback).isEqualTo(pendingIntent)
     }

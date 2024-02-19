@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -30,6 +32,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
   private val viewModel: EditPatientViewModel by viewModels()
+  var submitMenuItem: MenuItem? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -44,7 +47,12 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
     requireArguments()
       .putString(QUESTIONNAIRE_FILE_PATH_KEY, "new-patient-registration-paginated.json")
 
-    viewModel.livePatientData.observe(viewLifecycleOwner) { addQuestionnaireFragment(it) }
+    viewModel.livePatientData.observe(viewLifecycleOwner) {
+      addQuestionnaireFragment(it)
+      if (!it.toList().isNullOrEmpty()) {
+        submitMenuItem?.setEnabled(true)
+      }
+    }
     viewModel.isPatientSaved.observe(viewLifecycleOwner) {
       if (!it) {
         Toast.makeText(requireContext(), R.string.inputs_missing, Toast.LENGTH_SHORT).show()
@@ -54,29 +62,24 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
       NavHostFragment.findNavController(this).navigateUp()
     }
     (activity as MainActivity).setDrawerEnabled(false)
+  }
 
-    /** Use the provided cancel|submit buttons from the sdc library */
-    childFragmentManager.setFragmentResultListener(
-      QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner,
-    ) { _, _ ->
-      onSubmitAction()
-    }
-    childFragmentManager.setFragmentResultListener(
-      QuestionnaireFragment.CANCEL_REQUEST_KEY,
-      viewLifecycleOwner,
-    ) { _, _ ->
-      NavHostFragment.findNavController(this@EditPatientFragment).navigateUp()
-    }
+  override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+    inflater.inflate(R.menu.edit_patient_fragment_menu, menu)
+    submitMenuItem = menu.findItem(R.id.action_edit_patient_submit)
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        NavHostFragment.findNavController(this@EditPatientFragment).navigateUp()
+        NavHostFragment.findNavController(this).navigateUp()
         true
       }
-      else -> false
+      R.id.action_edit_patient_submit -> {
+        onSubmitAction()
+        true
+      }
+      else -> super.onOptionsItemSelected(item)
     }
   }
 
@@ -88,7 +91,7 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
           .setQuestionnaire(pair.first)
           .setQuestionnaireResponse(pair.second)
           .build(),
-        QUESTIONNAIRE_FRAGMENT_TAG,
+        QUESTIONNAIRE_FRAGMENT_TAG
       )
     }
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import com.google.android.fhir.sync.CurrentSyncJobStatus
-import com.google.android.fhir.sync.LastSyncJobStatus
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
@@ -63,13 +60,12 @@ class PatientListFragment : Fragment() {
   private var _binding: FragmentPatientListBinding? = null
   private val binding
     get() = _binding!!
-
   private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?,
+    savedInstanceState: Bundle?
   ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
     return binding.root
@@ -85,7 +81,7 @@ class PatientListFragment : Fragment() {
     patientListViewModel =
       ViewModelProvider(
           this,
-          PatientListViewModelFactory(requireActivity().application, fhirEngine),
+          PatientListViewModelFactory(requireActivity().application, fhirEngine)
         )
         .get(PatientListViewModel::class.java)
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
@@ -94,7 +90,7 @@ class PatientListFragment : Fragment() {
     recyclerView.addItemDecoration(
       DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL).apply {
         setDrawable(ColorDrawable(Color.LTGRAY))
-      },
+      }
     )
 
     patientListViewModel.liveSearchedPatients.observe(viewLifecycleOwner) {
@@ -108,7 +104,6 @@ class PatientListFragment : Fragment() {
 
     searchView = binding.search
     topBanner = binding.syncStatusContainer.linearLayoutSyncStatus
-    topBanner.visibility = View.GONE
     syncStatus = binding.syncStatusContainer.tvSyncingStatus
     syncPercent = binding.syncStatusContainer.tvSyncingPercent
     syncProgress = binding.syncStatusContainer.progressSyncing
@@ -123,7 +118,7 @@ class PatientListFragment : Fragment() {
           patientListViewModel.searchPatientsByName(query)
           return true
         }
-      },
+      }
     )
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
@@ -133,8 +128,7 @@ class PatientListFragment : Fragment() {
       }
     }
     requireActivity()
-      .onBackPressedDispatcher
-      .addCallback(
+      .onBackPressedDispatcher.addCallback(
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
@@ -145,7 +139,7 @@ class PatientListFragment : Fragment() {
               activity?.onBackPressed()
             }
           }
-        },
+        }
       )
 
     binding.apply {
@@ -153,74 +147,38 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(false)
+    (activity as MainActivity).setDrawerEnabled(true)
 
     lifecycleScope.launch {
       mainActivityViewModel.pollState.collect {
         Timber.d("onViewCreated: pollState Got status $it")
         when (it) {
-          is CurrentSyncJobStatus.Running -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data ${it.inProgressSyncJob}")
+          is SyncJobStatus.Started -> {
+            Timber.i("Sync: ${it::class.java.simpleName}")
             fadeInTopBanner(it)
           }
-          is CurrentSyncJobStatus.Succeeded -> {
+          is SyncJobStatus.InProgress -> {
+            Timber.i("Sync: ${it::class.java.simpleName} with data $it")
+            fadeInTopBanner(it)
+          }
+          is SyncJobStatus.Finished -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
+            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is CurrentSyncJobStatus.Failed -> {
+          is SyncJobStatus.Failed -> {
             Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
+            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          is CurrentSyncJobStatus.Enqueued -> {
-            Timber.i("Sync: Enqueued")
+          else -> {
+            Timber.i("Sync: Unknown state.")
             patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+            mainActivityViewModel.updateLastSyncTimestamp()
             fadeOutTopBanner(it)
           }
-          CurrentSyncJobStatus.Cancelled -> TODO()
-        }
-      }
-    }
-
-    lifecycleScope.launch {
-      mainActivityViewModel.pollPeriodicSyncJobStatus.collect {
-        Timber.d("onViewCreated: pollState Got status ${it.currentSyncJobStatus}")
-        when (it.currentSyncJobStatus) {
-          is CurrentSyncJobStatus.Running -> {
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} with data ${it.currentSyncJobStatus}",
-            )
-            fadeInTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Succeeded -> {
-            val lastSyncTimestamp =
-              (it.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp",
-            )
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Failed -> {
-            val lastSyncTimestamp =
-              (it.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
-            )
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Enqueued -> {
-            Timber.i("Sync: Enqueued")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          CurrentSyncJobStatus.Cancelled -> TODO()
         }
       }
     }
@@ -234,7 +192,9 @@ class PatientListFragment : Fragment() {
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        NavHostFragment.findNavController(this).navigateUp()
+        // hide the soft keyboard when the navigation drawer is shown on the screen.
+        searchView.clearFocus()
+        (requireActivity() as MainActivity).openNavigationDrawer()
         true
       }
       else -> false
@@ -251,7 +211,7 @@ class PatientListFragment : Fragment() {
       .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 
-  private fun fadeInTopBanner(state: CurrentSyncJobStatus) {
+  private fun fadeInTopBanner(state: SyncJobStatus) {
     if (topBanner.visibility != View.VISIBLE) {
       syncStatus.text = resources.getString(R.string.syncing).uppercase()
       syncPercent.text = ""
@@ -260,35 +220,26 @@ class PatientListFragment : Fragment() {
       topBanner.visibility = View.VISIBLE
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_in)
       topBanner.startAnimation(animation)
-    } else if (
-      state is CurrentSyncJobStatus.Running && state.inProgressSyncJob is SyncJobStatus.InProgress
-    ) {
-      val inProgressState = state.inProgressSyncJob as? SyncJobStatus.InProgress
+    } else if (state is SyncJobStatus.InProgress) {
       val progress =
-        inProgressState
-          ?.let { it.completed.toDouble().div(it.total) }
-          ?.let { if (it.isNaN()) 0.0 else it }
-          ?.times(100)
-          ?.roundToInt()
-      "$progress% ${inProgressState?.syncOperation?.name?.lowercase()}ed"
-        .also { syncPercent.text = it }
-      syncProgress.progress = progress ?: 0
+        state
+          .let { it.completed.toDouble().div(it.total) }
+          .let { if (it.isNaN()) 0.0 else it }
+          .times(100)
+          .roundToInt()
+      "$progress% ${state.syncOperation.name.lowercase()}ed".also { syncPercent.text = it }
+      syncProgress.progress = progress
     }
   }
 
-  private fun fadeOutTopBanner(state: CurrentSyncJobStatus) {
-    fadeOutTopBanner(state::class.java.simpleName.uppercase())
-  }
-
-  private fun fadeOutTopBanner(state: LastSyncJobStatus) {
-    fadeOutTopBanner(state::class.java.simpleName.uppercase())
-  }
-
-  private fun fadeOutTopBanner(statusText: String) {
-    syncPercent.text = ""
+  private fun fadeOutTopBanner(state: SyncJobStatus) {
+    if (state is SyncJobStatus.Finished) syncPercent.text = ""
     syncProgress.visibility = View.GONE
+
     if (topBanner.visibility == View.VISIBLE) {
-      "${resources.getString(R.string.sync).uppercase()} $statusText".also { syncStatus.text = it }
+      "${resources.getString(R.string.sync).uppercase()} ${state::class.java.simpleName.uppercase()}".also {
+        syncStatus.text = it
+      }
 
       val animation = AnimationUtils.loadAnimation(topBanner.context, R.anim.fade_out)
       topBanner.startAnimation(animation)

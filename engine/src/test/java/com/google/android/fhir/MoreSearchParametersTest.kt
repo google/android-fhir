@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import org.robolectric.RobolectricTestRunner
 class MoreSearchParametersTest {
   @Test
   fun asMapOfResourceTypeToSearchParamDefinitions() {
+
     val familyNameSearchParameter =
       SearchParameter().apply {
         name = "family"
@@ -60,14 +61,14 @@ class MoreSearchParametersTest {
           SearchParamDefinition(
             name = "family",
             type = Enumerations.SearchParamType.STRING,
-            path = "Patient.name.family",
+            path = "Patient.name.family"
           ),
           SearchParamDefinition(
             name = "gender",
             type = Enumerations.SearchParamType.TOKEN,
-            path = "Patient.gender",
-          ),
-        ),
+            path = "Patient.gender"
+          )
+        )
       )
     assertThat(result)
       .containsEntry(
@@ -76,14 +77,14 @@ class MoreSearchParametersTest {
           SearchParamDefinition(
             name = "family",
             type = Enumerations.SearchParamType.STRING,
-            path = "Practitioner.name.family",
+            path = "Practitioner.name.family"
           ),
           SearchParamDefinition(
             name = "gender",
             type = Enumerations.SearchParamType.TOKEN,
-            path = "Practitioner.gender",
-          ),
-        ),
+            path = "Practitioner.gender"
+          )
+        )
       )
     assertThat(result)
       .containsEntry(
@@ -92,9 +93,9 @@ class MoreSearchParametersTest {
           SearchParamDefinition(
             name = "gender",
             type = Enumerations.SearchParamType.TOKEN,
-            path = "Person.gender",
-          ),
-        ),
+            path = "Person.gender"
+          )
+        )
       )
     assertThat(result)
       .containsEntry(
@@ -103,9 +104,9 @@ class MoreSearchParametersTest {
           SearchParamDefinition(
             name = "gender",
             type = Enumerations.SearchParamType.TOKEN,
-            path = "RelatedPerson.gender",
-          ),
-        ),
+            path = "RelatedPerson.gender"
+          )
+        )
       )
   }
 
@@ -127,14 +128,14 @@ class MoreSearchParametersTest {
           SearchParamDefinition(
             name = "family",
             type = Enumerations.SearchParamType.STRING,
-            path = "Patient.name.family",
+            path = "Patient.name.family"
           ),
         "Practitioner" to
           SearchParamDefinition(
             name = "family",
             type = Enumerations.SearchParamType.STRING,
-            path = "Practitioner.name.family",
-          ),
+            path = "Practitioner.name.family"
+          )
       )
   }
 

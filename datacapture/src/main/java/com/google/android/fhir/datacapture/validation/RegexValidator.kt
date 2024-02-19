@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
@@ -38,8 +37,7 @@ internal object RegexValidator :
     predicate =
       predicate@{
         extension: Extension,
-        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
-        ->
+        answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
         if (!extension.value.isPrimitive || !answer.value.isPrimitive) {
           return@predicate false
         }
@@ -51,9 +49,9 @@ internal object RegexValidator :
           false
         }
       },
-    messageGenerator = { extension: Extension, context: Context ->
-      context.getString(R.string.regex_validation_error_msg, extension.value.primitiveValue())
-    },
+    { extension: Extension, _: Context ->
+      "The answer doesn't match regular expression: " + extension.value.primitiveValue()
+    }
   )
 
 internal const val REGEX_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/regex"

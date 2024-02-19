@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,17 +17,14 @@
 package com.google.android.fhir.search
 
 import android.os.Build
-import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
-import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
-import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
@@ -38,14 +35,11 @@ import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.UriType
@@ -66,11 +60,10 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
   }
@@ -85,8 +78,7 @@ class SearchTest {
         SELECT COUNT(*)
         FROM ResourceEntity a
         WHERE a.resourceType = ?
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name))
   }
@@ -98,12 +90,11 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         LIMIT ?
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name, 10))
   }
@@ -121,12 +112,11 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         LIMIT ? OFFSET ?
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(ResourceType.Patient.name, 10, 20))
   }
@@ -144,7 +134,7 @@ class SearchTest {
             {
               this.value = of(value)
               prefix = ParamPrefixEnum.APPROXIMATE
-            },
+            }
           )
         }
         .getQuery()
@@ -152,15 +142,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     val diffStart =
@@ -182,8 +171,8 @@ class SearchTest {
           diffStart,
           diffEnd,
           diffStart,
-          diffEnd,
-        ),
+          diffEnd
+        )
       )
   }
 
@@ -197,7 +186,7 @@ class SearchTest {
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
               value = of(DateType("2013-03-14"))
-            },
+            }
           )
         }
         .getQuery()
@@ -205,15 +194,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -222,8 +210,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.epochDay,
-        ),
+          DateTimeType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -237,7 +225,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.ENDS_BEFORE
-            },
+            }
           )
         }
         .getQuery()
@@ -245,15 +233,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -262,8 +249,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.epochDay,
-        ),
+          DateTimeType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -277,7 +264,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.NOT_EQUAL
-            },
+            }
           )
         }
         .getQuery()
@@ -285,15 +272,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -305,8 +291,8 @@ class SearchTest {
           DateType("2013-03-14").value.epochDay,
           DateType("2013-03-14").value.epochDay,
           DateType("2013-03-14").value.epochDay,
-          DateType("2013-03-14").value.epochDay,
-        ),
+          DateType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -320,15 +306,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -340,8 +325,8 @@ class SearchTest {
           DateType("2013-03-14").value.epochDay,
           DateType("2013-03-14").value.epochDay,
           DateType("2013-03-14").value.epochDay,
-          DateType("2013-03-14").value.epochDay,
-        ),
+          DateType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -355,7 +340,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.GREATERTHAN
-            },
+            }
           )
         }
         .getQuery()
@@ -363,15 +348,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -380,8 +364,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.epochDay,
-        ),
+          DateTimeType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -395,7 +379,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            },
+            }
           )
         }
         .getQuery()
@@ -403,15 +387,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -420,8 +403,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.epochDay,
-        ),
+          DateTimeType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -435,7 +418,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.LESSTHAN
-            },
+            }
           )
         }
         .getQuery()
@@ -443,15 +426,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -460,8 +442,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateType("2013-03-14").value.epochDay,
-        ),
+          DateType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -475,7 +457,7 @@ class SearchTest {
             {
               value = of(DateType("2013-03-14"))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            },
+            }
           )
         }
         .getQuery()
@@ -483,15 +465,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -500,8 +481,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateType("2013-03-14").value.epochDay,
-        ),
+          DateType("2013-03-14").value.epochDay
+        )
       )
   }
 
@@ -520,7 +501,7 @@ class SearchTest {
             {
               this.value = of(value)
               prefix = ParamPrefixEnum.APPROXIMATE
-            },
+            }
           )
         }
         .getQuery()
@@ -528,15 +509,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     val diffStart =
@@ -559,8 +539,8 @@ class SearchTest {
           diffStart,
           diffEnd,
           diffStart,
-          diffEnd,
-        ),
+          diffEnd
+        )
       )
   }
 
@@ -574,7 +554,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.STARTS_AFTER
-            },
+            }
           )
         }
         .getQuery()
@@ -582,15 +562,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -599,8 +578,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-15").value.time - 1,
-        ),
+          DateTimeType("2013-03-15").value.time - 1
+        )
       )
   }
 
@@ -614,7 +593,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.ENDS_BEFORE
-            },
+            }
           )
         }
         .getQuery()
@@ -622,15 +601,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -639,8 +617,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.time,
-        ),
+          DateTimeType("2013-03-14").value.time
+        )
       )
   }
 
@@ -654,7 +632,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.NOT_EQUAL
-            },
+            }
           )
         }
         .getQuery()
@@ -662,15 +640,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -682,8 +659,8 @@ class SearchTest {
           DateTimeType("2013-03-14").value.time,
           DateTimeType("2013-03-15").value.time - 1,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time - 1,
-        ),
+          DateTimeType("2013-03-15").value.time - 1
+        )
       )
   }
 
@@ -697,7 +674,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.EQUAL
-            },
+            }
           )
         }
         .getQuery()
@@ -705,15 +682,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -725,8 +701,8 @@ class SearchTest {
           DateTimeType("2013-03-14").value.time,
           DateTimeType("2013-03-15").value.time - 1,
           DateTimeType("2013-03-14").value.time,
-          DateTimeType("2013-03-15").value.time - 1,
-        ),
+          DateTimeType("2013-03-15").value.time - 1
+        )
       )
   }
 
@@ -740,7 +716,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.GREATERTHAN
-            },
+            }
           )
         }
         .getQuery()
@@ -748,15 +724,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -765,8 +740,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-15").value.time - 1,
-        ),
+          DateTimeType("2013-03-15").value.time - 1
+        )
       )
   }
 
@@ -780,7 +755,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            },
+            }
           )
         }
         .getQuery()
@@ -788,15 +763,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -805,8 +779,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.time,
-        ),
+          DateTimeType("2013-03-14").value.time
+        )
       )
   }
 
@@ -820,7 +794,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.LESSTHAN
-            },
+            }
           )
         }
         .getQuery()
@@ -828,15 +802,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -845,8 +818,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-14").value.time,
-        ),
+          DateTimeType("2013-03-14").value.time
+        )
       )
   }
 
@@ -860,7 +833,7 @@ class SearchTest {
             {
               value = of(DateTimeType("2013-03-14"))
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            },
+            }
           )
         }
         .getQuery()
@@ -868,15 +841,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -885,8 +857,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
-          DateTimeType("2013-03-15").value.time - 1,
-        ),
+          DateTimeType("2013-03-15").value.time - 1
+        )
       )
   }
 
@@ -900,22 +872,21 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .containsExactly(
         ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
-        "someValue",
+        "someValue"
       )
   }
 
@@ -929,7 +900,7 @@ class SearchTest {
             {
               modifier = StringFilterModifier.MATCHES_EXACTLY
               value = "someValue"
-            },
+            }
           )
         }
         .getQuery()
@@ -937,22 +908,21 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .containsExactly(
         ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
-        "someValue",
+        "someValue"
       )
   }
 
@@ -966,7 +936,7 @@ class SearchTest {
             {
               modifier = StringFilterModifier.CONTAINS
               value = "someValue"
-            },
+            }
           )
         }
         .getQuery()
@@ -974,22 +944,21 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .containsExactly(
         ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
-        "someValue",
+        "someValue"
       )
   }
 
@@ -1003,7 +972,7 @@ class SearchTest {
             {
               value =
                 of(Coding("http://hl7.org/fhir/ValueSet/administrative-gender", "male", "Male"))
-            },
+            }
           )
         }
         .getQuery()
@@ -1011,15 +980,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1028,8 +996,8 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
           "male",
-          "http://hl7.org/fhir/ValueSet/administrative-gender",
-        ),
+          "http://hl7.org/fhir/ValueSet/administrative-gender"
+        )
       )
   }
 
@@ -1043,7 +1011,7 @@ class SearchTest {
             {
               value =
                 of(CodeableConcept(Coding("http://snomed.info/sct", "260385009", "Allergy X")))
-            },
+            }
           )
         }
         .getQuery()
@@ -1051,15 +1019,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1068,8 +1035,8 @@ class SearchTest {
           ResourceType.Immunization.name,
           Immunization.VACCINE_CODE.paramName,
           "260385009",
-          "http://snomed.info/sct",
-        ),
+          "http://snomed.info/sct"
+        )
       )
   }
 
@@ -1086,15 +1053,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1103,8 +1069,8 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
           "12345",
-          "http://acme.org/patient",
-        ),
+          "http://acme.org/patient"
+        )
       )
   }
 
@@ -1122,24 +1088,23 @@ class SearchTest {
                     system = ContactPoint.ContactPointSystem.EMAIL
                     use = ContactPoint.ContactPointUse.HOME
                     value = "test@gmail.com"
-                  },
+                  }
                 )
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1148,8 +1113,8 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
           "test@gmail.com",
-          ContactPoint.ContactPointUse.HOME.toCode(),
-        ),
+          ContactPoint.ContactPointUse.HOME.toCode()
+        )
       )
   }
 
@@ -1166,24 +1131,23 @@ class SearchTest {
                   ContactPoint().apply {
                     system = ContactPoint.ContactPointSystem.EMAIL
                     value = "test@gmail.com"
-                  },
+                  }
                 )
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1191,8 +1155,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
-          "test@gmail.com",
-        ),
+          "test@gmail.com"
+        )
       )
   }
 
@@ -1205,15 +1169,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1221,8 +1184,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
-          "male",
-        ),
+          "male"
+        )
       )
   }
 
@@ -1234,15 +1197,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1250,8 +1212,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.ACTIVE.paramName,
-          "true",
-        ),
+          "true"
+        )
       )
   }
 
@@ -1262,7 +1224,7 @@ class SearchTest {
         .apply {
           filter(
             Patient.IDENTIFIER,
-            { value = of(UriType("16009886-bd57-11eb-8529-0242ac130003")) },
+            { value = of(UriType("16009886-bd57-11eb-8529-0242ac130003")) }
           )
         }
         .getQuery()
@@ -1270,15 +1232,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1286,8 +1247,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
-          "16009886-bd57-11eb-8529-0242ac130003",
-        ),
+          "16009886-bd57-11eb-8529-0242ac130003"
+        )
       )
   }
 
@@ -1301,15 +1262,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1317,8 +1277,8 @@ class SearchTest {
           ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.PHONE.paramName,
-          "+14845219791",
-        ),
+          "+14845219791"
+        )
       )
   }
 
@@ -1333,22 +1293,21 @@ class SearchTest {
               prefix = ParamPrefixEnum.EQUAL
               unit = "g"
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value >= ? AND index_value < ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1358,8 +1317,8 @@ class SearchTest {
           Observation.VALUE_QUANTITY.paramName,
           "g",
           BigDecimal("5.4025").toDouble(),
-          BigDecimal("5.4035").toDouble(),
-        ),
+          BigDecimal("5.4035").toDouble()
+        )
       )
   }
 
@@ -1374,22 +1333,21 @@ class SearchTest {
               prefix = ParamPrefixEnum.LESSTHAN
               unit = "g"
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value < ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1398,8 +1356,8 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "g",
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1414,22 +1372,21 @@ class SearchTest {
               prefix = ParamPrefixEnum.LESSTHAN_OR_EQUALS
               system = "http://unitsofmeasure.org"
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value <= ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1438,8 +1395,8 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1454,22 +1411,21 @@ class SearchTest {
               prefix = ParamPrefixEnum.GREATERTHAN
               system = "http://unitsofmeasure.org"
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value > ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1478,8 +1434,8 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1493,22 +1449,21 @@ class SearchTest {
             {
               prefix = ParamPrefixEnum.GREATERTHAN_OR_EQUALS
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1516,8 +1471,8 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1531,22 +1486,21 @@ class SearchTest {
             {
               prefix = ParamPrefixEnum.NOT_EQUAL
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1555,8 +1509,8 @@ class SearchTest {
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.4025").toDouble(),
-          BigDecimal("5.4035").toDouble(),
-        ),
+          BigDecimal("5.4035").toDouble()
+        )
       )
   }
 
@@ -1570,22 +1524,21 @@ class SearchTest {
             {
               prefix = ParamPrefixEnum.STARTS_AFTER
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1593,8 +1546,8 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1608,22 +1561,21 @@ class SearchTest {
             {
               prefix = ParamPrefixEnum.ENDS_BEFORE
               value = BigDecimal("5.403")
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1631,8 +1583,8 @@ class SearchTest {
           ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
-          BigDecimal("5.403").toDouble(),
-        ),
+          BigDecimal("5.403").toDouble()
+        )
       )
   }
 
@@ -1648,22 +1600,21 @@ class SearchTest {
               value = BigDecimal("5403")
               system = "http://unitsofmeasure.org"
               unit = "mg"
-            },
+            }
           )
         }
         .getQuery()
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1674,8 +1625,8 @@ class SearchTest {
           "http://unitsofmeasure.org",
           "g",
           BigDecimal("5.4025").toDouble(),
-          BigDecimal("5.4035").toDouble(),
-        ),
+          BigDecimal("5.4035").toDouble()
+        )
       )
   }
 
@@ -1687,22 +1638,21 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM UriIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .containsExactly(
         ResourceType.Library.name,
         ResourceType.Library.name,
         Library.URL.paramName,
-        "someValue",
+        "someValue"
       )
   }
 
@@ -1714,14 +1664,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(Patient.GIVEN.paramName, ResourceType.Patient.name))
   }
@@ -1734,14 +1683,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value DESC
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args).isEqualTo(listOf(Patient.GIVEN.paramName, ResourceType.Patient.name))
   }
@@ -1756,14 +1704,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN NumberIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
   }
 
@@ -1782,7 +1729,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -1793,8 +1740,7 @@ class SearchTest {
         )
         ORDER BY b.index_value ASC
         LIMIT ? OFFSET ?
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
     assertThat(query.args)
       .isEqualTo(
@@ -1805,8 +1751,8 @@ class SearchTest {
           Patient.FAMILY.paramName,
           "Jones",
           10,
-          20,
-        ),
+          20
+        )
       )
   }
 
@@ -1815,10 +1761,10 @@ class SearchTest {
     val query =
       Search(ResourceType.Patient)
         .apply {
-          has(resourceType = ResourceType.Condition, referenceParam = Condition.SUBJECT) {
+          has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
             )
           }
         }
@@ -1827,13 +1773,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """ 
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1843,22 +1789,20 @@ class SearchTest {
         )
         )
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
-          ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
           "44054006",
-          "http://snomed.info/sct",
-        ),
+          "http://snomed.info/sct"
+        )
       )
   }
 
@@ -1876,17 +1820,15 @@ class SearchTest {
                     Coding(
                       "http://hl7.org/fhir/sid/cvx",
                       "140",
-                      "Influenza, seasonal, injectable, preservative free",
-                    ),
+                      "Influenza, seasonal, injectable, preservative free"
+                    )
                   )
-              },
+              }
             )
             //      Follow Immunization.ImmunizationStatus
             filter(
               Immunization.STATUS,
-              {
-                value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight"))
-              },
+              { value = of(Coding("http://hl7.org/fhir/event-status", "completed", "Body Weight")) }
             )
           }
 
@@ -1895,7 +1837,7 @@ class SearchTest {
             {
               modifier = StringFilterModifier.MATCHES_EXACTLY
               value = "IN"
-            },
+            }
           )
         }
         .getQuery()
@@ -1903,7 +1845,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -1913,7 +1855,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1927,8 +1869,7 @@ class SearchTest {
         )
         )
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -1938,7 +1879,6 @@ class SearchTest {
           ResourceType.Patient.name,
           Patient.ADDRESS_COUNTRY.paramName,
           "IN",
-          ResourceType.Patient.name,
           ResourceType.Immunization.name,
           Immunization.PATIENT.paramName,
           ResourceType.Immunization.name,
@@ -1948,8 +1888,8 @@ class SearchTest {
           ResourceType.Immunization.name,
           Immunization.STATUS.paramName,
           "completed",
-          "http://hl7.org/fhir/event-status",
-        ),
+          "http://hl7.org/fhir/event-status"
+        )
       )
   }
 
@@ -1961,13 +1901,13 @@ class SearchTest {
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) }
             )
           }
           has<Condition>(Condition.SUBJECT) {
             filter(
               Condition.CODE,
-              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) },
+              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) }
             )
           }
         }
@@ -1976,13 +1916,13 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -1994,7 +1934,7 @@ class SearchTest {
         )  AND a.resourceUuid IN(
         SELECT resourceUuid
         FROM ResourceEntity a
-        WHERE a.resourceType = ? AND a.resourceId IN (
+        WHERE a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
         WHERE a.resourceType = ? AND a.index_name = ?
@@ -2004,14 +1944,12 @@ class SearchTest {
         )
         )
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
@@ -2019,14 +1957,13 @@ class SearchTest {
           Condition.CODE.paramName,
           "44054006",
           "http://snomed.info/sct",
-          ResourceType.Patient.name,
           ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
           "827069000",
           "http://snomed.info/sct",
-        ),
+        )
       )
   }
 
@@ -2038,7 +1975,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2046,8 +1983,7 @@ class SearchTest {
         ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from ASC, c.index_from ASC
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
   }
 
@@ -2059,7 +1995,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
         ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2067,8 +2003,7 @@ class SearchTest {
         ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from DESC, c.index_from DESC
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
   }
 
@@ -2087,7 +2022,7 @@ class SearchTest {
               value = "Jane"
               modifier = StringFilterModifier.MATCHES_EXACTLY
             },
-            operation = Operation.OR,
+            operation = Operation.OR
           )
         }
         .getQuery()
@@ -2095,15 +2030,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args).isEqualTo(listOf("Patient", "Patient", "given", "John", "Jane"))
@@ -2119,7 +2053,7 @@ class SearchTest {
             {
               value = "John"
               modifier = StringFilterModifier.MATCHES_EXACTLY
-            },
+            }
           )
 
           filter(
@@ -2127,7 +2061,7 @@ class SearchTest {
             {
               value = "Jane"
               modifier = StringFilterModifier.MATCHES_EXACTLY
-            },
+            }
           )
           operation = Operation.OR
         }
@@ -2136,7 +2070,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2147,14 +2081,12 @@ class SearchTest {
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
       .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
   }
-
   // Test for https://github.com/google/android-fhir/issues/903
   @Test
   fun search_patient_search_params_single_given_multiple_family() {
@@ -2169,7 +2101,7 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
@@ -2180,8 +2112,7 @@ class SearchTest {
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -2200,15 +2131,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -2228,9 +2158,9 @@ class SearchTest {
                   Coding().apply {
                     code = "test-code"
                     system = "http://my-code-system.org"
-                  },
+                  }
                 )
-            },
+            }
           )
         }
         .getQuery()
@@ -2238,15 +2168,14 @@ class SearchTest {
     assertThat(query.query)
       .isEqualTo(
         """
-        SELECT a.resourceUuid, a.serializedResource
+        SELECT a.serializedResource
         FROM ResourceEntity a
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-                """
-          .trimIndent(),
+        """.trimIndent()
       )
 
     assertThat(query.args)
@@ -2256,495 +2185,13 @@ class SearchTest {
           "Condition",
           "clinical-status",
           "test-code",
-          "http://my-code-system.org",
-        ),
-      )
-  }
-
-  @Test
-  fun `search include all practitioners`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply { include<Practitioner>(Patient.GENERAL_PRACTITIONER) }
-        .getIncludeQuery(
-          listOf(
-            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
-            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
-          ),
+          "http://my-code-system.org"
         )
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceType||"/"||re.resourceId = rie.index_value
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
-          )
-          """
-          .trimIndent(),
       )
-
-    assertThat(query.args)
-      .comparingElementsUsing(ArgsComparator)
-      .containsExactly(
-        "Patient",
-        "general-practitioner",
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search include all active practitioners`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
-            filter(Practitioner.ACTIVE, { value = of(true) })
-          }
-        }
-        .getIncludeQuery(
-          listOf(
-            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
-            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
-          ),
-        )
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceType||"/"||re.resourceId = rie.index_value
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
-          AND re.resourceUuid IN (
-          SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value = ?
-          )
-          )
-          """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .comparingElementsUsing(ArgsComparator)
-      .containsExactly(
-        "Patient",
-        "general-practitioner",
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
-        "Practitioner",
-        "active",
-        "true",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search include all active practitioners and sort by given name`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
-            filter(Practitioner.ACTIVE, { value = of(true) })
-            sort(Practitioner.GIVEN, Order.DESCENDING)
-          }
-        }
-        .getIncludeQuery(
-          listOf(
-            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
-            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
-          ),
-        )
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceType||"/"||re.resourceId = rie.index_value
-          LEFT JOIN StringIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
-          AND re.resourceUuid IN (
-          SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND index_value = ?
-          )
-          ORDER BY b.index_value DESC
-          )
-          """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .comparingElementsUsing(ArgsComparator)
-      .containsExactly(
-        "given",
-        "Patient",
-        "general-practitioner",
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
-        "Practitioner",
-        "active",
-        "true",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search include practitioners and organizations`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
-            filter(Practitioner.ACTIVE, { value = of(true) })
-            sort(Practitioner.GIVEN, Order.DESCENDING)
-          }
-
-          include<Organization>(Patient.ORGANIZATION) {
-            filter(Organization.ACTIVE, { value = of(true) })
-            sort(Organization.NAME, Order.DESCENDING)
-          }
-        }
-        .getIncludeQuery(
-          listOf(
-            UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb"),
-            UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb"),
-          ),
-        )
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-        SELECT * FROM (
-        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
-        ON re.resourceType||"/"||re.resourceId = rie.index_value
-        LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
-        AND re.resourceUuid IN (
-        SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        )
-        ORDER BY b.index_value DESC
-        )
-        UNION ALL
-        SELECT * FROM (
-        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
-        ON re.resourceType||"/"||re.resourceId = rie.index_value
-        LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
-        AND re.resourceUuid IN (
-        SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        )
-        ORDER BY b.index_value DESC
-        )
-        """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .comparingElementsUsing(ArgsComparator)
-      .containsExactly(
-        "given",
-        "Patient",
-        "general-practitioner",
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
-        "Practitioner",
-        "active",
-        "true",
-        "name",
-        "Patient",
-        "organization",
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
-        convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Organization",
-        "Organization",
-        "active",
-        "true",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search revInclude all conditions for patients`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply { revInclude<Condition>(Condition.SUBJECT) }
-        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceUuid = rie.resourceUuid
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
-          )
-          """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02", "Condition")
-      .inOrder()
-  }
-
-  @Test
-  fun `search revInclude diabetic conditions for patients`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          revInclude<Condition>(Condition.SUBJECT) {
-            filter(
-              Condition.CODE,
-              {
-                value =
-                  of(
-                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
-                  )
-              },
-            )
-          }
-        }
-        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-        SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
-        ON re.resourceUuid = rie.resourceUuid
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
-        AND re.resourceUuid IN (
-        SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-        )
-        )
-                """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .containsExactly(
-        "Condition",
-        "subject",
-        "Patient/pa01",
-        "Patient/pa02",
-        "Condition",
-        "Condition",
-        "code",
-        "44054006",
-        "http://snomed.info/sct",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search revInclude diabetic conditions for patients and sort by recorded date`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          revInclude<Condition>(Condition.SUBJECT) {
-            filter(
-              Condition.CODE,
-              {
-                value =
-                  of(
-                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
-                  )
-              },
-            )
-            sort(Condition.RECORDED_DATE, Order.DESCENDING)
-          }
-        }
-        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-        SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
-        ON re.resourceUuid = rie.resourceUuid
-        LEFT JOIN DateIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-        LEFT JOIN DateTimeIndexEntity c
-        ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
-        AND re.resourceUuid IN (
-        SELECT resourceUuid FROM TokenIndexEntity
-        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-        )
-        ORDER BY b.index_from DESC, c.index_from DESC
-        )
-            """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .containsExactly(
-        "recorded-date",
-        "recorded-date",
-        "Condition",
-        "subject",
-        "Patient/pa01",
-        "Patient/pa02",
-        "Condition",
-        "Condition",
-        "code",
-        "44054006",
-        "http://snomed.info/sct",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun `search revInclude encounters and conditions filtered and sorted`() {
-    val query =
-      Search(ResourceType.Patient)
-        .apply {
-          revInclude<Encounter>(Encounter.SUBJECT) {
-            filter(
-              Encounter.STATUS,
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://hl7.org/fhir/encounter-status",
-                      Encounter.EncounterStatus.ARRIVED.toCode(),
-                      "",
-                    ),
-                  )
-              },
-            )
-            sort(Encounter.DATE, Order.DESCENDING)
-          }
-
-          revInclude<Condition>(Condition.SUBJECT) {
-            filter(
-              Condition.CODE,
-              {
-                value =
-                  of(
-                    CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes")),
-                  )
-              },
-            )
-            sort(Condition.RECORDED_DATE, Order.DESCENDING)
-          }
-        }
-        .getRevIncludeQuery(listOf("Patient/pa01", "Patient/pa02"))
-
-    assertThat(query.query)
-      .isEqualTo(
-        """
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceUuid = rie.resourceUuid
-          LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-          LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
-          AND re.resourceUuid IN (
-          SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-          )
-          ORDER BY b.index_from DESC, c.index_from DESC
-          )
-          UNION ALL
-          SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
-          ON re.resourceUuid = rie.resourceUuid
-          LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
-          LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
-          AND re.resourceUuid IN (
-          SELECT resourceUuid FROM TokenIndexEntity
-          WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-          )
-          ORDER BY b.index_from DESC, c.index_from DESC
-          )
-          """
-          .trimIndent(),
-      )
-
-    assertThat(query.args)
-      .containsExactly(
-        "date",
-        "date",
-        "Encounter",
-        "subject",
-        "Patient/pa01",
-        "Patient/pa02",
-        "Encounter",
-        "Encounter",
-        "status",
-        "arrived",
-        "http://hl7.org/fhir/encounter-status",
-        "recorded-date",
-        "recorded-date",
-        "Condition",
-        "subject",
-        "Patient/pa01",
-        "Patient/pa02",
-        "Condition",
-        "Condition",
-        "code",
-        "44054006",
-        "http://snomed.info/sct",
-      )
-      .inOrder()
   }
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val APPROXIMATION_COEFFICIENT = 0.1
-
-    /**
-     * Custom implementation to equality check values of [com.google.common.truth.IterableSubject].
-     */
-    val ArgsComparator: Correspondence<Any, Any> =
-      Correspondence.from(
-        { a, b ->
-          if (a is ByteArray && b is ByteArray) {
-            a.contentEquals(b)
-          } else {
-            a == b
-          }
-        },
-        "",
-      )
   }
 }

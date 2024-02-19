@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.getValueAsString
-import com.google.android.fhir.datacapture.extensions.valueOrCalculateValue
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -34,16 +32,15 @@ internal object MaxValueValidator :
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
       extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
-      ->
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
       answer.value > extension.value?.valueOrCalculateValue()!!
     },
-    messageGenerator = { extension: Extension, context: Context ->
+    { extension: Extension, context: Context ->
       context.getString(
         R.string.max_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.getValueAsString(context),
+        extension.value?.valueOrCalculateValue()?.primitiveValue()
       )
-    },
+    }
   ) {
 
   fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ import javax.crypto.SecretKey
 /** A singleton object for generating or getting previously generated storage keys. */
 internal object DatabaseEncryptionKeyProvider {
   private val keyMap = ArrayMap<String, ByteArray>()
-
   /** Returns a previous generated storage passphrase with name [keyName]. */
   @Synchronized
   @RequiresApi(Build.VERSION_CODES.M)
@@ -65,9 +64,9 @@ internal object DatabaseEncryptionKeyProvider {
       }
 
     try {
-      keyStore.load(null)
+      keyStore.load(/* param = */ null)
       val signingKey: SecretKey =
-        keyStore.getKey(keyName, null) as SecretKey?
+        keyStore.getKey(keyName, /* password= */ null) as SecretKey?
           ?: run {
             val keyGenerator =
               KeyGenerator.getInstance(KEY_ALGORITHM_HMAC_SHA256, ANDROID_KEYSTORE_NAME)
@@ -95,7 +94,6 @@ internal object DatabaseEncryptionKeyProvider {
    * encryption secret.
    */
   @VisibleForTesting const val ANDROID_KEYSTORE_NAME = "AndroidKeyStore"
-
   /**
    * A message used to derive the database encryption key.
    *

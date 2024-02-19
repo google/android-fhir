@@ -33,7 +33,7 @@ internal object DisplayViewHolderFactory :
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
-        header.bind(questionnaireViewItem)
+        header.bind(questionnaireViewItem.questionnaireItem)
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {

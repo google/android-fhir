@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,24 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object EditTextDecimalViewHolderFactory :
   EditTextViewHolderFactory(R.layout.edit_text_single_line_view) {
-
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
       override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
-        editable.toString().toDoubleOrNull()?.let {
-          questionnaireViewItem.setAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DecimalType(it.toString())),
-          )
+        val input = getValue(editable.toString())
+        if (input != null) {
+          questionnaireViewItem.setAnswer(input)
+        } else {
+          questionnaireViewItem.clearAnswer()
         }
-          ?: questionnaireViewItem.setDraftAnswer(editable.toString())
+      }
+
+      private fun getValue(
+        text: String
+      ): QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent? {
+        return text.toDoubleOrNull()?.let {
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+            .setValue(DecimalType(it.toString()))
+        }
       }
 
       override fun updateUI(
@@ -45,25 +52,22 @@ internal object EditTextDecimalViewHolderFactory :
         textInputEditText: TextInputEditText,
         textInputLayout: TextInputLayout,
       ) {
-        val questionnaireItemViewItemDecimalAnswer =
-          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
-        val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
+        val text =
+          questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString() ?: ""
+        if (isTextUpdatesRequired(text, textInputEditText.text.toString())) {
+          textInputEditText.setText(text)
+        }
+      }
 
-        if (questionnaireItemViewItemDecimalAnswer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
-          textInputEditText.setText("")
-        } else if (
-          questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() !=
-            textInputEditText.text.toString().toDoubleOrNull()
-        ) {
-          textInputEditText.setText(questionnaireItemViewItemDecimalAnswer)
-        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
-          textInputEditText.setText(draftAnswer)
+      fun isTextUpdatesRequired(answerText: String, inputText: String): Boolean {
+        if (answerText.isEmpty() && inputText.isEmpty()) {
+          return false
         }
-        // Update error message if draft answer present
-        if (draftAnswer != null) {
-          textInputLayout.error =
-            textInputEditText.context.getString(R.string.decimal_format_validation_error_msg)
+        if (answerText.isEmpty() || inputText.isEmpty()) {
+          return true
         }
+        // Avoid shifting focus by updating text field if the values are the same
+        return answerText.toDouble() != inputText.toDouble()
       }
     }
 }

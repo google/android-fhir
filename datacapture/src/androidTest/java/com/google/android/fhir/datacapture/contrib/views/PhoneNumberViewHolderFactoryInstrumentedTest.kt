@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
     context =
       ContextThemeWrapper(
         InstrumentationRegistry.getInstrumentation().targetContext,
-        com.google.android.material.R.style.Theme_Material3_DayNight,
+        R.style.Theme_Material3_DayNight
       )
     parent = FrameLayout(context)
     viewHolder = PhoneNumberViewHolderFactory.create(parent)
@@ -82,13 +82,12 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
       .isEqualTo("Question?")
   }
-
   @Test
   @UiThreadTest
   fun shouldSetInputText() {
@@ -99,18 +98,17 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("+12345678910")
-            },
+            }
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
+          .text.toString()
       )
       .isEqualTo("+12345678910")
   }
@@ -125,11 +123,11 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("+12345678910")
-            },
+            }
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -137,14 +135,13 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text
-          .toString(),
+          .text.toString()
       )
       .isEqualTo("")
   }
@@ -184,7 +181,6 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
 
     assertThat(questionnaireViewItem.answers).isEmpty()
   }
-
   @Test
   @UiThreadTest
   fun displayValidationResult_noError_shouldShowNoErrorMessage() {
@@ -200,12 +196,12 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("hello there")
-            },
+            }
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -222,15 +218,15 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType("+1234567891011")
-            },
+            }
           )
         },
         validationResult =
           Invalid(
-            listOf("The maximum number of characters that are permitted in the answer is: 10"),
+            listOf("The maximum number of characters that are permitted in the answer is: 10")
           ),
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
       .isEqualTo("The maximum number of characters that are permitted in the answer is: 10")
@@ -245,11 +241,11 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled,
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
       )
       .isFalse()
   }

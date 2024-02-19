@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,12 +28,13 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.extensions.displayString
-import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
-import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
+import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.OptionSelectDialogFragment
@@ -62,26 +63,28 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         cleanupOldState()
-        with(holder.summaryHolder) {
-          hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
-          helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
-        }
+        holder.summaryHolder.hint = questionnaireViewItem.questionnaireItem.localizedFlyoverSpanned
         val activity =
           requireNotNull(holder.header.context.tryUnwrapContext()) {
             "Can only use dialog select in an AppCompatActivity context"
           }
         val viewModel: QuestionnaireItemDialogSelectViewModel by activity.viewModels()
 
-        // Bind static data
-        holder.header.bind(questionnaireViewItem)
+        val item = questionnaireViewItem.questionnaireItem
 
-        val questionnaireItem = questionnaireViewItem.questionnaireItem
-        val selectedOptions = questionnaireViewItem.extractInitialOptions(holder.header.context)
-        holder.summary.text = selectedOptions.selectedSummary
+        // Bind static data
+        holder.header.bind(item)
+
         selectedOptionsJob =
           activity.lifecycleScope.launch {
+            // Set the initial selected options state from the FHIR data model
+            viewModel.updateSelectedOptions(
+              item.linkId,
+              questionnaireViewItem.extractInitialOptions(holder.header.context)
+            )
+
             // Listen for changes to selected options to update summary + FHIR data model
-            viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
+            viewModel.getSelectedOptionsFlow(item.linkId).collect { selectedOptions ->
               holder.summary.text = selectedOptions.selectedSummary
               updateAnswers(selectedOptions)
             }
@@ -92,13 +95,12 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = questionnaireItem.localizedTextSpanned ?: "",
-                config = questionnaireItem.buildConfig(),
-                selectedOptions = selectedOptions,
+                title = item.localizedTextSpanned ?: "",
+                config = item.buildConfig(),
               )
             fragment.arguments =
               bundleOf(
-                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to questionnaireItem.linkId,
+                OptionSelectDialogFragment.KEY_QUESTION_LINK_ID to item.linkId,
               )
             fragment.show(activity.supportFragmentManager, null)
           }
@@ -114,11 +116,11 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         holder.summaryHolder.error =
-          getValidationErrorMessage(
-            holder.summaryHolder.context,
-            questionnaireViewItem,
-            validationResult,
-          )
+          when (validationResult) {
+            is NotValidated,
+            Valid -> null
+            is Invalid -> validationResult.getSingleStringValidationMessage()
+          }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -168,7 +170,7 @@ internal class QuestionnaireItemDialogSelectViewModel : ViewModel() {
   }
 
   private fun selectedOptionsFlow(linkId: String) =
-    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 0) }
+    linkIdsToSelectedOptionsFlow.getOrPut(linkId) { MutableSharedFlow(replay = 1) }
 }
 
 data class SelectedOptions(
@@ -190,11 +192,11 @@ data class OptionSelectOption(
 
 private fun QuestionnaireViewItem.extractInitialOptions(context: Context): SelectedOptions {
   val options =
-    enabledAnswerOptions.map { answerOption ->
+    answerOption.map { answerOption ->
       OptionSelectOption(
         item = answerOption,
         selected = isAnswerOptionSelected(answerOption),
-        context = context,
+        context = context
       )
     }
   return SelectedOptions(
@@ -204,7 +206,7 @@ private fun QuestionnaireViewItem.extractInitialOptions(context: Context): Selec
         // All of the Other options will be encoded as String value types
         .mapNotNull { if (it.hasValueStringType()) it.valueStringType.value else null }
         // We should also make sure that these values aren't present in the predefined options
-        .filter { value -> value !in options.map { it.item.value.asStringValue() } },
+        .filter { value -> value !in options.map { it.item.value.asStringValue() } }
   )
 }
 

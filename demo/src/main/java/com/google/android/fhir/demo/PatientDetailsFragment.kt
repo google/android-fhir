@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,9 +43,7 @@ class PatientDetailsFragment : Fragment() {
   private var _binding: PatientDetailBinding? = null
   private val binding
     get() = _binding!!
-
   var editMenuItem: MenuItem? = null
-
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setHasOptionsMenu(true)
@@ -54,7 +52,7 @@ class PatientDetailsFragment : Fragment() {
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
-    savedInstanceState: Bundle?,
+    savedInstanceState: Bundle?
   ): View {
     _binding = PatientDetailBinding.inflate(inflater, container, false)
     return binding.root
@@ -66,7 +64,7 @@ class PatientDetailsFragment : Fragment() {
     patientDetailsViewModel =
       ViewModelProvider(
           this,
-          PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId),
+          PatientDetailsViewModelFactory(requireActivity().application, fhirEngine, args.patientId)
         )
         .get(PatientDetailsViewModel::class.java)
     val adapter = PatientDetailsRecyclerViewAdapter(::onAddScreenerClick)
@@ -89,8 +87,8 @@ class PatientDetailsFragment : Fragment() {
     findNavController()
       .navigate(
         PatientDetailsFragmentDirections.actionPatientDetailsToScreenEncounterFragment(
-          args.patientId,
-        ),
+          args.patientId
+        )
       )
   }
 

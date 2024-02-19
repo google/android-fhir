@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
-import com.google.android.fhir.datacapture.XFhirQueryResolver
+import com.google.android.fhir.demo.data.FhirSyncWorker
 import com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver
-import com.google.android.fhir.search.search
 import com.google.android.fhir.security.FhirSecurityConfiguration
 import com.google.android.fhir.security.LockScreenComplexity
 import com.google.android.fhir.security.LockScreenRequirement
 import com.google.android.fhir.security.RequirementViolationAction
+import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.remote.HttpLogger
 import java.util.EnumSet
 import timber.log.Timber
@@ -42,8 +42,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
   private val fhirEngine: FhirEngine by lazy { constructFhirEngine() }
 
   private var dataCaptureConfig: DataCaptureConfig? = null
-
-  private val dataStore by lazy { DemoDataStore(this) }
 
   override fun onCreate() {
     super.onCreate()
@@ -58,14 +56,14 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
           FhirSecurityConfiguration(
             LockScreenRequirement(
               complexity = LockScreenComplexity.HIGH,
-              EnumSet.noneOf(RequirementViolationAction::class.java),
+              EnumSet.noneOf(RequirementViolationAction::class.java)
             ),
             PendingIntent.getBroadcast(
               applicationContext,
               /* requestCode= */ 0,
               Intent(applicationContext, SecurityRequirementViolationReceiver::class.java),
-              /* flags= */ PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
-            ),
+              /* flags= */ PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+            )
           ),
         serverConfiguration =
           ServerConfiguration(
@@ -73,19 +71,17 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
             httpLogger =
               HttpLogger(
                 HttpLogger.Configuration(
-                  if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
-                ),
-              ) {
-                Timber.tag("App-HttpLog").d(it)
-              },
-          ),
-      ),
+                  if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
+                )
+              ) { Timber.tag("App-HttpLog").d(it) },
+          )
+      )
     )
+    Sync.oneTimeSync<FhirSyncWorker>(this)
 
     dataCaptureConfig =
       DataCaptureConfig().apply {
         urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
-        xFhirQueryResolver = XFhirQueryResolver { it -> fhirEngine.search(it).map { it.resource } }
       }
   }
 
@@ -95,8 +91,6 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
 
   companion object {
     fun fhirEngine(context: Context) = (context.applicationContext as FhirApplication).fhirEngine
-
-    fun dataStore(context: Context) = (context.applicationContext as FhirApplication).dataStore
   }
 
   override fun getDataCaptureConfig(): DataCaptureConfig = dataCaptureConfig ?: DataCaptureConfig()

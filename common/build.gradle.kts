@@ -1,5 +1,3 @@
-import Dependencies.removeIncompatibleDependencies
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -12,14 +10,21 @@ publishArtifact(Releases.Common)
 createJacocoTestReportTask()
 
 android {
-  namespace = "com.google.android.fhir.common"
   compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+
+  defaultConfig {
+    minSdk = Sdk.minSdk
+    targetSdk = Sdk.targetSdk
+  }
+  compileOptions {
+    sourceCompatibility = Java.sourceCompatibility
+    targetCompatibility = Java.targetCompatibility
+  }
+  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
   configureJacocoTestOptions()
-  kotlin { jvmToolchain(11) }
 }
 
-configurations { all { removeIncompatibleDependencies() } }
+configurations { all { exclude(module = "xpp3") } }
 
 dependencies {
   api(Dependencies.HapiFhir.structuresR4)
@@ -31,10 +36,4 @@ dependencies {
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-
-  constraints {
-    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
-      api(libName, constraints)
-    }
-  }
 }

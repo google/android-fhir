@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,44 +21,35 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
-import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
+import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
+import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
+import org.hl7.fhir.r4.model.Questionnaire
 
-/**
- * Generic view for the prefix, question, and hint as the header of a group using a view holder of
- * type [QuestionnaireViewHolderType.GROUP].
- */
-class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context, attrs) {
+internal class GroupHeaderView(context: Context, attrs: AttributeSet?) :
+  LinearLayout(context, attrs) {
 
   init {
     LayoutInflater.from(context).inflate(R.layout.group_type_header_view, this, true)
   }
 
-  private val prefix = findViewById<TextView>(R.id.prefix)
-  private val question = findViewById<TextView>(R.id.question)
-  private val hint = findViewById<TextView>(R.id.hint)
-
-  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+  fun bind(questionnaireItem: Questionnaire.QuestionnaireItemComponent) {
+    val prefix = findViewById<TextView>(R.id.prefix)
+    val question = findViewById<TextView>(R.id.question)
+    val hint = findViewById<TextView>(R.id.hint)
     initHelpViews(
       helpButton = findViewById(R.id.helpButton),
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
-      questionnaireItem = questionnaireViewItem.questionnaireItem,
-      questionnaireResponseItem = questionnaireViewItem.getQuestionnaireResponseItem(),
-      isHelpCardInitiallyVisible = questionnaireViewItem.isHelpCardOpen,
-      helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
+      questionnaireItem
     )
-    prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(questionnaireViewItem.questionText)
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    prefix.updateTextAndVisibility(questionnaireItem.localizedPrefixSpanned)
+    question.updateTextAndVisibility(questionnaireItem.localizedTextSpanned)
+    hint.updateTextAndVisibility(questionnaireItem.localizedInstructionsSpanned)
     visibility = getHeaderViewVisibility(prefix, question, hint)
   }
 }

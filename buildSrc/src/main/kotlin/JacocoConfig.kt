@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,8 @@ fun Project.createJacocoTestReportTask() {
     dependsOn(
       setOf(
         "testDebugUnitTest", // Generates unit test coverage report
-      ),
+        "createDebugCoverageReport", // Generates instrumentation test coverage report
+      )
     )
     reports {
       xml.required.set(true)
@@ -64,8 +65,8 @@ fun Project.createJacocoTestReportTask() {
           "**/BuildConfig.*",
           "**/Manifest*.*",
           "**/*Test*.*",
-          "android/**/*.*",
-        ),
+          "android/**/*.*"
+        )
     )
 
     executionData.setFrom(
@@ -78,9 +79,9 @@ fun Project.createJacocoTestReportTask() {
             "outputs/code_coverage/debugAndroidTest/connected/**/*.ec",
             // Instrumentation coverage report location from Firebase Test Lab
             "fladle/results/**/*.ec",
-          ),
+          )
         )
-      },
+      }
     )
   }
 
@@ -99,7 +100,7 @@ fun Project.createJacocoTestReportTask() {
 
 /** Configures jacoco test options in the `LibraryExtension`. */
 fun LibraryExtension.configureJacocoTestOptions() {
-  buildTypes { getByName("debug") { enableUnitTestCoverage = true } }
+  buildTypes { getByName("debug") { isTestCoverageEnabled = true } }
   testOptions {
     unitTests.isIncludeAndroidResources = true
     unitTests.isReturnDefaultValues = true

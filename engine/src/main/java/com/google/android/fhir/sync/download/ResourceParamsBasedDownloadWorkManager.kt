@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 package com.google.android.fhir.sync.download
 
+import com.google.android.fhir.SyncDownloadContext
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.GREATER_THAN_PREFIX
 import com.google.android.fhir.sync.ParamMap
 import com.google.android.fhir.sync.SyncDataParams
 import com.google.android.fhir.sync.concatParams
-import com.google.android.fhir.toTimeZoneString
 import java.util.LinkedList
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle
@@ -30,37 +30,35 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 typealias ResourceSearchParams = Map<ResourceType, ParamMap>
-
 /**
  * [DownloadWorkManager] implementation based on the provided [ResourceSearchParams] to generate
  * [Resource] search queries and parse [Bundle.BundleType.SEARCHSET] type [Bundle]. This
  * implementation takes a DFS approach and downloads all available resources for a particular
  * [ResourceType] before moving on to the next [ResourceType].
  */
-class ResourceParamsBasedDownloadWorkManager(
-  syncParams: ResourceSearchParams,
-  val context: TimestampContext,
-) : DownloadWorkManager {
+class ResourceParamsBasedDownloadWorkManager(syncParams: ResourceSearchParams) :
+  DownloadWorkManager {
   private val resourcesToDownloadWithSearchParams = LinkedList(syncParams.entries)
   private val urlOfTheNextPagesToDownloadForAResource = LinkedList<String>()
 
-  override suspend fun getNextRequest(): DownloadRequest? {
-    if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty()) {
-      return urlOfTheNextPagesToDownloadForAResource.poll()?.let { DownloadRequest.of(it) }
-    }
+  override suspend fun getNextRequestUrl(context: SyncDownloadContext): String? {
+    if (urlOfTheNextPagesToDownloadForAResource.isNotEmpty())
+      return urlOfTheNextPagesToDownloadForAResource.poll()
 
     return resourcesToDownloadWithSearchParams.poll()?.let { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply { putAll(getLastUpdatedParam(resourceType, params, context)) }
 
-      DownloadRequest.of("${resourceType.name}?${newParams.concatParams()}")
+      "${resourceType.name}?${newParams.concatParams()}"
     }
   }
 
   /**
    * Returns the map of resourceType and URL for summary of total count for each download request
    */
-  override suspend fun getSummaryRequestUrls(): Map<ResourceType, String> {
+  override suspend fun getSummaryRequestUrls(
+    context: SyncDownloadContext
+  ): Map<ResourceType, String> {
     return resourcesToDownloadWithSearchParams.associate { (resourceType, params) ->
       val newParams =
         params.toMutableMap().apply {
@@ -75,14 +73,14 @@ class ResourceParamsBasedDownloadWorkManager(
   private suspend fun getLastUpdatedParam(
     resourceType: ResourceType,
     params: ParamMap,
-    context: TimestampContext,
+    context: SyncDownloadContext
   ): MutableMap<String, String> {
     val newParams = mutableMapOf<String, String>()
     if (!params.containsKey(SyncDataParams.SORT_KEY)) {
       newParams[SyncDataParams.SORT_KEY] = SyncDataParams.LAST_UPDATED_KEY
     }
     if (!params.containsKey(SyncDataParams.LAST_UPDATED_KEY)) {
-      val lastUpdate = context.getLasUpdateTimestamp(resourceType)
+      val lastUpdate = context.getLatestTimestampFor(resourceType)
       if (!lastUpdate.isNullOrEmpty()) {
         newParams[SyncDataParams.LAST_UPDATED_KEY] = "$GREATER_THAN_PREFIX$lastUpdate"
       }
@@ -103,37 +101,14 @@ class ResourceParamsBasedDownloadWorkManager(
       throw FHIRException(response.issueFirstRep.diagnostics)
     }
 
-    if ((response !is Bundle || response.type != Bundle.BundleType.SEARCHSET)) {
-      return emptyList()
+    return if (response is Bundle && response.type == Bundle.BundleType.SEARCHSET) {
+      response.link
+        .firstOrNull { component -> component.relation == "next" }
+        ?.url?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
+
+      response.entry.map { it.resource }
+    } else {
+      emptyList()
     }
-
-    response.link
-      .firstOrNull { component -> component.relation == "next" }
-      ?.url
-      ?.let { next -> urlOfTheNextPagesToDownloadForAResource.add(next) }
-
-    return response.entry
-      .map { it.resource }
-      .also { resources ->
-        resources
-          .groupBy { it.resourceType }
-          .entries
-          .map { map ->
-            map.value
-              .filter { it.meta.lastUpdated != null }
-              .let {
-                context.saveLastUpdatedTimestamp(
-                  map.key,
-                  it.maxOfOrNull { it.meta.lastUpdated }?.toTimeZoneString(),
-                )
-              }
-          }
-      }
-  }
-
-  interface TimestampContext {
-    suspend fun saveLastUpdatedTimestamp(resourceType: ResourceType, timestamp: String?)
-
-    suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String?
   }
 }

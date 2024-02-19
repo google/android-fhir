@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,14 +47,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   AndroidViewModel(application) {
   val questionnaire: String
     get() = getQuestionnaireJson()
-
   val isResourcesSaved = MutableLiveData<Boolean>()
 
   private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
-        as Questionnaire
-
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire) as
+        Questionnaire
   private var questionnaireJson: String? = null
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
 
@@ -81,7 +79,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   private suspend fun saveResources(
     bundle: Bundle,
     subjectReference: Reference,
-    encounterId: String,
+    encounterId: String
   ) {
     val encounterReference = Reference("Encounter/$encounterId")
     bundle.entry.forEach {
@@ -151,7 +149,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   private suspend fun generateRiskAssessmentResource(
     bundle: Bundle,
     subjectReference: Reference,
-    encounterId: String,
+    encounterId: String
   ) {
     val spO2 = getSpO2(bundle)
     spO2?.let {
@@ -178,7 +176,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   private fun getRiskProbability(
     isSymptomPresent: Boolean,
     isComorbidityPresent: Boolean,
-    spO2: BigDecimal,
+    spO2: BigDecimal
   ): RiskProbability? {
     if (spO2 < BigDecimal(90)) {
       return RiskProbability.HIGH
@@ -200,7 +198,8 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
   }
 
   private fun getSpO2(bundle: Bundle): BigDecimal? {
-    return bundle.entry
+    return bundle
+      .entry
       .asSequence()
       .filter { it.resource is Observation }
       .map { it.resource as Observation }
@@ -211,7 +210,8 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isSymptomPresent(bundle: Bundle): Boolean {
     val count =
-      bundle.entry
+      bundle
+        .entry
         .filter { it.resource is Observation }
         .map { it.resource as Observation }
         .filter { it.hasCode() && it.code.hasCoding() }
@@ -228,7 +228,8 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isComorbidityPresent(bundle: Bundle): Boolean {
     val count =
-      bundle.entry
+      bundle
+        .entry
         .filter { it.resource is Condition }
         .map { it.resource as Condition }
         .filter { it.hasCode() && it.code.hasCoding() }
@@ -267,7 +268,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         DIABETES,
         HYPER_TENSION,
         HEART_DISEASE,
-        HIGH_BLOOD_LIPIDS,
+        HIGH_BLOOD_LIPIDS
       )
     private val symptoms: Set<String> = setOf(FEVER, SHORTNESS_BREATH, COUGH, LOSS_OF_SMELL)
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,18 +37,16 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 class AddPatientViewModel(application: Application, private val state: SavedStateHandle) :
   AndroidViewModel(application) {
 
-  private var _questionnaireJson: String? = null
-  val questionnaireJson: String
-    get() = fetchQuestionnaireJson()
-
+  val questionnaire: String
+    get() = getQuestionnaireJson()
   val isPatientSaved = MutableLiveData<Boolean>()
 
-  private val questionnaire: Questionnaire
+  private val questionnaireResource: Questionnaire
     get() =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaireJson)
+      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(questionnaire)
         as Questionnaire
-
   private var fhirEngine: FhirEngine = FhirApplication.fhirEngine(application.applicationContext)
+  private var questionnaireJson: String? = null
 
   /**
    * Saves patient registration questionnaire response into the application database.
@@ -57,11 +55,10 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
    */
   fun savePatient(questionnaireResponse: QuestionnaireResponse) {
     viewModelScope.launch {
-      if (
-        QuestionnaireResponseValidator.validateQuestionnaireResponse(
-            questionnaire,
+      if (QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaireResource,
             questionnaireResponse,
-            getApplication(),
+            getApplication()
           )
           .values
           .flatten()
@@ -71,12 +68,7 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
         return@launch
       }
 
-      val entry =
-        ResourceMapper.extract(
-            questionnaire,
-            questionnaireResponse,
-          )
-          .entryFirstRep
+      val entry = ResourceMapper.extract(questionnaireResource, questionnaireResponse).entryFirstRep
       if (entry.resource !is Patient) {
         return@launch
       }
@@ -87,12 +79,12 @@ class AddPatientViewModel(application: Application, private val state: SavedStat
     }
   }
 
-  private fun fetchQuestionnaireJson(): String {
-    _questionnaireJson?.let {
+  private fun getQuestionnaireJson(): String {
+    questionnaireJson?.let {
       return it
     }
-    _questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
-    return _questionnaireJson!!
+    questionnaireJson = readFileFromAssets(state[AddPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    return questionnaireJson!!
   }
 
   private fun readFileFromAssets(filename: String): String {

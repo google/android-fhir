@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,29 @@
 
 package com.google.android.fhir.workflow
 
-/*
-TODO: These operators must be migrated to equivalent calls in the Repository classes
+import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.NumberClientParam
+import ca.uhn.fhir.rest.gclient.ReferenceClientParam
+import ca.uhn.fhir.rest.gclient.StringClientParam
+import ca.uhn.fhir.rest.gclient.TokenClientParam
+import ca.uhn.fhir.rest.param.ParamPrefixEnum
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.search.Search
+import com.google.android.fhir.search.filter.TokenParamFilterCriterion
+import com.google.android.fhir.search.query.XFhirQueryTranslator.applyFilterParam
+import java.math.BigDecimal
+import java.util.Date
+import org.hl7.fhir.r4.model.Coding
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
+import org.opencds.cqf.cql.engine.retrieve.TerminologyAwareRetrieveProvider
+import org.opencds.cqf.cql.engine.runtime.Code
+import org.opencds.cqf.cql.engine.runtime.DateTime
+import org.opencds.cqf.cql.engine.runtime.Interval
+import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
 
 internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
   TerminologyAwareRetrieveProvider() {
@@ -33,7 +54,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     datePath: String?,
     dateLowPath: String?,
     dateHighPath: String?,
-    dateRange: Interval?,
+    dateRange: Interval?
   ): Iterable<Any> = runBlockingOrThrowMainThreadException {
     if (dataType == null) {
       emptyList()
@@ -43,7 +64,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       listOfNotNull(
         safeGet(fhirEngine, ResourceType.fromCode(dataType), "$contextValue"),
         safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:uuid:$contextValue"),
-        safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:oid:$contextValue"),
+        safeGet(fhirEngine, ResourceType.fromCode(dataType), "urn:oid:$contextValue")
       )
     } else if (codePath == "id" && codes != null) {
       codes.mapNotNull { safeGet(fhirEngine, ResourceType.fromCode(dataType), it.code) }
@@ -53,7 +74,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       filterByCode(codePath, codes, search)
       filterByValueSet(codePath, valueSet, search)
       filterByDateRange(datePath, dateLowPath, dateHighPath, dateRange, search)
-      fhirEngine.search<Resource>(search)
+      fhirEngine.search(search)
     }
   }
 
@@ -62,20 +83,17 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     dateLowPath: String?,
     dateHighPath: String?,
     dateRange: Interval?,
-    search: Search,
+    search: Search
   ) {
     if (datePath != null && dateRange?.low != null) {
       search.filter(
         DateClientParam(datePath),
         {
           prefix =
-            if (dateRange.lowClosed) {
-              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            } else {
-              ParamPrefixEnum.GREATERTHAN
-            }
+            if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            else ParamPrefixEnum.GREATERTHAN
           value = of(DateTimeType(convertDate(dateRange.low)))
-        },
+        }
       )
     }
 
@@ -84,13 +102,10 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         DateClientParam(datePath),
         {
           prefix =
-            if (dateRange.highClosed) {
-              ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            } else {
-              ParamPrefixEnum.LESSTHAN
-            }
+            if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            else ParamPrefixEnum.LESSTHAN
           value = of(DateTimeType(convertDate(dateRange.high)))
-        },
+        }
       )
     }
 
@@ -99,13 +114,10 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         DateClientParam(dateLowPath),
         {
           prefix =
-            if (dateRange.lowClosed) {
-              ParamPrefixEnum.GREATERTHAN_OR_EQUALS
-            } else {
-              ParamPrefixEnum.GREATERTHAN
-            }
+            if (dateRange.lowClosed) ParamPrefixEnum.GREATERTHAN_OR_EQUALS
+            else ParamPrefixEnum.GREATERTHAN
           value = of(DateTimeType(convertDate(dateRange.low)))
-        },
+        }
       )
     }
 
@@ -114,13 +126,10 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         DateClientParam(dateHighPath),
         {
           prefix =
-            if (dateRange.highClosed) {
-              ParamPrefixEnum.LESSTHAN_OR_EQUALS
-            } else {
-              ParamPrefixEnum.LESSTHAN
-            }
+            if (dateRange.highClosed) ParamPrefixEnum.LESSTHAN_OR_EQUALS
+            else ParamPrefixEnum.LESSTHAN
           value = of(DateTimeType(convertDate(dateRange.high)))
-        },
+        }
       )
     }
   }
@@ -132,7 +141,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
       else ->
         throw UnsupportedOperationException(
           "FhirEngineRetrieveProvider doesn't know " +
-            "how to convert (${obj.javaClass.name}) into a java.util.Date",
+            "how to convert (${obj.javaClass.name}) into a java.util.Date"
         )
     }
   }
@@ -185,7 +194,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           ReferenceClientParam(ann.name),
           { value = "$context/$contextValue" },
           { value = "urn:uuid:$contextValue" },
-          { value = "urn:oid:$contextValue" },
+          { value = "urn:oid:$contextValue" }
         )
       } else {
         search.applyFilterParam(ann, "$contextValue")
@@ -200,7 +209,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
           throw UnsupportedOperationException(
             "FhirEngineRetrieveProvider doesn't know " +
               "how to search for $dataType.$contextPath = $contextValue" +
-              "(${contextValue.javaClass.name}) and get $context",
+              "(${contextValue.javaClass.name}) and get $context"
           )
       }
     }
@@ -226,7 +235,7 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
         com.google.android.fhir.index.SearchParamDefinition(
           it.name,
           Enumerations.SearchParamType.fromCode(it.type),
-          it.path,
+          it.path
         )
       }
       .firstOrNull()
@@ -235,4 +244,3 @@ internal class FhirEngineRetrieveProvider(private val fhirEngine: FhirEngine) :
     return Class.forName("org.hl7.fhir.r4.model.$dataType")
   }
 }
-*/

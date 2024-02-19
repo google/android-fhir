@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,6 @@ import com.google.android.fhir.datacapture.R
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
-import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemAnswerOptionComponent
-import org.hl7.fhir.r4.model.Type
 
 internal const val EXTENSION_OPTION_EXCLUSIVE_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-optionExclusive"
@@ -44,12 +42,8 @@ internal val Questionnaire.QuestionnaireItemAnswerOptionComponent.optionExclusiv
     return false
   }
 
-/** Get the answer options values with `initialSelected` set to true */
-internal val List<QuestionnaireItemAnswerOptionComponent>.initialSelected: List<Type>
-  get() = this.filter { it.initialSelected }.map { it.value }
-
 fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
-  context: Context,
+  context: Context
 ): Drawable? {
   return (extension.singleOrNull { it.url == EXTENSION_ITEM_ANSWER_MEDIA }?.value as Attachment?)
     ?.let {
@@ -59,10 +53,9 @@ fun Questionnaire.QuestionnaireItemAnswerOptionComponent.itemAnswerOptionImage(
       when (it.contentType) {
         "image/jpeg",
         "image/jpg",
-        "image/png", -> {
+        "image/png" -> {
           val bitmap = BitmapFactory.decodeByteArray(it.data, 0, it.data.size)
-          val imageSize =
-            context.resources.getDimensionPixelOffset(R.dimen.item_answer_media_image_size)
+          val imageSize = context.resources.getDimensionPixelOffset(R.dimen.choice_button_image)
           val drawable: Drawable = BitmapDrawable(context.resources, bitmap)
           drawable.setBounds(0, 0, imageSize, imageSize)
           drawable

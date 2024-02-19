@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import androidx.core.view.isVisible
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.DisplayItemControlType
-import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -50,9 +50,7 @@ import org.robolectric.RuntimeEnvironment
 class ReviewViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply {
-        setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      },
+      RuntimeEnvironment.getApplication().apply { setTheme(R.style.Theme_Material3_DayNight) }
     )
   private val viewHolder = ReviewViewHolderFactory.create(parent)
 
@@ -64,7 +62,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -83,7 +81,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.flyover_text_view).visibility)
@@ -92,35 +90,33 @@ class ReviewViewHolderFactoryTest {
 
   @Test
   fun `bind() should set fly over text`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "flyover text"
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-          addExtension(
-            EXTENSION_ITEM_CONTROL_URL,
-            CodeableConcept().apply {
-              addCoding().apply {
-                system = EXTENSION_ITEM_CONTROL_SYSTEM
-                code = DisplayItemControlType.FLYOVER.extensionCode
-              }
-            },
-          )
-        },
-      )
     viewHolder.bind(
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply {
           linkId = "parent-question"
           text = "parent question text"
           type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          item = itemList
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                text = "flyover text"
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+                addExtension(
+                  EXTENSION_ITEM_CONTROL_URL,
+                  CodeableConcept().apply {
+                    addCoding().apply {
+                      system = EXTENSION_ITEM_CONTROL_SYSTEM
+                      code = DisplayItemControlType.FLYOVER.extensionCode
+                    }
+                  }
+                )
+              }
+            )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-        enabledDisplayItems = itemList,
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.flyover_text_view).text.toString())
@@ -139,7 +135,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).visibility)
@@ -158,7 +154,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).visibility)
@@ -177,12 +173,12 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
       .isEqualTo(
-        ApplicationProvider.getApplicationContext<Application>().getString(R.string.not_answered),
+        ApplicationProvider.getApplicationContext<Application>().getString(R.string.not_answered)
       )
   }
 
@@ -199,11 +195,11 @@ class ReviewViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            },
+            }
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
@@ -221,7 +217,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
@@ -236,7 +232,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
@@ -263,15 +259,15 @@ class ReviewViewHolderFactoryTest {
                       system = EXTENSION_ITEM_CONTROL_SYSTEM
                       code = DisplayItemControlType.FLYOVER.extensionCode
                     }
-                  },
+                  }
                 )
-              },
+              }
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
@@ -290,11 +286,11 @@ class ReviewViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            },
+            }
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<MaterialDivider>(R.id.text_divider).visibility)
@@ -314,11 +310,11 @@ class ReviewViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            },
+            }
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
@@ -337,7 +333,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field")),
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
@@ -356,7 +352,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Invalid(listOf("Missing answer for required field")),
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_view).text)
@@ -375,11 +371,11 @@ class ReviewViewHolderFactoryTest {
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = BooleanType(true)
-            },
+            }
           ),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<LinearLayout>(R.id.error_view).visibility)
@@ -394,7 +390,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isTrue()
@@ -410,7 +406,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.prefix).isVisible).isFalse()
@@ -427,7 +423,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -436,23 +432,23 @@ class ReviewViewHolderFactoryTest {
 
   @Test
   fun `shows instructions`() {
-    val itemList =
-      listOf(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          linkId = "nested-display-question"
-          text = "subtitle text"
-          extension = listOf(displayCategoryExtensionWithInstructionsCode)
-          type = Questionnaire.QuestionnaireItemType.DISPLAY
-        },
-      )
     viewHolder.bind(
       QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { item = itemList },
+        Questionnaire.QuestionnaireItemComponent().apply {
+          item =
+            listOf(
+              Questionnaire.QuestionnaireItemComponent().apply {
+                linkId = "nested-display-question"
+                text = "subtitle text"
+                extension = listOf(displayCategoryExtensionWithInstructionsCode)
+                type = Questionnaire.QuestionnaireItemType.DISPLAY
+              }
+            )
+        },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-        enabledDisplayItems = itemList,
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).isVisible).isTrue()
@@ -470,13 +466,13 @@ class ReviewViewHolderFactoryTest {
               Questionnaire.QuestionnaireItemComponent().apply {
                 linkId = "nested-display-question"
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
+              }
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.hint).visibility)
@@ -495,13 +491,13 @@ class ReviewViewHolderFactoryTest {
                 text = "subtitle text"
                 extension = listOf(displayCategoryExtensionWithInstructionsCode)
                 type = Questionnaire.QuestionnaireItemType.DISPLAY
-              },
+              }
             )
         },
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.visibility).isEqualTo(View.VISIBLE)
@@ -515,7 +511,7 @@ class ReviewViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = Valid,
         answersChangedCallback = { _, _, _, _ -> },
-      ),
+      )
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).visibility)
@@ -530,11 +526,11 @@ class ReviewViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
+                code = INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              },
+              }
             )
-        },
+        }
       )
     }
 }

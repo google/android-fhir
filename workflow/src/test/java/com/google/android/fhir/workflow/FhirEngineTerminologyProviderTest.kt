@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,26 @@
 
 package com.google.android.fhir.workflow
 
-/*
+import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.context.FhirContext
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.Loadable
+import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CodeSystem
+import org.hl7.fhir.r4.model.ValueSet
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.opencds.cqf.cql.engine.exception.TerminologyProviderException
+import org.opencds.cqf.cql.engine.runtime.Code
+import org.opencds.cqf.cql.engine.terminology.CodeSystemInfo
+import org.opencds.cqf.cql.engine.terminology.ValueSetInfo
+import org.robolectric.RobolectricTestRunner
+
 @RunWith(RobolectricTestRunner::class)
 class FhirEngineTerminologyProviderTest : Loadable() {
   @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
@@ -32,14 +51,8 @@ class FhirEngineTerminologyProviderTest : Loadable() {
 
   @Before
   fun setupTest() {
-    val context: Context = ApplicationProvider.getApplicationContext()
-    fhirEngine = FhirEngineProvider.getInstance(context)
-    provider =
-      FhirEngineTerminologyProvider(
-        FhirContext.forR4Cached(),
-        fhirEngine,
-        KnowledgeManager.createInMemory(context),
-      )
+    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    provider = FhirEngineTerminologyProvider(FhirContext.forR4Cached(), fhirEngine)
   }
 
   @Test
@@ -319,4 +332,3 @@ class FhirEngineTerminologyProviderTest : Loadable() {
       provider.lookup(code, info)
     }
 }
-*/

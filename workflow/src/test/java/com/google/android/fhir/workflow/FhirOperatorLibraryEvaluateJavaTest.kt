@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,23 +16,19 @@
 
 package com.google.android.fhir.workflow
 
-import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.knowledge.KnowledgeManager
+import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
-import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
-import java.io.File
 import java.io.InputStream
 import java.math.BigDecimal
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Library
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.StringType
 import org.intellij.lang.annotations.Language
@@ -50,8 +46,6 @@ class FhirOperatorLibraryEvaluateJavaTest {
   private lateinit var fhirEngine: FhirEngine
   private lateinit var fhirOperator: FhirOperator
 
-  private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
@@ -59,12 +53,14 @@ class FhirOperatorLibraryEvaluateJavaTest {
     return javaClass.getResourceAsStream(asset)
   }
 
-  private fun load(asset: String) = jsonParser.parseResource(open(asset))
+  private fun load(asset: String): Bundle {
+    return jsonParser.parseResource(open(asset)) as Bundle
+  }
 
   @Before
   fun setUp() = runBlocking {
-    fhirEngine = FhirEngineProvider.getInstance(context)
-    fhirOperator = FhirOperator(fhirContext, fhirEngine, knowledgeManager)
+    fhirEngine = FhirEngineProvider.getInstance(ApplicationProvider.getApplicationContext())
+    fhirOperator = FhirOperator(fhirContext, fhirEngine)
   }
 
   /**
@@ -77,7 +73,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
    * 2. load the Immunization records of that patient,
    * 3. load the CQL Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   *    matches the number of required doses or if the number of required doses is null.
+   * matches the number of required doses or if the number of required doses is null.
    *
    * ```
    * library ImmunityCheck version '1.0.0'
@@ -104,21 +100,20 @@ class FhirOperatorLibraryEvaluateJavaTest {
   @Test
   fun evaluateImmunityCheck() = runBlockingOnWorkerThread {
     // Load patient
-    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json") as Bundle
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json")
     for (entry in patientImmunizationHistory.entry) {
       fhirEngine.create(entry.resource)
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.install(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
-    knowledgeManager.install(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
+    fhirOperator.loadLibs(load("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
         "http://localhost/Library/ImmunityCheck|1.0.0",
         "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization"),
+        setOf("CompletedImmunization")
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
@@ -132,12 +127,11 @@ class FhirOperatorLibraryEvaluateJavaTest {
       library TestGetName version '1.0.0'
       
       define GetName: 'MyName'
-            """
-        .trimIndent()
+      """.trimIndent()
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
 
-    knowledgeManager.install(writeToFile(library))
+    fhirOperator.loadLib(library)
 
     // Evaluates expression without any extra data
     val results = fhirOperator.evaluateLibrary(library.url, setOf("GetName")) as Parameters
@@ -155,12 +149,11 @@ class FhirOperatorLibraryEvaluateJavaTest {
       parameter "MyNumber" Decimal
       
       define SumOne: MyNumber + 1
-            """
-        .trimIndent()
+      """.trimIndent()
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
 
-    knowledgeManager.install(writeToFile(library))
+    fhirOperator.loadLib(library)
 
     val params =
       Parameters().apply {
@@ -174,11 +167,5 @@ class FhirOperatorLibraryEvaluateJavaTest {
     val results = fhirOperator.evaluateLibrary(library.url, params, setOf("SumOne")) as Parameters
 
     assertThat((results.parameterFirstRep.value as DecimalType).value).isEqualTo(BigDecimal(2))
-  }
-
-  private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.name).apply {
-      writeText(jsonParser.encodeResourceToString(library))
-    }
   }
 }
