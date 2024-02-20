@@ -95,7 +95,8 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
           when (syncJobStatus) {
             is SyncJobStatus.Succeeded,
-            is SyncJobStatus.Failed, -> {
+            is SyncJobStatus.Failed,
+            is SyncJobStatus.Cancelled-> {
               // While creating periodicSync request if
               // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
               // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.

@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.work.Constraints
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -39,6 +40,7 @@ import kotlinx.coroutines.flow.transformWhile
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Duration
 
 /**
  * Note : If you are running these tests on a local machine in Android Studio, make sure to clear
@@ -227,5 +229,32 @@ class SyncInstrumentedTest {
 
     assertThat(workManager.getWorkInfoById(periodicWorkerId).get().state)
       .isEqualTo(WorkInfo.State.RUNNING)
+  }
+
+  @Test
+  fun oneTime_worker_cancelledSyncState(){
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<CurrentSyncJobStatus>()
+    val workManager = WorkManager.getInstance(context)
+    // Enqueue the periodic worker
+    val periodicRequest =
+      PeriodicWorkRequestBuilder<TestSyncWorker>(
+        Duration.ZERO
+      ).build()
+    workManager.enqueue(periodicRequest)
+    //Cancel the periodic worker
+    workManager.cancelAllWorkByTag(TestSyncWorker::class.java.name)
+    //Run and wait for the cancelled worker to finish
+    runBlocking {
+      Sync.oneTimeSync<TestSyncWorker>(
+        context = context
+      ).transformWhile {
+        states.add(it)
+        emit(it)
+        it !is CurrentSyncJobStatus.Cancelled
+      }.shareIn(this, SharingStarted.Eagerly, 5 )
+    }
+    assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+    assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Cancelled::class.java)
   }
 }

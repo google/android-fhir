@@ -49,6 +49,10 @@ sealed class LastSyncJobStatus(val timestamp: OffsetDateTime) {
 
   /** Represents a failed synchronization result. */
   class Failed(timestamp: OffsetDateTime) : LastSyncJobStatus(timestamp)
+
+  /** Represents a cancelled synchronization result. */
+  class Cancelled(timestamp: OffsetDateTime) : LastSyncJobStatus(timestamp)
+
 }
 
 /**
