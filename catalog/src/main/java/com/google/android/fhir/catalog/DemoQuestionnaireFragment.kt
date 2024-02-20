@@ -140,7 +140,13 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .apply {
+                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                    .LOCATION_WIDGET_PROVIDER,
+                )
+                setQuestionnaire(args.questionnaireJsonStringKey!!)
+              }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
