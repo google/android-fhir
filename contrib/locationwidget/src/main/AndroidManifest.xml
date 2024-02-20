@@ -14,7 +14,24 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.google.android.fhir"
+    >
+
+    <application>
+        <receiver
+            android:name="com.google.android.fhir.security.SecurityCheckReceiver"
+            android:exported="false"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+    <uses-permission
+        android:name="android.permission.REQUEST_PASSWORD_COMPLEXITY"
+        />
 </manifest>

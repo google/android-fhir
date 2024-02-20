@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+<<<<<<<< HEAD:knowledge/src/main/java/com/google/android/fhir/knowledge/FhirNpmPackage.kt
 package com.google.android.fhir.knowledge
 
 /**
@@ -25,3 +26,17 @@ package com.google.android.fhir.knowledge
  * management of FHIR Infrastructure.
  */
 data class FhirNpmPackage(val name: String, val version: String, val canonical: String? = null)
+========
+package com.google.android.fhir.search
+
+import ca.uhn.fhir.rest.gclient.DateClientParam
+
+internal const val LOCAL_LAST_UPDATED = "local_lastUpdated"
+internal const val LAST_UPDATED = "_lastUpdated"
+
+/** Resource Date Parameter to search using local last updated date. */
+val LOCAL_LAST_UPDATED_PARAM = DateClientParam(LOCAL_LAST_UPDATED)
+
+/** Resource Date Parameter to search using remote last updated date. */
+val LAST_UPDATED_PARAM = DateClientParam(LAST_UPDATED)
+>>>>>>>> 5633905a4 (Copy PR 1861):engine/src/main/java/com/google/android/fhir/search/MoreClientParams.kt
