@@ -52,7 +52,7 @@ constructor(
             }
           }
         }
-        callback.send(context, code = 0, extras)
+        callback.send(context, 0, extras)
       }
     }
   }
