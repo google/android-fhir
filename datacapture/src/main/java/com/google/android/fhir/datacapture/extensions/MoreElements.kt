@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-<<<<<<<< HEAD:datacapture/src/main/java/com/google/android/fhir/datacapture/extensions/MoreElements.kt
 package com.google.android.fhir.datacapture.extensions
 
 import org.hl7.fhir.r4.model.Element
@@ -29,18 +28,3 @@ internal val Element.cqfExpression: Expression?
     ToolingExtensions.getExtension(this, EXTENSION_CQF_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
     }
-========
-import java.io.File
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.PathSensitive
-import org.gradle.api.tasks.PathSensitivity
-import org.gradle.process.CommandLineArgumentProvider
-
-// https://developer.android.com/training/data-storage/room/migrating-db-versions#test
-class RoomSchemaArgProvider(
-  @get:InputDirectory @get:PathSensitive(PathSensitivity.RELATIVE) val schemaDir: File,
-) : CommandLineArgumentProvider {
-
-  override fun asArguments() = listOf("-Aroom.schemaLocation=${schemaDir.path}")
-}
->>>>>>>> 5633905a4 (Copy PR 1861):buildSrc/src/main/kotlin/RoomSchemaArgProvider.kt
