@@ -28,7 +28,6 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
-import com.google.android.fhir.search.search
 import com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver
 import com.google.android.fhir.search.search
 import com.google.android.fhir.security.FhirSecurityConfiguration
@@ -73,13 +72,13 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
           ServerConfiguration(
             "https://hapi.fhir.org/baseR4/",
             httpLogger =
-            HttpLogger(
-              HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
-              ),
-            ) {
-              Timber.tag("App-HttpLog").d(it)
-            },
+              HttpLogger(
+                HttpLogger.Configuration(
+                  if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+                ),
+              ) {
+                Timber.tag("App-HttpLog").d(it)
+              },
             networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
           ),
       ),
