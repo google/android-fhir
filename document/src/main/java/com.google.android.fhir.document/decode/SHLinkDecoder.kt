@@ -50,8 +50,8 @@ import com.google.android.fhir.document.IPSDocument
  *
  *  ```
  *  {
- *    "Recipient" : "example_name",
- *    "Passcode" : "example_passcode"
+ *    "recipient" : "example_name",
+ *    "passcode" : "example_passcode"
  *  }
  *  ```
  * ```
@@ -77,10 +77,9 @@ interface SHLinkDecoder {
    * Decodes and decompresses a Smart Health Link (SHL) into an [IPSDocument] object.
    *
    * @param shLink The full Smart Health Link.
-   * @param jsonData The JSON data to be posted to the manifest. The JSON must contain a 'recipient'
-   *   and, if the P flag is present in the SHL payload, a passcode. For example: `{"recipient":
-   *   "Example SHL Client", "passcode": "123"}`
+   * @param recipient The recipient for the manifest request.
+   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is not present in the SHL payload).
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
-  suspend fun decodeSHLinkToDocument(shLink: String, jsonData: String): IPSDocument?
+  suspend fun decodeSHLinkToDocument(shLink: String, recipient: String, passcode: String?): IPSDocument?
 }
