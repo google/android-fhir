@@ -34,6 +34,7 @@ import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -57,6 +58,7 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import org.hl7.fhir.utilities.npm.NpmPackage
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -2340,7 +2342,7 @@ class ResourceMapperTest {
       ResourceMapper.extract(
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(context = context) { _, worker ->
+        StructureMapExtractionContext { _, worker ->
           StructureMapUtilities(worker).parse(mapping, "")
         },
       )
@@ -2431,7 +2433,7 @@ class ResourceMapperTest {
         ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
-          StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+          StructureMapExtractionContext(transformSupportServices, simpleWorkerContext = SimpleWorkerContext()) { _, worker ->
             StructureMapUtilities(worker).parse(mapping, "")
           },
         )

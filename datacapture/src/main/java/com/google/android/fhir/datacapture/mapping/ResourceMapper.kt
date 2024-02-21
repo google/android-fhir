@@ -199,10 +199,7 @@ object ResourceMapper {
     structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
-    val simpleWorkerContext =
-      DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
+    val simpleWorkerContext = structureMapExtractionContext.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {

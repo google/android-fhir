@@ -43,15 +43,6 @@ data class DataCaptureConfig(
   var valueSetResolverExternal: ExternalAnswerValueSetResolver? = null,
 
   /**
-   * A [NpmPackage] may be set by the client for Structure-Map based Resource Extraction.
-   *
-   * The loading and extraction of a [NpmPackage] may take multiple seconds, so the client app
-   * should try to include the smallest [NpmPackage] possible that contains only the resources
-   * needed by [StructureMap]s used by the client app.
-   */
-  var npmPackage: NpmPackage? = null,
-
-  /**
    * A [XFhirQueryResolver] may be set by the client to resolve x-fhir-query for the library. See
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirquery for more details.
    */
@@ -69,10 +60,6 @@ data class DataCaptureConfig(
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
 ) {
-
-  internal val simpleWorkerContext: SimpleWorkerContext by lazy {
-    if (npmPackage == null) SimpleWorkerContext() else SimpleWorkerContext.fromPackage(npmPackage)
-  }
 
   /**
    * A class that can provide the [DataCaptureConfig] for the Structured Data Capture Library. To do
