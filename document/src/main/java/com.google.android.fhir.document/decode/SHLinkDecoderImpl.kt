@@ -44,7 +44,7 @@ class SHLinkDecoderImpl(
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
   override suspend fun decodeSHLinkToDocument(shLink: String, jsonData: String): IPSDocument? {
-    val shLinkScanData = SHLinkScanData().create(shLink)
+    val shLinkScanData = SHLinkScanData.create(shLink)
     val bundle = postToServer(jsonData, shLinkScanData)
     return if (bundle != null) {
       IPSDocument.create(bundle)

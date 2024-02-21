@@ -36,7 +36,7 @@ import timber.log.Timber
  * @property manifestUrl The URL to the SHL manifest.
  * @property key The key for decoding the data.
  * @property label A label describing the SHL data.
- * @property flags Flags indicating specific conditions or requirements (e.g., "P" for passcode).
+ * @property flag Flags indicating specific conditions or requirements (e.g., "P" for passcode).
  * @property expirationTime The expiration time of the SHL data.
  * @property versionNumber The version number of the SHL data.
  * @property ipsDoc The IPS document linked to by the SHL.
@@ -52,38 +52,28 @@ data class SHLinkScanData(
   val versionNumber: String,
   val ipsDoc: IPSDocument?,
 ) {
-  fun create(fullLink: String): SHLinkScanData {
-    val extractedJson = ReadSHLinkUtils.extractUrl(fullLink)
-    val decodedJson = ReadSHLinkUtils.decodeUrl(extractedJson)
+  companion object {
+    fun create(fullLink: String): SHLinkScanData {
+      val extractedJson = ReadSHLinkUtils.extractUrl(fullLink)
+      val decodedJson = ReadSHLinkUtils.decodeUrl(extractedJson)
 
-    try {
-      val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
-      return SHLinkScanData(
-        fullLink,
-        extractedJson,
-        jsonObject.optString("url", ""),
-        jsonObject.optString("key", ""),
-        jsonObject.optString("label", ""),
-        jsonObject.optString("flag", ""),
-        jsonObject.optString("expirationTime", ""),
-        jsonObject.optString("versionNumber", ""),
-        null,
-      )
-    } catch (exception: JSONException) {
-      Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
-      throw exception
+      try {
+        val jsonObject = JSONObject(String(decodedJson, StandardCharsets.UTF_8))
+        return SHLinkScanData(
+          fullLink,
+          extractedJson,
+          jsonObject.optString("url", ""),
+          jsonObject.optString("key", ""),
+          jsonObject.optString("label", ""),
+          jsonObject.optString("flag", ""),
+          jsonObject.optString("expirationTime", ""),
+          jsonObject.optString("versionNumber", ""),
+          null,
+        )
+      } catch (exception: JSONException) {
+        Timber.e(exception, "Error creating JSONObject from decodedJson: $decodedJson")
+        throw exception
+      }
     }
   }
-
-  constructor() : this("", "", "", "", "", "", "", "", null)
-
-  constructor(scannedValue: String) : this(scannedValue, "", "", "", "", "", "", "", null)
-
-  constructor(
-    fullLink: String,
-    extractedJson: String,
-    manifestUrl: String,
-    key: String,
-    flag: String,
-  ) : this(fullLink, extractedJson, manifestUrl, key, "", flag, "", "", null)
 }
