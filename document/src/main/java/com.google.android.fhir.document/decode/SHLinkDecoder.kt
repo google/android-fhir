@@ -78,8 +78,13 @@ interface SHLinkDecoder {
    *
    * @param shLink The full Smart Health Link.
    * @param recipient The recipient for the manifest request.
-   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is not present in the SHL payload).
+   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is
+   *   not present in the SHL payload).
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
-  suspend fun decodeSHLinkToDocument(shLink: String, recipient: String, passcode: String?): IPSDocument?
+  suspend fun decodeSHLinkToDocument(
+    shLink: String,
+    recipient: String,
+    passcode: String?,
+  ): IPSDocument?
 }

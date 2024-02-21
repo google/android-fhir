@@ -39,17 +39,23 @@ class SHLinkDecoderImpl(
    *
    * @param shLink The full Smart Health Link.
    * @param recipient The recipient for the manifest request.
-   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is not present in the SHL payload).
+   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is
+   *   not present in the SHL payload).
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
-  override suspend fun decodeSHLinkToDocument(shLink: String, recipient: String, passcode: String?): IPSDocument? {
+  override suspend fun decodeSHLinkToDocument(
+    shLink: String,
+    recipient: String,
+    passcode: String?,
+  ): IPSDocument? {
     val shLinkScanData = SHLinkScanData.create(shLink)
-    val requestBody = JSONObject().apply {
-      put("recipient", recipient)
-      if (passcode != null) {
-        put("passcode", passcode)
+    val requestBody =
+      JSONObject().apply {
+        put("recipient", recipient)
+        if (passcode != null) {
+          put("passcode", passcode)
+        }
       }
-    }
     val bundle = postToServer(requestBody, shLinkScanData)
     return if (bundle != null) {
       IPSDocument.create(bundle)
@@ -67,26 +73,28 @@ class SHLinkDecoderImpl(
    * @return A FHIR Bundle representing the IPS Document.
    * @throws Error if there's an issue posting to the manifest or decoding the response.
    */
-  private suspend fun postToServer(requestBody: JSONObject, shLinkScanData: SHLinkScanData): Bundle? =
-    coroutineScope {
-      try {
-        val response =
-          retrofitSHLService.getFilesFromManifest(
-            shLinkScanData.manifestUrl.substringAfterLast("shl/"),
-            requestBody,
-          )
-        if (response.isSuccessful) {
-          val responseBody = response.body()?.string()
-          responseBody?.let {
-            return@coroutineScope decodeResponseBody(it, shLinkScanData)
-          }
-        } else {
-          throw (Error("HTTP Error: ${response.code()}"))
+  private suspend fun postToServer(
+    requestBody: JSONObject,
+    shLinkScanData: SHLinkScanData,
+  ): Bundle? = coroutineScope {
+    try {
+      val response =
+        retrofitSHLService.getFilesFromManifest(
+          shLinkScanData.manifestUrl.substringAfterLast("shl/"),
+          requestBody,
+        )
+      if (response.isSuccessful) {
+        val responseBody = response.body()?.string()
+        responseBody?.let {
+          return@coroutineScope decodeResponseBody(it, shLinkScanData)
         }
-      } catch (err: Throwable) {
-        throw (Error("Error posting to the manifest: $err"))
+      } else {
+        throw (Error("HTTP Error: ${response.code()}"))
       }
+    } catch (err: Throwable) {
+      throw (Error("Error posting to the manifest: $err"))
     }
+  }
 
   /**
    * Decodes the response body, handling both embedded files and files stored in an external
