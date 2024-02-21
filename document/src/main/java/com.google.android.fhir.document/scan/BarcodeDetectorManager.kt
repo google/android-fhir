@@ -37,7 +37,8 @@ class BarcodeDetectorManager(
    */
   fun processImage(imageProxy: ImageProxy, onResult: (Barcode?) -> Unit) {
     // Extract the data from the ImageProxy and create an InputImage from this data
-    val data = ByteArray(imageProxy.planes[0].buffer.capacity())
+    val plane = imageProxy.planes[0]
+    val data = ByteArray(plane.buffer.capacity())
     val rotationDegrees = imageProxy.imageInfo.rotationDegrees
     val inputImage =
       com.google.mlkit.vision.common.InputImage.fromByteArray(
@@ -52,17 +53,15 @@ class BarcodeDetectorManager(
     barcodeScanner
       .process(inputImage)
       .addOnSuccessListener { barcodes ->
-        // If barcodes are detected, pass the result to the callback
+        // If barcodes are detected, pass the result to the callback - otherwise, pass null
         if (barcodes.isNotEmpty()) {
           val result = barcodes.single()
           onResult(result)
         } else {
-          // If no barcode is detected, pass null to the callback
           onResult(null)
         }
       }
       .addOnFailureListener {
-        // Handle failure by passing null to the callback
         onResult(null)
       }
       .addOnCompleteListener { imageProxy.close() }
@@ -70,7 +69,6 @@ class BarcodeDetectorManager(
 
   /** Closes the [barcodeScanner]. */
   fun releaseBarcodeScanner() {
-    // Closes the BarcodeScanner to release associated resources
     barcodeScanner.close()
   }
 }
