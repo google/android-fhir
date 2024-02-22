@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -276,10 +276,16 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
             // This is some other row
             if (multiSelectEnabled) {
               // In multi-select mode,
-              if (selected && ((selectedItem is OptionSelectRow.Option && selectedItem.option.item.optionExclusive)
-                  || (row is OptionSelectRow.Option && row.option.item.optionExclusive))) {
-                // if the selected answer option has optionExclusive extension, then deselect other answer options.
-                // or if the selected answer option does not have optionExclusive extension, then deselect optionExclusive answer option.
+              if (
+                selected &&
+                  ((selectedItem is OptionSelectRow.Option &&
+                    selectedItem.option.item.optionExclusive) ||
+                    (row is OptionSelectRow.Option && row.option.item.optionExclusive))
+              ) {
+                // if the selected answer option has optionExclusive extension, then deselect other
+                // answer options.
+                // or if the selected answer option does not have optionExclusive extension, then
+                // deselect optionExclusive answer option.
                 row.withSelectedState(selected = false) ?: row
               } else {
                 // the other rows don't need to change

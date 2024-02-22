@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -109,10 +109,12 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          }),
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          ),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
@@ -137,10 +139,12 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          }),
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          ),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
@@ -165,14 +169,18 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive 1" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          })
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive 2" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          }),
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive 1" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          )
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive 2" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          ),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
@@ -197,14 +205,18 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive 1" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          })
-          .addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-            value = Coding().apply { display = "Coding Exclusive 2" }
-            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-          }),
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive 1" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          )
+          .addAnswerOption(
+            Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+              value = Coding().apply { display = "Coding Exclusive 2" }
+              extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+            },
+          ),
         responseOptions(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answers, _ -> answerHolder = answers },
@@ -491,19 +503,22 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   fun selectOther_selectExclusive_shouldHideAddAnotherAnswer() {
     val questionnaireItem =
       answerOptions(
-        true,
-        "Coding 1",
-        "Coding 2",
-        "Coding 3",
-        "Coding 4",
-        "Coding 5",
-        "Coding 6",
-        "Coding 7",
-        "Coding 8",
-      ).addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-        value = Coding().apply { display = "Coding Exclusive" }
-        extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-      })
+          true,
+          "Coding 1",
+          "Coding 2",
+          "Coding 3",
+          "Coding 4",
+          "Coding 5",
+          "Coding 6",
+          "Coding 7",
+          "Coding 8",
+        )
+        .addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          },
+        )
 
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireViewItem =
@@ -529,19 +544,22 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
   fun selectOther_clickAddAnotherAnswer_selectExclusive_shouldHideAddAnotherAnswerWithEditText() {
     val questionnaireItem =
       answerOptions(
-        true,
-        "Coding 1",
-        "Coding 2",
-        "Coding 3",
-        "Coding 4",
-        "Coding 5",
-        "Coding 6",
-        "Coding 7",
-        "Coding 8",
-      ).addAnswerOption(Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
-        value = Coding().apply { display = "Coding Exclusive" }
-        extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
-      })
+          true,
+          "Coding 1",
+          "Coding 2",
+          "Coding 3",
+          "Coding 4",
+          "Coding 5",
+          "Coding 6",
+          "Coding 7",
+          "Coding 8",
+        )
+        .addAnswerOption(
+          Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+            value = Coding().apply { display = "Coding Exclusive" }
+            extension = listOf(Extension(EXTENSION_OPTION_EXCLUSIVE_URL, BooleanType(true)))
+          },
+        )
 
     questionnaireItem.addExtension(openChoiceType)
     val questionnaireViewItem =
