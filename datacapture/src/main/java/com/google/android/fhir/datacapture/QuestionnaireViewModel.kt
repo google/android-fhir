@@ -45,7 +45,6 @@ import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
-import com.google.android.fhir.datacapture.extensions.toTimeZoneString
 import com.google.android.fhir.datacapture.extensions.unpackRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
 import com.google.android.fhir.datacapture.extensions.zipByLinkId
@@ -69,10 +68,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.BooleanType
-import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Element
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -80,10 +76,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Date
-import java.util.Locale
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -95,12 +87,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val externalValueSetResolver: ExternalAnswerValueSetResolver? by lazy {
     DataCapture.getConfiguration(application).valueSetResolverExternal
   }
-
-  /**
-   * A [Boolean] value to enable addition of [QuestionnaireItemComponent] containing timestamps for
-   * Questionnaire launch and submission time.
-   */
-  private val shouldAddTimestampItems = state[QuestionnaireFragment.EXTRA_INCLUDE_TIMESTAMP_ITEMS] ?: false
 
   /** The current questionnaire as questions are being answered. */
   internal val questionnaire: Questionnaire
@@ -128,11 +114,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             "Neither EXTRA_QUESTIONNAIRE_JSON_URI nor EXTRA_QUESTIONNAIRE_JSON_STRING is supplied.",
           )
       }
-    // Add timestamp questionnaire items
-    if (shouldAddTimestampItems) {
-      questionnaire.addItem(getTimestampItem(LAUNCH_TIMESTAMP_LINK_ID))
-      questionnaire.addItem(getTimestampItem(SUBMISSION_TIMESTAMP_LINK_ID))
-    }
   }
 
   /** The current questionnaire response as questions are being answered. */
@@ -174,8 +155,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    if (shouldAddTimestampItems)
-      addTimeStampValue(questionnaireResponse.item, LAUNCH_TIMESTAMP_LINK_ID)
     questionnaireResponse.packRepeatedGroups()
   }
 
@@ -453,31 +432,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
           .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
-      if (shouldAddTimestampItems)
-        addTimeStampValue(item, SUBMISSION_TIMESTAMP_LINK_ID)
     }
   }
-
-    private fun addTimeStampValue(items: List<QuestionnaireResponseItemComponent>, itemLinkId : String) {
-          items.forEach { item ->
-              if (item.linkId == itemLinkId) {
-                  item.answer = arrayListOf<QuestionnaireResponseItemAnswerComponent?>().apply {
-                      add(QuestionnaireResponseItemAnswerComponent().apply {
-                          value = DateTimeType(Date().toTimeZoneString())
-                      })
-                  }
-              }
-          }
-    }
-
-    private fun getTimestampItem(linkIdVal : String): QuestionnaireItemComponent =
-        QuestionnaireItemComponent().apply {
-            linkId = linkIdVal
-            readOnly = true
-            type = Questionnaire.QuestionnaireItemType.DATETIME
-            extension.add(Extension("http://hl7.org/fhir/StructureDefinition/questionnaire-hidden", BooleanType(true)))
-        }
-
 
   /** Clears all the answers from the questionnaire response by iterating through each item. */
   fun clearAllAnswers() {
@@ -984,16 +940,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
-  companion object {
-    /**
-     *  [QuestionnaireItemComponent] Link ID for launch time stamp
-     */
-    internal const val LAUNCH_TIMESTAMP_LINK_ID = "launch-timestamp"
-    /**
-     *  [QuestionnaireItemComponent] Link ID for submission time stamp
-     */
-    internal const val SUBMISSION_TIMESTAMP_LINK_ID = "submission-timestamp"
-  }
 }
 
 typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, QuestionnaireItemComponent>
