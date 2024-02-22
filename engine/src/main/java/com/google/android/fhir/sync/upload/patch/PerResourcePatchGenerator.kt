@@ -22,6 +22,8 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
+import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 
 /**
  * Generates a [Patch] for all [LocalChange]es made to a single FHIR resource.
@@ -30,10 +32,10 @@ import com.google.android.fhir.LocalChange.Type
  * maintain an audit trail, but instead, multiple changes made to the same FHIR resource on the
  * client can be recorded as a single change on the server.
  */
-internal object PerResourcePatchGenerator : PatchGenerator {
+internal class PerResourcePatchGenerator(val database: Database) : PatchGenerator {
 
-  override fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
-    return generateSquashedChangesMapping(localChanges).orderByReferences()
+  override suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
+    return generateSquashedChangesMapping(localChanges).orderByReferences(database)
   }
 
   @androidx.annotation.VisibleForTesting
@@ -152,7 +154,7 @@ private typealias Node = String
  * - throws [IllegalStateException] otherwise
  */
 @androidx.annotation.VisibleForTesting
-internal fun List<PatchMapping>.orderByReferences(): List<PatchMapping> {
+internal suspend fun List<PatchMapping>.orderByReferences(database: Database): List<PatchMapping> {
   // if the resource A has outgoing references (B,C) and these referenced resources are getting
   // created on device,
   // then these referenced resources (B,C) needs to go before the resource A so that referential
@@ -161,11 +163,18 @@ internal fun List<PatchMapping>.orderByReferences(): List<PatchMapping> {
     "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}"
   }
 
+  // get references for all the local changes
+  val localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>> =
+    database
+      .getLocalChangeResourceReferences(flatMap { it.localChanges.flatMap { it.token.ids } })
+      .groupBy { it.localChangeId }
+
   val adjacencyList =
-    createReferenceAdjacencyList(
+    createAdjacencyListForCreateReferences(
       resourceIdToPatchMapping.keys
         .filter { resourceIdToPatchMapping[it]?.generatedPatch?.type == Patch.Type.INSERT }
         .toSet(),
+      localChangeIdToReferenceMap,
     )
   return createTopologicalOrderedList(adjacencyList).mapNotNull { resourceIdToPatchMapping[it] }
 }
@@ -175,33 +184,36 @@ internal fun List<PatchMapping>.orderByReferences(): List<PatchMapping> {
  *   type [Patch.Type.INSERT] .
  */
 @androidx.annotation.VisibleForTesting
-internal fun List<PatchMapping>.createReferenceAdjacencyList(
+internal fun List<PatchMapping>.createAdjacencyListForCreateReferences(
   insertResourceIds: Set<String>,
+  localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>>,
 ): Map<Node, List<Node>> {
   val adjacencyList = mutableMapOf<Node, List<Node>>()
   forEach { patchMapping ->
     adjacencyList[
       "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}",
-    ] = patchMapping.findOutgoingReferences().filter { insertResourceIds.contains(it) }
+    ] =
+      patchMapping.findOutgoingReferences(localChangeIdToReferenceMap).filter {
+        insertResourceIds.contains(it)
+      }
   }
   return adjacencyList
 }
 
 // if the outgoing reference is to a resource that's just an update and not create, then don't link
 // to it. This may make the sub graphs smaller and also help avoid cyclic dependencies.
-@androidx.annotation.VisibleForTesting
-internal fun PatchMapping.findOutgoingReferences(): List<Node> {
-  val references = mutableListOf<Node>()
+private fun PatchMapping.findOutgoingReferences(
+  localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>>,
+): Set<Node> {
+  val references = mutableSetOf<Node>()
   when (generatedPatch.type) {
-    Patch.Type.INSERT -> {
-      JsonLoader.fromString(generatedPatch.payload).search(references)
-    }
-    Patch.Type.UPDATE -> {
-      JsonLoader.fromString(generatedPatch.payload).forEach {
-        if (it.get("path").asText().endsWith("/reference")) {
-          references.add(it.get("value").asText())
-        } else {
-          it.get("value").search(references)
+    Patch.Type.INSERT,
+    Patch.Type.UPDATE, -> {
+      localChanges.forEach { localChange ->
+        localChange.token.ids.forEach { id ->
+          localChangeIdToReferenceMap[id]?.let {
+            references.addAll(it.map { it.resourceReferenceValue })
+          }
         }
       }
     }
@@ -210,13 +222,6 @@ internal fun PatchMapping.findOutgoingReferences(): List<Node> {
     }
   }
   return references
-}
-
-private fun JsonNode.search(reference: MutableList<String>) {
-  if (has("reference") && get("reference").isTextual) {
-    reference.add(get("reference").asText())
-  }
-  elements().forEach { it.search(reference) }
 }
 
 @androidx.annotation.VisibleForTesting

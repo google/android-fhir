@@ -20,6 +20,8 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
@@ -34,7 +36,9 @@ import java.time.Instant
 import java.util.Date
 import java.util.LinkedList
 import java.util.UUID
-import org.hl7.fhir.r4.model.CarePlan
+import kotlin.random.Random
+import kotlin.test.assertFailsWith
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Group
 import org.hl7.fhir.r4.model.HumanName
@@ -46,20 +50,34 @@ import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
-import org.junit.Assert
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class PerResourcePatchGeneratorTest {
 
+  @Mock private lateinit var database: Database
+  private lateinit var patchGenerator: PerResourcePatchGenerator
+
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    runTest { whenever(database.getLocalChangeResourceReferences(any())).thenReturn(emptyList()) }
+    patchGenerator = PerResourcePatchGenerator(database)
+  }
+
   @Test
-  fun `should generate a single insert patch if the resource is inserted`() {
+  fun `should generate a single insert patch if the resource is inserted`() = runTest {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     val insertionLocalChange = createInsertLocalChange(patient)
 
-    val patches = PerResourcePatchGenerator.generate(listOf(insertionLocalChange))
+    val patches = patchGenerator.generate(listOf(insertionLocalChange))
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -77,7 +95,7 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should generate a single update patch if the resource is updated`() {
+  fun `should generate a single update patch if the resource is updated`() = runTest {
     val remoteMeta =
       Meta().apply {
         versionId = "patient-version-1"
@@ -90,7 +108,7 @@ class PerResourcePatchGeneratorTest {
     val updateLocalChange1 = createUpdateLocalChange(remotePatient, updatedPatient1, 1L)
     val updatePatch = readJsonArrayFromFile("/update_patch_1.json")
 
-    val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1))
+    val patches = patchGenerator.generate(listOf(updateLocalChange1))
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -109,7 +127,7 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should generate a single delete patch if the resource is deleted`() {
+  fun `should generate a single delete patch if the resource is deleted`() = runTest {
     val remoteMeta =
       Meta().apply {
         versionId = "patient-version-1"
@@ -119,7 +137,7 @@ class PerResourcePatchGeneratorTest {
     remotePatient.meta = remoteMeta
     val deleteLocalChange = createDeleteLocalChange(remotePatient, 3L)
 
-    val patches = PerResourcePatchGenerator.generate(listOf(deleteLocalChange))
+    val patches = patchGenerator.generate(listOf(deleteLocalChange))
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -138,15 +156,14 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should generate a single insert patch if the resource is inserted and updated`() {
+  fun `should generate a single insert patch if the resource is inserted and updated`() = runTest {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     val insertionLocalChange = createInsertLocalChange(patient)
     val updatedPatient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     val updateLocalChange = createUpdateLocalChange(patient, updatedPatient, 1L)
     val patientString = jsonParser.encodeResourceToString(updatedPatient)
 
-    val patches =
-      PerResourcePatchGenerator.generate(listOf(insertionLocalChange, updateLocalChange))
+    val patches = patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange))
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -164,7 +181,7 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should generate no patch if the resource is inserted and deleted`() {
+  fun `should generate no patch if the resource is inserted and deleted`() = runTest {
     val changes =
       listOf(
         LocalChangeEntity(
@@ -203,13 +220,13 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
       )
-    val patchToUpload = PerResourcePatchGenerator.generate(changes)
+    val patchToUpload = patchGenerator.generate(changes)
 
     assertThat(patchToUpload).isEmpty()
   }
 
   @Test
-  fun `should generate no patch if the resource is inserted, updated, and deleted`() {
+  fun `should generate no patch if the resource is inserted, updated, and deleted`() = runTest {
     val changes =
       listOf(
         LocalChangeEntity(
@@ -281,13 +298,13 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
       )
-    val patchToUpload = PerResourcePatchGenerator.generate(changes)
+    val patchToUpload = patchGenerator.generate(changes)
 
     assertThat(patchToUpload).isEmpty()
   }
 
   @Test
-  fun `should generate a single update patch if the resource is updated twice`() {
+  fun `should generate a single update patch if the resource is updated twice`() = runTest {
     val remoteMeta =
       Meta().apply {
         versionId = "patient-version-1"
@@ -303,7 +320,7 @@ class PerResourcePatchGeneratorTest {
     val updateLocalChange2 = createUpdateLocalChange(updatedPatient1, updatedPatient2, 2L)
     val updatePatch = readJsonArrayFromFile("/update_patch_2.json")
 
-    val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2))
+    val patches = patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2))
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -322,44 +339,44 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should generate a single update patch with three elements of two adds and one remove`() {
-    val expectedPatch = readJsonArrayFromFile("/update_careplan_patch.json")
-    val updatePatch1 = readJsonArrayFromFile("/update_careplan_patch_1.json")
-    val updatePatch2 = readJsonArrayFromFile("/update_careplan_patch_2.json")
+  fun `should generate a single update patch with three elements of two adds and one remove`() =
+    runTest {
+      val expectedPatch = readJsonArrayFromFile("/update_careplan_patch.json")
+      val updatePatch1 = readJsonArrayFromFile("/update_careplan_patch_1.json")
+      val updatePatch2 = readJsonArrayFromFile("/update_careplan_patch_2.json")
 
-    val updatedLocalChange1 =
-      LocalChange(
-        resourceType = "CarePlan",
-        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
-        type = LocalChange.Type.UPDATE,
-        payload = updatePatch1.toString(),
-        timestamp = Instant.now(),
-        token = LocalChangeToken(listOf(1)),
-      )
+      val updatedLocalChange1 =
+        LocalChange(
+          resourceType = "CarePlan",
+          resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+          type = LocalChange.Type.UPDATE,
+          payload = updatePatch1.toString(),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        )
 
-    val updatedLocalChange2 =
-      LocalChange(
-        resourceType = "CarePlan",
-        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
-        type = LocalChange.Type.UPDATE,
-        payload = updatePatch2.toString(),
-        timestamp = Instant.now(),
-        token = LocalChangeToken(listOf(1)),
-      )
+      val updatedLocalChange2 =
+        LocalChange(
+          resourceType = "CarePlan",
+          resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+          type = LocalChange.Type.UPDATE,
+          payload = updatePatch2.toString(),
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1)),
+        )
 
-    val patches =
-      PerResourcePatchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
+      val patches = patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
 
-    with(patches.single().generatedPatch) {
-      assertThat(type).isEqualTo(Patch.Type.UPDATE)
-      assertThat(resourceId).isEqualTo("131b5257-a8b3-435a-8cb3-4cb1296be24a")
-      assertThat(resourceType).isEqualTo("CarePlan")
-      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), expectedPatch)
+      with(patches.single().generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.UPDATE)
+        assertThat(resourceId).isEqualTo("131b5257-a8b3-435a-8cb3-4cb1296be24a")
+        assertThat(resourceType).isEqualTo("CarePlan")
+        assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), expectedPatch)
+      }
     }
-  }
 
   @Test
-  fun `should generate a single delete patch if the resource is updated and deleted`() {
+  fun `should generate a single delete patch if the resource is updated and deleted`() = runTest {
     val remoteMeta =
       Meta().apply {
         versionId = "patient-version-1"
@@ -376,7 +393,7 @@ class PerResourcePatchGeneratorTest {
     val deleteLocalChange = createDeleteLocalChange(updatedPatient2, 3L)
 
     val patches =
-      PerResourcePatchGenerator.generate(
+      patchGenerator.generate(
         listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
       )
 
@@ -397,7 +414,7 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `should throw an error if a change is done after a resource is deleted locally`() {
+  fun `should throw an error if a change is done after a resource is deleted locally`() = runTest {
     val changes =
       listOf(
         LocalChangeEntity(
@@ -425,16 +442,14 @@ class PerResourcePatchGeneratorTest {
       )
 
     val errorMessage =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-          PerResourcePatchGenerator.generate(changes)
-        }
+      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes) }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Changes after deletion of resource are not permitted")
   }
 
   @Test
-  fun `should throw an error if a change is done before a resource is created locally`() {
+  fun `should throw an error if a change is done before a resource is created locally`() = runTest {
     val changes =
       listOf(
         LocalChangeEntity(
@@ -473,11 +488,8 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
       )
-
     val errorMessage =
-      Assert.assertThrows(IllegalArgumentException::class.java) {
-          PerResourcePatchGenerator.generate(changes)
-        }
+      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes) }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Changes before creation of resource are not permitted")
@@ -500,14 +512,14 @@ class PerResourcePatchGeneratorTest {
     )
   }
 
-  private fun createInsertLocalChange(entity: Resource): LocalChange {
+  private fun createInsertLocalChange(entity: Resource, currentChangeId: Long = 1): LocalChange {
     return LocalChange(
       resourceId = entity.logicalId,
       resourceType = entity.resourceType.name,
       type = LocalChange.Type.INSERT,
       payload = jsonParser.encodeResourceToString(entity),
       versionId = entity.versionId,
-      token = LocalChangeToken(listOf(1L)),
+      token = LocalChangeToken(listOf(currentChangeId)),
       timestamp = Instant.now(),
     )
   }
@@ -525,569 +537,478 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun test_observation_findOutgoingReferences() {
-    val observation =
-      FhirContext.forR4Cached()
-        .newJsonParser()
-        .parseResource(
-          """
-      {
-        "resourceType" : "Observation",
-        "id" : "f206",
-        "text" : {
-          "status" : "generated",
-          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: Observation</b><a name=\"f206\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource Observation &quot;f206&quot; </p></div><p><b>status</b>: final</p><p><b>code</b>: Blood culture <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (acmelabs.org#104177; <a href=\"https://loinc.org/\">LOINC</a>#600-7 &quot;Bacteria identified in Blood by Culture&quot;)</span></p><p><b>subject</b>: <span title=\"  No identifier could be provided to this observation  \"><a href=\"patient-example-f201-roel.html\">Patient/f201: Roel</a> &quot;Roel&quot;</span></p><p><b>issued</b>: 11 Mar 2013, 8:28:00 pm</p><p><b>performer</b>: <a href=\"practitioner-example-f202-lm.html\">Practitioner/f202: Luigi Maas</a> &quot;Luigi Maas&quot;</p><p><b>value</b>: Staphylococcus aureus <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#3092008)</span></p><p><b>interpretation</b>: Positive <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"http://terminology.hl7.org/5.1.0/CodeSystem-v3-ObservationInterpretation.html\">ObservationInterpretation</a>#POS)</span></p><p><b>method</b>: <span title=\"  BodySite not relevant  \">Blood culture for bacteria, including anaerobic screen <span style=\"background: LightGoldenRodYellow; margin: 4px; border: 1px solid khaki\"> (<a href=\"https://browser.ihtsdotools.org/\">SNOMED CT</a>#104177005)</span></span></p></div>"
-        },
-        "status" : "final",
-        "code" : {
-          "coding" : [{
-            "system" : "http://acmelabs.org",
-            "code" : "104177",
-            "display" : "Blood culture"
-          },
-          {
-            "system" : "http://loinc.org",
-            "code" : "600-7",
-            "display" : "Bacteria identified in Blood by Culture"
-          }]
-        },
-        "subject" : {
-          "reference" : "Patient/f201",
-          "display" : "Roel"
-        },
-        "issued" : "2013-03-11T10:28:00+01:00",
-        "performer" : [{
-          "reference" : "Practitioner/f202",
-          "display" : "Luigi Maas"
-        }],
-        "valueCodeableConcept" : {
-          "coding" : [{
-            "system" : "http://snomed.info/sct",
-            "code" : "3092008",
-            "display" : "Staphylococcus aureus"
-          }]
-        },
-        "interpretation" : [{
-          "coding" : [{
-            "system" : "http://terminology.hl7.org/CodeSystem/v3-ObservationInterpretation",
-            "code" : "POS"
-          }]
-        }],
-        "method" : {
-          "coding" : [{
-            "system" : "http://snomed.info/sct",
-            "code" : "104177005",
-            "display" : "Blood culture for bacteria, including anaerobic screen"
-          }]
-        }
-      }
-    """
-            .trimIndent(),
-        ) as Resource
+  fun `createReferenceAdjacencyList with local changes for only new resources should only have edges to inserted resources`() =
+    runTest {
+      val localChanges = LinkedList<LocalChange>()
+      val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
 
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(
-          listOf(createInsertLocalChange(observation)),
+      var group =
+        Group()
+          .apply {
+            id = "group-1"
+            type = Group.GroupType.PERSON
+          }
+          .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+
+      // pa-01
+      Patient()
+        .apply { id = "patient-1" }
+        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+      Encounter()
+        .apply {
+          id = "encounter-1"
+          subject = Reference("Patient/patient-1")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-1",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-1"
+          subject = Reference("Patient/patient-1")
+          encounter = Reference("Encounter/encounter-1")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-1",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-1",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-1",
+                "Group.member",
+              ),
+            )
+          }
+
+      // pa-02
+      Patient()
+        .apply { id = "patient-2" }
+        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+      Encounter()
+        .apply {
+          id = "encounter-2"
+          subject = Reference("Patient/patient-2")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-2",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-2"
+          subject = Reference("Patient/patient-2")
+          encounter = Reference("Encounter/encounter-2")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-2",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-2",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-2",
+                "Group.member",
+              ),
+            )
+          }
+
+      // pa-03
+      Patient()
+        .apply { id = "patient-3" }
+        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+
+      Encounter()
+        .apply {
+          id = "encounter-3"
+          subject = Reference("Patient/patient-3")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-3",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-3"
+          subject = Reference("Patient/patient-3")
+          encounter = Reference("Encounter/encounter-3")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-3",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-3",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-3",
+                "Group.member",
+              ),
+            )
+          }
+
+      whenever(database.getLocalChangeResourceReferences(any()))
+        .thenReturn(localChangeResourceReferences)
+
+      val result =
+        patchGenerator
+          .generateSquashedChangesMapping(localChanges)
+          .createAdjacencyListForCreateReferences(
+            localChanges.map { "${it.resourceType}/${it.resourceId}" }.toSet(),
+            localChangeResourceReferences.groupBy { it.localChangeId },
+          )
+
+      assertThat(result)
+        .isEqualTo(
+          mutableMapOf(
+            "Group/group-1" to
+              listOf("Patient/patient-1", "Patient/patient-2", "Patient/patient-3"),
+            "Patient/patient-1" to emptyList(),
+            "Patient/patient-2" to emptyList(),
+            "Patient/patient-3" to emptyList(),
+            "Encounter/encounter-1" to listOf("Patient/patient-1"),
+            "Encounter/encounter-2" to listOf("Patient/patient-2"),
+            "Encounter/encounter-3" to listOf("Patient/patient-3"),
+            "Observation/observation-1" to listOf("Patient/patient-1", "Encounter/encounter-1"),
+            "Observation/observation-2" to listOf("Patient/patient-2", "Encounter/encounter-2"),
+            "Observation/observation-3" to listOf("Patient/patient-3", "Encounter/encounter-3"),
+          ),
         )
-        .single()
-        .findOutgoingReferences()
-    assertThat(result).containsExactly("Patient/f201", "Practitioner/f202")
-  }
+    }
 
   @Test
-  fun test_group_findOutgoingReferences() {
-    val group =
-      FhirContext.forR4Cached()
-        .newJsonParser()
-        .parseResource(
-          """
-      {
-  "resourceType" : "Group",
-  "id" : "102",
-  "text" : {
-    "status" : "additional",
-    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>Selected Patients</p>\n      <ul>\n        <li>Patient Donald DUCK @ Acme Healthcare, Inc. MR = 654321</li>\n        <li>Patient Donald D DUCK @ Acme Healthcare, Inc. MR = 123456</li>\n        <li>Patient Simon Notsowell @ Acme Healthcare, Inc. MR = 123457, DECEASED</li>\n        <li>Patient Sandy Notsowell @ Acme Healthcare, Inc. MR = 123458, DECEASED</li>\n      </ul>\n    </div>"
-  },
-  "type" : "person",
-  "membership" : "enumerated",
-  "member" : [{
-    "entity" : {
-      "reference" : "Patient/pat1"
-    },
-    "period" : {
-      "start" : "2014-10-08"
-    }
-  },
-  {
-    "entity" : {
-      "reference" : "Patient/pat2"
-    },
-    "period" : {
-      "start" : "2015-04-02"
-    },
-    "inactive" : true
-  },
-  {
-    "entity" : {
-      "reference" : "Patient/pat3"
-    },
-    "period" : {
-      "start" : "2015-08-06"
-    }
-  },
-  {
-    "entity" : {
-      "reference" : "Patient/pat4"
-    },
-    "period" : {
-      "start" : "2015-08-06"
-    }
-  }],
-  "characteristic" : [{
-    "code" : {
-      "coding" : [{
-        "system" : "http://example.org",
-        "code" : "attributed-to"
-      }],
-      "text" : "Patients primarily attributed to"
-    },
-    "valueReference" : {
-      "reference" : "Practitioner/123"
-    },
-    "exclude" : false
-  }]
-}
-    """
-            .trimIndent(),
-        ) as Resource
+  fun `createReferenceAdjacencyList with local changes for new and old resources should only have edges to inserted resources`() =
+    runTest {
+      val localChanges = mutableListOf<LocalChange>()
+      val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
 
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(
-          listOf(createInsertLocalChange(group)),
+      var group =
+        Group()
+          .apply {
+            id = "group-1"
+            type = Group.GroupType.PERSON
+          }
+          .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+
+      // pa-01
+      Patient()
+        .apply { id = "patient-1" }
+        .also {
+          localChanges.add(
+            createUpdateLocalChange(
+              it,
+              it.copy().apply { active = true },
+              Random.nextLong(),
+            ),
+          )
+        }
+
+      Encounter()
+        .apply {
+          id = "encounter-1"
+          subject = Reference("Patient/patient-1")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-1",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-1"
+          subject = Reference("Patient/patient-1")
+          encounter = Reference("Encounter/encounter-1")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-1",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-1",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-1",
+                "Group.member",
+              ),
+            )
+          }
+
+      // pa-02
+      Patient()
+        .apply { id = "patient-2" }
+        .also {
+          localChanges.add(
+            createUpdateLocalChange(
+              it,
+              it.copy().apply { active = true },
+              Random.nextLong(),
+            ),
+          )
+        }
+      Encounter()
+        .apply {
+          id = "encounter-2"
+          subject = Reference("Patient/patient-2")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-2",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-2"
+          subject = Reference("Patient/patient-2")
+          encounter = Reference("Encounter/encounter-2")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-2",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-2",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-2",
+                "Group.member",
+              ),
+            )
+          }
+
+      // pa-03
+      Patient()
+        .apply { id = "patient-3" }
+        .also {
+          localChanges.add(
+            createUpdateLocalChange(
+              it,
+              it.copy().apply { active = true },
+              Random.nextLong(),
+            ),
+          )
+        }
+
+      Encounter()
+        .apply {
+          id = "encounter-3"
+          subject = Reference("Patient/patient-3")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-3",
+              "Encounter.subject",
+            ),
+          )
+        }
+
+      Observation()
+        .apply {
+          id = "observation-3"
+          subject = Reference("Patient/patient-3")
+          encounter = Reference("Encounter/encounter-3")
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-3",
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Encounter/encounter-3",
+              "Observation.encounter",
+            ),
+          )
+        }
+
+      group =
+        group
+          .copy()
+          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+          .also {
+            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "Patient/patient-3",
+                "Group.member",
+              ),
+            )
+          }
+
+      whenever(database.getLocalChangeResourceReferences(any()))
+        .thenReturn(localChangeResourceReferences)
+
+      val result =
+        patchGenerator
+          .generateSquashedChangesMapping(localChanges)
+          .createAdjacencyListForCreateReferences(
+            localChanges
+              .filter { it.type == LocalChange.Type.INSERT }
+              .map { "${it.resourceType}/${it.resourceId}" }
+              .toSet(),
+            localChangeResourceReferences.groupBy { it.localChangeId },
+          )
+
+      assertThat(result)
+        .isEqualTo(
+          mutableMapOf(
+            "Group/group-1" to emptyList(),
+            "Patient/patient-1" to emptyList(),
+            "Patient/patient-2" to emptyList(),
+            "Patient/patient-3" to emptyList(),
+            "Encounter/encounter-1" to emptyList(),
+            "Encounter/encounter-2" to emptyList(),
+            "Encounter/encounter-3" to emptyList(),
+            "Observation/observation-1" to listOf("Encounter/encounter-1"),
+            "Observation/observation-2" to listOf("Encounter/encounter-2"),
+            "Observation/observation-3" to listOf("Encounter/encounter-3"),
+          ),
         )
-        .single()
-        .findOutgoingReferences()
-    assertThat(result)
-      .containsExactly(
-        "Patient/pat1",
-        "Patient/pat2",
-        "Patient/pat3",
-        "Patient/pat4",
-        "Practitioner/123",
-      )
-  }
+    }
 
   @Test
-  fun test_careplan_insertpatch_findOutgoingReferences() {
-    val group =
-      FhirContext.forR4Cached()
-        .newJsonParser()
-        .parseResource(
-          """{
-  "resourceType": "CarePlan",
-  "id": "gpvisit",
-  "text": {
-    "status": "additional",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>  Represents the flow of a patient within a practice. The plan is created when\n        they arrive and represents the 'care' of the patient over the course of that encounter.\n        They first see the nurse for basic observations (BP, pulse, temp) then the doctor for\n        the consultation and finally the nurse again for a tetanus immunization. As the plan is\n        updated (e.g. a new activity added), different versions of the plan exist, and workflow timings\n        for reporting can be gained by examining the plan history. This example is the version after\n        seeing the doctor, and waiting for the nurse.The plan can either be created 'ad hoc' and modified as\n        the parient progresses, or start with a standard template (which can, of course, be altered to suit the patient.</p>\n    </div>"
-  },
-  "contained": [
-    {
-      "resourceType": "Condition",
-      "id": "p1",
-      "clinicalStatus": {
-        "coding": [
-          {
-            "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-            "code": "active"
-          }
-        ]
-      },
-      "verificationStatus": {
-        "coding": [
-          {
-            "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-            "code": "confirmed"
-          }
-        ]
-      },
-      "code": {
-        "text": "Overseas encounter"
-      },
-      "subject": {
-        "reference": "Patient/100",
-        "display": "Peter James Chalmers"
-      }
-    },
-    {
-      "resourceType": "CareTeam",
-      "id": "careteam",
-      "participant": [
-        {
-          "id": "part1",
-          "role": [
-            {
-              "coding": [
-                {
-                  "system": "http://example.org/local",
-                  "code": "nur"
-                }
-              ],
-              "text": "nurse"
-            }
-          ],
-          "member": {
-            "reference": "Practitioner/13",
-            "display": "Nurse Nancy"
-          }
-        },
-        {
-          "id": "part2",
-          "role": [
-            {
-              "coding": [
-                {
-                  "system": "http://example.org/local",
-                  "code": "doc"
-                }
-              ],
-              "text": "doctor"
-            }
-          ],
-          "member": {
-            "reference": "Practitioner/14",
-            "display": "Doctor Dave"
-          }
-        }
-      ]
-    },
-    {
-      "resourceType": "Goal",
-      "id": "goal",
-      "lifecycleStatus": "planned",
-      "description": {
-        "text": "Complete consultation"
-      },
-      "subject": {
-        "reference": "Patient/100",
-        "display": "Peter James Chalmers"
-      }
-    }
-  ],
-  "status": "active",
-  "intent": "plan",
-  "subject": {
-    "reference": "Patient/100",
-    "display": "Peter James Chalmers"
-  },
-  "period": {
-    "start": "2013-01-01T10:30:00+00:00"
-  },
-  "careTeam": [
-    {
-      "reference": "#careteam"
-    }
-  ],
-  "addresses": [
-    {
-      "reference": "#p1",
-      "display": "obesity"
-    }
-  ],
-  "goal": [
-    {
-      "reference": "#goal"
-    }
-  ],
-  "activity": [
-    {
-      "outcomeReference": [
-        {
-          "reference": "Encounter/example"
-        }
-      ],
-      "detail": {
-        "kind": "Appointment",
-        "code": {
-          "coding": [
-            {
-              "system": "http://example.org/local",
-              "code": "nursecon"
-            }
-          ],
-          "text": "Nurse Consultation"
-        },
-        "status": "completed",
-        "doNotPerform": false,
-        "scheduledPeriod": {
-          "start": "2013-01-01T10:38:00+00:00",
-          "end": "2013-01-01T10:50:00+00:00"
-        },
-        "performer": [
-          {
-            "reference": "Practitioner/13",
-            "display": "Nurse Nancy"
-          }
-        ]
-      }
-    },
-    {
-      "detail": {
-        "kind": "Appointment",
-        "code": {
-          "coding": [
-            {
-              "system": "http://example.org/local",
-              "code": "doccon"
-            }
-          ],
-          "text": "Doctor Consultation"
-        },
-        "status": "scheduled",
-        "doNotPerform": false,
-        "performer": [
-          {
-            "reference": "Practitioner/14",
-            "display": "Doctor Dave"
-          }
-        ]
-      }
-    }
-  ]
-}
-                    """
-            .trimIndent(),
-        ) as Resource
-
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(
-          listOf(createInsertLocalChange(group)),
-        )
-        .single()
-        .findOutgoingReferences()
-    assertThat(result)
-      .containsExactly(
-        "Patient/100",
-        "Practitioner/13",
-        "Practitioner/14",
-        "Patient/100",
-        "Patient/100",
-        "#careteam",
-        "#p1",
-        "#goal",
-        "Encounter/example",
-        "Practitioner/13",
-        "Practitioner/14",
-      )
-      .inOrder()
-  }
-
-  @Test
-  fun test_careplan_updatepatch_findOutgoingReferences() {
-    val group =
-      FhirContext.forR4Cached()
-        .newJsonParser()
-        .parseResource(
-          """{
-  "resourceType": "CarePlan",
-  "id": "gpvisit",
-  "text": {
-    "status": "additional",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">\n      <p>  Represents the flow of a patient within a practice. The plan is created when\n        they arrive and represents the 'care' of the patient over the course of that encounter.\n        They first see the nurse for basic observations (BP, pulse, temp) then the doctor for\n        the consultation and finally the nurse again for a tetanus immunization. As the plan is\n        updated (e.g. a new activity added), different versions of the plan exist, and workflow timings\n        for reporting can be gained by examining the plan history. This example is the version after\n        seeing the doctor, and waiting for the nurse.The plan can either be created 'ad hoc' and modified as\n        the parient progresses, or start with a standard template (which can, of course, be altered to suit the patient.</p>\n    </div>"
-  },
-  "contained": [
-    {
-      "resourceType": "Condition",
-      "id": "p1",
-      "clinicalStatus": {
-        "coding": [
-          {
-            "system": "http://terminology.hl7.org/CodeSystem/condition-clinical",
-            "code": "active"
-          }
-        ]
-      },
-      "verificationStatus": {
-        "coding": [
-          {
-            "system": "http://terminology.hl7.org/CodeSystem/condition-ver-status",
-            "code": "confirmed"
-          }
-        ]
-      },
-      "code": {
-        "text": "Overseas encounter"
-      },
-      "subject": {
-        "reference": "Patient/100",
-        "display": "Peter James Chalmers"
-      }
-    },
-    {
-      "resourceType": "CareTeam",
-      "id": "careteam",
-      "participant": [
-        {
-          "id": "part1",
-          "role": [
-            {
-              "coding": [
-                {
-                  "system": "http://example.org/local",
-                  "code": "nur"
-                }
-              ],
-              "text": "nurse"
-            }
-          ],
-          "member": {
-            "reference": "Practitioner/13",
-            "display": "Nurse Nancy"
-          }
-        },
-        {
-          "id": "part2",
-          "role": [
-            {
-              "coding": [
-                {
-                  "system": "http://example.org/local",
-                  "code": "doc"
-                }
-              ],
-              "text": "doctor"
-            }
-          ],
-          "member": {
-            "reference": "Practitioner/14",
-            "display": "Doctor Dave"
-          }
-        }
-      ]
-    },
-    {
-      "resourceType": "Goal",
-      "id": "goal",
-      "lifecycleStatus": "planned",
-      "description": {
-        "text": "Complete consultation"
-      },
-      "subject": {
-        "reference": "Patient/100",
-        "display": "Peter James Chalmers"
-      }
-    }
-  ],
-  "status": "active",
-  "intent": "plan",
-  "subject": {
-    "reference": "Patient/100",
-    "display": "Peter James Chalmers"
-  },
-  "period": {
-    "start": "2013-01-01T10:30:00+00:00"
-  },
-  "careTeam": [
-    {
-      "reference": "#careteam"
-    }
-  ],
-  "addresses": [
-    {
-      "reference": "#p1",
-      "display": "obesity"
-    }
-  ],
-  "goal": [
-    {
-      "reference": "#goal"
-    }
-  ],
-  "activity": [
-    {
-      "outcomeReference": [
-        {
-          "reference": "Encounter/example"
-        }
-      ],
-      "detail": {
-        "kind": "Appointment",
-        "code": {
-          "coding": [
-            {
-              "system": "http://example.org/local",
-              "code": "nursecon"
-            }
-          ],
-          "text": "Nurse Consultation"
-        },
-        "status": "completed",
-        "doNotPerform": false,
-        "scheduledPeriod": {
-          "start": "2013-01-01T10:38:00+00:00",
-          "end": "2013-01-01T10:50:00+00:00"
-        },
-        "performer": [
-          {
-            "reference": "Practitioner/13",
-            "display": "Nurse Nancy"
-          }
-        ]
-      }
-    },
-    {
-      "detail": {
-        "kind": "Appointment",
-        "code": {
-          "coding": [
-            {
-              "system": "http://example.org/local",
-              "code": "doccon"
-            }
-          ],
-          "text": "Doctor Consultation"
-        },
-        "status": "scheduled",
-        "doNotPerform": false,
-        "performer": [
-          {
-            "reference": "Practitioner/14",
-            "display": "Doctor Dave"
-          }
-        ]
-      }
-    }
-  ]
-}
-                    """
-            .trimIndent(),
-        ) as Resource
-
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(
-          listOf(createUpdateLocalChange(CarePlan().apply { id = "gpvisit" }, group, 1)),
-        )
-        .single()
-        .also { println(it) }
-        .findOutgoingReferences()
-    assertThat(result)
-      .containsExactly(
-        "Patient/100",
-        "Practitioner/13",
-        "Practitioner/14",
-        "Patient/100",
-        "Patient/100",
-        "#careteam",
-        "#p1",
-        "#goal",
-        "Encounter/example",
-        "Practitioner/13",
-        "Practitioner/14",
-      )
-  }
-
-  @Test
-  fun test_createReferenceAdjacencyList() {
+  fun `generate with acyclic references should return the list in topological order`() = runTest {
     val localChanges = LinkedList<LocalChange>()
+    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
 
     var group =
       Group()
@@ -1095,16 +1016,23 @@ class PerResourcePatchGeneratorTest {
           id = "group-1"
           type = Group.GroupType.PERSON
         }
-        .also { localChanges.add(createInsertLocalChange(it)) }
+        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
 
     // pa-01
-    Patient().apply { id = "patient-1" }.also { localChanges.add(createInsertLocalChange(it)) }
-    Encounter()
-      .apply {
-        id = "encounter-1"
-        subject = Reference("Patient/patient-1")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+    group =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
+        .also {
+          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-1",
+              "Group.member",
+            ),
+          )
+        }
 
     Observation()
       .apply {
@@ -1112,307 +1040,168 @@ class PerResourcePatchGeneratorTest {
         subject = Reference("Patient/patient-1")
         encounter = Reference("Encounter/encounter-1")
       }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
-
-    // pa-02
-    Patient().apply { id = "patient-2" }.also { localChanges.add(createInsertLocalChange(it)) }
-    Encounter()
-      .apply {
-        id = "encounter-2"
-        subject = Reference("Patient/patient-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Observation()
-      .apply {
-        id = "observation-2"
-        subject = Reference("Patient/patient-2")
-        encounter = Reference("Encounter/encounter-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
-
-    // pa-03
-    Patient().apply { id = "patient-3" }.also { localChanges.add(createInsertLocalChange(it)) }
-
-    Encounter()
-      .apply {
-        id = "encounter-3"
-        subject = Reference("Patient/patient-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Observation()
-      .apply {
-        id = "observation-3"
-        subject = Reference("Patient/patient-3")
-        encounter = Reference("Encounter/encounter-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
-
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(localChanges)
-        .createReferenceAdjacencyList(
-          localChanges.map { "${it.resourceType}/${it.resourceId}" }.toSet(),
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-1",
+            "Observation.subject",
+          ),
         )
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Encounter/encounter-1",
+            "Observation.encounter",
+          ),
+        )
+      }
 
-    assertThat(result)
-      .isEqualTo(
-        mutableMapOf(
-          "Group/group-1" to listOf("Patient/patient-1", "Patient/patient-2", "Patient/patient-3"),
-          "Patient/patient-1" to emptyList(),
-          "Patient/patient-2" to emptyList(),
-          "Patient/patient-3" to emptyList(),
-          "Encounter/encounter-1" to listOf("Patient/patient-1"),
-          "Encounter/encounter-2" to listOf("Patient/patient-2"),
-          "Encounter/encounter-3" to listOf("Patient/patient-3"),
-          "Observation/observation-1" to listOf("Patient/patient-1", "Encounter/encounter-1"),
-          "Observation/observation-2" to listOf("Patient/patient-2", "Encounter/encounter-2"),
-          "Observation/observation-3" to listOf("Patient/patient-3", "Encounter/encounter-3"),
-        ),
-      )
-  }
+    Encounter()
+      .apply {
+        id = "encounter-1"
+        subject = Reference("Patient/patient-1")
+      }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-1",
+            "Encounter.subject",
+          ),
+        )
+      }
 
-  @Test
-  fun test_createReferenceAdjacencyList_WithUpdate() {
-    val localChanges = LinkedList<LocalChange>()
-
-    var group =
-      Group()
-        .apply {
-          id = "group-1"
-          type = Group.GroupType.PERSON
-        }
-        .also { localChanges.add(createInsertLocalChange(it)) }
-
-    // pa-01
     Patient()
       .apply { id = "patient-1" }
-      .also {
-        localChanges.add(
-          createUpdateLocalChange(
-            it,
-            it.copy().apply { active = true },
-            1,
-          ),
-        )
-      }
-    Encounter()
-      .apply {
-        id = "encounter-1"
-        subject = Reference("Patient/patient-1")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
 
-    Observation()
-      .apply {
-        id = "observation-1"
-        subject = Reference("Patient/patient-1")
-        encounter = Reference("Encounter/encounter-1")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
+    // pa-02
     group =
       group
         .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
+        .also {
+          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-2",
+              "Group.member",
+            ),
+          )
+        }
 
-    // pa-02
+    Observation()
+      .apply {
+        id = "observation-2"
+        subject = Reference("Patient/patient-2")
+        encounter = Reference("Encounter/encounter-2")
+      }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-2",
+            "Observation.subject",
+          ),
+        )
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Encounter/encounter-2",
+            "Observation.encounter",
+          ),
+        )
+      }
+
+    Encounter()
+      .apply {
+        id = "encounter-2"
+        subject = Reference("Patient/patient-2")
+      }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-1",
+            "Encounter.subject",
+          ),
+        )
+      }
+
     Patient()
       .apply { id = "patient-2" }
-      .also {
-        localChanges.add(
-          createUpdateLocalChange(
-            it,
-            it.copy().apply { active = true },
-            1,
-          ),
-        )
-      }
-    Encounter()
-      .apply {
-        id = "encounter-2"
-        subject = Reference("Patient/patient-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
 
-    Observation()
-      .apply {
-        id = "observation-2"
-        subject = Reference("Patient/patient-2")
-        encounter = Reference("Encounter/encounter-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
+    // pa-03
     group =
       group
         .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
+        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
+        .also {
+          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              "Patient/patient-3",
+              "Group.member",
+            ),
+          )
+        }
 
-    // pa-03
+    Observation()
+      .apply {
+        id = "observation-3"
+        subject = Reference("Patient/patient-3")
+        encounter = Reference("Encounter/encounter-3")
+      }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-3",
+            "Observation.subject",
+          ),
+        )
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Encounter/encounter-3",
+            "Observation.encounter",
+          ),
+        )
+      }
+
+    Encounter()
+      .apply {
+        id = "encounter-3"
+        subject = Reference("Patient/patient-3")
+      }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-3",
+            "Encounter.subject",
+          ),
+        )
+      }
+
     Patient()
       .apply { id = "patient-3" }
-      .also {
-        localChanges.add(
-          createUpdateLocalChange(
-            it,
-            it.copy().apply { active = true },
-            1,
-          ),
-        )
-      }
+      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
 
-    Encounter()
-      .apply {
-        id = "encounter-3"
-        subject = Reference("Patient/patient-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+    whenever(database.getLocalChangeResourceReferences(any()))
+      .thenReturn(localChangeResourceReferences)
 
-    Observation()
-      .apply {
-        id = "observation-3"
-        subject = Reference("Patient/patient-3")
-        encounter = Reference("Encounter/encounter-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
-
-    val result =
-      PerResourcePatchGenerator.generateSquashedChangesMapping(localChanges)
-        .createReferenceAdjacencyList(
-          localChanges
-            .filter { it.type == LocalChange.Type.INSERT }
-            .map { "${it.resourceType}/${it.resourceId}" }
-            .toSet(),
-        )
-
-    assertThat(result)
-      .isEqualTo(
-        mutableMapOf(
-          "Group/group-1" to emptyList(),
-          "Patient/patient-1" to emptyList(),
-          "Patient/patient-2" to emptyList(),
-          "Patient/patient-3" to emptyList(),
-          "Encounter/encounter-1" to emptyList(),
-          "Encounter/encounter-2" to emptyList(),
-          "Encounter/encounter-3" to emptyList(),
-          "Observation/observation-1" to listOf("Encounter/encounter-1"),
-          "Observation/observation-2" to listOf("Encounter/encounter-2"),
-          "Observation/observation-3" to listOf("Encounter/encounter-3"),
-        ),
-      )
-  }
-
-  @Test
-  fun `generate with acyclic references should return the list in topological order`() {
-    val localChanges = LinkedList<LocalChange>()
-
-    var group =
-      Group()
-        .apply {
-          id = "group-1"
-          type = Group.GroupType.PERSON
-        }
-        .also { localChanges.add(createInsertLocalChange(it)) }
-
-    // pa-01
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 1)) }
-
-    Observation()
-      .apply {
-        id = "observation-1"
-        subject = Reference("Patient/patient-1")
-        encounter = Reference("Encounter/encounter-1")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Encounter()
-      .apply {
-        id = "encounter-1"
-        subject = Reference("Patient/patient-1")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Patient().apply { id = "patient-1" }.also { localChanges.add(createInsertLocalChange(it)) }
-
-    // pa-02
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 2)) }
-
-    Observation()
-      .apply {
-        id = "observation-2"
-        subject = Reference("Patient/patient-2")
-        encounter = Reference("Encounter/encounter-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Encounter()
-      .apply {
-        id = "encounter-2"
-        subject = Reference("Patient/patient-2")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Patient().apply { id = "patient-2" }.also { localChanges.add(createInsertLocalChange(it)) }
-
-    // pa-03
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-        .also { localChanges.add(createUpdateLocalChange(group, it, 3)) }
-
-    Observation()
-      .apply {
-        id = "observation-3"
-        subject = Reference("Patient/patient-3")
-        encounter = Reference("Encounter/encounter-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Encounter()
-      .apply {
-        id = "encounter-3"
-        subject = Reference("Patient/patient-3")
-      }
-      .also { localChanges.add(createInsertLocalChange(it)) }
-
-    Patient().apply { id = "patient-3" }.also { localChanges.add(createInsertLocalChange(it)) }
-
-    val result = PerResourcePatchGenerator.generate(localChanges)
+    val result = patchGenerator.generate(localChanges)
     assertThat(result.map { it.generatedPatch.resourceId })
       .containsExactly(
         "patient-1",
@@ -1430,8 +1219,9 @@ class PerResourcePatchGeneratorTest {
   }
 
   @Test
-  fun `generate with cyclic references should throw exception`() {
+  fun `generate with cyclic references should throw exception`() = runTest {
     val localChanges = LinkedList<LocalChange>()
+    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
 
     Patient()
       .apply {
@@ -1440,19 +1230,38 @@ class PerResourcePatchGeneratorTest {
           Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/related-1") },
         )
       }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+      .also {
+        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "RelatedPerson/related-1",
+            "Patient.other",
+          ),
+        )
+      }
 
     RelatedPerson()
       .apply {
         id = "related-1"
         patient = Reference("Patient/patient-1")
       }
-      .also { localChanges.add(createInsertLocalChange(it)) }
+      .also {
+        localChanges.add(createInsertLocalChange(it))
+        localChangeResourceReferences.add(
+          LocalChangeResourceReference(
+            localChanges.last().token.ids.first(),
+            "Patient/patient-1",
+            "RelatedPerson.patient",
+          ),
+        )
+      }
+
+    whenever(database.getLocalChangeResourceReferences(any()))
+      .thenReturn(localChangeResourceReferences)
 
     val errorMessage =
-      Assert.assertThrows(IllegalStateException::class.java) {
-          PerResourcePatchGenerator.generate(localChanges)
-        }
+      assertFailsWith<IllegalStateException> { patchGenerator.generate(localChanges) }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Detected a cycle.")

@@ -18,6 +18,7 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.db.Database
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
@@ -65,6 +66,11 @@ object FhirEngineProvider {
   @Synchronized
   internal fun getFhirDataStore(context: Context): FhirDataStore {
     return getOrCreateFhirService(context).fhirDataStore
+  }
+
+  @Synchronized
+  internal fun getFhirDatabase(context: Context): Database {
+    return getOrCreateFhirService(context).database
   }
 
   @Synchronized

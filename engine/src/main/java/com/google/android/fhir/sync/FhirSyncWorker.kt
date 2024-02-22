@@ -76,7 +76,11 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         UploadConfiguration(
           Uploader(
             dataSource = dataSource,
-            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+            patchGenerator =
+              PatchGeneratorFactory.byMode(
+                getUploadStrategy().patchGeneratorMode,
+                FhirEngineProvider.getFhirDatabase(applicationContext),
+              ),
             requestGenerator =
               UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
           ),
