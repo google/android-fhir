@@ -86,7 +86,7 @@ internal constructor(
    */
   @WorkerThread
   fun evaluateLibrary(libraryUrl: String, expressions: Set<String>?): IBaseParameters {
-    return evaluateLibrary(libraryUrl, null, null, expressions)
+    return evaluateLibrary(libraryUrl = libraryUrl, expressions = expressions)
   }
 
   /**
@@ -109,7 +109,11 @@ internal constructor(
     patientId: String,
     expressions: Set<String>?,
   ): IBaseParameters {
-    return evaluateLibrary(libraryUrl, patientId, null, expressions)
+    return evaluateLibrary(
+      libraryUrl = libraryUrl,
+      patientId = patientId,
+      expressions = expressions
+    )
   }
 
   /**
@@ -132,7 +136,11 @@ internal constructor(
     parameters: Parameters,
     expressions: Set<String>?,
   ): IBaseParameters {
-    return evaluateLibrary(libraryUrl, null, parameters, expressions)
+    return evaluateLibrary(
+      libraryUrl = libraryUrl,
+      parameters = parameters,
+      expressions = expressions
+    )
   }
 
   /**
@@ -158,11 +166,10 @@ internal constructor(
     expressions: Set<String>?,
   ): IBaseParameters {
     return evaluateLibrary(
-      libraryUrl,
-      patientId,
-      parameters,
-      null,
-      expressions,
+      libraryUrl = libraryUrl,
+      patientId = patientId,
+      parameters = parameters,
+      expressions = expressions,
     )
   }
 
@@ -186,10 +193,10 @@ internal constructor(
   @WorkerThread
   fun evaluateLibrary(
     libraryUrl: String,
-    patientId: String?,
-    parameters: Parameters?,
-    additionalData: IBaseBundle?,
-    expressions: Set<String>?,
+    patientId: String? = null,
+    parameters: Parameters? = null,
+    additionalData: IBaseBundle? = null,
+    expressions: Set<String>? = null,
   ): IBaseParameters {
     return libraryProcessor.evaluate(
       /* url = */ libraryUrl,
