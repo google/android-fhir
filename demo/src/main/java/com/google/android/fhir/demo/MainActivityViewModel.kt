@@ -33,10 +33,8 @@ import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.shareIn
@@ -50,64 +48,28 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
 
   private val _oneTimeSyncTrigger = MutableStateFlow(false)
 
-  val pollState =
+  val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
     Sync.periodicSync<DemoFhirSyncWorker>(
-        context = application.applicationContext,
-        periodicSyncConfiguration =
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
-          ),
-      )
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
+      application.applicationContext,
+      periodicSyncConfiguration =
+      PeriodicSyncConfiguration(
+        syncConstraints = Constraints.Builder().build(),
+        repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+      ),
+    ).shareIn(viewModelScope, SharingStarted.Eagerly, 10)
 
-  val oneTimeSyncState =
+
+  val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .combine(
         flow = Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext),
       ) { _, syncJobStatus ->
         syncJobStatus
       }
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
-      
-  private val _pollState = MutableSharedFlow<CurrentSyncJobStatus>()
-  val pollState: Flow<CurrentSyncJobStatus>
-    get() = _pollState
-
-  private val _
-  = MutableSharedFlow<PeriodicSyncJobStatus>()
-  val pollPeriodicSyncJobStatus: Flow<PeriodicSyncJobStatus>
-    get() = _pollPeriodicSyncJobStatus
-
-  init {
-    viewModelScope.launch {
-      Sync.periodicSync<DemoFhirSyncWorker>(
-          application.applicationContext,
-          periodicSyncConfiguration =
-            PeriodicSyncConfiguration(
-              syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
-            ),
-        )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollPeriodicSyncJobStatus.emit(it) }
-    }
-  }
-
-  private var oneTimeSyncJob: Job? = null
+    .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
 
   fun triggerOneTimeSync() {
     _oneTimeSyncTrigger.value = !_oneTimeSyncTrigger.value
-    // Cancels any ongoing sync job before starting a new one. Since this function may be called
-    // more than once, not canceling the ongoing job could result in the creation of multiple jobs
-    // that emit the same object.
-    oneTimeSyncJob?.cancel()
-    oneTimeSyncJob =
-      viewModelScope.launch {
-        Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-          .shareIn(this, SharingStarted.Eagerly, 0)
-          .collect { result -> result.let { _pollState.emit(it) } }
-      }
   }
 
   /** Emits last sync time. */

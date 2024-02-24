@@ -1,58 +1,58 @@
-  /*
-   * Copyright 2022-2024 Google LLC
-   *
-   * Licensed under the Apache License, Version 2.0 (the "License");
-   * you may not use this file except in compliance with the License.
-   * You may obtain a copy of the License at
-   *
-   *       http://www.apache.org/licenses/LICENSE-2.0
-   *
-   * Unless required by applicable law or agreed to in writing, software
-   * distributed under the License is distributed on an "AS IS" BASIS,
-   * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   * See the License for the specific language governing permissions and
-   * limitations under the License.
-   */
+/*
+ * Copyright 2022-2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
-  package com.google.android.fhir.demo
+package com.google.android.fhir.demo
 
-  import android.content.Context
-  import android.graphics.Color
-  import android.graphics.drawable.ColorDrawable
-  import android.os.Bundle
-  import android.os.Handler
-  import android.os.Looper
-  import android.view.LayoutInflater
-  import android.view.MenuItem
-  import android.view.View
-  import android.view.ViewGroup
-  import android.view.animation.AnimationUtils
-  import android.view.inputmethod.InputMethodManager
-  import android.widget.LinearLayout
-  import android.widget.ProgressBar
-  import android.widget.TextView
-  import androidx.activity.OnBackPressedCallback
-  import androidx.appcompat.app.AppCompatActivity
-  import androidx.appcompat.widget.SearchView
-  import androidx.fragment.app.Fragment
-  import androidx.fragment.app.activityViewModels
-  import androidx.lifecycle.ViewModelProvider
-  import androidx.lifecycle.lifecycleScope
-  import androidx.navigation.fragment.NavHostFragment
-  import androidx.navigation.fragment.findNavController
-  import androidx.recyclerview.widget.DividerItemDecoration
-  import androidx.recyclerview.widget.RecyclerView
-  import com.google.android.fhir.FhirEngine
-  import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
-  import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-  import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
-  import com.google.android.fhir.sync.CurrentSyncJobStatus
-  import com.google.android.fhir.sync.LastSyncJobStatus
-  import com.google.android.fhir.sync.SyncJobStatus
-  import kotlin.math.roundToInt
-  import timber.log.Timber
+import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.view.inputmethod.InputMethodManager
+import android.widget.LinearLayout
+import android.widget.ProgressBar
+import android.widget.TextView
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
+import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
+import com.google.android.fhir.sync.CurrentSyncJobStatus
+import com.google.android.fhir.sync.LastSyncJobStatus
+import com.google.android.fhir.sync.PeriodicSyncJobStatus
+import com.google.android.fhir.sync.SyncJobStatus
+import kotlin.math.roundToInt
+import timber.log.Timber
 
-  class PatientListFragment : Fragment() {
+class PatientListFragment : Fragment() {
     private lateinit var fhirEngine: FhirEngine
     private lateinit var patientListViewModel: PatientListViewModel
     private lateinit var searchView: SearchView
@@ -62,7 +62,7 @@
     private lateinit var syncProgress: ProgressBar
     private var _binding: FragmentPatientListBinding? = null
     private val binding
-      get() = _binding!!
+        get() = _binding!!
 
     private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
@@ -155,108 +155,67 @@
       setHasOptionsMenu(true)
       (activity as MainActivity).setDrawerEnabled(false)
       launchAndRepeatStarted(
-        { mainActivityViewModel.pollState.collect(::syncJobStatus) },
-        { mainActivityViewModel.oneTimeSyncState.collect(::syncJobStatus) },
+        { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
+        { mainActivityViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
       )
     }
 
-    private fun syncJobStatus(it: SyncJobStatus) {
-      when (it) {
-        is SyncJobStatus.Started -> {
-          Timber.i("Sync: ${it::class.java.simpleName}")
-          fadeInTopBanner(it)
-        }
-        is SyncJobStatus.InProgress -> {
-          Timber.i("Sync: ${it::class.java.simpleName} with data $it")
-          fadeInTopBanner(it)
-        }
-        is SyncJobStatus.Finished -> {
-          Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-          mainActivityViewModel.updateLastSyncTimestamp()
-          fadeOutTopBanner(it)
-        }
-        is SyncJobStatus.Failed -> {
-          Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-          mainActivityViewModel.updateLastSyncTimestamp()
-          fadeOutTopBanner(it)
-        }
-        else -> {
-          Timber.i("Sync: Unknown state.")
-          patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-          mainActivityViewModel.updateLastSyncTimestamp()
-          fadeOutTopBanner(it)
-      lifecycleScope.launch {
-        mainActivityViewModel.pollState.collect {
-          Timber.d("onViewCreated: pollState Got status $it")
-          when (it) {
+    private fun currentSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
+        when (currentSyncJobStatus) {
             is CurrentSyncJobStatus.Running -> {
-              Timber.i("Sync: ${it::class.java.simpleName} with data ${it.inProgressSyncJob}")
-              fadeInTopBanner(it)
+                Timber.i("Sync: ${currentSyncJobStatus::class.java.simpleName} with data ${currentSyncJobStatus.inProgressSyncJob}")
+                fadeInTopBanner(currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Succeeded -> {
-              Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
-              fadeOutTopBanner(it)
+                Timber.i("Sync: ${currentSyncJobStatus::class.java.simpleName} at ${currentSyncJobStatus.timestamp}")
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                mainActivityViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+                fadeOutTopBanner(currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Failed -> {
-              Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
-              fadeOutTopBanner(it)
+                Timber.i("Sync: ${currentSyncJobStatus::class.java.simpleName} at ${currentSyncJobStatus.timestamp}")
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                mainActivityViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+                fadeOutTopBanner(currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Enqueued -> {
-              Timber.i("Sync: Enqueued")
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              fadeOutTopBanner(it)
+                Timber.i("Sync: Enqueued")
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                fadeOutTopBanner(currentSyncJobStatus)
             }
             CurrentSyncJobStatus.Cancelled -> TODO()
-          }
         }
-      }
+    }
 
-      lifecycleScope.launch {
-        mainActivityViewModel.pollPeriodicSyncJobStatus.collect {
-          Timber.d("onViewCreated: pollState Got status ${it.currentSyncJobStatus}")
-          when (it.currentSyncJobStatus) {
+    private fun periodicSyncJobStatus(periodicSyncJobStatus: PeriodicSyncJobStatus) {
+        when (periodicSyncJobStatus.currentSyncJobStatus) {
             is CurrentSyncJobStatus.Running -> {
-              Timber.i(
-                "Sync: ${it.currentSyncJobStatus::class.java.simpleName} with data ${it.currentSyncJobStatus}",
-              )
-              fadeInTopBanner(it.currentSyncJobStatus)
+                fadeInTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Succeeded -> {
-              val lastSyncTimestamp =
-                (it.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
-              Timber.i(
-                "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp",
-              )
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-              fadeOutTopBanner(it.currentSyncJobStatus)
+                val lastSyncTimestamp =
+                    (periodicSyncJobStatus.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
+                fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Failed -> {
-              val lastSyncTimestamp =
-                (it.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
-              Timber.i(
-                "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
-              )
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-              fadeOutTopBanner(it.currentSyncJobStatus)
+                val lastSyncTimestamp =
+                    (periodicSyncJobStatus.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
+                Timber.i(
+                    "Sync: ${periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
+                )
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
+                fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
             }
             is CurrentSyncJobStatus.Enqueued -> {
-              Timber.i("Sync: Enqueued")
-              patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-              fadeOutTopBanner(it.currentSyncJobStatus)
+                Timber.i("Sync: Enqueued")
+                patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+                fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
             }
             CurrentSyncJobStatus.Cancelled -> TODO()
-          }
-  >>>>>>> master
         }
-      }
     }
 
     override fun onDestroyView() {
