@@ -19,6 +19,7 @@ package com.google.android.fhir.document.scan
 import androidx.camera.core.ImageProxy
 import com.google.mlkit.vision.barcode.Barcode
 import com.google.mlkit.vision.barcode.BarcodeScanner
+import com.google.mlkit.vision.common.InputImage
 
 /**
  * A class handling the detection and scanning of SHL QR codes by a device's camera.
@@ -36,35 +37,45 @@ class BarcodeDetectorManager(
    * @param onResult Callback function to handle the scanning result.
    */
   fun processImage(imageProxy: ImageProxy, onResult: (Barcode?) -> Unit) {
-    // Extract the data from the ImageProxy and create an InputImage from this data
+    // Check if planes are available
+    if (imageProxy.planes.isEmpty()) {
+      onResult(null)
+      return
+    }
+
     val plane = imageProxy.planes[0]
+    if (plane == null) {
+      onResult(null)
+      return
+    }
+
+    // Extract the data from the ImageProxy and create an InputImage from this data
     val data = ByteArray(plane.buffer.capacity())
+    plane.buffer.get(data)
     val rotationDegrees = imageProxy.imageInfo.rotationDegrees
+
+    // Process the input image using the barcode scanner
     val inputImage =
-      com.google.mlkit.vision.common.InputImage.fromByteArray(
+      InputImage.fromByteArray(
         data,
         imageProxy.width,
         imageProxy.height,
         rotationDegrees,
-        com.google.mlkit.vision.common.InputImage.IMAGE_FORMAT_NV21,
+        InputImage.IMAGE_FORMAT_NV21,
       )
 
-    // Process the input image using the barcode scanner
     barcodeScanner
       .process(inputImage)
       .addOnSuccessListener { barcodes ->
         // If barcodes are detected, pass the result to the callback - otherwise, pass null
-        if (barcodes.isNotEmpty()) {
-          val result = barcodes.single()
-          onResult(result)
-        } else {
-          onResult(null)
-        }
+        onResult(barcodes.firstOrNull())
       }
-      .addOnFailureListener {
-        onResult(null)
+      .addOnFailureListener { onResult(null) }
+      .addOnCompleteListener {
+        // Close the ImageProxy in the finally block to ensure it is closed even if an exception
+        // occurs
+        imageProxy.close()
       }
-      .addOnCompleteListener { imageProxy.close() }
   }
 
   /** Closes the [barcodeScanner]. */
