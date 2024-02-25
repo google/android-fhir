@@ -45,12 +45,12 @@ import com.google.android.fhir.datacapture.views.factories.localDateTime
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -123,7 +123,7 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    runBlocking {
+    runTest {
       onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
         .isEqualTo(0)
@@ -145,7 +145,7 @@ class QuestionnaireUiEspressoTest {
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    runBlocking {
+    runTest {
       onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
       assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
         .isEqualTo(BigDecimal.valueOf(0.0))
@@ -205,7 +205,7 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    runBlocking {
+    runTest {
       assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
       assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
     }
@@ -225,7 +225,7 @@ class QuestionnaireUiEspressoTest {
     clickOnText("10")
     clickOnText("OK")
 
-    runBlocking {
+    runTest {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
     }
@@ -259,7 +259,7 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    runBlocking {
+    runTest {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
       assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
     }
@@ -297,7 +297,7 @@ class QuestionnaireUiEspressoTest {
 
     val today = DateTimeType.today().valueAsString
 
-    runBlocking {
+    runTest {
       val answer =
         getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
       assertThat(answer).isEqualTo(today)
@@ -344,7 +344,7 @@ class QuestionnaireUiEspressoTest {
 
     val maxDateAllowed = maxDate.valueAsString
 
-    runBlocking {
+    runTest {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
@@ -391,7 +391,7 @@ class QuestionnaireUiEspressoTest {
 
     val minDateAllowed = minDate.valueAsString
 
-    runBlocking {
+    runTest {
       val validationResult =
         QuestionnaireResponseValidator.validateQuestionnaireResponse(
           questionnaire,
