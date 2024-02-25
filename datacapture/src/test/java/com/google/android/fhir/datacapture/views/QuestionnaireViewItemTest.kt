@@ -43,7 +43,7 @@ class QuestionnaireViewItemTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
-  fun `addAnswer() should throw exception if question does not allow repeated answers`() {
+  fun `addAnswer() should throw exception if question does not allow repeated answers`() = runTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
@@ -57,7 +57,6 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runTest {
       val errorMessage =
         assertFailsWith<IllegalStateException> {
             questionnaireViewItem.addAnswer(
@@ -69,11 +68,10 @@ class QuestionnaireViewItemTest {
 
       assertThat(errorMessage)
         .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
-    }
   }
 
   @Test
-  fun `addAnswer() should add answer to QuestionnaireResponseItem`() {
+  fun `addAnswer() should add answer to QuestionnaireResponseItem`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -91,18 +89,16 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
-    runTest {
       questionnaireViewItem.addAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(BooleanType(true)),
       )
 
       assertThat(answers).hasSize(2)
-    }
   }
 
   @Test
-  fun `removeAnswer() should throw exception if question does not allow repeated answers`() {
+  fun `removeAnswer() should throw exception if question does not allow repeated answers`() = runTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
@@ -120,7 +116,6 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-    runTest {
       val errorMessage =
         assertFailsWith<IllegalStateException> {
             questionnaireViewItem.removeAnswer(
@@ -132,11 +127,10 @@ class QuestionnaireViewItemTest {
 
       assertThat(errorMessage)
         .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
-    }
   }
 
   @Test
-  fun `removeAnswer() should remove answer from QuestionnaireResponseItem`() {
+  fun `removeAnswer() should remove answer from QuestionnaireResponseItem`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -162,14 +156,12 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
-    runTest {
       questionnaireViewItem.removeAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(BooleanType(false)),
       )
 
       assertThat(answers).hasSize(1)
-    }
   }
 
   @Test
@@ -389,8 +381,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameResponse() should return false for null and non-null answers`() {
-    runTest {
+  fun `hasTheSameResponse() should return false for null and non-null answers`() = runTest {
       assertThat(
           QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
@@ -415,12 +406,10 @@ class QuestionnaireViewItemTest {
             ),
         )
         .isFalse()
-    }
   }
 
   @Test
-  fun `hasTheSameResponse() should return false for non-null and null answers`() {
-    runTest {
+  fun `hasTheSameResponse() should return false for non-null and null answers`() = runTest {
       assertThat(
           QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
@@ -447,7 +436,6 @@ class QuestionnaireViewItemTest {
             ),
         )
         .isFalse()
-    }
   }
 
   @Test
@@ -493,8 +481,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameResponse() should return true for the same answers`() {
-    runTest {
+  fun `hasTheSameResponse() should return true for the same answers`() = runTest {
       assertThat(
           QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
@@ -526,7 +513,6 @@ class QuestionnaireViewItemTest {
             ),
         )
         .isTrue()
-    }
   }
 
   @Test
@@ -726,8 +712,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `update partial answer`() {
-    runTest {
+  fun `update partial answer`() = runTest {
       var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
       var partialAnswer: Any? = null
       val questionnaireViewItem =
@@ -745,11 +730,10 @@ class QuestionnaireViewItemTest {
 
       assertThat(partialAnswer).isEqualTo("02/02")
       assertThat(answers).isEmpty()
-    }
   }
 
   @Test
-  fun `no partial answer for addAnswer`() {
+  fun `no partial answer for addAnswer`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     var partialAnswer: Any? = null
     val questionnaireViewItem =
@@ -766,7 +750,6 @@ class QuestionnaireViewItemTest {
         },
       )
 
-    runTest {
       questionnaireViewItem.addAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DateType(2023, 1, 2)),
@@ -774,11 +757,10 @@ class QuestionnaireViewItemTest {
 
       assertThat(partialAnswer).isNull()
       assertThat(answers).hasSize(1)
-    }
   }
 
   @Test
-  fun `no partial answer for removeAnswer`() {
+  fun `no partial answer for removeAnswer`() = runTest {
     var partialAnswer: Any? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -791,18 +773,16 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, partialValue -> partialAnswer = partialValue },
       )
 
-    runTest {
       questionnaireViewItem.removeAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DateType(2023, 1, 2)),
       )
 
       assertThat(partialAnswer).isNull()
-    }
   }
 
   @Test
-  fun `no partial answer for setAnswer`() {
+  fun `no partial answer for setAnswer`() = runTest {
     var partialAnswer: Any? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -815,14 +795,12 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, partialValue -> partialAnswer = partialValue },
       )
 
-    runTest {
       questionnaireViewItem.setAnswer(
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DateType(2023, 1, 2)),
       )
 
       assertThat(partialAnswer).isNull()
-    }
   }
 
   @Test
