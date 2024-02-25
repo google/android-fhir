@@ -37,7 +37,6 @@ import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,17 +57,17 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, _, _ -> },
       )
 
-      val errorMessage =
-        assertFailsWith<IllegalStateException> {
-            questionnaireViewItem.addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(BooleanType(true)),
-            )
-          }
-          .localizedMessage
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          questionnaireViewItem.addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+              .setValue(BooleanType(true)),
+          )
+        }
+        .localizedMessage
 
-      assertThat(errorMessage)
-        .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
+    assertThat(errorMessage)
+      .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
   }
 
   @Test
@@ -89,32 +89,32 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
-      questionnaireViewItem.addAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-          .setValue(BooleanType(true)),
-      )
+    questionnaireViewItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(true)),
+    )
 
-      assertThat(answers).hasSize(2)
+    assertThat(answers).hasSize(2)
   }
 
   @Test
-  fun `removeAnswer() should throw exception if question does not allow repeated answers`() = runTest {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
+  fun `removeAnswer() should throw exception if question does not allow repeated answers`() =
+    runTest {
+      val questionnaireViewItem =
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(true)),
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(true)),
+            )
+          },
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+        )
 
       val errorMessage =
         assertFailsWith<IllegalStateException> {
@@ -127,7 +127,7 @@ class QuestionnaireViewItemTest {
 
       assertThat(errorMessage)
         .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
-  }
+    }
 
   @Test
   fun `removeAnswer() should remove answer from QuestionnaireResponseItem`() = runTest {
@@ -156,12 +156,11 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, _ -> answers = result },
       )
 
-      questionnaireViewItem.removeAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-          .setValue(BooleanType(false)),
-      )
+    questionnaireViewItem.removeAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false)),
+    )
 
-      assertThat(answers).hasSize(1)
+    assertThat(answers).hasSize(1)
   }
 
   @Test
@@ -382,60 +381,60 @@ class QuestionnaireViewItemTest {
 
   @Test
   fun `hasTheSameResponse() should return false for null and non-null answers`() = runTest {
-      assertThat(
-          QuestionnaireViewItem(
-              Questionnaire.QuestionnaireItemComponent(),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> },
-            )
-            .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
-            .hasTheSameResponse(
-              QuestionnaireViewItem(
-                Questionnaire.QuestionnaireItemComponent(),
-                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                  addAnswer(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = BooleanType(false)
-                    },
-                  )
-                },
-                validationResult = NotValidated,
-                answersChangedCallback = { _, _, _, _ -> },
-              ),
-            ),
-        )
-        .isFalse()
-  }
-
-  @Test
-  fun `hasTheSameResponse() should return false for non-null and null answers`() = runTest {
-      assertThat(
-          QuestionnaireViewItem(
+    assertThat(
+        QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          )
+          .apply { setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()) }
+          .hasTheSameResponse(
+            QuestionnaireViewItem(
               Questionnaire.QuestionnaireItemComponent(),
               QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
                 addAnswer(
                   QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = BooleanType(true)
+                    value = BooleanType(false)
                   },
                 )
               },
               validationResult = NotValidated,
               answersChangedCallback = { _, _, _, _ -> },
-            )
-            .hasTheSameResponse(
-              QuestionnaireViewItem(
-                  Questionnaire.QuestionnaireItemComponent(),
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                  validationResult = NotValidated,
-                  answersChangedCallback = { _, _, _, _ -> },
-                )
-                .apply {
-                  setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
-                },
             ),
-        )
-        .isFalse()
+          ),
+      )
+      .isFalse()
+  }
+
+  @Test
+  fun `hasTheSameResponse() should return false for non-null and null answers`() = runTest {
+    assertThat(
+        QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                },
+              )
+            },
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          )
+          .hasTheSameResponse(
+            QuestionnaireViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _, _ -> },
+              )
+              .apply {
+                setAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+              },
+          ),
+      )
+      .isFalse()
   }
 
   @Test
@@ -482,37 +481,37 @@ class QuestionnaireViewItemTest {
 
   @Test
   fun `hasTheSameResponse() should return true for the same answers`() = runTest {
-      assertThat(
-          QuestionnaireViewItem(
-              Questionnaire.QuestionnaireItemComponent(),
-              QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-              validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> },
+    assertThat(
+        QuestionnaireViewItem(
+            Questionnaire.QuestionnaireItemComponent(),
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          )
+          .apply {
+            setAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = BooleanType(true)
+              },
             )
-            .apply {
-              setAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  value = BooleanType(true)
-                },
+          }
+          .hasTheSameResponse(
+            QuestionnaireViewItem(
+                Questionnaire.QuestionnaireItemComponent(),
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+                validationResult = NotValidated,
+                answersChangedCallback = { _, _, _, _ -> },
               )
-            }
-            .hasTheSameResponse(
-              QuestionnaireViewItem(
-                  Questionnaire.QuestionnaireItemComponent(),
-                  QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-                  validationResult = NotValidated,
-                  answersChangedCallback = { _, _, _, _ -> },
+              .apply {
+                setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = BooleanType(true)
+                  },
                 )
-                .apply {
-                  setAnswer(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = BooleanType(true)
-                    },
-                  )
-                },
-            ),
-        )
-        .isTrue()
+              },
+          ),
+      )
+      .isTrue()
   }
 
   @Test
@@ -713,23 +712,23 @@ class QuestionnaireViewItemTest {
 
   @Test
   fun `update partial answer`() = runTest {
-      var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
-      var partialAnswer: Any? = null
-      val questionnaireViewItem =
-        QuestionnaireViewItem(
-          Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-          validationResult = NotValidated,
-          answersChangedCallback = { _, _, result, partialValue ->
-            answers = result
-            partialAnswer = partialValue
-          },
-        )
+    var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
+    var partialAnswer: Any? = null
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, result, partialValue ->
+          answers = result
+          partialAnswer = partialValue
+        },
+      )
 
-      questionnaireViewItem.setDraftAnswer("02/02")
+    questionnaireViewItem.setDraftAnswer("02/02")
 
-      assertThat(partialAnswer).isEqualTo("02/02")
-      assertThat(answers).isEmpty()
+    assertThat(partialAnswer).isEqualTo("02/02")
+    assertThat(answers).isEmpty()
   }
 
   @Test
@@ -750,13 +749,13 @@ class QuestionnaireViewItemTest {
         },
       )
 
-      questionnaireViewItem.addAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-          .setValue(DateType(2023, 1, 2)),
-      )
+    questionnaireViewItem.addAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(DateType(2023, 1, 2)),
+    )
 
-      assertThat(partialAnswer).isNull()
-      assertThat(answers).hasSize(1)
+    assertThat(partialAnswer).isNull()
+    assertThat(answers).hasSize(1)
   }
 
   @Test
@@ -773,12 +772,12 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, partialValue -> partialAnswer = partialValue },
       )
 
-      questionnaireViewItem.removeAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-          .setValue(DateType(2023, 1, 2)),
-      )
+    questionnaireViewItem.removeAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(DateType(2023, 1, 2)),
+    )
 
-      assertThat(partialAnswer).isNull()
+    assertThat(partialAnswer).isNull()
   }
 
   @Test
@@ -795,12 +794,12 @@ class QuestionnaireViewItemTest {
         answersChangedCallback = { _, _, result, partialValue -> partialAnswer = partialValue },
       )
 
-      questionnaireViewItem.setAnswer(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-          .setValue(DateType(2023, 1, 2)),
-      )
+    questionnaireViewItem.setAnswer(
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+        .setValue(DateType(2023, 1, 2)),
+    )
 
-      assertThat(partialAnswer).isNull()
+    assertThat(partialAnswer).isNull()
   }
 
   @Test

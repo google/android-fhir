@@ -47,12 +47,12 @@ import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.test.runTest
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
