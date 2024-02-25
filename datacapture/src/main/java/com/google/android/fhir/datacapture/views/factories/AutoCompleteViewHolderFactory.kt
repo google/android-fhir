@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,7 @@ import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object AutoCompleteViewHolderFactory :
@@ -147,7 +148,7 @@ internal object AutoCompleteViewHolderFactory :
 
         val chip = Chip(chipContainer.context, null, R.attr.questionnaireChipStyle)
         chip.id = View.generateViewId()
-        chip.text = answer.valueCoding.display
+        chip.text = answer.valueCoding.displayOrCode
         chip.isCloseIconVisible = true
         chip.isClickable = true
         chip.isCheckable = false
@@ -178,7 +179,7 @@ internal object AutoCompleteViewHolderFactory :
           addNewChipIfNotPresent(answer)
         } else {
           (chipContainer[0] as Chip).apply {
-            text = answer.valueCoding.display
+            text = answer.valueCoding.displayOrCode
             tag = answer
           }
         }
@@ -226,6 +227,14 @@ internal object AutoCompleteViewHolderFactory :
           }
         }
       }
+
+      private val Coding.displayOrCode: String
+        get() =
+          if (display.isNullOrBlank()) {
+            code
+          } else {
+            display
+          }
     }
 }
 

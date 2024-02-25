@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,10 +55,17 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(insertionLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.INSERT)
-      assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(payload).isEqualTo(jsonParser.encodeResourceToString(patient))
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.INSERT)
+        assertThat(resourceId).isEqualTo(patient.logicalId)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(payload).isEqualTo(jsonParser.encodeResourceToString(patient))
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(insertionLocalChange)
+      }
     }
   }
 
@@ -79,11 +86,18 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.UPDATE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(updateLocalChange1)
+      }
     }
   }
 
@@ -101,11 +115,18 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(deleteLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.DELETE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertThat(payload).isEmpty()
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.DELETE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertThat(payload).isEmpty()
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(1)
+        assertThat(this[0]).isEqualTo(deleteLocalChange)
+      }
     }
   }
 
@@ -121,10 +142,17 @@ class PerResourcePatchGeneratorTest {
       PerResourcePatchGenerator.generate(listOf(insertionLocalChange, updateLocalChange))
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.INSERT)
-      assertThat(resourceId).isEqualTo(patient.logicalId)
-      assertThat(resourceType).isEqualTo(patient.resourceType.name)
-      assertThat(payload).isEqualTo(patientString)
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.INSERT)
+        assertThat(resourceId).isEqualTo(patient.logicalId)
+        assertThat(resourceType).isEqualTo(patient.resourceType.name)
+        assertThat(payload).isEqualTo(patientString)
+      }
+
+      with(localChanges) {
+        assertThat(this).hasSize(2)
+        assertThat(this).containsExactly(insertionLocalChange, updateLocalChange)
+      }
     }
   }
 
@@ -271,11 +299,55 @@ class PerResourcePatchGeneratorTest {
     val patches = PerResourcePatchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2))
 
     with(patches.single()) {
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.UPDATE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      }
+
+      with(localChanges) {
+        assertThat(size).isEqualTo(2)
+        assertThat(this).containsExactly(updateLocalChange1, updateLocalChange2)
+      }
+    }
+  }
+
+  @Test
+  fun `should generate a single update patch with three elements of two adds and one remove`() {
+    val expectedPatch = readJsonArrayFromFile("/update_careplan_patch.json")
+    val updatePatch1 = readJsonArrayFromFile("/update_careplan_patch_1.json")
+    val updatePatch2 = readJsonArrayFromFile("/update_careplan_patch_2.json")
+
+    val updatedLocalChange1 =
+      LocalChange(
+        resourceType = "CarePlan",
+        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+        type = LocalChange.Type.UPDATE,
+        payload = updatePatch1.toString(),
+        timestamp = Instant.now(),
+        token = LocalChangeToken(listOf(1)),
+      )
+
+    val updatedLocalChange2 =
+      LocalChange(
+        resourceType = "CarePlan",
+        resourceId = "131b5257-a8b3-435a-8cb3-4cb1296be24a",
+        type = LocalChange.Type.UPDATE,
+        payload = updatePatch2.toString(),
+        timestamp = Instant.now(),
+        token = LocalChangeToken(listOf(1)),
+      )
+
+    val patches =
+      PerResourcePatchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
+
+    with(patches.single().generatedPatch) {
       assertThat(type).isEqualTo(Patch.Type.UPDATE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), updatePatch)
+      assertThat(resourceId).isEqualTo("131b5257-a8b3-435a-8cb3-4cb1296be24a")
+      assertThat(resourceType).isEqualTo("CarePlan")
+      assertJsonArrayEqualsIgnoringOrder(JSONArray(payload), expectedPatch)
     }
   }
 
@@ -302,11 +374,18 @@ class PerResourcePatchGeneratorTest {
       )
 
     with(patches.single()) {
-      assertThat(type).isEqualTo(Patch.Type.DELETE)
-      assertThat(resourceId).isEqualTo(remotePatient.logicalId)
-      assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
-      assertThat(versionId).isEqualTo(remoteMeta.versionId)
-      assertThat(payload).isEmpty()
+      with(generatedPatch) {
+        assertThat(type).isEqualTo(Patch.Type.DELETE)
+        assertThat(resourceId).isEqualTo(remotePatient.logicalId)
+        assertThat(resourceType).isEqualTo(remotePatient.resourceType.name)
+        assertThat(versionId).isEqualTo(remoteMeta.versionId)
+        assertThat(payload).isEmpty()
+      }
+
+      with(localChanges) {
+        assertThat(size).isEqualTo(3)
+        assertThat(this).containsExactly(updateLocalChange1, updateLocalChange2, deleteLocalChange)
+      }
     }
   }
 

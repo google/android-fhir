@@ -69,7 +69,7 @@ internal object DatePickerViewHolderFactory :
       private lateinit var textInputEditText: TextInputEditText
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var canonicalizedDatePattern: String
-      private lateinit var textWatcher: DatePatternTextWatcher
+      private var textWatcher: TextWatcher? = null
 
       override fun init(itemView: View) {
         context = itemView.context.tryUnwrapContext()!!
@@ -113,7 +113,6 @@ internal object DatePickerViewHolderFactory :
         val datePattern = questionnaireViewItem.questionnaireItem.dateEntryFormatOrSystemDefault
         // Special character used in date pattern
         val datePatternSeparator = getDateSeparator(datePattern)
-        textWatcher = DatePatternTextWatcher(datePatternSeparator)
         canonicalizedDatePattern = canonicalizeDatePattern(datePattern)
 
         with(textInputLayout) {
@@ -147,6 +146,7 @@ internal object DatePickerViewHolderFactory :
         } else {
           displayValidationResult(questionnaireViewItem.validationResult)
         }
+        textWatcher = DatePatternTextWatcher(datePatternSeparator)
         textInputEditText.addTextChangedListener(textWatcher)
       }
 

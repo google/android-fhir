@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.kotlin.dsl.exclude
 
 object Dependencies {
@@ -42,34 +43,53 @@ object Dependencies {
   }
 
   object HapiFhir {
-    const val fhirBase = "ca.uhn.hapi.fhir:hapi-fhir-base:${Versions.hapiFhir}"
-    const val fhirClient = "ca.uhn.hapi.fhir:hapi-fhir-client:${Versions.hapiFhir}"
-    const val structuresDstu2 = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2:${Versions.hapiFhir}"
-    const val structuresDstu3 = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3:${Versions.hapiFhir}"
-    const val structuresR4 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4:${Versions.hapiFhir}"
-    const val structuresR4b = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4b:${Versions.hapiFhir}"
-    const val structuresR5 = "ca.uhn.hapi.fhir:hapi-fhir-structures-r5:${Versions.hapiFhir}"
+    const val fhirBaseModule = "ca.uhn.hapi.fhir:hapi-fhir-base"
+    const val fhirClientModule = "ca.uhn.hapi.fhir:hapi-fhir-client"
+    const val structuresDstu2Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2"
+    const val structuresDstu3Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3"
+    const val structuresR4Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4"
+    const val structuresR4bModule = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4b"
+    const val structuresR5Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r5"
 
-    const val validation = "ca.uhn.hapi.fhir:hapi-fhir-validation:${Versions.hapiFhir}"
-    const val validationDstu3 =
-      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3:${Versions.hapiFhir}"
-    const val validationR4 =
-      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4:${Versions.hapiFhir}"
-    const val validationR5 =
-      "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5:${Versions.hapiFhir}"
+    const val validationModule = "ca.uhn.hapi.fhir:hapi-fhir-validation"
+    const val validationDstu3Module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-dstu3"
+    const val validationR4Module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r4"
+    const val validationR5Module = "ca.uhn.hapi.fhir:hapi-fhir-validation-resources-r5"
 
-    const val fhirCoreDstu2 = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2:${Versions.hapiFhirCore}"
-    const val fhirCoreDstu2016 =
-      "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may:${Versions.hapiFhirCore}"
-    const val fhirCoreDstu3 = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu3:${Versions.hapiFhirCore}"
-    const val fhirCoreR4 = "ca.uhn.hapi.fhir:org.hl7.fhir.r4:${Versions.hapiFhirCore}"
-    const val fhirCoreR4b = "ca.uhn.hapi.fhir:org.hl7.fhir.r4b:${Versions.hapiFhirCore}"
-    const val fhirCoreR5 = "ca.uhn.hapi.fhir:org.hl7.fhir.r5:${Versions.hapiFhirCore}"
-    const val fhirCoreUtils = "ca.uhn.hapi.fhir:org.hl7.fhir.utilities:${Versions.hapiFhirCore}"
-    const val fhirCoreConvertors =
-      "ca.uhn.hapi.fhir:org.hl7.fhir.convertors:${Versions.hapiFhirCore}"
+    const val fhirCoreDstu2Module = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2"
+    const val fhirCoreDstu2016Module = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu2016may"
+    const val fhirCoreDstu3Module = "ca.uhn.hapi.fhir:org.hl7.fhir.dstu3"
+    const val fhirCoreR4Module = "ca.uhn.hapi.fhir:org.hl7.fhir.r4"
+    const val fhirCoreR4bModule = "ca.uhn.hapi.fhir:org.hl7.fhir.r4b"
+    const val fhirCoreR5Module = "ca.uhn.hapi.fhir:org.hl7.fhir.r5"
+    const val fhirCoreUtilsModule = "ca.uhn.hapi.fhir:org.hl7.fhir.utilities"
+    const val fhirCoreConvertorsModule = "ca.uhn.hapi.fhir:org.hl7.fhir.convertors"
 
-    const val guavaCaching = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava:${Versions.hapiFhir}"
+    const val guavaCachingModule = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava"
+
+    const val fhirBase = "$fhirBaseModule:${Versions.hapiFhir}"
+    const val fhirClient = "$fhirClientModule:${Versions.hapiFhir}"
+    const val structuresDstu2 = "$structuresDstu2Module:${Versions.hapiFhir}"
+    const val structuresDstu3 = "$structuresDstu3Module:${Versions.hapiFhir}"
+    const val structuresR4 = "$structuresR4Module:${Versions.hapiFhir}"
+    const val structuresR4b = "$structuresR4bModule:${Versions.hapiFhir}"
+    const val structuresR5 = "$structuresR5Module:${Versions.hapiFhir}"
+
+    const val validation = "$validationModule:${Versions.hapiFhir}"
+    const val validationDstu3 = "$validationDstu3Module:${Versions.hapiFhir}"
+    const val validationR4 = "$validationR4Module:${Versions.hapiFhir}"
+    const val validationR5 = "$validationR5Module:${Versions.hapiFhir}"
+
+    const val fhirCoreDstu2 = "$fhirCoreDstu2Module:${Versions.hapiFhirCore}"
+    const val fhirCoreDstu2016 = "$fhirCoreDstu2016Module:${Versions.hapiFhirCore}"
+    const val fhirCoreDstu3 = "$fhirCoreDstu3Module:${Versions.hapiFhirCore}"
+    const val fhirCoreR4 = "$fhirCoreR4Module:${Versions.hapiFhirCore}"
+    const val fhirCoreR4b = "$fhirCoreR4bModule:${Versions.hapiFhirCore}"
+    const val fhirCoreR5 = "$fhirCoreR5Module:${Versions.hapiFhirCore}"
+    const val fhirCoreUtils = "$fhirCoreUtilsModule:${Versions.hapiFhirCore}"
+    const val fhirCoreConvertors = "$fhirCoreConvertorsModule:${Versions.hapiFhirCore}"
+
+    const val guavaCaching = "$guavaCachingModule:${Versions.hapiFhir}"
   }
 
   object Jackson {
@@ -79,13 +99,14 @@ object Dependencies {
     private const val datatypeGroup = "$mainGroup.datatype"
     private const val moduleGroup = "$mainGroup.module"
 
-    const val annotations = "$coreGroup:jackson-annotations:${Versions.jackson}"
-    const val bom = "$mainGroup:jackson-bom:${Versions.jackson}"
-    const val core = "$coreGroup:jackson-core:${Versions.jacksonCore}"
-    const val databind = "$coreGroup:jackson-databind:${Versions.jackson}"
-    const val dataformatXml = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
-    const val jaxbAnnotations = "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
-    const val jsr310 = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
+    const val annotationsBase = "$coreGroup:jackson-annotations:${Versions.jackson}"
+    const val bomBase = "$mainGroup:jackson-bom:${Versions.jackson}"
+    const val coreBase = "$coreGroup:jackson-core:${Versions.jacksonCore}"
+    const val databindBase = "$coreGroup:jackson-databind:${Versions.jackson}"
+    const val dataformatXmlBase = "$dataformatGroup:jackson-dataformat-xml:${Versions.jackson}"
+    const val jaxbAnnotationsBase =
+      "$moduleGroup:jackson-module-jaxb-annotations:${Versions.jackson}"
+    const val jsr310Base = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
   }
 
   object Kotlin {
@@ -96,6 +117,8 @@ object Dependencies {
     const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
     const val kotlinCoroutinesTest =
       "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
+    const val kotlinCoroutinesPlay =
+      "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.Kotlin.kotlinCoroutinesCore}"
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.stdlib}"
   }
 
@@ -134,6 +157,9 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
+  const val playServicesLocation =
+    "com.google.android.gms:play-services-location:${Versions.playServicesLocation}"
+
   const val androidFhirGroup = "com.google.android.fhir"
   const val androidFhirEngineModule = "engine"
   const val androidFhirKnowledgeModule = "knowledge"
@@ -148,7 +174,10 @@ object Dependencies {
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
   const val gson = "com.google.code.gson:gson:${Versions.gson}"
-  const val guava = "com.google.guava:guava:${Versions.guava}"
+
+  const val guavaModule = "com.google.guava:guava"
+  const val guava = "$guavaModule:${Versions.guava}"
+
   const val httpInterceptor = "com.squareup.okhttp3:logging-interceptor:${Versions.http}"
   const val http = "com.squareup.okhttp3:okhttp:${Versions.http}"
   const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
@@ -231,7 +260,7 @@ object Dependencies {
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
     const val gson = "2.9.1"
-    const val guava = "32.1.2-android"
+    const val guava = "32.1.3-android"
 
     const val hapiFhir = "6.8.0"
     const val hapiFhirCore = "6.0.22"
@@ -283,6 +312,8 @@ object Dependencies {
       const val objectDetection = "16.2.3"
       const val objectDetectionCustom = "16.3.1"
     }
+
+    const val playServicesLocation = "21.0.1"
   }
 
   fun Configuration.removeIncompatibleDependencies() {
@@ -294,57 +325,38 @@ object Dependencies {
     exclude(group = "org.apache.httpcomponents")
     exclude(group = "org.antlr", module = "antlr4")
     exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
-  }
-
-  fun Configuration.forceGuava() {
-    // Removes caffeine
     exclude(module = "hapi-fhir-caching-caffeine")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
-
-    resolutionStrategy {
-      force(guava)
-      force(HapiFhir.guavaCaching)
-    }
   }
 
-  fun Configuration.forceHapiVersion() {
-    // Removes newer versions of caffeine and manually imports 2.9
-    // Removes newer versions of hapi and keeps on 6.0.1
-    // (newer versions don't work on Android)
-    resolutionStrategy {
-      force(HapiFhir.fhirBase)
-      force(HapiFhir.fhirClient)
-      force(HapiFhir.fhirCoreConvertors)
-
-      force(HapiFhir.fhirCoreDstu2)
-      force(HapiFhir.fhirCoreDstu2016)
-      force(HapiFhir.fhirCoreDstu3)
-      force(HapiFhir.fhirCoreR4)
-      force(HapiFhir.fhirCoreR4b)
-      force(HapiFhir.fhirCoreR5)
-      force(HapiFhir.fhirCoreUtils)
-
-      force(HapiFhir.structuresDstu2)
-      force(HapiFhir.structuresDstu3)
-      force(HapiFhir.structuresR4)
-      force(HapiFhir.structuresR5)
-
-      force(HapiFhir.validation)
-      force(HapiFhir.validationDstu3)
-      force(HapiFhir.validationR4)
-      force(HapiFhir.validationR5)
-    }
-  }
-
-  fun Configuration.forceJacksonVersion() {
-    resolutionStrategy {
-      force(Jackson.annotations)
-      force(Jackson.bom)
-      force(Jackson.core)
-      force(Jackson.databind)
-      force(Jackson.jaxbAnnotations)
-      force(Jackson.jsr310)
-      force(Jackson.dataformatXml)
-    }
+  fun hapiFhirConstraints(): Map<String, DependencyConstraint.() -> Unit> {
+    return mutableMapOf<String, DependencyConstraint.() -> Unit>(
+      guavaModule to { version { strictly(Versions.guava) } },
+      HapiFhir.fhirBaseModule to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.fhirClientModule to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.fhirCoreConvertorsModule to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreDstu2Module to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreDstu2016Module to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreDstu3Module to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreR4Module to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreR4bModule to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreR5Module to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.fhirCoreUtilsModule to { version { strictly(Versions.hapiFhirCore) } },
+      HapiFhir.structuresDstu2Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.structuresDstu3Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.structuresR4Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.structuresR5Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.validationModule to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.validationDstu3Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.validationR4Module to { version { strictly(Versions.hapiFhir) } },
+      HapiFhir.validationR5Module to { version { strictly(Versions.hapiFhir) } },
+      Jackson.annotationsBase to { version { strictly(Versions.jackson) } },
+      Jackson.bomBase to { version { strictly(Versions.jackson) } },
+      Jackson.coreBase to { version { strictly(Versions.jacksonCore) } },
+      Jackson.databindBase to { version { strictly(Versions.jackson) } },
+      Jackson.jaxbAnnotationsBase to { version { strictly(Versions.jackson) } },
+      Jackson.jsr310Base to { version { strictly(Versions.jackson) } },
+      Jackson.dataformatXmlBase to { version { strictly(Versions.jackson) } },
+    )
   }
 }

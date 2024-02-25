@@ -1028,27 +1028,6 @@ class ResourceMapperTest {
                   ]
                 },
                 {
-                  "linkId": "PR-address",
-                  "item": [
-                    {
-                      "linkId": "PR-address-city",
-                      "answer": [
-                        {
-                          "valueString": "Nairobi"
-                        }
-                      ]
-                    },
-                    {
-                      "linkId": "PR-address-country",
-                      "answer": [
-                        {
-                          "valueString": "Kenya"
-                        }
-                      ]
-                    }
-                  ]
-                },
-                {
                   "linkId": "PR-active"
                 }
               ]
@@ -1176,6 +1155,121 @@ class ResourceMapperTest {
 
       assertThat(observation.valueQuantity.value).isEqualTo(BigDecimal(90))
     }
+
+  @Test
+  fun `extract() should perform definition-based extraction for repeated groups`() = runBlocking {
+    @Language("JSON")
+    val questionnaireJson =
+      """
+      {
+        "resourceType": "Questionnaire",
+        "item": [
+          {
+            "linkId": "repeated-parent",
+            "type": "group",
+            "repeats": true,
+            "extension": [
+              {
+                "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-itemExtractionContext",
+                "valueExpression": {
+                  "expression": "Observation"
+                }
+              }
+            ],
+            "item": [
+              {
+                "linkId": "1.0",
+                "type": "group",
+                "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept",
+                "item": [
+                  {
+                    "linkId": "1.0.1",
+                    "type": "choice",
+                    "definition": "http://hl7.org/fhir/StructureDefinition/Observation#Observation.valueCodeableConcept.coding"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+            """
+        .trimIndent()
+
+    @Language("JSON")
+    val questionnaireResponseJson =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "repeated-parent",
+              "item": [
+                {
+                  "linkId": "1.0",
+                  "item": [
+                    {
+                      "linkId": "1.0.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "test-coding-system",
+                            "code": "test-coding-code-1",
+                            "display": "Test Coding Display 1"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "linkId": "repeated-parent",
+              "item": [
+                {
+                  "linkId": "1.0",
+                  "item": [
+                    {
+                      "linkId": "1.0.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "system": "test-coding-system",
+                            "code": "test-coding-code-2",
+                            "display": "Test Coding Display 2"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val uriTestQuestionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireJson) as Questionnaire
+
+    val uriTestQuestionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseJson)
+        as QuestionnaireResponse
+
+    val bundle = ResourceMapper.extract(uriTestQuestionnaire, uriTestQuestionnaireResponse)
+
+    val observation1 = bundle.entry.first().resource as Observation
+    assertThat(observation1.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code-1")
+    assertThat(observation1.valueCodeableConcept.coding[0].display)
+      .isEqualTo("Test Coding Display 1")
+
+    val observation2 = bundle.entry[1].resource as Observation
+    assertThat(observation2.valueCodeableConcept.coding[0].code).isEqualTo("test-coding-code-2")
+    assertThat(observation2.valueCodeableConcept.coding[0].display)
+      .isEqualTo("Test Coding Display 2")
+  }
 
   @Test
   fun `populate() should fill QuestionnaireResponse with values when given a single Resource`() =

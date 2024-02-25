@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,6 +90,9 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
         QuestionnaireFragment.builder()
           .setQuestionnaire(viewModel.questionnaireJson)
           .setShowCancelButton(true)
+          .setSubmitButtonText(
+            getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+          )
           .build(),
         QUESTIONNAIRE_FRAGMENT_TAG,
       )
