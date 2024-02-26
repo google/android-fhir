@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,74 +16,132 @@
 
 package com.google.android.fhir.document.scan
 
-import androidx.camera.core.ImageAnalysis
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.view.SurfaceHolder
+import androidx.core.app.ActivityCompat
+import com.google.android.gms.vision.CameraSource
+import com.google.android.gms.vision.Detector
+import com.google.android.gms.vision.Detector.Detections
+import com.google.android.gms.vision.barcode.Barcode
+import com.google.android.gms.vision.barcode.BarcodeDetector
+import java.io.IOException
 
-/**
- * Implementation of the [SHLinkScanner] interface.
- *
- * @param cameraManager The manager for handling camera-related operations.
- * @param barcodeDetectorManager The manager for handling barcode detection operations.
- * @param imageAnalysis The [ImageAnalysis] object for processing camera images.
- */
-class SHLinkScannerImpl(
-  private val cameraManager: CameraManager,
-  private val barcodeDetectorManager: BarcodeDetectorManager,
-  private val imageAnalysis: ImageAnalysis,
-) : SHLinkScanner {
+class SHLinkScannerImpl(private val context: Context, private val surfaceHolder: SurfaceHolder) :
+  SHLinkScanner {
 
-  /**
-   * Scans a SHL QR code and calls [successCallback] with the newly instantiated [SHLinkScanData] if
-   * successful. Otherwise, invokes [failCallback] with an [Error].
-   *
-   * @param successCallback Callback function invoked when the SHL QR code is successfully scanned.
-   *   It provides a newly instantiated [SHLinkScanData] object.
-   * @param failCallback Callback function invoked when an error occurs during the scanning process.
-   *   It provides an [Error] object with details about the failure.
-   */
+  private lateinit var cameraSource: CameraSource
+  private lateinit var barcodeDetector: BarcodeDetector
+  private var scanCallback: ((SHLinkScanData) -> Unit)? = null
+  private var failCallback: ((Error) -> Unit)? = null
+
+  private var scannedData: SHLinkScanData? = null
+
   override fun scanSHLQRCode(
     successCallback: (SHLinkScanData) -> Unit,
     failCallback: (Error) -> Unit,
   ) {
-    if (cameraManager.hasCameraPermission()) {
-      try {
-        // Open camera and scan
-        val shLinkScanData = scan()
-        releaseScanner()
-        successCallback(shLinkScanData)
-      } catch (error: Error) {
-        // There was an error trying to scan the QR code
-        failCallback(error)
-      }
+    if (!hasCameraPermission()) {
+      val error = Error("Camera permission not granted")
+      failCallback.invoke(error)
+      failCallback(error)
     } else {
-      failCallback(Error("Camera permission not granted"))
+      setup()
+      // Set the scanCallback to handle the result
+      scanCallback = { shlData ->
+        // Handle the result here if needed
+        successCallback(shlData)
+      }
     }
   }
 
-  /**
-   * Scans the SHL QR code using camera and barcode detection.
-   *
-   * @return The newly instantiated [SHLinkScanData] if a valid SHL QR code is scanned.
-   * @throws Error if no valid scan data is found.
-   */
-  private fun scan(): SHLinkScanData {
-    var scannedData: SHLinkScanData? = null
-    imageAnalysis.setAnalyzer(cameraManager.cameraExecutor) { imageProxy ->
-      barcodeDetectorManager.processImage(imageProxy) { result ->
-        val scannedValue = result?.displayValue
-        if (scannedValue != null) {
-          scannedData = SHLinkScanData(scannedValue)
+  private fun setup() {
+    barcodeDetector = createBarcodeDetector()
+    cameraSource = createCameraSource(barcodeDetector)
+    surfaceHolder.addCallback(createSurfaceCallback())
+    barcodeDetector.setProcessor(createBarcodeProcessor())
+    println("FINISHED SETUP")
+  }
+
+  private fun createBarcodeProcessor(): Detector.Processor<Barcode> {
+    return object : Detector.Processor<Barcode> {
+      override fun release() {
+        return
+      }
+
+      private var scanSucceeded = false
+
+      override fun receiveDetections(detections: Detections<Barcode>) {
+        if (scanSucceeded) {
+          return
+        }
+
+        val barcodes = detections.detectedItems
+        if (barcodes.size() == 1) {
+          val scannedValue = barcodes.valueAt(0).rawValue
+          val shlData = SHLinkScanData.create(scannedValue)
+          scannedData = shlData
+          scanCallback?.invoke(shlData)
+          scanSucceeded = true
         }
       }
     }
-    cameraManager.bindCamera()
-    return scannedData ?: throw Error("No valid scan data found")
   }
 
-  /**
-   * Releases resources associated with the scanner, including camera executor and barcode scanner.
-   */
-  private fun releaseScanner() {
-    cameraManager.releaseExecutor()
-    barcodeDetectorManager.releaseBarcodeScanner()
+  private fun createBarcodeDetector(): BarcodeDetector {
+    return BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
+  }
+
+  private fun createCameraSource(barcodeDetector: BarcodeDetector): CameraSource {
+    return CameraSource.Builder(context, barcodeDetector)
+      .setRequestedPreviewSize(1920, 1080)
+      .setAutoFocusEnabled(true)
+      .build()
+  }
+
+  private fun createSurfaceCallback(): SurfaceHolder.Callback {
+    return object : SurfaceHolder.Callback {
+      override fun surfaceCreated(holder: SurfaceHolder) {
+        startCameraPreview(holder)
+      }
+
+      override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
+        return
+      }
+
+      override fun surfaceDestroyed(holder: SurfaceHolder) {
+        cameraSource.stop()
+      }
+    }
+  }
+
+  private fun startCameraPreview(holder: SurfaceHolder) {
+    try {
+      if (hasCameraPermission()) {
+        if (
+          ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA,
+          ) != PackageManager.PERMISSION_GRANTED
+        ) {
+          return
+        }
+        cameraSource.start(holder)
+      }
+    } catch (e: IOException) {
+      e.printStackTrace()
+      failCallback?.invoke(Error("Failed to start camera"))
+    }
+  }
+
+  private fun hasCameraPermission(): Boolean {
+    return context.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)
+  }
+
+  fun release() {
+    cameraSource.stop()
+    cameraSource.release()
+    barcodeDetector.release()
   }
 }

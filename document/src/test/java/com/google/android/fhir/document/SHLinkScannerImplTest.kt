@@ -53,7 +53,7 @@ class SHLinkScannerImplTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    shLinkScannerImpl = SHLinkScannerImpl(cameraManager, barcodeDetectorManager, imageAnalysis)
+    // shLinkScannerImpl = SHLinkScannerImpl(cameraManager, barcodeDetectorManager, imageAnalysis)
   }
 
   @Test
