@@ -724,7 +724,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         QuestionnaireResponseItemValidator.validate(
           questionnaireItem,
           questionnaireResponseItem.answer,
-          context = this@QuestionnaireViewModel.getApplication(),
+          this@QuestionnaireViewModel.getApplication(),
         ) { _, expression ->
           expressionEvaluator.evaluateExpressionValue(
             questionnaireItem,

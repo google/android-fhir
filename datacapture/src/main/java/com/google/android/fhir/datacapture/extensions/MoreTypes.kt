@@ -95,7 +95,7 @@ private fun getDisplayString(type: Type, context: Context): String? =
   }
 
 /**
- * Returns the string representation when type is of [PrimitiveType] or [Quantity], otherwise null
+ * Returns the string representation for [PrimitiveType] or [Quantity], otherwise defaults to null
  */
 private fun getValueString(type: Type): String? =
   when (type) {
