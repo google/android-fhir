@@ -1,4 +1,4 @@
-import Dependencies.forceGuava
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
@@ -67,13 +67,7 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    forceGuava()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -109,6 +103,12 @@ dependencies {
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
