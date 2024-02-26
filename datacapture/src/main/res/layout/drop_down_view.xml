@@ -13,6 +13,7 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -32,21 +33,40 @@
         android:layout_height="wrap_content"
     />
 
-    <com.google.android.material.textfield.TextInputLayout
-        style="?attr/questionnaireDropdownLayoutStyle"
-        android:id="@+id/text_input_layout"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
     >
 
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
-            style="?attr/questionnaireDropDownSelectedTextStyle"
-            android:id="@+id/auto_complete"
-            android:drawablePadding="@dimen/icon_drawable_padding"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout"
+            style="?attr/questionnaireDropdownLayoutStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+        >
+
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/auto_complete"
+                style="?attr/questionnaireDropDownSelectedTextStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="@dimen/icon_drawable_padding"
+            />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/clearIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|center_vertical"
+            android:layout_marginTop="@dimen/help_container_margin_top"
+            android:layout_marginEnd="28dp"
+            android:padding="@dimen/icon_drawable_padding"
+            android:src="@drawable/ic_clear"
+            android:visibility="gone"
         />
 
-    </com.google.android.material.textfield.TextInputLayout>
+    </FrameLayout>
 
 </LinearLayout>

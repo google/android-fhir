@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -50,6 +51,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
+      private lateinit var clearIcon: ImageView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: Context
       private var isDropdownEditable = true
@@ -58,6 +60,7 @@ internal object DropDownViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
+        clearIcon = itemView.findViewById(R.id.clearIcon)
         context = itemView.context
       }
 
@@ -151,19 +154,27 @@ internal object DropDownViewHolderFactory :
 
             override fun afterTextChanged(editable: Editable?) {
               if (editable.isNullOrBlank()) {
+                clearIcon.visibility = View.GONE
                 Handler(Looper.getMainLooper())
                   .postDelayed(
                     {
-                      if (autoCompleteTextView.isPopupShowing.not()) {
+                      if (autoCompleteTextView.isPopupShowing.not() && isDropdownEditable) {
                         autoCompleteTextView.showDropDown()
                       }
                     },
                     100,
                   )
+              } else {
+                clearIcon.visibility = View.VISIBLE
               }
             }
           },
         )
+
+        clearIcon.setOnClickListener {
+          autoCompleteTextView.text = null
+          isDropdownEditable = true
+        }
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
