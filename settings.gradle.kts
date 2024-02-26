@@ -47,6 +47,8 @@ include(":common")
 
 include(":contrib:barcode")
 
+include(":contrib:locationwidget")
+
 include(":datacapture")
 
 include(":document")
