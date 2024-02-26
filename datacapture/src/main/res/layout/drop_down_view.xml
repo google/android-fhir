@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
             android:layout_marginTop="@dimen/help_container_margin_top"
-            android:layout_marginEnd="28dp"
+            android:layout_marginEnd="@dimen/drop_down_clear_icon_margin"
             android:padding="@dimen/icon_drawable_padding"
             android:src="@drawable/ic_clear"
             android:visibility="gone"

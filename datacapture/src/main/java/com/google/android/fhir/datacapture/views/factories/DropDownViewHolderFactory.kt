@@ -137,18 +137,25 @@ internal object DropDownViewHolderFactory :
             }
           }
 
-      autoCompleteTextView.doAfterTextChanged {
+        autoCompleteTextView.doAfterTextChanged {
           if (it.isNullOrBlank()) {
-            Handler(Looper.getMainLooper())
-              .postDelayed(
-                {
-                  if (autoCompleteTextView.isPopupShowing.not()) {
-                    autoCompleteTextView.showDropDown()
-                  }
-                },
-                100,
-              )
+            clearIcon.visibility = View.GONE
+            autoCompleteTextView.postDelayed(
+              {
+                if (autoCompleteTextView.isPopupShowing.not() && isDropdownEditable) {
+                  autoCompleteTextView.showDropDown()
+                }
+              }, 100
+            )
+          } else {
+            clearIcon.visibility = View.VISIBLE
           }
+        }
+
+        clearIcon.setOnClickListener {
+          autoCompleteTextView.text = null
+          isDropdownEditable = true
+          setReadOnly(false)
         }
 
         displayValidationResult(questionnaireViewItem.validationResult)
