@@ -133,37 +133,19 @@ internal object DropDownViewHolderFactory :
             }
           }
 
-        autoCompleteTextView.addTextChangedListener(
-          object : TextWatcher {
-            override fun beforeTextChanged(
-              charSequence: CharSequence?,
-              start: Int,
-              count: Int,
-              after: Int,
-            ) {}
-
-            override fun onTextChanged(
-              charSequence: CharSequence?,
-              start: Int,
-              before: Int,
-              count: Int,
-            ) {}
-
-            override fun afterTextChanged(editable: Editable?) {
-              if (editable.isNullOrBlank()) {
-                Handler(Looper.getMainLooper())
-                  .postDelayed(
-                    {
-                      if (autoCompleteTextView.isPopupShowing.not()) {
-                        autoCompleteTextView.showDropDown()
-                      }
-                    },
-                    100,
-                  )
-              }
-            }
-          },
-        )
+      autoCompleteTextView.doAfterTextChanged {
+          if (it.isNullOrBlank()) {
+            Handler(Looper.getMainLooper())
+              .postDelayed(
+                {
+                  if (autoCompleteTextView.isPopupShowing.not()) {
+                    autoCompleteTextView.showDropDown()
+                  }
+                },
+                100,
+              )
+          }
+        }
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
