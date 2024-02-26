@@ -30,7 +30,7 @@ class MoreEnumerationsTest {
   @Test
   fun enumeration_should_return_coding() {
     val maleEnumerationCoding =
-      Enumeration(Enumerations.AdministrativeGenderEnumFactory(), "male").toCodingUnit()
+      Enumeration(Enumerations.AdministrativeGenderEnumFactory(), "male").toCoding()
     val coding =
       Coding().apply {
         display = "Male"

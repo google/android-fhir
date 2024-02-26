@@ -29,7 +29,7 @@ import org.hl7.fhir.r4.model.Enumeration
  * client, we have to call the desired api on the GenericType passed to the [Enumeration] and get
  * the desired value by calling the api's as described above.
  */
-internal fun Enumeration<*>.toCodingUnit(): Coding {
+internal fun Enumeration<*>.toCoding(): Coding {
   val enumeration = this
   return Coding().apply {
     display =

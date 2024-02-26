@@ -24,7 +24,7 @@ import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
 import com.google.android.fhir.datacapture.extensions.toCodeType
-import com.google.android.fhir.datacapture.extensions.toCodingUnit
+import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
@@ -743,7 +743,7 @@ private fun Base.asExpectedType(
   return when {
     questionnaireItemType == Questionnaire.QuestionnaireItemType.REFERENCE ->
       asExpectedReferenceType()
-    this is Enumeration<*> -> toCodingUnit()
+    this is Enumeration<*> -> toCoding()
     this is IdType -> StringType(idPart)
     else -> this as Type
   }
