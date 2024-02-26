@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import androidx.core.widget.doAfterTextChanged
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -112,6 +113,7 @@ internal object QuantityViewHolderFactory :
 
         textInputEditText.removeTextChangedListener(textWatcher)
         updateUI()
+
         textWatcher =
           textInputEditText.doAfterTextChanged { editable: Editable? ->
             handleInput(editable!!, null)
@@ -185,10 +187,12 @@ internal object QuantityViewHolderFactory :
         }
 
         val unit =
-          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.let {
-            Coding(it.system, it.code, it.unit)
-          }
+          questionnaireViewItem.answers.singleOrNull()?.valueQuantity?.toCoding()
             ?: questionnaireViewItem.draftAnswer?.let { if (it is Coding) it else null }
+              ?: questionnaireViewItem.questionnaireItem.initial
+              ?.firstOrNull()
+              ?.valueQuantity
+              ?.toCoding()
         unitAutoCompleteTextView.setText(unit?.display ?: "")
 
         val unitAdapter =
