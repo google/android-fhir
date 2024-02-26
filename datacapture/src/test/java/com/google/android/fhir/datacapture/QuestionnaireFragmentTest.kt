@@ -82,8 +82,8 @@ class QuestionnaireFragmentTest {
       runTest {
         assertThat(this@withFragment.getQuestionnaireResponse()).isNotNull()
         assertThat(
-          this@withFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
-        )
+            this@withFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
+          )
           .isTrue()
       }
     }
@@ -383,8 +383,7 @@ class QuestionnaireFragmentTest {
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
-      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get())
-        .isEmpty()
+      assertThat(this.questionnaireItemViewHolderFactoryMatchersProvider.get()).isEmpty()
     }
   }
 
