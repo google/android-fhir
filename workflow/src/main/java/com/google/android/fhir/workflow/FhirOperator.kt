@@ -112,7 +112,7 @@ internal constructor(
     return evaluateLibrary(
       libraryUrl = libraryUrl,
       patientId = patientId,
-      expressions = expressions
+      expressions = expressions,
     )
   }
 
@@ -139,7 +139,7 @@ internal constructor(
     return evaluateLibrary(
       libraryUrl = libraryUrl,
       parameters = parameters,
-      expressions = expressions
+      expressions = expressions,
     )
   }
 
