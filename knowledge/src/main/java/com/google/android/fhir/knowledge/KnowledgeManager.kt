@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ internal constructor(
   private suspend fun loadWorkerContext(
     vararg npmPackages: NpmPackage,
     allowLoadingDuplicates: Boolean = true,
-    loader: SimpleWorkerContext.IContextResourceLoader? = null
+    loader: SimpleWorkerContext.IContextResourceLoader? = null,
   ): IWorkerContext {
     return withContext(Dispatchers.IO) {
       val simpleWorkerContext = SimpleWorkerContext()

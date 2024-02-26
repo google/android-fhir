@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.initialExpression
@@ -199,7 +198,8 @@ object ResourceMapper {
     structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
-    val simpleWorkerContext = structureMapExtractionContext.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
+    val simpleWorkerContext =
+      structureMapExtractionContext.simpleWorkerContext.apply { setExpansionProfile(Parameters()) }
     val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
 
     return Bundle().apply {

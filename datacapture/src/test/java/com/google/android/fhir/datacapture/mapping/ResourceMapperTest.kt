@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,6 @@ import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
-import org.hl7.fhir.utilities.npm.NpmPackage
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -2433,7 +2432,7 @@ class ResourceMapperTest {
         ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
-          StructureMapExtractionContext(transformSupportServices, simpleWorkerContext = SimpleWorkerContext()) { _, worker ->
+          StructureMapExtractionContext(transformSupportServices) { _, worker ->
             StructureMapUtilities(worker).parse(mapping, "")
           },
         )

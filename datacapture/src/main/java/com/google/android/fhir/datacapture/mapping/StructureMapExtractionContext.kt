@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.content.Context
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.StructureMap
@@ -31,6 +30,7 @@ data class StructureMapExtractionContext(
   val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
   /**
    * Optionally pass a custom version of [IWorkerContext].
+   *
    * @default [SimpleWorkerContext]
    */
   val simpleWorkerContext: IWorkerContext = SimpleWorkerContext(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,8 @@ import android.graphics.Bitmap
 import com.google.android.fhir.datacapture.DataCaptureConfig.Provider
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
 import com.google.android.fhir.datacapture.QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatchersProvider
-import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.StructureMap
-import org.hl7.fhir.utilities.npm.NpmPackage
 
 /**
  * The App developers may provide the [DataCaptureConfig] for the DataCapture library by
