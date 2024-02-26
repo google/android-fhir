@@ -34,6 +34,4 @@ class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   override fun getConflictResolver() = AcceptLocalConflictResolver
 
   override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
-
-  override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }
