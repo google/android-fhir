@@ -151,6 +151,35 @@ class QuantityViewHolderFactoryTest {
   }
 
   @Test
+  fun `should set unit value from initial when answer is missing`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addInitial(
+            Questionnaire.QuestionnaireItemInitialComponent(
+              Quantity().apply {
+                this.unit = "kg"
+                this.code = "kilo"
+              },
+            ),
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<AutoCompleteTextView>(R.id.unit_auto_complete)
+          .text
+          .toString(),
+      )
+      .isEqualTo("kg")
+  }
+
+  @Test
   fun `should clear unit value`() {
     viewHolder.bind(
       QuestionnaireViewItem(
