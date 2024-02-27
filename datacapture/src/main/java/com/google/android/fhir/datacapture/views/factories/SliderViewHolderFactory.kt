@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,11 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.sliderStepValue
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MaxValueValidator
 import com.google.android.fhir.datacapture.validation.MinValueValidator
@@ -29,6 +32,7 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.slider.Slider
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -36,12 +40,14 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.slider_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var appContext: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var slider: Slider
       private lateinit var error: TextView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
+        appContext = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         slider = itemView.findViewById(R.id.slider)
         error = itemView.findViewById(R.id.error)
@@ -68,11 +74,13 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           value = answer?.valueIntegerType?.value?.toFloat() ?: valueFrom
 
           addOnChangeListener { _, newValue, _ ->
-            // Responds to when slider's value is changed
-            questionnaireViewItem.setAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                .setValue(IntegerType(newValue.toInt())),
-            )
+            appContext.lifecycleScope.launch {
+              // Responds to when slider's value is changed
+              questionnaireViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                  .setValue(IntegerType(newValue.toInt())),
+              )
+            }
           }
         }
 
