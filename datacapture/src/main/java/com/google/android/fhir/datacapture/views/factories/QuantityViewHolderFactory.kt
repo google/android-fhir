@@ -24,11 +24,14 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.toCoding
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.unitOption
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -40,6 +43,7 @@ import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.math.BigDecimal
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -56,10 +60,10 @@ internal object QuantityViewHolderFactory :
       private lateinit var unitTextInputLayout: TextInputLayout
       private lateinit var unitAutoCompleteTextView: MaterialAutoCompleteTextView
       private var textWatcher: TextWatcher? = null
-      private lateinit var context: Context
+      private lateinit var appContext: AppCompatActivity
 
       override fun init(itemView: View) {
-        context = itemView.context
+        appContext = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText =
@@ -81,11 +85,14 @@ internal object QuantityViewHolderFactory :
                     as InputMethodManager)
                   .hideSoftInputFromWindow(view.windowToken, 0)
 
-                // Update answer even if the text box loses focus without any change. This will mark
-                // the
-                // questionnaire response item as being modified in the view model and trigger
-                // validation.
-                handleInput(textInputEditText.editableText, null)
+                appContext.lifecycleScope.launch {
+                  // Update answer even if the text box loses focus without any change. This will
+                  // mark
+                  // the
+                  // questionnaire response item as being modified in the view model and trigger
+                  // validation.
+                  handleInput(textInputEditText.editableText, null)
+                }
               }
             }
           }
@@ -95,10 +102,12 @@ internal object QuantityViewHolderFactory :
           itemView.findViewById<MaterialAutoCompleteTextView?>(R.id.unit_auto_complete).apply {
             onItemClickListener =
               AdapterView.OnItemClickListener { _, _, position, _ ->
-                handleInput(
-                  null,
-                  questionnaireViewItem.questionnaireItem.unitOption[position],
-                )
+                appContext.lifecycleScope.launch {
+                  handleInput(
+                    null,
+                    questionnaireViewItem.questionnaireItem.unitOption[position],
+                  )
+                }
               }
           }
       }
@@ -116,7 +125,7 @@ internal object QuantityViewHolderFactory :
 
         textWatcher =
           textInputEditText.doAfterTextChanged { editable: Editable? ->
-            handleInput(editable!!, null)
+            appContext.lifecycleScope.launch { handleInput(editable!!, null) }
           }
       }
 
@@ -136,7 +145,7 @@ internal object QuantityViewHolderFactory :
         unitAutoCompleteTextView.isEnabled = !isReadOnly
       }
 
-      private fun handleInput(editable: Editable?, unitDropDown: Coding?) {
+      private suspend fun handleInput(editable: Editable?, unitDropDown: Coding?) {
         var decimal: BigDecimal? = null
         var unit: Coding? = null
 
@@ -197,7 +206,7 @@ internal object QuantityViewHolderFactory :
 
         val unitAdapter =
           AnswerOptionDropDownArrayAdapter(
-            context,
+            appContext,
             R.layout.drop_down_list_item,
             questionnaireViewItem.questionnaireItem.unitOption.map {
               DropDownAnswerOption(it.code, it.display)
