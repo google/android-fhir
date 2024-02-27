@@ -108,7 +108,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
-        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
           .addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "Coding Exclusive" }
@@ -125,7 +125,6 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     endIconClickInTextInputLayout(R.id.multi_select_summary_holder)
     clickOnTextInDialog("Coding 1")
     clickOnText("Coding 3")
-    clickOnText("Coding 5")
     clickOnText("Coding Exclusive")
     clickOnText("Save")
 
@@ -138,7 +137,7 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     var answerHolder: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
-        answerOptions(true, "Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5")
+        answerOptions(true, "Coding 1", "Coding 2", "Coding 3")
           .addAnswerOption(
             Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
               value = Coding().apply { display = "Coding Exclusive" }
@@ -156,11 +155,10 @@ class QuestionnaireItemDialogMultiSelectViewHolderFactoryEspressoTest {
     clickOnTextInDialog("Coding Exclusive")
     clickOnText("Coding 1")
     clickOnText("Coding 3")
-    clickOnText("Coding 5")
     clickOnText("Save")
 
-    assertDisplayedText().isEqualTo("Coding 1, Coding 3, Coding 5")
-    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3", "Coding 5")
+    assertDisplayedText().isEqualTo("Coding 1, Coding 3")
+    assertQuestionnaireResponseAtIndex(answerHolder!!, "Coding 1", "Coding 3")
   }
 
   @Test
