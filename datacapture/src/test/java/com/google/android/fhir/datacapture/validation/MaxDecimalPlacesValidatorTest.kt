@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
@@ -42,15 +43,16 @@ class MaxDecimalPlacesValidatorTest {
   }
 
   @Test
-  fun validate_noExtension_shouldReturnValidResult() {
+  fun validate_noExtension_shouldReturnValidResult() = runTest {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val validationResult =
       MaxDecimalPlacesValidator.validate(
-        Questionnaire.QuestionnaireItemComponent(),
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.00")),
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult.isValid).isTrue()
@@ -58,17 +60,19 @@ class MaxDecimalPlacesValidatorTest {
   }
 
   @Test
-  fun validate_validAnswer_shouldReturnValidResult() {
+  fun validate_validAnswer_shouldReturnValidResult() = runTest {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
+      }
     val validationResult =
       MaxDecimalPlacesValidator.validate(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.00")),
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult.isValid).isTrue()
@@ -76,17 +80,19 @@ class MaxDecimalPlacesValidatorTest {
   }
 
   @Test
-  fun validate_tooManyDecimalPlaces_shouldReturnInvalidResult() {
+  fun validate_tooManyDecimalPlaces_shouldReturnInvalidResult() = runTest {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
+      }
     val validationResult =
       MaxDecimalPlacesValidator.validate(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          this.addExtension(Extension(MAX_DECIMAL_URL, IntegerType(2)))
-        },
+        questionnaireItem,
         QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
           .setValue(DecimalType("1.000")),
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult.isValid).isFalse()

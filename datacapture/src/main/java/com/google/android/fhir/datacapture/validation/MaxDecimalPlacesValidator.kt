@@ -33,16 +33,16 @@ internal object MaxDecimalPlacesValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_DECIMAL_URL,
     predicate = {
-      extensionValue: Type,
+      constraintValue: Type,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ->
-      val maxDecimalPlaces = (extensionValue as? IntegerType)?.value
+      val maxDecimalPlaces = (constraintValue as? IntegerType)?.value
       answer.hasValueDecimalType() &&
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
-    messageGenerator = { extensionValue: Type, context: Context ->
-      context.getString(R.string.max_decimal_validation_error_msg, extensionValue.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.max_decimal_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 

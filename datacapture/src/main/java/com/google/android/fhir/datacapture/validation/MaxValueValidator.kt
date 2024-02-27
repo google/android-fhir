@@ -30,15 +30,15 @@ internal object MaxValueValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
-      extensionValue: Type,
+      constraintValue: Type,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ->
-      answer.value > extensionValue
+      answer.value > constraintValue
     },
-    messageGenerator = { extensionValue: Type, context: Context ->
+    messageGenerator = { constraintValue: Type, context: Context ->
       context.getString(
         R.string.max_value_validation_error_msg,
-        extensionValue.getValueAsString(context),
+        constraintValue.getValueAsString(context),
       )
     },
   )

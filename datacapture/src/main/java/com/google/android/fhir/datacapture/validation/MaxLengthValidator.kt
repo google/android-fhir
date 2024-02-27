@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -31,11 +30,11 @@ import org.hl7.fhir.r4.model.Type
  * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object MaxLengthValidator : AnswerConstraintValidator {
-  override fun validate(
+  override suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
-    evaluateExtensionCqfCalculatedValue: (Extension, Expression) -> Type?,
+    expressionEvaluator: suspend (Expression) -> Type?,
   ): AnswerConstraintValidator.Result {
     if (
       questionnaireItem.hasMaxLength() &&

@@ -181,11 +181,11 @@ object QuestionnaireResponseValidator {
             questionnaireItem,
             questionnaireResponseItem.answer,
             context,
-          ) { _, expression ->
+          ) {
             expressionEvaluator.evaluateExpressionValue(
               questionnaireItem,
               questionnaireResponseItem,
-              expression,
+              it,
             )
           },
         )

@@ -17,17 +17,18 @@
 package com.google.android.fhir.datacapture.validation
 
 import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
+import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Type
 
-object CalculatedValueExpressionEvaluator {
+object TestExpressionValueEvaluator {
   /**
    * Doesn't handle expressions containing FHIRPath supplements
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
    */
-  fun evaluate(type: Type, expression: Expression): Type? =
+  fun evaluate(base: Base, expression: Expression): Type? =
     try {
-      evaluateToBase(type, expression.expression).singleOrNull() as? Type
+      evaluateToBase(base, expression.expression).singleOrNull() as? Type
     } catch (_: Exception) {
       null
     }

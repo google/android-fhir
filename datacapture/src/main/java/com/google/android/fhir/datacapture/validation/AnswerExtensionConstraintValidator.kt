@@ -20,7 +20,6 @@ import android.content.Context
 import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.hasValue
 import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
@@ -40,38 +39,31 @@ internal open class AnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
     (
-      /*extensionValue*/
+      /*constraintValue*/
       Type,
-      /*answer*/
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     ) -> Boolean,
   val messageGenerator: (Type, Context) -> String,
 ) : AnswerConstraintValidator {
-  override fun validate(
+  override suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
-    evaluateExtensionCqfCalculatedValue: (Extension, Expression) -> Type?,
+    expressionEvaluator: suspend (Expression) -> Type?,
   ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
-      val extensionValueType =
-        extension.value.let {
-          it.cqfCalculatedValueExpression?.let { expression ->
-            evaluateExtensionCqfCalculatedValue(extension, expression)
-          }
-            ?: it
-        }
+      val extensionCalculatedValue =
+        extension.value.cqfCalculatedValueExpression?.let { expressionEvaluator(it) }
+      val extensionValue = extensionCalculatedValue ?: extension.value
 
       // Only checks constraint if both extension and answer have a value
       if (
-        extensionValueType.hasValue() &&
-          answer.value.hasValue() &&
-          predicate(extensionValueType, answer)
+        extensionValue.hasValue() && answer.value.hasValue() && predicate(extensionValue, answer)
       ) {
         return AnswerConstraintValidator.Result(
           false,
-          messageGenerator(extensionValueType, context),
+          messageGenerator(extensionValue, context),
         )
       }
     }

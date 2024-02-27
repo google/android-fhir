@@ -142,7 +142,7 @@ internal class ExpressionEvaluator(
   }
 
   /** Returns the evaluation result of an expression as a [Type] value */
-  fun evaluateExpressionValue(
+  suspend fun evaluateExpressionValue(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
     expression: Expression,

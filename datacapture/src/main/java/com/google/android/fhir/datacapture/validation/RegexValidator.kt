@@ -37,22 +37,22 @@ internal object RegexValidator :
     url = REGEX_EXTENSION_URL,
     predicate =
       predicate@{
-        extensionValue: Type,
+        constraintValue: Type,
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
         ->
-        if (!extensionValue.isPrimitive || !answer.value.isPrimitive) {
+        if (!constraintValue.isPrimitive || !answer.value.isPrimitive) {
           return@predicate false
         }
         try {
-          val pattern = Pattern.compile((extensionValue as PrimitiveType<*>).asStringValue())
+          val pattern = Pattern.compile((constraintValue as PrimitiveType<*>).asStringValue())
           !pattern.matcher(answer.value.asStringValue()).matches()
         } catch (e: PatternSyntaxException) {
-          Timber.w("Can't parse regex: $extensionValue", e)
+          Timber.w("Can't parse regex: $constraintValue", e)
           false
         }
       },
-    messageGenerator = { extensionValue: Type, context: Context ->
-      context.getString(R.string.regex_validation_error_msg, extensionValue.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.regex_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 

@@ -72,8 +72,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -735,11 +733,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItem,
           questionnaireResponseItem.answer,
           this@QuestionnaireViewModel.getApplication(),
-        ) { _, expression ->
+        ) {
           expressionEvaluator.evaluateExpressionValue(
             questionnaireItem,
             questionnaireResponseItem,
-            expression,
+            it,
           )
         }
       } else {

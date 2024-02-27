@@ -25,6 +25,7 @@ import com.google.common.truth.Truth.assertThat
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -49,7 +50,7 @@ class MaxValueValidatorTest {
   }
 
   @Test
-  fun `should return invalid result when entered value is greater than maxValue`() {
+  fun `should return invalid result when entered value is greater than maxValue`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -65,8 +66,8 @@ class MaxValueValidatorTest {
       }
 
     val validationResult =
-      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      MaxValueValidator.validate(questionnaireItem, answer, context) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult.isValid).isFalse()
@@ -74,7 +75,7 @@ class MaxValueValidatorTest {
   }
 
   @Test
-  fun `should return valid result when entered value is less than maxValue`() {
+  fun `should return valid result when entered value is less than maxValue`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -90,8 +91,8 @@ class MaxValueValidatorTest {
       }
 
     val validationResult =
-      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      MaxValueValidator.validate(questionnaireItem, answer, context) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult.isValid).isTrue()
@@ -99,166 +100,172 @@ class MaxValueValidatorTest {
   }
 
   @Test
-  fun `should return invalid result with correct max allowed value if contains only cqf-calculatedValue`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            this.url = MAX_VALUE_EXTENSION_URL
-            this.setValue(
-              DateType().apply {
-                addExtension(
-                  Extension(
-                    EXTENSION_CQF_CALCULATED_VALUE_URL,
-                    Expression().apply {
-                      expression = "today() - 7 'days'"
-                      language = "text/fhirpath"
-                    },
-                  ),
-                )
-              },
-            )
-          },
-        )
-      }
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = DateType().apply { value = Date() }
-      }
-
-    val validationResult =
-      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
-      }
-
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage)
-      .isEqualTo("Maximum value allowed is:${LocalDate.now().minusDays(7)}")
-  }
-
-  @Test
-  fun `should return invalid result with correct max allowed value if contains both value and cqf-calculatedValue`() {
-    val tenDaysAgo = LocalDate.now().minusDays(10)
-
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            this.url = MAX_VALUE_EXTENSION_URL
-            this.setValue(
-              DateType().apply {
-                value =
-                  Date.from(tenDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
-                addExtension(
-                  Extension(
-                    EXTENSION_CQF_CALCULATED_VALUE_URL,
-                    Expression().apply {
-                      expression = "today() - 7 'days'"
-                      language = "text/fhirpath"
-                    },
-                  ),
-                )
-              },
-            )
-          },
-        )
-      }
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = DateType().apply { value = Date() }
-      }
-
-    val validationResult =
-      MaxValueValidator.validate(questionnaireItem, answer, context) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
-      }
-
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage)
-      .isEqualTo("Maximum value allowed is:${LocalDate.now().minusDays(7)}")
-  }
-
-  @Test
-  fun `should return valid result and removes constraint for an answer value when maxValue cqf-calculatedValue evaluates to empty`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            url = MAX_VALUE_EXTENSION_URL
-            this.setValue(
-              DateType().apply {
-                extension =
-                  listOf(
+  fun `should return invalid result with correct max allowed value if contains only cqf-calculatedValue`() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              this.url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  addExtension(
                     Extension(
                       EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
+                        expression = "today() - 7 'days'"
                         language = "text/fhirpath"
-                        expression = "yesterday()" // invalid FHIRPath expression
                       },
                     ),
                   )
-              },
-            )
-          },
-        )
-      }
+                },
+              )
+            },
+          )
+        }
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType().apply { value = Date() }
+        }
 
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-        value = DateType(Date())
-      }
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer, context) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
 
-    val validationResult =
-      MaxValueValidator.validate(
-        questionnaireItem,
-        answer,
-        InstrumentationRegistry.getInstrumentation().context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
-      }
-
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
-  }
+      assertThat(validationResult.isValid).isFalse()
+      assertThat(validationResult.errorMessage)
+        .isEqualTo("Maximum value allowed is:${LocalDate.now().minusDays(7)}")
+    }
 
   @Test
-  fun `should return valid result and removes constraint for an answer with an empty value`() {
-    val questionnaireItem =
-      Questionnaire.QuestionnaireItemComponent().apply {
-        addExtension(
-          Extension().apply {
-            url = MAX_VALUE_EXTENSION_URL
-            this.setValue(
-              DateType().apply {
-                extension =
-                  listOf(
+  fun `should return invalid result with correct max allowed value if contains both value and cqf-calculatedValue`() =
+    runTest {
+      val tenDaysAgo = LocalDate.now().minusDays(10)
+
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              this.url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  value =
+                    Date.from(tenDaysAgo.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
+                  addExtension(
                     Extension(
                       EXTENSION_CQF_CALCULATED_VALUE_URL,
                       Expression().apply {
+                        expression = "today() - 7 'days'"
                         language = "text/fhirpath"
-                        expression = "today()"
                       },
                     ),
                   )
-              },
-            )
-          },
-        )
-      }
+                },
+              )
+            },
+          )
+        }
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType().apply { value = Date() }
+        }
 
-    val answer =
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply { value = DateType() }
+      val validationResult =
+        MaxValueValidator.validate(questionnaireItem, answer, context) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
 
-    val validationResult =
-      MaxValueValidator.validate(
-        questionnaireItem,
-        answer,
-        InstrumentationRegistry.getInstrumentation().context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
-      }
+      assertThat(validationResult.isValid).isFalse()
+      assertThat(validationResult.errorMessage)
+        .isEqualTo("Maximum value allowed is:${LocalDate.now().minusDays(7)}")
+    }
 
-    assertThat(validationResult.isValid).isTrue()
-    assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
-  }
+  @Test
+  fun `should return valid result and removes constraint for an answer value when maxValue cqf-calculatedValue evaluates to empty`() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "yesterday()" // invalid FHIRPath expression
+                        },
+                      ),
+                    )
+                },
+              )
+            },
+          )
+        }
+
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType(Date())
+        }
+
+      val validationResult =
+        MaxValueValidator.validate(
+          questionnaireItem,
+          answer,
+          InstrumentationRegistry.getInstrumentation().context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
+
+      assertThat(validationResult.isValid).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
+    }
+
+  @Test
+  fun `should return valid result and removes constraint for an answer with an empty value`() =
+    runTest {
+      val questionnaireItem =
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(
+            Extension().apply {
+              url = MAX_VALUE_EXTENSION_URL
+              this.setValue(
+                DateType().apply {
+                  extension =
+                    listOf(
+                      Extension(
+                        EXTENSION_CQF_CALCULATED_VALUE_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "today()"
+                        },
+                      ),
+                    )
+                },
+              )
+            },
+          )
+        }
+
+      val answer =
+        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+          value = DateType()
+        }
+
+      val validationResult =
+        MaxValueValidator.validate(
+          questionnaireItem,
+          answer,
+          InstrumentationRegistry.getInstrumentation().context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
+        }
+
+      assertThat(validationResult.isValid).isTrue()
+      assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
+    }
 }

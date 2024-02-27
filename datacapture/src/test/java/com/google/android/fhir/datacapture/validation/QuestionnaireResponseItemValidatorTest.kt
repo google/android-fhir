@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -43,7 +44,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun `should return valid result`() {
+  fun `should return valid result`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -77,15 +78,15 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult).isEqualTo(Valid)
   }
 
   @Test
-  fun `should validate individual answers and combine results`() {
+  fun `should validate individual answers and combine results`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "a-question"
@@ -121,8 +122,8 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
@@ -132,7 +133,7 @@ class QuestionnaireResponseItemValidatorTest {
   }
 
   @Test
-  fun `should validate all answers`() {
+  fun `should validate all answers`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         type = Questionnaire.QuestionnaireItemType.INTEGER
@@ -145,8 +146,8 @@ class QuestionnaireResponseItemValidatorTest {
         questionnaireItem,
         answers,
         context,
-      ) { extension, expression ->
-        CalculatedValueExpressionEvaluator.evaluate(extension.value, expression)
+      ) {
+        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
       }
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)

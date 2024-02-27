@@ -37,13 +37,13 @@ import org.hl7.fhir.r4.model.Type
 internal object MinLengthValidator :
   AnswerExtensionConstraintValidator(
     url = MIN_LENGTH_EXTENSION_URL,
-    predicate = { extensionValue, answer ->
+    predicate = { constraintValue, answer ->
       answer.value.isPrimitive &&
         (answer.value as PrimitiveType<*>).asStringValue().length <
-          (extensionValue as IntegerType).value
+          (constraintValue as IntegerType).value
     },
-    messageGenerator = { extensionValue: Type, context: Context ->
-      context.getString(R.string.min_length_validation_error_msg, extensionValue.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.min_length_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 
