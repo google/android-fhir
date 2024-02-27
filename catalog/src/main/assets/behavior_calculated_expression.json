@@ -3,7 +3,7 @@
   "item": [
     {
       "linkId": "a-birthdate",
-      "text": "Birth Date",
+      "text": "Birth Date (select age to auto calculate if not known)",
       "type": "date",
       "extension": [
         {
@@ -17,15 +17,36 @@
     },
     {
       "linkId": "a-age-years",
-      "text": "Age years",
+      "text": "Age",
       "type": "quantity",
-      "initial": [{
-        "valueQuantity": {
-          "unit": "years",
-          "system": "http://unitsofmeasure.org",
-          "code": "years"
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "years",
+            "display": "years"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
+          "valueCoding": {
+            "system": "http://unitsofmeasure.org",
+            "code": "months",
+            "display": "months"
+          }
         }
-      }]
+      ],
+      "initial": [
+        {
+          "valueQuantity": {
+            "value": 1,
+            "unit": "months",
+            "system": "http://unitsofmeasure.org",
+            "code": "months"
+          }
+        }
+      ]
     }
   ]
 }

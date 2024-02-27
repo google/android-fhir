@@ -202,6 +202,18 @@ class MoreTypesTest {
   }
 
   @Test
+  fun `should return coding for quantity`() {
+    val quantity =
+      Quantity(1).apply {
+        this.code = "yr"
+        this.unit = "years"
+        this.system = "http://unit.org"
+      }
+    val result = quantity.toCoding()
+    assertThat(result.equalsDeep(Coding("http://unit.org", "yr", "years")))
+  }
+
+  @Test
   fun `should return identifier string for coding containing system, version and code`() {
     val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay").apply { version = "2.0" }
     assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0|fakeCode")

@@ -68,12 +68,12 @@ import org.hl7.fhir.r4.model.Type
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  private val questionnaireResponseItem: QuestionnaireResponseItemComponent,
   val validationResult: ValidationResult,
   internal val answersChangedCallback:
-    (
+    suspend (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?,
     ) -> Unit,
@@ -108,7 +108,7 @@ data class QuestionnaireViewItem(
     questionnaireResponseItem.answer.map { it.copy() }
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
-  fun setAnswer(
+  suspend fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -124,12 +124,12 @@ data class QuestionnaireViewItem(
   }
 
   /** Clears existing answers and any draft answer. */
-  fun clearAnswer() {
+  suspend fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  fun addAnswer(
+  suspend fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -145,7 +145,7 @@ data class QuestionnaireViewItem(
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  fun removeAnswer(
+  suspend fun removeAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -166,7 +166,7 @@ data class QuestionnaireViewItem(
    * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
    * the question.
    */
-  fun setDraftAnswer(draftAnswer: Any? = null) {
+  suspend fun setDraftAnswer(draftAnswer: Any? = null) {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 

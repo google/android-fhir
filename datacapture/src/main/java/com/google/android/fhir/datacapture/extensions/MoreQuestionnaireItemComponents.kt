@@ -593,6 +593,12 @@ internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
     return this.extension
       .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
       .map { it.value as Coding }
+      .plus(
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // quantity given as initial without value is for default unit reference purpose
+        this.initial.map { it.valueQuantity.toCoding() },
+      )
+      .distinctBy { it.code }
   }
 
 // ********************************************************************************************** //
