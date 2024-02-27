@@ -20,12 +20,15 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
@@ -36,6 +39,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -44,6 +48,7 @@ internal object AutoCompleteViewHolderFactory :
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       private lateinit var chipContainer: ChipGroup
@@ -55,6 +60,7 @@ internal object AutoCompleteViewHolderFactory :
       private lateinit var errorTextView: TextView
 
       override fun init(itemView: View) {
+        context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         autoCompleteTextView = itemView.findViewById(R.id.autoCompleteTextView)
         chipContainer = itemView.findViewById(R.id.chipContainer)
@@ -177,7 +183,7 @@ internal object AutoCompleteViewHolderFactory :
             tag = answer
           }
         }
-        questionnaireViewItem.setAnswer(answer)
+        context.lifecycleScope.launch { questionnaireViewItem.setAnswer(answer) }
       }
 
       private fun handleSelectionWhenQuestionCanHaveMultipleAnswers(
@@ -188,17 +194,19 @@ internal object AutoCompleteViewHolderFactory :
 
         if (answerNotPresent) {
           addNewChipIfNotPresent(answer)
-          questionnaireViewItem.addAnswer(answer)
+          context.lifecycleScope.launch { questionnaireViewItem.addAnswer(answer) }
         }
       }
 
       private fun onChipRemoved(chip: Chip) {
-        if (canHaveMultipleAnswers) {
-          (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent).let {
-            questionnaireViewItem.removeAnswer(it)
+        context.lifecycleScope.launch {
+          if (canHaveMultipleAnswers) {
+            (chip.tag as QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent).let {
+              questionnaireViewItem.removeAnswer(it)
+            }
+          } else {
+            questionnaireViewItem.clearAnswer()
           }
-        } else {
-          questionnaireViewItem.clearAnswer()
         }
       }
 

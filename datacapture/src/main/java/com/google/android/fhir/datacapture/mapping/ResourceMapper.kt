@@ -737,7 +737,7 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(
+fun Base.asExpectedType(
   questionnaireItemType: Questionnaire.QuestionnaireItemType? = null,
 ): Type {
   return when {
