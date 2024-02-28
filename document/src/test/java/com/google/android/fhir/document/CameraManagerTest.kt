@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+package com.google.android.fhir.document
+
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
@@ -23,6 +25,7 @@ import com.google.android.fhir.document.scan.CameraManager
 import com.google.android.gms.vision.CameraSource
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import com.google.common.truth.Truth.assertThat
+import java.io.IOException
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +33,8 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.mock
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
@@ -42,38 +47,41 @@ class CameraManagerTest {
   private lateinit var mockSurfaceHolder: SurfaceHolder
   private lateinit var mockCameraSource: CameraSource
   private lateinit var mockBarcodeDetector: BarcodeDetector
+  private val mockPackageManager: PackageManager = mock()
 
   @Before
   fun setUp() {
     mockSurfaceHolder = mock(SurfaceHolder::class.java)
     mockCameraSource = mock(CameraSource::class.java)
     mockBarcodeDetector = mock(BarcodeDetector::class.java)
+    mockContext = mock(Context::class.java)
+    MockitoAnnotations.openMocks(this)
   }
 
   @Test
-  fun testStartCameraPreview_withPermission() {
+  fun `test startCameraPreview with camera permissions granted`() {
     `when`(ActivityCompat.checkSelfPermission(mockContext, Manifest.permission.CAMERA))
       .thenReturn(PackageManager.PERMISSION_GRANTED)
-    `when`(mockContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-      .thenReturn(true)
 
-    cameraManager.startCameraPreview(mockContext, mockSurfaceHolder, mockCameraSource, null)
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+
+    CameraManager.startCameraPreview(mockContext, mockSurfaceHolder, mockCameraSource, null)
 
     verify(mockCameraSource).start(mockSurfaceHolder)
   }
 
   @Test
-  fun testStartCameraPreview_withoutPermission() {
-    `when`(mockContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-      .thenReturn(false)
-
+  fun `test startCameraPreview with camera permissions denied`() {
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(false)
     CameraManager.startCameraPreview(mockContext, mockSurfaceHolder, mockCameraSource, null)
 
     verify(mockCameraSource, never()).start(mockSurfaceHolder)
   }
 
   @Test
-  fun testStartCameraPreview_withCameraPermissionGranted() {
+  fun `test startCameraPreview with CameraFeature`() {
     `when`(
         ActivityCompat.checkSelfPermission(
           mockContext,
@@ -81,6 +89,8 @@ class CameraManagerTest {
         ),
       )
       .thenReturn(PackageManager.PERMISSION_GRANTED)
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
 
     CameraManager.startCameraPreview(mockContext, mockSurfaceHolder, mockCameraSource, null)
 
@@ -88,7 +98,7 @@ class CameraManagerTest {
   }
 
   @Test
-  fun testStartCameraPreview_withCameraPermissionDenied() {
+  fun `test startCameraPreview without CameraFeature`() {
     `when`(
         ActivityCompat.checkSelfPermission(
           mockContext,
@@ -96,6 +106,8 @@ class CameraManagerTest {
         ),
       )
       .thenReturn(PackageManager.PERMISSION_DENIED)
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(false)
 
     CameraManager.startCameraPreview(mockContext, mockSurfaceHolder, mockCameraSource, null)
 
@@ -103,10 +115,10 @@ class CameraManagerTest {
   }
 
   @Test
-  fun testStartCameraPreview_withIOException() {
-    `when`(mockContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-      .thenReturn(true)
-    // `when`(mockCameraSource.start(mockSurfaceHolder)).thenThrow(IOException())
+  fun `test startCameraPreview with an IOException`() {
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+    `when`(mockCameraSource.start(mockSurfaceHolder)).thenThrow(IOException())
 
     val errorCallback: (Error) -> Unit = mock()
 
@@ -117,13 +129,16 @@ class CameraManagerTest {
       errorCallback,
     )
 
-    verify(errorCallback).invoke(Error("Failed to start camera"))
+    verify(errorCallback)
+      .invoke(
+        argThat { message == "Failed to start camera" },
+      )
   }
 
   @Test
-  fun testHasCameraPermission_withPermission() {
-    `when`(mockContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-      .thenReturn(true)
+  fun `test hasCameraPermission with camera permissions granted`() {
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
 
     val result = CameraManager.hasCameraPermission(mockContext)
 
@@ -131,9 +146,9 @@ class CameraManagerTest {
   }
 
   @Test
-  fun testHasCameraPermission_withoutPermission() {
-    `when`(mockContext.packageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY))
-      .thenReturn(false)
+  fun `test hasCameraPermission with camera permissions denied`() {
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(false)
 
     val result = CameraManager.hasCameraPermission(mockContext)
 
@@ -141,12 +156,13 @@ class CameraManagerTest {
   }
 
   @Test
-  fun testCreateCameraSource() {
+  fun `test that createCameraSource works as intended`() {
+    `when`(mockContext.packageManager).thenReturn(mockPackageManager)
+    `when`(mockPackageManager.hasSystemFeature(PackageManager.FEATURE_CAMERA_ANY)).thenReturn(true)
+
     val cameraSource = CameraManager.createCameraSource(mockContext, mockBarcodeDetector)
 
     assertThat(cameraSource).isNotNull()
-    // assertEquals(1920, cameraSource.requestedPreviewWidth)
-    // assertEquals(1080, cameraSource.requestedPreviewHeight)
-    // assertThat(cameraSource.isAutoFocusEnabled).
+    assertThat(cameraSource.cameraFacing).isEqualTo(CameraSource.CAMERA_FACING_BACK)
   }
 }
