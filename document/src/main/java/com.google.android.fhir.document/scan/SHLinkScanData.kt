@@ -18,6 +18,7 @@ package com.google.android.fhir.document.scan
 
 import com.google.android.fhir.document.IPSDocument
 import com.google.android.fhir.document.decode.ReadSHLinkUtils
+import java.io.Serializable
 import java.nio.charset.StandardCharsets
 import org.json.JSONException
 import org.json.JSONObject
@@ -36,7 +37,7 @@ import timber.log.Timber
  * @property manifestUrl The URL to the SHL manifest.
  * @property key The key for decoding the data.
  * @property label A label describing the SHL data.
- * @property flags Flags indicating specific conditions or requirements (e.g., "P" for passcode).
+ * @property flag Flags indicating specific conditions or requirements (e.g., "P" for passcode).
  * @property expirationTime The expiration time of the SHL data.
  * @property versionNumber The version number of the SHL data.
  * @property ipsDoc The IPS document linked to by the SHL.
@@ -47,11 +48,12 @@ data class SHLinkScanData(
   val manifestUrl: String,
   val key: String,
   val label: String,
-  val flags: String,
+  val flag: String,
   val expirationTime: String,
   val versionNumber: String,
   val ipsDoc: IPSDocument?,
-) {
+) : Serializable {
+
   companion object {
     fun create(fullLink: String): SHLinkScanData {
       val extractedJson = ReadSHLinkUtils.extractUrl(fullLink)
