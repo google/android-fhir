@@ -80,7 +80,7 @@ jobs:
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
       - name: Upload maven repo
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: maven-repository
           path: build/ci-repo
@@ -92,7 +92,7 @@ jobs:
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: build.zip

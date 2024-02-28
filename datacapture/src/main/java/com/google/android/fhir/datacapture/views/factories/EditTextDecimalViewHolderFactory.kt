@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,10 @@ internal object EditTextDecimalViewHolderFactory :
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
-      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+      override suspend fun handleInput(
+        editable: Editable,
+        questionnaireViewItem: QuestionnaireViewItem,
+      ) {
         editable.toString().toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
@@ -47,16 +50,17 @@ internal object EditTextDecimalViewHolderFactory :
       ) {
         val questionnaireItemViewItemDecimalAnswer =
           questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
-
         val draftAnswer = questionnaireViewItem.draftAnswer?.toString()
 
-        val decimalStringToDisplay = questionnaireItemViewItemDecimalAnswer ?: draftAnswer
-
-        if (
-          decimalStringToDisplay?.toDoubleOrNull() !=
+        if (questionnaireItemViewItemDecimalAnswer.isNullOrEmpty() && draftAnswer.isNullOrEmpty()) {
+          textInputEditText.setText("")
+        } else if (
+          questionnaireItemViewItemDecimalAnswer?.toDoubleOrNull() !=
             textInputEditText.text.toString().toDoubleOrNull()
         ) {
-          textInputEditText.setText(decimalStringToDisplay)
+          textInputEditText.setText(questionnaireItemViewItemDecimalAnswer)
+        } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
+          textInputEditText.setText(draftAnswer)
         }
         // Update error message if draft answer present
         if (draftAnswer != null) {

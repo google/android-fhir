@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -183,13 +183,7 @@ val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
       ?.let { it.value as Expression }
   }
 
-/**
- * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
- * extension, or `null`.
- *
- * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
- */
-val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
   get() {
     val codeableConcept =
       this.extension
@@ -197,16 +191,23 @@ val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
         ?.value as CodeableConcept?
-    val code =
-      codeableConcept
-        ?.coding
-        ?.firstOrNull {
-          it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
-            it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
-        }
-        ?.code
-    return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
+    return codeableConcept
+      ?.coding
+      ?.firstOrNull {
+        it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
+          it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
+      }
+      ?.code
   }
+
+/**
+ * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
+ * extension, or `null`.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
+ */
+val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+  get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
 
 /**
  * The desired orientation for the list of choices.
@@ -581,6 +582,12 @@ internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
     return this.extension
       .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
       .map { it.value as Coding }
+      .plus(
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // quantity given as initial without value is for default unit reference purpose
+        this.initial.map { it.valueQuantity.toCoding() },
+      )
+      .distinctBy { it.code }
   }
 
 // ********************************************************************************************** //
@@ -769,10 +776,9 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
  * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
  * applied to each pair of questionnaire item and questionnaire response item.
  *
- * It is assumed that the linkIds are unique in `this` and in `questionnaireResponseItemList`.
- *
- * Although linkIds may appear more than once in questionnaire response, they would not appear more
- * than once within a list of questionnaire response items sharing the same parent.
+ * In case of repeated group item, `questionnaireResponseItemList` will contain
+ * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
+ * associated with its questionnaire item linkId.
  */
 internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
@@ -782,12 +788,13 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
     ) -> T,
 ): List<T> {
-  val linkIdToQuestionnaireResponseItemMap = questionnaireResponseItemList.associateBy { it.linkId }
-  return mapNotNull { questionnaireItem ->
-    linkIdToQuestionnaireResponseItemMap[questionnaireItem.linkId]?.let { questionnaireResponseItem,
-      ->
+  val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
+  return flatMap { questionnaireItem ->
+    linkIdToQuestionnaireResponseItemListMap[questionnaireItem.linkId]?.mapNotNull {
+      questionnaireResponseItem ->
       transform(questionnaireItem, questionnaireResponseItem)
     }
+      ?: emptyList()
   }
 }
 

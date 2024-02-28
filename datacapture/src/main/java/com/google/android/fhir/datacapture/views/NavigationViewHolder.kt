@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.view.View
+import android.widget.Button
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireNavigationUIState
 import com.google.android.fhir.datacapture.QuestionnaireNavigationViewUIState
@@ -54,6 +55,9 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
+        if (navigationViewState.labelText.isNullOrBlank().not() && this is Button) {
+          text = navigationViewState.labelText
+        }
         setOnClickListener { navigationViewState.onClickAction() }
       }
       QuestionnaireNavigationViewUIState.Hidden -> {

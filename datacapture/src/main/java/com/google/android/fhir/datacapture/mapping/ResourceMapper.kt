@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,8 @@ import com.google.android.fhir.datacapture.extensions.toCoding
 import com.google.android.fhir.datacapture.extensions.toIdType
 import com.google.android.fhir.datacapture.extensions.toUriType
 import com.google.android.fhir.datacapture.extensions.validateLaunchContextExtensions
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.extensions.zipByLinkId
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -252,13 +253,11 @@ object ResourceMapper {
 
     questionnaireItem.initialExpression
       ?.let {
-        fhirPathEngine
-          .evaluate(
-            /* appContext= */ launchContexts,
-            /* focusResource= */ null,
-            /* rootResource= */ null,
-            /* base= */ null,
-            /* path= */ it.expression,
+        evaluateToBase(
+            questionnaireResponse = null,
+            questionnaireResponseItem = null,
+            expression = it.expression,
+            contextMap = launchContexts,
           )
           .firstOrNull()
       }
@@ -290,31 +289,17 @@ object ResourceMapper {
     extractionResult: MutableList<Resource>,
     profileLoader: ProfileLoader,
   ) {
-    val questionnaireItemListIterator = questionnaireItemList.iterator()
-    val questionnaireResponseItemListIterator = questionnaireResponseItemList.iterator()
-    while (
-      questionnaireItemListIterator.hasNext() && questionnaireResponseItemListIterator.hasNext()
-    ) {
-      val currentQuestionnaireResponseItem = questionnaireResponseItemListIterator.next()
-      var currentQuestionnaireItem = questionnaireItemListIterator.next()
-      // Find the next questionnaire item with the same link ID. This is necessary because some
-      // questionnaire items that are disabled might not have corresponding questionnaire response
-      // items.
-      while (
-        questionnaireItemListIterator.hasNext() &&
-          currentQuestionnaireItem.linkId != currentQuestionnaireResponseItem.linkId
-      ) {
-        currentQuestionnaireItem = questionnaireItemListIterator.next()
-      }
-      if (currentQuestionnaireItem.linkId == currentQuestionnaireResponseItem.linkId) {
-        extractByDefinition(
-          currentQuestionnaireItem,
-          currentQuestionnaireResponseItem,
-          extractionContext,
-          extractionResult,
-          profileLoader,
-        )
-      }
+    questionnaireItemList.zipByLinkId(questionnaireResponseItemList) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      extractByDefinition(
+        questionnaireItem,
+        questionnaireResponseItem,
+        extractionContext,
+        extractionResult,
+        profileLoader,
+      )
     }
   }
 
@@ -752,7 +737,7 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(
+fun Base.asExpectedType(
   questionnaireItemType: Questionnaire.QuestionnaireItemType? = null,
 ): Type {
   return when {

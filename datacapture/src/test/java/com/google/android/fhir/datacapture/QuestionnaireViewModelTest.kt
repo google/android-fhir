@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,6 +82,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.HumanName
+import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Practitioner
@@ -177,12 +178,14 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+        },
+      )
+    }
   }
 
   @Test
@@ -201,17 +204,19 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Yes or no?"
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Yes or no?"
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -237,23 +242,25 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic questions"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "another-link-id"
-                text = "Name?"
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic questions"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "another-link-id"
+                  text = "Name?"
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -308,22 +315,24 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic question"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -404,27 +413,29 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              },
-            )
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic question"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                },
+              )
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -478,7 +489,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -545,10 +556,16 @@ class QuestionnaireViewModelTest {
         )
       }
 
-    assertResourceEquals(
-      createQuestionnaireViewModel(questionnaire, questionnaireResponse).getQuestionnaireResponse(),
-      expectedQuestionnaireResponse,
-    )
+    runTest {
+      assertResourceEquals(
+        createQuestionnaireViewModel(
+            questionnaire,
+            questionnaireResponse,
+          )
+          .getQuestionnaireResponse(),
+        expectedQuestionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -626,7 +643,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse())
+    runTest { assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse()) }
   }
 
   @Test
@@ -717,7 +734,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -769,7 +786,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -828,7 +845,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -870,7 +887,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -975,12 +992,14 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
     state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
     val viewModel = QuestionnaireViewModel(context, state)
-    val value = viewModel.getQuestionnaireResponse()
-    val expectedResponse =
-      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
-        as QuestionnaireResponse
+    runTest {
+      val value = viewModel.getQuestionnaireResponse()
+      val expectedResponse =
+        printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+          as QuestionnaireResponse
 
-    assertResourceEquals(value, expectedResponse)
+      assertResourceEquals(value, expectedResponse)
+    }
   }
 
   @Test
@@ -1101,12 +1120,14 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
     state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
     val viewModel = QuestionnaireViewModel(context, state)
-    val value = viewModel.getQuestionnaireResponse()
-    val expectedResponse =
-      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
-        as QuestionnaireResponse
+    runTest {
+      val value = viewModel.getQuestionnaireResponse()
+      val expectedResponse =
+        printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+          as QuestionnaireResponse
 
-    assertResourceEquals(value, expectedResponse)
+      assertResourceEquals(value, expectedResponse)
+    }
   }
 
   // ==================================================================== //
@@ -3195,22 +3216,24 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic question"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -3240,22 +3263,24 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic Question"
-            addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic Question"
+              addAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -3286,29 +3311,31 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Basic question"
-            addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-                linkId = "a.1-link-id"
-                text = "Basic Nested question"
-                answer =
-                  listOf(
-                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                      value = StringType("Test Value")
-                    },
-                  )
-              },
-            )
-          },
-        )
-      },
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Basic question"
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+                  linkId = "a.1-link-id"
+                  text = "Basic Nested question"
+                  answer =
+                    listOf(
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                        value = StringType("Test Value")
+                      },
+                    )
+                },
+              )
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -4029,12 +4056,112 @@ class QuestionnaireViewModelTest {
     state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
     state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
     val viewModel = QuestionnaireViewModel(context, state)
-    val value = viewModel.getQuestionnaireResponse()
-    val expectedResponse =
-      printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
-        as QuestionnaireResponse
+    runTest {
+      val value = viewModel.getQuestionnaireResponse()
+      val expectedResponse =
+        printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+          as QuestionnaireResponse
 
-    assertResourceEquals(value, expectedResponse)
+      assertResourceEquals(value, expectedResponse)
+    }
+  }
+
+  @Test
+  fun `clearAllAnswers clears all answers in questionnaire response`() {
+    val questionnaireString =
+      """
+        {
+          "resourceType": "Questionnaire",
+          "id": "client-registration-sample",
+          "item": [
+            {
+              "linkId": "1",
+              "type": "group",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item",
+                  "type": "boolean"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item",
+                  "type": "boolean"
+                }
+              ]
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val questionnaireResponseString =
+      """
+           {
+              "resourceType": "QuestionnaireResponse",
+              "item": [
+                {
+                  "linkId": "1",
+                  "item": [
+                    {
+                      "linkId": "1.1",
+                      "text": "First Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "1.2",
+                      "text": "Second Nested Item",
+                      "answer": [
+                        {
+                          "valueBoolean": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+      """
+        .trimIndent()
+
+    val expectedResponseString =
+      """
+        {
+          "resourceType": "QuestionnaireResponse",
+          "item": [
+            {
+              "linkId": "1",
+              "item": [
+                {
+                  "linkId": "1.1",
+                  "text": "First Nested Item"
+                },
+                {
+                  "linkId": "1.2",
+                  "text": "Second Nested Item"
+                }
+              ]
+            }
+          ]
+        }
+      """
+        .trimIndent()
+
+    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
+    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    val viewModel = QuestionnaireViewModel(context, state)
+    viewModel.clearAllAnswers()
+    runTest {
+      val value = viewModel.getQuestionnaireResponse()
+      val expectedResponse =
+        printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
+          as QuestionnaireResponse
+      assertResourceEquals(value, expectedResponse)
+    }
   }
 
   // ==================================================================== //
@@ -4746,7 +4873,7 @@ class QuestionnaireViewModelTest {
     }
 
   @Test
-  fun `should return questionnaire item answer options for answer expression with fhirpath supplement context`() =
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %context`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -4794,6 +4921,109 @@ class QuestionnaireViewModelTest {
             .single { it.questionnaireItem.linkId == "b" }
         assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
           .containsExactly("Code 1-b", "Code 2-b")
+      }
+    }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %questionnaire`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          this.identifier = listOf(Identifier().apply { value = "A" })
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two")),
+                )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Q2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "'Questionnaire = ' + %questionnaire.identifier.value"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    },
+                  ),
+                )
+            },
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Questionnaire = A")
+      }
+    }
+
+  @Test
+  fun `should return questionnaire item answer options for answer expression with fhirpath supplement %qItem`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "a"
+              text = "Question 1"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              initial =
+                listOf(
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "1", "One")),
+                  Questionnaire.QuestionnaireItemInitialComponent(Coding("test", "2", "Two")),
+                )
+            },
+          )
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "b"
+              text = "Q2"
+              type = Questionnaire.QuestionnaireItemType.STRING
+              extension =
+                listOf(
+                  Extension(
+                    "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+                    Expression().apply {
+                      this.expression = "'Id of item = ' + %qItem.linkId"
+                      this.language = Expression.ExpressionLanguage.TEXT_FHIRPATH.toCode()
+                    },
+                  ),
+                )
+            },
+          )
+        }
+
+      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      val viewModel = QuestionnaireViewModel(context, state)
+
+      viewModel.runViewModelBlocking {
+        val viewItem =
+          viewModel
+            .getQuestionnaireItemViewItemList()
+            .map { it.asQuestion() }
+            .single { it.questionnaireItem.linkId == "b" }
+        assertThat(viewItem.enabledAnswerOptions.map { it.valueStringType.value })
+          .containsExactly("Id of item = b")
       }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngine
+import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
@@ -124,13 +124,21 @@ internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
 
+/**
+ * Converts Quantity to Coding type. The resulting Coding properties are equivalent of Coding.system
+ * = Quantity.system Coding.code = Quantity.code Coding.display = Quantity.unit
+ */
+internal fun Quantity.toCoding(): Coding {
+  return Coding(this.system, this.code, this.unit)
+}
+
 fun Type.valueOrCalculateValue(): Type {
   return if (this.hasExtension()) {
     this.extension
       .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
       ?.let { extension ->
         val expression = (extension.value as Expression).expression
-        fhirPathEngine.evaluate(this, expression).singleOrNull()?.let { it as Type }
+        evaluateToBase(this, expression).singleOrNull()?.let { it as Type }
       }
       ?: this
   } else {

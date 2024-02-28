@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,13 +21,16 @@ import android.text.Spanned
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -63,12 +66,12 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  private val questionnaireResponseItem: QuestionnaireResponseItemComponent,
   val validationResult: ValidationResult,
   internal val answersChangedCallback:
-    (
+    suspend (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?,
     ) -> Unit,
@@ -77,7 +80,13 @@ data class QuestionnaireViewItem(
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
+  val isHelpCardOpen: Boolean = questionnaireItem.isHelpCode,
+  val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
+    { _, _ ->
+    },
 ) {
+
+  fun getQuestionnaireResponseItem(): QuestionnaireResponseItemComponent = questionnaireResponseItem
 
   /**
    * A read-only list of answers to be rendered in the view.
@@ -95,7 +104,7 @@ data class QuestionnaireViewItem(
     questionnaireResponseItem.answer.map { it.copy() }
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
-  fun setAnswer(
+  suspend fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -111,12 +120,12 @@ data class QuestionnaireViewItem(
   }
 
   /** Clears existing answers and any draft answer. */
-  fun clearAnswer() {
+  suspend fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  fun addAnswer(
+  suspend fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -132,7 +141,7 @@ data class QuestionnaireViewItem(
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  fun removeAnswer(
+  suspend fun removeAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -153,7 +162,7 @@ data class QuestionnaireViewItem(
    * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
    * the question.
    */
-  fun setDraftAnswer(draftAnswer: Any? = null) {
+  suspend fun setDraftAnswer(draftAnswer: Any? = null) {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 

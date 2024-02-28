@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
 
@@ -100,17 +101,19 @@ class QuestionnaireFragment : Fragment() {
         .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
     }
     viewModel.setOnSubmitButtonClickListener {
-      viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
-        if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
-          setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
-        } else {
-          val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
-          errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
-          QuestionnaireValidationErrorMessageDialogFragment()
-            .show(
-              requireActivity().supportFragmentManager,
-              QuestionnaireValidationErrorMessageDialogFragment.TAG,
-            )
+      lifecycleScope.launch {
+        viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
+          if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
+            setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
+          } else {
+            val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
+            errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
+            QuestionnaireValidationErrorMessageDialogFragment()
+              .show(
+                requireActivity().supportFragmentManager,
+                QuestionnaireValidationErrorMessageDialogFragment.TAG,
+              )
+          }
         }
       }
     }
@@ -257,7 +260,9 @@ class QuestionnaireFragment : Fragment() {
    * Returns a [QuestionnaireResponse][org.hl7.fhir.r4.model.QuestionnaireResponse] populated with
    * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
    */
-  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+  suspend fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+
+  fun clearAllAnswers() = viewModel.clearAllAnswers()
 
   /** Helper to create [QuestionnaireFragment] with appropriate [Bundle] arguments. */
   class Builder {
@@ -371,6 +376,9 @@ class QuestionnaireFragment : Fragment() {
      */
     fun setShowSubmitButton(value: Boolean) = apply { args.add(EXTRA_SHOW_SUBMIT_BUTTON to value) }
 
+    /** To accept a configurable text for the submit button */
+    fun setSubmitButtonText(text: String) = apply { args.add(EXTRA_SUBMIT_BUTTON_TEXT to text) }
+
     /**
      * A [Boolean] extra to show or hide the Cancel button in the questionnaire. Default is true.
      */
@@ -480,6 +488,8 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_ASTERISK_TEXT = "show-asterisk-text"
 
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
+
+    internal const val EXTRA_SUBMIT_BUTTON_TEXT = "submit-button-text"
 
     internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
       "show-navigation-in-default-long-scroll"

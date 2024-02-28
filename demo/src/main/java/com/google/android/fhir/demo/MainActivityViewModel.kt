@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,61 +24,63 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.work.Constraints
 import com.google.android.fhir.demo.data.DemoFhirSyncWorker
+import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.PeriodicSyncConfiguration
+import com.google.android.fhir.sync.PeriodicSyncJobStatus
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
-import com.google.android.fhir.sync.SyncJobStatus
+import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.TimeUnit
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
-@OptIn(InternalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
 
-  private val _pollState = MutableSharedFlow<SyncJobStatus>()
-  val pollState: Flow<SyncJobStatus>
-    get() = _pollState
+  private val _oneTimeSyncTrigger = MutableStateFlow(false)
 
-  init {
-    viewModelScope.launch {
-      Sync.periodicSync<DemoFhirSyncWorker>(
-          application.applicationContext,
-          periodicSyncConfiguration =
-            PeriodicSyncConfiguration(
-              syncConstraints = Constraints.Builder().build(),
-              repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
-            ),
-        )
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
-  }
+  val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
+    Sync.periodicSync<DemoFhirSyncWorker>(
+        application.applicationContext,
+        periodicSyncConfiguration =
+          PeriodicSyncConfiguration(
+            syncConstraints = Constraints.Builder().build(),
+            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
+          ),
+      )
+      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
+
+  val pollState: SharedFlow<CurrentSyncJobStatus> =
+    _oneTimeSyncTrigger
+      .combine(
+        flow = Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext),
+      ) { _, syncJobStatus ->
+        syncJobStatus
+      }
+      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
 
   fun triggerOneTimeSync() {
-    viewModelScope.launch {
-      Sync.oneTimeSync<DemoFhirSyncWorker>(getApplication())
-        .shareIn(this, SharingStarted.Eagerly, 10)
-        .collect { _pollState.emit(it) }
-    }
+    _oneTimeSyncTrigger.value = !_oneTimeSyncTrigger.value
   }
 
   /** Emits last sync time. */
-  fun updateLastSyncTimestamp() {
+  fun updateLastSyncTimestamp(lastSync: OffsetDateTime? = null) {
     val formatter =
       DateTimeFormatter.ofPattern(
         if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12,
       )
     _lastSyncTimestampLiveData.value =
-      Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
+      lastSync?.let { it.toLocalDateTime()?.format(formatter) ?: "" }
+        ?: Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
   }
 
   companion object {

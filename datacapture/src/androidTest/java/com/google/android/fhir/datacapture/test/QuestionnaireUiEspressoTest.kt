@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
@@ -42,6 +43,7 @@ import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValid
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localDateTime
+import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
@@ -50,6 +52,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -105,6 +108,30 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  fun shouldHideNextButtonIfDisabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    clickOnText("Next")
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.GONE)),
+      )
+  }
+
+  @Test
+  fun shouldDisplayNextButtonIfEnabled() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json", true)
+
+    onView(withId(R.id.pagination_next_button))
+      .check(
+        ViewAssertions.matches(
+          ViewMatchers.withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE),
+        ),
+      )
+  }
+
+  @Test
   fun integerTextEdit_inputOutOfRange_shouldShowError() {
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
@@ -122,40 +149,44 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(0)
+    runTest {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(0)
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
   }
 
   @Test
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.0))
+    runTest {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.0))
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
   }
 
   @Test
@@ -200,8 +231,10 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
-    assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    runTest {
+      assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
+      assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    }
   }
 
   @Test
@@ -213,14 +246,14 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
-    clickOnText("AM")
     clickOnText("6")
     clickOnText("10")
     clickOnText("OK")
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
-
-    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    runTest {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    }
   }
 
   @Test
@@ -251,8 +284,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
-    assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    runTest {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
+      assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    }
   }
 
   @Test
@@ -286,17 +321,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val today = DateTimeType.today().valueAsString
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
 
-    assertThat(answer).isEqualTo(today)
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
+    runTest {
+      val answer =
+        getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
+      assertThat(answer).isEqualTo(today)
 
-    assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+      assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+    }
   }
 
   @Test
@@ -330,15 +368,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val maxDateAllowed = maxDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    runTest {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    }
   }
 
   @Test
@@ -372,15 +415,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val minDateAllowed = minDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    runTest {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    }
   }
 
   @Test
@@ -478,11 +526,91 @@ class QuestionnaireUiEspressoTest {
     }
   }
 
-  private fun buildFragmentFromQuestionnaire(fileName: String, isReviewMode: Boolean = false) {
+  @Test
+  @SdkSuppress(minSdkVersion = 33)
+  fun clearAllAnswers_shouldClearDraftAnswer() {
+    val questionnaireFragment = buildFragmentFromQuestionnaire("/component_date_picker.json")
+    // Add month and day. No need to add slashes as they are added automatically
+    onView(withId(R.id.text_input_edit_text))
+      .perform(ViewActions.click())
+      .perform(ViewActions.typeTextIntoFocusedView("0105"))
+
+    questionnaireFragment.clearAllAnswers()
+
+    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+      assertThat((view as TextInputEditText).text.toString()).isEmpty()
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeVisible_withSinglePageQuestionnaire() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+      assertThat(linearProgressIndicator.progress).isEqualTo(100)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeVisible_withPaginatedQuestionnaire() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json")
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+      assertThat(linearProgressIndicator.progress).isEqualTo(50)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldProgress_onPaginationNext() {
+    buildFragmentFromQuestionnaire("/layout_paginated.json")
+
+    onView(withId(R.id.pagination_next_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.progress).isEqualTo(100)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeGone_whenNavigatedToReviewScreen() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
+
+    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.GONE)
+    }
+  }
+
+  @Test
+  fun progressBar_shouldBeVisible_whenNavigatedToEditScreenFromReview() {
+    buildFragmentFromQuestionnaire("/text_questionnaire_integer.json", isReviewMode = true)
+
+    onView(withId(R.id.review_mode_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.review_mode_edit_button)).perform(ViewActions.click())
+
+    onView(withId(R.id.questionnaire_progress_indicator)).check { view, _ ->
+      val linearProgressIndicator = (view as LinearProgressIndicator)
+      assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
+    }
+  }
+
+  private fun buildFragmentFromQuestionnaire(
+    fileName: String,
+    isReviewMode: Boolean = false,
+  ): QuestionnaireFragment {
     val questionnaireJsonString = readFileFromAssets(fileName)
     val questionnaireFragment =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
+        .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
         .build()
     activityScenarioRule.scenario.onActivity { activity ->
@@ -491,6 +619,7 @@ class QuestionnaireUiEspressoTest {
         add(R.id.container_holder, questionnaireFragment)
       }
     }
+    return questionnaireFragment
   }
 
   private fun buildFragmentFromQuestionnaire(
@@ -513,7 +642,7 @@ class QuestionnaireUiEspressoTest {
   private fun readFileFromAssets(filename: String) =
     javaClass.getResourceAsStream(filename)!!.bufferedReader().use { it.readText() }
 
-  private fun getQuestionnaireResponse(): QuestionnaireResponse {
+  private suspend fun getQuestionnaireResponse(): QuestionnaireResponse {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =

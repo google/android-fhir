@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ sealed class QuestionnaireNavigationViewUIState(val isShown: Boolean, val isEnab
 
   object Disabled : QuestionnaireNavigationViewUIState(isShown = true, isEnabled = false)
 
-  data class Enabled(val onClickAction: () -> Unit) :
+  data class Enabled(val labelText: String? = null, val onClickAction: () -> Unit) :
     QuestionnaireNavigationViewUIState(isShown = true, isEnabled = true)
 }
 
