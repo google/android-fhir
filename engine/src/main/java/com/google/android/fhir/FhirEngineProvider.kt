@@ -109,7 +109,6 @@ object FhirEngineProvider {
   }
 }
 
-
 /**
  * Configuration for the FHIR Engine, including database setup, error recovery, server connection,
  * and custom search parameters.
@@ -128,20 +127,20 @@ object FhirEngineProvider {
  * database.
  *
  * @property enableEncryptionIfSupported Enables database encryption if supported by the device.
- * Defaults to false.
+ *   Defaults to false.
  * @property databaseErrorStrategy The strategy to handle database errors. Defaults to
- * [DatabaseErrorStrategy.UNSPECIFIED].
+ *   [DatabaseErrorStrategy.UNSPECIFIED].
  * @property serverConfiguration Optional configuration for connecting to a remote FHIR server.
  * @property testMode Whether to run the engine in test mode (using an in-memory database). Defaults
- * to false.
+ *   to false.
  * @property customSearchParameters Additional search parameters to be used for querying the FHIR
- * engine with the Search API. These are in addition to the default
- * [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html) defined in the FHIR
- * specification. Custom search parameters must be unique and not change existing or default search
- * parameters.
+ *   engine with the Search API. These are in addition to the default
+ *   [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html) defined in the FHIR
+ *   specification. Custom search parameters must be unique and not change existing or default
+ *   search parameters.
  *
- * Note: The engine does not automatically reindex resources after new custom search parameters
- * are added. You must manually reindex resources by updating them. Any new CRUD operations on a
+ * Note: The engine does not automatically reindex resources after new custom search parameters are
+ * added. You must manually reindex resources by updating them. Any new CRUD operations on a
  * resource after adding new search parameters will automatically trigger reindexing.
  */
 data class FhirEngineConfiguration(
@@ -173,10 +172,10 @@ enum class DatabaseErrorStrategy {
  *
  * @property baseUrl The base URL of the remote FHIR server.
  * @property networkConfiguration Configuration for network connection parameters. Defaults to
- * [NetworkConfiguration].
+ *   [NetworkConfiguration].
  * @property authenticator An optional [HttpAuthenticator] for providing HTTP authorization headers.
  * @property httpLogger Logs the communication between the engine and the remote server. Defaults to
- * [HttpLogger.NONE].
+ *   [HttpLogger.NONE].
  */
 data class ServerConfiguration(
   val baseUrl: String,
@@ -186,15 +185,16 @@ data class ServerConfiguration(
 )
 
 /**
- * Configuration for network connection parameters used when communicating with a remote FHIR server.
+ * Configuration for network connection parameters used when communicating with a remote FHIR
+ * server.
  *
  * @property connectionTimeOut Connection timeout in seconds. Defaults to 10 seconds.
  * @property readTimeOut Read timeout in seconds for network connections. Defaults to 10 seconds.
  * @property writeTimeOut Write timeout in seconds for network connections. Defaults to 10 seconds.
  * @property uploadWithGzip Enables compression of requests when uploading to a server that supports
- * gzip. Defaults to false.
+ *   gzip. Defaults to false.
  * @property httpCache Optional [CacheConfiguration] to enable Cache-Control headers for network
- * requests.
+ *   requests.
  */
 data class NetworkConfiguration(
   val connectionTimeOut: Long = 10,
@@ -207,7 +207,8 @@ data class NetworkConfiguration(
 /**
  * Configuration for HTTP caching of network requests.
  *
- * @property cacheDir The directory used for caching, e.g., `File(application.cacheDir, "http_cache")`.
+ * @property cacheDir The directory used for caching, e.g., `File(application.cacheDir,
+ *   "http_cache")`.
  * @property maxSize The maximum size of the cache in bits, e.g., `50L * 1024L * 1024L` for 50 MiB.
  */
 data class CacheConfiguration(

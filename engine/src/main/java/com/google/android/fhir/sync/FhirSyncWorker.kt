@@ -49,20 +49,15 @@ import timber.log.Timber
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
 
-    /**
-   * Returns the [FhirEngine] instance used for interacting with the local FHIR data store.
-   */
+  /** Returns the [FhirEngine] instance used for interacting with the local FHIR data store. */
   abstract fun getFhirEngine(): FhirEngine
 
-  /**
-   * Returns the [DownloadWorkManager] instance that manages the download process.
-   */
-
+  /** Returns the [DownloadWorkManager] instance that manages the download process. */
   abstract fun getDownloadWorkManager(): DownloadWorkManager
 
   /**
-   * Returns the [ConflictResolver] instance that defines how to handle conflicts between local
-   * and remote data during synchronization.
+   * Returns the [ConflictResolver] instance that defines how to handle conflicts between local and
+   * remote data during synchronization.
    */
   abstract fun getConflictResolver(): ConflictResolver
 

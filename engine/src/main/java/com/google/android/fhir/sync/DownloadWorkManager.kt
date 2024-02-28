@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,9 +31,7 @@ import org.hl7.fhir.r4.model.ResourceType
  *   manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
-  /**
-   * Returns the next [DownloadRequest] to be executed, or `null` if there are no more requests.
-   */
+  /** Returns the next [DownloadRequest] to be executed, or `null` if there are no more requests. */
   suspend fun getNextRequest(): DownloadRequest?
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */

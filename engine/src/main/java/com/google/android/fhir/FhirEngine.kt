@@ -73,21 +73,21 @@ interface FhirEngine {
    *
    * @param search The search criteria to apply.
    * @return A list of [SearchResult] objects containing the matching resources and any included
-   * references.
+   *   references.
    */
   suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
 
   /**
    * Synchronizes upload results with the database.
    *
-   * This function initiates multiple server calls to upload local changes. The results of each
-   * call are emitted as [UploadRequestResult] objects, which can be collected using a [Flow].
+   * This function initiates multiple server calls to upload local changes. The results of each call
+   * are emitted as [UploadRequestResult] objects, which can be collected using a [Flow].
    *
    * @param localChangesFetchMode Specifies how to fetch local changes for upload.
    * @param upload A suspending function that takes a list of [LocalChange] objects and returns a
-   * [Flow] of [UploadRequestResult] objects.
+   *   [Flow] of [UploadRequestResult] objects.
    * @return A [Flow] that emits the progress of the synchronization process as [SyncUploadProgress]
-   * objects.
+   *   objects.
    */
   suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
@@ -100,10 +100,10 @@ interface FhirEngine {
    * This function updates the local database to reflect the results of the download operation,
    * resolving any conflicts using the provided [ConflictResolver].
    *
-   * @param conflictResolver The [ConflictResolver] to use for resolving conflicts between local
-   * and remote data.
+   * @param conflictResolver The [ConflictResolver] to use for resolving conflicts between local and
+   *   remote data.
    * @param download A suspending function that returns a [Flow] of lists of [Resource] objects
-   * representing the downloaded data.
+   *   representing the downloaded data.
    */
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
@@ -187,8 +187,7 @@ typealias SearchParamName = String
  * @param R The type of the main FHIR resource in the search result.
  * @property resource The FHIR resource that matches the search criteria.
  * @property included A map of included resources, keyed by the search parameter name used for
- *   inclusion, as per the
- *   [Search.forwardIncludes] criteria in the query.
+ *   inclusion, as per the [Search.forwardIncludes] criteria in the query.
  * @property revIncluded A map of reverse included resources, keyed by the resource type and search
  *   parameter name used for inclusion, as per the [Search.revIncludes] criteria in the query.
  */

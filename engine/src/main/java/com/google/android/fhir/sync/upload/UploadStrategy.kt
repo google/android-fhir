@@ -28,7 +28,6 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * specific upload behavior.
  *
  * Each strategy specifies three key aspects of the upload process:
- *
  * * **Fetching local changes**: This determines which local changes are included in the upload,
  *   specified by the [localChangesFetchMode] property.
  * * **Generating patches**: This determines how the local changes are represented for upload,
@@ -39,10 +38,9 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * To specify an upload strategy, override
  * [getUploadStrategy][com.google.android.fhir.sync.FhirSyncWorker.getUploadStrategy] in your app's
  * [FhirSyncWorker][com.google.android.fhir.sync.FhirSyncWorker], for example:
- *
  * ```
  * override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
- *```
+ * ```
  *
  * Note: The strategies listed here represent all currently supported combinations of local change
  * fetching, patch generation, and upload request creation. Not all possible combinations of these
@@ -57,8 +55,8 @@ private constructor(
 
   /**
    * Fetches all local changes, generates one patch per resource, and uploads them in a single
-   * bundled PUT request. This strategy is efficient and minimizes the number of requests sent to the
-   * server, but does not maintain individual change history.
+   * bundled PUT request. This strategy is efficient and minimizes the number of requests sent to
+   * the server, but does not maintain individual change history.
    */
   object AllChangesSquashedBundlePut :
     UploadStrategy(
@@ -131,7 +129,6 @@ private constructor(
   /**
    * Not yet implemented - Fetches all local changes, generates a patch for each individual change,
    * and creates a single bundle POST request containing all the patches.
-   *
    */
   private object AllChangesBundlePost :
     UploadStrategy(
