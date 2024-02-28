@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.demo.extensions.readFileFromAssets
 import java.math.BigDecimal
 import java.util.UUID
 import kotlinx.coroutines.launch
@@ -113,8 +114,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun isRequiredFieldMissing(bundle: Bundle): Boolean {
     bundle.entry.forEach {
-      val resource = it.resource
-      when (resource) {
+      when (val resource = it.resource) {
         is Observation -> {
           if (resource.hasValueQuantity() && !resource.valueQuantity.hasValueElement()) {
             return true
@@ -132,16 +132,12 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
 
   private fun getQuestionnaireJson(): String {
     questionnaireJson?.let {
-      return it!!
+      return it
     }
-    questionnaireJson = readFileFromAssets(state[ScreenerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    questionnaireJson =
+      getApplication<Application>()
+        .readFileFromAssets(state[ScreenerFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
     return questionnaireJson!!
-  }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
   }
 
   private fun generateUuid(): String {
@@ -217,8 +213,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         .filter { it.hasCode() && it.code.hasCoding() }
         .flatMap { it.code.coding }
         .map { it.code }
-        .filter { isSymptomPresent(it) }
-        .count()
+        .count { isSymptomPresent(it) }
     return count > 0
   }
 
@@ -234,8 +229,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
         .filter { it.hasCode() && it.code.hasCoding() }
         .flatMap { it.code.coding }
         .map { it.code }
-        .filter { isComorbidityPresent(it) }
-        .count()
+        .count { isComorbidityPresent(it) }
     return count > 0
   }
 
