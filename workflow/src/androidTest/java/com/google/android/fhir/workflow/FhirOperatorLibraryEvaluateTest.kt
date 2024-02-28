@@ -126,9 +126,9 @@ class FhirOperatorLibraryEvaluateTest {
     // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/ImmunityCheck|1.0.0",
-        "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization"),
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
@@ -151,13 +151,13 @@ class FhirOperatorLibraryEvaluateTest {
               "resourceType": "Location",
               "id": "nairobi-047",
               "status": "active",
-              "name": "Arundel mobile clinic",
+              "name": "Nairobi mobile clinic",
               "mode": "instance",
               "physicalType": {
                 "coding": [ {
                   "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
                   "code": "bu",
-                  "display": "Arundel mobile clinic"
+                  "display": "Nairobi mobile clinic"
                 } ]
             }
           }
