@@ -51,7 +51,7 @@ data class IPSDocument(
           } as ArrayList<Title>
         return IPSDocument(bundle, titles)
       }
-      return IPSDocument(bundle, arrayListOf())
+      return IPSDocument(bundle, titles = arrayListOf())
     }
   }
 }
