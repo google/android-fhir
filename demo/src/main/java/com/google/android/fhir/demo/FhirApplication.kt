@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
+import com.google.android.fhir.SyncConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
+import com.google.android.fhir.db.impl.DatabaseConfiguration
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
@@ -45,20 +47,28 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     }
     FhirEngineProvider.init(
       FhirEngineConfiguration(
-        enableEncryptionIfSupported = true,
-        RECREATE_AT_OPEN,
-        ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
-          httpLogger =
-            HttpLogger(
-              HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+        databaseConfiguration =
+          DatabaseConfiguration(
+            inMemory = false,
+            enableEncryption = true,
+            databaseErrorStrategy = RECREATE_AT_OPEN,
+          ),
+        syncConfiguration =
+          SyncConfiguration(
+            serverConfiguration =
+              ServerConfiguration(
+                "https://hapi.fhir.org/baseR4/",
+                httpLogger =
+                  HttpLogger(
+                    HttpLogger.Configuration(
+                      if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+                    ),
+                  ) {
+                    Timber.tag("App-HttpLog").d(it)
+                  },
+                networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
               ),
-            ) {
-              Timber.tag("App-HttpLog").d(it)
-            },
-          networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
-        ),
+          ),
       ),
     )
 

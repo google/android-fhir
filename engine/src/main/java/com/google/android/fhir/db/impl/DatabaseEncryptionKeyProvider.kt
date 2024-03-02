@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties.KEY_ALGORITHM_HMAC_SHA256
 import android.security.keystore.KeyProperties.PURPOSE_SIGN
 import android.util.ArrayMap
-import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.DatabaseEncryptionException
 import com.google.android.fhir.db.DatabaseEncryptionException.DatabaseEncryptionErrorCode.UNSUPPORTED
@@ -40,12 +39,7 @@ internal object DatabaseEncryptionKeyProvider {
 
   /** Returns a previous generated storage passphrase with name [keyName]. */
   @Synchronized
-  @RequiresApi(Build.VERSION_CODES.M)
   fun getOrCreatePassphrase(keyName: String): ByteArray {
-    if (!isDatabaseEncryptionSupported()) {
-      throw UnsupportedOperationException("Database encryption is not supported on this device.")
-    }
-
     keyMap[keyName]?.let {
       return it
     }

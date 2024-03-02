@@ -18,6 +18,7 @@ package com.google.android.fhir
 
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.db.impl.DatabaseConfiguration
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import org.junit.After
@@ -52,11 +53,7 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(
-      FhirEngineConfiguration(
-        testMode = true,
-      ),
-    )
+    provider.init(FhirEngineConfiguration())
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -67,7 +64,7 @@ class FhirEngineProviderTest {
   fun cleanup_not_in_test_mode_fails() {
     provider.init(
       FhirEngineConfiguration(
-        testMode = false,
+        databaseConfiguration = DatabaseConfiguration(inMemory = false, enableEncryption = false),
       ),
     )
 
@@ -79,8 +76,8 @@ class FhirEngineProviderTest {
 
   @Test
   fun createFhirEngineConfiguration_withDefaultNetworkConfig_shouldHaveDefaultTimeout() {
-    val config = FhirEngineConfiguration(serverConfiguration = ServerConfiguration(""))
-    with(config.serverConfiguration!!.networkConfiguration) {
+    val config = FhirEngineConfiguration(syncConfiguration = SyncConfiguration())
+    with(config.syncConfiguration!!.serverConfiguration.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(10L)
       assertThat(this.readTimeOut).isEqualTo(10L)
       assertThat(this.writeTimeOut).isEqualTo(10L)
@@ -91,13 +88,20 @@ class FhirEngineProviderTest {
   fun createFhirEngineConfiguration_configureNetworkTimeouts_shouldHaveconfiguredTimeout() {
     val config =
       FhirEngineConfiguration(
-        serverConfiguration =
-          ServerConfiguration(
-            "",
-            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6),
+        syncConfiguration =
+          SyncConfiguration(
+            serverConfiguration =
+              ServerConfiguration(
+                networkConfiguration =
+                  NetworkConfiguration(
+                    connectionTimeOut = 5,
+                    readTimeOut = 4,
+                    writeTimeOut = 6,
+                  ),
+              ),
           ),
       )
-    with(config.serverConfiguration!!.networkConfiguration) {
+    with(config.syncConfiguration!!.serverConfiguration.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
@@ -108,20 +112,23 @@ class FhirEngineProviderTest {
   fun createFhirEngineConfiguration_configureOkHttpCache_shouldHaveOkHttpCache() {
     val config =
       FhirEngineConfiguration(
-        serverConfiguration =
-          ServerConfiguration(
-            "",
-            NetworkConfiguration(
-              httpCache =
-                CacheConfiguration(
-                  cacheDir = File("sample-dir", "http_cache"),
-                  // $0.05 worth of phone storage in 2020
-                  maxSize = 50L * 1024L * 1024L, // 50 MiB
-                ),
-            ),
+        syncConfiguration =
+          SyncConfiguration(
+            serverConfiguration =
+              ServerConfiguration(
+                networkConfiguration =
+                  NetworkConfiguration(
+                    httpCache =
+                      CacheConfiguration(
+                        cacheDir = File("sample-dir", "http_cache"),
+                        // $0.05 worth of phone storage in 2020
+                        maxSize = 50L * 1024L * 1024L, // 50 MiB
+                      ),
+                  ),
+              ),
           ),
       )
-    with(config.serverConfiguration!!.networkConfiguration) {
+    with(config.syncConfiguration!!.serverConfiguration.networkConfiguration) {
       assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
       assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
     }
