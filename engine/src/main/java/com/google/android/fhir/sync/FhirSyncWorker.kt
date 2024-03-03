@@ -22,6 +22,7 @@ import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.FhirSyncDbInteractorImpl
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.download.DownloaderImpl
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
@@ -66,59 +67,55 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
           ),
         )
 
-    val synchronizer =
-      FhirSynchronizer(
-        FhirEngineProvider.getFhirSyncDbInteractor(applicationContext),
-        UploadConfiguration(
-          Uploader(
-            dataSource = dataSource,
-            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
-            requestGenerator =
-              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
-          ),
+    val database = FhirEngineProvider.getFhirDatabase(applicationContext)
+    val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
+
+    val fhirSyncDbInteractor =
+      FhirSyncDbInteractorImpl(
+        database = database,
+        localChangeFetcher =
           LocalChangeFetcherFactory.byMode(
             getUploadStrategy().localChangesFetchMode,
-            FhirEngineProvider.getFhirDatabase(applicationContext),
+            database,
           ),
-          DefaultResourceConsolidator(FhirEngineProvider.getFhirDatabase(applicationContext)),
-        ),
-        DownloadConfiguration(
-          DownloaderImpl(dataSource, getDownloadWorkManager()),
-          getConflictResolver(),
-        ),
-        FhirEngineProvider.getFhirDataStore(applicationContext),
+        resourceConsolidator = DefaultResourceConsolidator(database),
+        conflictResolver = getConflictResolver(),
       )
+    val uploader =
+      Uploader(
+        dataSource = dataSource,
+        patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+        requestGenerator =
+          UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+      )
+    val downloader = DownloaderImpl(dataSource, getDownloadWorkManager())
 
-    val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
-    val result =
-      synchronizer
+    val terminalSyncJobStatus =
+      FhirSynchronizer(
+          fhirSyncDbInteractor = fhirSyncDbInteractor,
+          uploader = uploader,
+          downloader = downloader,
+        )
         .synchronize()
-        .onEach { syncJobStatus ->
-          val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
-          when (syncJobStatus) {
-            is SyncJobStatus.Succeeded,
-            is SyncJobStatus.Failed, -> {
-              // While creating periodicSync request if
-              // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
-              // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
-              if (uniqueWorkerName != null) {
-                fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, syncJobStatus)
-              }
-            }
-            else -> {
-              setProgress(buildWorkData(syncJobStatus))
-            }
-          }
-        }
+        .onEach { setProgress(buildWorkData(it)) }
         .first { it is SyncJobStatus.Failed || it is SyncJobStatus.Succeeded }
+
+    fhirDataStore.writeLastSyncTimestamp(terminalSyncJobStatus.timestamp)
+    val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
+    // While creating periodicSync request if
+    // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
+    // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
+    if (uniqueWorkerName != null) {
+      fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, terminalSyncJobStatus)
+    }
 
     /**
      * In case of failure, we can check if its worth retrying and do retry based on
      * [RetryConfiguration.maxRetries] set by user.
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
-    val output = buildWorkData(result)
-    return when (result) {
+    val output = buildWorkData(terminalSyncJobStatus)
+    return when (terminalSyncJobStatus) {
       is SyncJobStatus.Succeeded -> Result.success(output)
       else -> {
         if (retries > runAttemptCount) Result.retry() else Result.failure(output)

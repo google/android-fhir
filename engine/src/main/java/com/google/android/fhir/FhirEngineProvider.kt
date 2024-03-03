@@ -70,12 +70,6 @@ object FhirEngineProvider {
 
   @PublishedApi
   @Synchronized
-  internal fun getFhirSyncDbInteractor(context: Context): FhirSyncDbInteractor {
-    return getOrCreateFhirService(context).fhirSyncDbInteractor
-  }
-
-  @PublishedApi
-  @Synchronized
   internal fun getFhirDatabase(context: Context): Database {
     return getOrCreateFhirService(context).database
   }

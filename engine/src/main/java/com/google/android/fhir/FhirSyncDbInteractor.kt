@@ -19,7 +19,6 @@ package com.google.android.fhir
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.SyncJobStatus
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.upload.LocalChangeFetcher
 import com.google.android.fhir.sync.upload.ResourceConsolidator
@@ -27,12 +26,6 @@ import com.google.android.fhir.sync.upload.UploadRequestResult
 import org.hl7.fhir.r4.model.Resource
 
 internal interface FhirSyncDbInteractor {
-  suspend fun init(
-      localChangeFetcher: LocalChangeFetcher,
-      resourceConsolidator: ResourceConsolidator,
-      conflictResolver: ConflictResolver,
-  )
-
   suspend fun getLocalChanges(): List<LocalChange>
 
   suspend fun consolidateUploadResult(uploadRequestResult: UploadRequestResult)
@@ -40,30 +33,14 @@ internal interface FhirSyncDbInteractor {
   suspend fun getLocalChangesCount(): Int
 
   suspend fun consolidateDownloadResult(downloadState: DownloadState)
-
-  suspend fun updateLastSyncTime()
-
-  suspend fun updateLastSyncJobState(syncJobStatus: SyncJobStatus)
 }
 
 internal class FhirSyncDbInteractorImpl(
   private val database: Database,
+  private val localChangeFetcher: LocalChangeFetcher,
+  private val resourceConsolidator: ResourceConsolidator,
+  private val conflictResolver: ConflictResolver,
 ) : FhirSyncDbInteractor {
-
-  private lateinit var localChangeFetcher: LocalChangeFetcher
-  private lateinit var resourceConsolidator: ResourceConsolidator
-  private lateinit var conflictResolver: ConflictResolver
-
-  override suspend fun init(
-      localChangeFetcher: LocalChangeFetcher,
-      resourceConsolidator: ResourceConsolidator,
-      conflictResolver: ConflictResolver,
-  ) {
-    this.localChangeFetcher = localChangeFetcher
-    this.resourceConsolidator = resourceConsolidator
-    this.conflictResolver = conflictResolver
-  }
-
   override suspend fun getLocalChanges() = localChangeFetcher.next()
 
   override suspend fun getLocalChangesCount() = database.getLocalChangesCount()
@@ -93,14 +70,6 @@ internal class FhirSyncDbInteractorImpl(
     }
   }
 
-  override suspend fun updateLastSyncTime() {
-    TODO("Not yet implemented")
-  }
-
-  override suspend fun updateLastSyncJobState(syncJobStatus: SyncJobStatus) {
-    TODO("Not yet implemented")
-  }
-
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
     resolved?.let {
       database.deleteUpdates(it)
@@ -109,9 +78,9 @@ internal class FhirSyncDbInteractorImpl(
   }
 
   private suspend fun resolveConflictingResources(
-      resources: List<Resource>,
-      conflictingResourceIds: Set<String>,
-      conflictResolver: ConflictResolver,
+    resources: List<Resource>,
+    conflictingResourceIds: Set<String>,
+    conflictResolver: ConflictResolver,
   ) =
     resources
       .filter { conflictingResourceIds.contains(it.logicalId) }

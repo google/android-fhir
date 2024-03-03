@@ -19,15 +19,10 @@ package com.google.android.fhir.sync
 import com.google.android.fhir.FhirSyncDbInteractor
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.LocalChangeFetcher
-import com.google.android.fhir.sync.upload.ResourceConsolidator
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -52,57 +47,19 @@ private sealed class SyncResult {
 
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
-internal data class UploadConfiguration(
-  val uploader: Uploader,
-  val localChangeFetcher: LocalChangeFetcher,
-  val resourceConsolidator: ResourceConsolidator,
-)
-
-internal class DownloadConfiguration(
-  val downloader: Downloader,
-  val conflictResolver: ConflictResolver,
-)
-
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
   private val fhirSyncDbInteractor: FhirSyncDbInteractor,
-  private val uploadConfiguration: UploadConfiguration,
-  private val downloadConfiguration: DownloadConfiguration,
-  private val datastoreUtil: FhirDataStore,
+  private val uploader: Uploader,
+  private val downloader: Downloader,
 ) {
-
-  private val _syncState = MutableSharedFlow<SyncJobStatus>()
-  val syncState: SharedFlow<SyncJobStatus> = _syncState
-
-  private suspend fun setSyncState(state: SyncJobStatus) = _syncState.emit(state)
-
-  private suspend fun setSyncState(result: SyncResult): SyncJobStatus {
-    // todo: emit this properly instead of using datastore?
-    datastoreUtil.writeLastSyncTimestamp(result.timestamp)
-
-    val state =
-      when (result) {
-        is SyncResult.Success -> SyncJobStatus.Succeeded()
-        is SyncResult.Error -> SyncJobStatus.Failed(result.exceptions)
-      }
-
-    setSyncState(state)
-    return state
-  }
-
   /**
    * Manages the sequential execution of downloading and uploading for coordinated operation. This
    * function is coroutine-safe, ensuring that multiple invocations will not interfere with each
    * other.
    */
-  @OptIn(FlowPreview::class)
   suspend fun synchronize(): Flow<SyncJobStatus> = flow {
     mutex.withLock {
-      fhirSyncDbInteractor.init(
-        uploadConfiguration.localChangeFetcher,
-        uploadConfiguration.resourceConsolidator,
-        downloadConfiguration.conflictResolver,
-      )
       emit(SyncJobStatus.Started())
       emitAll(download())
       emitAll(upload())
@@ -113,7 +70,7 @@ internal class FhirSynchronizer(
   private suspend fun download(): Flow<SyncJobStatus> = flow {
     val initialSyncJobStatus =
       SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, 0, 0) as SyncJobStatus
-    downloadConfiguration.downloader
+    downloader
       .download()
       .onEach { fhirSyncDbInteractor.consolidateDownloadResult(it) }
       .runningFold(initialSyncJobStatus) { lastStatus, downloadState ->
@@ -152,7 +109,7 @@ internal class FhirSynchronizer(
         as SyncJobStatus
     while (localChanges.isNotEmpty()) {
       val syncJobStatus =
-        uploadConfiguration.uploader
+        uploader
           .upload(localChanges)
           .onEach { fhirSyncDbInteractor.consolidateUploadResult(it) }
           .runningFold(initialSyncJobStatus) { lastStatus, uploadRequestResult ->

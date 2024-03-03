@@ -41,7 +41,6 @@ internal data class FhirServices(
   val database: Database,
   val remoteDataSource: DataSource? = null,
   val fhirDataStore: FhirDataStore,
-  val fhirSyncDbInteractor: FhirSyncDbInteractor,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -96,14 +95,12 @@ internal data class FhirServices(
                 .build(),
           )
         }
-      val fhirSyncDbInteractor = FhirSyncDbInteractorImpl(db)
       return FhirServices(
         fhirEngine = engine,
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource,
         fhirDataStore = FhirDataStore(context),
-        fhirSyncDbInteractor = fhirSyncDbInteractor,
       )
     }
   }
