@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -203,6 +203,18 @@ class MoreTypesTest {
   fun coding_toCodeType() {
     val code = Coding("fakeSystem", "fakeCode", "fakeDisplay").toCodeType()
     assertThat(code.equalsDeep(CodeType("fakeCode"))).isTrue()
+  }
+
+  @Test
+  fun `should return coding for quantity`() {
+    val quantity =
+      Quantity(1).apply {
+        this.code = "yr"
+        this.unit = "years"
+        this.system = "http://unit.org"
+      }
+    val result = quantity.toCoding()
+    assertThat(result.equalsDeep(Coding("http://unit.org", "yr", "years")))
   }
 
   @Test

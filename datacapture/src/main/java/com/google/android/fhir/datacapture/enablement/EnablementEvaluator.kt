@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.enablement
 
 import com.google.android.fhir.compareTo
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.enableWhenExpression
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
@@ -77,6 +78,7 @@ internal class EnablementEvaluator(
     Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
     emptyMap(),
   private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+  private val xFhirQueryResolver: XFhirQueryResolver? = null,
 ) {
 
   private val expressionEvaluator =
@@ -85,6 +87,7 @@ internal class EnablementEvaluator(
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   /**
@@ -125,7 +128,7 @@ internal class EnablementEvaluator(
    * @param questionnaireItem the corresponding questionnaire item.
    * @param questionnaireResponseItem the corresponding questionnaire response item.
    */
-  fun evaluate(
+  suspend fun evaluate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ): Boolean {

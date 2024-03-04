@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1496,6 +1496,113 @@ class MoreQuestionnaireItemComponentsTest {
     Locale.setDefault(Locale.forLanguageTag("vi-VN"))
 
     assertThat(questionItemList.first().localizedFlyoverSpanned.toString()).isEqualTo("gợi ý")
+  }
+
+  @Test
+  fun `unitOption should return list of coding for multiple available unit options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "mn", "months"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mn", "months"))))
+  }
+
+  @Test
+  fun `unitOption should return list with single coding for single available unit option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return empty list for no available unit option`() {
+    val question = Questionnaire.QuestionnaireItemComponent()
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(0)
+  }
+
+  @Test
+  fun `unitOption should return list with single coding when initial value of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return list with de-duplicated coding when multiple initial values of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "mo"
+              this.unit = "months"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mo", "months"))))
   }
 
   @Test
