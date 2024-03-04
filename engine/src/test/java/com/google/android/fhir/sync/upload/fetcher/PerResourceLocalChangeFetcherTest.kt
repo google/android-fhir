@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class PerResourceLocalChangeFetcherTest {
 
-  private val services =
-    FhirServices.builder(ApplicationProvider.getApplicationContext()).inMemory().build()
+  private val services = FhirServices.builder(ApplicationProvider.getApplicationContext()).build()
   private val database = services.database
 
   @Test

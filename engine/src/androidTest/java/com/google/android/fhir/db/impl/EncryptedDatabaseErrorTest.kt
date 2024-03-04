@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,14 +66,11 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -84,14 +81,11 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             it.search<Patient>(
@@ -115,14 +109,11 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -139,14 +130,11 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             it.search<Patient>(
@@ -169,14 +157,11 @@ class EncryptedDatabaseErrorTest {
       // GIVEN an unencrypted database.
       DatabaseImpl(
           context,
-          parser,
-          terser,
-          DatabaseConfig(
+          DatabaseConfiguration(
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = UNSPECIFIED,
           ),
-          resourceIndexer,
         )
         .let {
           it.insert(TEST_PATIENT_1)
@@ -193,14 +178,11 @@ class EncryptedDatabaseErrorTest {
       // THEN it should recreate the database
       DatabaseImpl(
           context,
-          parser,
-          terser,
-          DatabaseConfig(
+          DatabaseConfiguration(
             inMemory = false,
             enableEncryption = true,
             databaseErrorStrategy = RECREATE_AT_OPEN,
           ),
-          resourceIndexer,
         )
         .let {
           assertThat(
@@ -226,14 +208,11 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an encrypted database.
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = true,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             it.insert(TEST_PATIENT_1)
@@ -244,14 +223,11 @@ class EncryptedDatabaseErrorTest {
         // THEN it should recreate database.
         DatabaseImpl(
             context,
-            parser,
-            terser,
-            DatabaseConfig(
+            DatabaseConfiguration(
               inMemory = false,
               enableEncryption = false,
               databaseErrorStrategy = UNSPECIFIED,
             ),
-            resourceIndexer,
           )
           .let {
             assertThat(

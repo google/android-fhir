@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,7 @@ class FhirEngineProviderTestRule : TestRule {
   override fun apply(base: Statement, description: Description): Statement {
     return object : Statement() {
       override fun evaluate() {
-        FhirEngineProvider.init(
-          FhirEngineConfiguration(testMode = true),
-        )
+        FhirEngineProvider.init(FhirEngineConfiguration())
         try {
           base.evaluate()
         } finally {

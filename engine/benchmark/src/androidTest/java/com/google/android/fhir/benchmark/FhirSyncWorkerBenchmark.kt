@@ -33,6 +33,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.ServerConfiguration
+import com.google.android.fhir.SyncConfiguration
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
@@ -417,8 +418,10 @@ class FhirSyncWorkerBenchmark {
     fun oneTimeSetup() {
       FhirEngineProvider.init(
         FhirEngineConfiguration(
-          serverConfiguration = ServerConfiguration("http://127.0.0.1:$mockServerPort/fhir/"),
-          testMode = true,
+          syncConfiguration =
+            SyncConfiguration(
+              serverConfiguration = ServerConfiguration("http://127.0.0.1:$mockServerPort/fhir/"),
+            ),
         ),
       )
       mockWebServer.start(mockServerPort)

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.db
 
+import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
@@ -185,6 +186,8 @@ internal interface Database {
    *   will delete resource entry from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+
+  suspend fun getParser(): IParser
 }
 
 data class ResourceWithUUID<R>(

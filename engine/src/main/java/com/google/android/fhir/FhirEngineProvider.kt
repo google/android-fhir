@@ -17,13 +17,13 @@
 package com.google.android.fhir
 
 import android.content.Context
-import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.db.impl.DatabaseConfiguration
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
+import com.google.android.fhir.sync.upload.UploadStrategy
 import java.io.File
-import org.hl7.fhir.r4.model.SearchParameter
 
 /** The provider for [FhirEngine] instance. */
 object FhirEngineProvider {
@@ -75,12 +75,9 @@ object FhirEngineProvider {
       fhirServices =
         FhirServices.builder(context.applicationContext)
           .apply {
-            if (configuration.enableEncryptionIfSupported) enableEncryptionIfSupported()
-            setDatabaseErrorStrategy(configuration.databaseErrorStrategy)
-            configuration.serverConfiguration?.let { setServerConfiguration(it) }
-            configuration.customSearchParameters?.let { setSearchParameters(it) }
-            if (configuration.testMode) {
-              inMemory()
+            setDatabaseConfiguration(configuration.databaseConfiguration)
+            if (configuration.syncConfiguration != null) {
+              setSyncConfiguration(configuration.syncConfiguration)
             }
           }
           .build()
@@ -90,7 +87,7 @@ object FhirEngineProvider {
 
   @Synchronized
   fun cleanup() {
-    check(fhirEngineConfiguration?.testMode == true) {
+    check(fhirEngineConfiguration?.databaseConfiguration?.inMemory == true) {
       "FhirEngineProvider: FhirEngineProvider needs to be in the test mode to perform cleanup."
     }
     forceCleanup()
@@ -113,23 +110,13 @@ object FhirEngineProvider {
  * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is thrown.
  */
 data class FhirEngineConfiguration(
-  val enableEncryptionIfSupported: Boolean = false,
-  val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
-  val serverConfiguration: ServerConfiguration? = null,
-  val testMode: Boolean = false,
-  /**
-   * Additional search parameters to be used to query FHIR engine using the search API. These are in
-   * addition to the default search parameters defined in
-   * [FHIR](https://www.hl7.org/fhir/searchparameter-registry.html). The search parameters should be
-   * unique and not change the existing/default search parameters and it may lead to unexpected
-   * search behaviour.
-   *
-   * NOTE: The engine doesn't reindex resources after a new [SearchParameter] is added to the
-   * engine. It is the responsibility of the app developer to reindex the resources by updating
-   * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
-   * in the reindexing of the resource.
-   */
-  val customSearchParameters: List<SearchParameter>? = null,
+  val syncConfiguration: SyncConfiguration? = null,
+  val databaseConfiguration: DatabaseConfiguration = DatabaseConfiguration(),
+)
+
+data class SyncConfiguration(
+  val uploadStrategy: UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut,
+  val serverConfiguration: ServerConfiguration = ServerConfiguration(),
 )
 
 enum class DatabaseErrorStrategy {
@@ -151,7 +138,7 @@ enum class DatabaseErrorStrategy {
 /** A configuration to provide necessary params for network connection. */
 data class ServerConfiguration(
   /** Url of the remote FHIR server. */
-  val baseUrl: String,
+  val baseUrl: String = "",
   /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
   /** An [HttpAuthenticator] for providing HTTP authorization header. */

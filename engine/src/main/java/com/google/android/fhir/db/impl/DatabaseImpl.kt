@@ -21,11 +21,14 @@ import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.asMapOfResourceTypeToSearchParamDefinitions
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
@@ -33,6 +36,7 @@ import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
@@ -40,6 +44,7 @@ import java.time.Instant
 import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.SearchParameter
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -47,19 +52,21 @@ import org.hl7.fhir.r4.model.ResourceType
  */
 @Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(
-  private val context: Context,
-  private val iParser: IParser,
-  private val fhirTerser: FhirTerser,
-  databaseConfig: DatabaseConfig,
-  private val resourceIndexer: ResourceIndexer,
+  context: Context,
+  databaseConfiguration: DatabaseConfiguration,
 ) : com.google.android.fhir.db.Database {
+
+  private val iParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private val fhirTerser: FhirTerser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
+  private val resourceIndexer =
+    (databaseConfiguration.customSearchParameters?.asMapOfResourceTypeToSearchParamDefinitions()
+        ?: emptyMap())
+      .let { ResourceIndexer(SearchParamDefinitionsProviderImpl(it)) }
 
   val db: ResourceDatabase
 
   init {
-    val enableEncryption =
-      databaseConfig.enableEncryption &&
-        DatabaseEncryptionKeyProvider.isDatabaseEncryptionSupported()
+    val enableEncryption = databaseConfiguration.enableEncryption
 
     // The detection of unintentional switching of database encryption across releases can't be
     // placed inside withTransaction because the database is opened within withTransaction. The
@@ -80,7 +87,7 @@ internal class DatabaseImpl(
     db =
       // Initializes builder with the database file name
       when {
-          databaseConfig.inMemory ->
+          databaseConfiguration.inMemory ->
             Room.inMemoryDatabaseBuilder(context, ResourceDatabase::class.java)
           enableEncryption ->
             Room.databaseBuilder(context, ResourceDatabase::class.java, ENCRYPTED_DATABASE_NAME)
@@ -93,7 +100,7 @@ internal class DatabaseImpl(
             openHelperFactory {
               SQLCipherSupportHelper(
                 it,
-                databaseErrorStrategy = databaseConfig.databaseErrorStrategy,
+                databaseErrorStrategy = databaseConfiguration.databaseErrorStrategy,
               ) {
                 DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
               }
@@ -408,6 +415,8 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun getParser() = iParser
+
   companion object {
     /**
      * The name for unencrypted database.
@@ -429,8 +438,21 @@ internal class DatabaseImpl(
   }
 }
 
-data class DatabaseConfig(
-  val inMemory: Boolean,
-  val enableEncryption: Boolean,
-  val databaseErrorStrategy: DatabaseErrorStrategy,
+data class DatabaseConfiguration(
+  val inMemory: Boolean = true,
+  val enableEncryption: Boolean = false,
+  val databaseErrorStrategy: DatabaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED,
+  /**
+   * Additional search parameters to be used to query FHIR engine using the search API. These are in
+   * addition to the default search parameters defined in
+   * [FHIR](https://www.hl7.org/fhir/searchparameter-registry.html). The search parameters should be
+   * unique and not change the existing/default search parameters and it may lead to unexpected
+   * search behaviour.
+   *
+   * NOTE: The engine doesn't reindex resources after a new [SearchParameter] is added to the
+   * engine. It is the responsibility of the app developer to reindex the resources by updating
+   * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
+   * in the reindexing of the resource.
+   */
+  val customSearchParameters: List<SearchParameter>? = null,
 )
