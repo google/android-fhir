@@ -92,9 +92,9 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val terminalSyncJobStatus =
       FhirSynchronizer(
-          fhirSyncDbInteractor = fhirSyncDbInteractor,
           uploader = uploader,
           downloader = downloader,
+          fhirSyncDbInteractor = fhirSyncDbInteractor,
         )
         .synchronize()
         .onEach { setProgress(buildWorkData(it)) }

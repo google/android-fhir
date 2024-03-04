@@ -19,6 +19,8 @@ package com.google.android.fhir
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
+import com.google.android.fhir.sync.SyncJobStatus
+import com.google.android.fhir.sync.SyncOperation
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.upload.LocalChangeFetcher
 import com.google.android.fhir.sync.upload.ResourceConsolidator
@@ -30,9 +32,17 @@ internal interface FhirSyncDbInteractor {
 
   suspend fun consolidateUploadResult(uploadRequestResult: UploadRequestResult)
 
-  suspend fun getLocalChangesCount(): Int
-
   suspend fun consolidateDownloadResult(downloadState: DownloadState)
+
+  suspend fun updateSyncJobStatus(
+    previousSyncJobStatus: SyncJobStatus,
+    downloadState: DownloadState,
+  ): SyncJobStatus
+
+  suspend fun updateSyncJobStatus(
+    previousSyncJobStatus: SyncJobStatus,
+    uploadRequestResult: UploadRequestResult,
+  ): SyncJobStatus
 }
 
 internal class FhirSyncDbInteractorImpl(
@@ -42,8 +52,6 @@ internal class FhirSyncDbInteractorImpl(
   private val conflictResolver: ConflictResolver,
 ) : FhirSyncDbInteractor {
   override suspend fun getLocalChanges() = localChangeFetcher.next()
-
-  override suspend fun getLocalChangesCount() = database.getLocalChangesCount()
 
   override suspend fun consolidateUploadResult(uploadRequestResult: UploadRequestResult) {
     resourceConsolidator.consolidate(uploadRequestResult)
@@ -67,6 +75,59 @@ internal class FhirSyncDbInteractorImpl(
         }
       }
       is DownloadState.Failure -> {}
+    }
+  }
+
+  override suspend fun updateSyncJobStatus(
+    previousSyncJobStatus: SyncJobStatus,
+    downloadState: DownloadState,
+  ): SyncJobStatus {
+    return with(previousSyncJobStatus as SyncJobStatus.InProgress) {
+      when (downloadState) {
+        is DownloadState.Started -> {
+          SyncJobStatus.InProgress(
+            syncOperation = SyncOperation.DOWNLOAD,
+            total = downloadState.total,
+            completed = 0,
+          )
+        }
+        is DownloadState.Success -> {
+          SyncJobStatus.InProgress(
+            syncOperation = syncOperation,
+            total = downloadState.total,
+            completed = downloadState.completed,
+          )
+        }
+        is DownloadState.Failure -> {
+          SyncJobStatus.Failed(
+            exceptions = listOf(downloadState.syncError),
+          )
+        }
+      }
+    }
+  }
+
+  override suspend fun updateSyncJobStatus(
+    previousSyncJobStatus: SyncJobStatus,
+    uploadRequestResult: UploadRequestResult,
+  ): SyncJobStatus {
+    return when (uploadRequestResult) {
+      is UploadRequestResult.Success -> {
+        val localChangesCount =
+          uploadRequestResult.successfulUploadResponseMappings.flatMap { it.localChanges }.size
+        with(previousSyncJobStatus as SyncJobStatus.InProgress) {
+          SyncJobStatus.InProgress(
+            syncOperation = syncOperation,
+            completed = completed + localChangesCount,
+            total = total,
+          )
+        }
+      }
+      is UploadRequestResult.Failure -> {
+        SyncJobStatus.Failed(
+          exceptions = listOf(uploadRequestResult.uploadError),
+        )
+      }
     }
   }
 

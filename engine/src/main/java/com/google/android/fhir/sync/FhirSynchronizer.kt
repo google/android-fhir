@@ -17,12 +17,10 @@
 package com.google.android.fhir.sync
 
 import com.google.android.fhir.FhirSyncDbInteractor
-import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.Uploader
-import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
@@ -37,21 +35,13 @@ enum class SyncOperation {
   UPLOAD,
 }
 
-private sealed class SyncResult {
-  val timestamp: OffsetDateTime = OffsetDateTime.now()
-
-  class Success : SyncResult()
-
-  data class Error(val exceptions: List<ResourceSyncException>) : SyncResult()
-}
-
 data class ResourceSyncException(val resourceType: ResourceType, val exception: Exception)
 
 /** Class that helps synchronize the data source and save it in the local database */
 internal class FhirSynchronizer(
-  private val fhirSyncDbInteractor: FhirSyncDbInteractor,
   private val uploader: Uploader,
   private val downloader: Downloader,
+  private val fhirSyncDbInteractor: FhirSyncDbInteractor,
 ) {
   /**
    * Manages the sequential execution of downloading and uploading for coordinated operation. This
@@ -68,75 +58,35 @@ internal class FhirSynchronizer(
   }
 
   private suspend fun download(): Flow<SyncJobStatus> = flow {
+    // Following is to bootstrap new state calculation based on previous "InProgress" states
     val initialSyncJobStatus =
       SyncJobStatus.InProgress(SyncOperation.DOWNLOAD, 0, 0) as SyncJobStatus
     downloader
       .download()
       .onEach { fhirSyncDbInteractor.consolidateDownloadResult(it) }
-      .runningFold(initialSyncJobStatus) { lastStatus, downloadState ->
-        with(lastStatus as SyncJobStatus.InProgress) {
-          when (downloadState) {
-            is DownloadState.Started -> {
-              SyncJobStatus.InProgress(
-                syncOperation = SyncOperation.DOWNLOAD,
-                total = downloadState.total,
-                completed = 0,
-              )
-            }
-            is DownloadState.Success -> {
-              SyncJobStatus.InProgress(
-                syncOperation = syncOperation,
-                total = downloadState.total,
-                completed = downloadState.completed,
-              )
-            }
-            is DownloadState.Failure -> {
-              SyncJobStatus.Failed(
-                exceptions = listOf(downloadState.syncError),
-              )
-            }
-          }
-        }
-      }
+      .runningFold(initialSyncJobStatus, fhirSyncDbInteractor::updateSyncJobStatus)
+      // initialSyncJobStatus is dropped
+      .drop(1)
       .onEach { emit(it) }
       .firstOrNull { it is SyncJobStatus.Failed }
   }
 
   private suspend fun upload(): Flow<SyncJobStatus> = flow {
     var localChanges = fhirSyncDbInteractor.getLocalChanges()
+    // Following is to bootstrap new state calculation based on previous "InProgress" states
     val initialSyncJobStatus =
-      SyncJobStatus.InProgress(SyncOperation.UPLOAD, 0, fhirSyncDbInteractor.getLocalChangesCount())
-        as SyncJobStatus
+      SyncJobStatus.InProgress(SyncOperation.UPLOAD, 0, localChanges.size) as SyncJobStatus
     while (localChanges.isNotEmpty()) {
-      val syncJobStatus =
+      val failedOrNullSyncJobStatus =
         uploader
           .upload(localChanges)
           .onEach { fhirSyncDbInteractor.consolidateUploadResult(it) }
-          .runningFold(initialSyncJobStatus) { lastStatus, uploadRequestResult ->
-            when (uploadRequestResult) {
-              is UploadRequestResult.Success -> {
-                val localChangesCount =
-                  uploadRequestResult.successfulUploadResponseMappings
-                    .flatMap { it.localChanges }
-                    .size
-                with(lastStatus as SyncJobStatus.InProgress) {
-                  SyncJobStatus.InProgress(
-                    syncOperation = syncOperation,
-                    completed = completed + localChangesCount,
-                    total = total,
-                  )
-                }
-              }
-              is UploadRequestResult.Failure -> {
-                SyncJobStatus.Failed(
-                  exceptions = listOf(uploadRequestResult.uploadError),
-                )
-              }
-            }
-          }
+          .runningFold(initialSyncJobStatus, fhirSyncDbInteractor::updateSyncJobStatus)
+          // initialSyncJobStatus is dropped
+          .drop(1)
           .onEach { emit(it) }
           .firstOrNull { it is SyncJobStatus.Failed }
-      if (syncJobStatus is SyncJobStatus.Failed) {
+      if (failedOrNullSyncJobStatus is SyncJobStatus.Failed) {
         return@flow
       }
       localChanges = fhirSyncDbInteractor.getLocalChanges()
