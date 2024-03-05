@@ -81,16 +81,6 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-//  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
-//    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-//      database.updateVersionIdAndLastUpdated(
-//        resource.id,
-//        resource.resourceType,
-//        resource.meta.versionId,
-//        resource.meta.lastUpdated.toInstant(),
-//      )
-//    }
-//  }
 
   private suspend fun updateResource(resource: DomainResource, localChangeResourceId : String) {
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {

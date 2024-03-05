@@ -172,22 +172,6 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
-//  @Query(
-//    """
-//        UPDATE ResourceEntity
-//        SET versionId = :versionId,
-//            lastUpdatedRemote = :lastUpdatedRemote
-//        WHERE resourceId = :resourceId
-//        AND resourceType = :resourceType
-//    """,
-//  )
-//  abstract suspend fun updateRemoteVersionIdAndLastUpdate(
-//    resourceId: String,
-//    resourceType: ResourceType,
-//    versionId: String,
-//    lastUpdatedRemote: Instant,
-//  )
-
   @Query(
     """
         UPDATE ResourceEntity
@@ -370,8 +354,6 @@ internal abstract class ResourceDao {
     versionId: String,
     lastUpdated: Instant,
   ) {
-//    updateRemoteVersionIdAndLastUpdate( localChangeResourceId,resourceType, versionId, lastUpdated)
-//    updateResponseResourceId( localChangeResourceId,responseResourceId,resourceType,)
     updateResource(localChangeResourceId,
       responseResourceId,
       resourceType,

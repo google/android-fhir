@@ -63,14 +63,6 @@ internal interface Database {
     lastUpdated: Instant,
   )
 
-//  suspend fun updateVersionIdAndLastUpdated(
-//    localChangeResourceId : String,
-//    responseResourceId: String,
-//    resourceType: ResourceType,
-//    versionId: String,
-//    lastUpdated: Instant,
-//  )
-
   suspend fun updateResource(
     localChangeResourceId : String,
     responseResourceId: String,
