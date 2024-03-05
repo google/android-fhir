@@ -18,15 +18,14 @@ name: "Build"
 # events for the `master` branch
 on:
   push:
-    branches: [ master ]
-    tags:
-      build*
+    branches: [master]
+    tags: build*
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ master ]
+    branches: [master]
   schedule:
     # Run once a week (even if no new code or PRs) to detect random regressions
-    - cron: '12 13 * * 2'
+    - cron: "12 13 * * 2"
 
 env:
   # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
@@ -56,7 +55,6 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
         uses: actions/checkout@v4
