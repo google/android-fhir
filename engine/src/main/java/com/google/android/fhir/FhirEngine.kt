@@ -31,11 +31,40 @@ import org.hl7.fhir.r4.model.ResourceType
  * Provides an interface for managing FHIR resources in local storage.
  *
  * The FHIR Engine allows you to create, read, update, and delete (CRUD) FHIR resources, as well as
- * perform searches and synchronize data with a remote FHIR server.
+ * perform searches and synchronize data with a remote FHIR server. The FHIR resources are
+ * represented using HAPI FHIR Structures [Resource] and [ResourceType].
+ *
+ * To use a FHIR Engine instance, first call [FhirEngineProvider.init] with a
+ * [FhirEngineConfiguration]. This must be done only once; we recommend doing this in the
+ * `onCreate()` function of your `Application` class.
+ *
+ * ```
+ * class MyApplication : Application() {
+ *   override fun onCreate() {
+ *     super.onCreate()
+ *
+ *     FhirEngineProvider.init(
+ *       FhirEngineConfiguration(
+ *         enableEncryptionIfSupported = true,
+ *         RECREATE_AT_OPEN
+ *       )
+ *     )
+ *   }
+ * }
+ * ```
+ *
+ * To get a `FhirEngine` to interact with, use [FhirEngineProvider.getInstance]:
+ * ```
+ * val fhirEngine = FhirEngineProvider.getInstance(this)
+ * ```
  */
 interface FhirEngine {
   /**
-   * Creates one or more FHIR [Resource]s in the local storage.
+   * Creates one or more FHIR [Resource]s in the local storage. FHIR Engine requires all stored
+   * resources to have a logical [Resource.id]. If the `id` is specified in the resource passed to
+   * [create], the resource created in `FhirEngine` will have the same `id`. If no `id` is
+   * specified, `FhirEngine` will generate a UUID as that resource's `id` and include it in the
+   * returned list of IDs.
    *
    * @param resource The FHIR resources to create.
    * @return A list of logical IDs of the newly created resources.
@@ -71,6 +100,16 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list of resources matching the [Search] specifications.
    *
+   * Example:
+   * ```
+   * fhirEngine.search<Patient> {
+   *  filter(Patient.GIVEN, {
+   *    value = "Kiran"
+   *    modifier = StringFilterModifier.MATCHES_EXACTLY
+   *  })
+   * }
+   * ```
+   *
    * @param search The search criteria to apply.
    * @return A list of [SearchResult] objects containing the matching resources and any included
    *   references.
@@ -89,6 +128,7 @@ interface FhirEngine {
    * @return A [Flow] that emits the progress of the synchronization process as [SyncUploadProgress]
    *   objects.
    */
+  @Deprecated("To be deprecated.")
   suspend fun syncUpload(
     localChangesFetchMode: LocalChangesFetchMode,
     upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
@@ -105,6 +145,7 @@ interface FhirEngine {
    * @param download A suspending function that returns a [Flow] of lists of [Resource] objects
    *   representing the downloaded data.
    */
+  @Deprecated("To be deprecated.")
   suspend fun syncDownload(
     conflictResolver: ConflictResolver,
     download: suspend () -> Flow<List<Resource>>,

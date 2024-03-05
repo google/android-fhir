@@ -40,7 +40,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
- * Handles periodic FHIR data synchronization between local database and remote server.
+ * Handles FHIR data synchronization between local database and remote server.
  *
  * Extend this abstract [CoroutineWorker][androidx.work.CoroutineWorker] and implement the abstract
  * methods to define your specific synchronization behavior. The custom worker class can then be

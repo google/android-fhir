@@ -46,8 +46,8 @@ interface DownloadWorkManager {
    * Processes the [response] received from the FHIR server.
    *
    * This method is responsible for:
-   * * Extracting resources from from the response.
-   * * Handling pagination (if applicable).
+   * * Extracting resources from the response.
+   * * Identifying additional resource URLs to download, for example to handle pagination.
    * * Returning the resources to be saved to the local database.
    *
    * @param response The FHIR resource received from the server, often a

@@ -40,7 +40,7 @@ object FhirEngineProvider {
    * done only once; we recommend doing this in the `onCreate()` function of your Application class.
    *
    * @throws IllegalStateException if called multiple times.
-   * @throws NullPointerException if [FhirEngineConfiguration.context] is null.
+   * @throws NullPointerException if `FhirEngineConfiguration.context` is null.
    */
   @Synchronized
   fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
