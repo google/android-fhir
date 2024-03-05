@@ -45,7 +45,7 @@ internal object PatchGeneratorFactory {
   ): PatchGenerator =
     when (mode) {
       is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
-      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator(database)
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator.with(database)
     }
 }
 

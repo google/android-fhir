@@ -32,7 +32,8 @@ import com.google.android.fhir.sync.upload.patch.PatchOrdering.orderByReferences
  * maintain an audit trail, but instead, multiple changes made to the same FHIR resource on the
  * client can be recorded as a single change on the server.
  */
-internal class PerResourcePatchGenerator(val database: Database) : PatchGenerator {
+internal class PerResourcePatchGenerator private constructor(val database: Database) :
+  PatchGenerator {
 
   override suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
     return generateSquashedChangesMapping(localChanges).orderByReferences(database)
@@ -143,5 +144,21 @@ internal class PerResourcePatchGenerator(val database: Database) : PatchGenerato
     val mergedNode = objectMapper.createArrayNode()
     mergedOperations.values.flatten().forEach(mergedNode::add)
     return objectMapper.writeValueAsString(mergedNode)
+  }
+
+  companion object {
+
+    private lateinit var _instance: PerResourcePatchGenerator
+
+    @Synchronized
+    fun with(database: Database): PerResourcePatchGenerator {
+      if (!::_instance.isInitialized) {
+        _instance = PerResourcePatchGenerator(database)
+      } else if (_instance.database != database) {
+        _instance = PerResourcePatchGenerator(database)
+      }
+
+      return _instance
+    }
   }
 }

@@ -61,7 +61,7 @@ class PerResourcePatchGeneratorTest {
   fun setUp() {
     MockitoAnnotations.openMocks(this)
     runTest { whenever(database.getLocalChangeResourceReferences(any())).thenReturn(emptyList()) }
-    patchGenerator = PerResourcePatchGenerator(database)
+    patchGenerator = PerResourcePatchGenerator.with(database)
   }
 
   @Test
