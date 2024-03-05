@@ -54,7 +54,10 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
             is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
-            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is ResourceUploadResponseMapping -> {
+              val localResourceId = it.localChanges.firstOrNull()?.resourceId?:""
+              updateResource(it.output,localResourceId)
+            }
           }
         }
       }
@@ -78,11 +81,24 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
+//  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
+//    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
+//      database.updateVersionIdAndLastUpdated(
+//        resource.id,
+//        resource.resourceType,
+//        resource.meta.versionId,
+//        resource.meta.lastUpdated.toInstant(),
+//      )
+//    }
+//  }
+
+  private suspend fun updateResource(resource: DomainResource, localChangeResourceId : String) {
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
+      database.updateResource(
+        localChangeResourceId,
+        resource.idPart,
         resource.resourceType,
+        resource,
         resource.meta.versionId,
         resource.meta.lastUpdated.toInstant(),
       )

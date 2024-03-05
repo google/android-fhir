@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.remote
 
+import android.util.Log
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.sync.DataSource
@@ -45,7 +46,11 @@ internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) 
 
   override suspend fun upload(request: UploadRequest): Resource =
     when (request) {
-      is BundleUploadRequest -> fhirHttpService.post(request.url, request.resource, request.headers)
+      is BundleUploadRequest ->  {
+        val bundle = fhirHttpService.post(request.url, request.resource, request.headers)
+        Log.d("santosh", request.toString())
+        bundle
+      }
       is UrlUploadRequest -> uploadIndividualRequest(request)
     }
 

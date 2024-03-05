@@ -36,7 +36,7 @@ import org.hl7.fhir.r4.model.ResourceType
 class TimestampBasedDownloadWorkManagerImpl(private val dataStore: DemoDataStore) :
   DownloadWorkManager {
   private val resourceTypeList = ResourceType.values().map { it.name }
-  private val urls = LinkedList(listOf("Patient?address-city=NAIROBI&_sort=_lastUpdated"))
+  private val urls = LinkedList(listOf("Patient?address-city=WAKAD&_sort=_lastUpdated"))
 
   override suspend fun getNextRequest(): DownloadRequest? {
     var url = urls.poll() ?: return null

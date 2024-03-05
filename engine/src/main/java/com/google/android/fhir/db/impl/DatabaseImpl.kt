@@ -156,6 +156,22 @@ internal class DatabaseImpl(
     }
   }
 
+//  override suspend fun updateResource(
+//    localChangeResourceId : String,
+//    responseResourceId: String,
+//    resourceType: ResourceType,
+//    resource : Resource,
+//  ) {
+//    db.withTransaction {
+//      resourceDao.updateResource(
+//        resourceId,
+//        resourceType,
+//        versionId,
+//        lastUpdated,
+//      )
+//    }
+//  }
+
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
@@ -166,6 +182,26 @@ internal class DatabaseImpl(
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
+        versionId,
+        lastUpdated,
+      )
+    }
+  }
+
+  override suspend fun updateResource(
+    localChangeResourceId : String,
+    responseResourceId: String,
+    resourceType: ResourceType,
+    resource : Resource,
+    versionId: String,
+    lastUpdated: Instant,
+  ) {
+    db.withTransaction {
+      resourceDao.updateResourceEntity(
+        localChangeResourceId,
+        responseResourceId,
+        resourceType,
+        resource,
         versionId,
         lastUpdated,
       )

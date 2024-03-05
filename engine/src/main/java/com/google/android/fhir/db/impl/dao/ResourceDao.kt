@@ -172,18 +172,54 @@ internal abstract class ResourceDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertPositionIndex(positionIndexEntity: PositionIndexEntity)
 
+//  @Query(
+//    """
+//        UPDATE ResourceEntity
+//        SET versionId = :versionId,
+//            lastUpdatedRemote = :lastUpdatedRemote
+//        WHERE resourceId = :resourceId
+//        AND resourceType = :resourceType
+//    """,
+//  )
+//  abstract suspend fun updateRemoteVersionIdAndLastUpdate(
+//    resourceId: String,
+//    resourceType: ResourceType,
+//    versionId: String,
+//    lastUpdatedRemote: Instant,
+//  )
+
   @Query(
     """
         UPDATE ResourceEntity
         SET versionId = :versionId,
             lastUpdatedRemote = :lastUpdatedRemote
-        WHERE resourceId = :resourceId
+        WHERE resourceId = :localChangeResourceId
         AND resourceType = :resourceType
     """,
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
-    resourceId: String,
+    localChangeResourceId : String,
     resourceType: ResourceType,
+    versionId: String,
+    lastUpdatedRemote: Instant,
+  )
+
+  @Query(
+    """
+        UPDATE ResourceEntity
+        SET resourceId = :responseResourceId,
+            serializedResource = :resource,
+            versionId = :versionId,
+            lastUpdatedRemote = :lastUpdatedRemote
+        WHERE resourceId = :localChangeResourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updateResource(
+    localChangeResourceId : String,
+    responseResourceId: String,
+    resourceType: ResourceType,
+    resource : String,
     versionId: String,
     lastUpdatedRemote: Instant,
   )
@@ -212,6 +248,18 @@ internal abstract class ResourceDao {
   )
   abstract suspend fun getResourceEntity(
     resourceId: String,
+    resourceType: ResourceType,
+  ): ResourceEntity?
+
+  @Query(
+    """
+        SELECT *
+        FROM ResourceEntity
+        WHERE resourceId = :localChangeResourceId AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun getResourceEntityByLocalChangeResourceId(
+    localChangeResourceId : String,
     resourceType: ResourceType,
   ): ResourceEntity?
 
@@ -304,6 +352,36 @@ internal abstract class ResourceDao {
     getResourceEntity(resourceId, resourceType)?.let {
       val indicesToUpdate =
         ResourceIndices.Builder(resourceType, resourceId)
+          .apply {
+            addDateTimeIndex(
+              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),
+            )
+          }
+          .build()
+      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    }
+  }
+
+  suspend fun updateResourceEntity(
+    localChangeResourceId : String,
+    responseResourceId: String,
+    resourceType: ResourceType,
+    resource : Resource,
+    versionId: String,
+    lastUpdated: Instant,
+  ) {
+//    updateRemoteVersionIdAndLastUpdate( localChangeResourceId,resourceType, versionId, lastUpdated)
+//    updateResponseResourceId( localChangeResourceId,responseResourceId,resourceType,)
+    updateResource(localChangeResourceId,
+      responseResourceId,
+      resourceType,
+      iParser.encodeResourceToString(resource),
+      versionId,
+      lastUpdated,)
+    // update the remote lastUpdated index
+    getResourceEntity(responseResourceId, resourceType)?.let {
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, responseResourceId)
           .apply {
             addDateTimeIndex(
               createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),

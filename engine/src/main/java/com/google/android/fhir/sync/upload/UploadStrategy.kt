@@ -76,7 +76,7 @@ private constructor(
       UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
     )
 
-  private object SingleResourcePost :
+   object SingleResourcePost :
     UploadStrategy(
       LocalChangesFetchMode.PerResource,
       PatchGeneratorMode.PerResource,

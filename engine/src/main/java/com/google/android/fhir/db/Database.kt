@@ -63,6 +63,23 @@ internal interface Database {
     lastUpdated: Instant,
   )
 
+//  suspend fun updateVersionIdAndLastUpdated(
+//    localChangeResourceId : String,
+//    responseResourceId: String,
+//    resourceType: ResourceType,
+//    versionId: String,
+//    lastUpdated: Instant,
+//  )
+
+  suspend fun updateResource(
+    localChangeResourceId : String,
+    responseResourceId: String,
+    resourceType: ResourceType,
+    resource : Resource,
+    versionId: String,
+    lastUpdated: Instant,
+  )
+
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
    *
