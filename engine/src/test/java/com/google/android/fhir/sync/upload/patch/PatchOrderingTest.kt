@@ -57,7 +57,7 @@ class PatchOrderingTest {
   @Before
   fun setUp() {
     MockitoAnnotations.openMocks(this)
-    patchGenerator = PerResourcePatchGenerator(database)
+    patchGenerator = PerResourcePatchGenerator.with(database)
   }
 
   @Test
