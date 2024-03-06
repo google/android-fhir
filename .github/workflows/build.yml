@@ -96,6 +96,40 @@ jobs:
           path: build.zip
 
       # Steps that follow are related to the Documentation Web Site
+      # This deploys content based on docs/ which ends up in site/
+      # to https://google.github.io/android-fhir/ using GitHub Pages.
 
       - name: Build Docs Site
+        # This 1st step intentionally runs not just on the main ("master") branch
+        # but also for all pull requests. This serves to detect doc breakages.
+        # (But the following steps, which do the actual deploy, only run for
+        #  the main branch, of course.)
         run: ./build-docs.bash
+
+      - name: Setup GitHub Pages
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/configure-pages@v4
+
+      - name: Upload site/ directory as GitHub Pages artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "site/"
+
+  deploy-website:
+    needs: build
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    # https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+    # Sets required permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # https://github.com/actions/deploy-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
