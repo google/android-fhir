@@ -53,9 +53,9 @@ internal open class AnswerExtensionConstraintValidator(
   ): AnswerConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
-      val extensionCalculatedValue =
+      val extensionValue =
         extension.value.cqfCalculatedValueExpression?.let { expressionEvaluator(it) }
-      val extensionValue = extensionCalculatedValue ?: extension.value
+          ?: extension.value
 
       // Only checks constraint if both extension and answer have a value
       if (

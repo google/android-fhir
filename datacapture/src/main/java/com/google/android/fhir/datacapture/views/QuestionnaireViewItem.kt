@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -59,8 +60,12 @@ import org.hl7.fhir.r4.model.Type
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
  * @param enabledAnswerOptions the enabled answer options in [questionnaireItem]
- * @param minAnswerValue the inclusive lower bound on the range of allowed answer values
- * @param maxAnswerValue the inclusive upper bound on the range of allowed answer values.
+ * @param minAnswerValue the inclusive lower bound on the range of allowed answer values, that may
+ *   be used for widgets that check for bounds and change behavior based on the min allowed answer
+ *   value, e.g the Slider widget
+ * @param maxAnswerValue the inclusive upper bound on the range of allowed answer values, that may
+ *   be used for widgets that check for bounds and change behavior based on the max allowed answer
+ *   value, e.g the Slider widget
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text

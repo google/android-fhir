@@ -141,7 +141,10 @@ internal class ExpressionEvaluator(
     )
   }
 
-  /** Returns the evaluation result of an expression as a [Type] value */
+  /**
+   * Returns single [Type] evaluation value result of an expression, including cqf-expression and
+   * cqf-calculatedValue expressions
+   */
   suspend fun evaluateExpressionValue(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
