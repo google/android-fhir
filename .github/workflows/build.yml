@@ -94,3 +94,8 @@ jobs:
         with:
           name: build
           path: build.zip
+
+      # Steps that follow are related to the Documentation Web Site
+
+      - name: Build Docs Site
+        run: ./build-docs.bash
