@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,9 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
@@ -26,8 +28,14 @@ import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
+import com.google.android.fhir.demo.security.SecurityRequirementViolationReceiver
 import com.google.android.fhir.search.search
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenComplexity
+import com.google.android.fhir.security.LockScreenRequirement
+import com.google.android.fhir.security.RequirementViolationAction
 import com.google.android.fhir.sync.remote.HttpLogger
+import java.util.EnumSet
 import timber.log.Timber
 
 class FhirApplication : Application(), DataCaptureConfig.Provider {
@@ -46,19 +54,33 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
-        RECREATE_AT_OPEN,
-        ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
-          httpLogger =
-            HttpLogger(
-              HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
-              ),
-            ) {
-              Timber.tag("App-HttpLog").d(it)
-            },
-          networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
-        ),
+        databaseErrorStrategy = RECREATE_AT_OPEN,
+        securityConfiguration =
+          FhirSecurityConfiguration(
+            LockScreenRequirement(
+              complexity = LockScreenComplexity.HIGH,
+              EnumSet.noneOf(RequirementViolationAction::class.java),
+            ),
+            PendingIntent.getBroadcast(
+              applicationContext,
+              /* requestCode= */ 0,
+              Intent(applicationContext, SecurityRequirementViolationReceiver::class.java),
+              /* flags= */ PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
+            ),
+          ),
+        serverConfiguration =
+          ServerConfiguration(
+            "https://hapi.fhir.org/baseR4/",
+            httpLogger =
+              HttpLogger(
+                HttpLogger.Configuration(
+                  if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+                ),
+              ) {
+                Timber.tag("App-HttpLog").d(it)
+              },
+            networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
+          ),
       ),
     )
 

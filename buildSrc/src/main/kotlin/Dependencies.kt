@@ -200,6 +200,7 @@ object Dependencies {
     const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
     const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
     const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
+    const val extTruth = "androidx.test.ext:truth:${Versions.AndroidxTest.extTruth}"
     const val fragmentTesting =
       "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
@@ -291,13 +292,14 @@ object Dependencies {
 
     // Test dependencies
     object AndroidxTest {
+      const val archCore = "2.2.0"
       const val benchmarkJUnit = "1.1.1"
       const val core = "1.5.0"
-      const val archCore = "2.2.0"
       const val extJunit = "1.1.5"
+      const val extTruth = "1.5.0"
+      const val fragmentVersion = "1.6.0"
       const val rules = "1.5.0"
       const val runner = "1.5.0"
-      const val fragmentVersion = "1.6.0"
     }
 
     const val espresso = "3.5.1"
@@ -305,7 +307,7 @@ object Dependencies {
     const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
-    const val robolectric = "4.10.3"
+    const val robolectric = "4.11.1"
 
     object Mlkit {
       const val barcodeScanning = "16.1.1"

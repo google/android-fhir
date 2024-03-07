@@ -138,6 +138,7 @@ dependencies {
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
+  testImplementation(Dependencies.AndroidxTest.extTruth)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.junit)

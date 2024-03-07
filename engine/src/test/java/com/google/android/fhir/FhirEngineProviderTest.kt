@@ -16,10 +16,18 @@
 
 package com.google.android.fhir
 
+import android.app.PendingIntent
+import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.LockScreenComplexity.HIGH
+import com.google.android.fhir.security.LockScreenRequirement
+import com.google.android.fhir.security.RequirementViolationAction
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import java.lang.IllegalStateException
+import java.util.EnumSet
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -124,6 +132,34 @@ class FhirEngineProviderTest {
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
       assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_securityConfig_shouldHaveExpectedSecurityConfiguration() {
+    val pendingIntent =
+      PendingIntent.getBroadcast(
+        ApplicationProvider.getApplicationContext(),
+        /* requestCode= */ 0,
+        Intent("TEST_ACTION"),
+        /* flags= */ 0,
+      )
+
+    val config =
+      FhirEngineConfiguration(
+        securityConfiguration =
+          FhirSecurityConfiguration(
+            LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
+            warningCallback = pendingIntent,
+          ),
+      )
+
+    with(config.securityConfiguration) {
+      assertThat(this?.lockScreenRequirement)
+        .isEqualTo(
+          LockScreenRequirement(HIGH, EnumSet.noneOf(RequirementViolationAction::class.java)),
+        )
+      assertThat(this?.warningCallback).isEqualTo(pendingIntent)
     }
   }
 }

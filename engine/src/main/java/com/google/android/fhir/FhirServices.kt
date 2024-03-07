@@ -28,6 +28,8 @@ import com.google.android.fhir.db.impl.DatabaseImpl
 import com.google.android.fhir.impl.FhirEngineImpl
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
+import com.google.android.fhir.security.FhirSecurityConfiguration
+import com.google.android.fhir.security.SecurityRequirementsManager
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.remote.FhirHttpDataSource
@@ -41,6 +43,7 @@ internal data class FhirServices(
   val database: Database,
   val remoteDataSource: DataSource? = null,
   val fhirDataStore: FhirDataStore,
+  val securityRequirementsManager: SecurityRequirementsManager,
 ) {
   class Builder(private val context: Context) {
     private var inMemory: Boolean = false
@@ -48,6 +51,7 @@ internal data class FhirServices(
     private var databaseErrorStrategy = DatabaseErrorStrategy.UNSPECIFIED
     private var serverConfiguration: ServerConfiguration? = null
     private var searchParameters: List<SearchParameter>? = null
+    private var securityConfiguration: FhirSecurityConfiguration? = null
 
     internal fun inMemory() = apply { inMemory = true }
 
@@ -70,6 +74,11 @@ internal data class FhirServices(
     internal fun setSearchParameters(searchParameters: List<SearchParameter>?) = apply {
       this.searchParameters = searchParameters
     }
+
+    internal fun setSecurityConfiguration(securityConfiguration: FhirSecurityConfiguration) =
+      apply {
+        this.securityConfiguration = securityConfiguration
+      }
 
     fun build(): FhirServices {
       val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
@@ -95,12 +104,14 @@ internal data class FhirServices(
                 .build(),
           )
         }
+      val securityRequirementsManager = SecurityRequirementsManager(context, securityConfiguration)
       return FhirServices(
         fhirEngine = engine,
         parser = parser,
         database = db,
         remoteDataSource = remoteDataSource,
         fhirDataStore = FhirDataStore(context),
+        securityRequirementsManager = securityRequirementsManager,
       )
     }
   }
