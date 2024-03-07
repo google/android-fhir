@@ -148,7 +148,7 @@ internal class PerResourcePatchGenerator private constructor(val database: Datab
 
   companion object {
 
-    private lateinit var _instance: PerResourcePatchGenerator
+    @Volatile private lateinit var _instance: PerResourcePatchGenerator
 
     @Synchronized
     fun with(database: Database): PerResourcePatchGenerator {

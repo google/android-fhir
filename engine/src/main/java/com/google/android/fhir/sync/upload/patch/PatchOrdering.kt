@@ -22,39 +22,55 @@ import com.google.android.fhir.db.LocalChangeResourceReference
 
 private typealias Node = String
 
-/** Orders the [PatchMapping]s to maintain referential integrity during upload. */
-object PatchOrdering {
+/**
+ * Orders the [PatchMapping]s to maintain referential integrity during upload.
+ *
+ * ```
+ * Encounter().apply {
+ *   id = "encounter-1"
+ *   subject = Reference("Patient/patient-1")
+ * }
+ *
+ * Observation().apply {
+ *   id = "observation-1"
+ *   subject = Reference("Patient/patient-1")
+ *   encounter = Reference("Encounter/encounter-1")
+ * }
+ * ```
+ * * The Encounter has an outgoing reference to Patient and the Observation has outgoing references
+ *   to Patient and the Encounter.
+ * * Now, to maintain the referential integrity of the resources during the upload,
+ *   `Encounter/encounter-1` must go before the `Observation/observation-1`, irrespective of the
+ *   order in which the Encounter and Observation were added to the database.
+ */
+internal object PatchOrdering {
+
+  private val PatchMapping.resourceTypeAndId: String
+    get() = "${generatedPatch.resourceType}/${generatedPatch.resourceId}"
 
   /**
+   * Order the [PatchMapping] so that if the resource A has outgoing references {B,C} (CREATE) and
+   * {D} (UPDATE), then B,C needs to go before the resource A so that referential integrity is
+   * retained. Order of D shouldn't matter for the purpose of referential integrity.
+   *
    * @return - A ordered list of the [PatchMapping]s based on the references to other [PatchMapping]
    *   if the mappings are acyclic
    * - throws [IllegalStateException] otherwise
    */
-  @VisibleForTesting(otherwise = VisibleForTesting.PROTECTED)
-  internal suspend fun List<PatchMapping>.orderByReferences(
+  suspend fun List<PatchMapping>.orderByReferences(
     database: Database,
   ): List<PatchMapping> {
-    // if the resource A has outgoing references (B,C) and these referenced resources are getting
-    // created on device,
-    // then these referenced resources (B,C) needs to go before the resource A so that referential
-    // integrity is retained.
-    val resourceIdToPatchMapping = associateBy { patchMapping ->
-      "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}"
-    }
+    val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
 
-    // get references for all the local changes
-    val localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>> =
+    /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
+    multiple LocalChangeResourceReference, one for each resource reference in the
+    LocalChange.payload.*/
+    val localChangeIdToResourceReferenceMap: Map<Long, List<LocalChangeResourceReference>> =
       database
         .getLocalChangeResourceReferences(flatMap { it.localChanges.flatMap { it.token.ids } })
         .groupBy { it.localChangeId }
 
-    val adjacencyList =
-      createAdjacencyListForCreateReferences(
-        resourceIdToPatchMapping.keys
-          .filter { resourceIdToPatchMapping[it]?.generatedPatch?.type == Patch.Type.INSERT }
-          .toSet(),
-        localChangeIdToReferenceMap,
-      )
+    val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
     return createTopologicalOrderedList(adjacencyList).mapNotNull { resourceIdToPatchMapping[it] }
   }
 
@@ -64,24 +80,26 @@ object PatchOrdering {
    */
   @VisibleForTesting
   internal fun List<PatchMapping>.createAdjacencyListForCreateReferences(
-    insertResourceIds: Set<String>,
     localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>>,
   ): Map<Node, List<Node>> {
     val adjacencyList = mutableMapOf<Node, List<Node>>()
+    /* if the outgoing reference is to a resource that's just an update and not create, then don't
+    link to it. This may make the sub graphs smaller and also help avoid cyclic dependencies.*/
+    val resourceIdsOfInsertTypeLocalChanges =
+      asSequence()
+        .filter { it.generatedPatch.type == Patch.Type.INSERT }
+        .map { it.resourceTypeAndId }
+        .toSet()
+
     forEach { patchMapping ->
-      adjacencyList[
-        "${patchMapping.generatedPatch.resourceType}/${patchMapping.generatedPatch.resourceId}",
-      ] =
+      adjacencyList[patchMapping.resourceTypeAndId] =
         patchMapping.findOutgoingReferences(localChangeIdToReferenceMap).filter {
-          insertResourceIds.contains(it)
+          resourceIdsOfInsertTypeLocalChanges.contains(it)
         }
     }
     return adjacencyList
   }
 
-  // if the outgoing reference is to a resource that's just an update and not create, then don't
-  // link
-  // to it. This may make the sub graphs smaller and also help avoid cyclic dependencies.
   private fun PatchMapping.findOutgoingReferences(
     localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>>,
   ): Set<Node> {

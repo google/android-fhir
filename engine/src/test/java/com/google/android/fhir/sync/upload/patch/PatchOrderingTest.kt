@@ -25,7 +25,6 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.sync.upload.patch.PatchOrdering.createAdjacencyListForCreateReferences
 import com.google.android.fhir.testing.jsonParser
 import com.google.android.fhir.versionId
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.LinkedList
@@ -63,204 +62,31 @@ class PatchOrderingTest {
   @Test
   fun `createReferenceAdjacencyList with local changes for only new resources should only have edges to inserted resources`() =
     runTest {
-      val localChanges = LinkedList<LocalChange>()
-      val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+      val helper = LocalChangeHelper()
 
-      var group =
-        Group()
-          .apply {
-            id = "group-1"
-            type = Group.GroupType.PERSON
-          }
-          .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+      var group = helper.createGroup("group-1", 1)
+      helper.createPatient("patient-1", 2)
+      helper.createEncounter("encounter-1", 3, "Patient/patient-1")
+      helper.createObservation("observation-1", 4, "Patient/patient-1", "Encounter/encounter-1")
+      group = helper.updateGroup(group, 5, "Patient/patient-1")
 
-      // pa-01
-      Patient()
-        .apply { id = "patient-1" }
-        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
-      Encounter()
-        .apply {
-          id = "encounter-1"
-          subject = Reference("Patient/patient-1")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-1",
-              "Encounter.subject",
-            ),
-          )
-        }
+      helper.createPatient("patient-2", 6)
+      helper.createEncounter("encounter-2", 7, "Patient/patient-2")
+      helper.createObservation("observation-2", 8, "Patient/patient-2", "Encounter/encounter-2")
+      group = helper.updateGroup(group, 9, "Patient/patient-2")
 
-      Observation()
-        .apply {
-          id = "observation-1"
-          subject = Reference("Patient/patient-1")
-          encounter = Reference("Encounter/encounter-1")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-1",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-1",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-1",
-                "Group.member",
-              ),
-            )
-          }
-
-      // pa-02
-      Patient()
-        .apply { id = "patient-2" }
-        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
-      Encounter()
-        .apply {
-          id = "encounter-2"
-          subject = Reference("Patient/patient-2")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-2",
-              "Encounter.subject",
-            ),
-          )
-        }
-
-      Observation()
-        .apply {
-          id = "observation-2"
-          subject = Reference("Patient/patient-2")
-          encounter = Reference("Encounter/encounter-2")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-2",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-2",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-2",
-                "Group.member",
-              ),
-            )
-          }
-
-      // pa-03
-      Patient()
-        .apply { id = "patient-3" }
-        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
-
-      Encounter()
-        .apply {
-          id = "encounter-3"
-          subject = Reference("Patient/patient-3")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-3",
-              "Encounter.subject",
-            ),
-          )
-        }
-
-      Observation()
-        .apply {
-          id = "observation-3"
-          subject = Reference("Patient/patient-3")
-          encounter = Reference("Encounter/encounter-3")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-3",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-3",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-3",
-                "Group.member",
-              ),
-            )
-          }
-
+      helper.createPatient("patient-3", 10)
+      helper.createEncounter("encounter-3", 11, "Patient/patient-3")
+      helper.createObservation("observation-3", 12, "Patient/patient-3", "Encounter/encounter-3")
+      group = helper.updateGroup(group, 13, "Patient/patient-3")
       whenever(database.getLocalChangeResourceReferences(any()))
-        .thenReturn(localChangeResourceReferences)
+        .thenReturn(helper.localChangeResourceReferences)
 
       val result =
         patchGenerator
-          .generateSquashedChangesMapping(localChanges)
+          .generateSquashedChangesMapping(helper.localChanges)
           .createAdjacencyListForCreateReferences(
-            localChanges.map { "${it.resourceType}/${it.resourceId}" }.toSet(),
-            localChangeResourceReferences.groupBy { it.localChangeId },
+            helper.localChangeResourceReferences.groupBy { it.localChangeId },
           )
 
       assertThat(result)
@@ -284,232 +110,34 @@ class PatchOrderingTest {
   @Test
   fun `createReferenceAdjacencyList with local changes for new and old resources should only have edges to inserted resources`() =
     runTest {
-      val localChanges = mutableListOf<LocalChange>()
-      val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+      val helper = LocalChangeHelper()
+      var group = helper.createGroup("group-1", 1)
+      // The scenario is that Patient is already created on the server and device is just updating
+      // it.
+      helper.updatePatient(Patient().apply { id = "patient-1" }, 2)
+      helper.createEncounter("encounter-1", 3, "Patient/patient-1")
+      helper.createObservation("observation-1", 4, "Patient/patient-1", "Encounter/encounter-1")
 
-      var group =
-        Group()
-          .apply {
-            id = "group-1"
-            type = Group.GroupType.PERSON
-          }
-          .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+      group = helper.updateGroup(group, 5, "Patient/patient-1")
+      // The scenario is that Patient is already created on the server and device is just updating
+      // it.
+      helper.updatePatient(Patient().apply { id = "patient-2" }, 6)
+      helper.createEncounter("encounter-2", 7, "Patient/patient-2")
+      helper.createObservation("observation-2", 8, "Patient/patient-2", "Encounter/encounter-2")
 
-      // pa-01
-      Patient()
-        .apply { id = "patient-1" }
-        .also {
-          localChanges.add(
-            createUpdateLocalChange(
-              it,
-              it.copy().apply { active = true },
-              Random.nextLong(),
-            ),
-          )
-        }
-
-      Encounter()
-        .apply {
-          id = "encounter-1"
-          subject = Reference("Patient/patient-1")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-1",
-              "Encounter.subject",
-            ),
-          )
-        }
-
-      Observation()
-        .apply {
-          id = "observation-1"
-          subject = Reference("Patient/patient-1")
-          encounter = Reference("Encounter/encounter-1")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-1",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-1",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-1",
-                "Group.member",
-              ),
-            )
-          }
-
-      // pa-02
-      Patient()
-        .apply { id = "patient-2" }
-        .also {
-          localChanges.add(
-            createUpdateLocalChange(
-              it,
-              it.copy().apply { active = true },
-              Random.nextLong(),
-            ),
-          )
-        }
-      Encounter()
-        .apply {
-          id = "encounter-2"
-          subject = Reference("Patient/patient-2")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-2",
-              "Encounter.subject",
-            ),
-          )
-        }
-
-      Observation()
-        .apply {
-          id = "observation-2"
-          subject = Reference("Patient/patient-2")
-          encounter = Reference("Encounter/encounter-2")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-2",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-2",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-2",
-                "Group.member",
-              ),
-            )
-          }
-
-      // pa-03
-      Patient()
-        .apply { id = "patient-3" }
-        .also {
-          localChanges.add(
-            createUpdateLocalChange(
-              it,
-              it.copy().apply { active = true },
-              Random.nextLong(),
-            ),
-          )
-        }
-
-      Encounter()
-        .apply {
-          id = "encounter-3"
-          subject = Reference("Patient/patient-3")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-3",
-              "Encounter.subject",
-            ),
-          )
-        }
-
-      Observation()
-        .apply {
-          id = "observation-3"
-          subject = Reference("Patient/patient-3")
-          encounter = Reference("Encounter/encounter-3")
-        }
-        .also {
-          localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-3",
-              "Observation.subject",
-            ),
-          )
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Encounter/encounter-3",
-              "Observation.encounter",
-            ),
-          )
-        }
-
-      group =
-        group
-          .copy()
-          .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-          .also {
-            localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-            localChangeResourceReferences.add(
-              LocalChangeResourceReference(
-                localChanges.last().token.ids.first(),
-                "Patient/patient-3",
-                "Group.member",
-              ),
-            )
-          }
-
-      whenever(database.getLocalChangeResourceReferences(any()))
-        .thenReturn(localChangeResourceReferences)
+      group = helper.updateGroup(group, 9, "Patient/patient-2")
+      // The scenario is that Patient is already created on the server and device is just updating
+      // it.
+      helper.updatePatient(Patient().apply { id = "patient-3" }, 10)
+      helper.createEncounter("encounter-3", 11, "Patient/patient-3")
+      helper.createObservation("observation-3", 12, "Patient/patient-3", "Encounter/encounter-3")
+      group = helper.updateGroup(group, 13, "Patient/patient-3")
 
       val result =
         patchGenerator
-          .generateSquashedChangesMapping(localChanges)
+          .generateSquashedChangesMapping(helper.localChanges)
           .createAdjacencyListForCreateReferences(
-            localChanges
-              .filter { it.type == LocalChange.Type.INSERT }
-              .map { "${it.resourceType}/${it.resourceId}" }
-              .toSet(),
-            localChangeResourceReferences.groupBy { it.localChangeId },
+            helper.localChangeResourceReferences.groupBy { it.localChangeId },
           )
 
       assertThat(result)
@@ -531,202 +159,33 @@ class PatchOrderingTest {
 
   @Test
   fun `generate with acyclic references should return the list in topological order`() = runTest {
-    val localChanges = LinkedList<LocalChange>()
-    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+    val helper = LocalChangeHelper()
+    var group = helper.createGroup("group-1", 1)
 
-    var group =
-      Group()
-        .apply {
-          id = "group-1"
-          type = Group.GroupType.PERSON
-        }
-        .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+    group = helper.updateGroup(group, 2, "Patient/patient-1")
+    helper.createObservation("observation-1", 3, "Patient/patient-1", "Encounter/encounter-1")
+    helper.createEncounter("encounter-1", 4, "Patient/patient-1")
+    helper.createPatient("patient-1", 5)
 
-    // pa-01
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-1"))) }
-        .also {
-          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-1",
-              "Group.member",
-            ),
-          )
-        }
+    group = helper.updateGroup(group, 6, "Patient/patient-2")
+    helper.createObservation("observation-2", 7, "Patient/patient-2", "Encounter/encounter-2")
+    helper.createEncounter("encounter-2", 8, "Patient/patient-2")
+    helper.createPatient("patient-2", 9)
 
-    Observation()
-      .apply {
-        id = "observation-1"
-        subject = Reference("Patient/patient-1")
-        encounter = Reference("Encounter/encounter-1")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-1",
-            "Observation.subject",
-          ),
-        )
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Encounter/encounter-1",
-            "Observation.encounter",
-          ),
-        )
-      }
-
-    Encounter()
-      .apply {
-        id = "encounter-1"
-        subject = Reference("Patient/patient-1")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-1",
-            "Encounter.subject",
-          ),
-        )
-      }
-
-    Patient()
-      .apply { id = "patient-1" }
-      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
-
-    // pa-02
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-2"))) }
-        .also {
-          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-2",
-              "Group.member",
-            ),
-          )
-        }
-
-    Observation()
-      .apply {
-        id = "observation-2"
-        subject = Reference("Patient/patient-2")
-        encounter = Reference("Encounter/encounter-2")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-2",
-            "Observation.subject",
-          ),
-        )
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Encounter/encounter-2",
-            "Observation.encounter",
-          ),
-        )
-      }
-
-    Encounter()
-      .apply {
-        id = "encounter-2"
-        subject = Reference("Patient/patient-2")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-1",
-            "Encounter.subject",
-          ),
-        )
-      }
-
-    Patient()
-      .apply { id = "patient-2" }
-      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
-
-    // pa-03
-    group =
-      group
-        .copy()
-        .apply { addMember(Group.GroupMemberComponent(Reference("Patient/patient-3"))) }
-        .also {
-          localChanges.add(createUpdateLocalChange(group, it, Random.nextLong()))
-          localChangeResourceReferences.add(
-            LocalChangeResourceReference(
-              localChanges.last().token.ids.first(),
-              "Patient/patient-3",
-              "Group.member",
-            ),
-          )
-        }
-
-    Observation()
-      .apply {
-        id = "observation-3"
-        subject = Reference("Patient/patient-3")
-        encounter = Reference("Encounter/encounter-3")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-3",
-            "Observation.subject",
-          ),
-        )
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Encounter/encounter-3",
-            "Observation.encounter",
-          ),
-        )
-      }
-
-    Encounter()
-      .apply {
-        id = "encounter-3"
-        subject = Reference("Patient/patient-3")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-3",
-            "Encounter.subject",
-          ),
-        )
-      }
-
-    Patient()
-      .apply { id = "patient-3" }
-      .also { localChanges.add(createInsertLocalChange(it, Random.nextLong())) }
+    group = helper.updateGroup(group, 10, "Patient/patient-3")
+    helper.createObservation("observation-3", 11, "Patient/patient-3", "Encounter/encounter-3")
+    helper.createEncounter("encounter-3", 12, "Patient/patient-3")
+    helper.createPatient("patient-3", 13)
 
     whenever(database.getLocalChangeResourceReferences(any()))
-      .thenReturn(localChangeResourceReferences)
+      .thenReturn(helper.localChangeResourceReferences)
 
-    val result = patchGenerator.generate(localChanges)
-    Truth.assertThat(result.map { it.generatedPatch.resourceId })
+    val result = patchGenerator.generate(helper.localChanges)
+
+    // This order is based on the current implementation of the topological sort in [PatchOrdering],
+    // it's entirely possible to generate different order here which is acceptable/correct, should
+    // we have a different implementation of the topological sort.
+    assertThat(result.map { it.generatedPatch.resourceId })
       .containsExactly(
         "patient-1",
         "patient-2",
@@ -805,7 +264,7 @@ class PatchOrderingTest {
         type = LocalChange.Type.UPDATE,
         payload = jsonDiff.toString(),
         versionId = oldEntity.versionId,
-        token = LocalChangeToken(listOf(currentChangeId + 1)),
+        token = LocalChangeToken(listOf(currentChangeId)),
         timestamp = Instant.now(),
       )
     }
@@ -821,5 +280,108 @@ class PatchOrderingTest {
         timestamp = Instant.now(),
       )
     }
+  }
+
+  internal class LocalChangeHelper {
+    val localChanges = LinkedList<LocalChange>()
+    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+
+    fun createGroup(
+      id: String,
+      changeId: Long,
+    ) =
+      Group()
+        .apply {
+          this.id = id
+          type = Group.GroupType.PERSON
+        }
+        .also { localChanges.add(createInsertLocalChange(it, changeId)) }
+
+    fun updateGroup(
+      group: Group,
+      changeId: Long,
+      member: String,
+    ) =
+      group
+        .copy()
+        .apply { addMember(Group.GroupMemberComponent(Reference(member))) }
+        .also {
+          localChanges.add(createUpdateLocalChange(group, it, changeId))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              changeId,
+              member,
+              "Group.member",
+            ),
+          )
+        }
+
+    fun createPatient(
+      id: String,
+      changeId: Long,
+    ) =
+      Patient()
+        .apply { this.id = id }
+        .also { localChanges.add(createInsertLocalChange(it, changeId)) }
+
+    fun updatePatient(
+      patient: Patient,
+      changeId: Long,
+    ) =
+      patient
+        .copy()
+        .apply { active = true }
+        .also { localChanges.add(createUpdateLocalChange(patient, it, changeId)) }
+
+    fun createEncounter(
+      id: String,
+      changeId: Long,
+      subject: String,
+    ) =
+      Encounter()
+        .apply {
+          this.id = id
+          this.subject = Reference(subject)
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              changeId,
+              subject,
+              "Encounter.subject",
+            ),
+          )
+        }
+
+    fun createObservation(
+      id: String,
+      changeId: Long,
+      subject: String,
+      encounter: String,
+    ) =
+      Observation()
+        .apply {
+          this.id = id
+          this.subject = Reference(subject)
+          this.encounter = Reference(encounter)
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              changeId,
+              subject,
+              "Observation.subject",
+            ),
+          )
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              changeId,
+              encounter,
+              "Observation.encounter",
+            ),
+          )
+        }
   }
 }
