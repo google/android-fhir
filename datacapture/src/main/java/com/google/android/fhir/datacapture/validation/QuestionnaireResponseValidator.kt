@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import org.hl7.fhir.r4.model.Questionnaire
@@ -52,7 +53,7 @@ object QuestionnaireResponseValidator {
    *
    * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
    */
-  fun validateQuestionnaireResponse(
+  suspend fun validateQuestionnaireResponse(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     context: Context,
@@ -60,6 +61,7 @@ object QuestionnaireResponseValidator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
       mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
+    xFhirQueryResolver: XFhirQueryResolver? = null,
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -79,6 +81,7 @@ object QuestionnaireResponseValidator {
         questionnaireResponse,
         questionnaireItemParentMap,
         launchContextMap,
+        xFhirQueryResolver,
       ),
       linkIdToValidationResultMap,
     )
@@ -86,7 +89,7 @@ object QuestionnaireResponseValidator {
     return linkIdToValidationResultMap
   }
 
-  private fun validateQuestionnaireResponseItems(
+  private suspend fun validateQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
@@ -125,7 +128,7 @@ object QuestionnaireResponseValidator {
     return linkIdToValidationResultMap
   }
 
-  private fun validateQuestionnaireResponseItem(
+  private suspend fun validateQuestionnaireResponseItem(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
