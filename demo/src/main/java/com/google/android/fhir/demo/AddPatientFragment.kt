@@ -24,8 +24,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 /** A fragment class to show patient registration screen. */
@@ -98,9 +100,11 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
   }
 
   private fun onSubmitAction() {
-    val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    savePatient(questionnaireFragment.getQuestionnaireResponse())
+    lifecycleScope.launch {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
+      savePatient(questionnaireFragment.getQuestionnaireResponse())
+    }
   }
 
   private fun savePatient(questionnaireResponse: QuestionnaireResponse) {
