@@ -18,12 +18,7 @@ package com.google.android.fhir
 
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
-import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadRequestResult
 import java.time.OffsetDateTime
-import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -49,31 +44,6 @@ interface FhirEngine {
    * Searches the database and returns a list resources according to the [search] specifications.
    */
   suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
-
-  /**
-   * Synchronizes the upload results in the database.
-   *
-   * The [upload] function may initiate multiple server calls. Each call's result can then be used
-   * to emit [UploadSyncResult]. The caller should collect these results using [Flow.collect].
-   *
-   * @param localChangesFetchMode Specifies the mode to fetch local changes.
-   * @param upload A suspend function that takes a list of [LocalChange] and returns an
-   *   [UploadSyncResult].
-   * @return A [Flow] that emits the progress of the synchronization process.
-   */
-  suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
-  ): Flow<SyncUploadProgress>
-
-  /**
-   * Synchronizes the [download] result in the database. The database will be updated to reflect the
-   * result of the [download] operation.
-   */
-  suspend fun syncDownload(
-    conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>,
-  )
 
   /**
    * Returns the total count of entities available for given search.

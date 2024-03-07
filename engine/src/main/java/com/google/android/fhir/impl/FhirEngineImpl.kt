@@ -22,22 +22,10 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
-import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
-import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadRequestResult
 import java.time.OffsetDateTime
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -82,84 +70,5 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
     database.purge(type, id, forcePurge)
-  }
-
-  override suspend fun syncDownload(
-    conflictResolver: ConflictResolver,
-    download: suspend () -> Flow<List<Resource>>,
-  ) {
-    download().collect { resources ->
-      database.withTransaction {
-        val resolved =
-          resolveConflictingResources(
-            resources,
-            getConflictingResourceIds(resources),
-            conflictResolver,
-          )
-        database.insertSyncedResources(resources)
-        saveResolvedResourcesToDatabase(resolved)
-      }
-    }
-  }
-
-  private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
-    resolved?.let {
-      database.deleteUpdates(it)
-      database.update(*it.toTypedArray())
-    }
-  }
-
-  private suspend fun resolveConflictingResources(
-    resources: List<Resource>,
-    conflictingResourceIds: Set<String>,
-    conflictResolver: ConflictResolver,
-  ) =
-    resources
-      .filter { conflictingResourceIds.contains(it.logicalId) }
-      .map { conflictResolver.resolve(database.select(it.resourceType, it.logicalId), it) }
-      .filterIsInstance<Resolved>()
-      .map { it.resolved }
-      .takeIf { it.isNotEmpty() }
-
-  private suspend fun getConflictingResourceIds(resources: List<Resource>) =
-    resources
-      .map { it.logicalId }
-      .toSet()
-      .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
-
-  override suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
-  ): Flow<SyncUploadProgress> = flow {
-    val resourceConsolidator = DefaultResourceConsolidator(database)
-    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
-
-    emit(
-      SyncUploadProgress(
-        remaining = localChangeFetcher.total,
-        initialTotal = localChangeFetcher.total,
-      ),
-    )
-
-    while (localChangeFetcher.hasNext()) {
-      val localChanges = localChangeFetcher.next()
-      val uploadRequestResult =
-        upload(localChanges)
-          .onEach { result ->
-            resourceConsolidator.consolidate(result)
-            val newProgress =
-              when (result) {
-                is UploadRequestResult.Success -> localChangeFetcher.getProgress()
-                is UploadRequestResult.Failure ->
-                  localChangeFetcher.getProgress().copy(uploadError = result.uploadError)
-              }
-            emit(newProgress)
-          }
-          .firstOrNull { it is UploadRequestResult.Failure }
-
-      if (uploadRequestResult is UploadRequestResult.Failure) {
-        break
-      }
-    }
   }
 }
