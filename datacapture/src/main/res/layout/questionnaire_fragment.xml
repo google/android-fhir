@@ -86,8 +86,6 @@
         <Button
             android:id="@+id/cancel_questionnaire"
             style="?attr/questionnaireCancelButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/cancel_questionnaire"
@@ -102,8 +100,6 @@
         <Button
             android:id="@+id/pagination_previous_button"
             style="?attr/questionnaireButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_previous"
@@ -112,8 +108,6 @@
         <Button
             android:id="@+id/pagination_next_button"
             style="?attr/questionnaireButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_pagination_next"
@@ -122,8 +116,6 @@
         <Button
             android:id="@+id/review_mode_button"
             style="?attr/questionnaireButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/button_review"
@@ -132,8 +124,6 @@
         <Button
             android:id="@+id/submit_questionnaire"
             style="?attr/questionnaireSubmitButtonStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/action_button_margin_horizontal"
             android:layout_marginVertical="@dimen/action_button_margin_vertical"
             android:text="@string/submit_questionnaire"
