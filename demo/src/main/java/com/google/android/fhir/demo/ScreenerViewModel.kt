@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             resource.id = generateUuid()
             resource.subject = subjectReference
             resource.encounter = encounterReference
-            saveResourceToDatabase(resource)
+            //            saveResourceToDatabase(resource)
           }
         }
         is Condition -> {
@@ -99,7 +99,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             resource.id = generateUuid()
             resource.subject = subjectReference
             resource.encounter = encounterReference
-            saveResourceToDatabase(resource)
+            //            saveResourceToDatabase(resource)
           }
         }
         is Encounter -> {
@@ -163,14 +163,14 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
           RiskAssessment().apply {
             id = generateUuid()
             subject = subjectReference
-            encounter = Reference("Encounter/$encounterId")
+            //            encounter = Reference("Encounter/$encounterId")
             addPrediction().apply {
               qualitativeRisk =
                 CodeableConcept().apply { addCoding().updateRiskProbability(riskProbability) }
             }
             occurrence = DateTimeType.now()
           }
-        saveResourceToDatabase(riskAssessment)
+        //        saveResourceToDatabase(riskAssessment)
       }
     }
   }

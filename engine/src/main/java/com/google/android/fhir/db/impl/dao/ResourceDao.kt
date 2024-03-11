@@ -182,7 +182,7 @@ internal abstract class ResourceDao {
     """,
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
-    localChangeResourceId : String,
+    localChangeResourceId: String,
     resourceType: ResourceType,
     versionId: String,
     lastUpdatedRemote: Instant,
@@ -191,21 +191,17 @@ internal abstract class ResourceDao {
   @Query(
     """
         UPDATE ResourceEntity
-        SET resourceId = :responseResourceId,
-            serializedResource = :resource,
-            versionId = :versionId,
-            lastUpdatedRemote = :lastUpdatedRemote
-        WHERE resourceId = :localChangeResourceId
+        SET resourceId = :postSyncResourceId,
+            serializedResource = :postSyncSerializedResource
+        WHERE resourceId = :preSyncResourceId
         AND resourceType = :resourceType
     """,
   )
-  abstract suspend fun updateResource(
-    localChangeResourceId : String,
-    responseResourceId: String,
+  abstract suspend fun updateResourceIdInResourceEntityPostSync(
+    preSyncResourceId: String,
+    postSyncResourceId: String,
     resourceType: ResourceType,
-    resource : String,
-    versionId: String,
-    lastUpdatedRemote: Instant,
+    postSyncSerializedResource: String,
   )
 
   @Query(
@@ -232,18 +228,6 @@ internal abstract class ResourceDao {
   )
   abstract suspend fun getResourceEntity(
     resourceId: String,
-    resourceType: ResourceType,
-  ): ResourceEntity?
-
-  @Query(
-    """
-        SELECT *
-        FROM ResourceEntity
-        WHERE resourceId = :localChangeResourceId AND resourceType = :resourceType
-    """,
-  )
-  abstract suspend fun getResourceEntityByLocalChangeResourceId(
-    localChangeResourceId : String,
     resourceType: ResourceType,
   ): ResourceEntity?
 
@@ -346,32 +330,28 @@ internal abstract class ResourceDao {
     }
   }
 
-  suspend fun updateResourceEntity(
-    localChangeResourceId : String,
-    responseResourceId: String,
-    resourceType: ResourceType,
-    resource : Resource,
-    versionId: String,
-    lastUpdated: Instant,
+  suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
   ) {
-    updateResource(localChangeResourceId,
-      responseResourceId,
-      resourceType,
-      iParser.encodeResourceToString(resource),
-      versionId,
-      lastUpdated,)
-    // update the remote lastUpdated index
-    getResourceEntity(responseResourceId, resourceType)?.let {
-      val indicesToUpdate =
-        ResourceIndices.Builder(resourceType, responseResourceId)
-          .apply {
-            addDateTimeIndex(
-              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),
-            )
-          }
-          .build()
-      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    if (
+      postSyncResource.hasMeta() &&
+        postSyncResource.meta.hasVersionId() &&
+        postSyncResource.meta.hasLastUpdated()
+    ) {
+      updateAndIndexRemoteVersionIdAndLastUpdate(
+        postSyncResource.logicalId,
+        postSyncResource.resourceType,
+        postSyncResource.meta.versionId,
+        postSyncResource.meta.lastUpdated.toInstant(),
+      )
     }
+    updateResourceIdInResourceEntityPostSync(
+      preSyncResourceId,
+      postSyncResource.logicalId,
+      postSyncResource.resourceType,
+      iParser.encodeResourceToString(postSyncResource),
+    )
   }
 
   private suspend fun updateIndicesForResource(

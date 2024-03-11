@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +38,12 @@ class ResourceNotFoundException : Exception {
     id: String,
   ) : super("Resource not found with type $type and id $id!") {
     this.type = type
+    this.id = id
+  }
+
+  constructor(
+    id: String,
+  ) : super("Resource not found with id $id!") {
     this.id = id
   }
 

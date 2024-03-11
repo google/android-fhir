@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -385,6 +385,12 @@ internal abstract class LocalChangeDao {
     }
 
   /**
+   * Issue : discardLocalChanges(existingLocalChangeEntity.id)
+   * createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
+   *
+   * it should be updated rather delete and insert.
+   */
+  /**
    * Looks for [LocalChangeEntity] which refer to the updated resource through
    * [LocalChangeResourceReferenceEntity]. For each [LocalChangeEntity] which contains reference to
    * the updated resource in its payload, we update the payload with the reference and also update
@@ -393,7 +399,7 @@ internal abstract class LocalChangeDao {
    * place. This method returns a list of the [ResourceEntity.resourceUuid] for all the resources
    * whose [LocalChange] contained references to the oldResource
    */
-  private suspend fun updateReferencesInLocalChange(
+  internal suspend fun updateReferencesInLocalChange(
     oldResource: Resource,
     updatedResource: Resource,
   ): List<UUID> {
