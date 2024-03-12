@@ -22,7 +22,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
@@ -182,8 +181,6 @@ class QuestionnaireFragment : Fragment() {
             paginationPreviousButton.visibility = View.GONE
             paginationNextButton.visibility = View.GONE
 
-            updateBottomNavigationContainerVisibility()
-
             // Hide progress indicator
             questionnaireProgressIndicator.visibility = View.GONE
           }
@@ -211,8 +208,6 @@ class QuestionnaireFragment : Fragment() {
               paginationPreviousButton.visibility = View.GONE
               paginationNextButton.visibility = View.GONE
             }
-
-            updateBottomNavigationContainerVisibility()
 
             // Set progress indicator
             questionnaireProgressIndicator.visibility = View.VISIBLE
@@ -253,7 +248,6 @@ class QuestionnaireFragment : Fragment() {
             cancelButton.visibility = View.GONE
             reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
-            requireView().findViewById<View>(R.id.bottom_nav_container).visibility = View.GONE
           }
         }
       }
@@ -295,28 +289,6 @@ class QuestionnaireFragment : Fragment() {
             "Unknown fragment result $result",
           )
       }
-    }
-  }
-
-  private fun updateBottomNavigationContainerVisibility() {
-    val bottomNavigationContainer =
-      requireView().findViewById<LinearLayout>(R.id.bottom_nav_container)
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
-    val reviewModeButton = requireView().findViewById<View>(R.id.review_mode_button)
-    val paginationPreviousButton = requireView().findViewById<View>(R.id.pagination_previous_button)
-    val paginationNextButton = requireView().findViewById<View>(R.id.pagination_next_button)
-
-    if (
-      submitButton.visibility == View.GONE &&
-        cancelButton.visibility == View.GONE &&
-        reviewModeButton.visibility == View.GONE &&
-        paginationPreviousButton.visibility == View.GONE &&
-        paginationNextButton.visibility == View.GONE
-    ) {
-      bottomNavigationContainer.visibility = View.GONE
-    } else {
-      bottomNavigationContainer.visibility = View.VISIBLE
     }
   }
 
