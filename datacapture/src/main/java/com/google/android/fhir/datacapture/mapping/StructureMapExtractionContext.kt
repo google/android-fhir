@@ -33,7 +33,7 @@ data class StructureMapExtractionContext(
    *
    * @default [SimpleWorkerContext]
    */
-  val simpleWorkerContext: IWorkerContext = SimpleWorkerContext(),
+  val workerContext: IWorkerContext = SimpleWorkerContext(),
   /**
    * A lambda function which returns a [StructureMap]. Depending on your app this could be
    * hard-coded or use the [String] parameter to fetch the appropriate structure map.

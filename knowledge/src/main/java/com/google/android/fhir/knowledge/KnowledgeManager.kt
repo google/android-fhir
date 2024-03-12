@@ -192,7 +192,7 @@ internal constructor(
     return knowledgeDao.insertResource(igId, res)
   }
 
-  private suspend fun loadWorkerContext(
+  suspend fun loadWorkerContext(
     vararg npmPackages: NpmPackage,
     allowLoadingDuplicates: Boolean = true,
     loader: SimpleWorkerContext.IContextResourceLoader? = null,
