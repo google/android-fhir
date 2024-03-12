@@ -40,6 +40,10 @@ class DemoDataStore(private val context: Context) {
     context.dataStorage.edit { pref -> pref[stringPreferencesKey(resourceType.name)] = timestamp }
   }
 
+  fun getFhirQuery():String{
+    return context.getString(R.string.fhir_query).ifBlank { "Patient?address-city=NAIROBI&_sort=_lastUpdated" }
+  }
+
   suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? {
     return context.dataStorage.data.first()[stringPreferencesKey(resourceType.name)]
   }

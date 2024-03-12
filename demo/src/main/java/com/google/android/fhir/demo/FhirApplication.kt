@@ -27,6 +27,8 @@ import com.google.android.fhir.ServerConfiguration
 import com.google.android.fhir.datacapture.DataCaptureConfig
 import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.search.search
+import com.google.android.fhir.sync.HttpAuthenticationMethod
+import com.google.android.fhir.sync.HttpAuthenticator
 import com.google.android.fhir.sync.remote.HttpLogger
 import timber.log.Timber
 
@@ -43,12 +45,19 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
+    val baseUrl=resources.getString(R.string.fhir_url).ifBlank { "https://hapi.fhir.org/baseR4/" }
+    var httpAuthenticator : HttpAuthenticator?=null
+    val fhirUser=resources.getString(R.string.fhir_user)
+    if(fhirUser.isNotBlank()){
+      httpAuthenticator= HttpAuthenticator { HttpAuthenticationMethod.Basic(fhirUser,resources.getString(R.string.fhir_pwd) ) }
+    }
+
     FhirEngineProvider.init(
       FhirEngineConfiguration(
         enableEncryptionIfSupported = true,
         RECREATE_AT_OPEN,
         ServerConfiguration(
-          "https://hapi.fhir.org/baseR4/",
+          baseUrl,
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
@@ -58,6 +67,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
               Timber.tag("App-HttpLog").d(it)
             },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
+//                password hardcoded as available on https://openmrs.org/demo/
+          authenticator = httpAuthenticator
         ),
       ),
     )
