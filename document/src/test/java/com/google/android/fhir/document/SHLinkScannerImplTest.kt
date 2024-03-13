@@ -31,6 +31,8 @@ import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -60,35 +62,33 @@ class SHLinkScannerImplTest {
   }
 
   @Test
-  fun testScanSHLQRCodeWithCameraPermission() {
-    // Arrange
-    `when`(cameraManager.hasCameraPermission(eq(context))).thenReturn(true)
-    `when`(cameraManager.createCameraSource(eq(context), eq(mockBarcodeDetector))).thenReturn(mockCameraSource)
+  fun `test scanSHLQRCode with camera permission`() {
 
-    // Act
+    `when`(cameraManager.hasCameraPermission(eq(context))).thenReturn(true)
+    `when`(cameraManager.createBarcodeDetector(context)).thenReturn(mockBarcodeDetector)
+    `when`(cameraManager.createCameraSource(eq(context), eq(mockBarcodeDetector))).thenReturn(
+      mockCameraSource
+    )
+
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
 
-    // Assert
     verify(cameraManager, times(1)).hasCameraPermission(eq(context))
     verify(cameraManager, times(1)).createCameraSource(eq(context), eq(mockBarcodeDetector))
-    verify(surfaceHolder).addCallback(any())  // Ensure addCallback is called
-
-    // You may want to uncomment and verify other interactions based on your implementation
-    // verify(mockCameraSource).start(surfaceHolder)
-    // verify(successCallback, times(1)).invoke(any())
+    verify(surfaceHolder).addCallback(any())
     verify(failCallback, never()).invoke(any())
   }
 
-  // @Test
-  // fun testScanSHLQRCodeWithoutCameraPermission() {
-  //   `when`(cameraManager.hasCameraPermission(context)).thenReturn(false)
-  //   val mockBarcodeDetector = mock<BarcodeDetector>()
-  //   `when`(cameraManager.createCameraSource(context, mockBarcodeDetector)).thenReturn(mock {})
-  //
-  //   shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
-  //
-  //   verify(cameraManager, times(failedInvocation)).createCameraSource(context, mockBarcodeDetector)
-  //   verify(successCallback, times(failedInvocation)).invoke(anyOrNull())
-  //   verify(failCallback, times(2)).invoke(argThat { message == "Camera permission not granted" })
-  // }
+  @Test
+  fun `test scanSHLQRCode without camera permission`() {
+    `when`(cameraManager.hasCameraPermission(context)).thenReturn(false)
+    val mockBarcodeDetector = mock<BarcodeDetector>()
+    `when`(cameraManager.createCameraSource(context, mockBarcodeDetector)).thenReturn(mock {})
+
+    shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
+
+    verify(cameraManager, times(0)).createCameraSource(context, mockBarcodeDetector)
+    verify(successCallback, times(0)).invoke(anyOrNull())
+    verify(failCallback, times(1)).invoke(argThat { message == "Camera permission not granted" })
+  }
+
 }

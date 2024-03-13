@@ -22,6 +22,7 @@ import android.content.pm.PackageManager
 import android.view.SurfaceHolder
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.vision.CameraSource
+import com.google.android.gms.vision.barcode.Barcode
 import com.google.android.gms.vision.barcode.BarcodeDetector
 import java.io.IOException
 
@@ -82,5 +83,10 @@ object CameraManager {
       .setRequestedPreviewSize(1920, 1080)
       .setAutoFocusEnabled(true)
       .build()
+  }
+
+  /** Creates a barcode detector instance. */
+  fun createBarcodeDetector(context: Context): BarcodeDetector {
+    return BarcodeDetector.Builder(context).setBarcodeFormats(Barcode.ALL_FORMATS).build()
   }
 }
