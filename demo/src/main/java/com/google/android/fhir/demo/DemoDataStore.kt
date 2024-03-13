@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,8 +40,10 @@ class DemoDataStore(private val context: Context) {
     context.dataStorage.edit { pref -> pref[stringPreferencesKey(resourceType.name)] = timestamp }
   }
 
-  fun getFhirQuery():String{
-    return context.getString(R.string.fhir_query).ifBlank { "Patient?address-city=NAIROBI&_sort=_lastUpdated" }
+  fun getFhirQuery(): String {
+    return context.getString(R.string.fhir_query).ifBlank {
+      "Patient?address-city=NAIROBI&_sort=_lastUpdated"
+    }
   }
 
   suspend fun getLasUpdateTimestamp(resourceType: ResourceType): String? {

@@ -13,8 +13,8 @@ configureRuler()
 android {
   namespace = "com.google.android.fhir.demo"
   compileSdk = Sdk.compileSdk
-  val properties=Properties()
-  if (project.rootProject.file("local.properties").exists()){
+  val properties = Properties()
+  if (project.rootProject.file("local.properties").exists()) {
     properties.load(FileInputStream(rootProject.file("local.properties")))
   }
   defaultConfig {
@@ -24,10 +24,10 @@ android {
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
-    resValue("string","fhir_url",properties.getProperty("fhir_url", ""))
-    resValue("string","fhir_user",properties.getProperty("fhir_user", ""))
-    resValue("string","fhir_pwd",properties.getProperty("fhir_pwd", ""))
-    resValue("string","fhir_query",properties.getProperty("fhir_query", ""))
+    resValue("string", "fhir_url", properties.getProperty("fhir_url", ""))
+    resValue("string", "fhir_user", properties.getProperty("fhir_user", ""))
+    resValue("string", "fhir_pwd", properties.getProperty("fhir_pwd", ""))
+    resValue("string", "fhir_query", properties.getProperty("fhir_query", ""))
   }
   buildTypes {
     release {
@@ -44,8 +44,6 @@ android {
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
   }
-
-
 
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
   kotlin { jvmToolchain(11) }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,11 +45,13 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
     }
-    val baseUrl=resources.getString(R.string.fhir_url).ifBlank { "https://hapi.fhir.org/baseR4/" }
-    var httpAuthenticator : HttpAuthenticator?=null
-    val fhirUser=resources.getString(R.string.fhir_user)
-    if(fhirUser.isNotBlank()){
-      httpAuthenticator= HttpAuthenticator { HttpAuthenticationMethod.Basic(fhirUser,resources.getString(R.string.fhir_pwd) ) }
+    val baseUrl = resources.getString(R.string.fhir_url).ifBlank { "https://hapi.fhir.org/baseR4/" }
+    var httpAuthenticator: HttpAuthenticator? = null
+    val fhirUser = resources.getString(R.string.fhir_user)
+    if (fhirUser.isNotBlank()) {
+      httpAuthenticator = HttpAuthenticator {
+        HttpAuthenticationMethod.Basic(fhirUser, resources.getString(R.string.fhir_pwd))
+      }
     }
 
     FhirEngineProvider.init(
@@ -67,8 +69,8 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
               Timber.tag("App-HttpLog").d(it)
             },
           networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
-//                password hardcoded as available on https://openmrs.org/demo/
-          authenticator = httpAuthenticator
+          //                password hardcoded as available on https://openmrs.org/demo/
+          authenticator = httpAuthenticator,
         ),
       ),
     )

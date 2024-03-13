@@ -4,7 +4,7 @@ import java.net.URL
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  //id(Plugins.BuildPlugins.kotlinKapt)
+  // id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.kotlinKsp).version(Plugins.Versions.ksp)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
