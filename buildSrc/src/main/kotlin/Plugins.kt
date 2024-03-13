@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ object Plugins {
     const val kotlin = "kotlin"
     const val kotlinAndroid = "kotlin-android"
     const val kotlinKapt = "kotlin-kapt"
-    const val kotlinKsp = "com.google.devtools.ksp"
     const val mavenPublish = "maven-publish"
     const val fladle = "com.osacky.fladle"
     const val navSafeArgs = "androidx.navigation.safeargs.kotlin"
@@ -48,6 +47,5 @@ object Plugins {
     const val androidGradlePlugin = "8.0.2"
     const val benchmarkPlugin = "1.1.0"
     const val dokka = "1.7.20"
-    const val ksp = "1.9.21-1.0.16"
   }
 }

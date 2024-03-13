@@ -4,8 +4,7 @@ import java.net.URL
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  // id(Plugins.BuildPlugins.kotlinKapt)
-  id(Plugins.BuildPlugins.kotlinKsp).version(Plugins.Versions.ksp)
+  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -135,7 +134,7 @@ dependencies {
   implementation(Dependencies.timber)
   implementation(Dependencies.truth)
 
-  ksp(Dependencies.Room.compiler)
+  kapt(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
