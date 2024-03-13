@@ -51,13 +51,13 @@ class SHLinkScannerImpl(
       val error = Error("Camera permission not granted")
       failCallback.invoke(error)
     } else {
-      setup()
+      startScanning()
       scanCallback = { shlData -> successCallback(shlData) }
     }
   }
 
   /** Sets up the camera and barcode detector. */
-  private fun setup() {
+  private fun startScanning() {
     barcodeDetector = cameraManager.createBarcodeDetector(context)
     cameraSource = cameraManager.createCameraSource(context, barcodeDetector)
     surfaceHolder.addCallback(createSurfaceCallback())
