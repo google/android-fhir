@@ -28,20 +28,6 @@ This repository also contains the following demo apps:
 
 **These applications are provided for demo purposes only. Do NOT use in production.**
 
-By default the FHIS Engine Demo App use the server hapi.fhir.org and the query `Patient?address-city=NAIROBI&_sort=_lastUpdated`.
-It's possible to change this default server by adding these properties in the file `local.properties`:
-
-```dotenv
-#language= URL to the FHIR APP. For openmrs
-# default value is https://hapi.fhir.org/baseR4/. For OpenMRS:
-fhir_url=https://<yourServer>/openmrs/ws/fhir2/R4/
-fhir_user=....
-fhir_pwd=....
-# default value is Patient?address-city=NAIROBI&_sort=_lastUpdated
-# To have last updated patients for all addresses use:
-fhir_query=Patient?&_sort=_lastUpdated
-```
-
 ## Contributing
 
 The development of the SDK began as a collaborative effort between Google, [The World Health Organization](https://www.who.int/), and [Ona](https://ona.io/). Since then, a consortium of application developers have been contributing to the project.

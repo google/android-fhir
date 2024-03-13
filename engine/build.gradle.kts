@@ -5,7 +5,7 @@ plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
   //id(Plugins.BuildPlugins.kotlinKapt)
-  id(Plugins.BuildPlugins.kotlinKsp).version(Plugins.Versions.ksp)
+  id("com.google.devtools.ksp").version("1.9.21-1.0.16")
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
