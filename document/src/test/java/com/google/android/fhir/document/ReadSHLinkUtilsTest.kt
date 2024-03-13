@@ -18,11 +18,14 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.document.decode.ReadSHLinkUtils
 import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
+@Config(manifest = Config.NONE)
 class ReadSHLinkUtilsTest {
   private val readSHLinkUtils = ReadSHLinkUtils
 
@@ -40,17 +43,17 @@ class ReadSHLinkUtilsTest {
   @Test
   fun `test extractUrl with an invalid SHL`() {
     val scannedData = "invalidSHL"
-    val result = runCatching { readSHLinkUtils.extractUrl(scannedData) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
+    val result =
+      assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.extractUrl(scannedData) }
+    assertThat(result.message).isEqualTo("Not a valid SHLink")
   }
 
   @Test
   fun `test extractUrl with an empty SHL`() {
     val scannedData = ""
-    val result = runCatching { readSHLinkUtils.extractUrl(scannedData) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
+    val result =
+      assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.extractUrl(scannedData) }
+    assertThat(result.message).isEqualTo("Not a valid SHLink")
   }
 
   @Test
@@ -63,17 +66,17 @@ class ReadSHLinkUtilsTest {
   @Test
   fun `test that decodeUrl throws an error when decoding an invalid Base64 encoded input string`() {
     val extractedUrl = "aGsbG8="
-    val result = runCatching { readSHLinkUtils.decodeUrl(extractedUrl) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
+    val result =
+      assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.decodeUrl(extractedUrl) }
+    assertThat(result.message).isEqualTo("Not a valid Base64 encoded string")
   }
 
   @Test
   fun `test that decodeUrl throws an error when decoding an empty input string`() {
     val extractedUrl = ""
-    val result = runCatching { readSHLinkUtils.decodeUrl(extractedUrl) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
+    val result =
+      assertThrows(IllegalArgumentException::class.java) { readSHLinkUtils.decodeUrl(extractedUrl) }
+    assertThat(result.message).isEqualTo("Not a valid Base64 encoded string")
   }
 
   @Test
@@ -88,25 +91,25 @@ class ReadSHLinkUtilsTest {
   @Test
   fun `test that decodeShc unsuccessfully decrypts an empty string`() {
     val responseBody = ""
-    val result = runCatching { readSHLinkUtils.decodeShc(responseBody, key) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
+    val result =
+      assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, key) }
+    assertThat(result.message).contains("JWE decryption failed")
   }
 
   @Test
   fun `test that decodeShc unsuccessfully decrypts an SHL with an empty key`() {
     val key = ""
-    val result = runCatching { readSHLinkUtils.decodeShc(responseBody, key) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
+    val result =
+      assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, key) }
+    assertThat(result.message).contains("JWE decryption failed")
   }
 
   @Test
   fun `test that decodeShc unsuccessfully decrypts an SHL with an invalid key`() {
     val invalidKey = "VmFndWVseS1FbmdhZ2luZy1QYXJhZG94LTA1NTktMDb"
-    val result = runCatching { readSHLinkUtils.decodeShc(responseBody, invalidKey) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Exception::class)
+    val result =
+      assertThrows(Exception::class.java) { readSHLinkUtils.decodeShc(responseBody, invalidKey) }
+    assertThat(result.message).contains("JWE decryption failed")
   }
 
   @Test
@@ -137,17 +140,15 @@ class ReadSHLinkUtilsTest {
   @Test
   fun `test that empty JWTs throw an error when attempting to decode and decompress them`() {
     val jwt = ""
-    val result = runCatching { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
+    val result = assertThrows(Error::class.java) { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
+    assertThat(result.message).contains("Invalid JWT token passed in:")
   }
 
   @Test
   fun `test that invalid JWTs throw an error when attempting to decode and decompress them`() {
     val jwt =
       "XAiOiJERUYiLCJhbGciOiJFUzI1NiIsImtpZCI6IjNLZmRnLVh3UC03Z1h5eXd0VWZVQUR3QnVtRE9QS01ReC1pRUxMMTFXOXMifQ.pHJJT8MwEIX_ChquaZZSthyBAxwQSCwX1IPrTBsjL9HYKRSU_85MaAVCiAtSDnH85vN7z3kHEyPU0KbUxbooYoc6j05RalHZ1OZaURMLfFWusxgLVvdIkIFfLKGujman5bQ8mM7y6dFhBmsN9TukTYdQP30xf-L2PxcTWTDq_zrjXO_Nm0omeJhnoAkb9Mkoe9cvnlEnsbVsDT0iRdHUMMvLvGKofD3rfWNRNIQx9KTxfowA241sGwl0sJZpQsiAD6AN52Ryb-0DWRbs5uuSBbvFL-Bbtsrz0qNy-AlRztiNHErhRfgrs0YvPd5YfiOYD5xsYTj6hUoCmZbV8aSsJuUMhiH71Ub1t42r771lEJNKfRxzym0nlNbXSmvj8Tw0I0GHxvjV6DhuYkK3_Xn4Xlp7nAdaFVJpEU1T6PUrA_Q4CeUJDPMhg24bfXSzREIv1r43x6KgdU_jlmS9N-5HXsYgLQM57kWsKJ0CCbIxsbNKarxGMglp7zLEziRluaP5-AzDBw.xOwN6qSTeHU-FkqTIojbvryr8Ztue_HBbiiGdIcfio7m2-STuC-CdNIEt9WbxU_CpveZwdwdYlaQ3cX-yi-SQg"
-    val result = runCatching { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
+    val result = assertThrows(Error::class.java) { readSHLinkUtils.decodeAndDecompressPayload(jwt) }
+    assertThat(result.message).contains("Invalid JWT token passed in:")
   }
 }
