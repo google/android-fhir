@@ -44,9 +44,13 @@ import org.robolectric.annotation.Config
 class SHLinkScannerImplTest {
 
   @Mock private lateinit var context: Context
+
   @Mock private lateinit var surfaceHolder: SurfaceHolder
+
   @Mock private lateinit var cameraManager: CameraManager
+
   @Mock private lateinit var mockBarcodeDetector: BarcodeDetector
+
   @Mock private lateinit var mockCameraSource: CameraSource
 
   private lateinit var shLinkScannerImpl: SHLinkScannerImpl
@@ -63,12 +67,12 @@ class SHLinkScannerImplTest {
 
   @Test
   fun `test scanSHLQRCode with camera permission`() {
-
     `when`(cameraManager.hasCameraPermission(eq(context))).thenReturn(true)
     `when`(cameraManager.createBarcodeDetector(context)).thenReturn(mockBarcodeDetector)
-    `when`(cameraManager.createCameraSource(eq(context), eq(mockBarcodeDetector))).thenReturn(
-      mockCameraSource
-    )
+    `when`(cameraManager.createCameraSource(eq(context), eq(mockBarcodeDetector)))
+      .thenReturn(
+        mockCameraSource,
+      )
 
     shLinkScannerImpl.scanSHLQRCode(successCallback, failCallback)
 
@@ -90,5 +94,4 @@ class SHLinkScannerImplTest {
     verify(successCallback, times(0)).invoke(anyOrNull())
     verify(failCallback, times(1)).invoke(argThat { message == "Camera permission not granted" })
   }
-
 }
