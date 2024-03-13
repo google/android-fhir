@@ -24,8 +24,6 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.sliderStepValue
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.MaxValueValidator
-import com.google.android.fhir.datacapture.validation.MinValueValidator
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
@@ -34,8 +32,8 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.slider.Slider
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.IntegerType
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.layout.slider_view) {
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
@@ -58,8 +56,8 @@ internal object SliderViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val answer = questionnaireViewItem.answers.singleOrNull()
-        val minValue = getMinValue(questionnaireViewItem.questionnaireItem)
-        val maxValue = getMaxValue(questionnaireViewItem.questionnaireItem)
+        val minValue = getMinValue(questionnaireViewItem.minAnswerValue)
+        val maxValue = getMaxValue(questionnaireViewItem.maxAnswerValue)
         if (minValue >= maxValue) {
           throw IllegalStateException("minValue $minValue must be smaller than maxValue $maxValue")
         }
@@ -106,15 +104,15 @@ private const val SLIDER_DEFAULT_STEP_SIZE = 1
 private const val SLIDER_DEFAULT_VALUE_FROM = 0.0F
 private const val SLIDER_DEFAULT_VALUE_TO = 100.0F
 
-private fun getMinValue(questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
-  when (val minValue = MinValueValidator.getMinValue(questionnaireItem)) {
+private fun getMinValue(minValue: Type?) =
+  when (minValue) {
     is IntegerType -> minValue.value.toFloat()
     null -> SLIDER_DEFAULT_VALUE_FROM
     else -> throw IllegalArgumentException("Cannot support data type: ${minValue.fhirType()}}")
   }
 
-private fun getMaxValue(questionnaireItem: Questionnaire.QuestionnaireItemComponent) =
-  when (val maxValue = MaxValueValidator.getMaxValue(questionnaireItem)) {
+private fun getMaxValue(maxValue: Type?) =
+  when (maxValue) {
     is IntegerType -> maxValue.value.toFloat()
     null -> SLIDER_DEFAULT_VALUE_TO
     else -> throw IllegalArgumentException("Cannot support data type: ${maxValue.fhirType()}}")
