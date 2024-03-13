@@ -37,11 +37,14 @@ import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtensio
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
-import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.minValue
+import com.google.android.fhir.datacapture.extensions.minValueCqfCalculatedValueExpression
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.shouldHaveNestedItemsUnderAnswers
@@ -69,8 +72,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
-import org.hl7.fhir.r4.model.Base
-import org.hl7.fhir.r4.model.Element
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -591,23 +592,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
   }
 
-  private suspend fun resolveCqfExpression(
-    questionnaireItem: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    element: Element,
-  ): List<Base> {
-    val cqfExpression = element.cqfExpression ?: return emptyList()
-
-    if (!cqfExpression.isFhirPath) {
-      throw UnsupportedOperationException("${cqfExpression.language} not supported yet")
-    }
-    return expressionEvaluator.evaluateExpression(
-      questionnaireItem,
-      questionnaireResponseItem,
-      cqfExpression,
-    )
-  }
-
   private fun removeDisabledAnswers(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
@@ -749,17 +733,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItem,
           questionnaireResponseItem.answer,
           this@QuestionnaireViewModel.getApplication(),
-        )
+        ) {
+          expressionEvaluator.evaluateExpressionValue(
+            questionnaireItem,
+            questionnaireResponseItem,
+            it,
+          )
+        }
       } else {
         NotValidated
       }
 
     // Set question text dynamically from CQL expression
-    questionnaireResponseItem.apply {
-      resolveCqfExpression(questionnaireItem, this, questionnaireItem.textElement)
-        .firstOrNull()
-        ?.let { text = it.primitiveValue() }
+    questionnaireItem.textElement.cqfExpression?.let { expression ->
+      expressionEvaluator
+        .evaluateExpressionValue(questionnaireItem, questionnaireResponseItem, expression)
+        ?.primitiveValue()
+        ?.let { questionnaireResponseItem.text = it }
     }
+
     val (enabledQuestionnaireAnswerOptions, disabledQuestionnaireResponseAnswers) =
       answerOptionsEvaluator.evaluate(
         questionnaireItem,
@@ -786,6 +778,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             validationResult = validationResult,
             answersChangedCallback = answersChangedCallback,
             enabledAnswerOptions = enabledQuestionnaireAnswerOptions,
+            minAnswerValue =
+              questionnaireItem.minValueCqfCalculatedValueExpression?.let {
+                expressionEvaluator.evaluateExpressionValue(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  it,
+                )
+              }
+                ?: questionnaireItem.minValue,
+            maxAnswerValue =
+              questionnaireItem.maxValueCqfCalculatedValueExpression?.let {
+                expressionEvaluator.evaluateExpressionValue(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  it,
+                )
+              }
+                ?: questionnaireItem.maxValue,
             draftAnswer = draftAnswerMap[questionnaireResponseItem],
             enabledDisplayItems =
               questionnaireItem.item.filter {

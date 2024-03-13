@@ -20,6 +20,7 @@ import android.content.Context
 import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -83,6 +84,12 @@ object QuestionnaireResponseValidator {
         launchContextMap,
         xFhirQueryResolver,
       ),
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap,
+      ),
       linkIdToValidationResultMap,
     )
 
@@ -94,6 +101,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    expressionEvaluator: ExpressionEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -121,6 +129,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem,
           context,
           enablementEvaluator,
+          expressionEvaluator,
           linkIdToValidationResultMap,
         )
       }
@@ -133,6 +142,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    expressionEvaluator: ExpressionEvaluator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -146,6 +156,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem.item,
           context,
           enablementEvaluator,
+          expressionEvaluator,
           linkIdToValidationResultMap,
         )
       else -> {
@@ -159,6 +170,7 @@ object QuestionnaireResponseValidator {
             it.item,
             context,
             enablementEvaluator,
+            expressionEvaluator,
             linkIdToValidationResultMap,
           )
         }
@@ -169,7 +181,13 @@ object QuestionnaireResponseValidator {
             questionnaireItem,
             questionnaireResponseItem.answer,
             context,
-          ),
+          ) {
+            expressionEvaluator.evaluateExpressionValue(
+              questionnaireItem,
+              questionnaireResponseItem,
+              it,
+            )
+          },
         )
       }
     }
