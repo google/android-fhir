@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.Database
 
 /**
  * Generates [Patch]es from [LocalChange]s and output [List<[PatchMapping]>] to keep a mapping of
@@ -34,16 +35,17 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  fun generate(localChanges: List<LocalChange>): List<PatchMapping>
+  suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping>
 }
 
 internal object PatchGeneratorFactory {
   fun byMode(
     mode: PatchGeneratorMode,
+    database: Database,
   ): PatchGenerator =
     when (mode) {
       is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
-      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator.with(database)
     }
 }
 
