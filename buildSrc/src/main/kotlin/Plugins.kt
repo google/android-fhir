@@ -41,11 +41,12 @@ object Plugins {
     "androidx.navigation:navigation-safe-args-gradle-plugin:${Dependencies.Versions.Androidx.navigation}"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
   const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
+  const val kspGradlePlugin = "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${Versions.kspPlugin}"
 
   object Versions {
     const val androidGradlePlugin = "8.0.2"
     const val benchmarkPlugin = "1.1.0"
     const val dokka = "1.7.20"
-    const val ksp = "1.9.21-1.0.16"
+    const val kspPlugin = "1.9.22-1.0.18"
   }
 }

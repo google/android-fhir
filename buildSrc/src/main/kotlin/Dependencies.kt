@@ -249,7 +249,7 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.7.2"
-      const val stdlib = "1.9.21"
+      const val stdlib = "1.9.22"
     }
 
     const val androidFhirCommon = "0.1.0-alpha05"
