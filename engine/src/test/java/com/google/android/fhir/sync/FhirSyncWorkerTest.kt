@@ -23,6 +23,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -31,6 +32,7 @@ import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -88,6 +90,11 @@ class FhirSyncWorkerTest {
   @Before
   fun setUp() {
     context = ApplicationProvider.getApplicationContext()
+  }
+
+  @After
+  fun tearDown() {
+    FhirEngineProvider.getFhirDatabase(context).close()
   }
 
   @Test
