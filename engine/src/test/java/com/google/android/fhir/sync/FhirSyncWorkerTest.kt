@@ -90,9 +90,10 @@ class FhirSyncWorkerTest {
   }
 
   companion object {
-    @BeforeClass // add this annotation
+    @BeforeClass
     @JvmStatic
     fun setupConfiguration() {
+      //activate testMode
       FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
     }
   }
@@ -104,7 +105,8 @@ class FhirSyncWorkerTest {
 
   @After
   fun tearDown() {
-    FhirEngineProvider.getFhirDatabase(context).close()
+    //cleaning database
+    FhirEngineProvider.forceCleanup()
   }
 
   @Test
