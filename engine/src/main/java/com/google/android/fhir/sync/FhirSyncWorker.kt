@@ -80,6 +80,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
             requestGenerator =
               UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
           ),
+          getUploadStrategy().localChangesFetchMode,
         ),
         DownloadConfiguration(
           DownloaderImpl(dataSource, getDownloadWorkManager()),

@@ -385,12 +385,6 @@ internal abstract class LocalChangeDao {
     }
 
   /**
-   * Issue : discardLocalChanges(existingLocalChangeEntity.id)
-   * createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
-   *
-   * it should be updated rather delete and insert.
-   */
-  /**
    * Looks for [LocalChangeEntity] which refer to the updated resource through
    * [LocalChangeResourceReferenceEntity]. For each [LocalChangeEntity] which contains reference to
    * the updated resource in its payload, we update the payload with the reference and also update

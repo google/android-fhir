@@ -177,12 +177,12 @@ internal abstract class ResourceDao {
         UPDATE ResourceEntity
         SET versionId = :versionId,
             lastUpdatedRemote = :lastUpdatedRemote
-        WHERE resourceId = :localChangeResourceId
+        WHERE resourceId = :resourceId
         AND resourceType = :resourceType
     """,
   )
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
-    localChangeResourceId: String,
+    resourceId: String,
     resourceType: ResourceType,
     versionId: String,
     lastUpdatedRemote: Instant,

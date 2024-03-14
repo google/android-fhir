@@ -46,6 +46,7 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 
 internal data class UploadConfiguration(
   val uploader: Uploader,
+  val localChangesFetchMode: LocalChangesFetchMode,
 )
 
 internal class DownloadConfiguration(
@@ -131,7 +132,7 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    val localChangesFetchMode = LocalChangesFetchMode.AllChanges
+    val localChangesFetchMode = uploadConfiguration.localChangesFetchMode
     fhirEngine.syncUpload(localChangesFetchMode, uploadConfiguration.uploader::upload).collect {
       progress ->
       progress.uploadError?.let { exceptions.add(it) }

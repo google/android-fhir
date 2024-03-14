@@ -297,13 +297,13 @@ internal class DatabaseImpl(
   }
 
   override suspend fun updateResourceAndReferences(
-    oldResourceId: String,
+    currentResourceId: String,
     updatedResource: Resource,
   ) {
     db.withTransaction {
-      val oldResourceEntity = selectEntity(updatedResource.resourceType, oldResourceId)
-      val oldResource = iParser.parseResource(oldResourceEntity.serializedResource) as Resource
-      val resourceUuid = oldResourceEntity.resourceUuid
+      val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
+      val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+      val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
       val uuidsOfReferringResources =
