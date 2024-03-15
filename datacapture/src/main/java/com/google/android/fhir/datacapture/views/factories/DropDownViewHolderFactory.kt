@@ -172,7 +172,8 @@ internal object DropDownViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
-        autoCompleteTextView.isEnabled = isDropdownEditable
+        autoCompleteTextView.isEnabled = isDropdownEditable && !isReadOnly
+        clearIcon.isEnabled = !isReadOnly
       }
 
       private fun cleanupOldState() {
