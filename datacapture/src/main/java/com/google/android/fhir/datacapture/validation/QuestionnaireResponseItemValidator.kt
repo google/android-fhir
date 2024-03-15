@@ -18,17 +18,20 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.extensions.isHidden
-import org.hl7.fhir.r4.model.Expression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Type
 
-internal object QuestionnaireResponseItemValidator {
+internal class QuestionnaireResponseItemValidator(
+  val questionnaireResponse: QuestionnaireResponse,
+  val expressionEvaluator: ExpressionEvaluator,
+) {
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
   private val questionnaireResponseItemConstraintValidators =
     listOf(
       RequiredValidator,
+      ConstraintExtensionValidator(questionnaireResponse, expressionEvaluator),
     )
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */
