@@ -93,7 +93,7 @@ class FhirSyncWorkerTest {
     @BeforeClass
     @JvmStatic
     fun setupConfiguration() {
-      //activate testMode
+      // activate testMode
       FhirEngineProvider.init(FhirEngineConfiguration(testMode = true))
     }
   }
@@ -105,7 +105,7 @@ class FhirSyncWorkerTest {
 
   @After
   fun tearDown() {
-    //cleaning database
+    // cleaning database
     FhirEngineProvider.forceCleanup()
   }
 
