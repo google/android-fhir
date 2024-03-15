@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,18 +26,18 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  */
 internal interface QuestionnaireResponseItemConstraintValidator : ConstraintValidator {
   /**
-   * Validates that [answers] satisfy a particular constraint of the [questionnaireItem] according
-   * to the [structured data capture implementation guide]
+   * Validates that [questionnaireResponseItem] satisfy a particular constraint of the
+   * [questionnaireItem] according to the [structured data capture implementation guide]
    * (http://build.fhir.org/ig/HL7/sdc/behavior.html).
    *
-   * This does not validate the consistency between the structure of the [answers] and their
-   * descendants and that of the [questionnaireItem] and its descendants.
+   * This does not validate the consistency between the structure of the [questionnaireResponseItem]
+   * and their descendants and that of the [questionnaireItem] and its descendants.
    *
    * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
    */
-  fun validate(
+  suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
   ): List<ConstraintValidator.Result>
 }
