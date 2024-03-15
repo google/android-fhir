@@ -6,16 +6,16 @@
   "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
 
   "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "17",
-      "installMaven": "false",
-      "installGradle": "false"
-    },
+    "ghcr.io/akhildevelops/devcontainer-features/android-cli:0": {}
 
     // https://github.com/CASL0/devcontainer-features/issues/4
     // "ghcr.io/casl0/devcontainer-features/android-sdk:1": {}
 
-    "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {}
+    // https://github.com/NordcomInc/devcontainer-features/issues/20
+    // "ghcr.io/nordcominc/devcontainer-features/android-sdk:1": {
+    //   "platform": "33",
+    //   "build_tools": "33.0.1"
+    // }
   }
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
