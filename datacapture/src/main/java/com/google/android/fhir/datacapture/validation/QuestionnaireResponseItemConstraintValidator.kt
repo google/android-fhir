@@ -24,7 +24,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent] against a particular
  * constraint.
  */
-internal interface QuestionnaireResponseItemConstraintValidator {
+internal interface QuestionnaireResponseItemConstraintValidator : ConstraintValidator {
   /**
    * Validates that [answers] satisfy a particular constraint of the [questionnaireItem] according
    * to the [structured data capture implementation guide]
@@ -39,11 +39,5 @@ internal interface QuestionnaireResponseItemConstraintValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
     context: Context,
-  ): Result
-
-  /**
-   * The validation result containing whether the response item is valid and any error message if it
-   * is not valid.
-   */
-  data class Result(val isValid: Boolean, val errorMessage: String?)
+  ): List<ConstraintValidator.Result>
 }
