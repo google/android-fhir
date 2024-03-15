@@ -19,12 +19,14 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Test
@@ -72,15 +74,26 @@ class QuestionnaireResponseItemValidatorTest {
           value = IntegerType(275)
         },
       )
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply { answer = answers },
+        )
+      }
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+      )
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        answers,
-        context,
-      ) {
-        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
-      }
+      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+        .validate(
+          questionnaire.item.first(),
+          questionnaireResponse.item.first(),
+          context,
+        )
 
     assertThat(validationResult).isEqualTo(Valid)
   }
@@ -116,15 +129,26 @@ class QuestionnaireResponseItemValidatorTest {
           value = IntegerType(250)
         },
       )
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply { answer = answers },
+        )
+      }
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+      )
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        answers,
-        context,
-      ) {
-        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
-      }
+      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+        .validate(
+          questionnaire.item.first(),
+          questionnaireResponse.item.first(),
+          context,
+        )
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
@@ -140,15 +164,27 @@ class QuestionnaireResponseItemValidatorTest {
         required = true
       }
     val answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
+    val questionnaire = Questionnaire().apply { addItem(questionnaireItem) }
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply { answer = answers },
+        )
+      }
+
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        questionnaireResponse,
+      )
 
     val validationResult =
-      QuestionnaireResponseItemValidator.validate(
-        questionnaireItem,
-        answers,
-        context,
-      ) {
-        TestExpressionValueEvaluator.evaluate(questionnaireItem, it)
-      }
+      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+        .validate(
+          questionnaire.item.first(),
+          questionnaireResponse.item.first(),
+          context,
+        )
 
     assertThat(validationResult).isInstanceOf(Invalid::class.java)
     val invalidValidationResult = validationResult as Invalid
