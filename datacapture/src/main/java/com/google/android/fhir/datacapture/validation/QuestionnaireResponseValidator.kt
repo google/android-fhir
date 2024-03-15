@@ -186,7 +186,7 @@ object QuestionnaireResponseValidator {
         linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
           questionnaireResponseItemValidator.validate(
             questionnaireItem,
-            questionnaireResponseItem.answer,
+            questionnaireResponseItem,
             context,
           ) {
             expressionEvaluator.evaluateExpressionValue(

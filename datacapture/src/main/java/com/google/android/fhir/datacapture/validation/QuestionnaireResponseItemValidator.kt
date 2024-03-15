@@ -45,18 +45,18 @@ internal class QuestionnaireResponseItemValidator(
       RegexValidator,
     )
 
-  /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
+  /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
   suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     expressionEvaluator: suspend (Expression) -> Type?,
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
     val questionnaireResponseItemConstraintValidationResult =
-      questionnaireResponseItemConstraintValidators.map {
-        it.validate(questionnaireItem, answers, context)
+      questionnaireResponseItemConstraintValidators.flatMap {
+        it.validate(questionnaireItem, questionnaireResponseItem, context)
       }
     val questionnaireResponseItemAnswerConstraintValidationResult =
       answerConstraintValidators.flatMap { validator ->
