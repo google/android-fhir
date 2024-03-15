@@ -1,3 +1,3 @@
 {
-  "recommendations": ["davidanson.vscode-markdownlint", "vscjava.vscode-gradle"]
+  "recommendations": ["davidanson.vscode-markdownlint"]
 }
