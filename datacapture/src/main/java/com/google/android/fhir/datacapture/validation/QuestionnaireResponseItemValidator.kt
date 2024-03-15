@@ -50,7 +50,6 @@ internal class QuestionnaireResponseItemValidator(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
-    expressionEvaluator: suspend (Expression) -> Type?,
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
@@ -60,8 +59,14 @@ internal class QuestionnaireResponseItemValidator(
       }
     val questionnaireResponseItemAnswerConstraintValidationResult =
       answerConstraintValidators.flatMap { validator ->
-        answers.map { answer ->
-          validator.validate(questionnaireItem, answer, context, expressionEvaluator)
+        questionnaireResponseItem.answer.map { answer ->
+          validator.validate(questionnaireItem, answer, context) {
+            expressionEvaluator.evaluateExpressionValue(
+              questionnaireItem,
+              questionnaireResponseItem,
+              it,
+            )
+          }
         }
       }
 

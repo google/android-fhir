@@ -736,13 +736,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItem,
           questionnaireResponseItem,
           this@QuestionnaireViewModel.getApplication(),
-        ) {
-          expressionEvaluator.evaluateExpressionValue(
-            questionnaireItem,
-            questionnaireResponseItem,
-            it,
-          )
-        }
+        )
       } else {
         NotValidated
       }
