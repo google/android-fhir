@@ -67,7 +67,17 @@ internal class ExpressionEvaluator(
 ) {
 
   private val reservedVariables =
-    listOf("sct", "loinc", "ucum", "resource", "rootResource", "context", "map-codes", "questionnaire", "qItem")
+    listOf(
+      "sct",
+      "loinc",
+      "ucum",
+      "resource",
+      "rootResource",
+      "context",
+      "map-codes",
+      "questionnaire",
+      "qItem",
+    )
 
   /**
    * Finds all the matching occurrences of variables. For example, when we apply regex to the
