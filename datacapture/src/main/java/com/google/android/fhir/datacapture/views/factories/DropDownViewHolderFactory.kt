@@ -152,6 +152,7 @@ internal object DropDownViewHolderFactory :
         clearIcon.setOnClickListener {
           autoCompleteTextView.text = null
           isDropdownEditable = true
+          questionnaireViewItem.clearAnswer()
           setReadOnly(false)
         }
 
