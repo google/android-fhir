@@ -23,7 +23,7 @@
 
     <!--  Action button  -->
     <dimen name="action_button_margin_horizontal">16dp</dimen>
-    <dimen name="action_button_margin_vertical">8dp</dimen>
+    <dimen name="action_button_margin_vertical">16dp</dimen>
 
     <!--  Header  -->
     <dimen name="error_text_at_header_margin_top">4dp</dimen>

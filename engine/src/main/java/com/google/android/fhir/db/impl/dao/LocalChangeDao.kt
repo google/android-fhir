@@ -348,6 +348,17 @@ internal abstract class LocalChangeDao {
     localChangeId: Long,
   ): List<LocalChangeResourceReferenceEntity>
 
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeResourceReferenceEntity
+        WHERE localChangeId = (:localChangeId)
+    """,
+  )
+  abstract suspend fun getReferencesForLocalChanges(
+    localChangeId: List<Long>,
+  ): List<LocalChangeResourceReferenceEntity>
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertLocalChangeResourceReferences(
     resourceReferences: List<LocalChangeResourceReferenceEntity>,
