@@ -18,10 +18,6 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -145,7 +141,8 @@ internal object DropDownViewHolderFactory :
                 if (autoCompleteTextView.isPopupShowing.not() && isDropdownEditable) {
                   autoCompleteTextView.showDropDown()
                 }
-              }, 100
+              },
+              100,
             )
           } else {
             clearIcon.visibility = View.VISIBLE
@@ -173,7 +170,7 @@ internal object DropDownViewHolderFactory :
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
         autoCompleteTextView.isEnabled = isDropdownEditable && !isReadOnly
-        clearIcon.isEnabled = !isReadOnly
+        if (isReadOnly) clearIcon.visibility = View.GONE
       }
 
       private fun cleanupOldState() {
