@@ -22,7 +22,6 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import java.util.TimeZone
@@ -32,10 +31,7 @@ import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -274,46 +270,14 @@ class MoreTypesTest {
   }
 
   @Test
-  fun `should return calculated value for cqf expression`() {
-    val today = LocalDate.now().toString()
-    val type =
-      DateType().apply {
-        extension =
-          listOf(
-            Extension(
-              EXTENSION_CQF_CALCULATED_VALUE_URL,
-              Expression().apply {
-                language = "text/fhirpath"
-                expression = "today()"
-              },
-            ),
-          )
-      }
-    assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(today)
+  fun `getValueAsString should return 'not answered' for an empty Quantity`() {
+    val quantity = Quantity()
+    assertThat(quantity.getValueAsString(context)).isEqualTo("Not Answered")
   }
 
   @Test
-  fun `should return calculated value for a non-cqf extension`() {
-    LocalDate.now().toString()
-    val type =
-      DateType().apply {
-        extension =
-          listOf(
-            Extension(
-              "http://hl7.org/fhir/StructureDefinition/my-own-expression",
-              Expression().apply {
-                language = "text/fhirpath"
-                expression = "today()"
-              },
-            ),
-          )
-      }
-    assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(null)
-  }
-
-  @Test
-  fun `should return entered value when no cqf expression is defined`() {
-    val type = IntegerType().apply { value = 500 }
-    assertThat((type.valueOrCalculateValue() as IntegerType).value).isEqualTo(500)
+  fun `getValueAsString should return correct value for a Quantity`() {
+    val quantity = Quantity(20L)
+    assertThat(quantity.getValueAsString(context)).isEqualTo("20")
   }
 }
