@@ -255,7 +255,7 @@ class QuestionnaireUiEspressoTest {
       val dateTime12 = LocalDateTime.of(2005, 1, 5, 6, 10)
       val dateTime24 = LocalDateTime.of(2005, 1, 5, 18, 10)
       val isOK = answer.localDateTime.equals(dateTime12) || answer.localDateTime.equals(dateTime24)
-      assertThat(isOK).withMessage​("expected: %s OR %s but was: %s", dateTime12, dateTime24, answer)
+      assertThat(isOK) // TODO .withMessage​("expected: %s OR %s but was: %s", dateTime12, dateTime24, answer)
     }
   }
 
