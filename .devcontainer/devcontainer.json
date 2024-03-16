@@ -6,6 +6,7 @@
   "image": "mcr.microsoft.com/devcontainers/java:1-17-bookworm",
 
   "features": {
+    // https://github.com/akhildevelops/devcontainer-features/issues/7
     "ghcr.io/akhildevelops/devcontainer-features/android-cli:0": {}
 
     // https://github.com/CASL0/devcontainer-features/issues/4
