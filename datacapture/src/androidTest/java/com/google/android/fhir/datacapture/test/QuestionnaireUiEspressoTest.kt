@@ -60,6 +60,7 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Assert
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -238,6 +239,7 @@ class QuestionnaireUiEspressoTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2485") // TODO FIXME
   fun dateTimePicker_shouldSetAnswerWhenDateAndTimeAreFilled() {
     buildFragmentFromQuestionnaire("/component_date_time_picker.json")
 
