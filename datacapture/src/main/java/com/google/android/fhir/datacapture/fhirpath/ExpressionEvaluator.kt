@@ -142,6 +142,27 @@ internal class ExpressionEvaluator(
   }
 
   /**
+   * Returns single [Type] evaluation value result of an expression, including cqf-expression and
+   * cqf-calculatedValue expressions
+   */
+  suspend fun evaluateExpressionValue(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+    expression: Expression,
+  ): Type? {
+    if (!expression.isFhirPath) {
+      throw UnsupportedOperationException("${expression.language} not supported yet")
+    }
+    return try {
+      evaluateExpression(questionnaireItem, questionnaireResponseItem, expression).singleOrNull()
+        as? Type
+    } catch (e: Exception) {
+      Timber.w("Could not evaluate expression ${expression.expression} with FHIRPathEngine", e)
+      null
+    }
+  }
+
+  /**
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */

@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.fhirpath.evaluateToBase
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
 import com.google.android.fhir.getLocalizedText
@@ -95,13 +94,13 @@ private fun getDisplayString(type: Type, context: Context): String? =
     else -> (type as? PrimitiveType<*>)?.valueAsString
   }
 
+/**
+ * Returns the string representation for [PrimitiveType] or [Quantity], otherwise defaults to null
+ */
 private fun getValueString(type: Type): String? =
   when (type) {
-    is DateType,
-    is DateTimeType,
-    is StringType, -> type.asStringValue()
-    is Quantity -> type.value.toString()
-    else -> (type as? PrimitiveType<*>)?.valueAsString
+    is Quantity -> type.value?.toString()
+    else -> (type as? PrimitiveType<*>)?.asStringValue()
   }
 
 /** Converts StringType to toUriType. */
@@ -132,16 +131,10 @@ internal fun Quantity.toCoding(): Coding {
   return Coding(this.system, this.code, this.unit)
 }
 
-fun Type.valueOrCalculateValue(): Type {
-  return if (this.hasExtension()) {
-    this.extension
-      .firstOrNull { it.url == EXTENSION_CQF_CALCULATED_VALUE_URL }
-      ?.let { extension ->
-        val expression = (extension.value as Expression).expression
-        evaluateToBase(this, expression).singleOrNull()?.let { it as Type }
-      }
-      ?: this
-  } else {
-    this
-  }
-}
+internal fun Type.hasValue(): Boolean = !getValueString(this).isNullOrBlank()
+
+internal val Type.cqfCalculatedValueExpression
+  get() = this.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL)?.value as? Expression
+
+internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
