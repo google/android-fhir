@@ -52,6 +52,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import java.util.TimeZone
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
@@ -79,6 +80,7 @@ class QuestionnaireUiEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
+    TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
   @Test
