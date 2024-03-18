@@ -192,6 +192,9 @@ interface FhirEngine {
    * @param forcePurge If `true`, the resource will be purged even if it has local changes.
    *   Otherwise, an [IllegalStateException] will be thrown if local changes exist. Defaults to
    *   `false`.
+   *
+   *   If you need to purge resources in bulk use the method
+   *   [FhirEngine.purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)]
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 
@@ -201,10 +204,12 @@ interface FhirEngine {
    *
    * @param type The [ResourceType]
    * @param ids The resource ids [Set]<[Resource.id]>
-   * @param forcePurge default value is false, here resources will not be deleted from
-   *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   *   either sync with server or FORCE_PURGE required") if local changes exists. If true this API
-   *   will delete resource entries from LocalChangeEntity table.
+   * @param forcePurge If `true`, the resource will be purged even if it has local changes.
+   *   Otherwise, an [IllegalStateException] will be thrown if local changes exist. Defaults to
+   *   `false`.
+   *
+   *   In the case an exception is thrown by any entry in the list the whole transaction is rolled
+   *   back and no record is purged.
    */
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
 }
