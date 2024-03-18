@@ -185,9 +185,24 @@ internal interface Database {
    *   will delete resource entries from LocalChangeEntity table.
    */
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
+
+  /**
+   * @return List of [LocalChangeResourceReference] associated with the [LocalChangeEntity.id]s. A
+   *   single [LocalChangeEntity] may have one or more [LocalChangeResourceReference] associated
+   *   with it.
+   */
+  suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference>
 }
 
 data class ResourceWithUUID<R>(
   val uuid: UUID,
   val resource: R,
+)
+
+data class LocalChangeResourceReference(
+  val localChangeId: Long,
+  val resourceReferenceValue: String,
+  val resourceReferencePath: String?,
 )

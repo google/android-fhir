@@ -37,7 +37,6 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -45,11 +44,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
 import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.LastSyncJobStatus
+import com.google.android.fhir.sync.PeriodicSyncJobStatus
 import com.google.android.fhir.sync.SyncJobStatus
 import kotlin.math.roundToInt
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
@@ -154,75 +154,73 @@ class PatientListFragment : Fragment() {
     }
     setHasOptionsMenu(true)
     (activity as MainActivity).setDrawerEnabled(false)
+    launchAndRepeatStarted(
+      { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
+      { mainActivityViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
+    )
+  }
 
-    lifecycleScope.launch {
-      mainActivityViewModel.pollState.collect {
-        Timber.d("onViewCreated: pollState Got status $it")
-        when (it) {
-          is CurrentSyncJobStatus.Running -> {
-            Timber.i("Sync: ${it::class.java.simpleName} with data ${it.inProgressSyncJob}")
-            fadeInTopBanner(it)
-          }
-          is CurrentSyncJobStatus.Succeeded -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
-            fadeOutTopBanner(it)
-          }
-          is CurrentSyncJobStatus.Failed -> {
-            Timber.i("Sync: ${it::class.java.simpleName} at ${it.timestamp}")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(it.timestamp)
-            fadeOutTopBanner(it)
-          }
-          is CurrentSyncJobStatus.Enqueued -> {
-            Timber.i("Sync: Enqueued")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            fadeOutTopBanner(it)
-          }
-          CurrentSyncJobStatus.Cancelled -> TODO()
-        }
+  private fun currentSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
+    when (currentSyncJobStatus) {
+      is CurrentSyncJobStatus.Running -> {
+        Timber.i(
+          "Sync: ${currentSyncJobStatus::class.java.simpleName} with data ${currentSyncJobStatus.inProgressSyncJob}",
+        )
+        fadeInTopBanner(currentSyncJobStatus)
       }
+      is CurrentSyncJobStatus.Succeeded -> {
+        Timber.i(
+          "Sync: ${currentSyncJobStatus::class.java.simpleName} at ${currentSyncJobStatus.timestamp}",
+        )
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+        fadeOutTopBanner(currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Failed -> {
+        Timber.i(
+          "Sync: ${currentSyncJobStatus::class.java.simpleName} at ${currentSyncJobStatus.timestamp}",
+        )
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+        fadeOutTopBanner(currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Enqueued -> {
+        Timber.i("Sync: Enqueued")
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        fadeOutTopBanner(currentSyncJobStatus)
+      }
+      CurrentSyncJobStatus.Cancelled -> TODO()
     }
+  }
 
-    lifecycleScope.launch {
-      mainActivityViewModel.pollPeriodicSyncJobStatus.collect {
-        Timber.d("onViewCreated: pollState Got status ${it.currentSyncJobStatus}")
-        when (it.currentSyncJobStatus) {
-          is CurrentSyncJobStatus.Running -> {
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} with data ${it.currentSyncJobStatus}",
-            )
-            fadeInTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Succeeded -> {
-            val lastSyncTimestamp =
-              (it.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp",
-            )
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Failed -> {
-            val lastSyncTimestamp =
-              (it.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
-            Timber.i(
-              "Sync: ${it.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
-            )
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          is CurrentSyncJobStatus.Enqueued -> {
-            Timber.i("Sync: Enqueued")
-            patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
-            fadeOutTopBanner(it.currentSyncJobStatus)
-          }
-          CurrentSyncJobStatus.Cancelled -> TODO()
-        }
+  private fun periodicSyncJobStatus(periodicSyncJobStatus: PeriodicSyncJobStatus) {
+    when (periodicSyncJobStatus.currentSyncJobStatus) {
+      is CurrentSyncJobStatus.Running -> {
+        fadeInTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
       }
+      is CurrentSyncJobStatus.Succeeded -> {
+        val lastSyncTimestamp =
+          (periodicSyncJobStatus.currentSyncJobStatus as CurrentSyncJobStatus.Succeeded).timestamp
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
+        fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Failed -> {
+        val lastSyncTimestamp =
+          (periodicSyncJobStatus.currentSyncJobStatus as CurrentSyncJobStatus.Failed).timestamp
+        Timber.i(
+          "Sync: ${periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName} at $lastSyncTimestamp}",
+        )
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        mainActivityViewModel.updateLastSyncTimestamp(lastSyncTimestamp)
+        fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Enqueued -> {
+        Timber.i("Sync: Enqueued")
+        patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
+        fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
+      }
+      CurrentSyncJobStatus.Cancelled -> TODO()
     }
   }
 

@@ -26,6 +26,7 @@ import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
@@ -407,6 +408,18 @@ internal class DatabaseImpl(
           }
         }
       }
+    }
+  }
+
+  override suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference> {
+    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
+      LocalChangeResourceReference(
+        it.localChangeId,
+        it.resourceReferenceValue,
+        it.resourceReferencePath,
+      )
     }
   }
 
