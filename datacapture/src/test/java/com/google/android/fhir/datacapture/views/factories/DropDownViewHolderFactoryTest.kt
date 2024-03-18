@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -316,6 +317,58 @@ class DropDownViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
       .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun shouldHideClearIconWhenTextIsEmpty() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clearIcon)
+    assertThat(clearIcon.visibility).isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun shouldShowClearIconWhenTextIsNotEmpty() {
+    val answerOption =
+      Questionnaire.QuestionnaireItemAnswerOptionComponent().apply {
+        value =
+          Coding().apply {
+            code = "test-code"
+            display = "Test Code"
+          }
+      }
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { addAnswerOption(answerOption) },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    val autoCompleteTextView =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+    val clearIcon = viewHolder.itemView.findViewById<ImageView>(R.id.clearIcon)
+    autoCompleteTextView.setText("Some Text")
+
+    assertThat(clearIcon.visibility).isEqualTo(View.VISIBLE)
   }
 
   @Test
