@@ -66,7 +66,7 @@ internal class ExpressionEvaluator(
   private val xFhirQueryResolver: XFhirQueryResolver? = null,
 ) {
 
-  private val reservedVariables =
+  private val reservedItemVariables =
     listOf(
       "sct",
       "loinc",
@@ -77,6 +77,18 @@ internal class ExpressionEvaluator(
       "map-codes",
       "questionnaire",
       "qItem",
+    )
+
+  private val reservedRootVariables =
+    listOf(
+      "sct",
+      "loinc",
+      "ucum",
+      "resource",
+      "rootResource",
+      "context",
+      "map-codes",
+      "questionnaire",
     )
 
   /**
@@ -259,15 +271,17 @@ internal class ExpressionEvaluator(
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
   ): MutableMap<String, Base?> {
     questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
-    findDependentVariables(expression).forEach { variableName ->
-      if (variablesMap[variableName] == null) {
-        findAndEvaluateVariable(
-          variableName,
-          questionnaireItem,
-          variablesMap,
-        )
+    findDependentVariables(expression)
+      .filterNot { variable -> reservedItemVariables.contains(variable) }
+      .forEach { variableName ->
+        if (variablesMap[variableName] == null) {
+          findAndEvaluateVariable(
+            variableName,
+            questionnaireItem,
+            variablesMap,
+          )
+        }
       }
-    }
     return variablesMap.apply {
       put(questionnaireFhirPathSupplement, questionnaire)
       put(questionnaireItemFhirPathSupplement, questionnaireItem)
@@ -292,17 +306,19 @@ internal class ExpressionEvaluator(
     expression: Expression,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
   ): Base? {
-    findDependentVariables(expression).forEach { variableName ->
-      questionnaire.findVariableExpression(variableName)?.let { expression ->
-        if (variablesMap[expression.name] == null) {
-          variablesMap[expression.name] =
-            evaluateQuestionnaireVariableExpression(
-              expression,
-              variablesMap,
-            )
+    findDependentVariables(expression)
+      .filterNot { variable -> reservedRootVariables.contains(variable) }
+      .forEach { variableName ->
+        questionnaire.findVariableExpression(variableName)?.let { expression ->
+          if (variablesMap[expression.name] == null) {
+            variablesMap[expression.name] =
+              evaluateQuestionnaireVariableExpression(
+                expression,
+                variablesMap,
+              )
+          }
         }
       }
-    }
 
     return evaluateVariable(
       expression,
@@ -381,11 +397,7 @@ internal class ExpressionEvaluator(
       }
 
   private fun findDependentVariables(expression: Expression) =
-    variableRegex
-      .findAll(expression.expression)
-      .map { it.groupValues[1] }
-      .toList()
-      .filterNot { variable -> reservedVariables.contains(variable) }
+    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList()
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at
