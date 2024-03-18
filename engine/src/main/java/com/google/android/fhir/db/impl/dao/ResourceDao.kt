@@ -330,6 +330,14 @@ internal abstract class ResourceDao {
     }
   }
 
+  /**
+   * Updates resource metadata such as versionId, lastUpdated, resource ID, and payload in the
+   * [ResourceEntity] using information from [postSyncResource]. It matches the existing
+   * [preSyncResourceId] with the resourceId of [postSyncResource] to update the resource.
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResource The [Resource] after synchronization.
+   */
   suspend fun updateResourcePostSync(
     preSyncResourceId: String,
     postSyncResource: Resource,
