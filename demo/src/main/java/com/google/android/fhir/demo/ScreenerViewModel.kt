@@ -92,7 +92,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             resource.id = generateUuid()
             resource.subject = subjectReference
             resource.encounter = encounterReference
-            //            saveResourceToDatabase(resource)
+            saveResourceToDatabase(resource)
           }
         }
         is Condition -> {
@@ -100,7 +100,7 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
             resource.id = generateUuid()
             resource.subject = subjectReference
             resource.encounter = encounterReference
-            //            saveResourceToDatabase(resource)
+            saveResourceToDatabase(resource)
           }
         }
         is Encounter -> {
@@ -159,14 +159,14 @@ class ScreenerViewModel(application: Application, private val state: SavedStateH
           RiskAssessment().apply {
             id = generateUuid()
             subject = subjectReference
-            //            encounter = Reference("Encounter/$encounterId")
+            encounter = Reference("Encounter/$encounterId")
             addPrediction().apply {
               qualitativeRisk =
                 CodeableConcept().apply { addCoding().updateRiskProbability(riskProbability) }
             }
             occurrence = DateTimeType.now()
           }
-        //        saveResourceToDatabase(riskAssessment)
+        saveResourceToDatabase(riskAssessment)
       }
     }
   }
