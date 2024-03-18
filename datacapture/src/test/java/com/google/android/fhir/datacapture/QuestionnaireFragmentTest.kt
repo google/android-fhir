@@ -20,6 +20,7 @@ import android.os.Build
 import android.view.View
 import android.widget.Button
 import androidx.core.os.bundleOf
+import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
@@ -33,6 +34,7 @@ import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.views.factories.DateTimePickerViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertEquals
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
@@ -72,13 +74,18 @@ class QuestionnaireFragmentTest {
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
-      assertThat(this.getQuestionnaireResponse()).isNotNull()
-      assertThat(this.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" }).isTrue()
+      runTest {
+        assertThat(this@withFragment.getQuestionnaireResponse()).isNotNull()
+        assertThat(
+            this@withFragment.getQuestionnaireResponse().item.any { it.linkId == "a-link-id" },
+          )
+          .isTrue()
+      }
     }
   }
 
@@ -155,7 +162,7 @@ class QuestionnaireFragmentTest {
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val customButtonText = "Apply"
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setSubmitButtonText(customButtonText)
@@ -233,7 +240,7 @@ class QuestionnaireFragmentTest {
 }
 """
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         bundleOf(
           EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
         ),
@@ -307,7 +314,7 @@ class QuestionnaireFragmentTest {
 }
 """
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         bundleOf(
           EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
         ),
@@ -338,7 +345,7 @@ class QuestionnaireFragmentTest {
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
@@ -371,8 +378,8 @@ class QuestionnaireFragmentTest {
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
-        QuestionnaireFragment.builder().setQuestionnaire(questionnaireJson).buildArgs(),
+      launchFragment<QuestionnaireFragment>(
+        bundleOf(EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson),
       )
     scenario.moveToState(Lifecycle.State.RESUMED)
     scenario.withFragment {
@@ -398,7 +405,7 @@ class QuestionnaireFragmentTest {
       }
     val questionnaireJson = parser.encodeResourceToString(questionnaire)
     val scenario =
-      launchFragmentInContainer<QuestionnaireFragment>(
+      launchFragment<QuestionnaireFragment>(
         QuestionnaireFragment.builder()
           .setQuestionnaire(questionnaireJson)
           .setCustomQuestionnaireItemViewHolderFactoryMatchersProvider("Provider")
