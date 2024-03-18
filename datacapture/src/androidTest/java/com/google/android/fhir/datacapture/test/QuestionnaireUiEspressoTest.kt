@@ -52,7 +52,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
-import java.util.TimeZone
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
@@ -80,7 +79,6 @@ class QuestionnaireUiEspressoTest {
   @Before
   fun setup() {
     activityScenarioRule.scenario.onActivity { activity -> parent = FrameLayout(activity) }
-    TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
   }
 
   @Test
@@ -248,12 +246,14 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    clickOnText("AM")
     clickOnText("6")
     clickOnText("10")
     clickOnText("OK")
 
     runTest {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      // check Locale
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
     }
   }
