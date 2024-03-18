@@ -26,8 +26,8 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
@@ -125,14 +125,15 @@ internal object DropDownViewHolderFactory :
                   .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
                   ?.value
 
-            context.lifecycleScope.launch {
-              if (selectedAnswer == null) {
-                questionnaireViewItem.clearAnswer()
-              } else {
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(selectedAnswer),
-                )
+              context.lifecycleScope.launch {
+                if (selectedAnswer == null) {
+                  questionnaireViewItem.clearAnswer()
+                } else {
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(selectedAnswer),
+                  )
+                }
               }
             }
           }
@@ -166,7 +167,7 @@ internal object DropDownViewHolderFactory :
           isDropdownEditable = true
 
           // Clear the answer added in the questionnaireViewItem after clearIcon is clicked
-          questionnaireViewItem.clearAnswer()
+          context.lifecycleScope.launch { questionnaireViewItem.clearAnswer() }
           setReadOnly(false)
         }
 
