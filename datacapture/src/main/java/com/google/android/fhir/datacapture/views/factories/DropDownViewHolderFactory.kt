@@ -135,7 +135,11 @@ internal object DropDownViewHolderFactory :
 
         autoCompleteTextView.doAfterTextChanged {
           if (it.isNullOrBlank()) {
+            // Hide the clear icon when the text is empty
             clearIcon.visibility = View.GONE
+
+            // Delay to ensure dropdown is displayed after text is cleared
+            // And after MaterialAutoCompleteTextView resets its state
             autoCompleteTextView.postDelayed(
               {
                 if (autoCompleteTextView.isPopupShowing.not() && isDropdownEditable) {
@@ -145,13 +149,19 @@ internal object DropDownViewHolderFactory :
               100,
             )
           } else {
+            // Show the clear icon when the text is not empty
             clearIcon.visibility = View.VISIBLE
           }
         }
 
         clearIcon.setOnClickListener {
+          // Clear the text in the AutoCompleteTextView
           autoCompleteTextView.text = null
+
+          // Enable dropdown editing after text is cleared
           isDropdownEditable = true
+
+          // Clear the answer added in the questionnaireViewItem after clearIcon is clicked
           questionnaireViewItem.clearAnswer()
           setReadOnly(false)
         }
