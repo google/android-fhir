@@ -150,6 +150,7 @@ dependencies {
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)

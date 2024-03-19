@@ -131,6 +131,13 @@ tasks.dokkaHtml.configure {
       moduleName.set(Releases.Knowledge.artifactId)
       moduleVersion.set(Releases.Knowledge.version)
       noAndroidSdkLink.set(false)
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/knowledge/src/main/java"),
+        )
+        remoteLineSuffix.set("#L")
+      }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
