@@ -20,8 +20,10 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.sync.upload.patch.PatchGenerator
 import com.google.android.fhir.sync.upload.patch.PatchGeneratorFactory
 import com.google.android.fhir.sync.upload.patch.PatchGeneratorMode
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorFactory
@@ -42,12 +44,31 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.MockitoAnnotations
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class UploaderTest {
+
+  @Mock private lateinit var database: Database
+  private lateinit var perResourcePatchGenerator: PatchGenerator
+  private lateinit var perChangePatchGenerator: PatchGenerator
+
+  @Before
+  fun setUp() {
+    MockitoAnnotations.openMocks(this)
+    runTest { whenever(database.getLocalChangeResourceReferences(any())).thenReturn(emptyList()) }
+
+    perResourcePatchGenerator =
+      PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource, database)
+    perChangePatchGenerator = PatchGeneratorFactory.byMode(PatchGeneratorMode.PerChange, database)
+  }
 
   @Test
   fun `bundle upload for per resource patch should output responses mapped correctly to the local changes`() =
@@ -513,9 +534,7 @@ class UploaderTest {
     }
 
   companion object {
-    private val perResourcePatchGenerator =
-      PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource)
-    private val perChangePatchGenerator = PatchGeneratorFactory.byMode(PatchGeneratorMode.PerChange)
+
     private val urlUploadRequestGenerator =
       UploadRequestGeneratorFactory.byMode(
         UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),

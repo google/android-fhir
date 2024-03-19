@@ -17,8 +17,17 @@
 
 set -euox pipefail
 
+rm -rf site/
 mkdir -p site/
 
-# TODO Replace this with mkdocs generation
-# TODO Fix https://github.com/google/android-fhir/issues/2237 and generate API JavaDoc
-cp -R docs/* site/
+# TODO https://github.com/google/android-fhir/issues/2232 Add mkdocs generation
+
+./gradlew dokkaHtml
+mkdir -p site/api/
+mv docs/data-capture site/api/
+mv docs/engine site/api/
+mv docs/knowledge site/api/
+mv docs/workflow site/api/
+
+cp -R docs/index.html site/
+
