@@ -251,9 +251,9 @@ object Dependencies {
       const val stdlib = "1.8.20"
     }
 
-    const val androidFhirCommon = "0.1.0-alpha05-preview2-SNAPSHOT"
-    const val androidFhirEngine = "1.0.0-preview2-SNAPSHOT"
-    const val androidFhirKnowledge = "0.1.0-alpha03-preview2-SNAPSHOT"
+    const val androidFhirCommon = "0.1.0-alpha05-preview3-SNAPSHOT"
+    const val androidFhirEngine = "1.0.0-preview3-SNAPSHOT"
+    const val androidFhirKnowledge = "0.1.0-alpha03-preview3-SNAPSHOT"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
