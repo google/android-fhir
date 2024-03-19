@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.datacapture.extensions.EXTENSION_LAUNCH_CONTEXT
+import com.google.android.fhir.datacapture.extensions.CODE_SYSTEM_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.views.factories.localDate
@@ -1519,7 +1519,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1527,7 +1527,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "mother", "Mother")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1538,7 +1538,7 @@ class ResourceMapperTest {
                   Extension(
                     "name",
                     Coding(
-                      EXTENSION_LAUNCH_CONTEXT,
+                      CODE_SYSTEM_LAUNCH_CONTEXT,
                       "registration-encounter",
                       "Registration Encounter",
                     ),
@@ -1643,7 +1643,7 @@ class ResourceMapperTest {
             url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
             extension =
               listOf(
-                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                 Extension("type", CodeType("Patient")),
               )
           }
@@ -1718,7 +1718,7 @@ class ResourceMapperTest {
             url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
             extension =
               listOf(
-                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                 Extension("type", CodeType("Patient")),
               )
           }
@@ -1758,7 +1758,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1798,7 +1798,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1845,7 +1845,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "patient", "Patient")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "patient", "Patient")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1882,7 +1882,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1922,7 +1922,7 @@ class ResourceMapperTest {
               url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
               extension =
                 listOf(
-                  Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                  Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "mother", "Mother")),
                   Extension("type", CodeType("Patient")),
                 )
             }
@@ -1976,7 +1976,7 @@ class ResourceMapperTest {
             url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
             extension =
               listOf(
-                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "mother", "Mother")),
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "mother", "Mother")),
                 Extension("type", CodeType("Patient")),
               )
           }
@@ -2928,7 +2928,7 @@ class ResourceMapperTest {
             url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
             extension =
               listOf(
-                Extension("name", Coding(EXTENSION_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
                 Extension("type", CodeType("Patient")),
               )
           }

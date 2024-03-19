@@ -44,15 +44,32 @@ import org.hl7.fhir.r4.model.OperationOutcome
 import retrofit2.HttpException
 import timber.log.Timber
 
-/** A WorkManager Worker that handles periodic sync. */
+/**
+ * Handles FHIR data synchronization between local database and remote server.
+ *
+ * Extend this abstract [CoroutineWorker][androidx.work.CoroutineWorker] and implement the abstract
+ * methods to define your specific synchronization behavior. The custom worker class can then be
+ * used to schedule periodic synchronization jobs using [Sync].
+ */
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
+
+  /** Returns the [FhirEngine] instance used for interacting with the local FHIR data store. */
   abstract fun getFhirEngine(): FhirEngine
 
+  /** Returns the [DownloadWorkManager] instance that manages the download process. */
   abstract fun getDownloadWorkManager(): DownloadWorkManager
 
+  /**
+   * Returns the [ConflictResolver] instance that defines how to handle conflicts between local and
+   * remote data during synchronization.
+   */
   abstract fun getConflictResolver(): ConflictResolver
 
+  /**
+   * Returns the [UploadStrategy] instance that defines how local changes are uploaded to the
+   * server.
+   */
   abstract fun getUploadStrategy(): UploadStrategy
 
   private val gson =
@@ -61,7 +78,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
 
-  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
+  /** Convenience API to stub [FhirSyncWorker] for testing. */
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
@@ -81,7 +98,11 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
         UploadConfiguration(
           Uploader(
             dataSource = dataSource,
-            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
+            patchGenerator =
+              PatchGeneratorFactory.byMode(
+                getUploadStrategy().patchGeneratorMode,
+                FhirEngineProvider.getFhirDatabase(applicationContext),
+              ),
             requestGenerator =
               UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
           ),

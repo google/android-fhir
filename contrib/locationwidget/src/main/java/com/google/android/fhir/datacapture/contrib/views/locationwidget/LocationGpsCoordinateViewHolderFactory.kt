@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.contrib.views.locationwidget
 
 import android.view.View
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
@@ -28,6 +29,7 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -67,11 +69,13 @@ object LocationGpsCoordinateViewHolderFactory :
               ) { _, bundleResult ->
                 val latitude =
                   bundleResult.getDouble(CurrentLocationDialogFragment.LATITUDE_REQUEST_RESULT_KEY)
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = DecimalType(latitude)
-                  },
-                )
+                lifecycleScope.launch {
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = DecimalType(latitude)
+                    },
+                  )
+                }
               }
             }
             GPS_COORDINATE_EXTENSION_VALUE_LONGITUDE -> {
@@ -81,11 +85,13 @@ object LocationGpsCoordinateViewHolderFactory :
               ) { _, bundleResult ->
                 val longitude =
                   bundleResult.getDouble(CurrentLocationDialogFragment.LONGITUDE_REQUEST_RESULT_KEY)
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = DecimalType(longitude)
-                  },
-                )
+                lifecycleScope.launch {
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = DecimalType(longitude)
+                    },
+                  )
+                }
               }
             }
             GPS_COORDINATE_EXTENSION_VALUE_ALTITUDE -> {
@@ -95,11 +101,13 @@ object LocationGpsCoordinateViewHolderFactory :
               ) { _, bundleResult ->
                 val altitude =
                   bundleResult.getDouble(CurrentLocationDialogFragment.ALTITUDE_REQUEST_RESULT_KEY)
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = DecimalType(altitude)
-                  },
-                )
+                lifecycleScope.launch {
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = DecimalType(altitude)
+                    },
+                  )
+                }
               }
             }
           }
