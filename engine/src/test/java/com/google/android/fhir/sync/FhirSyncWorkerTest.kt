@@ -38,7 +38,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(manifest = Config.NONE)
-class FhirSyncWorkerTest {
+internal class FhirSyncWorkerTest {
   private lateinit var context: Context
 
   class PassingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
