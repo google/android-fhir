@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.canonicalizeDatePattern
 import com.google.android.fhir.datacapture.extensions.dateEntryFormatOrSystemDefault
@@ -32,8 +34,6 @@ import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.parseDate
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
-import com.google.android.fhir.datacapture.validation.MaxValueValidator.getMaxValue
-import com.google.android.fhir.datacapture.validation.MinValueValidator.getMinValue
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -53,6 +53,7 @@ import java.time.format.DateTimeParseException
 import java.util.Date
 import kotlin.math.abs
 import kotlin.math.log10
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -60,6 +61,7 @@ internal object DatePickerViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.date_picker_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var textInputEditText: TextInputEditText
@@ -68,6 +70,7 @@ internal object DatePickerViewHolderFactory :
       private var textWatcher: TextWatcher? = null
 
       override fun init(itemView: View) {
+        context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
@@ -163,8 +166,8 @@ internal object DatePickerViewHolderFactory :
       }
 
       private fun getCalenderConstraint(): CalendarConstraints {
-        val min = (getMinValue(questionnaireViewItem.questionnaireItem) as? DateType)?.value?.time
-        val max = (getMaxValue(questionnaireViewItem.questionnaireItem) as? DateType)?.value?.time
+        val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
+        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
 
         if (min != null && max != null && min > max) {
           throw IllegalArgumentException("minValue cannot be greater than maxValue")
@@ -185,24 +188,28 @@ internal object DatePickerViewHolderFactory :
 
       /** Set the answer in the [QuestionnaireResponse]. */
       private fun setQuestionnaireItemViewItemAnswer(localDate: LocalDate) =
-        questionnaireViewItem.setAnswer(
-          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-            value = localDate.dateType
-          },
-        )
+        context.lifecycleScope.launch {
+          questionnaireViewItem.setAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = localDate.dateType
+            },
+          )
+        }
 
       /**
        * Each time the user types in a character, parse the string and if it can be parsed into a
        * date, set the answer in the [QuestionnaireResponse], otherwise, set the draft answer.
        */
       private fun parseDateOnTextChanged(dateToDisplay: String) =
-        try {
-          val localDate = parseDate(dateToDisplay, canonicalizedDatePattern)
-          setQuestionnaireItemViewItemAnswer(localDate)
-        } catch (e: ParseException) {
-          questionnaireViewItem.setDraftAnswer(dateToDisplay)
-        } catch (e: DateTimeParseException) {
-          questionnaireViewItem.setDraftAnswer(dateToDisplay)
+        context.lifecycleScope.launch {
+          try {
+            val localDate = parseDate(dateToDisplay, canonicalizedDatePattern)
+            setQuestionnaireItemViewItemAnswer(localDate)
+          } catch (e: ParseException) {
+            questionnaireViewItem.setDraftAnswer(dateToDisplay)
+          } catch (e: DateTimeParseException) {
+            questionnaireViewItem.setDraftAnswer(dateToDisplay)
+          }
         }
 
       private fun displayValidationResult(validationResult: ValidationResult) {

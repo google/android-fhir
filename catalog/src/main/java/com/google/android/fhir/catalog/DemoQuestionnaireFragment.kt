@@ -140,7 +140,13 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .apply {
+                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                    .LOCATION_WIDGET_PROVIDER,
+                )
+                setQuestionnaire(args.questionnaireJsonStringKey!!)
+              }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
@@ -211,11 +217,13 @@ class DemoQuestionnaireFragment : Fragment() {
     }
 
   private fun onSubmitQuestionnaireClick() {
-    val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    launchQuestionnaireResponseFragment(
-      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
-    )
+    lifecycleScope.launch {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
+      launchQuestionnaireResponseFragment(
+        viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
+      )
+    }
   }
 
   private fun launchQuestionnaireResponseFragment(response: String) {

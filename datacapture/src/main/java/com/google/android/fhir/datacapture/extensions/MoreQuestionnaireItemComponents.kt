@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import ca.uhn.fhir.util.UrlUtil
 import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.fhirpath.evaluateToDisplay
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.getLocalizedText
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -81,9 +83,6 @@ internal const val EXTENSION_CHOICE_ORIENTATION_URL =
 
 internal const val EXTENSION_CHOICE_COLUMN_URL: String =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn"
-
-internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
-  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"
 
 internal const val EXTENSION_DISPLAY_CATEGORY_URL =
   "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory"
@@ -183,13 +182,7 @@ val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
       ?.let { it.value as Expression }
   }
 
-/**
- * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
- * extension, or `null`.
- *
- * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
- */
-val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
   get() {
     val codeableConcept =
       this.extension
@@ -197,16 +190,23 @@ val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
           it.url == EXTENSION_ITEM_CONTROL_URL || it.url == EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR
         }
         ?.value as CodeableConcept?
-    val code =
-      codeableConcept
-        ?.coding
-        ?.firstOrNull {
-          it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
-            it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
-        }
-        ?.code
-    return ItemControlTypes.values().firstOrNull { it.extensionCode == code }
+    return codeableConcept
+      ?.coding
+      ?.firstOrNull {
+        it.system == EXTENSION_ITEM_CONTROL_SYSTEM ||
+          it.system == EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
+      }
+      ?.code
   }
+
+/**
+ * The [ItemControlTypes] of the questionnaire item if it is specified by the item control
+ * extension, or `null`.
+ *
+ * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
+ */
+val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+  get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
 
 /**
  * The desired orientation for the list of choices.
@@ -292,6 +292,18 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     }
     return null
   }
+
+internal val Questionnaire.QuestionnaireItemComponent.minValue
+  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value
+
+internal val Questionnaire.QuestionnaireItemComponent.minValueCqfCalculatedValueExpression
+  get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
+
+internal val Questionnaire.QuestionnaireItemComponent.maxValue
+  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value
+
+internal val Questionnaire.QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
+  get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
 //                                                                                                //
@@ -581,6 +593,12 @@ internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
     return this.extension
       .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
       .map { it.value as Coding }
+      .plus(
+        // https://build.fhir.org/ig/HL7/sdc/behavior.html#initial
+        // quantity given as initial without value is for default unit reference purpose
+        this.initial.map { it.valueQuantity.toCoding() },
+      )
+      .distinctBy { it.code }
   }
 
 // ********************************************************************************************** //
