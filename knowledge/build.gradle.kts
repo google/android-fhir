@@ -118,9 +118,9 @@ tasks.dokkaHtml.configure {
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Knowledge.artifactId)
+      moduleName.set(Releases.Knowledge.name)
       moduleVersion.set(Releases.Knowledge.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
