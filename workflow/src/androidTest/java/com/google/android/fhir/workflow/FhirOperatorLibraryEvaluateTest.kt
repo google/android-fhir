@@ -150,16 +150,7 @@ class FhirOperatorLibraryEvaluateTest {
           {
               "resourceType": "Location",
               "id": "nairobi-047",
-              "status": "active",
-              "name": "Nairobi mobile clinic",
-              "mode": "instance",
-              "physicalType": {
-                "coding": [ {
-                  "system": "http://terminology.hl7.org/CodeSystem/location-physical-type",
-                  "code": "bu",
-                  "display": "Nairobi mobile clinic"
-                } ]
-            }
+              "name": "Nairobi mobile clinic"
           }
         """
         .trimIndent()
