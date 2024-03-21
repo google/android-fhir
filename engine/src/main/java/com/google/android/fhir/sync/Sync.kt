@@ -281,6 +281,7 @@ object Sync {
       when (it) {
         is SyncJobStatus.Succeeded -> Succeeded(it.timestamp)
         is SyncJobStatus.Failed -> Failed(it.timestamp)
+        is SyncJobStatus.Cancelled -> Cancelled
         else -> error("Inconsistent terminal syncJobStatus : $syncJobStatusFromDataStore")
       }
     }
@@ -327,6 +328,7 @@ object Sync {
     when (syncJobStatusFromDataStore) {
       is SyncJobStatus.Succeeded -> Succeeded(syncJobStatusFromDataStore.timestamp)
       is SyncJobStatus.Failed -> Failed(syncJobStatusFromDataStore.timestamp)
+      is SyncJobStatus.Cancelled -> Cancelled
       else -> error("Inconsistent syncJobStatus in the dataStore : $syncJobStatusFromDataStore.")
     }
 
@@ -348,6 +350,7 @@ object Sync {
       when (it) {
         is SyncJobStatus.Succeeded -> LastSyncJobStatus.Succeeded(it.timestamp)
         is SyncJobStatus.Failed -> LastSyncJobStatus.Failed(lastSyncJobStatus.timestamp)
+        is SyncJobStatus.Cancelled -> LastSyncJobStatus.Cancelled(lastSyncJobStatus.timestamp)
         else -> error("Inconsistent terminal syncJobStatus : $lastSyncJobStatus")
       }
     }
