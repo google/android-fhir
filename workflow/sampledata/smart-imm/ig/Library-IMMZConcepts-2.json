@@ -1,0 +1,441 @@
+{
+   "library" : {
+      "annotation" : [ {
+         "translatorVersion" : "2.7.0",
+         "translatorOptions" : "EnableAnnotations,EnableLocators,DisableListDemotion,DisableListPromotion",
+         "type" : "CqlToElmInfo"
+      }, {
+         "type" : "Annotation",
+         "s" : {
+            "r" : "27",
+            "s" : [ {
+               "value" : [ "","library IMMZConcepts" ]
+            } ]
+         }
+      } ],
+      "identifier" : {
+         "id" : "IMMZConcepts",
+         "system" : "http://fhir.org/guides/who/smart-immunization"
+      },
+      "schemaIdentifier" : {
+         "id" : "urn:hl7-org:elm",
+         "version" : "r1"
+      },
+      "usings" : {
+         "def" : [ {
+            "localIdentifier" : "System",
+            "uri" : "urn:hl7-org:elm-types:r1"
+         } ]
+      },
+      "codeSystems" : {
+         "def" : [ {
+            "localId" : "1",
+            "locator" : "5:1-5:53",
+            "name" : "ICD-10",
+            "id" : "http://hl7.org/fhir/sid/icd-10",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "1",
+                  "s" : [ {
+                     "value" : [ "// Code Systems\n//Probably can delete these once imported WHOConcepts\n","codesystem ","\"ICD-10\"",": ","'http://hl7.org/fhir/sid/icd-10'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "2",
+            "locator" : "6:1-6:48",
+            "name" : "SNOMED-CT",
+            "id" : "http://snomed.info/sct",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "2",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"SNOMED-CT\"",": ","'http://snomed.info/sct'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "3",
+            "locator" : "7:1-7:38",
+            "name" : "LOINC",
+            "id" : "http://loinc.org",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "3",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"LOINC\"",": ","'http://loinc.org'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "4",
+            "locator" : "8:1-8:66",
+            "name" : "RxNorm",
+            "id" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "4",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"RxNorm\"",": ","'http://www.nlm.nih.gov/research/umls/rxnorm'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "5",
+            "locator" : "9:1-9:49",
+            "name" : "CIEL",
+            "id" : "http://hl7.org/fhir/sid/ciel",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "5",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"CIEL\"",": ","'http://hl7.org/fhir/sid/ciel'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "6",
+            "locator" : "10:1-10:53",
+            "name" : "ICD-11",
+            "id" : "http://hl7.org/fhir/sid/icd-11",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "6",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICD-11\"",": ","'http://hl7.org/fhir/sid/icd-11'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "7",
+            "locator" : "11:1-11:77",
+            "name" : "ICHI",
+            "id" : "https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "7",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICHI\"",": ","'https://mitel.dimi.uniud.it/ichi/#http://id.who.int/ichi'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "8",
+            "locator" : "12:1-12:50",
+            "name" : "ICF",
+            "id" : "http://hl7.org/fhir/sid/icf-nl",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "8",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"ICF\"",": ","'http://hl7.org/fhir/sid/icf-nl'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "9",
+            "locator" : "13:1-13:110",
+            "name" : "Extended Codes CodeSystem codes",
+            "id" : "http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "9",
+                  "s" : [ {
+                     "value" : [ "","codesystem ","\"Extended Codes CodeSystem codes\"",": ","'http://fhir.org/guides/who/anc-cds/CodeSystem/anc-custom-codes'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "valueSets" : {
+         "def" : [ {
+            "localId" : "10",
+            "locator" : "16:1-16:71",
+            "name" : "WHO ATC",
+            "id" : "http://hl7.org/fhir/uv/ips/ValueSet/whoatc-uv-ips",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "10",
+                  "s" : [ {
+                     "value" : [ "//WHO ATC IPS Valueset\n","valueset ","\"WHO ATC\"",": ","'http://hl7.org/fhir/uv/ips/ValueSet/whoatc-uv-ips'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "11",
+            "locator" : "19:1-19:110",
+            "name" : "Negative Result",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/Negativetestresult-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "11",
+                  "s" : [ {
+                     "value" : [ "// General use ValueSets\n","valueset ","\"Negative Result\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/Negativetestresult-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "12",
+            "locator" : "20:1-20:110",
+            "name" : "Positive Result",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/PositiveTestResult-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "12",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Positive Result\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/PositiveTestResult-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "13",
+            "locator" : "21:1-21:111",
+            "name" : "Immunocompromised",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/Immunocompromised-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "13",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Immunocompromised\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/Immunocompromised-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "14",
+            "locator" : "22:1-22:126",
+            "name" : "Patient birth weight observation value",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/Birthweight-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "14",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Patient birth weight observation value\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/Birthweight-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "15",
+            "locator" : "23:1-23:96",
+            "name" : "PretermBirth",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/Preterm-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "15",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"PretermBirth\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/Preterm-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "16",
+            "locator" : "24:1-24:108",
+            "name" : "Live Attenuated",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/LiveAttenduatedVaccines",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "16",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Live Attenuated\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/LiveAttenduatedVaccines'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "17",
+            "locator" : "28:1-28:96",
+            "name" : "HIV status",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/HIVstatus-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "17",
+                  "s" : [ {
+                     "value" : [ "//valueset \"Target Disease\": 'http://hl7.org/fhir/ValueSet/immunization-target-disease'\n","valueset ","\"HIV status\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/HIVstatus-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "18",
+            "locator" : "29:1-29:103",
+            "name" : "HIV status - HIV positive Choices",
+            "id" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de46",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "18",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"HIV status - HIV positive Choices\"",": ","'http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de46'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "19",
+            "locator" : "30:1-30:103",
+            "name" : "HIV status - HIV negative Choices",
+            "id" : "http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de47",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "19",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"HIV status - HIV negative Choices\"",": ","'http://fhir.org/guides/who/anc-cds/ValueSet/anc-b9-de47'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "20",
+            "locator" : "32:1-32:94",
+            "name" : "ARV Drugs",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/ARVDrugs-values",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "20",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"ARV Drugs\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/ARVDrugs-values'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "21",
+            "locator" : "36:1-36:92",
+            "name" : "MCV Vaccine",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE9",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "21",
+                  "s" : [ {
+                     "value" : [ "// Vaccine Value Sets\n","valueset ","\"MCV Vaccine\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE9'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "22",
+            "locator" : "39:1-39:92",
+            "name" : "BCG Vaccine",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE1",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "22",
+                  "s" : [ {
+                     "value" : [ "// Plugin is complaining about not finding these so that should be resolved, but here until it can be fixed\n","valueset ","\"BCG Vaccine\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE1'" ]
+                  } ]
+               }
+            } ]
+         }, {
+            "localId" : "23",
+            "locator" : "40:1-40:96",
+            "name" : "Cholera Vaccine",
+            "id" : "http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE2",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "23",
+                  "s" : [ {
+                     "value" : [ "","valueset ","\"Cholera Vaccine\"",": ","'http://fhir.org/guides/who/smart-immunization/ValueSet/IMMZ.A1.DE2'" ]
+                  } ]
+               }
+            } ]
+         } ]
+      },
+      "codes" : {
+         "def" : [ {
+            "localId" : "25",
+            "locator" : "44:1-44:90",
+            "name" : "Adverse Event Severity",
+            "id" : "246112005",
+            "display" : "Severity (attribute)",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "25",
+                  "s" : [ {
+                     "value" : [ "","code ","\"Adverse Event Severity\"",": ","'246112005'"," from " ]
+                  }, {
+                     "r" : "24",
+                     "s" : [ {
+                        "value" : [ "\"SNOMED-CT\"" ]
+                     } ]
+                  }, {
+                     "value" : [ " display ","'Severity (attribute)'" ]
+                  } ]
+               }
+            } ],
+            "codeSystem" : {
+               "localId" : "24",
+               "locator" : "44:49-44:59",
+               "name" : "SNOMED-CT"
+            }
+         }, {
+            "localId" : "27",
+            "locator" : "45:1-45:95",
+            "name" : "Adverse Event Manifestation",
+            "id" : "246112005",
+            "display" : "Severity (attribute)",
+            "accessLevel" : "Public",
+            "annotation" : [ {
+               "type" : "Annotation",
+               "s" : {
+                  "r" : "27",
+                  "s" : [ {
+                     "value" : [ "","code ","\"Adverse Event Manifestation\"",": ","'246112005'"," from " ]
+                  }, {
+                     "r" : "26",
+                     "s" : [ {
+                        "value" : [ "\"SNOMED-CT\"" ]
+                     } ]
+                  }, {
+                     "value" : [ " display ","'Severity (attribute)'" ]
+                  } ]
+               }
+            } ],
+            "codeSystem" : {
+               "localId" : "26",
+               "locator" : "45:54-45:64",
+               "name" : "SNOMED-CT"
+            }
+         } ]
+      }
+   }
+}
