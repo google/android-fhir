@@ -23,6 +23,9 @@ object Dependencies {
   object Androidx {
     const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
     const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
+    const val camera = "androidx.camera:camera-camera2:${Versions.Androidx.camera}"
+    const val cameraLifecycle =
+      "androidx.camera:camera-lifecycle:${Versions.Androidx.cameraLifecycle}"
     const val constraintLayout =
       "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.Androidx.coreKtx}"
@@ -231,6 +234,8 @@ object Dependencies {
     object Androidx {
       const val activity = "1.7.2"
       const val appCompat = "1.6.1"
+      const val camera = "1.3.1"
+      const val cameraLifecycle = "1.3.1"
       const val constraintLayout = "2.1.4"
       const val coreKtx = "1.10.1"
       const val datastorePref = "1.0.0"
@@ -288,6 +293,7 @@ object Dependencies {
 
     const val zxing = "3.4.1"
     const val nimbus = "9.31"
+    const val vision = "20.1.3"
 
     // Test dependencies
     object AndroidxTest {
