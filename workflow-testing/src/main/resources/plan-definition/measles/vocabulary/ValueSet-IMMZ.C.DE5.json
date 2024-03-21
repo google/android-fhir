@@ -1,0 +1,50 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "IMMZ.C.DE5",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"CodeSystem-IMMZ.C.html\"><code>http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"CodeSystem-IMMZ.C.html#IMMZ.C-DE6\">DE6</a></td><td>Male</td><td>Client's biological sex is male</td></tr><tr><td><a href=\"CodeSystem-IMMZ.C.html#IMMZ.C-DE7\">DE7</a></td><td>Female</td><td>Client's biological sex is female</td></tr><tr><td><a href=\"CodeSystem-IMMZ.C.html#IMMZ.C-DE8\">DE8</a></td><td>Biological sex not specified</td><td>Client's biological sex is not specified</td></tr><tr><td><a href=\"CodeSystem-IMMZ.C.html#IMMZ.C-DE9\">DE9</a></td><td>Intersex</td><td>Client's biological sex is intersex</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://smart.who.int/ig/smart-immunizations/ValueSet/IMMZ.C.DE5",
+  "version" : "0.1.0",
+  "name" : "IMMZ_C_DE5",
+  "title" : "IMMZ.C.DE5 ValueSet for Sex",
+  "status" : "active",
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "ValueSet for Sex for IMMZ.C.DE5.",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "compose" : {
+    "include" : [{
+      "system" : "http://smart.who.int/ig/smart-immunizations/CodeSystem/IMMZ.C",
+      "concept" : [{
+        "code" : "DE6",
+        "display" : "Male"
+      },
+      {
+        "code" : "DE7",
+        "display" : "Female"
+      },
+      {
+        "code" : "DE8",
+        "display" : "Biological sex not specified"
+      },
+      {
+        "code" : "DE9",
+        "display" : "Intersex"
+      }]
+    }]
+  }
+}

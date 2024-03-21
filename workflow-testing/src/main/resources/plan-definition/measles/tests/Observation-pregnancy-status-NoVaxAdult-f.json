@@ -1,0 +1,32 @@
+{
+  "resourceType": "Observation",
+  "id": "pregnancy-status-NoVaxAdult-f",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Observation-pregnancy-status-uv-ips"
+    ]
+  },
+  "code": {
+    "coding": [
+      {
+        "code": "82810-3",
+        "system": "http://loinc.org",
+        "display": "Pregnancy status"
+      }
+    ]
+  },
+  "status": "final",
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxAdult-f"
+  },
+  "effectiveDateTime": "2020-01-10",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "code": "LA15173-0",
+        "system": "http://loinc.org",
+        "display": "Pregnant"
+      }
+    ]
+  }
+}

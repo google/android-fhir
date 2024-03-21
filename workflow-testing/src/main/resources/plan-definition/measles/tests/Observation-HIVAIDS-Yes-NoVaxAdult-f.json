@@ -1,0 +1,27 @@
+{
+  "resourceType": "Observation",
+  "id": "HIVAIDS-Yes-NoVaxAdult-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "278977008",
+        "system": "http://snomed.info/sct",
+        "display": "Human immunodeficiency virus status (observable entity)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxAdult-f"
+  },
+  "effectiveDateTime": "2020-05-27",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "code": "10828004",
+        "system": "http://snomed.info/sct",
+        "display": "Positive (qualifier value)"
+      }
+    ]
+  }
+}

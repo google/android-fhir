@@ -1,0 +1,27 @@
+{
+  "resourceType": "Observation",
+  "id": "preterm-eninfant-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "302080006",
+        "system": "http://snomed.info/sct",
+        "display": "Finding of birth outcome (finding)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-eninfant-f"
+  },
+  "effectiveDateTime": "2022-04-28",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "code": "367494004",
+        "system": "http://snomed.info/sct",
+        "display": "Premature birth of newborn (finding)"
+      }
+    ]
+  }
+}

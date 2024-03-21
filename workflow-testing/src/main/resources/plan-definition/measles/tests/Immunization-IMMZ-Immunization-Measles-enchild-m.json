@@ -1,0 +1,44 @@
+{
+  "resourceType": "Immunization",
+  "id": "IMMZ-Immunization-Measles-enchild-m",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Immunization-uv-ips"
+    ]
+  },
+  "status": "completed",
+  "vaccineCode": {
+    "coding": [
+      {
+        "code": "440075005",
+        "system": "http://snomed.info/sct",
+        "display": "Live measles + rubella vaccine injection dose form (product)"
+      }
+    ]
+  },
+  "expirationDate": "2024-06-30",
+  "lotNumber": "123",
+  "patient": {
+    "reference": "Patient/IMMZ-Patient-enchild-m"
+  },
+  "location": {
+    "display": "Vaccination Site"
+  },
+  "occurrenceDateTime": "2021-09-03",
+  "performer": [
+    {
+      "actor": {
+        "reference": "Organization/IMMZ-Organization-enchild-m"
+      }
+    }
+  ],
+  "protocolApplied": [
+    {
+      "authority": {
+        "reference": "Organization/IMMZ-Organization-enchild-m"
+      },
+      "doseNumberPositiveInt": 1,
+      "seriesDosesPositiveInt": 1
+    }
+  ]
+}

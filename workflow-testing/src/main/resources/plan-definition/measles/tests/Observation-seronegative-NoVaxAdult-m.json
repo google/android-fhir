@@ -1,0 +1,27 @@
+{
+  "resourceType": "Observation",
+  "id": "seronegative-NoVaxAdult-m",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "68793005",
+        "system": "http://snomed.info/sct",
+        "display": "Serologic test (procedure)"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-NoVaxAdult-m"
+  },
+  "effectiveDateTime": "2022-03-01",
+  "valueCodeableConcept": {
+    "coding": [
+      {
+        "code": "81321002",
+        "system": "http://snomed.info/sct",
+        "display": "Seronegative (qualifier value)"
+      }
+    ]
+  }
+}

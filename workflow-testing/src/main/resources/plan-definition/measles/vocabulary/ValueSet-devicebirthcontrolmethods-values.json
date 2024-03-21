@@ -1,0 +1,144 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "devicebirthcontrolmethods-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/169450001\">169450001</a></td><td>No Device-based method</td></tr><tr><td><a href=\"http://snomed.info/id/449038007\">449038007</a></td><td>Levonorgestrel IUD (LNG-IUD)</td></tr><tr><td><a href=\"http://snomed.info/id/448962006\">448962006</a></td><td>Copper-bearing intrauterine device (Cu-IUD)</td></tr><tr><td><a href=\"http://snomed.info/id/312081001\">312081001</a></td><td>Unspecified IUD</td></tr><tr><td><a href=\"http://snomed.info/id/428987008\">428987008</a></td><td>Implant</td></tr><tr><td><a href=\"http://snomed.info/id/396050000\">396050000</a></td><td>Etonogestrel (ETG) one-rod implant</td></tr><tr><td><a href=\"http://snomed.info/id/450881000124106\">450881000124106</a></td><td>Combined contraceptive patch</td></tr><tr><td><a href=\"http://snomed.info/id/702680002\">702680002</a></td><td>Combined contraceptive vaginal ring (CVR)</td></tr><tr><td><a href=\"http://snomed.info/id/225370004\">225370004</a></td><td>Barrier method</td></tr><tr><td><a href=\"http://snomed.info/id/275831001\">275831001</a></td><td>Male condom</td></tr><tr><td><a href=\"http://snomed.info/id/228479001\">228479001</a></td><td>Female condom</td></tr></table></li><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/LA27902-8/\">LA27902-8</a></td><td>Levonorgestrel IUD (LNG-IUD)</td></tr><tr><td><a href=\"https://loinc.org/LA27903-6/\">LA27903-6</a></td><td>Copper-bearing intrauterine device (Cu-IUD)</td></tr><tr><td><a href=\"https://loinc.org/LA27904-4/\">LA27904-4</a></td><td>Unspecified IUD</td></tr><tr><td><a href=\"https://loinc.org/LA27901-0/\">LA27901-0</a></td><td>Implant</td></tr><tr><td><a href=\"https://loinc.org/LA16581-3/\">LA16581-3</a></td><td>Combined contraceptive patch</td></tr><tr><td><a href=\"https://loinc.org/LA14546-8/\">LA14546-8</a></td><td>Combined contraceptive vaginal ring (CVR)</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.nlm.nih.gov/research/umls/rxnorm\"><code>http://www.nlm.nih.gov/research/umls/rxnorm</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>3127785</td><td>Levonorgestrel IUD (LNG-IUD)</td></tr><tr><td>393401</td><td>Etonogestrel (ETG) one-rod implant</td></tr><tr><td>646249</td><td>Etonogestrel (ETG) one-rod implant</td></tr><tr><td>710529</td><td>Combined contraceptive vaginal ring (CVR)</td></tr><tr><td>2109022</td><td>Progesterone-releasing vaginal ring (PVR)</td></tr></table></li><li>Include these codes as defined in <code>http://who.int/cg/CodeSystem/extended-content</code><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>Levonorgestrel (LNG) two-rod implant</td><td>Levonorgestrel (LNG) two-rod implant</td></tr></table></li><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-icd10.html\"><code>http://hl7.org/fhir/sid/icd-10</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>Z30.49</td><td>Female condom</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/devicebirthcontrolmethods-values",
+  "version" : "0.1.0",
+  "name" : "devicebirthcontrolmethods-values",
+  "title" : "Contraceptive history - Device-based values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Contraceptive history - Device-based element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "169450001",
+        "display" : "No Device-based method"
+      },
+      {
+        "code" : "449038007",
+        "display" : "Levonorgestrel IUD (LNG-IUD)"
+      },
+      {
+        "code" : "448962006",
+        "display" : "Copper-bearing intrauterine device (Cu-IUD)"
+      },
+      {
+        "code" : "312081001",
+        "display" : "Unspecified IUD"
+      },
+      {
+        "code" : "428987008",
+        "display" : "Implant"
+      },
+      {
+        "code" : "396050000",
+        "display" : "Etonogestrel (ETG) one-rod implant"
+      },
+      {
+        "code" : "450881000124106",
+        "display" : "Combined contraceptive patch"
+      },
+      {
+        "code" : "702680002",
+        "display" : "Combined contraceptive vaginal ring (CVR)"
+      },
+      {
+        "code" : "225370004",
+        "display" : "Barrier method"
+      },
+      {
+        "code" : "275831001",
+        "display" : "Male condom"
+      },
+      {
+        "code" : "228479001",
+        "display" : "Female condom"
+      }]
+    },
+    {
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "LA27902-8",
+        "display" : "Levonorgestrel IUD (LNG-IUD)"
+      },
+      {
+        "code" : "LA27903-6",
+        "display" : "Copper-bearing intrauterine device (Cu-IUD)"
+      },
+      {
+        "code" : "LA27904-4",
+        "display" : "Unspecified IUD"
+      },
+      {
+        "code" : "LA27901-0",
+        "display" : "Implant"
+      },
+      {
+        "code" : "LA16581-3",
+        "display" : "Combined contraceptive patch"
+      },
+      {
+        "code" : "LA14546-8",
+        "display" : "Combined contraceptive vaginal ring (CVR)"
+      }]
+    },
+    {
+      "system" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "concept" : [{
+        "code" : "3127785",
+        "display" : "Levonorgestrel IUD (LNG-IUD)"
+      },
+      {
+        "code" : "393401",
+        "display" : "Etonogestrel (ETG) one-rod implant"
+      },
+      {
+        "code" : "646249",
+        "display" : "Etonogestrel (ETG) one-rod implant"
+      },
+      {
+        "code" : "710529",
+        "display" : "Combined contraceptive vaginal ring (CVR)"
+      },
+      {
+        "code" : "2109022",
+        "display" : "Progesterone-releasing vaginal ring (PVR)"
+      }]
+    },
+    {
+      "system" : "http://who.int/cg/CodeSystem/extended-content",
+      "concept" : [{
+        "code" : "Levonorgestrel (LNG) two-rod implant",
+        "display" : "Levonorgestrel (LNG) two-rod implant"
+      }]
+    },
+    {
+      "system" : "http://hl7.org/fhir/sid/icd-10",
+      "concept" : [{
+        "code" : "Z30.49",
+        "display" : "Female condom"
+      }]
+    }]
+  }
+}

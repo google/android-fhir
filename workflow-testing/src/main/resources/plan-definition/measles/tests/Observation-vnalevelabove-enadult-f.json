@@ -1,0 +1,24 @@
+{
+  "resourceType": "Observation",
+  "id": "vnalevelabove-enadult-f",
+  "status": "final",
+  "code": {
+    "coding": [
+      {
+        "code": "6524-3",
+        "system": "http://loinc.org",
+        "display": "Rabies virus neutralizing antibody [Units/volume] in Serum by Neutralization test"
+      }
+    ]
+  },
+  "subject": {
+    "reference": "Patient/IMMZ-Patient-enadult-f"
+  },
+  "effectiveDateTime": "2022-02-02",
+  "valueQuantity": {
+    "value": 0.7,
+    "code": "IU/mL",
+    "system": "http://unitsofmeasure.org",
+    "unit": "international unit/milliliter"
+  }
+}
