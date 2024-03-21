@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -116,7 +116,7 @@ class ResourceMapperInstrumentedTest {
     val dateTimeType =
       patient
         .getExtensionByUrl(
-          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime",
+          "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
         )
         .value as DateTimeType
     val expectedDateTimeType = DateTimeType("2022-02-07T13:28:17-05:00")
@@ -138,7 +138,7 @@ class ResourceMapperInstrumentedTest {
     assertThat(patient).isNotNull()
     assertThat(
         patient.getExtensionByUrl(
-          "http://fhir.org/guides/who/core/StructureDefinition/who-patient#Patient.birthTime",
+          "http://hl7.org/fhir/StructureDefinition/patient-birthTime",
         ),
       )
       .isEqualTo(null)
