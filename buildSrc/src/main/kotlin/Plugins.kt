@@ -47,7 +47,7 @@ object Plugins {
   object Versions {
     const val androidGradlePlugin = "8.0.2"
     const val benchmarkPlugin = "1.1.0"
-    const val dokka = "1.7.20"
+    const val dokka = "1.9.20"
     const val kspPlugin = "1.9.22-1.0.18"
   }
 }
