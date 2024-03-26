@@ -44,17 +44,14 @@ import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Task
 
-
 // Known issues:
 // 1. RECOMMEND_IMMUNIZATION CGPActivity activity says its based on
-//  [MedicationRequest](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order)
+//
+// [MedicationRequest](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order)
 // but the examples have
-//[ImmunizationRecommendation](https://hl7.org/fhir/uv/cpg/ActivityDefinition-activity-example-recommendimmunization.json.html).
+// [ImmunizationRecommendation](https://hl7.org/fhir/uv/cpg/ActivityDefinition-activity-example-recommendimmunization.json.html).
 
-
-/**
- * Logical model for the Request resources as per the Clinical Practice Guidelines.
- */
+/** Logical model for the Request resources as per the Clinical Practice Guidelines. */
 internal open class Request<R : Resource>(val resource: R) {
 
   val intent: Intent
@@ -65,11 +62,11 @@ internal open class Request<R : Resource>(val resource: R) {
         is CommunicationRequest -> {
           // TODO: CommunicationRequest has no intent field
 
-//          RequestIntent
-          resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent")?.let {
-            Intent.of((it.value.primitiveValue()))
-          } ?:
-          Intent.PROPOSAL
+          //          RequestIntent
+          resource
+            .getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent")
+            ?.let { Intent.of((it.value.primitiveValue())) }
+            ?: Intent.PROPOSAL
           // Intent.of(request.intent.toCode())
         }
 
@@ -203,17 +200,17 @@ internal open class Request<R : Resource>(val resource: R) {
 
   fun copy(id: String, status: Status, intent: Intent): Request<Resource> {
     val parent = this
-    return Request(parent.resource.copy()).apply {
-      resource.idElement = IdType.of(resource).setValue(id)
-      setStatus(status)
-      setIntent(intent)
-      setBasedOn(Reference("${parent.resource.resourceType}/${parent.resource.logicalId}"))
-    }.also {
-      println(" Request-created ${it.resource.id}   ${it.getBasedOn()!!.reference}")
-    }
+    return Request(parent.resource.copy())
+      .apply {
+        resource.idElement = IdType.of(resource).setValue(id)
+        setStatus(status)
+        setIntent(intent)
+        setBasedOn(Reference("${parent.resource.resourceType}/${parent.resource.logicalId}"))
+      }
+      .also { println(" Request-created ${it.resource.id}   ${it.getBasedOn()!!.reference}") }
   }
 
-   fun setStatus(status: Status) {
+  fun setStatus(status: Status) {
     when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
@@ -247,15 +244,20 @@ internal open class Request<R : Resource>(val resource: R) {
     }
   }
 
-   fun setIntent(intent: Intent) {
+  fun setIntent(intent: Intent) {
     when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
         // TODO: Check what to do here
         if (resource.hasExtension("http://hl7.org/fhir/StructureDefinition/request-intent")) {
-          resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent").setValue(StringType(intent.code))
+          resource
+            .getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent")
+            .setValue(StringType(intent.code))
         } else {
-          resource.addExtension("http://hl7.org/fhir/StructureDefinition/request-intent", StringType(intent.code))
+          resource.addExtension(
+            "http://hl7.org/fhir/StructureDefinition/request-intent",
+            StringType(intent.code),
+          )
         }
       }
 
@@ -320,8 +322,8 @@ internal open class Request<R : Resource>(val resource: R) {
     }
   }
 
-   fun getBasedOn() : Reference?{
-   return when (resource) {
+  fun getBasedOn(): Reference? {
+    return when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
         resource.basedOn.lastOrNull()
@@ -351,16 +353,17 @@ internal open class Request<R : Resource>(val resource: R) {
       is ServiceRequest -> {
         resource.basedOn.lastOrNull()
       }
-
-     else -> {null}
-   }
+      else -> {
+        null
+      }
+    }
   }
 
   suspend fun createEventResource(fhirEngine: FhirEngine): Event<Resource> {
     // This needs to be filled
     lateinit var activity: CPGActivity
-    if ( 1 != 0) {
-      activity =  CPGActivity.SEND_MESSAGE
+    if (1 != 0) {
+      activity = CPGActivity.SEND_MESSAGE
     }
     val event =
       when (activity) {
@@ -381,7 +384,6 @@ internal open class Request<R : Resource>(val resource: R) {
             }
           }
         }
-
         CPGActivity.COLLECT_INFORMATION -> {
           QuestionnaireResponse().apply {
             id = UUID.randomUUID().toString()
@@ -392,7 +394,6 @@ internal open class Request<R : Resource>(val resource: R) {
             }
           }
         }
-
         CPGActivity.ORDER_MEDICATION -> {
           // The values here will come from MedicationRequest.
           MedicationDispense().apply {
@@ -476,7 +477,8 @@ internal open class Request<R : Resource>(val resource: R) {
               //            }
               //            }
               //            ]
-              val medicationRequestReference = this@Request.resource.input.first().value as Reference
+              val medicationRequestReference =
+                this@Request.resource.input.first().value as Reference
               fhirEngine.search(medicationRequestReference.reference).first().resource.let { r ->
                 if (r is MedicationRequest) {
                   subject = r.subject
@@ -578,5 +580,5 @@ internal open class Request<R : Resource>(val resource: R) {
     return Event(event)
   }
 
-  fun asReference()  = Reference("${resource.resourceType}/${resource.logicalId}")
+  fun asReference() = Reference("${resource.resourceType}/${resource.logicalId}")
 }

@@ -32,9 +32,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
-/**
- * Logical model for the event resources as per the Clinical Practice Guidelines.
- */
+/** Logical model for the event resources as per the Clinical Practice Guidelines. */
 internal class Event<R : Resource>(val resource: R) {
 
   /**
@@ -51,23 +49,25 @@ internal class Event<R : Resource>(val resource: R) {
     STOPPED("stopped"),
     DECLINED("decline"),
     UNKNOWN("unknown"),
-    NULL("null");
+    NULL("null"),
+    ;
 
     companion object {
 
-     fun of (code: String) = when (code) {
-       "preparation" -> PREPARATION
-         "in-progress" -> INPROGRESS
-         "not-done" -> CANCELLED
-         "on-hold" ->ONHOLD
-         "completed" -> COMPLETED
-         "entered-in-error" -> ENTEREDINERROR
-         "stopped" -> STOPPED
-         "decline" -> DECLINED
-         "unknown" -> UNKNOWN
-         "null" ->  NULL
-         else -> UNKNOWN
-     }
+      fun of(code: String) =
+        when (code) {
+          "preparation" -> PREPARATION
+          "in-progress" -> INPROGRESS
+          "not-done" -> CANCELLED
+          "on-hold" -> ONHOLD
+          "completed" -> COMPLETED
+          "entered-in-error" -> ENTEREDINERROR
+          "stopped" -> STOPPED
+          "decline" -> DECLINED
+          "unknown" -> UNKNOWN
+          "null" -> NULL
+          else -> UNKNOWN
+        }
     }
   }
 
@@ -145,7 +145,6 @@ internal class Event<R : Resource>(val resource: R) {
       // SEND_MESSAGE
       is Communication -> {
         Status.of(resource.status.toCode())
-
       }
       // COLLECT_INFORMATION
       is QuestionnaireResponse -> {
@@ -207,12 +206,13 @@ internal class Event<R : Resource>(val resource: R) {
       is Flag -> {
         Status.of(resource.status.toCode())
       }
-      else -> {Status.NULL}
+      else -> {
+        Status.NULL
+      }
     }
   }
 
-
-  fun getBasedOn() : Reference? {
+  fun getBasedOn(): Reference? {
     return when (resource) {
       // SEND_MESSAGE
       is Communication -> {
@@ -287,8 +287,9 @@ internal class Event<R : Resource>(val resource: R) {
         //        resource.addBasedOn(Reference(basedOn.request))
         null
       }
-
-      else -> { null}
+      else -> {
+        null
+      }
     }
   }
 
@@ -336,15 +337,18 @@ internal class Event<R : Resource>(val resource: R) {
       }
       // GENERATE_REPORT
       is Composition -> {
-        if (resource.hasExtension(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")) {
+        if (
+          resource.hasExtension(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")
+        ) {
           resource
             .getExtensionByUrl(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")
             .setValue(basedOn.asReference())
         } else {
-          resource
-            .addExtension(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor", basedOn.asReference())
+          resource.addExtension(
+            " http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor",
+            basedOn.asReference(),
+          )
         }
-
       }
       // PROPOSE_DIAGNOSIS
       is Condition -> {

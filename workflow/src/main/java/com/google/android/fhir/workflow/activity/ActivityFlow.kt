@@ -34,7 +34,6 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
    *
    * val plan = ActivityFlow.with(fhirEngine).plan("CommunicationRequest/12345")
    */
-
   suspend fun startPlan(proposalId: String): Resource {
     val searchQuery = proposalId.split("/").joinToString("?_id=")
     val request = fhirEngine.search(searchQuery).first().resource
@@ -42,15 +41,13 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   }
 
   suspend fun startPlan(proposal: Resource): Resource {
-
-
-//    check inputProposal.intent = proposal
-//      check inputProposal.status = active
-//    var result = new Request(copy from inputProposal)
-//    set result.id = null
-//    set result.intent = plan
-//      set result.status = draft
-//      set result.basedOn = referenceTo(inputProposal)
+    //    check inputProposal.intent = proposal
+    //      check inputProposal.status = active
+    //    var result = new Request(copy from inputProposal)
+    //    set result.id = null
+    //    set result.intent = plan
+    //      set result.status = draft
+    //      set result.basedOn = referenceTo(inputProposal)
 
     val inputProposal = Request(proposal)
 
@@ -75,14 +72,11 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   suspend fun endPlan(plan: Resource) {
     val inputPlan = Request(plan)
     val basedOn = inputPlan.getBasedOn()
-    check(basedOn != null) {
-      "${plan.resourceType}.basedOn shouldn't be null"
-    }
+    check(basedOn != null) { "${plan.resourceType}.basedOn shouldn't be null" }
 
-    val basedOnProposal = fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
-    check(basedOnProposal != null) {
-      "Couldn't find ${basedOn.searchByIdQuery} in the database."
-    }
+    val basedOnProposal =
+      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+    check(basedOnProposal != null) { "Couldn't find ${basedOn.searchByIdQuery} in the database." }
 
     check(basedOnProposal.intent == Request.Intent.PROPOSAL) {
       "Proposal is still in ${basedOnProposal.intent} state."
@@ -109,6 +103,7 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   /**
    * Given an active proposal or plan, order the proposal The plan is authorized by an appropriately
    * qualified user, resulting in an order to perform (or not perform) the activity.
+   *
    * ```
    * val order = ActivityFlow.with(fhirEngine).order("CommunicationRequest/6789")
    * ```
@@ -120,13 +115,16 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   }
 
   suspend fun startOrder(request: Resource): Resource {
-
     val inputRequest = Request(request)
-    check(inputRequest.intent == Request.Intent.PROPOSAL || inputRequest.intent == Request.Intent.PLAN) {
+    check(
+      inputRequest.intent == Request.Intent.PROPOSAL || inputRequest.intent == Request.Intent.PLAN,
+    ) {
       "Plan is still in ${inputRequest.intent} state."
     }
 
-    check(inputRequest.status == Request.Status.ACTIVE) { "Plan is still in ${inputRequest.status} status." }
+    check(inputRequest.status == Request.Status.ACTIVE) {
+      "Plan is still in ${inputRequest.status} status."
+    }
 
     val order =
       inputRequest.copy(
@@ -138,32 +136,30 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   }
 
   suspend fun endOrder(order: Resource) {
-//    check inputOrder.basedOn is not null
-//    var basedOn = engine.get(inputOrder.basedOn)
-//    check basedOn.intent in { proposal | plan }
-//    check basedOn.status = active
-//      check inputOrder.status in { draft | active }
-//    check inputOrder.intent = order
-//      set basedOn.status = completed
-//      try
-//        engine.save(inputOrder)
-//        engine.save(basedOn)
-//        commit
-
+    //    check inputOrder.basedOn is not null
+    //    var basedOn = engine.get(inputOrder.basedOn)
+    //    check basedOn.intent in { proposal | plan }
+    //    check basedOn.status = active
+    //      check inputOrder.status in { draft | active }
+    //    check inputOrder.intent = order
+    //      set basedOn.status = completed
+    //      try
+    //        engine.save(inputOrder)
+    //        engine.save(basedOn)
+    //        commit
 
     val inputOrder = Request(order)
     val basedOn = inputOrder.getBasedOn()
-    check(basedOn != null) {
-      "${order.resourceType}.basedOn shouldn't be null"
-    }
+    check(basedOn != null) { "${order.resourceType}.basedOn shouldn't be null" }
 
-    val basedOnResource = fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
-    check(basedOnResource != null) {
-      "Couldn't find $basedOn in the database."
-    }
+    val basedOnResource =
+      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+    check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
-
-    check(basedOnResource.intent == Request.Intent.PROPOSAL || basedOnResource.intent == Request.Intent.PLAN) {
+    check(
+      basedOnResource.intent == Request.Intent.PROPOSAL ||
+        basedOnResource.intent == Request.Intent.PLAN,
+    ) {
       "Proposal is still in ${basedOnResource.intent} state."
     }
 
@@ -206,17 +202,13 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
   }
 
   suspend fun endPerform(event: Resource) {
-
     val inputEvent = Event(event)
     val basedOn = inputEvent.getBasedOn()
-    check(basedOn != null) {
-      "${event.resourceType}.basedOn shouldn't be null"
-    }
+    check(basedOn != null) { "${event.resourceType}.basedOn shouldn't be null" }
 
-    val basedOnResource = fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
-    check(basedOnResource != null) {
-      "Couldn't find $basedOn in the database."
-    }
+    val basedOnResource =
+      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+    check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
     check(basedOnResource.intent == Request.Intent.ORDER) {
       "Proposal is still in ${basedOnResource.intent} state."
@@ -226,7 +218,10 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
       "Proposal is still in ${basedOnResource.status} status."
     }
 
-    check(inputEvent.getStatus() == Event.Status.PREPARATION || inputEvent.getStatus() == Event.Status.INPROGRESS) {
+    check(
+      inputEvent.getStatus() == Event.Status.PREPARATION ||
+        inputEvent.getStatus() == Event.Status.INPROGRESS,
+    ) {
       "Proposal is still in ${basedOnResource.status} status."
     }
 
@@ -234,7 +229,6 @@ class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
 
     fhirEngine.create(inputEvent.resource)
     fhirEngine.update(basedOnResource.resource)
-
   }
 
   companion object {

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.workflow.activity
 
 import android.content.Context
@@ -21,10 +37,8 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class ActivityFlowTest {
 
-  @get:Rule
-  val fhirEngineProviderRule = FhirEngineProviderTestRule()
+  @get:Rule val fhirEngineProviderRule = FhirEngineProviderTestRule()
   private lateinit var fhirEngine: FhirEngine
-
 
   @Before
   fun setupTest() {
@@ -32,10 +46,10 @@ class ActivityFlowTest {
     fhirEngine = FhirEngineProvider.getInstance(context)
   }
 
-@Test
+  @Test
   fun `communication request flow`() = runBlocking {
-
-    val proposalJson = """
+    val proposalJson =
+      """
    {
   "resourceType" : "CommunicationRequest",
   "id" : "sm-scenario2",
@@ -61,18 +75,20 @@ class ActivityFlowTest {
     "reference" : "Patient/sm-scenario2-patient"
   }]
 }
-    """.trimIndent()
+        """
+        .trimIndent()
 
+    val proposalFromCarePlan =
+      FhirContext.forR4Cached().newJsonParser().parseResource(proposalJson) as CommunicationRequest
 
-    val proposalFromCarePlan = FhirContext.forR4Cached().newJsonParser().parseResource(proposalJson) as CommunicationRequest
-
-     fhirEngine.create(proposalFromCarePlan)
+    fhirEngine.create(proposalFromCarePlan)
 
     println(" Staring Plan with Proposal ${proposalFromCarePlan.typeAndId}")
     val plan = ActivityFlow.with(fhirEngine).startPlan(proposalFromCarePlan.typeAndId)
 
     assertThat(plan).isInstanceOf(CommunicationRequest::class.java)
-    assertThat((plan as CommunicationRequest).status).isEqualTo(CommunicationRequest.CommunicationRequestStatus.DRAFT)
+    assertThat((plan as CommunicationRequest).status)
+      .isEqualTo(CommunicationRequest.CommunicationRequestStatus.DRAFT)
 
     // Marking the plan active
     plan.status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
@@ -83,7 +99,8 @@ class ActivityFlowTest {
     val order = ActivityFlow.with(fhirEngine).startOrder(plan.typeAndId)
 
     assertThat(order).isInstanceOf(CommunicationRequest::class.java)
-    assertThat((order as CommunicationRequest).status).isEqualTo(CommunicationRequest.CommunicationRequestStatus.DRAFT)
+    assertThat((order as CommunicationRequest).status)
+      .isEqualTo(CommunicationRequest.CommunicationRequestStatus.DRAFT)
 
     order.status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
 
@@ -93,7 +110,8 @@ class ActivityFlowTest {
     val perform = ActivityFlow.with(fhirEngine).startPerform(order.typeAndId)
 
     assertThat(perform).isInstanceOf(Communication::class.java)
-    assertThat((perform as Communication).status).isEqualTo(Communication.CommunicationStatus.PREPARATION)
+    assertThat((perform as Communication).status)
+      .isEqualTo(Communication.CommunicationStatus.PREPARATION)
 
     ActivityFlow.with(fhirEngine).endPerform(perform)
   }
