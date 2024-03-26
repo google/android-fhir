@@ -31,8 +31,7 @@ import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
-// TODO: Add constraint support for global case, add questionnaire in constructor, and process that
-// in the validate function, https://github.com/google/android-fhir/issues/2479
+/** TODO: Add constraint support for global case, create a separate validator, https://github.com/google/android-fhir/issues/2479 */
 internal class ConstraintExtensionValidator(
   private val questionnaireResponse: QuestionnaireResponse,
   private val expressionEvaluator: ExpressionEvaluator,
@@ -44,9 +43,7 @@ internal class ConstraintExtensionValidator(
   ): List<ConstraintValidator.Result> {
     return questionnaireItem.extension
       .filter { extension ->
-        // TODO: Add constraint support for warning case, update the [ConstraintValidator.Result]
-        // data class to also include warning state,
-        // https://github.com/google/android-fhir/issues/2480
+        /** TODO: Add constraint support for warning case, update the [ConstraintValidator.Result] data class to also include warning state, https://github.com/google/android-fhir/issues/2480 */
         extension.url == EXTENSION_QUESTIONNAIRE_CONSTRAINT_URL &&
           (extension.getExtensionByUrl(EXTENSION_QUESTIONNAIRE_CONSTRAINT_SEVERITY).value
               as CodeType)
