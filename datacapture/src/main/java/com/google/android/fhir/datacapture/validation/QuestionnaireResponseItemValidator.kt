@@ -23,7 +23,6 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal class QuestionnaireResponseItemValidator(
-  val questionnaireResponse: QuestionnaireResponse,
   val expressionEvaluator: ExpressionEvaluator,
 ) {
 
@@ -31,7 +30,7 @@ internal class QuestionnaireResponseItemValidator(
   private val questionnaireResponseItemConstraintValidators =
     listOf(
       RequiredValidator,
-      ConstraintExtensionValidator(questionnaireResponse, expressionEvaluator),
+      ConstraintExtensionValidator(expressionEvaluator),
     )
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */

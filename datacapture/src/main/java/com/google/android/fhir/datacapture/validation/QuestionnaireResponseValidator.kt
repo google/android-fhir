@@ -81,7 +81,6 @@ object QuestionnaireResponseValidator {
       )
     val questionnaireResponseItemValidator =
       QuestionnaireResponseItemValidator(
-        questionnaireResponse,
         ExpressionEvaluator(
           questionnaire,
           questionnaireResponse,

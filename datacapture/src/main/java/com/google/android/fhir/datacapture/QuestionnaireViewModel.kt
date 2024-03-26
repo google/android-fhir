@@ -387,7 +387,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     )
 
   private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
-    QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+    QuestionnaireResponseItemValidator(expressionEvaluator)
 
   /**
    * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each

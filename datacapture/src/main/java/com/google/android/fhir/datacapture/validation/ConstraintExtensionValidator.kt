@@ -24,6 +24,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CO
 import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CONSTRAINT_URL
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
+import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
 import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Expression
@@ -33,7 +34,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 
 /** TODO: Add constraint support for global case, create a separate validator, https://github.com/google/android-fhir/issues/2479 */
 internal class ConstraintExtensionValidator(
-  private val questionnaireResponse: QuestionnaireResponse,
   private val expressionEvaluator: ExpressionEvaluator,
 ) : QuestionnaireResponseItemConstraintValidator {
   override suspend fun validate(
@@ -59,14 +59,11 @@ internal class ConstraintExtensionValidator(
                 .value
                 .asStringValue()
           }
-        val variables = expressionEvaluator.extractDependentVariables(expression, questionnaireItem)
-        val isValid =
-          evaluateToBoolean(
-            questionnaireResponse,
-            questionnaireResponseItem,
-            expression.expression,
-            variables,
-          )
+        val isValid = expressionEvaluator.evaluateExpression(
+          questionnaireItem,
+          questionnaireResponseItem,
+          expression,
+        ).let { convertToBoolean(it) }
         if (isValid) {
           ConstraintValidator.Result(true, null)
         } else {
