@@ -30,7 +30,7 @@ internal class QuestionnaireResponseItemValidator(
   private val questionnaireResponseItemConstraintValidators =
     listOf(
       RequiredValidator,
-      ConstraintExtensionValidator(expressionEvaluator),
+      ConstraintItemExtensionValidator(expressionEvaluator),
     )
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */

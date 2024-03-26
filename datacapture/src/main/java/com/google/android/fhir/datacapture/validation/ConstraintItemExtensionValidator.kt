@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
  * TODO: Add constraint support for global case, create a separate validator,
  *   https://github.com/google/android-fhir/issues/2479
  */
-internal class ConstraintExtensionValidator(
+internal class ConstraintItemExtensionValidator(
   private val expressionEvaluator: ExpressionEvaluator,
 ) : QuestionnaireResponseItemConstraintValidator {
   override suspend fun validate(
