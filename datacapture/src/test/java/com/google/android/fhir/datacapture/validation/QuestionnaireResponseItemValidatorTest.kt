@@ -88,7 +88,7 @@ class QuestionnaireResponseItemValidatorTest {
       )
 
     val validationResult =
-      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+      QuestionnaireResponseItemValidator(expressionEvaluator)
         .validate(
           questionnaire.item.first(),
           questionnaireResponse.item.first(),
@@ -143,7 +143,7 @@ class QuestionnaireResponseItemValidatorTest {
       )
 
     val validationResult =
-      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+      QuestionnaireResponseItemValidator(expressionEvaluator)
         .validate(
           questionnaire.item.first(),
           questionnaireResponse.item.first(),
@@ -179,7 +179,7 @@ class QuestionnaireResponseItemValidatorTest {
       )
 
     val validationResult =
-      QuestionnaireResponseItemValidator(questionnaireResponse, expressionEvaluator)
+      QuestionnaireResponseItemValidator(expressionEvaluator)
         .validate(
           questionnaire.item.first(),
           questionnaireResponse.item.first(),
