@@ -25,14 +25,15 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_QUESTIONNAIRE_CO
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import com.google.android.fhir.datacapture.fhirpath.convertToBoolean
-import com.google.android.fhir.datacapture.fhirpath.evaluateToBoolean
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
-import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
-/** TODO: Add constraint support for global case, create a separate validator, https://github.com/google/android-fhir/issues/2479 */
+/**
+ * TODO: Add constraint support for global case, create a separate validator,
+ *   https://github.com/google/android-fhir/issues/2479
+ */
 internal class ConstraintExtensionValidator(
   private val expressionEvaluator: ExpressionEvaluator,
 ) : QuestionnaireResponseItemConstraintValidator {
@@ -43,7 +44,11 @@ internal class ConstraintExtensionValidator(
   ): List<ConstraintValidator.Result> {
     return questionnaireItem.extension
       .filter { extension ->
-        /** TODO: Add constraint support for warning case, update the [ConstraintValidator.Result] data class to also include warning state, https://github.com/google/android-fhir/issues/2480 */
+        /**
+         * TODO: Add constraint support for warning case, update the [ConstraintValidator.Result]
+         *   data class to also include warning state,
+         *   https://github.com/google/android-fhir/issues/2480
+         */
         extension.url == EXTENSION_QUESTIONNAIRE_CONSTRAINT_URL &&
           (extension.getExtensionByUrl(EXTENSION_QUESTIONNAIRE_CONSTRAINT_SEVERITY).value
               as CodeType)
@@ -59,11 +64,14 @@ internal class ConstraintExtensionValidator(
                 .value
                 .asStringValue()
           }
-        val isValid = expressionEvaluator.evaluateExpression(
-          questionnaireItem,
-          questionnaireResponseItem,
-          expression,
-        ).let { convertToBoolean(it) }
+        val isValid =
+          expressionEvaluator
+            .evaluateExpression(
+              questionnaireItem,
+              questionnaireResponseItem,
+              expression,
+            )
+            .let { convertToBoolean(it) }
         if (isValid) {
           ConstraintValidator.Result(true, null)
         } else {
