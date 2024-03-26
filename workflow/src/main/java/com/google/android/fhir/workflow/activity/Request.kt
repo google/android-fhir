@@ -17,15 +17,18 @@
 package com.google.android.fhir.workflow.activity
 
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.search
 import java.util.UUID
 import org.hl7.fhir.r4.model.Communication
+import org.hl7.fhir.r4.model.Communication.CommunicationPriority
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.Composition
 import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.DetectedIssue
 import org.hl7.fhir.r4.model.EpisodeOfCare
 import org.hl7.fhir.r4.model.Flag
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Immunization
 import org.hl7.fhir.r4.model.ImmunizationRecommendation
 import org.hl7.fhir.r4.model.MedicationAdministration
@@ -38,6 +41,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.Task
 
 
@@ -51,16 +55,21 @@ import org.hl7.fhir.r4.model.Task
 /**
  * Logical model for the Request resources as per the Clinical Practice Guidelines.
  */
-internal open class Request<R : Resource>(val request: R) {
+internal open class Request<R : Resource>(val resource: R) {
 
   val intent: Intent
     get() {
-      return when (request) {
+      return when (resource) {
 
         // SEND_MESSAGE
         is CommunicationRequest -> {
           // TODO: CommunicationRequest has no intent field
-          Intent.NULL
+
+//          RequestIntent
+          resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent")?.let {
+            Intent.of((it.value.primitiveValue()))
+          } ?:
+          Intent.PROPOSAL
           // Intent.of(request.intent.toCode())
         }
 
@@ -76,17 +85,17 @@ internal open class Request<R : Resource>(val request: R) {
         // REPORT_FLAG
 
         is Task -> {
-          Intent.of(request.intent.toCode())
+          Intent.of(resource.intent.toCode())
         }
         // ORDER_MEDICATION
         // RECOMMEND_IMMUNIZATION
         is MedicationRequest -> {
-          Intent.of(request.intent.toCode())
+          Intent.of(resource.intent.toCode())
         }
 
         // ORDER_SERVICE
         is ServiceRequest -> {
-          Intent.of(request.intent.toCode())
+          Intent.of(resource.intent.toCode())
         }
         else -> Intent.NULL
       }
@@ -94,11 +103,11 @@ internal open class Request<R : Resource>(val request: R) {
 
   val status: Status
     get() {
-      return when (request) {
+      return when (resource) {
 
         // SEND_MESSAGE
         is CommunicationRequest -> {
-          Status.of(request.status.toCode())
+          Status.of(resource.status.toCode())
         }
 
         // COLLECT_INFORMATION
@@ -113,17 +122,17 @@ internal open class Request<R : Resource>(val request: R) {
         // REPORT_FLAG
 
         is Task -> {
-          Status.of(request.status.toCode())
+          Status.of(resource.status.toCode())
         }
         // ORDER_MEDICATION
         // RECOMMEND_IMMUNIZATION
         is MedicationRequest -> {
-          Status.of(request.status.toCode())
+          Status.of(resource.status.toCode())
         }
 
         // ORDER_SERVICE
         is ServiceRequest -> {
-          Status.of(request.status.toCode())
+          Status.of(resource.status.toCode())
         }
         else -> Status.NULL
       }
@@ -194,19 +203,21 @@ internal open class Request<R : Resource>(val request: R) {
 
   fun copy(id: String, status: Status, intent: Intent): Request<Resource> {
     val parent = this
-    return Request(request.copy()).apply {
-      request.id = id
+    return Request(parent.resource.copy()).apply {
+      resource.idElement = IdType.of(resource).setValue(id)
       setStatus(status)
       setIntent(intent)
-      setBasedOn(Reference(parent.request))
+      setBasedOn(Reference("${parent.resource.resourceType}/${parent.resource.logicalId}"))
+    }.also {
+      println(" Request-created ${it.resource.id}   ${it.getBasedOn()!!.reference}")
     }
   }
 
-  private fun setStatus(status: Status) {
-    when (request) {
+   fun setStatus(status: Status) {
+    when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
-        request.status = CommunicationRequest.CommunicationRequestStatus.fromCode(status.string)
+        resource.status = CommunicationRequest.CommunicationRequestStatus.fromCode(status.string)
       }
 
       // COLLECT_INFORMATION
@@ -221,27 +232,31 @@ internal open class Request<R : Resource>(val request: R) {
       // REPORT_FLAG
 
       is Task -> {
-        request.status = Task.TaskStatus.fromCode(status.string)
+        resource.status = Task.TaskStatus.fromCode(status.string)
       }
       // ORDER_MEDICATION
       // RECOMMEND_IMMUNIZATION
       is MedicationRequest -> {
-        request.status = MedicationRequest.MedicationRequestStatus.fromCode(status.string)
+        resource.status = MedicationRequest.MedicationRequestStatus.fromCode(status.string)
       }
 
       // ORDER_SERVICE
       is ServiceRequest -> {
-        request.status = ServiceRequest.ServiceRequestStatus.fromCode(status.string)
+        resource.status = ServiceRequest.ServiceRequestStatus.fromCode(status.string)
       }
     }
   }
 
-  private fun setIntent(intent: Intent) {
-    when (request) {
+   fun setIntent(intent: Intent) {
+    when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
         // TODO: Check what to do here
-        // Has no intent
+        if (resource.hasExtension("http://hl7.org/fhir/StructureDefinition/request-intent")) {
+          resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent").setValue(StringType(intent.code))
+        } else {
+          resource.addExtension("http://hl7.org/fhir/StructureDefinition/request-intent", StringType(intent.code))
+        }
       }
 
       // COLLECT_INFORMATION
@@ -256,26 +271,26 @@ internal open class Request<R : Resource>(val request: R) {
       // REPORT_FLAG
 
       is Task -> {
-        request.intent = Task.TaskIntent.fromCode(intent.code)
+        resource.intent = Task.TaskIntent.fromCode(intent.code)
       }
       // ORDER_MEDICATION
       // RECOMMEND_IMMUNIZATION
       is MedicationRequest -> {
-        request.intent = MedicationRequest.MedicationRequestIntent.fromCode(intent.code)
+        resource.intent = MedicationRequest.MedicationRequestIntent.fromCode(intent.code)
       }
 
       // ORDER_SERVICE
       is ServiceRequest -> {
-        request.intent = ServiceRequest.ServiceRequestIntent.fromCode(intent.code)
+        resource.intent = ServiceRequest.ServiceRequestIntent.fromCode(intent.code)
       }
     }
   }
 
   private fun setBasedOn(basedOn: Reference) {
-    when (request) {
+    when (resource) {
       // SEND_MESSAGE
       is CommunicationRequest -> {
-        request.addBasedOn(basedOn)
+        resource.addBasedOn(basedOn)
       }
 
       // COLLECT_INFORMATION
@@ -290,55 +305,106 @@ internal open class Request<R : Resource>(val request: R) {
       // REPORT_FLAG
 
       is Task -> {
-        request.addBasedOn(basedOn)
+        resource.addBasedOn(basedOn)
       }
       // ORDER_MEDICATION
       // RECOMMEND_IMMUNIZATION
       is MedicationRequest -> {
-        request.addBasedOn(basedOn)
+        resource.addBasedOn(basedOn)
       }
 
       // ORDER_SERVICE
       is ServiceRequest -> {
-        request.addBasedOn(basedOn)
+        resource.addBasedOn(basedOn)
       }
     }
   }
 
+   fun getBasedOn() : Reference?{
+   return when (resource) {
+      // SEND_MESSAGE
+      is CommunicationRequest -> {
+        resource.basedOn.lastOrNull()
+      }
+
+      // COLLECT_INFORMATION
+      // DISPENSE_MEDICATION
+      // ADMINISTER_MEDICATION
+      // DOCUMENT_MEDICATION
+      // ENROLLMENT
+      // GENERATE_REPORT
+      // PROPOSE_DIAGNOSIS
+      // RECORD_DETECTED_ISSUE
+      // RECORD_INFERENCE
+      // REPORT_FLAG
+
+      is Task -> {
+        resource.basedOn.lastOrNull()
+      }
+      // ORDER_MEDICATION
+      // RECOMMEND_IMMUNIZATION
+      is MedicationRequest -> {
+        resource.basedOn.lastOrNull()
+      }
+
+      // ORDER_SERVICE
+      is ServiceRequest -> {
+        resource.basedOn.lastOrNull()
+      }
+
+     else -> {null}
+   }
+  }
+
   suspend fun createEventResource(fhirEngine: FhirEngine): Event<Resource> {
     // This needs to be filled
-    lateinit var activty: CPGActivity
+    lateinit var activity: CPGActivity
+    if ( 1 != 0) {
+      activity =  CPGActivity.SEND_MESSAGE
+    }
     val event =
-      when (activty) {
+      when (activity) {
         CPGActivity.SEND_MESSAGE -> {
           Communication().apply {
             id = UUID.randomUUID().toString()
             status = Communication.CommunicationStatus.PREPARATION
-            if (request is CommunicationRequest) {
-              subject = request.subject
-              recipient = request.recipient
-              request.payload.forEach {
+            if (resource is CommunicationRequest) {
+              category = resource.category
+              priority = CommunicationPriority.fromCode(resource.priority?.toCode())
+              subject = resource.subject
+              about = resource.about
+              encounter = resource.encounter
+              recipient = resource.recipient
+              resource.payload.forEach {
                 addPayload(Communication.CommunicationPayloadComponent(it.content))
               }
             }
           }
         }
+
         CPGActivity.COLLECT_INFORMATION -> {
-          // TODO: maybe this needs to come from the client itself.
-          QuestionnaireResponse()
+          QuestionnaireResponse().apply {
+            id = UUID.randomUUID().toString()
+            status = QuestionnaireResponse.QuestionnaireResponseStatus.INPROGRESS
+            if (resource is Task) {
+              subject = resource.`for`
+              encounter = resource.encounter
+            }
+          }
         }
+
         CPGActivity.ORDER_MEDICATION -> {
           // The values here will come from MedicationRequest.
           MedicationDispense().apply {
             id = UUID.randomUUID().toString()
             status = MedicationDispense.MedicationDispenseStatus.PREPARATION
 
-            if (request is MedicationRequest) {
-              subject = request.subject
-              medication = request.medication
+            if (resource is MedicationRequest) {
+              subject = resource.subject
+              medication = resource.medication
               // TODO: Find appropriate type value
               //            type = r.performerType
-              dosageInstruction = request.dosageInstruction
+              dosageInstruction = resource.dosageInstruction
               // TODO Maybe the client should create this as they would need to fill in
               //            quantity = r.dosageInstruction.filter { "doseQuantity"  }
               //            daysSupply = ???
@@ -351,7 +417,7 @@ internal open class Request<R : Resource>(val request: R) {
           MedicationDispense().apply {
             id = UUID.randomUUID().toString()
             status = MedicationDispense.MedicationDispenseStatus.PREPARATION
-            if (request is Task) {
+            if (resource is Task) {
               //            "input" : [
               //            {
               //              "type" : {
@@ -369,7 +435,7 @@ internal open class Request<R : Resource>(val request: R) {
               //            }
               //            }
               //            ]
-              val medicationRequestReference = request.input.first().value as Reference
+              val medicationRequestReference = resource.input.first().value as Reference
               fhirEngine.search(medicationRequestReference.reference).first().resource.let { r ->
                 if (r is MedicationRequest) {
                   subject = r.subject
@@ -392,7 +458,7 @@ internal open class Request<R : Resource>(val request: R) {
           MedicationAdministration().apply {
             id = UUID.randomUUID().toString()
             status = MedicationAdministration.MedicationAdministrationStatus.UNKNOWN
-            if (this@Request.request is Task) {
+            if (this@Request.resource is Task) {
               //            "input" : [
               //            {
               //              "type" : {
@@ -410,7 +476,7 @@ internal open class Request<R : Resource>(val request: R) {
               //            }
               //            }
               //            ]
-              val medicationRequestReference = this@Request.request.input.first().value as Reference
+              val medicationRequestReference = this@Request.resource.input.first().value as Reference
               fhirEngine.search(medicationRequestReference.reference).first().resource.let { r ->
                 if (r is MedicationRequest) {
                   subject = r.subject
@@ -431,7 +497,7 @@ internal open class Request<R : Resource>(val request: R) {
           MedicationStatement().apply {
             id = UUID.randomUUID().toString()
             status = MedicationStatement.MedicationStatementStatus.UNKNOWN
-            if (request is Task) {
+            if (resource is Task) {
               //            "input" : [
               //            {
               //              "type" : {
@@ -449,13 +515,13 @@ internal open class Request<R : Resource>(val request: R) {
               //            }
               //            }
               //            ]
-              val medicationRequestReference = request.input.first().value as Reference
+              val medicationRequestReference = resource.input.first().value as Reference
               fhirEngine.search(medicationRequestReference.reference).first().resource.let { r ->
                 if (r is MedicationRequest) {
                   subject = r.subject
                   medication = r.medication
                   addDerivedFrom(medicationRequestReference)
-                  informationSource = request.`for`
+                  informationSource = resource.`for`
 
                   // TODO Maybe the client should create this as they would need to fill in
                   //                effectivePeriod = ??
@@ -469,9 +535,9 @@ internal open class Request<R : Resource>(val request: R) {
           Immunization().apply {
             id = UUID.randomUUID().toString()
             status = Immunization.ImmunizationStatus.NOTDONE
-            if (request is ImmunizationRecommendation) {
-              vaccineCode = request.recommendationFirstRep.vaccineCode.first()
-              patient = request.patient
+            if (resource is ImmunizationRecommendation) {
+              vaccineCode = resource.recommendationFirstRep.vaccineCode.first()
+              patient = resource.patient
               // TODO Maybe the client should create this as they would need to fill in
               //          occurrence = ?? DateTime.now()
             }
@@ -481,12 +547,12 @@ internal open class Request<R : Resource>(val request: R) {
           Procedure().apply {
             id = UUID.randomUUID().toString()
             status = Procedure.ProcedureStatus.UNKNOWN
-            if (request is ServiceRequest) {
-              bodySite = request.bodySite
-              subject = request.subject
-              reasonCode = request.reasonCode
-              code = request.code
-              category = request.category.first()
+            if (resource is ServiceRequest) {
+              bodySite = resource.bodySite
+              subject = resource.subject
+              reasonCode = resource.reasonCode
+              code = resource.code
+              category = resource.category.first()
             }
           }
         }
@@ -511,4 +577,6 @@ internal open class Request<R : Resource>(val request: R) {
       }
     return Event(event)
   }
+
+  fun asReference()  = Reference("${resource.resourceType}/${resource.logicalId}")
 }

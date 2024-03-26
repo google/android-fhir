@@ -51,7 +51,24 @@ internal class Event<R : Resource>(val resource: R) {
     STOPPED("stopped"),
     DECLINED("decline"),
     UNKNOWN("unknown"),
-    NULL("null"),
+    NULL("null");
+
+    companion object {
+
+     fun of (code: String) = when (code) {
+       "preparation" -> PREPARATION
+         "in-progress" -> INPROGRESS
+         "not-done" -> CANCELLED
+         "on-hold" ->ONHOLD
+         "completed" -> COMPLETED
+         "entered-in-error" -> ENTEREDINERROR
+         "stopped" -> STOPPED
+         "decline" -> DECLINED
+         "unknown" -> UNKNOWN
+         "null" ->  NULL
+         else -> UNKNOWN
+     }
+    }
   }
 
   fun setStatus(status: Status) {
@@ -123,31 +140,183 @@ internal class Event<R : Resource>(val resource: R) {
     }
   }
 
-  fun <R : Resource> setBasedOn(basedOn: Request<R>) {
-    when (resource) {
+  fun getStatus(): Status {
+    return when (resource) {
       // SEND_MESSAGE
       is Communication -> {
-        resource.addBasedOn(Reference(basedOn.request))
+        Status.of(resource.status.toCode())
+
       }
       // COLLECT_INFORMATION
       is QuestionnaireResponse -> {
-        resource.addBasedOn(Reference(basedOn.request))
+        Status.of(resource.status.toCode())
       }
 
       //      ORDER_MEDICATION
       //      DISPENSE_MEDICATION
       is MedicationDispense -> {
-        resource.addAuthorizingPrescription(Reference(basedOn.request))
+        Status.of(resource.status.toCode())
       }
 
       //      ADMINISTER_MEDICATION
       is MedicationAdministration -> {
-        resource.request = Reference(basedOn.request)
+        Status.of(resource.status.toCode())
       }
 
       //      DOCUMENT_MEDICATION
       is MedicationStatement -> {
-        resource.addBasedOn(Reference(basedOn.request))
+        Status.of(resource.status.toCode())
+      }
+
+      //      RECOMMEND_IMMUNIZATION
+      is Immunization -> {
+        Status.of(resource.status.toCode())
+      }
+
+      //      ORDER_SERVICE
+      is Procedure -> {
+        Status.of(resource.status.toCode())
+      }
+      //      ENROLLMENT
+      is EpisodeOfCare -> {
+        Status.of(resource.status.toCode())
+      }
+      // GENERATE_REPORT
+      is Composition -> {
+        Status.of(resource.status.toCode())
+      }
+      // PROPOSE_DIAGNOSIS
+      is Condition -> {
+        // TODO : Check as based on activityflow.html, the clinicalStatus and verificationStatus are
+        // present but neither map to event status.
+        //        resource.status =
+        Status.UNKNOWN
+      }
+
+      // RECORD_DETECTED_ISSUE
+      is DetectedIssue -> {
+        Status.of(resource.status.toCode())
+      }
+
+      // RECORD_INFERENCE
+      is Observation -> {
+        Status.of(resource.status.toCode())
+      }
+
+      // REPORT_FLAG
+      is Flag -> {
+        Status.of(resource.status.toCode())
+      }
+      else -> {Status.NULL}
+    }
+  }
+
+
+  fun getBasedOn() : Reference? {
+    return when (resource) {
+      // SEND_MESSAGE
+      is Communication -> {
+        resource.basedOn.firstOrNull()
+      }
+      // COLLECT_INFORMATION
+      is QuestionnaireResponse -> {
+        resource.basedOn.firstOrNull()
+      }
+
+      //      ORDER_MEDICATION
+      //      DISPENSE_MEDICATION
+      is MedicationDispense -> {
+        resource.authorizingPrescription.firstOrNull()
+      }
+
+      //      ADMINISTER_MEDICATION
+      is MedicationAdministration -> {
+        resource.request
+      }
+
+      //      DOCUMENT_MEDICATION
+      is MedicationStatement -> {
+        resource.basedOn.firstOrNull()
+      }
+
+      //      RECOMMEND_IMMUNIZATION
+      is Immunization -> {
+        // TODO: Not present
+        //        resource.addBasedOn(Reference(basedOn.request))
+        null
+      }
+
+      //      ORDER_SERVICE
+      is Procedure -> {
+        resource.basedOn.firstOrNull()
+      }
+      //      ENROLLMENT
+      is EpisodeOfCare -> {
+        // TODO: Not present
+        //        resource.addBasedOn(Reference(basedOn.request))
+        null
+      }
+      // GENERATE_REPORT
+      is Composition -> {
+        resource
+          .getExtensionByUrl(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")
+          .value as Reference
+      }
+      // PROPOSE_DIAGNOSIS
+      is Condition -> {
+        // TODO: Not present
+        //        resource.addBasedOn(Reference(basedOn.request))
+        null
+      }
+
+      // RECORD_DETECTED_ISSUE
+      is DetectedIssue -> {
+        // TODO: Not present
+        //        resource.addBasedOn(Reference(basedOn.request))
+        null
+      }
+
+      // RECORD_INFERENCE
+      is Observation -> {
+        resource.basedOn.firstOrNull()
+      }
+
+      // REPORT_FLAG
+      is Flag -> {
+        // TODO: Not present
+        //        resource.addBasedOn(Reference(basedOn.request))
+        null
+      }
+
+      else -> { null}
+    }
+  }
+
+  fun <R : Resource> setBasedOn(basedOn: Request<R>) {
+    when (resource) {
+      // SEND_MESSAGE
+      is Communication -> {
+        resource.addBasedOn(basedOn.asReference())
+      }
+      // COLLECT_INFORMATION
+      is QuestionnaireResponse -> {
+        resource.addBasedOn(basedOn.asReference())
+      }
+
+      //      ORDER_MEDICATION
+      //      DISPENSE_MEDICATION
+      is MedicationDispense -> {
+        resource.addAuthorizingPrescription(basedOn.asReference())
+      }
+
+      //      ADMINISTER_MEDICATION
+      is MedicationAdministration -> {
+        resource.request = basedOn.asReference()
+      }
+
+      //      DOCUMENT_MEDICATION
+      is MedicationStatement -> {
+        resource.addBasedOn(basedOn.asReference())
       }
 
       //      RECOMMEND_IMMUNIZATION
@@ -158,7 +327,7 @@ internal class Event<R : Resource>(val resource: R) {
 
       //      ORDER_SERVICE
       is Procedure -> {
-        resource.addBasedOn(Reference(basedOn.request))
+        resource.addBasedOn(basedOn.asReference())
       }
       //      ENROLLMENT
       is EpisodeOfCare -> {
@@ -167,9 +336,15 @@ internal class Event<R : Resource>(val resource: R) {
       }
       // GENERATE_REPORT
       is Composition -> {
-        resource
-          .getExtensionByUrl(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")
-          .setValue(Reference(basedOn.request))
+        if (resource.hasExtension(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")) {
+          resource
+            .getExtensionByUrl(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor")
+            .setValue(basedOn.asReference())
+        } else {
+          resource
+            .addExtension(" http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-summaryFor", basedOn.asReference())
+        }
+
       }
       // PROPOSE_DIAGNOSIS
       is Condition -> {
@@ -185,7 +360,7 @@ internal class Event<R : Resource>(val resource: R) {
 
       // RECORD_INFERENCE
       is Observation -> {
-        resource.addBasedOn(Reference(basedOn.request))
+        resource.addBasedOn(basedOn.asReference())
       }
 
       // REPORT_FLAG
