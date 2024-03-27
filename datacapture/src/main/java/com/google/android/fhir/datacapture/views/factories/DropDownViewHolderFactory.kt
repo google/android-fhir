@@ -23,8 +23,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -50,14 +52,17 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
+      private lateinit var clearIcon: ImageView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: AppCompatActivity
+      private var isDropdownEditable = true
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
         context = itemView.context.tryUnwrapContext()!!
+        clearIcon = itemView.findViewById(R.id.clearIcon)
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -104,30 +109,67 @@ internal object DropDownViewHolderFactory :
         autoCompleteTextView.setAdapter(adapter)
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
-            val selectedItem = adapter.getItem(position)
-            autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
-            autoCompleteTextView.setCompoundDrawablesRelative(
-              adapter.getItem(position)?.answerOptionImage,
-              null,
-              null,
-              null,
-            )
-            val selectedAnswer =
-              questionnaireViewItem.enabledAnswerOptions
-                .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
-                ?.value
+            if (isDropdownEditable) {
+              val selectedItem = adapter.getItem(position)
+              autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
+              autoCompleteTextView.setCompoundDrawablesRelative(
+                adapter.getItem(position)?.answerOptionImage,
+                null,
+                null,
+                null,
+              )
 
-            context.lifecycleScope.launch {
-              if (selectedAnswer == null) {
-                questionnaireViewItem.clearAnswer()
-              } else {
-                questionnaireViewItem.setAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                    .setValue(selectedAnswer),
-                )
+              isDropdownEditable = false
+              val selectedAnswer =
+                questionnaireViewItem.enabledAnswerOptions
+                  .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
+                  ?.value
+
+              context.lifecycleScope.launch {
+                if (selectedAnswer == null) {
+                  questionnaireViewItem.clearAnswer()
+                } else {
+                  questionnaireViewItem.setAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                      .setValue(selectedAnswer),
+                  )
+                }
               }
             }
           }
+
+        autoCompleteTextView.doAfterTextChanged {
+          if (it.isNullOrBlank()) {
+            // Hide the clear icon when the text is empty
+            clearIcon.visibility = View.GONE
+
+            // Delay to ensure dropdown is displayed after text is cleared
+            // And after MaterialAutoCompleteTextView resets its state
+            autoCompleteTextView.postDelayed(
+              {
+                if (autoCompleteTextView.isPopupShowing.not() && isDropdownEditable) {
+                  autoCompleteTextView.showDropDown()
+                }
+              },
+              100,
+            )
+          } else {
+            // Show the clear icon when the text is not empty
+            clearIcon.visibility = View.VISIBLE
+          }
+        }
+
+        clearIcon.setOnClickListener {
+          // Clear the text in the AutoCompleteTextView
+          autoCompleteTextView.text = null
+
+          // Enable dropdown editing after text is cleared
+          isDropdownEditable = true
+
+          // Clear the answer added in the questionnaireViewItem after clearIcon is clicked
+          context.lifecycleScope.launch { questionnaireViewItem.clearAnswer() }
+          setReadOnly(false)
+        }
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
@@ -143,6 +185,8 @@ internal object DropDownViewHolderFactory :
 
       override fun setReadOnly(isReadOnly: Boolean) {
         textInputLayout.isEnabled = !isReadOnly
+        autoCompleteTextView.isEnabled = isDropdownEditable && !isReadOnly
+        if (isReadOnly) clearIcon.visibility = View.GONE
       }
 
       private fun cleanupOldState() {
