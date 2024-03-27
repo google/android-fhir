@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import org.hl7.fhir.r4.model.Bundle
-import org.hl7.fhir.r4.model.DomainResource
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
@@ -54,7 +54,12 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
             is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
-            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is ResourceUploadResponseMapping -> {
+              val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
+              preSyncResourceId?.let { preSyncResourceId ->
+                updateResourcePostSync(it.output, preSyncResourceId)
+              }
+            }
           }
         }
       }
@@ -78,15 +83,14 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant(),
-      )
-    }
+  private suspend fun updateResourcePostSync(
+    postSyncResource: Resource,
+    preSyncResourceId: String,
+  ) {
+    database.updateResourcesAndLocalChangesPostSync(
+      preSyncResourceId,
+      postSyncResource,
+    )
   }
 
   /**

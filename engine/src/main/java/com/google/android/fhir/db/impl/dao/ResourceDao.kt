@@ -190,6 +190,22 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        UPDATE ResourceEntity
+        SET resourceId = :postSyncResourceId,
+            serializedResource = :postSyncSerializedResource
+        WHERE resourceId = :preSyncResourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updateResourceIdInResourceEntityPostSync(
+    preSyncResourceId: String,
+    postSyncResourceId: String,
+    resourceType: ResourceType,
+    postSyncSerializedResource: String,
+  )
+
+  @Query(
+    """
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType""",
   )
@@ -312,6 +328,38 @@ internal abstract class ResourceDao {
           .build()
       updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
     }
+  }
+
+  /**
+   * Updates resource metadata such as versionId, lastUpdated, resource ID, and payload in the
+   * [ResourceEntity] using information from [postSyncResource]. It matches the existing
+   * [preSyncResourceId] with the resourceId of [postSyncResource] to update the resource.
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResource The [Resource] after synchronization.
+   */
+  suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    if (
+      postSyncResource.hasMeta() &&
+        postSyncResource.meta.hasVersionId() &&
+        postSyncResource.meta.hasLastUpdated()
+    ) {
+      updateAndIndexRemoteVersionIdAndLastUpdate(
+        postSyncResource.logicalId,
+        postSyncResource.resourceType,
+        postSyncResource.meta.versionId,
+        postSyncResource.meta.lastUpdated.toInstant(),
+      )
+    }
+    updateResourceIdInResourceEntityPostSync(
+      preSyncResourceId,
+      postSyncResource.logicalId,
+      postSyncResource.resourceType,
+      iParser.encodeResourceToString(postSyncResource),
+    )
   }
 
   private suspend fun updateIndicesForResource(

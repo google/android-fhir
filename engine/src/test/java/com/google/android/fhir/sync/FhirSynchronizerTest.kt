@@ -18,6 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
+import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
@@ -59,7 +60,7 @@ class FhirSynchronizerTest {
     fhirSynchronizer =
       FhirSynchronizer(
         TestFhirEngineImpl,
-        UploadConfiguration(uploader),
+        UploadConfiguration(uploader, LocalChangesFetchMode.AllChanges),
         DownloadConfiguration(downloader, conflictResolver),
         fhirDataStore,
       )
@@ -158,7 +159,7 @@ class FhirSynchronizerTest {
       val fhirSynchronizerWithDelayInDownload =
         FhirSynchronizer(
           TestFhirEngineImpl,
-          UploadConfiguration(uploader),
+          UploadConfiguration(uploader, LocalChangesFetchMode.AllChanges),
           DownloadConfiguration(
             object : Downloader {
               override suspend fun download(): Flow<DownloadState> {

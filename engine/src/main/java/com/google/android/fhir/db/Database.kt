@@ -64,6 +64,20 @@ internal interface Database {
   )
 
   /**
+   * Maps the [postSyncResource] with the [preSyncResourceId] present in the [ResourceEntity],
+   * [LocalChangeEntity], and [LocalChangeResourceReferenceEntity], and updates the [Resource.id] of
+   * the resource and references for other resources as per [Resource.id] present in the
+   * [postSyncResource].
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResource The [Resource] after synchronization.
+   */
+  suspend fun updateResourcesAndLocalChangesPostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  )
+
+  /**
    * Selects the FHIR resource of type `clazz` with `id`.
    *
    * @param <R> The resource type

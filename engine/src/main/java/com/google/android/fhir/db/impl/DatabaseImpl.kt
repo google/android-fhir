@@ -173,6 +173,21 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun updateResourcesAndLocalChangesPostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    db.withTransaction {
+      val preSyncResourceEntity = selectEntity(postSyncResource.resourceType, preSyncResourceId)
+      val preSyncResource =
+        iParser.parseResource(preSyncResourceEntity.serializedResource) as Resource
+      val uuids = getResourceUuidToUpdateReferences(preSyncResource)
+      updateResourcePostSync(preSyncResourceId, postSyncResource)
+      updateLocalChangesPostSync(postSyncResource, preSyncResource)
+      updateReferencesInResourcePostSync(postSyncResource, preSyncResource, uuids)
+    }
+  }
+
   override suspend fun select(type: ResourceType, id: String): Resource {
     return db.withTransaction {
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
@@ -418,6 +433,57 @@ internal class DatabaseImpl(
         it.resourceReferenceValue,
         it.resourceReferencePath,
       )
+    }
+  }
+
+  private suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    db.withTransaction {
+      resourceDao.updateResourcePostSync(
+        preSyncResourceId,
+        postSyncResource,
+      )
+    }
+  }
+
+  private suspend fun updateLocalChangesPostSync(
+    postSyncResource: Resource,
+    preSyncResource: Resource,
+  ) {
+    db.withTransaction {
+      localChangeDao.updateReferencesInLocalChange(
+        oldResource = preSyncResource,
+        updatedResource = postSyncResource,
+      )
+    }
+  }
+
+  private suspend fun updateReferencesInResourcePostSync(
+    postSyncResource: Resource,
+    preSyncResource: Resource,
+    resourceUuids: List<UUID>,
+  ) {
+    db.withTransaction {
+      updateReferringResources(
+        referringResourcesUuids = resourceUuids,
+        oldResource = preSyncResource,
+        updatedResource = postSyncResource,
+      )
+    }
+  }
+
+  private suspend fun getResourceUuidToUpdateReferences(preSyncResource: Resource): List<UUID> {
+    return db.withTransaction {
+      val preSyncReference = "${preSyncResource.resourceType.name}/${preSyncResource.logicalId}"
+      val localChangeIds =
+        localChangeDao
+          .getLocalChangeReferencesWithValue(preSyncReference)
+          .map { it.localChangeId }
+          .distinct()
+      val localChanges = localChangeDao.getLocalChanges(localChangeIds)
+      localChanges.map { it.resourceUuid }.distinct()
     }
   }
 
