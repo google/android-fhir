@@ -1,0 +1,86 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Password",
+      "type": "string",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.1",
+          "text": "Fill the password first",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint",
+          "extension": [
+            {
+              "url": "key",
+              "valueId": "constraint-1"
+            },
+            {
+              "url": "requirements",
+              "valueString": "Confirm password field must have the same value as password field"
+            },
+            {
+              "url": "severity",
+              "valueCode": "error"
+            },
+            {
+              "url": "expression",
+              "valueString": "%context.answer.value = %resource.descendants().where(linkId='1').answer.value"
+            },
+            {
+              "url": "human",
+              "valueString": "Password does not match"
+            },
+            {
+              "url": "location",
+              "valueString": "1"
+            }
+          ]
+        }
+      ],
+      "linkId": "2",
+      "text": "Confirm password",
+      "type": "string",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "2.1",
+          "text": "Show error message if confirm password does not match with password",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

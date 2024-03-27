@@ -63,6 +63,11 @@ class BehaviorListViewModel(application: Application) : AndroidViewModel(applica
       R.string.behavior_name_dynamic_question_text,
       "behavior_dynamic_question_text.json",
     ),
+    QUESTIONNAIRE_CONSTRAINT(
+      R.drawable.ic_rule,
+      R.string.behavior_name_questionnaire_constraint,
+      "behavior_questionnaire_constraint.json",
+    ),
   }
 
   fun isBehavior(context: Context, title: String) =
