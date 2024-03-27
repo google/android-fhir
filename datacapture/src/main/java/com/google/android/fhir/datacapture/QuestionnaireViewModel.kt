@@ -72,6 +72,8 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -79,6 +81,7 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
+import java.util.Date
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -158,6 +161,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
+    // Add extension for questionnaire launch time stamp
+    questionnaireResponse.extension.add(Extension("https://github.com/google/android-fhir/StructureDefinition/questionnaireresponse-launchTimestamp", DateTimeType(Date())))
     questionnaireResponse.packRepeatedGroups()
   }
 
@@ -440,6 +445,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
           .map { it.copy() }
       unpackRepeatedGroups(this@QuestionnaireViewModel.questionnaire)
+      // Use authored as a submission time stamp
+      authored = Date()
     }
   }
 
