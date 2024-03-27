@@ -118,9 +118,9 @@ tasks.dokkaHtml.configure {
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Knowledge.artifactId)
+      moduleName.set(Releases.Knowledge.name)
       moduleVersion.set(Releases.Knowledge.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
