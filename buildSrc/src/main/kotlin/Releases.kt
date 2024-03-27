@@ -54,7 +54,7 @@ object Releases {
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "1.1.0-preview6-SNAPSHOT"
+    override val version = "1.1.0-preview7-SNAPSHOT"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
@@ -81,7 +81,7 @@ object Releases {
 
   object Knowledge : LibraryArtifact {
     override val artifactId = "knowledge"
-    override val version = "0.1.0-alpha03-preview3-SNAPSHOT"
+    override val version = "0.1.0-alpha03-preview3.1-SNAPSHOT"
     override val name = "Android FHIR Knowledge Manager Library"
   }
 
