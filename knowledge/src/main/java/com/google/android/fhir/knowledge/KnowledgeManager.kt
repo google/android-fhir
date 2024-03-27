@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,13 @@ import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
 /**
@@ -187,6 +190,20 @@ internal constructor(
       )
 
     return knowledgeDao.insertResource(igId, res)
+  }
+
+  suspend fun loadWorkerContext(
+    vararg npmPackages: NpmPackage,
+    allowLoadingDuplicates: Boolean = true,
+    loader: SimpleWorkerContext.IContextResourceLoader? = null,
+  ): IWorkerContext {
+    return withContext(Dispatchers.IO) {
+      val simpleWorkerContext = SimpleWorkerContext()
+      simpleWorkerContext.apply {
+        isAllowLoadingDuplicates = allowLoadingDuplicates
+        npmPackages.forEach { npmPackage -> loadFromPackage(npmPackage, loader) }
+      }
+    }
   }
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
