@@ -210,31 +210,27 @@ class ActivityFlowTest {
   fun `communication request flow3`() = runBlocking {
     val proposalJson =
       """
-   {
-  "resourceType" : "CommunicationRequest",
-  "id" : "sm-scenario2",
-  "meta" : {
-    "profile" : ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest"]
-  },
-  "text" : {
-    "status" : "extensions",
-    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative: CommunicationRequest</b><a name=\"sm-scenario2\"> </a></p><div style=\"display: inline-block; background-color: #d9e0e7; padding: 6px; margin: 4px; border: 1px solid #8da1b4; border-radius: 5px; line-height: 60%\"><p style=\"margin-bottom: 0px\">Resource CommunicationRequest &quot;sm-scenario2&quot; </p><p style=\"margin-bottom: 0px\">Profile: <a href=\"StructureDefinition-cpg-communicationrequest.html\">CPG Communication Request</a></p></div><p><b>Definition</b>: <a href=\"ActivityDefinition-activity-example-sendmessage-ad.html\">Activity Example Send Message AD</a></p><p><b>status</b>: active</p><p><b>subject</b>: <a href=\"Patient-sm-scenario2-patient.html\">Patient/sm-scenario2-patient</a> &quot; PATIENT&quot;</p><h3>Payloads</h3><table class=\"grid\"><tr><td style=\"display: none\">-</td><td><b>Content[x]</b></td></tr><tr><td style=\"display: none\">*</td><td>Hello!</td></tr></table><p><b>recipient</b>: <a href=\"Patient-sm-scenario2-patient.html\">Patient/sm-scenario2-patient</a> &quot; PATIENT&quot;</p></div>"
-  },
-  "extension" : [{
-    "url" : "http://hl7.org/fhir/StructureDefinition/workflow-instantiatesCanonical",
-    "valueCanonical" : "http://hl7.org/fhir/uv/cpg/ActivityDefinition/activity-example-sendmessage-ad"
-  }],
-  "status" : "active",
-  "subject" : {
-    "reference" : "Patient/sm-scenario2-patient"
-  },
-  "payload" : [{
-    "contentString" : "Hello!"
-  }],
-  "recipient" : [{
-    "reference" : "Patient/sm-scenario2-patient"
-  }]
-}
+           {
+          "resourceType" : "CommunicationRequest",
+          "id" : "sm-scenario2",
+          "meta" : {
+            "profile" : ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest"]
+          },
+          "extension" : [{
+            "url" : "http://hl7.org/fhir/StructureDefinition/workflow-instantiatesCanonical",
+            "valueCanonical" : "http://hl7.org/fhir/uv/cpg/ActivityDefinition/activity-example-sendmessage-ad"
+          }],
+          "status" : "active",
+          "subject" : {
+            "reference" : "Patient/sm-scenario2-patient"
+          },
+          "payload" : [{
+            "contentString" : "Hello!"
+          }],
+          "recipient" : [{
+            "reference" : "Patient/sm-scenario2-patient"
+          }]
+          }
         """
         .trimIndent()
 
@@ -242,42 +238,47 @@ class ActivityFlowTest {
       FhirContext.forR4Cached().newJsonParser().parseResource(proposalJson) as CommunicationRequest
     fhirEngine.create(proposalFromCarePlan)
 
-    println(" Staring Plan with Proposal ${proposalFromCarePlan.typeAndId}")
     val sendMessageFlow =
       ActivityFlow2.sendMessage(fhirEngine, proposalFromCarePlan)
-        .startPlan { payload.first().content = StringType("Hello in Proposal") }
+        .startPlan {
+          // Change the message in the Proposal Request
+          payload.first().content = StringType("Hello in Proposal")
+        }
         .endPlan {
           // Marking the plan active
           status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
         }
         .startOrder {
+          // Update the plan resource to add a new message
           addPayload(
             CommunicationRequestPayloadComponent(StringType("Hello in Plan")),
           )
         }
         .endOrder { status = CommunicationRequest.CommunicationRequestStatus.ACTIVE }
         .startPerform {
+          // Update the order resource to add a new message
           addPayload(
             CommunicationRequestPayloadComponent(StringType("Hello in Order")),
           )
         }
         .endPerform {
+          // Add a new message to the event
           addPayload(Communication.CommunicationPayloadComponent(StringType("Hello in Event")))
         }
 
-    val proposal = sendMessageFlow.proposal!!
-    val plan = sendMessageFlow.plan!!
-    val order = sendMessageFlow.order!!
-    val event = sendMessageFlow.event!!
-
+    // Get all Request and Event resources from the engine and make sure that the changes to the
+    // resources are persisted.
     val proposalResource =
-      fhirEngine.get(ResourceType.CommunicationRequest, proposal.logicalId) as CommunicationRequest
+      fhirEngine.get(ResourceType.CommunicationRequest, sendMessageFlow.proposal!!.logicalId)
+        as CommunicationRequest
     val planResource =
-      fhirEngine.get(ResourceType.CommunicationRequest, plan.logicalId) as CommunicationRequest
+      fhirEngine.get(ResourceType.CommunicationRequest, sendMessageFlow.plan!!.logicalId)
+        as CommunicationRequest
     val orderResource =
-      fhirEngine.get(ResourceType.CommunicationRequest, order.logicalId) as CommunicationRequest
+      fhirEngine.get(ResourceType.CommunicationRequest, sendMessageFlow.order!!.logicalId)
+        as CommunicationRequest
     val communicationEvent =
-      fhirEngine.get(ResourceType.Communication, event.logicalId) as Communication
+      fhirEngine.get(ResourceType.Communication, sendMessageFlow.event!!.logicalId) as Communication
 
     assertThat(proposalResource.payload.map { it.content.primitiveValue() })
       .containsExactly("Hello in Proposal")

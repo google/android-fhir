@@ -38,7 +38,6 @@ internal constructor(val fhirEngine: FhirEngine) {
   var event: E? = null
 
   fun init(resource: R) {
-
     when (Request(resource).intent) {
       Request.Intent.PROPOSAL -> {
         proposal = resource
@@ -239,16 +238,11 @@ internal constructor(val fhirEngine: FhirEngine) {
 
   companion object {
 
-
     fun sendMessage(engine: FhirEngine, resource: CommunicationRequest) =
-      CommunicationActivityFlow(engine).apply {
-        init(resource)
-      }
+      CommunicationActivityFlow(engine).apply { init(resource) }
 
     fun collectInformation(engine: FhirEngine, resource: Task) =
-      CollectInformationFlow(engine).apply {
-      init(resource)
-    }
+      CollectInformationFlow(engine).apply { init(resource) }
   }
 }
 
@@ -269,14 +263,14 @@ class CommunicationActivityFlow(engine: FhirEngine) :
     }
 }
 
+class CollectInformationFlow(engine: FhirEngine) :
+  ActivityFlow2<Task, QuestionnaireResponse>(engine) {
 
-class CollectInformationFlow(engine: FhirEngine): ActivityFlow2<Task, QuestionnaireResponse>(engine) {
-
-  override fun createEventResource(order: Task) =  QuestionnaireResponse().apply {
-    id = UUID.randomUUID().toString()
-    status = QuestionnaireResponse.QuestionnaireResponseStatus.INPROGRESS
+  override fun createEventResource(order: Task) =
+    QuestionnaireResponse().apply {
+      id = UUID.randomUUID().toString()
+      status = QuestionnaireResponse.QuestionnaireResponseStatus.INPROGRESS
       subject = order.`for`
       encounter = order.encounter
     }
-
 }
