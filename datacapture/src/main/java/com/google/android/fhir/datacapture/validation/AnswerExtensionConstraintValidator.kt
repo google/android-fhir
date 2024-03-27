@@ -50,7 +50,7 @@ internal open class AnswerExtensionConstraintValidator(
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
     expressionEvaluator: suspend (Expression) -> Type?,
-  ): AnswerConstraintValidator.Result {
+  ): ConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
       val extensionValue =
@@ -61,12 +61,12 @@ internal open class AnswerExtensionConstraintValidator(
       if (
         extensionValue.hasValue() && answer.value.hasValue() && predicate(extensionValue, answer)
       ) {
-        return AnswerConstraintValidator.Result(
+        return ConstraintValidator.Result(
           false,
           messageGenerator(extensionValue, context),
         )
       }
     }
-    return AnswerConstraintValidator.Result(true, null)
+    return ConstraintValidator.Result(true, null)
   }
 }
