@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,7 +63,7 @@ abstract class KnowledgeDao {
   @Query(
     "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)",
   )
-  internal abstract suspend fun deleteOrphanedResources()
+  internal abstract suspend fun deleteOrphanedResources(): Int
 
   @Query("SELECT * from ImplementationGuideEntity")
   internal abstract suspend fun getImplementationGuides(): List<ImplementationGuideEntity>
