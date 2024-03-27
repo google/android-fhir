@@ -52,7 +52,7 @@ import org.hl7.fhir.r4.model.Task
 // [ImmunizationRecommendation](https://hl7.org/fhir/uv/cpg/ActivityDefinition-activity-example-recommendimmunization.json.html).
 
 /** Logical model for the Request resources as per the Clinical Practice Guidelines. */
-internal open class Request<R : Resource>(val resource: R) {
+internal class Request<R : Resource>(val resource: R) {
 
   val intent: Intent
     get() {
@@ -198,9 +198,9 @@ internal open class Request<R : Resource>(val resource: R) {
     }
   }
 
-  fun copy(id: String, status: Status, intent: Intent): Request<Resource> {
-    val parent = this
-    return Request(parent.resource.copy())
+  fun copy(id: String, status: Status, intent: Intent): Request<R> {
+    val parent: Request<R> = this
+    return Request(parent.resource.copy() as R)
       .apply {
         resource.idElement = IdType.of(resource).setValue(id)
         setStatus(status)
