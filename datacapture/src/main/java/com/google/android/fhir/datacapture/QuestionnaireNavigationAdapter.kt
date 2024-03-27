@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,8 @@ import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.ReviewViewHolderFactory
 
-/** List Adapter used to bind answers to [QuestionnaireItemViewHolder] in review mode. */
-internal class QuestionnaireReviewAdapter :
-  ListAdapter<QuestionnaireAdapterItem, RecyclerView.ViewHolder>(
-    DiffCallbacks.ITEMS,
-  ) {
+internal class QuestionnaireNavigationAdapter :
+  ListAdapter<QuestionnaireAdapterItem, RecyclerView.ViewHolder>(DiffCallbacks.ITEMS) {
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     val typedViewType = QuestionnaireEditAdapter.ViewType.parse(viewType)
     return when (typedViewType.type) {

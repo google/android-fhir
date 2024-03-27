@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,14 @@
 
 package com.google.android.fhir.datacapture
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
@@ -46,16 +49,21 @@ internal class QuestionnaireEditAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList(),
-) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallbacks.ITEMS) {
+) : ListAdapter<QuestionnaireAdapterItem, RecyclerView.ViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireViewHolderType] used to render the
    *   [QuestionnaireViewItem].
    */
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
     val typedViewType = ViewType.parse(viewType)
     val subtype = typedViewType.subtype
     return when (typedViewType.type) {
       ViewType.Type.QUESTION -> onCreateViewHolderQuestion(parent = parent, subtype = subtype)
+      ViewType.Type.NAVIGATION ->
+        NavigationViewHolder(
+          LayoutInflater.from(parent.context)
+            .inflate(R.layout.pagination_navigation_view, parent, false),
+        )
     }
   }
 
@@ -99,10 +107,15 @@ internal class QuestionnaireEditAdapter(
     return viewHolderFactory.create(parent)
   }
 
-  override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
     when (val item = getItem(position)) {
       is QuestionnaireAdapterItem.Question -> {
+        holder as QuestionnaireItemViewHolder
         holder.bind(item.item)
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        holder as NavigationViewHolder
+        holder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
@@ -119,6 +132,10 @@ internal class QuestionnaireEditAdapter(
       is QuestionnaireAdapterItem.Question -> {
         type = ViewType.Type.QUESTION
         subtype = getItemViewTypeForQuestion(item.item)
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        type = ViewType.Type.NAVIGATION
+        subtype = 0xFFFFFF
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -150,6 +167,7 @@ internal class QuestionnaireEditAdapter(
 
     enum class Type {
       QUESTION,
+      NAVIGATION,
     }
   }
 
@@ -261,6 +279,7 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areItemsTheSame(oldItem, newItem)
           }
+          is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
         }
 
       override fun areContentsTheSame(
@@ -271,6 +290,10 @@ internal object DiffCallbacks {
           is QuestionnaireAdapterItem.Question -> {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areContentsTheSame(oldItem, newItem)
+          }
+          is QuestionnaireAdapterItem.Navigation -> {
+            newItem is QuestionnaireAdapterItem.Navigation &&
+              oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
         }
     }
