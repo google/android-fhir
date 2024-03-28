@@ -154,7 +154,7 @@ internal class ExpressionEvaluator(
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
     expression: Expression,
   ): List<Base> {
-    val appContext = extractDependentVariables(expression, questionnaireItem)
+    val appContext = extractItemDependentVariables(expression, questionnaireItem)
     return evaluateToBase(
       questionnaireResponse,
       questionnaireResponseItem,
@@ -244,7 +244,7 @@ internal class ExpressionEvaluator(
     ) {
       "The expression should come from the same questionnaire item"
     }
-    extractDependentVariables(
+    extractItemDependentVariables(
       expression,
       questionnaireItem,
       variablesMap,
@@ -265,7 +265,7 @@ internal class ExpressionEvaluator(
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
    *   defined
    */
-  internal suspend fun extractDependentVariables(
+  internal suspend fun extractItemDependentVariables(
     expression: Expression,
     questionnaireItem: QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
