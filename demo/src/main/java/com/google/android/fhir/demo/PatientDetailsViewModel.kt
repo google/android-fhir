@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.revInclude
 import com.google.android.fhir.search.search
 import java.text.SimpleDateFormat
@@ -379,3 +378,12 @@ data class RiskAssessmentItem(
   var lastContacted: String,
   var patientCardColor: Int,
 )
+
+/**
+ * The logical (unqualified) part of the ID. For example, if the ID is
+ * "http://example.com/fhir/Patient/123/_history/456", then this value would be "123".
+ */
+private val Resource.logicalId: String
+  get() {
+    return this.idElement?.idPart.orEmpty()
+  }

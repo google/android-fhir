@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.time.Instant
 import org.hl7.fhir.r4.model.Resource
 
 /** Data class for squashed local changes for resource */
-data class Patch(
+internal data class Patch(
   /** The [ResourceType] */
   val resourceType: String,
   /** The resource id [Resource.id] */
