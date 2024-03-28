@@ -18,17 +18,19 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.extensions.isHidden
-import org.hl7.fhir.r4.model.Expression
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
-import org.hl7.fhir.r4.model.Type
 
-internal object QuestionnaireResponseItemValidator {
+internal class QuestionnaireResponseItemValidator(
+  val expressionEvaluator: ExpressionEvaluator,
+) {
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemComponent]. */
   private val questionnaireResponseItemConstraintValidators =
     listOf(
       RequiredValidator,
+      ConstraintItemExtensionValidator(expressionEvaluator),
     )
 
   /** Validators for [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]. */
@@ -42,23 +44,28 @@ internal object QuestionnaireResponseItemValidator {
       RegexValidator,
     )
 
-  /** Validates [answers] contains valid answer(s) to [questionnaireItem]. */
+  /** Validates [questionnaireResponseItem] contains valid answer(s) to [questionnaireItem]. */
   suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
-    expressionEvaluator: suspend (Expression) -> Type?,
   ): ValidationResult {
     if (questionnaireItem.isHidden) return NotValidated
 
     val questionnaireResponseItemConstraintValidationResult =
-      questionnaireResponseItemConstraintValidators.map {
-        it.validate(questionnaireItem, answers, context)
+      questionnaireResponseItemConstraintValidators.flatMap {
+        it.validate(questionnaireItem, questionnaireResponseItem, context)
       }
     val questionnaireResponseItemAnswerConstraintValidationResult =
       answerConstraintValidators.flatMap { validator ->
-        answers.map { answer ->
-          validator.validate(questionnaireItem, answer, context, expressionEvaluator)
+        questionnaireResponseItem.answer.map { answer ->
+          validator.validate(questionnaireItem, answer, context) {
+            expressionEvaluator.evaluateExpressionValue(
+              questionnaireItem,
+              questionnaireResponseItem,
+              it,
+            )
+          }
         }
       }
 
