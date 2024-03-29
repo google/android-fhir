@@ -91,17 +91,18 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       FhirSynchronizer(
         getFhirEngine(),
         UploadConfiguration(
-          Uploader(
-            dataSource = dataSource,
-            patchGenerator =
-              PatchGeneratorFactory.byMode(
-                getUploadStrategy().patchGeneratorMode,
-                FhirEngineProvider.getFhirDatabase(applicationContext),
-              ),
-            requestGenerator =
-              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
-          ),
-          getUploadStrategy().localChangesFetchMode,
+          uploader =
+            Uploader(
+              dataSource = dataSource,
+              patchGenerator =
+                PatchGeneratorFactory.byMode(
+                  getUploadStrategy().patchGeneratorMode,
+                  FhirEngineProvider.getFhirDatabase(applicationContext),
+                ),
+              requestGenerator =
+                UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+            ),
+          uploadStrategy = getUploadStrategy(),
         ),
         DownloadConfiguration(
           DownloaderImpl(dataSource, getDownloadWorkManager()),

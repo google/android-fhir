@@ -37,7 +37,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @RunWith(AndroidJUnit4::class)
-class ResourceConsolidatorTest {
+class HttpPostResourceConsolidatorTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val context: Context = ApplicationProvider.getApplicationContext()
@@ -55,7 +55,7 @@ class ResourceConsolidatorTest {
         }
         .build()
         .database
-    resourceConsolidator = DefaultResourceConsolidator(database)
+    resourceConsolidator = HttpPostResourceConsolidator(database)
   }
 
   @After
