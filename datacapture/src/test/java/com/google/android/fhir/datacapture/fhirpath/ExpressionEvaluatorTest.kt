@@ -1155,7 +1155,7 @@ class ExpressionEvaluatorTest {
 
     runBlocking {
       val variablesMap =
-        expressionEvaluator.extractDependentVariables(
+        expressionEvaluator.extractItemDependentVariables(
           questionnaire.item[0].item[0].answerExpression!!,
           questionnaire.item[0],
         )
@@ -1230,7 +1230,7 @@ class ExpressionEvaluatorTest {
 
     runBlocking {
       val variablesMap =
-        expressionEvaluator.extractDependentVariables(
+        expressionEvaluator.extractItemDependentVariables(
           questionnaire.item[0].item[0].answerExpression!!,
           questionnaire.item[0],
         )
