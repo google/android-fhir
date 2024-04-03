@@ -110,7 +110,7 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
             is ResourceUploadResponseMapping -> {
               val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
               preSyncResourceId?.let { preSyncResourceId ->
-                updateResourcePostSync(it.output, preSyncResourceId)
+                updateResourcePostSync(preSyncResourceId, it.output)
               }
             }
           }
@@ -137,8 +137,8 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   }
 
   private suspend fun updateResourcePostSync(
-    postSyncResource: Resource,
     preSyncResourceId: String,
+    postSyncResource: Resource,
   ) {
     database.updateResourcesAndLocalChangesPostSync(
       preSyncResourceId,
