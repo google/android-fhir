@@ -352,7 +352,7 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeResourceReferenceEntity
-        WHERE localChangeId = (:localChangeId)
+        WHERE localChangeId IN (:localChangeId)
     """,
   )
   abstract suspend fun getReferencesForLocalChanges(
