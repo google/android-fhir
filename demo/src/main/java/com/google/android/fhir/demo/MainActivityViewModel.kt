@@ -35,17 +35,12 @@ import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 /** View model for [MainActivity]. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -54,10 +49,11 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
 
-  private val _oneTimeSyncTrigger = MutableSharedFlow<Boolean>(
-    extraBufferCapacity = 1,
-    onBufferOverflow = BufferOverflow.DROP_OLDEST
-  )
+  private val _oneTimeSyncTrigger =
+    MutableSharedFlow<Boolean>(
+      extraBufferCapacity = 1,
+      onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    )
 
   val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
     Sync.periodicSync<DemoFhirSyncWorker>(
@@ -79,9 +75,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
       .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
 
   fun triggerOneTimeSync() {
-    viewModelScope.launch {
-      _oneTimeSyncTrigger.emit(true)
-    }
+    viewModelScope.launch { _oneTimeSyncTrigger.emit(true) }
   }
 
   /** Emits last sync time. */
