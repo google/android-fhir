@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import org.hl7.fhir.r4.model.ExpressionNode
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
-import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
 private val fhirPathEngine: FHIRPathEngine =
@@ -101,9 +100,9 @@ internal fun evaluateToBase(
 }
 
 /** Evaluates the given expression and returns list of [Base] */
-internal fun evaluateToBase(type: Type, expression: String): List<Base> {
+internal fun evaluateToBase(base: Base, expression: String): List<Base> {
   return fhirPathEngine.evaluate(
-    /* base = */ type,
+    /* base = */ base,
     /* path = */ expression,
   )
 }

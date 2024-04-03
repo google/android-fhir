@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class D_FhirJsonParserBenchmark {
       val fhirHelpersLibrary = jsonParser.parseResource(fhirHelpersJson) as Library
 
       assertThat(immunityCheckLibrary.id).isEqualTo("Library/ImmunityCheck-1.0.0")
-      assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(575)
+      assertThat(immunityCheckLibrary.content[0].data.size).isEqualTo(810)
       assertThat(fhirHelpersLibrary.id).isEqualTo("Library/FHIRHelpers-4.0.1")
       assertThat(fhirHelpersLibrary.content[0].data.size).isEqualTo(17845)
     }
