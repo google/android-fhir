@@ -75,6 +75,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
       .flatMapLatest {
         Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
       }
+      .map { it }
       .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
 
   fun triggerOneTimeSync() {
