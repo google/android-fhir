@@ -177,14 +177,29 @@ internal class DatabaseImpl(
     preSyncResourceId: String,
     postSyncResource: Resource,
   ) {
-    db.withTransaction {
-      val preSyncResourceEntity = selectEntity(postSyncResource.resourceType, preSyncResourceId)
-      val preSyncResource =
-        iParser.parseResource(preSyncResourceEntity.serializedResource) as Resource
-      val uuids = getResourceUuidToUpdateReferences(preSyncResource)
-      updateResourcePostSync(preSyncResourceId, postSyncResource)
-      updateLocalChangesPostSync(postSyncResource, preSyncResource)
-      updateReferencesInResourcePostSync(postSyncResource, preSyncResource, uuids)
+    val preSyncResource =
+      iParser.parseResource(
+        selectEntity(postSyncResource.resourceType, preSyncResourceId).serializedResource,
+      ) as Resource
+
+    preSyncResource.let {
+      db.withTransaction {
+        resourceDao.updateResourcePostSync(
+          preSyncResourceId,
+          postSyncResource,
+        )
+
+        updateReferringResources(
+          referringResourcesUuids = getResourceUuidsThatRefereceTheGivenResource(it),
+          oldResource = it,
+          updatedResource = postSyncResource,
+        )
+
+        localChangeDao.updateReferencesInLocalChange(
+          oldResource = it,
+          updatedResource = postSyncResource,
+        )
+      }
     }
   }
 
@@ -436,45 +451,19 @@ internal class DatabaseImpl(
     }
   }
 
-  private suspend fun updateResourcePostSync(
-    preSyncResourceId: String,
-    postSyncResource: Resource,
-  ) {
-    db.withTransaction {
-      resourceDao.updateResourcePostSync(
-        preSyncResourceId,
-        postSyncResource,
-      )
-    }
-  }
-
-  private suspend fun updateLocalChangesPostSync(
-    postSyncResource: Resource,
+  /**
+   * Retrieves a list of UUIDs for resources that reference [preSyncResource]. [preSyncResource] can
+   * be referenced as the reference value in other resources, returning those resource UUIDs.
+   * Essentially, [LocalChangeResourceReference] contains
+   * [LocalChangeResourceReference.resourceReferenceValue] and
+   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
+   *
+   * @param preSyncResource The resource that is being referenced.
+   * @return A list of UUIDs of resources that reference [preSyncResource].
+   */
+  private suspend fun getResourceUuidsThatRefereceTheGivenResource(
     preSyncResource: Resource,
-  ) {
-    db.withTransaction {
-      localChangeDao.updateReferencesInLocalChange(
-        oldResource = preSyncResource,
-        updatedResource = postSyncResource,
-      )
-    }
-  }
-
-  private suspend fun updateReferencesInResourcePostSync(
-    postSyncResource: Resource,
-    preSyncResource: Resource,
-    resourceUuids: List<UUID>,
-  ) {
-    db.withTransaction {
-      updateReferringResources(
-        referringResourcesUuids = resourceUuids,
-        oldResource = preSyncResource,
-        updatedResource = postSyncResource,
-      )
-    }
-  }
-
-  private suspend fun getResourceUuidToUpdateReferences(preSyncResource: Resource): List<UUID> {
+  ): List<UUID> {
     return db.withTransaction {
       val preSyncReference = "${preSyncResource.resourceType.name}/${preSyncResource.logicalId}"
       val localChangeIds =

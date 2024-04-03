@@ -64,10 +64,8 @@ internal interface Database {
   )
 
   /**
-   * Maps the [postSyncResource] with the [preSyncResourceId] present in the [ResourceEntity],
-   * [LocalChangeEntity], and [LocalChangeResourceReferenceEntity], and updates the [Resource.id] of
-   * the resource and references for other resources as per [Resource.id] present in the
-   * [postSyncResource].
+   * Updates the [postSyncResource] with the [preSyncResourceId] present in the [ResourceEntity],
+   * [LocalChangeEntity], and [LocalChangeResourceReferenceEntity].
    *
    * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
    * @param postSyncResource The [Resource] after synchronization.
