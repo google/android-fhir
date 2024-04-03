@@ -186,7 +186,7 @@ internal object ResourceConsolidatorFactory {
         is UploadRequestGeneratorMode.UrlRequest -> uploadRequestMode.httpVerbToUseForCreate
         is UploadRequestGeneratorMode.BundleRequest -> uploadRequestMode.httpVerbToUseForCreate
       }
-    return if (httpVerbToUse == HttpVerb.POST) {
+    return if (httpVerbToUse.toString() == HttpVerb.POST.toCode()) {
       HttpPostResourceConsolidator(database)
     } else {
       DefaultResourceConsolidator(database)
