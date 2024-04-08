@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.db.impl.dao
 
-import android.util.Log
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -411,69 +410,27 @@ internal abstract class LocalChangeDao {
   ): List<UUID> {
     val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
-    return updateReferencesInLocalChange(oldReferenceValue, updatedReferenceValue)
-    //    val referringLocalChangeIds =
-    //      getLocalChangeReferencesWithValue(oldReferenceValue).map { it.localChangeId }.distinct()
-    //    val referringLocalChanges = getLocalChanges(referringLocalChangeIds)
-    //
-    //    referringLocalChanges.forEach { existingLocalChangeEntity ->
-    //      val updatedLocalChangeEntity =
-    //        replaceReferencesInLocalChangePayload(
-    //            localChange = existingLocalChangeEntity,
-    //            oldReference = oldReferenceValue,
-    //            updatedReference = updatedReferenceValue,
-    //          )
-    //          .copy(id = DEFAULT_ID_VALUE)
-    //      val updatedLocalChangeReferences =
-    //        getReferencesForLocalChange(existingLocalChangeEntity.id).map {
-    //          localChangeResourceReferenceEntity ->
-    //          if (localChangeResourceReferenceEntity.resourceReferenceValue == oldReferenceValue)
-    // {
-    //            LocalChangeResourceReferenceEntity(
-    //              id = DEFAULT_ID_VALUE,
-    //              localChangeId = DEFAULT_ID_VALUE,
-    //              resourceReferencePath =
-    // localChangeResourceReferenceEntity.resourceReferencePath,
-    //              resourceReferenceValue = updatedReferenceValue,
-    //            )
-    //          } else {
-    //            localChangeResourceReferenceEntity.copy(
-    //              id = DEFAULT_ID_VALUE,
-    //              localChangeId = DEFAULT_ID_VALUE,
-    //            )
-    //          }
-    //        }
-    //      discardLocalChanges(existingLocalChangeEntity.id)
-    //      createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
-    //    }
-    //    return referringLocalChanges.map { it.resourceUuid }.distinct()
-  }
-
-  internal suspend fun updateReferencesInLocalChange(
-    preSyncReferenceValue: String,
-    postSyncReferenceValue: String,
-  ): List<UUID> {
     val referringLocalChangeIds =
-      getLocalChangeReferencesWithValue(preSyncReferenceValue).map { it.localChangeId }.distinct()
+      getLocalChangeReferencesWithValue(oldReferenceValue).map { it.localChangeId }.distinct()
     val referringLocalChanges = getLocalChanges(referringLocalChangeIds)
 
     referringLocalChanges.forEach { existingLocalChangeEntity ->
       val updatedLocalChangeEntity =
         replaceReferencesInLocalChangePayload(
             localChange = existingLocalChangeEntity,
-            oldReference = preSyncReferenceValue,
-            updatedReference = postSyncReferenceValue,
+            oldReference = oldReferenceValue,
+            updatedReference = updatedReferenceValue,
           )
           .copy(id = DEFAULT_ID_VALUE)
       val updatedLocalChangeReferences =
         getReferencesForLocalChange(existingLocalChangeEntity.id).map {
           localChangeResourceReferenceEntity ->
-          if (localChangeResourceReferenceEntity.resourceReferenceValue == preSyncReferenceValue) {
+          if (localChangeResourceReferenceEntity.resourceReferenceValue == oldReferenceValue) {
             LocalChangeResourceReferenceEntity(
               id = DEFAULT_ID_VALUE,
               localChangeId = DEFAULT_ID_VALUE,
               resourceReferencePath = localChangeResourceReferenceEntity.resourceReferencePath,
-              resourceReferenceValue = postSyncReferenceValue,
+              resourceReferenceValue = updatedReferenceValue,
             )
           } else {
             localChangeResourceReferenceEntity.copy(
@@ -482,30 +439,8 @@ internal abstract class LocalChangeDao {
             )
           }
         }
-      Log.d(
-        "Bundle POST",
-        "updateReferencesInLocalChange preSyncReferenceValue: $preSyncReferenceValue",
-      )
-      getAllLocalChanges().forEach {
-        Log.d(
-          "Bundle POST",
-          "updateReferencesInLocalChange local changes before discard : ${it.resourceId}, ${it.resourceType}, ${it.id}",
-        )
-      }
       discardLocalChanges(existingLocalChangeEntity.id)
-      getAllLocalChanges().forEach {
-        Log.d(
-          "Bundle POST",
-          "updateReferencesInLocalChange local changes after discard : ${it.resourceId}, ${it.resourceType}, ${it.id}",
-        )
-      }
       createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
-      getAllLocalChanges().forEach {
-        Log.d(
-          "Bundle POST",
-          "updateReferencesInLocalChange local changes after create : ${it.resourceId}, ${it.resourceType}, ${it.id}",
-        )
-      }
     }
     return referringLocalChanges.map { it.resourceUuid }.distinct()
   }

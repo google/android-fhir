@@ -203,7 +203,6 @@ internal class DatabaseImpl(
     }
   }
 
-  // entry Bundle
   override suspend fun updateResourcesAndLocalChangesPostSync(
     preSyncResourceId: String,
     postSyncResourceID: String,
@@ -226,7 +225,8 @@ internal class DatabaseImpl(
         postSyncResourceID,
         resourceType,
       )
-      updateLocalChangeReferencesPostSync(preSyncResourceId, postSyncResourceID, resourceType)
+      //      updateLocalChangeReferencesPostSync(preSyncResourceId, postSyncResourceID,
+      // resourceType)
     }
   }
 
@@ -522,19 +522,6 @@ internal class DatabaseImpl(
       val localChanges = localChangeDao.getLocalChanges(localChangeIds)
       localChanges.map { it.resourceUuid }.distinct()
     }
-  }
-
-  private suspend fun updateLocalChangeReferencesPostSync(
-    preSyncResourceId: String,
-    postSyncResourceID: String,
-    resourceType: ResourceType,
-  ) {
-    val preSyncReferenceValue = "$resourceType/$preSyncResourceId"
-    val postSyncReferenceValue = "$resourceType/$postSyncResourceID"
-    localChangeDao.updateReferencesInLocalChange(
-      preSyncReferenceValue = preSyncReferenceValue,
-      postSyncReferenceValue = postSyncReferenceValue,
-    )
   }
 
   private suspend fun updateResourceReferencesPostSync(

@@ -75,6 +75,12 @@ internal interface Database {
     postSyncResource: Resource,
   )
 
+  /**
+   * Updates the resource present in the [ResourceEntity] table. [preSyncResourceId] is the resource
+   * ID before synchronization, and [postSyncResourceID] is the resource ID after synchronization.
+   * [dependentResources] are UUIDs used to fetch the dependent resources. Referring resource's
+   * reference value is updated with the [postSyncResourceID].
+   */
   suspend fun updateResourcesAndLocalChangesPostSync(
     preSyncResourceId: String,
     postSyncResourceID: String,
@@ -216,6 +222,16 @@ internal interface Database {
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference>
 
+  /**
+   * Retrieves a list of UUIDs for resources that reference [preSyncResourceId]. [preSyncResourceId]
+   * can be referenced as the reference value in other resources, returning those resource UUIDs.
+   * Essentially, [LocalChangeResourceReference] contains
+   * [LocalChangeResourceReference.resourceReferenceValue] and
+   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
+   *
+   * @param preSyncResource The resource that is being referenced.
+   * @return A list of UUIDs of resources that reference [preSyncResource].
+   */
   suspend fun getResourceUuidsThatReferenceTheGivenResource(
     preSyncResourceId: String,
     resourceType: ResourceType,
