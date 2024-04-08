@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import android.util.Log
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
@@ -145,6 +146,12 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
     while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
+      localChanges.forEach {
+        Log.d(
+          "BundlePost",
+          "syncUpload: localchanges presyncResourceId : ${it.resourceId}, id : ${it.token.ids}",
+        )
+      }
       val uploadRequestResult =
         upload(localChanges)
           .onEach { result ->

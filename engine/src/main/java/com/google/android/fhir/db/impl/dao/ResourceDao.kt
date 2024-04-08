@@ -46,7 +46,9 @@ import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -186,6 +188,27 @@ internal abstract class ResourceDao {
     resourceType: ResourceType,
     versionId: String,
     lastUpdatedRemote: Instant,
+  )
+
+  @Query(
+    """
+        UPDATE ResourceEntity
+        SET 
+            resourceId = :postSyncResourceID,
+            serializedResource = :payloadPostSync,
+            versionId = :postSyncResourceVersionId,
+            lastUpdatedRemote = :postSyncResourceLastUpdated
+        WHERE resourceId = :preSyncResourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    payloadPostSync: String,
   )
 
   @Query(
@@ -360,6 +383,47 @@ internal abstract class ResourceDao {
       postSyncResource.resourceType,
       iParser.encodeResourceToString(postSyncResource),
     )
+  }
+
+  suspend fun updateResourceAndIndexPostSync(
+    preSyncResourceId: String,
+    postSyncResourceId: String,
+    resourceType: ResourceType,
+    postSyncVersionId: String,
+    postSyncRemoteLastUpdated: Instant,
+  ) {
+    getResourceEntity(preSyncResourceId, resourceType)?.let {
+      val preSyncResource = iParser.parseResource(it.serializedResource) as Resource
+      preSyncResource.idElement = IdType(postSyncResourceId)
+      preSyncResource.meta =
+        Meta().apply {
+          versionIdElement = IdType(postSyncVersionId)
+          lastUpdatedElement = InstantType(Date.from(postSyncRemoteLastUpdated))
+        }
+      updateResourcePostSync(
+        preSyncResourceId = preSyncResourceId,
+        postSyncResourceID = postSyncResourceId,
+        resourceType = resourceType,
+        postSyncResourceVersionId = postSyncVersionId,
+        postSyncResourceLastUpdated = postSyncRemoteLastUpdated,
+        payloadPostSync = iParser.encodeResourceToString(preSyncResource),
+      )
+    }
+    // update the remote lastUpdated index
+    getResourceEntity(postSyncResourceId, resourceType)?.let {
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, postSyncResourceId)
+          .apply {
+            addDateTimeIndex(
+              createLastUpdatedIndex(
+                resourceType,
+                InstantType(Date.from(postSyncRemoteLastUpdated)),
+              ),
+            )
+          }
+          .build()
+      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    }
   }
 
   private suspend fun updateIndicesForResource(

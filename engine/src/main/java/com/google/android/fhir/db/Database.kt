@@ -75,6 +75,15 @@ internal interface Database {
     postSyncResource: Resource,
   )
 
+  suspend fun updateResourcesAndLocalChangesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    dependentResources: List<UUID> = emptyList(),
+  )
+
   /**
    * Selects the FHIR resource of type `clazz` with `id`.
    *
@@ -206,6 +215,11 @@ internal interface Database {
   suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference>
+
+  suspend fun getResourceUuidsThatReferenceTheGivenResource(
+    preSyncResourceId: String,
+    resourceType: ResourceType,
+  ): List<UUID>
 }
 
 data class ResourceWithUUID<R>(

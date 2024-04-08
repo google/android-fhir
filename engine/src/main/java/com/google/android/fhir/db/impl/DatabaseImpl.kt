@@ -203,6 +203,33 @@ internal class DatabaseImpl(
     }
   }
 
+  // entry Bundle
+  override suspend fun updateResourcesAndLocalChangesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    dependentResources: List<UUID>,
+  ) {
+    db.withTransaction {
+      resourceDao.updateResourceAndIndexPostSync(
+        preSyncResourceId,
+        postSyncResourceID,
+        resourceType,
+        postSyncResourceVersionId,
+        postSyncResourceLastUpdated,
+      )
+      updateResourceReferencesPostSync(
+        dependentResources,
+        preSyncResourceId,
+        postSyncResourceID,
+        resourceType,
+      )
+      updateLocalChangeReferencesPostSync(preSyncResourceId, postSyncResourceID, resourceType)
+    }
+  }
+
   override suspend fun select(type: ResourceType, id: String): Resource {
     return db.withTransaction {
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
@@ -376,6 +403,14 @@ internal class DatabaseImpl(
   ) {
     val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    updateReferringResources(referringResourcesUuids, oldReferenceValue, updatedReferenceValue)
+  }
+
+  private suspend fun updateReferringResources(
+    referringResourcesUuids: List<UUID>,
+    preSyncReferenceValue: String,
+    postSyncReferenceValue: String,
+  ) {
     referringResourcesUuids.forEach { resourceUuid ->
       resourceDao.getResourceEntity(resourceUuid)?.let {
         val referringResource = iParser.parseResource(it.serializedResource) as Resource
@@ -383,8 +418,8 @@ internal class DatabaseImpl(
           addUpdatedReferenceToResource(
             iParser,
             referringResource,
-            oldReferenceValue,
-            updatedReferenceValue,
+            preSyncReferenceValue,
+            postSyncReferenceValue,
           )
         resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
       }
@@ -451,6 +486,19 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun getResourceUuidsThatReferenceTheGivenResource(
+    preSyncResourceId: String,
+    resourceType: ResourceType,
+  ): List<UUID> {
+    return db.withTransaction {
+      val preSyncResource =
+        iParser.parseResource(
+          selectEntity(resourceType, preSyncResourceId).serializedResource,
+        ) as Resource
+      getResourceUuidsThatRefereceTheGivenResource(preSyncResource)
+    }
+  }
+
   /**
    * Retrieves a list of UUIDs for resources that reference [preSyncResource]. [preSyncResource] can
    * be referenced as the reference value in other resources, returning those resource UUIDs.
@@ -474,6 +522,34 @@ internal class DatabaseImpl(
       val localChanges = localChangeDao.getLocalChanges(localChangeIds)
       localChanges.map { it.resourceUuid }.distinct()
     }
+  }
+
+  private suspend fun updateLocalChangeReferencesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+  ) {
+    val preSyncReferenceValue = "$resourceType/$preSyncResourceId"
+    val postSyncReferenceValue = "$resourceType/$postSyncResourceID"
+    localChangeDao.updateReferencesInLocalChange(
+      preSyncReferenceValue = preSyncReferenceValue,
+      postSyncReferenceValue = postSyncReferenceValue,
+    )
+  }
+
+  private suspend fun updateResourceReferencesPostSync(
+    referringResourcesUuids: List<UUID>,
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+  ) {
+    val preSyncReferenceValue = "$resourceType/$preSyncResourceId"
+    val postSyncReferenceValue = "$resourceType/$postSyncResourceID"
+    updateReferringResources(
+      referringResourcesUuids = referringResourcesUuids,
+      preSyncReferenceValue = preSyncReferenceValue,
+      postSyncReferenceValue = postSyncReferenceValue,
+    )
   }
 
   companion object {

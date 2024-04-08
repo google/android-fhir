@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl
 
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.logicalId
 import org.hl7.fhir.r4.model.Resource
 import org.json.JSONArray
 import org.json.JSONObject
@@ -29,6 +30,21 @@ internal fun addUpdatedReferenceToResource(
 ): Resource {
   val resourceJsonObject = JSONObject(iParser.encodeResourceToString(resource))
   val updatedResource = replaceJsonValue(resourceJsonObject, outdatedReference, updatedReference)
+  return iParser.parseResource(updatedResource.toString()) as Resource
+}
+
+/**
+ * Updates existing [Resource.logicalId] to [postSyncResourceId] in the given resource
+ * [preSyncResource].
+ */
+internal fun updateResourceId(
+  iParser: IParser,
+  preSyncResource: Resource,
+  postSyncResourceId: String,
+): Resource {
+  val resourceJsonObject = JSONObject(iParser.encodeResourceToString(preSyncResource))
+  val updatedResource =
+    replaceJsonValue(resourceJsonObject, preSyncResource.logicalId, postSyncResourceId)
   return iParser.parseResource(updatedResource.toString()) as Resource
 }
 
