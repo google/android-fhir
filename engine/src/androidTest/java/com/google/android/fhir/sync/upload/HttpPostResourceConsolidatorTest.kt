@@ -27,6 +27,8 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.logicalId
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Observation
@@ -236,4 +238,233 @@ class HttpPostResourceConsolidatorTest {
       )
       .isEqualTo("Patient/patient2")
   }
+
+  // AllChangesBundleSquashed
+
+  @Test
+  fun postSync_allChangesBundleSquashedPost_resourceConsolidation_updateResourceId() = runBlocking {
+    val preSyncPatientJsonString =
+      """
+        {
+          "resourceType": "Patient",
+          "id": "patient1"
+        }
+            """
+        .trimIndent()
+    val preSyncPatient =
+      FhirContext.forCached(FhirVersionEnum.R4)
+        .newJsonParser()
+        .parseResource(preSyncPatientJsonString) as DomainResource
+    database.insert(preSyncPatient)
+    val localChanges =
+      database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
+    val bundleEntryComponentJsonString =
+      """
+        {
+          "resourceType": "Bundle",
+          "id": "bundle1",
+          "type": "transaction-response",
+          "entry": [
+            {
+              "response": {
+                "status": "201 Created",
+                "location": "Patient/patient2/_history/1",
+                "etag": "1",
+                "lastModified": "2024-04-08T11:15:42.648+00:00",
+                "outcome": {
+                  "resourceType": "OperationOutcome"
+                }
+              }
+            },
+            {
+              "response": {
+                "status": "201 Created",
+                "location": "Encounter/8055/_history/1",
+                "etag": "1",
+                "lastModified": "2024-04-08T11:15:42.648+00:00",
+                "outcome": {
+                  "resourceType": "OperationOutcome"
+                }
+              }
+            }
+          ]
+        }
+            """
+        .trimIndent()
+
+    val postSyncResponseBundle =
+      FhirContext.forCached(FhirVersionEnum.R4)
+        .newJsonParser()
+        .parseResource(bundleEntryComponentJsonString) as Bundle
+
+    val patientResponseEntry =
+      (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
+    val secondResponseEntry = postSyncResponseBundle.entry[1]
+
+    val uploadRequestResult =
+      UploadRequestResult.Success(
+        listOf(BundleComponentUploadResponseMapping(localChanges, patientResponseEntry)),
+      )
+
+    resourceConsolidator.consolidate(uploadRequestResult)
+
+    assertThat(database.select(ResourceType.Patient, "patient2").logicalId)
+      .isEqualTo(patientResponseEntry.resourceIdAndType?.first)
+
+    val exception =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, "patient1") }
+      }
+
+    assertThat(exception.message).isEqualTo("Resource not found with type Patient and id patient1!")
+  }
+
+  @Test
+  fun postSync_allChangesBundleSquashedPost_resourceConsolidation_updateReferencesForResource() =
+    runBlocking {
+      val preSyncPatientJsonString =
+        """
+        {
+          "resourceType": "Patient",
+          "id": "patient1"
+        }
+            """
+          .trimIndent()
+      val preSyncPatient =
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(preSyncPatientJsonString) as DomainResource
+      val preSyncObservationJsonString =
+        """
+        {
+          "resourceType": "Observation",
+          "id": "observation1",
+          "subject": {
+            "reference": "Patient/patient1"
+          }
+        }
+            """
+          .trimIndent()
+      val preSyncObservation =
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(preSyncObservationJsonString) as DomainResource
+      database.insert(preSyncPatient, preSyncObservation)
+      val patientLocalChanges =
+        database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
+      val observationLocalChanges =
+        database.getLocalChanges(preSyncObservation.resourceType, preSyncObservation.logicalId)
+      val bundleEntryComponentJsonString =
+        """
+        {
+          "resourceType": "Bundle",
+          "id": "bundle1",
+          "type": "transaction-response",
+          "entry": [
+            {
+              "response": {
+                "status": "201 Created",
+                "location": "Patient/patient2/_history/1",
+                "etag": "1",
+                "lastModified": "2024-04-08T11:15:42.648+00:00",
+                "outcome": {
+                  "resourceType": "OperationOutcome"
+                }
+              }
+            },
+            {
+              "response": {
+                "status": "201 Created",
+                "location": "Observation/observation2/_history/1",
+                "etag": "1",
+                "lastModified": "2024-04-08T11:15:42.648+00:00",
+                "outcome": {
+                  "resourceType": "OperationOutcome"
+                }
+              }
+            }
+          ]
+        }
+            """
+          .trimIndent()
+
+      val postSyncResponseBundle =
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(bundleEntryComponentJsonString) as Bundle
+
+      val patientResponseEntry =
+        (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
+      val observationResponseEntry =
+        (postSyncResponseBundle.entry[1] as BundleEntryComponent).response
+
+      val uploadRequestResult =
+        UploadRequestResult.Success(
+          listOf(
+            BundleComponentUploadResponseMapping(patientLocalChanges, patientResponseEntry),
+            BundleComponentUploadResponseMapping(observationLocalChanges, observationResponseEntry),
+          ),
+        )
+
+      resourceConsolidator.consolidate(uploadRequestResult)
+
+      assertThat(
+          (database.select(ResourceType.Observation, "observation2") as Observation)
+            .subject
+            .reference,
+        )
+        .isEqualTo("Patient/patient2")
+    }
+
+  @Test
+  fun postSync_allChangesBundleSquashedPost_resourceConsolidation_localChangesSquashed() =
+    runBlocking {
+      val preSyncPatientJsonString =
+        """
+        {
+          "resourceType": "Patient",
+          "id": "patient1"
+        }
+            """
+          .trimIndent()
+      val preSyncPatient =
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(preSyncPatientJsonString) as DomainResource
+      database.insert(preSyncPatient)
+      val localChanges =
+        database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
+      val bundleEntryComponentJsonString =
+        """
+        {
+          "resourceType": "Bundle",
+          "id": "bundle1",
+          "type": "transaction-response",
+          "entry": [
+            {
+              "response": {
+                "status": "201 Created",
+                "location": "Patient/patient2/_history/1",
+                "etag": "1"
+              }
+            }
+          ]
+        }
+            """
+          .trimIndent()
+      val postSyncResponseBundle =
+        FhirContext.forCached(FhirVersionEnum.R4)
+          .newJsonParser()
+          .parseResource(bundleEntryComponentJsonString) as Bundle
+      val patientResponseEntry =
+        (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
+      val uploadRequestResult =
+        UploadRequestResult.Success(
+          listOf(BundleComponentUploadResponseMapping(localChanges, patientResponseEntry)),
+        )
+
+      resourceConsolidator.consolidate(uploadRequestResult)
+
+      assertThat(database.getAllLocalChanges()).isEmpty()
+    }
 }

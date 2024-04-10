@@ -187,7 +187,7 @@ private fun getVersionFromETag(eTag: String) =
  * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
  * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
  */
-private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+internal val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
   get() =
     location
       ?.split("/")
