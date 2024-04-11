@@ -197,7 +197,7 @@ internal abstract class ResourceDao {
         AND resourceType = :resourceType
     """,
   )
-  abstract suspend fun updateResourceIdInResourceEntityPostSync(
+  abstract suspend fun updateResourceIdAndPayloadPostSync(
     preSyncResourceId: String,
     postSyncResourceId: String,
     resourceType: ResourceType,
@@ -354,7 +354,7 @@ internal abstract class ResourceDao {
         postSyncResource.meta.lastUpdated.toInstant(),
       )
     }
-    updateResourceIdInResourceEntityPostSync(
+    updateResourceIdAndPayloadPostSync(
       preSyncResourceId,
       postSyncResource.logicalId,
       postSyncResource.resourceType,

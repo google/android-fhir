@@ -106,7 +106,10 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
         )
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
-            is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is BundleComponentUploadResponseMapping -> {
+              // TODO https://github.com/google/android-fhir/issues/2499
+              throw NotImplementedError()
+            }
             is ResourceUploadResponseMapping -> {
               val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
               preSyncResourceId?.let { preSyncResourceId ->
@@ -122,19 +125,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
          */
       }
     }
-
-  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (id, type) ->
-        database.updateVersionIdAndLastUpdated(
-          id,
-          type,
-          getVersionFromETag(response.etag),
-          response.lastModified.toInstant(),
-        )
-      }
-    }
-  }
 
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,

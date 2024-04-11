@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
@@ -66,7 +65,7 @@ class HttpPostResourceConsolidatorTest {
   }
 
   @Test
-  fun postSync_resourceConsolidation_updateResourceId() = runBlocking {
+  fun consolidate_shouldUpdateResourceId() = runBlocking {
     val patientJsonString =
       """
         {
@@ -76,8 +75,7 @@ class HttpPostResourceConsolidatorTest {
             """
         .trimIndent()
     val patient =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patientJsonString)
-        as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
     database.insert(patient)
     val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
 
@@ -93,9 +91,8 @@ class HttpPostResourceConsolidatorTest {
         """
         .trimIndent()
     val postSyncPatient =
-      FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(postSyncPatientJsonString) as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
+        as DomainResource
     postSyncPatient.meta.lastUpdatedElement = InstantType.now()
     val uploadRequestResult =
       UploadRequestResult.Success(
@@ -115,7 +112,7 @@ class HttpPostResourceConsolidatorTest {
   }
 
   @Test
-  fun postSync_resourceConsolidation_updateReferencesForResource() = runBlocking {
+  fun consolidate_dependentResources_shouldUpdateReferenceValue() = runBlocking {
     val patientJsonString =
       """
         {
@@ -125,8 +122,7 @@ class HttpPostResourceConsolidatorTest {
             """
         .trimIndent()
     val patient =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patientJsonString)
-        as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
     val observationJsonString =
       """
         {
@@ -139,7 +135,7 @@ class HttpPostResourceConsolidatorTest {
             """
         .trimIndent()
     val observation =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(observationJsonString)
+      FhirContext.forR4Cached().newJsonParser().parseResource(observationJsonString)
         as DomainResource
     database.insert(patient, observation)
     val postSyncPatientJsonString =
@@ -154,9 +150,8 @@ class HttpPostResourceConsolidatorTest {
         """
         .trimIndent()
     val postSyncPatient =
-      FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(postSyncPatientJsonString) as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
+        as DomainResource
     postSyncPatient.meta.lastUpdatedElement = InstantType.now()
     val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     val uploadRequestResult =
@@ -175,7 +170,7 @@ class HttpPostResourceConsolidatorTest {
   }
 
   @Test
-  fun postSync_resourceConsolidation_updateReferencesForLocalChanges() = runBlocking {
+  fun consolidate_localChanges_shouldUpdateReferenceValue() = runBlocking {
     val patientJsonString =
       """
         {
@@ -185,8 +180,7 @@ class HttpPostResourceConsolidatorTest {
             """
         .trimIndent()
     val patient =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patientJsonString)
-        as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
     val observationJsonString =
       """
         {
@@ -199,7 +193,7 @@ class HttpPostResourceConsolidatorTest {
             """
         .trimIndent()
     val observation =
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(observationJsonString)
+      FhirContext.forR4Cached().newJsonParser().parseResource(observationJsonString)
         as DomainResource
     database.insert(patient, observation)
     val postSyncPatientJsonString =
@@ -214,9 +208,8 @@ class HttpPostResourceConsolidatorTest {
         """
         .trimIndent()
     val postSyncPatient =
-      FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(postSyncPatientJsonString) as DomainResource
+      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
+        as DomainResource
     postSyncPatient.meta.lastUpdatedElement = InstantType.now()
     val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     val uploadRequestResult =
@@ -228,9 +221,8 @@ class HttpPostResourceConsolidatorTest {
 
     val localChange = database.getLocalChanges(ResourceType.Observation, "observation1").last()
     assertThat(
-        (FhirContext.forCached(FhirVersionEnum.R4)
-            .newJsonParser()
-            .parseResource(localChange.payload) as Observation)
+        (FhirContext.forR4Cached().newJsonParser().parseResource(localChange.payload)
+            as Observation)
           .subject
           .reference,
       )
