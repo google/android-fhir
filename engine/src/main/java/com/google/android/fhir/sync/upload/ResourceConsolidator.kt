@@ -153,7 +153,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
       }
     }
   }
-
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,
     postSyncResource: Resource,
