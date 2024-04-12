@@ -203,7 +203,7 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateResourcesAndLocalChangesPostSync(
+  override suspend fun updateResourcesPostSync(
     preSyncResourceId: String,
     postSyncResourceID: String,
     resourceType: ResourceType,
@@ -220,13 +220,11 @@ internal class DatabaseImpl(
         postSyncResourceLastUpdated,
       )
       updateResourceReferencesPostSync(
-        dependentResources,
         preSyncResourceId,
         postSyncResourceID,
         resourceType,
+        dependentResources,
       )
-      //      updateLocalChangeReferencesPostSync(preSyncResourceId, postSyncResourceID,
-      // resourceType)
     }
   }
 
@@ -525,10 +523,10 @@ internal class DatabaseImpl(
   }
 
   private suspend fun updateResourceReferencesPostSync(
-    referringResourcesUuids: List<UUID>,
     preSyncResourceId: String,
     postSyncResourceID: String,
     resourceType: ResourceType,
+    referringResourcesUuids: List<UUID>,
   ) {
     val preSyncReferenceValue = "$resourceType/$preSyncResourceId"
     val postSyncReferenceValue = "$resourceType/$postSyncResourceID"

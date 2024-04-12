@@ -385,7 +385,7 @@ internal abstract class ResourceDao {
     )
   }
 
-  suspend fun updateResourceAndIndexPostSync(
+  internal suspend fun updateResourceAndIndexPostSync(
     preSyncResourceId: String,
     postSyncResourceId: String,
     resourceType: ResourceType,

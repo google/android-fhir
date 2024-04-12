@@ -142,7 +142,7 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   ) {
     if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
       response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
-        database.updateResourcesAndLocalChangesPostSync(
+        database.updateResourcesPostSync(
           preSyncResourceId,
           postSyncResourceID,
           resourceType,

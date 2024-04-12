@@ -80,12 +80,21 @@ internal interface Database {
   )
 
   /**
-   * Updates the resource present in the [ResourceEntity] table. [preSyncResourceId] is the resource
-   * ID before synchronization, and [postSyncResourceID] is the resource ID after synchronization.
-   * [dependentResources] are UUIDs used to fetch the dependent resources. Referring resource's
-   * reference value is updated with the [postSyncResourceID].
+   * Updates existing [Resource] present in the [ResourceEntity]. It updates [Resource.id],
+   * metadata, and reference values of the dependent resources. This method is more suitable if
+   * [preSyncResourceId] and post-sync resourceId [postSyncResource] are different. However, even if
+   * [preSyncResourceId] and post-sync resourceId are the same, it still updates the reference value
+   * of referring resources, which is just redundant.
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResourceID The [Resource.id] of the resource after synchronization.
+   * @param postSyncResourceVersionId The version id of the resource after synchronization.
+   * @param postSyncResourceLastUpdated The last modified time of the resource after
+   *   synchronization.
+   * @param dependentResources The dependent resources for which the reference value will be
+   *   changed.
    */
-  suspend fun updateResourcesAndLocalChangesPostSync(
+  suspend fun updateResourcesPostSync(
     preSyncResourceId: String,
     postSyncResourceID: String,
     resourceType: ResourceType,
