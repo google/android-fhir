@@ -174,8 +174,8 @@ internal interface Database {
   suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
 
   /**
-   * Purge resources from database based on resource type and id without any deletion of data from
-   * the server.
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
    *
    * @param type The [ResourceType]
    * @param ids The resource ids [Set]<[Resource.id]>

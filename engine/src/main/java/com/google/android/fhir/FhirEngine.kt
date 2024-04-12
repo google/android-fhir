@@ -199,8 +199,8 @@ interface FhirEngine {
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
 
   /**
-   * Purges a resource from the database based on resource type and id without any deletion of data
-   * from the server.
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
    *
    * @param type The [ResourceType]
    * @param ids The resource ids [Set]<[Resource.id]>
