@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -253,22 +253,6 @@ class TransactionBundleGeneratorTest {
         }
       }
     assertThat(exception.localizedMessage).isEqualTo("Creation using PATCH is not supported.")
-  }
-
-  @Test
-  fun `getGenerator() should through exception for create by POST`() {
-    val exception =
-      assertThrows(IllegalArgumentException::class.java) {
-        runBlocking {
-          TransactionBundleGenerator.Factory.getGenerator(
-            Bundle.HTTPVerb.POST,
-            Bundle.HTTPVerb.PATCH,
-            generatedBundleSize = 500,
-            useETagForUpload = true,
-          )
-        }
-      }
-    assertThat(exception.localizedMessage).isEqualTo("Creation using POST is not supported.")
   }
 
   @Test
