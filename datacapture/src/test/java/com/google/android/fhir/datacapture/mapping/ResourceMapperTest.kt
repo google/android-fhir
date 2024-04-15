@@ -3083,7 +3083,8 @@ class ResourceMapperTest {
     val basePackage = NpmPackage.fromPackage(readFileFromResources("/measles-outbreak/package.tgz"))
 
     val workerContext = knowledgeManager.loadWorkerContext(measlesOutbreakPackage, basePackage)
-    val transformSupportServices = TransformSupportServicesLM(workerContext, mutableListOf())
+    val transformSupportServices =
+      TransformSupportServicesLogicalModel(workerContext, mutableListOf())
 
     val bundle =
       ResourceMapper.extract(
@@ -3150,7 +3151,21 @@ class ResourceMapperTest {
     }
   }
 
-  class TransformSupportServicesLM(
+  /**
+   * Class providing transformer services for a specific context, utilizing a worker context and
+   * managing outputs.
+   *
+   * This class helps the two step structure map extraction. QuestionnaireResponse -> Logical Model
+   * Logical Model -> Resource's
+   *
+   * This was referred through
+   * [matchbox](https://github.com/ahdis/matchbox/blob/main/matchbox-engine/src/main/java/ch/ahdis/matchbox/mappinglanguage/TransformSupportServices.java)
+   * implementation.
+   *
+   * @param workerContext The worker context for managing resources and operations.
+   * @param outputs The list to which output resources are added.
+   */
+  class TransformSupportServicesLogicalModel(
     private val workerContext: IWorkerContext,
     private val outputs: MutableList<Base>,
   ) : StructureMapUtilities.ITransformerServices {

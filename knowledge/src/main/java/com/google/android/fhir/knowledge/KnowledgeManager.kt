@@ -192,6 +192,17 @@ internal constructor(
     return knowledgeDao.insertResource(igId, res)
   }
 
+  /**
+   * Loads and initializes a worker context with the specified npm packages.
+   *
+   * @param npmPackages The npm packages to be loaded into the worker context.
+   * @param allowLoadingDuplicates Flag indicating whether loading duplicate packages is allowed.
+   *   Default is true.
+   * @param loader Custom resource loader for the worker context. Default is null, meaning the
+   *   default loader will be used.
+   *
+   * @return An initialized instance of [IWorkerContext].
+   */
   suspend fun loadWorkerContext(
     vararg npmPackages: NpmPackage,
     allowLoadingDuplicates: Boolean = true,
