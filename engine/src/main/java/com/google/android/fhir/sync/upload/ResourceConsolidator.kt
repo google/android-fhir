@@ -98,31 +98,36 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   override suspend fun consolidate(uploadRequestResult: UploadRequestResult) =
     when (uploadRequestResult) {
       is UploadRequestResult.Success -> {
-        uploadRequestResult.successfulUploadResponseMappings.forEach {
-          when (it) {
+        uploadRequestResult.successfulUploadResponseMappings.forEach { responseMapping ->
+          when (responseMapping) {
             is BundleComponentUploadResponseMapping -> {
-              val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
-              preSyncResourceId?.let { preSyncResourceId ->
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
                 val dependentResources =
-                  it.output.resourceIdAndType?.let {
+                  responseMapping.output.resourceIdAndType?.let {
                     database.getResourceUuidsThatReferenceTheGivenResource(
                       preSyncResourceId,
                       it.second,
                     )
                   }
                     ?: emptyList()
-                val tokenIds = it.localChanges.flatMap { localChange -> localChange.token.ids }
+                val tokenIds =
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids }
                 database.deleteUpdates(LocalChangeToken(tokenIds))
-                updateResourcePostSync(preSyncResourceId, it.output, dependentResources)
+                updateResourcePostSync(
+                  preSyncResourceId,
+                  responseMapping.output,
+                  dependentResources,
+                )
               }
             }
             is ResourceUploadResponseMapping -> {
-              val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
               database.deleteUpdates(
-                LocalChangeToken(it.localChanges.flatMap { localChange -> localChange.token.ids }),
+                LocalChangeToken(
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                ),
               )
-              preSyncResourceId?.let { preSyncResourceId ->
-                updateResourcePostSync(preSyncResourceId, it.output)
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                updateResourcePostSync(preSyncResourceId, responseMapping.output)
               }
             }
           }
