@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
-import org.hl7.fhir.r4.model.Extension
+import com.google.android.fhir.datacapture.extensions.cqfCalculatedValueExpression
+import com.google.android.fhir.datacapture.extensions.hasValue
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] against a constraint
@@ -35,20 +38,35 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
 internal open class AnswerExtensionConstraintValidator(
   val url: String,
   val predicate:
-    (Extension, QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent) -> Boolean,
-  val messageGenerator: (Extension, Context) -> String,
+    (
+      /*constraintValue*/
+      Type,
+      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+    ) -> Boolean,
+  val messageGenerator: (Type, Context) -> String,
 ) : AnswerConstraintValidator {
-  override fun validate(
+  override suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
-  ): AnswerConstraintValidator.Result {
+    expressionEvaluator: suspend (Expression) -> Type?,
+  ): ConstraintValidator.Result {
     if (questionnaireItem.hasExtension(url)) {
       val extension = questionnaireItem.getExtensionByUrl(url)
-      if (predicate(extension, answer)) {
-        return AnswerConstraintValidator.Result(false, messageGenerator(extension, context))
+      val extensionValue =
+        extension.value.cqfCalculatedValueExpression?.let { expressionEvaluator(it) }
+          ?: extension.value
+
+      // Only checks constraint if both extension and answer have a value
+      if (
+        extensionValue.hasValue() && answer.value.hasValue() && predicate(extensionValue, answer)
+      ) {
+        return ConstraintValidator.Result(
+          false,
+          messageGenerator(extensionValue, context),
+        )
       }
     }
-    return AnswerConstraintValidator.Result(true, null)
+    return ConstraintValidator.Result(true, null)
   }
 }

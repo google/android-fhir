@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.datacapture.mapping.ResourceMapper
+import com.google.android.fhir.demo.extensions.readFileFromAssets
 import com.google.android.fhir.get
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
@@ -47,7 +48,10 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
   private suspend fun prepareEditPatient(): Pair<String, String> {
     val patient = fhirEngine.get<Patient>(patientId)
     val launchContexts = mapOf<String, Resource>("client" to patient)
-    val question = readFileFromAssets("new-patient-registration-paginated.json").trimIndent()
+    val question =
+      getApplication<Application>()
+        .readFileFromAssets("new-patient-registration-paginated.json")
+        .trimIndent()
     val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
     val questionnaire = parser.parseResource(Questionnaire::class.java, question) as Questionnaire
 
@@ -101,13 +105,11 @@ class EditPatientViewModel(application: Application, private val state: SavedSta
     questionnaireJson?.let {
       return it
     }
-    questionnaireJson = readFileFromAssets(state[EditPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!)
+    questionnaireJson =
+      getApplication<Application>()
+        .readFileFromAssets(
+          state[EditPatientFragment.QUESTIONNAIRE_FILE_PATH_KEY]!!,
+        )
     return questionnaireJson!!
-  }
-
-  private fun readFileFromAssets(filename: String): String {
-    return getApplication<Application>().assets.open(filename).bufferedReader().use {
-      it.readText()
-    }
   }
 }

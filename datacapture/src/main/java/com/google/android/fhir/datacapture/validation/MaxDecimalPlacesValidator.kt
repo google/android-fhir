@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,24 @@ package com.google.android.fhir.datacapture.validation
  */
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 internal object MaxDecimalPlacesValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_DECIMAL_URL,
     predicate = {
-      extension: Extension,
+      constraintValue: Type,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ->
-      val maxDecimalPlaces = (extension.value as? IntegerType)?.value
+      val maxDecimalPlaces = (constraintValue as? IntegerType)?.value
       answer.hasValueDecimalType() &&
         maxDecimalPlaces != null &&
         answer.valueDecimalType.valueAsString.substringAfter(".").length > maxDecimalPlaces
     },
-    messageGenerator = { extension: Extension, context: Context ->
-      context.getString(R.string.max_decimal_validation_error_msg, extension.value.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.max_decimal_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 

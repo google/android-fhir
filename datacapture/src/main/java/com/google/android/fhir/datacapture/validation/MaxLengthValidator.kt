@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,10 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.extensions.asStringValue
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
  * A validator to check if the answer exceeds the maximum number of permitted characters.
@@ -28,22 +30,23 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse
  * https://www.hl7.org/fhir/valueset-item-type.html#expansion
  */
 internal object MaxLengthValidator : AnswerConstraintValidator {
-  override fun validate(
+  override suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
-  ): AnswerConstraintValidator.Result {
+    expressionEvaluator: suspend (Expression) -> Type?,
+  ): ConstraintValidator.Result {
     if (
       questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
-      return AnswerConstraintValidator.Result(
+      return ConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
           questionnaireItem.maxLength,
       )
     }
-    return AnswerConstraintValidator.Result(true, null)
+    return ConstraintValidator.Result(true, null)
   }
 }
