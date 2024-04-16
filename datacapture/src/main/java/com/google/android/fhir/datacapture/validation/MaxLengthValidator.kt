@@ -35,18 +35,18 @@ internal object MaxLengthValidator : AnswerConstraintValidator {
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
     expressionEvaluator: suspend (Expression) -> Type?,
-  ): AnswerConstraintValidator.Result {
+  ): ConstraintValidator.Result {
     if (
       questionnaireItem.hasMaxLength() &&
         answer.value.isPrimitive &&
         answer.value.asStringValue().length > questionnaireItem.maxLength
     ) {
-      return AnswerConstraintValidator.Result(
+      return ConstraintValidator.Result(
         false,
         "The maximum number of characters that are permitted in the answer is: " +
           questionnaireItem.maxLength,
       )
     }
-    return AnswerConstraintValidator.Result(true, null)
+    return ConstraintValidator.Result(true, null)
   }
 }
