@@ -1,0 +1,29 @@
+site_name: Android FHIR SDK
+site_url: https://google.github.io/android-fhir/
+repo_url: https://github.com/google/android-fhir/
+edit_uri: blob/master/docs/
+copyright: Copyright 2024 The Android FHIR SDK Authors
+
+nav:
+  - Users:
+    - API: use/api.md
+  - Contributors:
+    - Codespaces: contrib/codespaces.md
+    - Documentation: contrib/docs.md
+
+theme:
+  name: material
+  features:
+      - content.action.edit
+      - content.code.copy
+      - navigation.expand
+      - navigation.footer
+      - navigation.instant
+      - navigation.tracking
+      - navigation.expand
+      - navigation.path
+      - navigation.top
+      - navigation.sections
+      - navigation.tabs
+      - search.suggest
+      - search.share
