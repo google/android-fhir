@@ -48,6 +48,7 @@ import com.google.android.material.textfield.TextInputLayout
 import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeParseException
 import java.util.Date
@@ -154,21 +155,31 @@ internal object DatePickerViewHolderFactory :
       }
 
       private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
-        val selectedDateMillis =
-          localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
-            ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val min =
+          (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
+            ?: localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
+              ?: MaterialDatePicker.todayInUtcMilliseconds()
+        val minLocalDateTime =
+          LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(min),
+            ZoneId.of(
+              ZONE_ID_UTC.id,
+            ),
+          )
+        val newMinLocalDateTime = minLocalDateTime.plusDays(1)
+        val selectedDateTimeMillis =
+          newMinLocalDateTime.atZone(ZoneId.of(ZONE_ID_UTC.id)).toInstant().toEpochMilli()
+        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
+        val calendarConstraints = getCalenderConstraint(min, max)
 
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
-          .setSelection(selectedDateMillis)
-          .setCalendarConstraints(getCalenderConstraint())
+          .setSelection(selectedDateTimeMillis)
+          .setCalendarConstraints(calendarConstraints)
           .build()
       }
 
-      private fun getCalenderConstraint(): CalendarConstraints {
-        val min = (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
-        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
-
+      private fun getCalenderConstraint(min: Long?, max: Long?): CalendarConstraints {
         if (min != null && max != null && min > max) {
           throw IllegalArgumentException("minValue cannot be greater than maxValue")
         }
