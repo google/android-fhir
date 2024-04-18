@@ -200,7 +200,6 @@ internal constructor(
    *   Default is true.
    * @param loader Custom resource loader for the worker context. Default is null, meaning the
    *   default loader will be used.
-   *
    * @return An initialized instance of [IWorkerContext].
    */
   suspend fun loadWorkerContext(
