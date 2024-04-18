@@ -195,6 +195,10 @@ internal constructor(
   /**
    * Loads and initializes a worker context with the specified npm packages.
    *
+   * This
+   * [sample](https://github.com/google/android-fhir/blob/385dc32f2706ad5520c121bf39478a105a5d46eb/datacapture/src/test/java/com/google/android/fhir/datacapture/mapping/ResourceMapperTest.kt#L3065)
+   * test demonstrates how to use `loadWorkerContext` API.
+   *
    * @param npmPackages The npm packages to be loaded into the worker context.
    * @param allowLoadingDuplicates Flag indicating whether loading duplicate packages is allowed.
    *   Default is true.
