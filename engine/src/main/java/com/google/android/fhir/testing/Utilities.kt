@@ -204,6 +204,8 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {}
 }
 
 object TestFailingDatasource : DataSource {
