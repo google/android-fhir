@@ -18,7 +18,7 @@ name: "Build"
 # events for the `master` branch
 on:
   push:
-    branches: [master]
+    branches: [master,master-deploy-repo]
     tags: build*
   pull_request:
     # The branches below must be a subset of the branches above
@@ -82,6 +82,11 @@ jobs:
         with:
           name: maven-repository
           path: build/ci-repo
+      - name: Publish package
+        if: ${{ github.event_name == 'push' }}
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Zip artifact for debugging
         if: ${{ failure() }}
