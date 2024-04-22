@@ -125,14 +125,21 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
           }
           repositories {
             maven {
-              name = "CI"
-              url = uri("file://${rootProject.buildDir}/ci-repo")
-              version =
-                if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
-                  "${artifact.version}-build_${System.getenv("GITHUB_RUN_ID")}"
-                } else {
-                  artifact.version
+              if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
+                name = "GitHubPackages"
+//                url = uri("https://maven.pkg.github.com/google/android-fhir")
+                url = uri("https://maven.pkg.github.com/icrc-fdeniger/android-fhir")
+                //TODO: would change with SNAPSHOT THERE...
+                version ="${artifact.version}-build_${System.getenv("GITHUB_RUN_ID")}"
+                credentials {
+                  username = System.getenv("GITHUB_ACTOR")
+                  password = System.getenv("GITHUB_TOKEN")
                 }
+              }else{
+                name = "CI"
+                url = uri("file://${rootProject.buildDir}/ci-repo")
+                version = artifact.version
+              }
             }
           }
         }
