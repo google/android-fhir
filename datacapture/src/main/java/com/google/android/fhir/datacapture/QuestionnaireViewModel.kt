@@ -398,6 +398,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       externalValueSetResolver,
     )
 
+  private val questionnaireResponseItemValidator: QuestionnaireResponseItemValidator =
+    QuestionnaireResponseItemValidator(expressionEvaluator)
+
   /**
    * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
    * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
@@ -832,17 +835,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           forceValidation ||
           isInReviewModeFlow.value
       ) {
-        QuestionnaireResponseItemValidator.validate(
+        questionnaireResponseItemValidator.validate(
           questionnaireItem,
-          questionnaireResponseItem.answer,
+          questionnaireResponseItem,
           this@QuestionnaireViewModel.getApplication(),
-        ) {
-          expressionEvaluator.evaluateExpressionValue(
-            questionnaireItem,
-            questionnaireResponseItem,
-            it,
-          )
-        }
+        )
       } else {
         NotValidated
       }

@@ -483,6 +483,23 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun `purge() multiple with local change and force purge true should purge resources`() =
+    runBlocking {
+      val ids = fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2)
+
+      fhirEngine.purge(ResourceType.Patient, ids.toSet(), true)
+
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+      assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
+      assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID)).isEmpty()
+    }
+
+  @Test
   fun `purge() with local change and force purge false should throw IllegalStateException`() =
     runBlocking {
       val resourceIllegalStateException =
