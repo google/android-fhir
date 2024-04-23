@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.sync.upload.patch.Mapping
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
@@ -50,9 +51,10 @@ class TransactionBundleGeneratorTest {
   fun `generateUploadRequests() should return single Transaction Bundle with 3 entries`() =
     runBlocking {
       val patches =
-        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
-          PatchMapping(listOf(it), it.toPatch())
-        }
+        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
+          .map { PatchMapping(listOf(it), it.toPatch()) }
+          .map { Mapping.IndividualMapping(it) }
+
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
 
@@ -74,9 +76,9 @@ class TransactionBundleGeneratorTest {
     runBlocking {
       val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val patches =
-        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
-          PatchMapping(listOf(it), it.toPatch())
-        }
+        listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
+          .map { PatchMapping(listOf(it), it.toPatch()) }
+          .map { Mapping.IndividualMapping(it) }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -119,11 +121,12 @@ class TransactionBundleGeneratorTest {
         )
       val patches =
         listOf(
-          PatchMapping(
-            localChanges = listOf(localChange),
-            generatedPatch = localChange.toPatch(),
-          ),
-        )
+            PatchMapping(
+              localChanges = listOf(localChange),
+              generatedPatch = localChange.toPatch(),
+            ),
+          )
+          .map { Mapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
@@ -147,11 +150,12 @@ class TransactionBundleGeneratorTest {
         )
       val patches =
         listOf(
-          PatchMapping(
-            localChanges = listOf(localChange),
-            generatedPatch = localChange.toPatch(),
-          ),
-        )
+            PatchMapping(
+              localChanges = listOf(localChange),
+              generatedPatch = localChange.toPatch(),
+            ),
+          )
+          .map { Mapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -185,7 +189,10 @@ class TransactionBundleGeneratorTest {
             token = LocalChangeToken(listOf(2L)),
           ),
         )
-      val patches = localChanges.map { PatchMapping(listOf(it), it.toPatch()) }
+      val patches =
+        localChanges
+          .map { PatchMapping(listOf(it), it.toPatch()) }
+          .map { Mapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 

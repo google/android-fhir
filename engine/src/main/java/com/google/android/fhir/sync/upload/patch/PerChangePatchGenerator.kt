@@ -25,19 +25,21 @@ import com.google.android.fhir.LocalChange
  * maintain an audit trail.
  */
 internal object PerChangePatchGenerator : PatchGenerator {
-  override suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping> =
-    localChanges.map {
-      PatchMapping(
-        localChanges = listOf(it),
-        generatedPatch =
-          Patch(
-            resourceType = it.resourceType,
-            resourceId = it.resourceId,
-            versionId = it.versionId,
-            timestamp = it.timestamp,
-            type = it.type.toPatchType(),
-            payload = it.payload,
-          ),
-      )
-    }
+  override suspend fun generate(localChanges: List<LocalChange>): List<Mapping> =
+    localChanges
+      .map {
+        PatchMapping(
+          localChanges = listOf(it),
+          generatedPatch =
+            Patch(
+              resourceType = it.resourceType,
+              resourceId = it.resourceId,
+              versionId = it.versionId,
+              timestamp = it.timestamp,
+              type = it.type.toPatchType(),
+              payload = it.payload,
+            ),
+        )
+      }
+      .map { Mapping.IndividualMapping(it) }
 }

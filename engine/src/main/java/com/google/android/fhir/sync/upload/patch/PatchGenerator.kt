@@ -35,7 +35,7 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping>
+  suspend fun generate(localChanges: List<LocalChange>): List<Mapping>
 }
 
 internal object PatchGeneratorFactory {
@@ -67,3 +67,9 @@ internal data class PatchMapping(
   val localChanges: List<LocalChange>,
   val generatedPatch: Patch,
 )
+
+internal sealed interface Mapping {
+  data class IndividualMapping(val patchMapping: PatchMapping) : Mapping
+
+  data class CombinedMapping(val patchMappings: List<PatchMapping>) : Mapping
+}

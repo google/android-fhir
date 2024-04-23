@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.sync.upload.request
 
+import com.google.android.fhir.sync.upload.patch.Mapping
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
@@ -49,7 +50,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(patchOutput),
+        listOf(Mapping.IndividualMapping(patchOutput)),
       )
 
     with(requests.single()) {
@@ -72,7 +73,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(patchOutput),
+        listOf(Mapping.IndividualMapping(patchOutput)),
       )
 
     with(requests.single()) {
@@ -92,7 +93,7 @@ class IndividualGeneratorTest {
         generatedPatch = updateLocalChange.toPatch(),
       )
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val requests = generator.generateUploadRequests(listOf(patchOutput))
+    val requests = generator.generateUploadRequests(listOf(Mapping.IndividualMapping(patchOutput)))
     with(requests.single()) {
       with(generatedRequest) {
         assertThat(requests.size).isEqualTo(1)
@@ -115,7 +116,7 @@ class IndividualGeneratorTest {
         generatedPatch = deleteLocalChange.toPatch(),
       )
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val requests = generator.generateUploadRequests(listOf(patchOutput))
+    val requests = generator.generateUploadRequests(listOf(Mapping.IndividualMapping(patchOutput)))
     with(requests.single()) {
       with(generatedRequest) {
         assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
@@ -132,7 +133,8 @@ class IndividualGeneratorTest {
         PatchMapping(listOf(it), it.toPatch())
       }
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val result = generator.generateUploadRequests(patchOutputList)
+    val result =
+      generator.generateUploadRequests(patchOutputList.map { Mapping.IndividualMapping(it) })
     assertThat(result).hasSize(3)
     assertThat(result.map { it.generatedRequest.httpVerb })
       .containsExactly(HttpVerb.PUT, HttpVerb.PATCH, HttpVerb.DELETE)

@@ -20,7 +20,9 @@ import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 
-private typealias Node = String
+typealias Node = String
+
+typealias Graph = Map<Node, List<Node>>
 
 /**
  * Orders the [PatchMapping]s to maintain referential integrity during upload.
@@ -59,7 +61,7 @@ internal object PatchOrdering {
    */
   suspend fun List<PatchMapping>.orderByReferences(
     database: Database,
-  ): List<PatchMapping> {
+  ): List<Mapping> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
 
     /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
@@ -71,7 +73,37 @@ internal object PatchOrdering {
         .groupBy { it.localChangeId }
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
-    return createTopologicalOrderedList(adjacencyList).mapNotNull { resourceIdToPatchMapping[it] }
+
+    val weakConnectedComponents = connectedComponents(adjacencyList)
+
+    val componentsWithCycles = mutableListOf<Graph>()
+    val componentsWithOutCycles = mutableListOf<Graph>()
+    weakConnectedComponents.forEach {
+      try {
+        checkCycle(it)
+        componentsWithOutCycles.add(it)
+      } catch (e: IllegalStateException) {
+        e.printStackTrace()
+        componentsWithCycles.add(it)
+      }
+    }
+
+    val componentsNodesWithCycles =
+      if (componentsWithCycles.isNotEmpty()) {
+        componentsWithCycles.map { graph: Graph ->
+          (graph.keys + graph.values.flatten().toSet()).toList()
+        }
+      } else {
+        emptyList()
+      }
+
+    val combinedGraph = combineComponentsWithoutCycle(componentsWithOutCycles)
+    return componentsNodesWithCycles
+      .map { it.mapNotNull { resourceIdToPatchMapping[it] } }
+      .map { Mapping.CombinedMapping(it) } +
+      createTopologicalOrderedList(combinedGraph)
+        .mapNotNull { resourceIdToPatchMapping[it] }
+        .map { Mapping.IndividualMapping(it) }
   }
 
   /**
@@ -138,5 +170,83 @@ internal object PatchOrdering {
 
     adjacencyList.keys.forEach { dfs(it) }
     return stack.reversed()
+  }
+
+  fun connectedComponents(diGraph: Graph): List<Graph> {
+    // convert digraph to a graph
+    val graph = mutableMapOf<Node, MutableList<Node>>() // Map<Node, List<Node>>
+    diGraph.forEach { entry ->
+      if (!graph.containsKey(entry.key)) graph[entry.key] = mutableListOf()
+      entry.value.forEach {
+        graph[entry.key]!!.add(it)
+        graph.getOrPut(it) { mutableListOf() }.add(entry.key)
+        // add nodes
+      }
+    }
+
+    // find connected components
+
+    val connectedComponents = findConnectedComponents(graph)
+
+    // convert connected components back to digraph
+    val connectedDigraphs = mutableListOf<Graph>()
+    connectedComponents.forEach {
+      val connectedDigraph = mutableMapOf<Node, MutableList<Node>>()
+      it.forEach {
+        if (diGraph.containsKey(it)) {
+          connectedDigraph[it] = diGraph[it]!! as MutableList<Node>
+        }
+      }
+      if (connectedDigraph.isNotEmpty()) {
+        connectedDigraphs.add(connectedDigraph)
+      }
+    }
+
+    return connectedDigraphs
+  }
+
+  private fun findConnectedComponents(graph: Graph): List<List<Node>> {
+    val connectedComponents = mutableListOf<MutableList<Node>>()
+    val visited = mutableSetOf<String>()
+    val connectedNodes = mutableListOf<Node>()
+
+    fun dfs(node: Node) {
+      if (visited.add(node)) {
+        connectedNodes.add(node)
+        graph[node]?.forEach { dfs(it) }
+      }
+    }
+
+    graph.keys.forEach {
+      connectedNodes.clear()
+      dfs(it)
+      if (connectedNodes.isNotEmpty()) {
+        connectedComponents.add(ArrayList(connectedNodes))
+      }
+    }
+    return connectedComponents
+  }
+
+  fun checkCycle(diGraph: Graph) {
+    val stack = ArrayDeque<String>()
+    val visited = mutableSetOf<String>()
+    val currentPath = mutableSetOf<String>()
+
+    fun dfs(key: String) {
+      check(currentPath.add(key)) { "Detected a cycle." }
+      if (visited.add(key)) {
+        diGraph[key]?.forEach { dfs(it) }
+        stack.addFirst(key)
+      }
+      currentPath.remove(key)
+    }
+
+    diGraph.keys.forEach { dfs(it) }
+  }
+
+  fun combineComponentsWithoutCycle(graphs: List<Graph>): Graph {
+    val combinedGraph = mutableMapOf<Node, List<Node>>()
+    graphs.forEach { combinedGraph.putAll(it) }
+    return combinedGraph
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
+import com.google.android.fhir.sync.upload.patch.Mapping
 import com.google.android.fhir.sync.upload.patch.Patch
-import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -31,14 +31,30 @@ internal class UrlRequestGenerator(
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(
-    mappedPatches: List<PatchMapping>,
+    mappedPatches: List<Mapping>,
   ): List<UrlUploadRequestMapping> =
-    mappedPatches.map {
-      UrlUploadRequestMapping(
-        localChanges = it.localChanges,
-        generatedRequest = getUrlRequestForPatch(it.generatedPatch),
-      )
-    }
+    mappedPatches
+      .map {
+        when (it) {
+          is Mapping.IndividualMapping -> {
+            listOf(
+              UrlUploadRequestMapping(
+                localChanges = it.patchMapping.localChanges,
+                generatedRequest = getUrlRequestForPatch(it.patchMapping.generatedPatch),
+              ),
+            )
+          }
+          is Mapping.CombinedMapping -> {
+            it.patchMappings.map {
+              UrlUploadRequestMapping(
+                localChanges = it.localChanges,
+                generatedRequest = getUrlRequestForPatch(it.generatedPatch),
+              )
+            }
+          }
+        }
+      }
+      .flatten()
 
   companion object Factory {
 

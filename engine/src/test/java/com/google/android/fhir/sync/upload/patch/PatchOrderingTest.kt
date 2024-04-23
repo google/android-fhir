@@ -185,7 +185,9 @@ class PatchOrderingTest {
     // This order is based on the current implementation of the topological sort in [PatchOrdering],
     // it's entirely possible to generate different order here which is acceptable/correct, should
     // we have a different implementation of the topological sort.
-    assertThat(result.map { it.generatedPatch.resourceId })
+    assertThat(
+        result.map { (it as Mapping.IndividualMapping).patchMapping.generatedPatch.resourceId },
+      )
       .containsExactly(
         "patient-1",
         "patient-2",

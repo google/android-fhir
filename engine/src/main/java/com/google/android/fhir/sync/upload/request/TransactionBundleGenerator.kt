@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.sync.upload.patch.Mapping
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
@@ -30,9 +31,48 @@ internal class TransactionBundleGenerator(
 ) : UploadRequestGenerator {
 
   override fun generateUploadRequests(
-    mappedPatches: List<PatchMapping>,
+    mappedPatches: List<Mapping>,
   ): List<BundleUploadRequestMapping> {
-    return mappedPatches.chunked(generatedBundleSize).map { patchList ->
+    // Add the combined resource, then if there is space in the Bundle left, add some individual
+    // resource if possible
+    val combined =
+      mappedPatches.filterIsInstance<Mapping.CombinedMapping>().sortedByDescending {
+        it.patchMappings.size
+      }
+    val individual = mappedPatches.filterIsInstance<Mapping.IndividualMapping>()
+
+    val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
+
+    val cItr = combined.toMutableList().listIterator()
+    val iItr = individual.listIterator()
+
+    while (cItr.hasNext()) {
+      val bundle = mutableListOf<PatchMapping>()
+      bundle.addAll(cItr.next().patchMappings)
+      cItr.remove()
+
+      while (cItr.hasNext()) {
+        val next = cItr.next()
+        if (bundle.size + next.patchMappings.size <= generatedBundleSize) {
+          bundle.addAll(next.patchMappings)
+          cItr.remove() // get rid from itr as we have added it into the
+        }
+      }
+
+      while (iItr.hasNext() && bundle.size < generatedBundleSize) {
+        bundle.add(iItr.next().patchMapping)
+      }
+      mappingsPerBundle.add(bundle)
+
+      // go back to start from any remaining sub-graph
+      while (cItr.hasPrevious()) cItr.previous()
+    }
+
+    individual.subList(iItr.nextIndex(), individual.size).chunked(generatedBundleSize).forEach {
+      mappingsPerBundle.add(it.map { it.patchMapping })
+    }
+
+    return mappingsPerBundle.map { patchList ->
       generateBundleRequest(patchList).let { mappedBundleRequest ->
         BundleUploadRequestMapping(
           splitLocalChanges = mappedBundleRequest.first,

@@ -69,7 +69,10 @@ class PerResourcePatchGeneratorTest {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     val insertionLocalChange = createInsertLocalChange(patient)
 
-    val patches = patchGenerator.generate(listOf(insertionLocalChange))
+    val patches =
+      patchGenerator.generate(listOf(insertionLocalChange)).map {
+        (it as Mapping.IndividualMapping).patchMapping
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -100,7 +103,10 @@ class PerResourcePatchGeneratorTest {
     val updateLocalChange1 = createUpdateLocalChange(remotePatient, updatedPatient1, 1L)
     val updatePatch = readJsonArrayFromFile("/update_patch_1.json")
 
-    val patches = patchGenerator.generate(listOf(updateLocalChange1))
+    val patches =
+      patchGenerator.generate(listOf(updateLocalChange1)).map {
+        (it as Mapping.IndividualMapping).patchMapping
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -129,7 +135,10 @@ class PerResourcePatchGeneratorTest {
     remotePatient.meta = remoteMeta
     val deleteLocalChange = createDeleteLocalChange(remotePatient, 3L)
 
-    val patches = patchGenerator.generate(listOf(deleteLocalChange))
+    val patches =
+      patchGenerator.generate(listOf(deleteLocalChange)).map {
+        (it as Mapping.IndividualMapping).patchMapping
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -155,7 +164,10 @@ class PerResourcePatchGeneratorTest {
     val updateLocalChange = createUpdateLocalChange(patient, updatedPatient, 1L)
     val patientString = jsonParser.encodeResourceToString(updatedPatient)
 
-    val patches = patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange))
+    val patches =
+      patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange)).map {
+        (it as Mapping.IndividualMapping).patchMapping
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -312,7 +324,10 @@ class PerResourcePatchGeneratorTest {
     val updateLocalChange2 = createUpdateLocalChange(updatedPatient1, updatedPatient2, 2L)
     val updatePatch = readJsonArrayFromFile("/update_patch_2.json")
 
-    val patches = patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2))
+    val patches =
+      patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2)).map {
+        (it as Mapping.IndividualMapping).patchMapping
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -357,7 +372,10 @@ class PerResourcePatchGeneratorTest {
           token = LocalChangeToken(listOf(1)),
         )
 
-      val patches = patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2))
+      val patches =
+        patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2)).map {
+          (it as Mapping.IndividualMapping).patchMapping
+        }
 
       with(patches.single().generatedPatch) {
         assertThat(type).isEqualTo(Patch.Type.UPDATE)
@@ -385,9 +403,11 @@ class PerResourcePatchGeneratorTest {
     val deleteLocalChange = createDeleteLocalChange(updatedPatient2, 3L)
 
     val patches =
-      patchGenerator.generate(
-        listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
-      )
+      patchGenerator
+        .generate(
+          listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
+        )
+        .map { (it as Mapping.IndividualMapping).patchMapping }
 
     with(patches.single()) {
       with(generatedPatch) {
