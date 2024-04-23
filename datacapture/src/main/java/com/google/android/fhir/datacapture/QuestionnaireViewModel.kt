@@ -30,6 +30,7 @@ import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvalu
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculatedExpression
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
@@ -548,10 +549,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .onEach {
         if (it.index == 0) {
           expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-          questionnaire.item.flattened().forEach { qItem ->
-            updateDependentQuestionnaireResponseItems(
+          questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }.forEach { qItem ->
+            updateQuestionnaireResponseItemWithCalculatedExpression(
               qItem,
-              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
+              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId } ?: QuestionnaireResponseItemComponent(),
             )
           }
           modificationCount.update { count -> count + 1 }
@@ -593,6 +594,25 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
           }
       }
+  }
+
+  private suspend fun updateQuestionnaireResponseItemWithCalculatedExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+  ) {
+    val itemToAnswersPair = expressionEvaluator
+      .evaluateCalculatedExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
+    if (itemToAnswersPair.second.isEmpty()) return
+    if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) return
+    if (questionnaireResponseItem.answer.hasDifferentAnswerSet(itemToAnswersPair.second)) {
+      questionnaireResponseItem.answer =
+        itemToAnswersPair.second.map {
+          QuestionnaireResponseItemAnswerComponent().apply { value = it }
+        }
+    }
   }
 
   private fun removeDisabledAnswers(
