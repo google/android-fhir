@@ -141,6 +141,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               }
           }
         selectedOptions.otherOptions.map { otherOption ->
+          if (otherOption.isEmpty()) return@map
           answers +=
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = StringType(otherOption)
