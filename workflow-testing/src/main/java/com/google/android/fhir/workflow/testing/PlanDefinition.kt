@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.rest.api.EncodingEnum
 import java.io.IOException
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.instance.model.api.IPrimitiveType
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CommunicationRequest
@@ -38,10 +37,11 @@ import org.junit.Assert.fail
 import org.opencds.cqf.fhir.api.Repository
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
-import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
-import org.opencds.cqf.fhir.utility.repository.IGLayoutMode
+import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
+import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.InMemoryFhirRepository
 import org.opencds.cqf.fhir.utility.repository.Repositories
+import org.opencds.cqf.fhir.utility.repository.ig.IgConventions
 import org.skyscreamer.jsonassert.JSONAssert
 
 object PlanDefinition : Loadable() {
@@ -152,7 +152,7 @@ object PlanDefinition : Loadable() {
         IGInputStreamStructureRepository(
           fhirContext,
           repositoryPath ?: ".",
-          IGLayoutMode.TYPE_PREFIX,
+          IgConventions.FLAT, // ===>>> Not sure is this is right.
           EncodingEnum.JSON,
         )
       if (dataRepository == null && contentRepository == null && terminologyRepository == null) {
@@ -200,14 +200,12 @@ object PlanDefinition : Loadable() {
 
       return GeneratedBundle(
         buildProcessor(repository)
-          .applyR5<IPrimitiveType<String>>(
-            /* id = */ IdType("PlanDefinition", planDefinitionID),
-            /* canonical = */ null,
-            /* planDefinition = */ null,
-            /* patientId = */ patientID,
-            /* encounterId = */ encounterID,
-            /* practitionerId = */ practitionerID,
-            /* organizationId = */ null,
+          .applyR5(
+            /* planDefinition = */ Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
+            /* subject = */ patientID,
+            /* encounter = */ encounterID,
+            /* practitioner = */ practitionerID,
+            /* organization = */ null,
             /* userType = */ null,
             /* userLanguage = */ null,
             /* userTaskContext = */ null,
@@ -253,10 +251,8 @@ object PlanDefinition : Loadable() {
 
       return GeneratedCarePlan(
         (buildProcessor(repository)
-          .apply<IPrimitiveType<String>>(
-            IdType("PlanDefinition", planDefinitionID),
-            null,
-            null,
+          .apply(
+            Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
             patientID,
             encounterID,
             practitionerID,
@@ -280,10 +276,8 @@ object PlanDefinition : Loadable() {
       val repository = overrideRepository ?: buildRepository()
       return GeneratedPackage(
         (buildProcessor(repository)
-          .packagePlanDefinition<IPrimitiveType<String>>(
-            IdType("PlanDefinition", planDefinitionID),
-            null,
-            null,
+          .packagePlanDefinition(
+            Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
             true,
           ) as Bundle),
         null,

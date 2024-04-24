@@ -244,7 +244,7 @@ object Dependencies {
     }
 
     object Cql {
-      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
+      const val clinicalReasoning = "3.4.0"
     }
 
     object Kotlin {
