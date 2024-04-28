@@ -393,7 +393,7 @@ internal class DatabaseImpl(
         val localChanges = localChangeDao.getLocalChanges(type, id)
         if (localChanges.isNotEmpty() && !forcePurge) {
           throw IllegalStateException(
-            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
           )
         }
 
