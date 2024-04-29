@@ -214,6 +214,20 @@ internal abstract class ResourceDao {
   @Query(
     """
         UPDATE ResourceEntity
+        SET serializedResource = :postSyncSerializedResource
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updatePayloadPostSync(
+    resourceId: String,
+    resourceType: ResourceType,
+    postSyncSerializedResource: String,
+  )
+
+  @Query(
+    """
+        UPDATE ResourceEntity
         SET resourceId = :postSyncResourceId,
             serializedResource = :postSyncSerializedResource
         WHERE resourceId = :preSyncResourceId

@@ -63,6 +63,11 @@ internal interface Database {
     lastUpdated: Instant,
   )
 
+  /** Updates the `resource` meta in the FHIR resource database. */
+  suspend fun updateVersionIdAndLastUpdated(
+    resource: Resource,
+  )
+
   /**
    * Updates existing [Resource] present in the [ResourceEntity] for metadata such as versionId,
    * resourceId, lastModifiedTime, and reference value for other referring resources. In the

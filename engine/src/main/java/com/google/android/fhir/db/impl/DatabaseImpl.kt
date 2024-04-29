@@ -17,6 +17,7 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
@@ -34,11 +35,16 @@ import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
+import com.google.android.fhir.versionId
 import java.time.Instant
-import java.util.UUID
+import java.util.*
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -169,6 +175,37 @@ internal class DatabaseImpl(
         resourceType,
         versionId,
         lastUpdated,
+      )
+      resourceDao.getResourceEntity(resourceId, resourceType)?.let {
+        val preSyncResource = iParser.parseResource(it.serializedResource) as Resource
+        preSyncResource.meta =
+          Meta().apply {
+            versionIdElement = IdType(versionId)
+            lastUpdatedElement = InstantType(Date.from(lastUpdated))
+          }
+        resourceDao.updatePayloadPostSync(
+          preSyncResource.logicalId,
+          preSyncResource.resourceType,
+          iParser.encodeResourceToString(preSyncResource),
+        )
+      }
+    }
+  }
+
+  override suspend fun updateVersionIdAndLastUpdated(
+    resource: Resource,
+  ) {
+    db.withTransaction {
+      resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
+        resource.logicalId,
+        resource.resourceType,
+        resource.meta.versionId,
+        resource.meta.lastUpdated.toInstant(),
+      )
+      resourceDao.updatePayloadPostSync(
+        resource.logicalId,
+        resource.resourceType,
+        iParser.encodeResourceToString(resource),
       )
     }
   }
