@@ -48,7 +48,6 @@ import com.google.android.material.textfield.TextInputLayout
 import java.text.ParseException
 import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeParseException
 import java.util.Date
@@ -155,26 +154,23 @@ internal object DatePickerViewHolderFactory :
       }
 
       private fun buildMaterialDatePicker(localDate: LocalDate?): MaterialDatePicker<Long> {
-        val min =
-          (questionnaireViewItem.minAnswerValue as? DateType)?.value?.time
+        val minDateInMillis =
+          (questionnaireViewItem.minAnswerValue as? DateType)
+            ?.value
+            ?.localDate
+            ?.atStartOfDay(
+              ZONE_ID_UTC,
+            )
+            ?.toInstant()
+            ?.toEpochMilli()
             ?: localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
               ?: MaterialDatePicker.todayInUtcMilliseconds()
-        val minLocalDateTime =
-          LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(min),
-            ZoneId.of(
-              ZONE_ID_UTC.id,
-            ),
-          )
-        val newMinLocalDateTime = minLocalDateTime.plusDays(1)
-        val selectedDateTimeMillis =
-          newMinLocalDateTime.atZone(ZoneId.of(ZONE_ID_UTC.id)).toInstant().toEpochMilli()
         val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
-        val calendarConstraints = getCalenderConstraint(min, max)
+        val calendarConstraints = getCalenderConstraint(minDateInMillis, max)
 
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
-          .setSelection(selectedDateTimeMillis)
+          .setSelection(minDateInMillis)
           .setCalendarConstraints(calendarConstraints)
           .build()
       }
