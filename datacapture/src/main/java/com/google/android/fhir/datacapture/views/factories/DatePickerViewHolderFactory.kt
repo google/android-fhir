@@ -165,8 +165,8 @@ internal object DatePickerViewHolderFactory :
             ?.toEpochMilli()
             ?: localDate?.atStartOfDay(ZONE_ID_UTC)?.toInstant()?.toEpochMilli()
               ?: MaterialDatePicker.todayInUtcMilliseconds()
-        val max = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
-        val calendarConstraints = getCalenderConstraint(minDateInMillis, max)
+        val maxDateInMillis = (questionnaireViewItem.maxAnswerValue as? DateType)?.value?.time
+        val calendarConstraints = getCalenderConstraint(minDateInMillis, maxDateInMillis)
 
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
