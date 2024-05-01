@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.Resource
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-internal class FhirConverterFactory private constructor(private val fhirContext: FhirContext) :
+class FhirConverterFactory private constructor(private val fhirContext: FhirContext) :
   Converter.Factory() {
   override fun responseBodyConverter(
     type: Type,
