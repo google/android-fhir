@@ -11,6 +11,9 @@ nav:
     - Codespaces: contrib/codespaces.md
     - Documentation: contrib/docs.md
 
+# The following settings were originally partially inspired by
+# https://github.com/enola-dev/enola/blob/main/mkdocs.yaml
+
 theme:
   name: material
   features:
@@ -27,3 +30,8 @@ theme:
       - navigation.tabs
       - search.suggest
       - search.share
+
+plugins:
+  - search
+  - minify:
+     minify_html: true
