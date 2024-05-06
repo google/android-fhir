@@ -158,7 +158,9 @@ dependencies {
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}/${Releases.Engine.version}"))
+  outputDirectory.set(
+    file("../docs/use/api/${Releases.Engine.artifactId}/${Releases.Engine.version}"),
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
