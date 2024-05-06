@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-mkdocs-material = "*"
-mkdocs-minify-plugin = "*"
+mkdocs-material = "~=9.5.21"
+mkdocs-minify-plugin = "~=0.8.0"
 
 [dev-packages]
 
