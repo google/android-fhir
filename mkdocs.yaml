@@ -23,11 +23,8 @@ theme:
       - navigation.footer
       - navigation.instant
       - navigation.tracking
-      - navigation.expand
       - navigation.path
       - navigation.top
-      - navigation.sections
-      - navigation.tabs
       - search.suggest
       - search.share
 
