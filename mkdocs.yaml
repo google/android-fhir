@@ -5,6 +5,7 @@ edit_uri: blob/master/docs/
 copyright: Copyright 2024 The Android FHIR SDK Authors
 
 nav:
+  - Home: index.md
   - Users:
     - API: use/api.md
   - Contributors:
@@ -36,3 +37,17 @@ plugins:
   - git-revision-date-localized
   - minify:
      minify_html: true
+
+# https://www.mkdocs.org/user-guide/configuration/#validation
+# Nota Bene: There is no "error" level in MkDocs, but the build-docs.bash script
+# uses "mkdocs build --strict", which cause MkDocs to abort the build on any warnings.
+validation:
+  nav:
+    not_found: warn
+    absolute_links: warn
+    omitted_files: warn
+  links:
+    anchors: warn
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn
