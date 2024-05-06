@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 mkdocs-material = "~=9.5.21"
 mkdocs-minify-plugin = "~=0.8.0"
+mkdocs-git-revision-date-plugin = "~=0.3.2"
 
 [dev-packages]
 
