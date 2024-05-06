@@ -106,6 +106,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     }
   }
 
+  override suspend fun withTransaction(block: suspend FhirEngine.() -> Unit) {
+    database.withTransaction { block.invoke(this@FhirEngineImpl) }
+  }
+
   private suspend fun saveResolvedResourcesToDatabase(resolved: List<Resource>?) {
     resolved?.let {
       database.deleteUpdates(it)

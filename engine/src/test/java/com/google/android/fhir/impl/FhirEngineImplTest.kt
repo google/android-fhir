@@ -22,6 +22,7 @@ import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.delete
 import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
@@ -762,6 +763,86 @@ class FhirEngineImplTest {
         .containsExactly("patient-id-update")
         .inOrder()
     }
+
+  @Test
+  fun `withTransaction saves all changes successfully in order`() = runTest {
+    val patient01ID = "patient-01"
+    val patient01 =
+      Patient().apply {
+        id = patient01ID
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    val patient02ID = "patient-02"
+    val patient02 =
+      Patient().apply {
+        id = patient02ID
+        gender = Enumerations.AdministrativeGender.MALE
+      }
+    val patient03ID = "patient-03"
+    val patient03 =
+      Patient().apply {
+        id = patient03ID
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+
+    fhirEngine.create(patient01)
+    assertThat(fhirEngine.get<Patient>(patient01ID).gender)
+      .isEqualTo(Enumerations.AdministrativeGender.FEMALE)
+    fhirEngine.withTransaction {
+      fhirEngine.create(patient02, patient03)
+      patient01.gender = Enumerations.AdministrativeGender.FEMALE
+      fhirEngine.update(patient01)
+      fhirEngine.delete<Patient>(patient01ID)
+    }
+    assertResourceEquals(patient02, fhirEngine.get<Patient>(patient02ID))
+    assertResourceEquals(patient03, fhirEngine.get<Patient>(patient03ID))
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Patient>(patient01ID) }
+    }
+  }
+
+  @Test
+  fun `withTransaction reverts all changes when an error occurs`() = runTest {
+    val patient01ID = "patient-01"
+    val patient01 =
+      Patient().apply {
+        id = patient01ID
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    val patient02ID = "patient-02"
+    val patient02 =
+      Patient().apply {
+        id = patient02ID
+        gender = Enumerations.AdministrativeGender.MALE
+      }
+    val patient03ID = "patient-03"
+    val patient03 =
+      Patient().apply {
+        id = patient03ID
+        gender = Enumerations.AdministrativeGender.FEMALE
+      }
+    val patient03Updated =
+      patient03.copy().apply { gender = Enumerations.AdministrativeGender.MALE }
+
+    fhirEngine.create(patient03)
+    try {
+      fhirEngine.withTransaction {
+        this.create(patient01)
+        this.create(patient02)
+        this.update(patient03Updated)
+        this.get<Patient>("non_existent_patient_id") // Force ResourceNotFoundException
+      }
+    } catch (_: ResourceNotFoundException) {}
+
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Patient>(patient01ID) }
+    }
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Patient>(patient02ID) }
+    }
+    assertResourceEquals(patient03, fhirEngine.get<Patient>(patient03ID))
+    assertResourceNotEquals(patient03Updated, fhirEngine.get<Patient>(patient03ID))
+  }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
