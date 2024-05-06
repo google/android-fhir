@@ -17,7 +17,6 @@
 package com.google.android.fhir.db.impl
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
