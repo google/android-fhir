@@ -33,6 +33,6 @@ theme:
 
 plugins:
   - search
-  - git-revision-date
+  - git-revision-date-localized
   - minify:
      minify_html: true

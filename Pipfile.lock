@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "21cff45016b759d6ca125d27f9e222d5568c1fbf0750bcfe13ea714c98bc637d"
+            "sha256": "4c0fdc204681b0030cadaf374a59084d9c0678e874dee11ff3d2273175c44202"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -299,13 +299,14 @@
             "markers": "python_version >= '3.8'",
             "version": "==0.2.0"
         },
-        "mkdocs-git-revision-date-plugin": {
+        "mkdocs-git-revision-date-localized-plugin": {
             "hashes": [
-                "sha256:2e67956cb01823dd2418e2833f3623dee8604cdf223bddd005fe36226a56f6ef"
+                "sha256:0c439816d9d0dba48e027d9d074b2b9f1d7cd179f74ba46b51e4da7bb3dc4b9b",
+                "sha256:d796a18b07cfcdb154c133e3ec099d2bb5f38389e4fd54d3eb516a8a736815b8"
             ],
             "index": "pypi",
-            "markers": "python_version >= '3.4'",
-            "version": "==0.3.2"
+            "markers": "python_version >= '3.8'",
+            "version": "==1.2.5"
         },
         "mkdocs-material": {
             "hashes": [
@@ -386,6 +387,13 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.9.0.post0"
+        },
+        "pytz": {
+            "hashes": [
+                "sha256:2a29735ea9c18baf14b448846bde5a48030ed267578472d8955cd0e7443a9812",
+                "sha256:328171f4e3623139da4983451950b28e95ac706e13f3f2630a879749e7a8b319"
+            ],
+            "version": "==2024.1"
         },
         "pyyaml": {
             "hashes": [
