@@ -162,7 +162,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     // Add extension for questionnaire launch time stamp
-    questionnaireResponse.extension.add(Extension("https://github.com/google/android-fhir/StructureDefinition/questionnaireresponse-launchTimestamp", DateTimeType(Date())))
+    questionnaireResponse.extension.add(Extension("http://github.com/google-android/launch-timestamp", DateTimeType(Date())))
     questionnaireResponse.packRepeatedGroups()
   }
 
