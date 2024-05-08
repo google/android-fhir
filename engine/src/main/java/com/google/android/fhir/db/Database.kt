@@ -64,22 +64,6 @@ internal interface Database {
   )
 
   /**
-   * Updates existing [Resource] present in the [ResourceEntity] for metadata such as versionId,
-   * resourceId, lastModifiedTime, and reference value for other referring resources. In the
-   * [LocalChangeEntity] table, it only updates the reference value for referring resources. This
-   * method is more suitable if [preSyncResourceId] and post-sync resourceId [postSyncResource] are
-   * different. However, even if [preSyncResourceId] and post-sync resourceId are the same, it still
-   * updates the reference value of referring resources, which is just redundant.
-   *
-   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
-   * @param postSyncResource The [Resource] after synchronization.
-   */
-  suspend fun updateResourcesAndLocalChangesPostSync(
-    preSyncResourceId: String,
-    postSyncResource: Resource,
-  )
-
-  /**
    * Selects the FHIR resource of type `clazz` with `id`.
    *
    * @param <R> The resource type

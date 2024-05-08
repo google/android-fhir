@@ -130,10 +130,16 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
     preSyncResourceId: String,
     postSyncResource: Resource,
   ) {
-    database.updateResourcesAndLocalChangesPostSync(
-      preSyncResourceId,
-      postSyncResource,
-    )
+    if (
+      postSyncResource.hasMeta() &&
+        postSyncResource.meta.hasVersionId() &&
+        postSyncResource.meta.hasLastUpdated()
+    ) {
+      database.updateResourceAndReferences(
+        preSyncResourceId,
+        postSyncResource,
+      )
+    }
   }
 }
 

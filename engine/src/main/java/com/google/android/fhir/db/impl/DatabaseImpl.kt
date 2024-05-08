@@ -173,36 +173,6 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateResourcesAndLocalChangesPostSync(
-    preSyncResourceId: String,
-    postSyncResource: Resource,
-  ) {
-    val preSyncResource =
-      iParser.parseResource(
-        selectEntity(postSyncResource.resourceType, preSyncResourceId).serializedResource,
-      ) as Resource
-
-    preSyncResource.let {
-      db.withTransaction {
-        resourceDao.updateResourcePostSync(
-          preSyncResourceId,
-          postSyncResource,
-        )
-
-        updateReferringResources(
-          referringResourcesUuids = getResourceUuidsThatRefereceTheGivenResource(it),
-          oldResource = it,
-          updatedResource = postSyncResource,
-        )
-
-        localChangeDao.updateReferencesInLocalChange(
-          oldResource = it,
-          updatedResource = postSyncResource,
-        )
-      }
-    }
-  }
-
   override suspend fun select(type: ResourceType, id: String): Resource {
     return db.withTransaction {
       resourceDao.getResource(resourceId = id, resourceType = type)?.let {
@@ -450,31 +420,6 @@ internal class DatabaseImpl(
         it.resourceReferenceValue,
         it.resourceReferencePath,
       )
-    }
-  }
-
-  /**
-   * Retrieves a list of UUIDs for resources that reference [preSyncResource]. [preSyncResource] can
-   * be referenced as the reference value in other resources, returning those resource UUIDs.
-   * Essentially, [LocalChangeResourceReference] contains
-   * [LocalChangeResourceReference.resourceReferenceValue] and
-   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
-   *
-   * @param preSyncResource The resource that is being referenced.
-   * @return A list of UUIDs of resources that reference [preSyncResource].
-   */
-  private suspend fun getResourceUuidsThatRefereceTheGivenResource(
-    preSyncResource: Resource,
-  ): List<UUID> {
-    return db.withTransaction {
-      val preSyncReference = "${preSyncResource.resourceType.name}/${preSyncResource.logicalId}"
-      val localChangeIds =
-        localChangeDao
-          .getLocalChangeReferencesWithValue(preSyncReference)
-          .map { it.localChangeId }
-          .distinct()
-      val localChanges = localChangeDao.getLocalChanges(localChangeIds)
-      localChanges.map { it.resourceUuid }.distinct()
     }
   }
 
