@@ -65,7 +65,8 @@ internal class EditTextStringViewHolderDelegate :
   ) {
     val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
     if ((text != textInputEditText.text.toString())) {
-      textInputEditText.setText(text)
+      textInputEditText.text?.clear()
+      textInputEditText.append(text)
     }
   }
 }
