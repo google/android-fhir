@@ -283,7 +283,7 @@ class DatabaseImplTest {
 
   @Test
   fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
-    database.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
+    database.purge(ResourceType.Patient, setOf(TEST_PATIENT_1_ID), true)
     // after purge the resource is not available in database
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -300,7 +300,7 @@ class DatabaseImplTest {
   fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
     val resourceIllegalStateException =
       assertThrows(IllegalStateException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+        runBlocking { database.purge(ResourceType.Patient, setOf(TEST_PATIENT_1_ID)) }
       }
     assertThat(resourceIllegalStateException.message)
       .isEqualTo(
@@ -315,7 +315,7 @@ class DatabaseImplTest {
     assertThat(database.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID)).isEmpty()
     assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
-    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID)
+    database.purge(TEST_PATIENT_2.resourceType, setOf(TEST_PATIENT_2_ID))
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -332,7 +332,7 @@ class DatabaseImplTest {
 
     assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
-    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID, true)
+    database.purge(TEST_PATIENT_2.resourceType, setOf(TEST_PATIENT_2_ID), true)
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -346,7 +346,7 @@ class DatabaseImplTest {
   fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_2_ID) }
+        runBlocking { database.purge(ResourceType.Patient, setOf(TEST_PATIENT_2_ID)) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
