@@ -130,7 +130,7 @@ internal constructor(
     val resourceEntities =
       when {
         url != null && version != null ->
-          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(resType, url, version))
         url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(resType, url))
         id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
         name != null && version != null ->

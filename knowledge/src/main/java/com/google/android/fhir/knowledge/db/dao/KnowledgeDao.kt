@@ -38,7 +38,7 @@ abstract class KnowledgeDao {
   ): Long {
     val resourceMetadata =
       if (resource.url != null && resource.version != null) {
-        getResourceWithUrlAndVersion(resource.url, resource.version)
+        getResourceWithUrlAndVersion(resource.resourceType, resource.url, resource.version)
       } else if (resource.url != null) {
         getResourceWithUrl(resource.resourceType, resource.url)
       } else {
@@ -84,8 +84,11 @@ abstract class KnowledgeDao {
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
 
-  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  @Query(
+    "SELECT * from ResourceMetadataEntity WHERE resourceType =:resourceType AND url = :url AND version = :version",
+  )
   internal abstract suspend fun getResourceWithUrlAndVersion(
+    resourceType: ResourceType,
     url: String,
     version: String,
   ): ResourceMetadataEntity?
