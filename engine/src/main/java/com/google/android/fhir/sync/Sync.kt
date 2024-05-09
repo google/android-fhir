@@ -271,7 +271,7 @@ object Sync {
   }
 
   /**
-   * Creates a terminal states of [CurrentSyncJobStatus] from [syncJobStatusFromDataStore]; and
+   * Creates terminal states of [CurrentSyncJobStatus] from [syncJobStatusFromDataStore]; and
    * intermediate states of [CurrentSyncJobStatus] from [WorkInfo.State].
    *
    * Note : Only call this API when `syncJobStatusFromWorkManager` is null.
