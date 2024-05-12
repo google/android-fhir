@@ -78,7 +78,8 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       } else {
         database.searchReverseReferencedResources(
           search.getRevIncludeQuery(
-            includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
+            includeIds =
+              baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
           ),
         )
       }
@@ -87,17 +88,17 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       SearchResult(
         baseResource,
         included =
-        includedResources
-          ?.asSequence()
-          ?.filter { it.baseResourceUUID == uuid }
-          ?.groupBy({ it.searchIndex }, { it.resource }),
+          includedResources
+            ?.asSequence()
+            ?.filter { it.baseResourceUUID == uuid }
+            ?.groupBy({ it.searchIndex }, { it.resource }),
         revIncluded =
-        revIncludedResources
-          ?.asSequence()
-          ?.filter {
-            it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
-          }
-          ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
+          revIncludedResources
+            ?.asSequence()
+            ?.filter {
+              it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
+            }
+            ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
       )
     }
   }
