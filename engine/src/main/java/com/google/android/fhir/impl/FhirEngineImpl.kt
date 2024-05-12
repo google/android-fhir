@@ -25,7 +25,9 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
-import com.google.android.fhir.search.execute
+import com.google.android.fhir.search.getIncludeQuery
+import com.google.android.fhir.search.getQuery
+import com.google.android.fhir.search.getRevIncludeQuery
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
 import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
@@ -61,7 +63,43 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
-    return search.execute(database)
+    val baseResources = database.search<R>(search.getQuery())
+    val includedResources =
+      if (search.forwardIncludes.isEmpty() || baseResources.isEmpty()) {
+        null
+      } else {
+        database.searchForwardReferencedResources(
+          search.getIncludeQuery(includeIds = baseResources.map { it.uuid }),
+        )
+      }
+    val revIncludedResources =
+      if (search.revIncludes.isEmpty() || baseResources.isEmpty()) {
+        null
+      } else {
+        database.searchReverseReferencedResources(
+          search.getRevIncludeQuery(
+            includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
+          ),
+        )
+      }
+
+    return baseResources.map { (uuid, baseResource) ->
+      SearchResult(
+        baseResource,
+        included =
+        includedResources
+          ?.asSequence()
+          ?.filter { it.baseResourceUUID == uuid }
+          ?.groupBy({ it.searchIndex }, { it.resource }),
+        revIncluded =
+        revIncludedResources
+          ?.asSequence()
+          ?.filter {
+            it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
+          }
+          ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
+      )
+    }
   }
 
   override suspend fun count(search: Search): Long {
