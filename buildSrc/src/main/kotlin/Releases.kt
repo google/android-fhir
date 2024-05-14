@@ -128,13 +128,14 @@ fun Project.publishArtifact(artifact: LibraryArtifact) {
               name = "CI"
               url =
                 if (System.getenv("REPOSITORY_URL") != null) {
+                  // REPOSITORY_URL is defined in .github/workflows/build.yml
                   uri(System.getenv("REPOSITORY_URL"))
                 } else {
                   uri("file://${rootProject.buildDir}/ci-repo")
                 }
               version =
                 if (project.providers.environmentVariable("GITHUB_ACTIONS").isPresent) {
-                  // ARTIFACT_VERSION_SUFFIX is defined in build.yml
+                  // ARTIFACT_VERSION_SUFFIX is defined in .github/workflows/build.yml
                   "${artifact.version}-${System.getenv("ARTIFACT_VERSION_SUFFIX")}"
                 } else {
                   artifact.version
