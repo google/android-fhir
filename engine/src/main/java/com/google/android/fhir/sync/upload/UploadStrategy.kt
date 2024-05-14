@@ -79,7 +79,7 @@ private constructor(
    * Not yet implemented - Fetches all local changes, generates one patch per resource, and uploads
    * them in a single bundled POST request.
    */
-  private object AllChangesSquashedBundlePost :
+  object AllChangesSquashedBundlePost :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerResource,
@@ -120,10 +120,10 @@ private constructor(
     )
 
   /**
-   * Not yet implemented - Fetches all changes for a single resource, generates a patch for that
-   * resource, and creates a single POST request with the patch.
+   * Fetches all changes for a single resource, generates a patch for that resource, and creates a
+   * single POST request with the patch.
    */
-  private object SingleResourcePost :
+  object SingleResourcePost :
     UploadStrategy(
       LocalChangesFetchMode.PerResource,
       PatchGeneratorMode.PerResource,

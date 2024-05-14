@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,6 +68,7 @@ internal class TransactionBundleGenerator(
     private val createMapping =
       mapOf(
         Bundle.HTTPVerb.PUT to this::putForCreateBasedBundleComponentMapper,
+        Bundle.HTTPVerb.POST to this::postForCreateBasedBundleComponentMapper,
       )
 
     private val updateMapping =
@@ -113,6 +114,10 @@ internal class TransactionBundleGenerator(
     private fun putForCreateBasedBundleComponentMapper(
       useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+
+    private fun postForCreateBasedBundleComponentMapper(
+      useETagForUpload: Boolean,
+    ): BundleEntryComponentGenerator = HttpPostForCreateEntryComponentGenerator(useETagForUpload)
 
     private fun patchForUpdateBasedBundleComponentMapper(
       useETagForUpload: Boolean,

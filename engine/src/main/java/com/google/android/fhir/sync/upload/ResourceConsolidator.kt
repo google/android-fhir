@@ -18,9 +18,13 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
+import java.util.*
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Represents a mechanism to consolidate resources after they are uploaded.
@@ -81,40 +85,131 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
   private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
     if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
       database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant(),
+        resource,
       )
     }
   }
+}
 
-  /**
-   * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
-   * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
-   */
-  private fun getVersionFromETag(eTag: String) =
-    // The server should always return a weak etag that starts with W, but if it server returns a
-    // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
-    // always add value as a weak tag.
-    if (eTag.startsWith("W/")) {
-      eTag.split("\"")[1]
-    } else {
-      eTag
+internal class HttpPostResourceConsolidator(private val database: Database) : ResourceConsolidator {
+  override suspend fun consolidate(uploadRequestResult: UploadRequestResult) =
+    when (uploadRequestResult) {
+      is UploadRequestResult.Success -> {
+        uploadRequestResult.successfulUploadResponseMappings.forEach { responseMapping ->
+          when (responseMapping) {
+            is BundleComponentUploadResponseMapping -> {
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                val dependentResources =
+                  responseMapping.output.resourceIdAndType?.let {
+                    database.getResourceUuidsThatReferenceTheGivenResource(
+                      preSyncResourceId,
+                      it.second,
+                    )
+                  }
+                    ?: emptyList()
+                val tokenIds =
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids }
+                database.deleteUpdates(LocalChangeToken(tokenIds))
+                updateResourcePostSync(
+                  preSyncResourceId,
+                  responseMapping.output,
+                  dependentResources,
+                )
+              }
+            }
+            is ResourceUploadResponseMapping -> {
+              database.deleteUpdates(
+                LocalChangeToken(
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                ),
+              )
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                updateResourcePostSync(preSyncResourceId, responseMapping.output)
+              }
+            }
+          }
+        }
+      }
+      is UploadRequestResult.Failure -> {
+        /* For now, do nothing (we do not delete the local changes from the database as they were
+        not uploaded successfully. In the future, add consolidation required if upload fails.
+         */
+      }
     }
 
-  /**
-   * May return a Pair of versionId and resource type extracted from the
-   * [Bundle.BundleEntryResponseComponent.location].
-   *
-   * [Bundle.BundleEntryResponseComponent.location] may be:
-   * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
-   * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
-   */
-  private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
-    get() =
-      location
-        ?.split("/")
-        ?.takeIf { it.size > 3 }
-        ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
+  private suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    response: Bundle.BundleEntryResponseComponent,
+    dependentResources: List<UUID> = emptyList(),
+  ) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
+        database.updateResourcesPostSync(
+          preSyncResourceId,
+          postSyncResourceID,
+          resourceType,
+          getVersionFromETag(response.etag),
+          response.lastModified.toInstant(),
+          dependentResources,
+        )
+      }
+    }
+  }
+
+  private suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    database.updateResourcesAndLocalChangesPostSync(
+      preSyncResourceId,
+      postSyncResource,
+    )
+  }
+}
+
+/**
+ * FHIR uses weak ETag that look something like W/"MTY4NDMyODE2OTg3NDUyNTAwMA", so we need to
+ * extract version from it. See https://hl7.org/fhir/http.html#Http-Headers.
+ */
+private fun getVersionFromETag(eTag: String) =
+  // The server should always return a weak etag that starts with W, but if it server returns a
+  // strong tag, we store it as-is. The http-headers for conditional upload like if-match will
+  // always add value as a weak tag.
+  if (eTag.startsWith("W/")) {
+    eTag.split("\"")[1]
+  } else {
+    eTag
+  }
+
+/**
+ * May return a Pair of versionId and resource type extracted from the
+ * [Bundle.BundleEntryResponseComponent.location].
+ *
+ * [Bundle.BundleEntryResponseComponent.location] may be:
+ * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
+ * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
+ */
+internal val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+  get() =
+    location
+      ?.split("/")
+      ?.takeIf { it.size > 3 }
+      ?.let { it[it.size - 3] to ResourceType.fromCode(it[it.size - 4]) }
+
+internal object ResourceConsolidatorFactory {
+  fun byHttpVerb(
+    uploadRequestMode: UploadRequestGeneratorMode,
+    database: Database,
+  ): ResourceConsolidator {
+    val httpVerbToUse =
+      when (uploadRequestMode) {
+        is UploadRequestGeneratorMode.UrlRequest -> uploadRequestMode.httpVerbToUseForCreate
+        is UploadRequestGeneratorMode.BundleRequest -> uploadRequestMode.httpVerbToUseForCreate
+      }
+    return if (httpVerbToUse.toString() == HttpVerb.POST.toCode()) {
+      HttpPostResourceConsolidator(database)
+    } else {
+      DefaultResourceConsolidator(database)
+    }
+  }
 }

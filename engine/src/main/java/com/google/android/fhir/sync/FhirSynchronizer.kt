@@ -19,7 +19,7 @@ package com.google.android.fhir.sync
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.sync.upload.Uploader
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -46,6 +46,7 @@ data class ResourceSyncException(val resourceType: ResourceType, val exception: 
 
 internal data class UploadConfiguration(
   val uploader: Uploader,
+  val uploadStrategy: UploadStrategy,
 )
 
 internal class DownloadConfiguration(
@@ -131,18 +132,18 @@ internal class FhirSynchronizer(
 
   private suspend fun upload(): SyncResult {
     val exceptions = mutableListOf<ResourceSyncException>()
-    val localChangesFetchMode = LocalChangesFetchMode.AllChanges
-    fhirEngine.syncUpload(localChangesFetchMode, uploadConfiguration.uploader::upload).collect {
-      progress ->
-      progress.uploadError?.let { exceptions.add(it) }
-        ?: setSyncState(
-          SyncJobStatus.InProgress(
-            SyncOperation.UPLOAD,
-            progress.initialTotal,
-            progress.initialTotal - progress.remaining,
-          ),
-        )
-    }
+    fhirEngine
+      .syncUpload(uploadConfiguration.uploadStrategy, uploadConfiguration.uploader::upload)
+      .collect { progress ->
+        progress.uploadError?.let { exceptions.add(it) }
+          ?: setSyncState(
+            SyncJobStatus.InProgress(
+              SyncOperation.UPLOAD,
+              progress.initialTotal,
+              progress.initialTotal - progress.remaining,
+            ),
+          )
+      }
 
     return if (exceptions.isEmpty()) {
       SyncResult.Success()

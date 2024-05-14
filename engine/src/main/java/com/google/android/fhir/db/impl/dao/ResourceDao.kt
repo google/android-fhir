@@ -46,7 +46,9 @@ import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -190,6 +192,57 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        UPDATE ResourceEntity
+        SET 
+            resourceId = :postSyncResourceID,
+            serializedResource = :payloadPostSync,
+            versionId = :postSyncResourceVersionId,
+            lastUpdatedRemote = :postSyncResourceLastUpdated
+        WHERE resourceId = :preSyncResourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    payloadPostSync: String,
+  )
+
+  @Query(
+    """
+        UPDATE ResourceEntity
+        SET serializedResource = :postSyncSerializedResource
+        WHERE resourceId = :resourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updatePayloadPostSync(
+    resourceId: String,
+    resourceType: ResourceType,
+    postSyncSerializedResource: String,
+  )
+
+  @Query(
+    """
+        UPDATE ResourceEntity
+        SET resourceId = :postSyncResourceId,
+            serializedResource = :postSyncSerializedResource
+        WHERE resourceId = :preSyncResourceId
+        AND resourceType = :resourceType
+    """,
+  )
+  abstract suspend fun updateResourceIdAndPayloadPostSync(
+    preSyncResourceId: String,
+    postSyncResourceId: String,
+    resourceType: ResourceType,
+    postSyncSerializedResource: String,
+  )
+
+  @Query(
+    """
         DELETE FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType""",
   )
@@ -307,6 +360,79 @@ internal abstract class ResourceDao {
           .apply {
             addDateTimeIndex(
               createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),
+            )
+          }
+          .build()
+      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    }
+  }
+
+  /**
+   * Updates resource metadata such as versionId, lastUpdated, resource ID, and payload in the
+   * [ResourceEntity] using information from [postSyncResource]. It matches the existing
+   * [preSyncResourceId] with the resourceId of [postSyncResource] to update the resource.
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResource The [Resource] after synchronization.
+   */
+  suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    if (
+      postSyncResource.hasMeta() &&
+        postSyncResource.meta.hasVersionId() &&
+        postSyncResource.meta.hasLastUpdated()
+    ) {
+      updateAndIndexRemoteVersionIdAndLastUpdate(
+        postSyncResource.logicalId,
+        postSyncResource.resourceType,
+        postSyncResource.meta.versionId,
+        postSyncResource.meta.lastUpdated.toInstant(),
+      )
+    }
+    updateResourceIdAndPayloadPostSync(
+      preSyncResourceId,
+      postSyncResource.logicalId,
+      postSyncResource.resourceType,
+      iParser.encodeResourceToString(postSyncResource),
+    )
+  }
+
+  internal suspend fun updateResourceAndIndexPostSync(
+    preSyncResourceId: String,
+    postSyncResourceId: String,
+    resourceType: ResourceType,
+    postSyncVersionId: String,
+    postSyncRemoteLastUpdated: Instant,
+  ) {
+    getResourceEntity(preSyncResourceId, resourceType)?.let {
+      val preSyncResource = iParser.parseResource(it.serializedResource) as Resource
+      preSyncResource.idElement = IdType(postSyncResourceId)
+      preSyncResource.meta =
+        Meta().apply {
+          versionIdElement = IdType(postSyncVersionId)
+          lastUpdatedElement = InstantType(Date.from(postSyncRemoteLastUpdated))
+        }
+      updateResourcePostSync(
+        preSyncResourceId = preSyncResourceId,
+        postSyncResourceID = postSyncResourceId,
+        resourceType = resourceType,
+        postSyncResourceVersionId = postSyncVersionId,
+        postSyncResourceLastUpdated = postSyncRemoteLastUpdated,
+        payloadPostSync = iParser.encodeResourceToString(preSyncResource),
+      )
+    }
+    // update the remote lastUpdated index
+    getResourceEntity(postSyncResourceId, resourceType)?.let {
+      val indicesToUpdate =
+        ResourceIndices.Builder(resourceType, postSyncResourceId)
+          .apply {
+            addDateTimeIndex(
+              createLastUpdatedIndex(
+                resourceType,
+                InstantType(Date.from(postSyncRemoteLastUpdated)),
+              ),
             )
           }
           .build()

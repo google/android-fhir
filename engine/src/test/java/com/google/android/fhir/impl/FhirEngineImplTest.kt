@@ -30,10 +30,10 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -323,7 +323,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         localChanges.addAll(it)
         flowOf(
           UploadRequestResult.Success(
@@ -356,7 +356,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         flowOf(
           UploadRequestResult.Failure(
             it,
