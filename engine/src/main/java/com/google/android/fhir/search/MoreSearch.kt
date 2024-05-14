@@ -76,6 +76,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
         includedResources
           ?.asSequence()
           ?.filter { it.baseResourceUUID == uuid }
+          ?.distinctBy { Pair(it.searchIndex,it.resource.id) }
           ?.groupBy({ it.searchIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
@@ -83,6 +84,7 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
           ?.filter {
             it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
+          ?.distinctBy { Pair(it.searchIndex,it.resource.id) }
           ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
     )
   }

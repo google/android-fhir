@@ -71,6 +71,7 @@ internal abstract class ResourceDao {
         it.copy(
           serializedResource = iParser.encodeResourceToString(resource),
           lastUpdatedLocal = timeOfLocalChange,
+          lastUpdatedRemote = resource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
         )
       updateChanges(entity, resource)
     }
@@ -126,11 +127,6 @@ internal abstract class ResourceDao {
           entity.lastUpdatedLocal?.let { instant ->
             addDateTimeIndex(
               createLocalLastUpdatedIndex(resource.resourceType, InstantType(Date.from(instant))),
-            )
-          }
-          entity.lastUpdatedRemote?.let { instant ->
-            addDateTimeIndex(
-              createLastUpdatedIndex(resource.resourceType, InstantType(Date.from(instant))),
             )
           }
         }

@@ -67,6 +67,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Extension
+import org.hl7.fhir.r4.model.Group
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Identifier
 import org.hl7.fhir.r4.model.Immunization
@@ -4084,6 +4085,101 @@ class DatabaseImplTest {
         .map { it.resource }
     assertThat(searchedObservations.size).isEqualTo(1)
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
+  }
+
+  @Test
+  fun included_and_revIncluded_results_should_have_distinct_resources() = runBlocking {
+    // A person has multiple first names and encounter has multiple location
+    // Searching a group including Patient and revIncluding encounter with results sorted by
+    // Patient.GIVEN and Encounter.LOCATION_PERIOD should return single copies of the resources.
+
+    val group =
+      Group().apply {
+        id = "group"
+        addMember(Group.GroupMemberComponent(Reference("Patient/multiple-first-names")))
+      }
+    val patient =
+      Patient().apply {
+        id = "multiple-first-names"
+
+        addName(
+          HumanName().apply {
+            family = "LastName"
+            addGiven("FirstName-01")
+            addGiven("FirstName-02")
+            addGiven("FirstName-03")
+          },
+        )
+      }
+
+    val encounter =
+      Encounter().apply {
+        id = "encounter-multiple-locations"
+
+        subject = Reference("Group/group")
+
+        addLocation().apply {
+          location = Reference("Location/1")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T10:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T10:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/2")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T11:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T11:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/3")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T09:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T09:30:00-05:30")
+            }
+        }
+      }
+    database.insert(group, patient, encounter)
+
+    val result =
+      Search(ResourceType.Group)
+        .apply {
+          include<Patient>(Group.MEMBER) {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "FirstName"
+                modifier = StringFilterModifier.STARTS_WITH
+              },
+            )
+
+            sort(Patient.GIVEN, Order.ASCENDING)
+          }
+
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            sort(Encounter.LOCATION_PERIOD, Order.ASCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .contains(
+        SearchResult(
+          group,
+          mapOf(
+            Group.MEMBER.paramName to listOf(patient),
+          ),
+          mapOf(Pair(ResourceType.Encounter, Encounter.SUBJECT.paramName) to listOf(encounter)),
+        ),
+      )
   }
 
   private companion object {
