@@ -188,7 +188,6 @@ data class ServerConfiguration(
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
   val authenticator: HttpAuthenticator? = null,
   val httpLogger: HttpLogger = HttpLogger.NONE,
-  val referentialIntegrityDuringUpload: Boolean = true,
 )
 
 /**

@@ -77,34 +77,34 @@ internal object PatchOrdering {
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
 
-    val weakConnectedComponents = connectedComponents(adjacencyList)
+    val weakConnectedComponents = weakConnectedComponents(adjacencyList)
 
-    val componentsWithCycles = mutableListOf<Graph>()
-    val componentsWithOutCycles = mutableListOf<Graph>()
+    val graphsWithCycles = mutableListOf<Graph>()
+    val graphsWithOutCycles = mutableListOf<Graph>()
     weakConnectedComponents.forEach {
       try {
         checkCycle(it)
-        componentsWithOutCycles.add(it)
+        graphsWithOutCycles.add(it)
       } catch (e: IllegalStateException) {
         Timber.i(e)
-        componentsWithCycles.add(it)
+        graphsWithCycles.add(it)
       }
     }
 
-    val componentsNodesWithCycles =
-      if (componentsWithCycles.isNotEmpty()) {
-        componentsWithCycles.map { graph: Graph ->
+    val nodesPerConnectedGraph: List<List<Node>> =
+      if (graphsWithCycles.isNotEmpty()) {
+        graphsWithCycles.map { graph: Graph ->
           (graph.keys + graph.values.flatten().toSet()).toList()
         }
       } else {
         emptyList()
       }
 
-    val combinedGraph = combineComponentsWithoutCycle(componentsWithOutCycles)
-    return componentsNodesWithCycles
+    val combinedGraphWithoutCycles = combineGraphs(graphsWithOutCycles)
+    return nodesPerConnectedGraph
       .map { it.mapNotNull { resourceIdToPatchMapping[it] } }
       .map { OrderedMapping.CombinedMapping(it) } +
-      createTopologicalOrderedList(combinedGraph)
+      createTopologicalOrderedList(combinedGraphWithoutCycles)
         .mapNotNull { resourceIdToPatchMapping[it] }
         .map { OrderedMapping.IndividualMapping(it) }
   }
@@ -175,7 +175,7 @@ internal object PatchOrdering {
     return stack.reversed()
   }
 
-  fun connectedComponents(diGraph: Graph): List<Graph> {
+  private fun weakConnectedComponents(diGraph: Graph): List<Graph> {
     // convert digraph to a graph
     val graph = mutableMapOf<Node, MutableList<Node>>() // Map<Node, List<Node>>
     diGraph.forEach { entry ->
@@ -188,7 +188,6 @@ internal object PatchOrdering {
     }
 
     // find connected components
-
     val connectedComponents = findConnectedComponents(graph)
 
     // convert connected components back to digraph
@@ -230,7 +229,7 @@ internal object PatchOrdering {
     return connectedComponents
   }
 
-  fun checkCycle(diGraph: Graph) {
+  private fun checkCycle(diGraph: Graph) {
     val stack = ArrayDeque<String>()
     val visited = mutableSetOf<String>()
     val currentPath = mutableSetOf<String>()
@@ -247,7 +246,7 @@ internal object PatchOrdering {
     diGraph.keys.forEach { dfs(it) }
   }
 
-  fun combineComponentsWithoutCycle(graphs: List<Graph>): Graph {
+  private fun combineGraphs(graphs: List<Graph>): Graph {
     val combinedGraph = mutableMapOf<Node, List<Node>>()
     graphs.forEach { combinedGraph.putAll(it) }
     return combinedGraph
