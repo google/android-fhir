@@ -26,6 +26,7 @@ import com.google.android.fhir.datacapture.extensions.CODE_SYSTEM_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.ITEM_INITIAL_EXPRESSION_URL
 import com.google.android.fhir.datacapture.views.factories.localDate
+import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -34,6 +35,9 @@ import java.util.UUID
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.exceptions.FHIRException
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
+import org.hl7.fhir.r4.elementmodel.Manager
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
@@ -52,11 +56,15 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceFactory
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.StructureDefinition
 import org.hl7.fhir.r4.model.codesystems.AdministrativeGender
 import org.hl7.fhir.r4.terminologies.ConceptMapEngine
 import org.hl7.fhir.r4.utils.StructureMapUtilities
+import org.hl7.fhir.utilities.npm.NpmPackage
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -68,6 +76,8 @@ import org.robolectric.annotation.Config
 class ResourceMapperTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
   private val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+
+  private val knowledgeManager = KnowledgeManager.create(context, inMemory = true)
 
   @Test
   fun `extract() should perform definition-based extraction`() = runBlocking {
@@ -2340,7 +2350,7 @@ class ResourceMapperTest {
       ResourceMapper.extract(
         uriTestQuestionnaire,
         uriTestQuestionnaireResponse,
-        StructureMapExtractionContext(context = context) { _, worker ->
+        StructureMapExtractionContext { _, worker ->
           StructureMapUtilities(worker).parse(mapping, "")
         },
       )
@@ -2431,7 +2441,7 @@ class ResourceMapperTest {
         ResourceMapper.extract(
           uriTestQuestionnaire,
           uriTestQuestionnaireResponse,
-          StructureMapExtractionContext(context, transformSupportServices) { _, worker ->
+          StructureMapExtractionContext(transformSupportServices) { _, worker ->
             StructureMapUtilities(worker).parse(mapping, "")
           },
         )
@@ -3051,6 +3061,56 @@ class ResourceMapperTest {
       .containsExactly("TestName-First", "TestName-Middle")
   }
 
+  @Test
+  fun `extract() should perform StructureMap-based extraction using workerContext from knowledge-manager`():
+    Unit = runBlocking {
+    val questionnaireString =
+      readFileFromResourcesAsString("/measles-outbreak/questionnaire_outbreak.json")
+    val questionnaire =
+      iParser.parseResource(Questionnaire::class.java, questionnaireString) as Questionnaire
+
+    val questionnaireResponseString =
+      readFileFromResourcesAsString("/measles-outbreak/questionnaire_response_outbreak.json")
+
+    val questionnaireResponse =
+      iParser.parseResource(QuestionnaireResponse::class.java, questionnaireResponseString)
+        as QuestionnaireResponse
+    val structureMap =
+      readFileFromResourcesAsString("/measles-outbreak/MeaslesQuestionnaireToResources.map")
+
+    val measlesOutbreakPackage =
+      NpmPackage.fromPackage(readFileFromResources("/measles-outbreak/package.r4.tgz"))
+    val basePackage = NpmPackage.fromPackage(readFileFromResources("/measles-outbreak/package.tgz"))
+
+    val workerContext = knowledgeManager.loadWorkerContext(measlesOutbreakPackage, basePackage)
+    val transformSupportServices =
+      TransformSupportServicesLogicalModel(workerContext, mutableListOf())
+
+    val bundle =
+      ResourceMapper.extract(
+        questionnaire,
+        questionnaireResponse,
+        StructureMapExtractionContext(
+          transformSupportServices,
+          workerContext = workerContext,
+        ) { _, worker ->
+          StructureMapUtilities(worker).parse(structureMap, "MeaslesQuestionnaireToResources")
+        },
+      )
+
+    assertThat(bundle).isNotNull()
+    assertThat(bundle.entry).isNotEmpty()
+
+    val patient =
+      bundle.entry.find { it.resource.resourceType == ResourceType.Patient }?.resource as Patient
+    assertThat(patient.name.first().family).isEqualTo("John Doe")
+  }
+
+  private fun readFileFromResourcesAsString(filename: String) =
+    readFileFromResources(filename).bufferedReader().use { it.readText() }
+
+  private fun readFileFromResources(filename: String) = javaClass.getResourceAsStream(filename)!!
+
   private fun String.toDateFromFormatYyyyMmDd(): Date? = SimpleDateFormat("yyyy-MM-dd").parse(this)
 
   class TransformSupportServices(private val outputs: MutableList<Base>) :
@@ -3089,5 +3149,76 @@ class ResourceMapperTest {
     override fun performSearch(appContext: Any, url: String): List<Base> {
       throw FHIRException("performSearch is not supported yet")
     }
+  }
+
+  /**
+   * Class providing transformer services for a specific context, utilizing a worker context and
+   * managing outputs.
+   *
+   * This class helps the two step structure map extraction. QuestionnaireResponse -> Logical Model
+   * Logical Model -> Resource's
+   *
+   * This was referred through
+   * [matchbox](https://github.com/ahdis/matchbox/blob/main/matchbox-engine/src/main/java/ch/ahdis/matchbox/mappinglanguage/TransformSupportServices.java)
+   * implementation.
+   *
+   * @param workerContext The worker context for managing resources and operations.
+   * @param outputs The list to which output resources are added.
+   */
+  class TransformSupportServicesLogicalModel(
+    private val workerContext: IWorkerContext,
+    private val outputs: MutableList<Base>,
+  ) : StructureMapUtilities.ITransformerServices {
+
+    override fun createType(appInfo: Any, name: String): Base {
+      return try {
+        ResourceFactory.createResourceOrType(name)
+      } catch (fhirException: FHIRException) {
+        Manager.build(
+          workerContext,
+          workerContext.fetchResource(
+            StructureDefinition::class.java,
+            name,
+          ),
+        )
+      }
+    }
+
+    override fun createResource(appInfo: Any, res: Base, atRootofTransform: Boolean): Base {
+      if (atRootofTransform) outputs.add(res)
+      return try {
+        val fhirType = Enumerations.FHIRAllTypes.fromCode(res.fhirType())
+        val constructor =
+          Class.forName(
+              "org.hl7.fhir.r4.model." + fhirType.display,
+            )
+            .getConstructor()
+        constructor.newInstance() as Base
+      } catch (e: Exception) {
+        res
+      }
+    }
+
+    override fun translate(appInfo: Any, source: Coding, conceptMapUrl: String): Coding? {
+      val conceptMapEngine = ConceptMapEngine(workerContext as SimpleWorkerContext)
+      return conceptMapEngine.translate(source, conceptMapUrl)
+    }
+
+    override fun resolveReference(
+      appContext: Any,
+      url: String,
+    ): Base {
+      return workerContext.fetchResource(
+        Resource::class.java,
+        url,
+      )
+    }
+
+    @Throws(FHIRException::class)
+    override fun performSearch(appContext: Any, url: String): List<Base> {
+      throw FHIRException("performSearch is not supported yet")
+    }
+
+    override fun log(message: String) {}
   }
 }
