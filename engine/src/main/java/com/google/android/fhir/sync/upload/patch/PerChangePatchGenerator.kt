@@ -25,7 +25,7 @@ import com.google.android.fhir.LocalChange
  * maintain an audit trail.
  */
 internal object PerChangePatchGenerator : PatchGenerator {
-  override suspend fun generate(localChanges: List<LocalChange>): List<Mapping> =
+  override suspend fun generate(localChanges: List<LocalChange>): List<OrderedMapping> =
     localChanges
       .map {
         PatchMapping(
@@ -41,5 +41,5 @@ internal object PerChangePatchGenerator : PatchGenerator {
             ),
         )
       }
-      .map { Mapping.IndividualMapping(it) }
+      .map { OrderedMapping.IndividualMapping(it) }
 }

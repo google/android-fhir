@@ -19,8 +19,9 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.sync.upload.patch.Mapping
+import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -30,13 +31,19 @@ internal class UrlRequestGenerator(
   private val getUrlRequestForPatch: (patch: Patch) -> UrlUploadRequest,
 ) : UploadRequestGenerator {
 
+  /**
+   * Since a [UrlUploadRequest] can only handle a single resource request, the
+   * [OrderedMapping.CombinedMapping.patchMappings] are flattened and handled as
+   * [OrderedMapping.IndividualMapping] mapping to generate [UrlUploadRequestMapping] for each
+   * [PatchMapping].
+   */
   override fun generateUploadRequests(
-    mappedPatches: List<Mapping>,
+    mappedPatches: List<OrderedMapping>,
   ): List<UrlUploadRequestMapping> =
     mappedPatches
       .map {
         when (it) {
-          is Mapping.IndividualMapping -> {
+          is OrderedMapping.IndividualMapping -> {
             listOf(
               UrlUploadRequestMapping(
                 localChanges = it.patchMapping.localChanges,
@@ -44,7 +51,7 @@ internal class UrlRequestGenerator(
               ),
             )
           }
-          is Mapping.CombinedMapping -> {
+          is OrderedMapping.CombinedMapping -> {
             it.patchMappings.map {
               UrlUploadRequestMapping(
                 localChanges = it.localChanges,

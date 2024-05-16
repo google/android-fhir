@@ -28,8 +28,6 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.LinkedList
-import kotlin.random.Random
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Group
@@ -39,7 +37,6 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.Resource
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -187,7 +184,9 @@ class PatchOrderingTest {
     // it's entirely possible to generate different order here which is acceptable/correct, should
     // we have a different implementation of the topological sort.
     assertThat(
-        result.map { (it as Mapping.IndividualMapping).patchMapping.generatedPatch.resourceId },
+        result.map {
+          (it as OrderedMapping.IndividualMapping).patchMapping.generatedPatch.resourceId
+        },
       )
       .containsExactly(
         "patient-1",
@@ -204,55 +203,54 @@ class PatchOrderingTest {
       .inOrder()
   }
 
-  @Ignore("Invalid test with latest changes.")
   @Test
-  fun `generate with cyclic references should throw exception`() = runTest {
-    val localChanges = LinkedList<LocalChange>()
-    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+  fun `generate with cyclic and acyclic references should generate both Individual and Combined mappings`() =
+    runTest {
+      val helper = LocalChangeHelper()
 
-    Patient()
-      .apply {
-        id = "patient-1"
-        addLink(
-          Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/related-1") },
+      // Patient and RelatedPerson have cyclic dependency
+      helper.createPatient("patient-1", 1, "related-1")
+      helper.createRelatedPerson("related-1", 2, "Patient/patient-1")
+
+      // Patient, RelatedPerson have cyclic dependency. Observation, Encounter and Patient have
+      // acyclic dependency and order doesn't matter since they all go in same bundle.
+      helper.createPatient("patient-2", 3, "related-2")
+      helper.createRelatedPerson("related-2", 4, "Patient/patient-2")
+      helper.createObservation("observation-1", 5, "Patient/patient-2", "Encounter/encounter-1")
+      helper.createEncounter("encounter-1", 6, "Patient/patient-2")
+
+      // observation , encounter and Patient have acyclic dependency with each other, hence order is
+      // important here.
+      helper.createObservation("observation-2", 7, "Patient/patient-3", "Encounter/encounter-2")
+      helper.createEncounter("encounter-2", 8, "Patient/patient-3")
+      helper.createPatient("patient-3", 9)
+
+      whenever(database.getLocalChangeResourceReferences(any()))
+        .thenReturn(helper.localChangeResourceReferences)
+
+      val result = patchGenerator.generate(helper.localChanges)
+
+      assertThat(result.filterIsInstance<OrderedMapping.CombinedMapping>()).hasSize(2)
+      assertThat(result.filterIsInstance<OrderedMapping.IndividualMapping>()).hasSize(3)
+
+      assertThat(
+          result.filterIsInstance<OrderedMapping.CombinedMapping>().map {
+            it.patchMappings.map { it.generatedPatch.resourceId }
+          },
         )
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "RelatedPerson/related-1",
-            "Patient.other",
-          ),
+        .containsExactly(
+          listOf("patient-1", "related-1"),
+          listOf("patient-2", "related-2", "observation-1", "encounter-1"),
         )
-      }
 
-    RelatedPerson()
-      .apply {
-        id = "related-1"
-        patient = Reference("Patient/patient-1")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-1",
-            "RelatedPerson.patient",
-          ),
+      assertThat(
+          result.filterIsInstance<OrderedMapping.IndividualMapping>().map {
+            it.patchMapping.generatedPatch.resourceId
+          },
         )
-      }
-
-    whenever(database.getLocalChangeResourceReferences(any()))
-      .thenReturn(localChangeResourceReferences)
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> { patchGenerator.generate(localChanges) }
-        .localizedMessage
-
-    assertThat(errorMessage).isEqualTo("Detected a cycle.")
-  }
+        .containsExactly("patient-3", "encounter-2", "observation-2")
+        .inOrder()
+    }
 
   companion object {
 
@@ -323,10 +321,29 @@ class PatchOrderingTest {
     fun createPatient(
       id: String,
       changeId: Long,
+      relatedPersonId: String? = null,
     ) =
       Patient()
-        .apply { this.id = id }
-        .also { localChanges.add(createInsertLocalChange(it, changeId)) }
+        .apply {
+          this.id = id
+          relatedPersonId?.let {
+            addLink(
+              Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/$it") },
+            )
+          }
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          relatedPersonId?.let {
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "RelatedPerson/$relatedPersonId",
+                "Patient.other",
+              ),
+            )
+          }
+        }
 
     fun updatePatient(
       patient: Patient,
@@ -384,6 +401,27 @@ class PatchOrderingTest {
               changeId,
               encounter,
               "Observation.encounter",
+            ),
+          )
+        }
+
+    fun createRelatedPerson(
+      id: String,
+      changeId: Long,
+      patient: String,
+    ) =
+      RelatedPerson()
+        .apply {
+          this.id = id
+          this.patient = Reference(patient)
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              patient,
+              "RelatedPerson.patient",
             ),
           )
         }

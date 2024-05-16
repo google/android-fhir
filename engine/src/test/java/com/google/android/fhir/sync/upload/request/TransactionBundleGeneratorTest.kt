@@ -16,11 +16,9 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.sync.upload.patch.Mapping
+import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
@@ -53,7 +51,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { Mapping.IndividualMapping(it) }
+          .map { OrderedMapping.IndividualMapping(it) }
 
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
@@ -74,11 +72,10 @@ class TransactionBundleGeneratorTest {
   @Test
   fun `generateUploadRequests() should return 3 Transaction Bundle with single entry each`() =
     runBlocking {
-      val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { Mapping.IndividualMapping(it) }
+          .map { OrderedMapping.IndividualMapping(it) }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -126,7 +123,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { Mapping.IndividualMapping(it) }
+          .map { OrderedMapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
@@ -155,7 +152,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { Mapping.IndividualMapping(it) }
+          .map { OrderedMapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -192,7 +189,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         localChanges
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { Mapping.IndividualMapping(it) }
+          .map { OrderedMapping.IndividualMapping(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 

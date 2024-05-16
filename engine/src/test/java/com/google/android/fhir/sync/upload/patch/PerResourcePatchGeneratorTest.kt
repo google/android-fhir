@@ -71,7 +71,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(insertionLocalChange)).map {
-        (it as Mapping.IndividualMapping).patchMapping
+        (it as OrderedMapping.IndividualMapping).patchMapping
       }
 
     with(patches.single()) {
@@ -105,7 +105,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(updateLocalChange1)).map {
-        (it as Mapping.IndividualMapping).patchMapping
+        (it as OrderedMapping.IndividualMapping).patchMapping
       }
 
     with(patches.single()) {
@@ -137,7 +137,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(deleteLocalChange)).map {
-        (it as Mapping.IndividualMapping).patchMapping
+        (it as OrderedMapping.IndividualMapping).patchMapping
       }
 
     with(patches.single()) {
@@ -166,7 +166,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange)).map {
-        (it as Mapping.IndividualMapping).patchMapping
+        (it as OrderedMapping.IndividualMapping).patchMapping
       }
 
     with(patches.single()) {
@@ -326,7 +326,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2)).map {
-        (it as Mapping.IndividualMapping).patchMapping
+        (it as OrderedMapping.IndividualMapping).patchMapping
       }
 
     with(patches.single()) {
@@ -374,7 +374,7 @@ class PerResourcePatchGeneratorTest {
 
       val patches =
         patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2)).map {
-          (it as Mapping.IndividualMapping).patchMapping
+          (it as OrderedMapping.IndividualMapping).patchMapping
         }
 
       with(patches.single().generatedPatch) {
@@ -407,7 +407,7 @@ class PerResourcePatchGeneratorTest {
         .generate(
           listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
         )
-        .map { (it as Mapping.IndividualMapping).patchMapping }
+        .map { (it as OrderedMapping.IndividualMapping).patchMapping }
 
     with(patches.single()) {
       with(generatedPatch) {

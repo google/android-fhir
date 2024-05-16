@@ -35,7 +35,7 @@ import com.google.android.fhir.sync.upload.patch.PatchOrdering.orderByReferences
 internal class PerResourcePatchGenerator private constructor(val database: Database) :
   PatchGenerator {
 
-  override suspend fun generate(localChanges: List<LocalChange>): List<Mapping> {
+  override suspend fun generate(localChanges: List<LocalChange>): List<OrderedMapping> {
     return generateSquashedChangesMapping(localChanges).orderByReferences(database)
   }
 

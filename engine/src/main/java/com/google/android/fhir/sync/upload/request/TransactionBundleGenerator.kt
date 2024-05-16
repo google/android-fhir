@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.upload.patch.Mapping
+import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
@@ -30,16 +30,31 @@ internal class TransactionBundleGenerator(
     (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
+  /**
+   * In order to accommodate cyclic dependencies between [PatchMapping]s and maintain referential
+   * integrity on the server, the [PatchMapping]s in a [OrderedMapping.CombinedMapping] are all put
+   * in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the remaining
+   * space of the [BundleUploadRequestMapping] maybe filled with other
+   * [OrderedMapping.CombinedMapping] or [OrderedMapping.IndividualMapping] mappings.
+   *
+   * In case a single [OrderedMapping.CombinedMapping] has more [PatchMapping]s than the
+   * [generatedBundleSize], [generatedBundleSize] will be ignored so that all of the dependent
+   * mappings in [OrderedMapping.CombinedMapping] can be sent in a single [Bundle].
+   *
+   * **NOTE: The order of the [OrderedMapping.IndividualMapping] is always maintained and the order
+   * of [OrderedMapping.CombinedMapping] doesn't matter since it contain all the required
+   * [PatchMapping] inside the same [Bundle].**
+   */
   override fun generateUploadRequests(
-    mappedPatches: List<Mapping>,
+    mappedPatches: List<OrderedMapping>,
   ): List<BundleUploadRequestMapping> {
     // Add the combined resource, then if there is space in the Bundle left, add some individual
     // resource if possible
     val combined =
-      mappedPatches.filterIsInstance<Mapping.CombinedMapping>().sortedByDescending {
+      mappedPatches.filterIsInstance<OrderedMapping.CombinedMapping>().sortedByDescending {
         it.patchMappings.size
       }
-    val individual = mappedPatches.filterIsInstance<Mapping.IndividualMapping>()
+    val individual = mappedPatches.filterIsInstance<OrderedMapping.IndividualMapping>()
 
     val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
 
@@ -55,7 +70,7 @@ internal class TransactionBundleGenerator(
         val next = cItr.next()
         if (bundle.size + next.patchMappings.size <= generatedBundleSize) {
           bundle.addAll(next.patchMappings)
-          cItr.remove() // get rid from itr as we have added it into the
+          cItr.remove() // get rid from itr as we have added it into the bundle
         }
       }
 

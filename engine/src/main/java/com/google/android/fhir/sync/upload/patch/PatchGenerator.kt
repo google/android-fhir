@@ -20,7 +20,7 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 
 /**
- * Generates [Patch]es from [LocalChange]s and output [List<[PatchMapping]>] to keep a mapping of
+ * Generates [Patch]es from [LocalChange]s and output [List<[OrderedMapping]>] to keep a mapping of
  * the [LocalChange]s to their corresponding generated [Patch]
  *
  * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
@@ -35,7 +35,7 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  suspend fun generate(localChanges: List<LocalChange>): List<Mapping>
+  suspend fun generate(localChanges: List<LocalChange>): List<OrderedMapping>
 }
 
 internal object PatchGeneratorFactory {
@@ -68,8 +68,19 @@ internal data class PatchMapping(
   val generatedPatch: Patch,
 )
 
-internal sealed interface Mapping {
-  data class IndividualMapping(val patchMapping: PatchMapping) : Mapping
+/** Structure to help describe the cyclic nature of ordered [PatchMapping]. */
+internal sealed interface OrderedMapping {
 
-  data class CombinedMapping(val patchMappings: List<PatchMapping>) : Mapping
+  /**
+   * [IndividualMapping] doesn't have a cyclic dependency on other [IndividualMapping] /
+   * [PatchMapping]. It may however have an acyclic dependency on other [IndividualMapping]s /
+   * [PatchMapping]s.
+   */
+  data class IndividualMapping(val patchMapping: PatchMapping) : OrderedMapping
+
+  /**
+   * [CombinedMapping] contains weakly connected [PatchMapping]s where one or more [PatchMapping]s
+   * have a cyclic dependency between each other.
+   */
+  data class CombinedMapping(val patchMappings: List<PatchMapping>) : OrderedMapping
 }

@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.upload.patch.Mapping
+import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
@@ -25,14 +25,14 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Generator that generates [UploadRequest]s from the [Patch]es present in the
- * [List<[PatchMapping]>]. Any implementation of this generator is expected to output
+ * [List<[OrderedMapping]>]. Any implementation of this generator is expected to output
  * [List<[UploadRequestMapping]>] which maps [UploadRequest] to the corresponding [LocalChange]s it
  * was generated from.
  */
 internal interface UploadRequestGenerator {
   /** Generates a list of [UploadRequestMapping] from the [PatchMapping]s */
   fun generateUploadRequests(
-    mappedPatches: List<Mapping>,
+    mappedPatches: List<OrderedMapping>,
   ): List<UploadRequestMapping>
 }
 

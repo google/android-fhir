@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload.patch
 import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
+import timber.log.Timber
 
 typealias Node = String
 
@@ -55,13 +56,15 @@ internal object PatchOrdering {
    * {D} (UPDATE), then B,C needs to go before the resource A so that referential integrity is
    * retained. Order of D shouldn't matter for the purpose of referential integrity.
    *
-   * @return - A ordered list of the [PatchMapping]s based on the references to other [PatchMapping]
-   *   if the mappings are acyclic
-   * - throws [IllegalStateException] otherwise
+   * @return A ordered list of the [OrderedMapping] containing:
+   * - [OrderedMapping.IndividualMapping] for the [PatchMapping] based on the references to other
+   *   [PatchMapping] if the mappings are acyclic
+   * - [OrderedMapping.CombinedMapping] for [PatchMapping]s based on the references to other
+   *   [PatchMapping]s if the mappings are cyclic.
    */
   suspend fun List<PatchMapping>.orderByReferences(
     database: Database,
-  ): List<Mapping> {
+  ): List<OrderedMapping> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
 
     /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
@@ -83,7 +86,7 @@ internal object PatchOrdering {
         checkCycle(it)
         componentsWithOutCycles.add(it)
       } catch (e: IllegalStateException) {
-        e.printStackTrace()
+        Timber.i(e)
         componentsWithCycles.add(it)
       }
     }
@@ -100,10 +103,10 @@ internal object PatchOrdering {
     val combinedGraph = combineComponentsWithoutCycle(componentsWithOutCycles)
     return componentsNodesWithCycles
       .map { it.mapNotNull { resourceIdToPatchMapping[it] } }
-      .map { Mapping.CombinedMapping(it) } +
+      .map { OrderedMapping.CombinedMapping(it) } +
       createTopologicalOrderedList(combinedGraph)
         .mapNotNull { resourceIdToPatchMapping[it] }
-        .map { Mapping.IndividualMapping(it) }
+        .map { OrderedMapping.IndividualMapping(it) }
   }
 
   /**
