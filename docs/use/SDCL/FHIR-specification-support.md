@@ -95,7 +95,7 @@ The [`itemControl`](https://build.fhir.org/ig/HL7/fhir-extensions/ValueSet-quest
 | Fly-over      | Display              |         |                                               |
 | Help-Button   | Display              | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_help.json)                |                                               | |
 | Auto-complete | Choice               | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_auto_complete.json)       | Filter-forward based on inlined answerOptions | |
-| Drop down | Choice               | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_dropdown.json)            | Default for 4 or more answer options          | [<img src="sdc-ref-dropdown.png" height="60">](sdc-ref-dropdown.png) |
+| Drop down | Choice               | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_dropdown.json)            | Default for 4 or more answer options          | ![Drop Down](sdc-ref-dropdown.png) |
 | Check-box | Choice               | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_multi_select_choice.json) | Default for repeat answers                    | |
 | Radio Button | Choice               | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_single_choice.json)       | Default for less than 4 answer options        | |
 | Slider        | Integer              | [JSON](https://github.com/google/android-fhir/blob/master/catalog/src/main/assets/component_slider.json)              |                                               | |
