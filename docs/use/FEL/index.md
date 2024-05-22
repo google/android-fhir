@@ -4,13 +4,7 @@ The _FHIR Engine Library_ is a Kotlin library that makes it easy to manage FHIR 
 
 Today, there are a growing number of tools and software libraries supporting the use of [FHIR](https://www.hl7.org/fhir/) on various platforms. However, developer support for FHIR on Android is still lacking. Typically, Android healthcare applications still use proprietary data models, and as a result, suffer from a lack of interoperability. The FHIR Engine Library addresses this problem by provding a set of APIs to help manage FHIR resources on Android, allowing easier integration with other software systems using FHIR.
 
-<p align="center">
-[[fhir-engine-components.png|width=640px]]
-</p>
-
-<p align="center">
-Figure 1: FHIR Engine Library components
-</p>
+![FHIR Engine Library components](fhir-engine-components.png)
 
 ## FHIR Engine Library components
 
