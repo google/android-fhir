@@ -24,6 +24,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.WorkInfo.State.FAILED
@@ -33,6 +34,7 @@ import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
+import com.google.android.fhir.sync.CurrentSyncJobStatus.Blocked
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Cancelled
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Enqueued
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Failed
@@ -300,7 +302,7 @@ object Sync {
         }
           ?: error("Inconsistent terminal syncJobStatus.")
       CANCELLED -> Cancelled
-      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
+      BLOCKED -> Blocked
     }
 
   /**
@@ -329,6 +331,7 @@ object Sync {
           ?: Enqueued
       }
       CANCELLED -> Cancelled
+      BLOCKED -> Blocked
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
     }
 
