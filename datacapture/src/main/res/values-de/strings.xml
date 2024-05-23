@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="audio_deleted">Lösche Audio</string>
+    <string name="audio_uploaded">Audio hochgeladen</string>
+    <string name="back_button_text">Zurück</string>
+    <string name="button_pagination_next">Weiter</string>
+    <string name="button_pagination_previous">Zurück</string>
+    <string name="button_review">Zusammenfassung</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="cancel_questionnaire">@android:string/cancel</string>
+    <string name="cd_file_icon_preview">Datei Icon Voransicht</string>
+    <string name="cd_photo_preview">Foto Voransicht</string>
+    <string name="date">Datum</string>
+    <string name="date_format_validation_error_msg">Datumsformat muss <ns1:g id="locale_format">%1$s</ns1:g> (z.B. %2$s) sein</string>
+    <string name="decimal_format_validation_error_msg">Ungültige Nummer</string>
+    <string name="delete">Löschen</string>
+    <string name="edit_button_text">Bearbeiten</string>
+    <string name="file_deleted">Datei gelöscht</string>
+    <string name="file_uploaded">Datei hochgeladen</string>
+    <string name="group_header_add_item_button">Element hinzufügen</string>
+    <string name="help">Hilfe</string>
+    <string name="hyphen">-</string>
+    <string name="image_deleted">Bild gelöscht</string>
+    <string name="image_uploaded">Bild hochgeladen</string>
+    <string name="integer_format_validation_error_msg">Nummer muss zwischen <ns1:g id="min_value">%1$s</ns1:g> und <ns1:g id="max_value">%2$s sein</ns1:g></string>
+    <string name="max_decimal_validation_error_msg">Die maximale Anzahl an Nachkommastellen ist: <ns1:g id="max_value">%1$s</ns1:g>  </string>
+    <string name="max_size_file_above_limit_validation_error_msg">Fehler: Datei ist größer als %1$s MB</string>
+    <string name="max_size_image_above_limit_validation_error_msg">Fehler: Bild ist größer als %1$s MB</string>
+    <string name="max_value_validation_error_msg">Maximal zulässiger Wert:<ns1:g id="max_value">%1$s</ns1:g> </string>
+    <string name="mime_type_wrong_media_format_validation_error_msg">Fehler: Ungültiges Format</string>
+    <string name="min_length_validation_error_msg">Die Antwort muss mindestens <ns1:g id="min_length">%1$s</ns1:g> Zeichen lang sein.</string>
+    <string name="min_value_validation_error_msg">Minimal zulässiger Wert:<ns1:g id="min_value">%1$s</ns1:g> </string>
+    <string name="multi_select_dialog_subtitle">Bitte auswählen:</string>
+    <string name="no">Nein</string>
+    <string name="not_answered">"Nicht beantwortet"</string>
+    <string name="number_format_validation_error_msg">Bitte (.) zwischen Ziffern verwenden. Andere Zeichen werden nicht unterstützt.</string>
+    <string name="open_choice_other">Andere</string>
+    <string name="open_choice_other_add_another">Weitere Antwort</string>
+    <string name="open_choice_other_hint">Option eingeben</string>
+    <string name="optional_helper_text">Optional</string>
+    <string name="questionnaire_cancel_text">Willst du die Beantwortung abbrechen?</string>
+    <string name="questionnaire_validation_error_fix_button_text">Korregiere Frage(n)</string>
+    <string name="questionnaire_validation_error_headline">Fehler gefunden</string>
+    <string name="questionnaire_validation_error_item_text_with_bullet">• %s</string>
+    <string name="questionnaire_validation_error_submit_button_text">Trotzdem abschicken</string>
+    <string name="questionnaire_validation_error_supporting_text">Fehler in Frage(n) beheben:</string>
+    <string name="regex_validation_error_msg">Die Antwort entspricht nicht dem Ausdruck: <ns1:g id="answer_value">%1$s</ns1:g> </string>
+    <string name="required">Verpflichtend</string>
+    <string name="required_constraint_validation_error_msg">Fehlende Antwort für Pflichtfeld.</string>
+    <string name="required_text_and_new_line">Pflicht\n</string>
+    <string name="review_answers_text">Zusammenfassung</string>
+    <!-- duplicate w/ values/strings.xml:470
+    <string name="save">Save</string>
+    -->
+    <string name="select_date">Datum auswählen</string>
+    <string name="select_time">Zeit auswählen</string>
+    <string name="space_asterisk">\u0020\u002a</string>
+    <string name="submit_questionnaire">Speichern</string>
+    <string name="take_photo">Foto aufnehmen</string>
+    <string name="time">Zeit</string>
+    <string name="upload_audio">Audio hochladen</string>
+    <string name="upload_document">Dokument hochladen</string>
+    <string name="upload_failed">Upload Fehler</string>
+    <string name="upload_file">Upload Datei</string>
+    <string name="upload_photo">Upload Foto</string>
+    <string name="upload_video">Upload Video</string>
+    <string name="uploaded">Hochgeladen</string>
+    <string name="video_deleted">Video gelöscht</string>
+    <string name="video_uploaded">Video hochgeladen</string>
+    <string name="yes">Ja</string>
+</resources>
+
+
+
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!-- 1. The following sections include strings used for the questionnaire UI -->
+
+    <!-- 1.1 Navigation -->
+    <string name="button_pagination_next">Weiter</string>
+    <string name="button_pagination_previous">Zurück</string>
+    <string name="back_button_text">Zurück</string>
+    <string name="edit_button_text">Bearbeiten</string>
+    <string name="review_answers_text">Zusammenfassung</string>
+    <string name="button_review">Zusammenfassung</string>
+    <string name="submit_questionnaire">Absenden</string>
+    <string name="cancel_questionnaire">@android:string/cancel</string>
+
+    <!-- 1.2 Submit Pop-up -->
+    <string name="questionnaire_validation_error_headline">Fehler gefunden</string>
+    <string
+        name="questionnaire_validation_error_supporting_text"
+    >Korrigiere die Frage(n):</string>
+    <string
+        name="questionnaire_validation_error_item_text_with_bullet"
+    >• %s</string>
+    <string
+        name="questionnaire_validation_error_submit_button_text"
+    >Trotzdem Absenden</string>
+    <string
+        name="questionnaire_validation_error_fix_button_text"
+    >Korrigiere Frage(n)</string>
+
+    <!-- 1.3 Cancel Pop-up-->
+    <string
+        name="questionnaire_cancel_text"
+    >Beantwortung des Fragebogens beenden?</string>
+    
+    <!-- 2. The following sections include strings used in widgets -->
+
+    <!-- 2.1 All Widgets -->
+    <string name="not_answered">"Nicht beantwortet"</string>
+    <string name="help">Hilfe</string>
+
+    <!-- 2.2 Boolean -->
+    <string name="no">Nein</string>
+    <string name="yes">Ja</string>
+
+    <!-- 2.3 Drop Down -->
+    <string name="hyphen">-</string>
+
+    <!-- 2.4 Multi Select / Open Choice -->
+    <string name="open_choice_other">Andere</string>
+    <string name="open_choice_other_hint">Weitere Antwort eingeben</string>
+    <string name="open_choice_other_add_another">Antwort hinzufügen</string>
+    <string name="multi_select_dialog_subtitle">Bitte auswählen</string>
+    <string name="save">Speichern</string>
+    <string name="cancel">Abbrechen</string>
+
+    <!-- 2.5 Date / DateTime -->
+    <string name="date">Datum</string>
+    <string name="time">Zeit</string>
+    <string name="select_date">Datum auswählen</string>
+    <string name="select_time">Zeit auswählen</string>
+
+    <!-- 2.6 Attachment widget -->
+    <string name="take_photo">Foto aufnehmen</string>
+    <string name="cd_photo_preview">Foto ansehen</string>
+    <string name="cd_file_icon_preview">Datei Icon Ansicht</string>
+    <string name="upload_photo">Foto hochladen</string>
+    <string name="upload_audio">Audio hochladen</string>
+    <string name="upload_video">Video hochladen</string>
+    <string name="upload_document">Dokument hochladen</string>
+    <string name="upload_file">Datei hochladen</string>
+    <string name="delete">Löschen</string>
+    <string
+        name="max_size_image_above_limit_validation_error_msg"
+    >Fehler: Bild ist größer als %1$s MB</string>
+    <string
+        name="max_size_file_above_limit_validation_error_msg"
+    >Fehler: Datei ist größer als %1$s MB</string>
+    <string name="upload_failed">Hochladen fehlgeschlagen</string>
+    <string
+        name="mime_type_wrong_media_format_validation_error_msg"
+    >Fehler: Falsches Dateiformat</string>
+    <string name="uploaded">Hochgeladen</string>
+    <string name="image_uploaded">Bild hochgeladen</string>
+    <string name="file_uploaded">Datei hochgeladen</string>
+    <string name="video_uploaded">Video hochgeladen</string>
+    <string name="audio_uploaded">Audio hochgeladen</string>
+    <string name="image_deleted">Bild gelöscht</string>
+    <string name="file_deleted">Datei gelöscht</string>
+    <string name="video_deleted">Video gelöscht</string>
+    <string name="audio_deleted">Audio gelöscht</string>
+
+    <!-- 2.7 Group -->
+    <string name="group_header_add_item_button">Element hinzufügen</string>
+
+    <!-- 3. The following sections include strings used in validation -->
+
+    <!-- 3.1 Validation -->
+    <string
+        name="required_constraint_validation_error_msg"
+    >Fehlende Antwort für Pflichtfeld.</string>
+    <string
+        name="min_value_validation_error_msg"
+    >Minimal zulässiger Wert:<xliff:g id="min_value">%1$s</xliff:g> </string>
+    <string
+        name="max_value_validation_error_msg"
+    >Maximal zulässiger Wert:<xliff:g id="max_value">%1$s</xliff:g> </string>
+    <string
+        name="min_length_validation_error_msg"
+    >Die Antwort muss mindestens <xliff:g
+            id="min_length"
+        >%1$s</xliff:g> Zeichen enthalten </string>
+    <string
+        name="max_decimal_validation_error_msg"
+    >Die maximale Anzahl an Nachkommastellen darf <xliff:g
+            id="max_value"
+        >%1$s</xliff:g> betragen </string>
+    <string
+        name="regex_validation_error_msg"
+    >Die Antwort entspricht nicht dem Ausdruck: <xliff:g
+            id="answer_value"
+        >%1$s</xliff:g> </string>
+    <string
+        name="number_format_validation_error_msg"
+    >Bitte (.) zwischen Ziffern verwenden. Andere Zeichen werden nicht unterstützt.</string>
+    <string
+        name="date_format_validation_error_msg"
+    >Das Datumsformat muss <xliff:g
+            id="locale_format"
+        >%1$s</xliff:g> (z.B. %2$s) entsprechen.</string>
+    <string
+        name="integer_format_validation_error_msg"
+    >Die Nummer muss zwischen <xliff:g id="min_value">%1$s</xliff:g> und <xliff:g
+            id="max_value"
+        >%2$s</xliff:g> sein.</string>
+    <string name="decimal_format_validation_error_msg">Ungültige Nummer</string>
+    <string name="optional_helper_text">Optional</string>
+    <string name="required">Pflichtfeld</string>
+    <string name="required_text_and_new_line">Pflichtfeld\n</string>
+    <string name="space_asterisk">\u0020\u002a</string>
+</resources>
