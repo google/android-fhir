@@ -404,7 +404,7 @@ internal abstract class LocalChangeDao {
    * place. This method returns a list of the [ResourceEntity.resourceUuid] for all the resources
    * whose [LocalChange] contained references to the oldResource
    */
-  internal suspend fun updateReferencesInLocalChange(
+  private suspend fun updateReferencesInLocalChange(
     oldResource: Resource,
     updatedResource: Resource,
   ): List<UUID> {
