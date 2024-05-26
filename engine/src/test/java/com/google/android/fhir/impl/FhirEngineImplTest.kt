@@ -830,7 +830,8 @@ class FhirEngineImplTest {
         this.create(patient01)
         this.create(patient02)
         this.update(patient03Updated)
-        this.get<Patient>("non_existent_patient_id") // Force ResourceNotFoundException
+        this.get(ResourceType.Patient, "non_existent_patient_id")
+          as Patient // Force ResourceNotFoundException
       }
     } catch (_: ResourceNotFoundException) {}
 

@@ -20,6 +20,7 @@ import androidx.work.Data
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
+import com.google.android.fhir.BaseFHIREngine
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
@@ -176,7 +177,7 @@ object TestFhirEngineImpl : FhirEngine {
     download().collect()
   }
 
-  override suspend fun withTransaction(block: suspend FhirEngine.() -> Unit) {}
+  override suspend fun withTransaction(block: suspend BaseFHIREngine.() -> Unit) {}
 
   override suspend fun count(search: Search): Long {
     return 0

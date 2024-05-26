@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
+import com.google.android.fhir.BaseFHIREngine
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
@@ -106,7 +107,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
     }
   }
 
-  override suspend fun withTransaction(block: suspend FhirEngine.() -> Unit) {
+  override suspend fun withTransaction(block: suspend BaseFHIREngine.() -> Unit) {
     database.withTransaction { block.invoke(this@FhirEngineImpl) }
   }
 
