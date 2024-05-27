@@ -4088,6 +4088,119 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun included_results_should_have_distinct_resources() = runBlocking {
+    // A person has multiple first names. Searching a group including Patient  sorted by
+    // Patient.GIVEN should return single copy of of the Patient resource.
+    val group =
+      Group().apply {
+        id = "group"
+        addMember(Group.GroupMemberComponent(Reference("Patient/multiple-first-names")))
+      }
+    val patient =
+      Patient().apply {
+        id = "multiple-first-names"
+        addName(
+          HumanName().apply {
+            family = "LastName"
+            addGiven("FirstName-01")
+            addGiven("FirstName-02")
+            addGiven("FirstName-03")
+          },
+        )
+      }
+
+    database.insert(group, patient)
+
+    val result =
+      Search(ResourceType.Group)
+        .apply {
+          include<Patient>(Group.MEMBER) {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "FirstName"
+                modifier = StringFilterModifier.STARTS_WITH
+              },
+            )
+            sort(Patient.GIVEN, Order.ASCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .contains(SearchResult(group, mapOf(Group.MEMBER.paramName to listOf(patient)), null))
+  }
+
+  @Test
+  fun revIncluded_results_should_have_distinct_resources() = runBlocking {
+    // An encounter has multiple location and Searching a group revIncluding encounter with results
+    // sorted by Encounter.LOCATION_PERIOD should return single copy of the Encounter resource.
+
+    val group =
+      Group().apply {
+        id = "group"
+        addMember(Group.GroupMemberComponent(Reference("Patient/multiple-first-names")))
+      }
+
+    val encounter =
+      Encounter().apply {
+        id = "encounter-multiple-locations"
+
+        subject = Reference("Group/group")
+
+        addLocation().apply {
+          location = Reference("Location/1")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T10:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T10:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/2")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T11:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T11:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/3")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T09:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T09:30:00-05:30")
+            }
+        }
+      }
+    database.insert(group, encounter)
+
+    val result =
+      Search(ResourceType.Group)
+        .apply {
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            sort(Encounter.LOCATION_PERIOD, Order.ASCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .contains(
+        SearchResult(
+          group,
+          null,
+          mapOf(Pair(ResourceType.Encounter, Encounter.SUBJECT.paramName) to listOf(encounter)),
+        ),
+      )
+  }
+
+  @Test
   fun included_and_revIncluded_results_should_have_distinct_resources() = runBlocking {
     // A person has multiple first names and encounter has multiple location
     // Searching a group including Patient and revIncluding encounter with results sorted by

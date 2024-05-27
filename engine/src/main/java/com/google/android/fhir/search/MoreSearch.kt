@@ -76,7 +76,6 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
         includedResources
           ?.asSequence()
           ?.filter { it.baseResourceUUID == uuid }
-          ?.distinctBy { Pair(it.searchIndex, it.resource.id) }
           ?.groupBy({ it.searchIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
@@ -84,7 +83,6 @@ internal suspend fun <R : Resource> Search.execute(database: Database): List<Sea
           ?.filter {
             it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.distinctBy { Pair(it.searchIndex, it.resource.id) }
           ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
     )
   }
@@ -138,7 +136,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
       args.addAll(join.args)
       val filterQuery = generateFilterQuery(it)
       """
-      SELECT  rie.index_name, rie.index_value, re.serializedResource
+      SELECT DISTINCT rie.index_name, rie.index_value, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceUuid = rie.resourceUuid
@@ -200,7 +198,7 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
       args.addAll(join.args)
       val filterQuery = generateFilterQuery(it)
       """
-      SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+      SELECT DISTINCT rie.index_name, rie.resourceUuid, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceType||"/"||re.resourceId = rie.index_value
