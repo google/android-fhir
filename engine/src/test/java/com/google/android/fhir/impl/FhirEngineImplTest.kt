@@ -764,7 +764,7 @@ class FhirEngineImplTest {
     }
 
   @Test
-  fun `test consolidate() is called`() = runBlocking {
+  fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
       .syncUpload(UploadStrategy.SingleResourcePost) {
