@@ -62,6 +62,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import java.util.Date
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -81,7 +82,6 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
-import java.util.Date
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -162,7 +162,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
     }
     // Add extension for questionnaire launch time stamp
-    questionnaireResponse.extension.add(Extension("http://github.com/google-android/questionnaire-launch-timestamp", DateTimeType(Date())))
+    questionnaireResponse.extension.add(
+      Extension(
+        "http://github.com/google-android/questionnaire-launch-timestamp",
+        DateTimeType(Date())
+      )
+    )
     questionnaireResponse.packRepeatedGroups()
   }
 
