@@ -142,6 +142,22 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
 
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,
+    postSyncResource: Resource,
+  ) {
+    if (
+      postSyncResource.hasMeta() &&
+        postSyncResource.meta.hasVersionId() &&
+        postSyncResource.meta.hasLastUpdated()
+    ) {
+      database.updateResourceAndReferences(
+        preSyncResourceId,
+        postSyncResource,
+      )
+    }
+  }
+
+  private suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
     response: Bundle.BundleEntryResponseComponent,
     dependentResources: List<UUID> = emptyList(),
   ) {
@@ -157,16 +173,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
         )
       }
     }
-  }
-
-  private suspend fun updateResourcePostSync(
-    preSyncResourceId: String,
-    postSyncResource: Resource,
-  ) {
-    database.updateResourcesAndLocalChangesPostSync(
-      preSyncResourceId,
-      postSyncResource,
-    )
   }
 }
 

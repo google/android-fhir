@@ -89,6 +89,7 @@ internal abstract class ResourceDao {
           resourceId = updatedResource.logicalId,
           serializedResource = iParser.encodeResourceToString(updatedResource),
           lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
+          versionId = updatedResource.meta.versionId,
         )
       updateChanges(entity, updatedResource)
     }
@@ -351,38 +352,6 @@ internal abstract class ResourceDao {
           .build()
       updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
     }
-  }
-
-  /**
-   * Updates resource metadata such as versionId, lastUpdated, resource ID, and payload in the
-   * [ResourceEntity] using information from [postSyncResource]. It matches the existing
-   * [preSyncResourceId] with the resourceId of [postSyncResource] to update the resource.
-   *
-   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
-   * @param postSyncResource The [Resource] after synchronization.
-   */
-  suspend fun updateResourcePostSync(
-    preSyncResourceId: String,
-    postSyncResource: Resource,
-  ) {
-    if (
-      postSyncResource.hasMeta() &&
-        postSyncResource.meta.hasVersionId() &&
-        postSyncResource.meta.hasLastUpdated()
-    ) {
-      updateAndIndexRemoteVersionIdAndLastUpdate(
-        postSyncResource.logicalId,
-        postSyncResource.resourceType,
-        postSyncResource.meta.versionId,
-        postSyncResource.meta.lastUpdated.toInstant(),
-      )
-    }
-    updateResourceIdAndPayloadPostSync(
-      preSyncResourceId,
-      postSyncResource.logicalId,
-      postSyncResource.resourceType,
-      iParser.encodeResourceToString(postSyncResource),
-    )
   }
 
   internal suspend fun updateResourceAndIndexPostSync(

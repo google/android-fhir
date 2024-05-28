@@ -62,11 +62,22 @@ private constructor(
    * bundled PUT request. This strategy is efficient and minimizes the number of requests sent to
    * the server, but does not maintain individual change history.
    */
-  object AllChangesSquashedBundlePut :
+  data object AllChangesSquashedBundlePut :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerResource,
       UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
+    )
+
+  /**
+   * Fetches all changes for a single resource, generates a patch for that resource, and creates a
+   * single POST request with the patch.
+   */
+  data object SingleResourcePost :
+    UploadStrategy(
+      LocalChangesFetchMode.PerResource,
+      PatchGeneratorMode.PerResource,
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
     )
 
   /*
@@ -117,17 +128,6 @@ private constructor(
       LocalChangesFetchMode.PerResource,
       PatchGeneratorMode.PerResource,
       UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
-    )
-
-  /**
-   * Fetches all changes for a single resource, generates a patch for that resource, and creates a
-   * single POST request with the patch.
-   */
-  object SingleResourcePost :
-    UploadStrategy(
-      LocalChangesFetchMode.PerResource,
-      PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
     )
 
   /**
