@@ -763,6 +763,26 @@ class FhirEngineImplTest {
         .inOrder()
     }
 
+  @Test
+  fun `test consolidate() is called`() = runBlocking {
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
+    fhirEngine
+      .syncUpload(UploadStrategy.SingleResourcePost) {
+        flowOf(
+          UploadRequestResult.Success(
+            listOf(
+              ResourceUploadResponseMapping(
+                it,
+                TEST_PATIENT_1,
+              ),
+            ),
+          ),
+        )
+      }
+      .collect {}
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
+
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"
     private var TEST_PATIENT_1 =
