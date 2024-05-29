@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import kotlinx.coroutines.launch
 
 /** A fragment class to show screener questionnaire screen. */
 class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
@@ -48,8 +50,10 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
     }
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onSubmitAction() }
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -77,18 +81,20 @@ class ScreenerFragment : Fragment(R.layout.screener_encounter_fragment) {
       add(
         R.id.add_patient_container,
         QuestionnaireFragment.builder().setQuestionnaire(viewModel.questionnaire).build(),
-        QUESTIONNAIRE_FRAGMENT_TAG
+        QUESTIONNAIRE_FRAGMENT_TAG,
       )
     }
   }
 
   private fun onSubmitAction() {
-    val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    viewModel.saveScreenerEncounter(
-      questionnaireFragment.getQuestionnaireResponse(),
-      args.patientId
-    )
+    lifecycleScope.launch {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
+      viewModel.saveScreenerEncounter(
+        questionnaireFragment.getQuestionnaireResponse(),
+        args.patientId,
+      )
+    }
   }
 
   private fun showCancelScreenerQuestionnaireAlertDialog() {

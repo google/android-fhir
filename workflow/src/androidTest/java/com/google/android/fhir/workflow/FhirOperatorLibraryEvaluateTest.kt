@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
+import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.Location
 import org.hl7.fhir.r4.model.Parameters
 import org.junit.Before
 import org.junit.Rule
@@ -48,7 +49,7 @@ class FhirOperatorLibraryEvaluateTest {
 
   private val context: Context = ApplicationProvider.getApplicationContext()
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val jsonParser = fhirContext.newJsonParser()
 
   private fun open(asset: String): InputStream? {
@@ -70,10 +71,10 @@ class FhirOperatorLibraryEvaluateTest {
   fun setUp() = runBlocking {
     fhirEngine = FhirEngineProvider.getInstance(context)
     fhirOperator =
-      FhirOperatorBuilder(context)
-        .withFhirContext(fhirContext)
-        .withFhirEngine(fhirEngine)
-        .withIgManager(knowledgeManager)
+      FhirOperator.Builder(context)
+        .fhirContext(fhirContext)
+        .fhirEngine(fhirEngine)
+        .knowledgeManager(knowledgeManager)
         .build()
   }
 
@@ -87,7 +88,7 @@ class FhirOperatorLibraryEvaluateTest {
    * 2. load the Immunization records of that patient,
    * 3. load the CQL Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   * matches the number of required doses or if the number of required doses is null.
+   *    matches the number of required doses or if the number of required doses is null.
    *
    * ```
    * library ImmunityCheck version '1.0.0'
@@ -125,11 +126,77 @@ class FhirOperatorLibraryEvaluateTest {
     // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/ImmunityCheck|1.0.0",
-        "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization")
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
+  }
+
+  @Test
+  fun evaluateImmunityCheckWithAdditionalData() = runBlocking {
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json") as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
+
+    // Load Library that checks if Patient has taken a vaccine
+    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.install(copy("/immunity-check/FhirHelpers.json"))
+
+    val location =
+      """
+          {
+              "resourceType": "Location",
+              "id": "nairobi-047",
+              "name": "Nairobi mobile clinic"
+          }
+        """
+        .trimIndent()
+
+    val additionalDataBundle =
+      Bundle().apply {
+        addEntry(
+          Bundle.BundleEntryComponent().apply {
+            resource = jsonParser.parseResource(location) as Location
+          },
+        )
+      }
+
+    // Evaluates a specific Patient
+    val results =
+      fhirOperator.evaluateLibrary(
+        "http://localhost/Library/ImmunityCheck|1.0.0",
+        "d4d35004-24f8-40e4-8084-1ad75924514f",
+        null,
+        additionalDataBundle,
+        null,
+      ) as Parameters
+
+    assertThat(results.hasParameter("GetFinalDoseWithLocationData")).isTrue()
+  }
+
+  @Test
+  fun evaluateImmunityCheck_shouldReturn_allEvaluatedVariables() = runBlocking {
+    val patientImmunizationHistory = load("/immunity-check/ImmunizationHistory.json") as Bundle
+    for (entry in patientImmunizationHistory.entry) {
+      fhirEngine.create(entry.resource)
+    }
+
+    // Load Library that checks if Patient has taken a vaccine
+    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+
+    // Evaluates a specific Patient
+    val results =
+      fhirOperator.evaluateLibrary(
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = null,
+      ) as Parameters
+
+    assertThat(results.hasParameter("CompletedImmunization")).isTrue()
+    assertThat(results.hasParameter("GetFinalDose")).isTrue()
+    assertThat(results.hasParameter("Patient")).isTrue()
   }
 }

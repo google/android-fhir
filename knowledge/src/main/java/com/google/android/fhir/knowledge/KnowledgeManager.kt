@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,49 +20,93 @@ import android.content.Context
 import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
-import com.google.android.fhir.knowledge.db.impl.KnowledgeDatabase
-import com.google.android.fhir.knowledge.db.impl.entities.ResourceMetadataEntity
-import com.google.android.fhir.knowledge.db.impl.entities.toEntity
+import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
+import com.google.android.fhir.knowledge.db.entities.toEntity
+import com.google.android.fhir.knowledge.files.NpmFileManager
+import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
+import com.google.android.fhir.knowledge.npm.OkHttpNpmPackageDownloader
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
-/** Responsible for importing, accessing and deleting Implementation Guides. */
+/**
+ * Manages knowledge artifacts on the Android device. Knowledge artifacts can be installed
+ * individually as JSON files or from FHIR NPM packages.
+ *
+ * Coordinates the management of knowledge artifacts by using the three following components:
+ * - database: indexing knowledge artifacts stored in the local file system,
+ * - file manager: managing files containing the knowledge artifacts, and
+ * - NPM downloader: downloading from an NPM package server the knowledge artifacts.
+ */
 class KnowledgeManager
 internal constructor(
-  private val knowledgeDatabase: KnowledgeDatabase,
+  knowledgeDatabase: KnowledgeDatabase,
+  private val npmFileManager: NpmFileManager,
+  private val npmPackageDownloader: NpmPackageDownloader,
   private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
 ) {
-
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
-   * * Checks if the [implementationGuides] are present in DB. If necessary, downloads the
-   * dependencies from NPM and imports data from the package manager (populates the metadata of the
-   * FHIR Resources)
+   * Checks if the [fhirNpmPackages] are present in DB. If necessary, downloads the dependencies
+   * from NPM and imports data from the package manager (populates the metadata of the FHIR
+   * Resources).
    */
-  suspend fun install(vararg implementationGuides: ImplementationGuide) {
-    TODO("[1937]Not implemented yet ")
+  suspend fun install(vararg fhirNpmPackages: FhirNpmPackage) {
+    fhirNpmPackages
+      .filter { knowledgeDao.getImplementationGuide(it.name, it.version) == null }
+      .forEach {
+        try {
+          if (!npmFileManager.containsPackage(it.name, it.version)) {
+            npmPackageDownloader.downloadPackage(
+              it,
+              npmFileManager.getPackageDir(it.name, it.version),
+            )
+          }
+        } catch (e: Exception) {
+          Timber.w("Unable to download package ${it.name} ${it.version}")
+        }
+        try {
+          val localFhirNpmPackageMetadata =
+            npmFileManager.getLocalFhirNpmPackageMetadata(it.name, it.version)
+          install(it, localFhirNpmPackageMetadata.rootDirectory)
+          install(*localFhirNpmPackageMetadata.dependencies.toTypedArray())
+        } catch (e: Exception) {
+          Timber.w("Unable to install package ${it.name} ${it.version}")
+        }
+      }
   }
 
   /**
-   * Checks if the [implementationGuide] is present in DB. If necessary, populates the database with
-   * the metadata of FHIR Resource from the provided [rootDirectory].
+   * Checks if the [fhirNpmPackage] is present in DB. If necessary, populates the database with the
+   * metadata of FHIR Resource from the provided [rootDirectory].
    */
-  suspend fun install(implementationGuide: ImplementationGuide, rootDirectory: File) {
+  suspend fun install(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId = knowledgeDao.insert(implementationGuide.toEntity(rootDirectory))
+    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
     rootDirectory.listFiles()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
         if (resource is Resource) {
-          importResource(igId, resource, file)
+          val newId = indexResourceFile(igId, resource, file)
+          resource.setId(IdType(resource.resourceType.name, newId))
+
+          // Overrides the Id in the file
+          FileOutputStream(file).use {
+            it.write(jsonParser.encodeResourceToString(resource).toByteArray())
+          }
         } else {
           Timber.d("Unable to import file: %file")
         }
@@ -72,7 +116,7 @@ internal constructor(
     }
   }
 
-  /** Imports the Knolwedge Artifact from the provided [file] to the default dependency. */
+  /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
   suspend fun install(file: File) {
     importFile(null, file)
   }
@@ -89,9 +133,9 @@ internal constructor(
     val resourceEntities =
       when {
         url != null && version != null ->
-          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
-        url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
-        id != null -> listOfNotNull(knowledgeDao.getResourceWithUrlLike("%$id"))
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(resType, url, version))
+        url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(resType, url))
+        id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
         name != null && version != null ->
           listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
         name != null -> knowledgeDao.getResourcesWithName(resType, name)
@@ -101,10 +145,9 @@ internal constructor(
   }
 
   /** Deletes Implementation Guide, cleans up files. */
-  suspend fun delete(vararg igDependencies: ImplementationGuide) {
+  suspend fun delete(vararg igDependencies: FhirNpmPackage) {
     igDependencies.forEach { igDependency ->
-      val igEntity =
-        knowledgeDao.getImplementationGuide(igDependency.packageId, igDependency.version)
+      val igEntity = knowledgeDao.getImplementationGuide(igDependency.name, igDependency.version)
       if (igEntity != null) {
         knowledgeDao.deleteImplementationGuide(igEntity)
         igEntity.rootDirectory.deleteRecursively()
@@ -122,11 +165,19 @@ internal constructor(
         }
       }
     when (resource) {
-      is Resource -> importResource(igId, resource, file)
+      is Resource -> {
+        val newId = indexResourceFile(igId, resource, file)
+        resource.setId(IdType(resource.resourceType.name, newId))
+
+        // Overrides the Id in the file
+        FileOutputStream(file).use {
+          it.write(jsonParser.encodeResourceToString(resource).toByteArray())
+        }
+      }
     }
   }
 
-  private suspend fun importResource(igId: Long?, resource: Resource, file: File) {
+  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
     val metadataResource = resource as? MetadataResource
     val res =
       ResourceMetadataEntity(
@@ -135,30 +186,73 @@ internal constructor(
         metadataResource?.url,
         metadataResource?.name,
         metadataResource?.version,
-        file
+        file,
       )
-    knowledgeDao.insertResource(igId, res)
+
+    return knowledgeDao.insertResource(igId, res)
+  }
+
+  /**
+   * Loads and initializes a worker context with the specified npm packages.
+   *
+   * This
+   * [sample](https://github.com/google/android-fhir/blob/385dc32f2706ad5520c121bf39478a105a5d46eb/datacapture/src/test/java/com/google/android/fhir/datacapture/mapping/ResourceMapperTest.kt#L3065)
+   * test demonstrates how to use `loadWorkerContext` API.
+   *
+   * @param npmPackages The npm packages to be loaded into the worker context.
+   * @param allowLoadingDuplicates Flag indicating whether loading duplicate packages is allowed.
+   *   Default is true.
+   * @param loader Custom resource loader for the worker context. Default is null, meaning the
+   *   default loader will be used.
+   * @return An initialized instance of [IWorkerContext].
+   */
+  suspend fun loadWorkerContext(
+    vararg npmPackages: NpmPackage,
+    allowLoadingDuplicates: Boolean = true,
+    loader: SimpleWorkerContext.IContextResourceLoader? = null,
+  ): IWorkerContext {
+    return withContext(Dispatchers.IO) {
+      val simpleWorkerContext = SimpleWorkerContext()
+      simpleWorkerContext.apply {
+        isAllowLoadingDuplicates = allowLoadingDuplicates
+        npmPackages.forEach { npmPackage -> loadFromPackage(npmPackage, loader) }
+      }
+    }
   }
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
     return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
   }
 
-  fun close() {
-    knowledgeDatabase.close()
-  }
-
   companion object {
     private const val DB_NAME = "knowledge.db"
+    private const val DOWNLOADED_DATA_SUB_DIR = ".fhir_package_cache"
+    private const val DEFAULT_PACKAGE_SERVER = "https://packages.fhir.org/packages/"
 
-    /** Creates an [KnowledgeManager] backed by the Room DB. */
-    fun create(context: Context) =
+    /**
+     * Creates a [KnowledgeManager] instance.
+     *
+     * @param context the application context
+     * @param inMemory whether the knowledge manager instance is in-memory or backed by a Room
+     *   database
+     * @param downloadedNpmDir the directory to store downloaded NPM packages
+     * @param packageServer the package server to download FHIR NPM packages from. Defaulted to
+     *   https://packages.fhir.org/packages/.
+     */
+    fun create(
+      context: Context,
+      inMemory: Boolean = false,
+      downloadedNpmDir: File? = context.dataDir,
+      packageServer: String? = DEFAULT_PACKAGE_SERVER,
+    ) =
       KnowledgeManager(
-        Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build()
+        if (inMemory) {
+          Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build()
+        } else {
+          Room.databaseBuilder(context, KnowledgeDatabase::class.java, DB_NAME).build()
+        },
+        NpmFileManager(File(downloadedNpmDir, DOWNLOADED_DATA_SUB_DIR)),
+        OkHttpNpmPackageDownloader(packageServer!!),
       )
-
-    /** Creates an [KnowledgeManager] backed by the in-memory DB. */
-    fun createInMemory(context: Context) =
-      KnowledgeManager(Room.inMemoryDatabaseBuilder(context, KnowledgeDatabase::class.java).build())
   }
 }

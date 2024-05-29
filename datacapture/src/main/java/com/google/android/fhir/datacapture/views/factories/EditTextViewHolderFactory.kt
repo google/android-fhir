@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,19 +21,27 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.view.View.FOCUS_DOWN
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
+import com.google.android.fhir.datacapture.extensions.unit
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 
 internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
   QuestionnaireItemViewHolderFactory(resId) {
@@ -45,15 +53,20 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
+  private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
   protected lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
+  private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
+    context = itemView.context.tryUnwrapContext()!!
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
+    unitTextView = itemView.findViewById(R.id.unit_text_view)
+
     textInputEditText.setRawInputType(rawInputType)
     // Override `setOnEditorActionListener` to avoid crash with `IllegalStateException` if it's not
     // possible to move focus forward.
@@ -71,9 +84,11 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
             as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
 
-        // Update answer even if the text box loses focus without any change. This will mark the
-        // questionnaire response item as being modified in the view model and trigger validation.
-        handleInput(textInputEditText.editableText, questionnaireViewItem)
+        context.lifecycleScope.launch {
+          // Update answer even if the text box loses focus without any change. This will mark the
+          // questionnaire response item as being modified in the view model and trigger validation.
+          handleInput(textInputEditText.editableText, questionnaireViewItem)
+        }
       }
     }
   }
@@ -89,9 +104,14 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     textInputEditText.removeTextChangedListener(textWatcher)
     updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
+    unitTextView?.apply {
+      text = questionnaireViewItem.questionnaireItem.unit?.code
+      visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
+    }
+
     textWatcher =
       textInputEditText.doAfterTextChanged { editable: Editable? ->
-        handleInput(editable!!, questionnaireViewItem)
+        context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
       }
   }
 
@@ -106,7 +126,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   }
 
   /** Handles user input from the `editable` and updates the questionnaire. */
-  abstract fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
+  abstract suspend fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
 
   /** Handles the UI update. */
   abstract fun updateUI(

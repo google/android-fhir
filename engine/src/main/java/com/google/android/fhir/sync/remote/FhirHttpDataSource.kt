@@ -16,23 +16,55 @@
 
 package com.google.android.fhir.sync.remote
 
-import com.google.android.fhir.sync.BundleRequest
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.sync.DataSource
-import com.google.android.fhir.sync.Request
-import com.google.android.fhir.sync.UrlRequest
+import com.google.android.fhir.sync.download.BundleDownloadRequest
+import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.download.UrlDownloadRequest
+import com.google.android.fhir.sync.upload.request.BundleUploadRequest
+import com.google.android.fhir.sync.upload.request.UploadRequest
+import com.google.android.fhir.sync.upload.request.UrlUploadRequest
+import org.hl7.fhir.r4.model.Binary
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
 /**
  * Implementation of [DataSource] to sync data with the FHIR server using HTTP method calls.
+ *
  * @param fhirHttpService Http service to make requests to the server.
  */
 internal class FhirHttpDataSource(private val fhirHttpService: FhirHttpService) : DataSource {
 
-  override suspend fun download(request: Request) =
-    when (request) {
-      is UrlRequest -> fhirHttpService.get(request.url, request.headers)
-      is BundleRequest -> fhirHttpService.post(request.bundle, request.headers)
+  override suspend fun download(downloadRequest: DownloadRequest) =
+    when (downloadRequest) {
+      is UrlDownloadRequest -> fhirHttpService.get(downloadRequest.url, downloadRequest.headers)
+      is BundleDownloadRequest ->
+        fhirHttpService.post(".", downloadRequest.bundle, downloadRequest.headers)
     }
 
-  override suspend fun upload(request: BundleRequest) =
-    fhirHttpService.post(request.bundle, request.headers)
+  override suspend fun upload(request: UploadRequest): Resource =
+    when (request) {
+      is BundleUploadRequest -> fhirHttpService.post(request.url, request.resource, request.headers)
+      is UrlUploadRequest -> uploadIndividualRequest(request)
+    }
+
+  private suspend fun uploadIndividualRequest(request: UrlUploadRequest): Resource =
+    when (request.httpVerb) {
+      HttpVerb.POST -> fhirHttpService.post(request.url, request.resource, request.headers)
+      HttpVerb.PUT -> fhirHttpService.put(request.url, request.resource, request.headers)
+      HttpVerb.PATCH ->
+        fhirHttpService.patch(request.url, request.resource.toJsonPatch(), request.headers)
+      HttpVerb.DELETE -> fhirHttpService.delete(request.url, request.headers)
+      else -> error("The method, ${request.httpVerb}, is not supported for upload")
+    }
 }
+
+private fun Resource.toJsonPatch(): JsonPatch =
+  when (this) {
+    is Binary -> {
+      val objectMapper = ObjectMapper()
+      objectMapper.readValue(String(this.data), JsonPatch::class.java)
+    }
+    else -> error("This resource cannot have the PATCH operation be applied to it")
+  }

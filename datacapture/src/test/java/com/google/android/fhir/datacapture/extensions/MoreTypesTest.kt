@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import android.app.Application
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 import java.util.TimeZone
@@ -30,10 +31,7 @@ import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
-import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
-import org.hl7.fhir.r4.model.Expression
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.IntegerType
@@ -41,6 +39,7 @@ import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.OidType
 import org.hl7.fhir.r4.model.PositiveIntType
 import org.hl7.fhir.r4.model.Quantity
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
@@ -57,13 +56,15 @@ import org.robolectric.annotation.Config
 @Config(sdk = [Build.VERSION_CODES.P])
 class MoreTypesTest {
 
+  private val context = ApplicationProvider.getApplicationContext<Application>()
+
   @Test
   fun instant_shouldReturnExpectedStringValue() {
     val value =
       InstantType(
         Date.from(Instant.ofEpochMilli(1609459200000)),
         TemporalPrecisionEnum.SECOND,
-        TimeZone.getTimeZone(ZoneId.of("GMT"))
+        TimeZone.getTimeZone(ZoneId.of("GMT")),
       )
     assertThat((value as Type).asStringValue()).isEqualTo(value.asStringValue())
   }
@@ -80,7 +81,7 @@ class MoreTypesTest {
       DateTimeType(
         Date.from(Instant.ofEpochMilli(1609459200000)),
         TemporalPrecisionEnum.SECOND,
-        TimeZone.getTimeZone(ZoneId.of("GMT"))
+        TimeZone.getTimeZone(ZoneId.of("GMT")),
       )
     assertThat((value as Type).asStringValue()).isEqualTo(value.asStringValue())
   }
@@ -175,6 +176,7 @@ class MoreTypesTest {
     val value = Quantity(1234567.89)
     assertThat((value as Type).asStringValue()).isEqualTo("")
   }
+
   @Test
   fun stringType_toUriType() {
     val uri = StringType("fakeUri").toUriType()
@@ -200,46 +202,82 @@ class MoreTypesTest {
   }
 
   @Test
-  fun `should return calculated value for cqf expression`() {
-    val today = LocalDate.now().toString()
-    val type =
-      DateType().apply {
-        extension =
-          listOf(
-            Extension(
-              EXTENSION_CQF_CALCULATED_VALUE_URL,
-              Expression().apply {
-                language = "text/fhirpath"
-                expression = "today()"
-              }
-            )
-          )
+  fun `should return coding for quantity`() {
+    val quantity =
+      Quantity(1).apply {
+        this.code = "yr"
+        this.unit = "years"
+        this.system = "http://unit.org"
       }
-    assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(today)
+    val result = quantity.toCoding()
+    assertThat(result.equalsDeep(Coding("http://unit.org", "yr", "years")))
   }
 
   @Test
-  fun `should return calculated value for a non-cqf extension`() {
-    LocalDate.now().toString()
-    val type =
-      DateType().apply {
-        extension =
-          listOf(
-            Extension(
-              "http://hl7.org/fhir/StructureDefinition/my-own-expression",
-              Expression().apply {
-                language = "text/fhirpath"
-                expression = "today()"
-              }
-            )
-          )
-      }
-    assertThat((type.valueOrCalculateValue() as DateType).valueAsString).isEqualTo(null)
+  fun `should return identifier string for coding containing system, version and code`() {
+    val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay").apply { version = "2.0" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0|fakeCode")
   }
 
   @Test
-  fun `should return entered value when no cqf expression is defined`() {
-    val type = IntegerType().apply { value = 500 }
-    assertThat((type.valueOrCalculateValue() as IntegerType).value).isEqualTo(500)
+  fun `should return identifier string for coding containing system and version`() {
+    val coding =
+      Coding().apply {
+        system = "fakeSystem"
+        version = "2.0"
+      }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem2.0")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing system and code`() {
+    val coding = Coding("fakeSystem", "fakeCode", "fakeDisplay")
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem|fakeCode")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only system`() {
+    val coding = Coding().apply { system = "fakeSystem" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeSystem")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing version and code`() {
+    val coding =
+      Coding().apply {
+        version = "2.0"
+        code = "fakeCode"
+      }
+    assertThat(coding.identifierString(context)).isEqualTo("2.0|fakeCode")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only version`() {
+    val coding = Coding().apply { version = "2.0" }
+    assertThat(coding.identifierString(context)).isEqualTo("2.0")
+  }
+
+  @Test
+  fun `should return identifier string for coding containing only code`() {
+    val coding = Coding().apply { code = "fakeCode" }
+    assertThat(coding.identifierString(context)).isEqualTo("fakeCode")
+  }
+
+  @Test
+  fun `should return identifier string for reference`() {
+    val reference = Reference().apply { reference = "fakeReference" }
+    assertThat(reference.identifierString(context)).isEqualTo("fakeReference")
+  }
+
+  @Test
+  fun `getValueAsString should return 'not answered' for an empty Quantity`() {
+    val quantity = Quantity()
+    assertThat(quantity.getValueAsString(context)).isEqualTo("Not Answered")
+  }
+
+  @Test
+  fun `getValueAsString should return correct value for a Quantity`() {
+    val quantity = Quantity(20L)
+    assertThat(quantity.getValueAsString(context)).isEqualTo("20")
   }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,20 +54,20 @@ class MoreHttpLoggersTest {
         requestHeaders =
           listOf(
             "Restricted" to "request-restricted-value",
-            "Unrestricted" to "request-unrestricted-value"
+            "Unrestricted" to "request-unrestricted-value",
           ),
         responseHeaders =
           listOf(
             "Restricted" to "response-restricted-value",
-            "Unrestricted" to "response-unrestricted-value"
-          )
+            "Unrestricted" to "response-unrestricted-value",
+          ),
       )
     assertThat(logMessages)
       .containsAtLeast(
         "Restricted: request-restricted-value",
         "Restricted: response-restricted-value",
         "Unrestricted: request-unrestricted-value",
-        "Unrestricted: response-unrestricted-value"
+        "Unrestricted: response-unrestricted-value",
       )
   }
 
@@ -80,24 +80,24 @@ class MoreHttpLoggersTest {
         requestHeaders =
           listOf(
             "Restricted" to "request-restricted-value",
-            "Unrestricted" to "request-unrestricted-value"
+            "Unrestricted" to "request-unrestricted-value",
           ),
         responseHeaders =
           listOf(
             "Restricted" to "response-restricted-value",
-            "Unrestricted" to "response-unrestricted-value"
-          )
+            "Unrestricted" to "response-unrestricted-value",
+          ),
       )
 
     assertThat(logMessages)
       .containsAtLeast(
         "Unrestricted: request-unrestricted-value",
-        "Unrestricted: response-unrestricted-value"
+        "Unrestricted: response-unrestricted-value",
       )
     assertThat(logMessages)
       .containsNoneOf(
         "Restricted: request-restricted-value",
-        "Restricted: response-restricted-value"
+        "Restricted: response-restricted-value",
       )
   }
 
@@ -108,7 +108,7 @@ class MoreHttpLoggersTest {
     level: HttpLogger.Level,
     headersToIgnore: List<String>? = null,
     requestHeaders: List<Pair<String, String>>,
-    responseHeaders: List<Pair<String, String>>
+    responseHeaders: List<Pair<String, String>>,
   ): List<String> {
     val logMessages = mutableListOf<String>()
     HttpLogger(HttpLogger.Configuration(level, headersToIgnore)) { logMessages.add(it) }
@@ -119,7 +119,7 @@ class MoreHttpLoggersTest {
 
   class TestInterceptorChain(
     private val requestHeaders: List<Pair<String, String>>,
-    private val responseHeaders: List<Pair<String, String>>
+    private val responseHeaders: List<Pair<String, String>>,
   ) : Interceptor.Chain {
 
     override fun connection(): Connection? = null

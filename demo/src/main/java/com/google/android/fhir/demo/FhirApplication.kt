@@ -52,18 +52,20 @@ class FhirApplication : Application(), DataCaptureConfig.Provider {
           httpLogger =
             HttpLogger(
               HttpLogger.Configuration(
-                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC
-              )
-            ) { Timber.tag("App-HttpLog").d(it) },
-          networkConfiguration = NetworkConfiguration(uploadWithGzip = false)
-        )
-      )
+                if (BuildConfig.DEBUG) HttpLogger.Level.BODY else HttpLogger.Level.BASIC,
+              ),
+            ) {
+              Timber.tag("App-HttpLog").d(it)
+            },
+          networkConfiguration = NetworkConfiguration(uploadWithGzip = false),
+        ),
+      ),
     )
 
     dataCaptureConfig =
       DataCaptureConfig().apply {
         urlResolver = ReferenceUrlResolver(this@FhirApplication as Context)
-        xFhirQueryResolver = XFhirQueryResolver { fhirEngine.search(it) }
+        xFhirQueryResolver = XFhirQueryResolver { it -> fhirEngine.search(it).map { it.resource } }
       }
   }
 

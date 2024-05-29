@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
@@ -64,7 +65,7 @@ class QuestionnaireResponseValidatorTest {
             .setLinkId("a-question")
             .setMaxLength(3)
             .setType(Questionnaire.QuestionnaireItemType.INTEGER)
-            .setText("Age in years?")
+            .setText("Age in years?"),
         )
     val questionnaireResponse =
       QuestionnaireResponse()
@@ -74,17 +75,19 @@ class QuestionnaireResponseValidatorTest {
             .setAnswer(
               listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(IntegerType(3))
-              )
-            )
+                  .setValue(IntegerType(3)),
+              ),
+            ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-    assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
+    }
   }
 
   @Test
@@ -96,7 +99,7 @@ class QuestionnaireResponseValidatorTest {
             .setLinkId("a-question")
             .setMaxLength(3)
             .setType(Questionnaire.QuestionnaireItemType.INTEGER)
-            .setText("Age in years?")
+            .setText("Age in years?"),
         )
     val questionnaireResponse =
       QuestionnaireResponse()
@@ -106,20 +109,24 @@ class QuestionnaireResponseValidatorTest {
             .setAnswer(
               listOf(
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(IntegerType(1000))
-              )
-            )
+                  .setValue(IntegerType(1000)),
+              ),
+            ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-    assertThat(result["a-question"]!!.single())
-      .isEqualTo(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"]!!.single())
+        .isEqualTo(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+    }
   }
 
   @Test
@@ -137,8 +144,8 @@ class QuestionnaireResponseValidatorTest {
                 .setLinkId("a-nested-question")
                 .setMaxLength(3)
                 .setType(Questionnaire.QuestionnaireItemType.STRING)
-                .setText("Country code")
-            )
+                .setText("Country code"),
+            ),
         )
     val questionnaireResponse =
       QuestionnaireResponse()
@@ -155,27 +162,33 @@ class QuestionnaireResponseValidatorTest {
                       .setAnswer(
                         listOf(
                           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                            .setValue(StringType("ABCD"))
-                        )
-                      )
-                  )
-              )
-            )
+                            .setValue(StringType("ABCD")),
+                        ),
+                      ),
+                  ),
+              ),
+            ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-    assertThat(result["a-question"])
-      .containsExactly(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
-      )
-    assertThat(result["a-nested-question"])
-      .containsExactly(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3"))
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"])
+        .containsExactly(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+      assertThat(result["a-nested-question"])
+        .containsExactly(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+    }
   }
 
   @Test
@@ -187,7 +200,7 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
       },
       "Missing questionnaire item for questionnaire response item question-1",
-      context
+      context,
     )
   }
 
@@ -200,7 +213,7 @@ class QuestionnaireResponseValidatorTest {
           Questionnaire.QuestionnaireItemComponent().apply {
             linkId = "q1"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
         addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
@@ -211,9 +224,9 @@ class QuestionnaireResponseValidatorTest {
               Questionnaire.QuestionnaireItemEnableWhenComponent()
                 .setQuestion("q1")
                 .setOperator(Questionnaire.QuestionnaireItemOperator.EXISTS)
-                .setAnswer(BooleanType(true))
+                .setAnswer(BooleanType(true)),
             )
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -225,20 +238,22 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(false)
-              }
+              },
             )
-          }
+          },
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-    assertThat(result.keys).containsExactly("q1")
-    assertThat(result["q1"]).containsExactly(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result.keys).containsExactly("q1")
+      assertThat(result["q1"]).containsExactly(Valid)
+    }
   }
 
   @Test
@@ -251,27 +266,27 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-2"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-3"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
       }
 
@@ -282,26 +297,30 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-3")))
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
-    assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
+    }
   }
 
   @Test
   fun `validation passes if questionnaire response matches questionnaire`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      context
-    )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+        },
+        context,
+      )
+    }
   }
 
   @Test
@@ -310,17 +329,19 @@ class QuestionnaireResponseValidatorTest {
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
       "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)",
-      context
+      context,
     )
   }
 
   @Test
   fun `validation passes if questionnaire response does not specify questionnaire`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply { url = "questionnaire-1" },
-      QuestionnaireResponse(),
-      context
-    )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply { url = "questionnaire-1" },
+        QuestionnaireResponse(),
+        context,
+      )
+    }
   }
 
   @Test
@@ -333,9 +354,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-2"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -343,7 +364,7 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
       },
       "Missing questionnaire item for questionnaire response item question-1",
-      context
+      context,
     )
   }
 
@@ -355,8 +376,8 @@ class QuestionnaireResponseValidatorTest {
         addItem(
           Questionnaire.QuestionnaireItemComponent(
             StringType("question-1"),
-            Enumeration(Questionnaire.QuestionnaireItemTypeEnumFactory())
-          )
+            Enumeration(Questionnaire.QuestionnaireItemTypeEnumFactory()),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -364,54 +385,58 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
       },
       "Questionnaire item must have type",
-      context
+      context,
     )
   }
 
   @Test
   fun `validation passes for questionnaire item type DISPLAY`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent(
-            StringType("display-1"),
-            Enumeration(
-              Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DISPLAY
-            )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "questionnaire-1"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+              StringType("display-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.DISPLAY,
+              ),
+            ),
           )
-        )
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
-      },
-      context
-    )
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "questionnaire-1"
+          addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
+        },
+        context,
+      )
+    }
   }
 
   @Test
   fun `validation passes for questionnaire item type NULL`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent(
-            StringType("null-1"),
-            Enumeration(
-              Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.NULL
-            )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "questionnaire-1"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+              StringType("null-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.NULL,
+              ),
+            ),
           )
-        )
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
-      },
-      context
-    )
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "questionnaire-1"
+          addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
+        },
+        context,
+      )
+    }
   }
 
   @Test
@@ -424,8 +449,8 @@ class QuestionnaireResponseValidatorTest {
               StringType("valid-hidden-item"),
               Enumeration(
                 Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.INTEGER
-              )
+                Questionnaire.QuestionnaireItemType.INTEGER,
+              ),
             )
             .apply {
               this.required = true
@@ -433,26 +458,28 @@ class QuestionnaireResponseValidatorTest {
                 url = EXTENSION_HIDDEN_URL
                 setValue(BooleanType(true))
               }
-            }
+            },
         )
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         this.questionnaire = "questionnaire-1"
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item")),
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
 
-    assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
-    assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
+      assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
+      assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
+    }
   }
 
   @Test
@@ -465,8 +492,8 @@ class QuestionnaireResponseValidatorTest {
               StringType("valid-hidden-item"),
               Enumeration(
                 Questionnaire.QuestionnaireItemTypeEnumFactory(),
-                Questionnaire.QuestionnaireItemType.INTEGER
-              )
+                Questionnaire.QuestionnaireItemType.INTEGER,
+              ),
             )
             .apply {
               this.required = true
@@ -474,29 +501,32 @@ class QuestionnaireResponseValidatorTest {
                 url = EXTENSION_HIDDEN_URL
                 setValue(BooleanType(false))
               }
-            }
+            },
         )
       }
     val questionnaireResponse =
       QuestionnaireResponse().apply {
         this.questionnaire = "questionnaire-1"
         addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item"))
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("valid-hidden-item")),
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context
-        )
-        .entries.first()
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+          .entries
+          .first()
 
-    assertThat(result.key).isEqualTo("valid-hidden-item")
-    assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
-    assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Missing answer for required field.")
+      assertThat(result.key).isEqualTo("valid-hidden-item")
+      assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
+      assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
+        .isEqualTo("Missing answer for required field.")
+    }
   }
 
   @Test
@@ -509,9 +539,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("group-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.GROUP
-            )
-          )
+              Questionnaire.QuestionnaireItemType.GROUP,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -519,13 +549,13 @@ class QuestionnaireResponseValidatorTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
             addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1"))
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")),
             )
-          }
+          },
         )
       },
       "Missing questionnaire item for questionnaire response item question-1",
-      context
+      context,
     )
   }
 
@@ -539,9 +569,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.INTEGER
-            )
-          )
+              Questionnaire.QuestionnaireItemType.INTEGER,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -551,18 +581,18 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(1)
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(2)
-              }
+              },
             )
-          }
+          },
         )
       },
       "Multiple answers for non-repeat questionnaire item question-1",
-      context
+      context,
     )
   }
 
@@ -574,7 +604,7 @@ class QuestionnaireResponseValidatorTest {
       },
       QuestionnaireResponse().apply {
         questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      }
+      },
     )
   }
 
@@ -583,7 +613,7 @@ class QuestionnaireResponseValidatorTest {
     assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
       Questionnaire().apply { url = "questionnaire-1" },
       QuestionnaireResponse().apply { questionnaire = "questionnaire-2" },
-      "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)"
+      "Mismatching Questionnaire questionnaire-1 and QuestionnaireResponse (for Questionnaire questionnaire-2)",
     )
   }
 
@@ -591,7 +621,7 @@ class QuestionnaireResponseValidatorTest {
   fun `check passes if questionnaire response does not specify questionnaire`() {
     QuestionnaireResponseValidator.checkQuestionnaireResponse(
       Questionnaire().apply { url = "questionnaire-1" },
-      QuestionnaireResponse()
+      QuestionnaireResponse(),
     )
   }
 
@@ -603,7 +633,7 @@ class QuestionnaireResponseValidatorTest {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
       },
-      "Missing questionnaire item for questionnaire response item question-1"
+      "Missing questionnaire item for questionnaire response item question-1",
     )
   }
 
@@ -617,16 +647,16 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-2"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")))
       },
-      "Missing questionnaire item for questionnaire response item question-1"
+      "Missing questionnaire item for questionnaire response item question-1",
     )
   }
 
@@ -640,15 +670,15 @@ class QuestionnaireResponseValidatorTest {
             StringType("display-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DISPLAY
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DISPLAY,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
-      }
+      },
     )
   }
 
@@ -662,15 +692,15 @@ class QuestionnaireResponseValidatorTest {
             StringType("null-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.NULL
-            )
-          )
+              Questionnaire.QuestionnaireItemType.NULL,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
         questionnaire = "questionnaire-1"
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
-      }
+      },
     )
   }
 
@@ -684,9 +714,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("group-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.GROUP
-            )
-          )
+              Questionnaire.QuestionnaireItemType.GROUP,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -694,12 +724,12 @@ class QuestionnaireResponseValidatorTest {
         addItem(
           QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
             addItem(
-              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1"))
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-1")),
             )
-          }
+          },
         )
       },
-      "Missing questionnaire item for questionnaire response item question-1"
+      "Missing questionnaire item for questionnaire response item question-1",
     )
   }
 
@@ -713,9 +743,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.INTEGER
-            )
-          )
+              Questionnaire.QuestionnaireItemType.INTEGER,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -725,17 +755,17 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(1)
-              }
+              },
             )
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(2)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Multiple answers for non-repeat questionnaire item question-1"
+      "Multiple answers for non-repeat questionnaire item question-1",
     )
   }
 
@@ -749,9 +779,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.BOOLEAN
-            )
-          )
+              Questionnaire.QuestionnaireItemType.BOOLEAN,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -761,11 +791,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -779,9 +809,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.BOOLEAN
-            )
-          )
+              Questionnaire.QuestionnaireItemType.BOOLEAN,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -791,12 +821,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(1)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type BOOLEAN and answer type integer for question-1"
+      "Mismatching question type BOOLEAN and answer type integer for question-1",
     )
   }
 
@@ -810,9 +840,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DECIMAL
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DECIMAL,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -822,11 +852,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -840,9 +870,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DECIMAL
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DECIMAL,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -852,12 +882,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(1)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type DECIMAL and answer type integer for question-1"
+      "Mismatching question type DECIMAL and answer type integer for question-1",
     )
   }
 
@@ -871,9 +901,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.INTEGER
-            )
-          )
+              Questionnaire.QuestionnaireItemType.INTEGER,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -883,11 +913,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = IntegerType(1)
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -901,9 +931,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.INTEGER
-            )
-          )
+              Questionnaire.QuestionnaireItemType.INTEGER,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -913,12 +943,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type INTEGER and answer type decimal for question-1"
+      "Mismatching question type INTEGER and answer type decimal for question-1",
     )
   }
 
@@ -932,9 +962,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DATE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DATE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -944,11 +974,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DateType("1900-01-01")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -962,9 +992,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DATE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DATE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -974,12 +1004,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type DATE and answer type decimal for question-1"
+      "Mismatching question type DATE and answer type decimal for question-1",
     )
   }
 
@@ -993,9 +1023,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DATETIME
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DATETIME,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1005,11 +1035,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DateTimeType("1990-01-01")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1023,9 +1053,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DATETIME
-            )
-          )
+              Questionnaire.QuestionnaireItemType.DATETIME,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1035,12 +1065,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type DATETIME and answer type decimal for question-1"
+      "Mismatching question type DATETIME and answer type decimal for question-1",
     )
   }
 
@@ -1054,9 +1084,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.TIME
-            )
-          )
+              Questionnaire.QuestionnaireItemType.TIME,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1066,11 +1096,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = TimeType("10:30.000")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1084,9 +1114,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.TIME
-            )
-          )
+              Questionnaire.QuestionnaireItemType.TIME,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1096,12 +1126,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type TIME and answer type decimal for question-1"
+      "Mismatching question type TIME and answer type decimal for question-1",
     )
   }
 
@@ -1115,9 +1145,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1127,11 +1157,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = StringType("")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1145,9 +1175,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.STRING
-            )
-          )
+              Questionnaire.QuestionnaireItemType.STRING,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1157,12 +1187,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type STRING and answer type decimal for question-1"
+      "Mismatching question type STRING and answer type decimal for question-1",
     )
   }
 
@@ -1176,9 +1206,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.TEXT
-            )
-          )
+              Questionnaire.QuestionnaireItemType.TEXT,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1188,11 +1218,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = StringType("Some text")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1206,9 +1236,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.TEXT
-            )
-          )
+              Questionnaire.QuestionnaireItemType.TEXT,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1218,12 +1248,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type TEXT and answer type decimal for question-1"
+      "Mismatching question type TEXT and answer type decimal for question-1",
     )
   }
 
@@ -1237,9 +1267,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.URL
-            )
-          )
+              Questionnaire.QuestionnaireItemType.URL,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1249,11 +1279,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = UrlType("http://unitsofmeasure.org")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1267,9 +1297,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.URL
-            )
-          )
+              Questionnaire.QuestionnaireItemType.URL,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1279,12 +1309,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type URL and answer type decimal for question-1"
+      "Mismatching question type URL and answer type decimal for question-1",
     )
   }
 
@@ -1298,9 +1328,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.CHOICE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.CHOICE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1310,11 +1340,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = Coding()
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1328,9 +1358,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.CHOICE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.CHOICE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1340,12 +1370,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type CHOICE and answer type decimal for question-1"
+      "Mismatching question type CHOICE and answer type decimal for question-1",
     )
   }
 
@@ -1359,9 +1389,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.OPENCHOICE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.OPENCHOICE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1371,11 +1401,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = Coding().apply { code = "some code" }
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1389,9 +1419,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.OPENCHOICE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.OPENCHOICE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1401,11 +1431,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = StringType("")
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1419,9 +1449,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.OPENCHOICE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.OPENCHOICE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1431,12 +1461,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type OPENCHOICE and answer type decimal for question-1"
+      "Mismatching question type OPENCHOICE and answer type decimal for question-1",
     )
   }
 
@@ -1450,9 +1480,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.ATTACHMENT
-            )
-          )
+              Questionnaire.QuestionnaireItemType.ATTACHMENT,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1462,11 +1492,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = Attachment().apply { id = "some id" }
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1480,9 +1510,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.ATTACHMENT
-            )
-          )
+              Questionnaire.QuestionnaireItemType.ATTACHMENT,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1492,12 +1522,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type ATTACHMENT and answer type decimal for question-1"
+      "Mismatching question type ATTACHMENT and answer type decimal for question-1",
     )
   }
 
@@ -1511,9 +1541,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.REFERENCE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.REFERENCE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1523,11 +1553,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = Reference().apply { id = "non-empty ID" }
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1541,9 +1571,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.REFERENCE
-            )
-          )
+              Questionnaire.QuestionnaireItemType.REFERENCE,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1553,12 +1583,12 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type REFERENCE and answer type decimal for question-1"
+      "Mismatching question type REFERENCE and answer type decimal for question-1",
     )
   }
 
@@ -1572,9 +1602,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.QUANTITY
-            )
-          )
+              Questionnaire.QuestionnaireItemType.QUANTITY,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1584,11 +1614,11 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = Quantity().apply { value = BigDecimal("100") }
-              }
+              },
             )
-          }
+          },
         )
-      }
+      },
     )
   }
 
@@ -1602,9 +1632,9 @@ class QuestionnaireResponseValidatorTest {
             StringType("question-1"),
             Enumeration(
               Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.QUANTITY
-            )
-          )
+              Questionnaire.QuestionnaireItemType.QUANTITY,
+            ),
+          ),
         )
       },
       QuestionnaireResponse().apply {
@@ -1614,25 +1644,25 @@ class QuestionnaireResponseValidatorTest {
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = DecimalType(1.0)
-              }
+              },
             )
-          }
+          },
         )
       },
-      "Mismatching question type QUANTITY and answer type decimal for question-1"
+      "Mismatching question type QUANTITY and answer type decimal for question-1",
     )
   }
 
   private fun assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
-    message: String
+    message: String,
   ) {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
         QuestionnaireResponseValidator.checkQuestionnaireResponse(
           questionnaire,
-          questionnaireResponse
+          questionnaireResponse,
         )
       }
     assertThat(exception.message).isEqualTo(message)
@@ -1642,15 +1672,17 @@ class QuestionnaireResponseValidatorTest {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     message: String,
-    context: Context
+    context: Context,
   ) {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context
-        )
+        runTest {
+          QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+        }
       }
     assertThat(exception.message).isEqualTo(message)
   }
@@ -1659,15 +1691,17 @@ class QuestionnaireResponseValidatorTest {
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     message: String,
-    context: Context
+    context: Context,
   ) {
     val exception =
       assertThrows(IllegalStateException::class.java) {
-        QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context
-        )
+        runTest {
+          QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+        }
       }
     assertThat(exception.message).isEqualTo(message)
   }

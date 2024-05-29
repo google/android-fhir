@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,8 @@ import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
+import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
-import com.google.android.fhir.datacapture.extensions.localizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import org.hl7.fhir.r4.model.Questionnaire
@@ -48,15 +48,18 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpButton = findViewById(R.id.helpButton),
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
-      questionnaireItem = questionnaireViewItem.questionnaireItem
+      questionnaireItem = questionnaireViewItem.questionnaireItem,
+      questionnaireResponseItem = questionnaireViewItem.getQuestionnaireResponseItem(),
+      isHelpCardInitiallyVisible = questionnaireViewItem.isHelpCardOpen,
+      helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(
-      appendAsteriskToQuestionText(question.context, questionnaireViewItem)
+      appendAsteriskToQuestionText(question.context, questionnaireViewItem),
     )
     hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.localizedInstructionsSpanned
+      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.

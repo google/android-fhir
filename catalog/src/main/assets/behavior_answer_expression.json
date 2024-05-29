@@ -1,0 +1,34 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-answerExpression",
+          "valueExpression": {
+            "language": "application/x-fhir-query",
+            "expression": "Task?subject=Patient/P1&code=33879002&status=ready&_sort=period"
+          }
+        },
+        {
+          "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-choiceColumn",
+          "extension": [
+            {
+              "url": "path",
+              "valueString": "description + ' - ' + reasonCode.coding.where(system='http://snomed.info/sct').display"
+            },
+            {
+              "url": "forDisplay",
+              "valueBoolean": true
+            }
+          ]
+        }
+      ],
+      "linkId": "vaccines",
+      "text": "Which vaccine tasks were completed?",
+      "type": "reference",
+      "required": true,
+      "repeats": true
+    }
+  ]
+}

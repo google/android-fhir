@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import com.google.android.fhir.search.StringFilterModifier
 data class StringParamFilterCriterion(
   val parameter: StringClientParam,
   var modifier: StringFilterModifier = StringFilterModifier.STARTS_WITH,
-  var value: String? = null
+  var value: String? = null,
 ) : FilterCriterion {
 
   override fun getConditionalParams() =
@@ -42,8 +42,8 @@ data class StringParamFilterCriterion(
             StringFilterModifier.MATCHES_EXACTLY -> "= ?"
             StringFilterModifier.CONTAINS -> "LIKE '%' || ? || '%' COLLATE NOCASE"
           },
-        value!!
-      )
+        value!!,
+      ),
     )
 }
 

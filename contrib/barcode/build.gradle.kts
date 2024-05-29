@@ -1,3 +1,5 @@
+import Dependencies.removeIncompatibleDependencies
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -33,8 +35,8 @@ android {
         "META-INF/INDEX.LIST",
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
-        "META-INF/LGPL-3.0.txt"
-      )
+        "META-INF/LGPL-3.0.txt",
+      ),
     )
   }
 
@@ -42,13 +44,9 @@ android {
 
   testOptions { animationsDisabled = true }
   kotlin { jvmToolchain(11) }
-  compileOptions {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-  }
 }
 
-configurations { all { exclude(module = "xpp3") } }
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)

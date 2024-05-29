@@ -1,7 +1,6 @@
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
@@ -32,8 +31,6 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
   }
 
   packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }

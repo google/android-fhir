@@ -68,10 +68,10 @@ class RetrofitHttpServiceTest {
                 HumanName().apply {
                   addGiven("John")
                   family = "Doe"
-                }
+                },
               )
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
@@ -85,7 +85,7 @@ class RetrofitHttpServiceTest {
   }
 
   @Test // https://github.com/google/android-fhir/issues/1892
-  fun `should assemble upload request correctly`() = runTest {
+  fun `should assemble upload bundle request correctly`() = runTest {
     // checks that a upload request can be made successfully with parameters without exception
     val mockResponse =
       MockResponse().apply {
@@ -95,8 +95,8 @@ class RetrofitHttpServiceTest {
             Bundle().apply {
               id = "transaction-response-1"
               type = Bundle.BundleType.TRANSACTIONRESPONSE
-            }
-          )
+            },
+          ),
         )
       }
     mockWebServer.enqueue(mockResponse)
@@ -106,7 +106,8 @@ class RetrofitHttpServiceTest {
         type = Bundle.BundleType.TRANSACTION
       }
 
-    val result = retrofitHttpService.post(request, mapOf("If-Match" to "randomResourceVersionID"))
+    val result =
+      retrofitHttpService.post(".", request, mapOf("If-Match" to "randomResourceVersionID"))
     val serverRequest = mockWebServer.takeRequest()
     assertThat(serverRequest.headers["If-Match"]).isEqualTo("randomResourceVersionID")
     // No exception has occurred
@@ -124,8 +125,8 @@ class RetrofitHttpServiceTest {
               Bundle().apply {
                 id = "transaction-response-1"
                 type = Bundle.BundleType.TRANSACTIONRESPONSE
-              }
-            )
+              },
+            ),
           )
         }
       mockWebServer.enqueue(mockResponse)
@@ -135,7 +136,7 @@ class RetrofitHttpServiceTest {
           type = Bundle.BundleType.TRANSACTION
         }
 
-      val result = retrofitHttpService.post(request, emptyMap())
+      val result = retrofitHttpService.post(".", request, emptyMap())
 
       assertThat(result).isInstanceOf(Bundle::class.java)
       assertThat((result as Bundle).type).isEqualTo(Bundle.BundleType.TRANSACTIONRESPONSE)

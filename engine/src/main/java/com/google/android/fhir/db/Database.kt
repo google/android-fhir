@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,15 @@
 
 package com.google.android.fhir.db
 
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -57,7 +60,7 @@ internal interface Database {
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,
-    lastUpdated: Instant
+    lastUpdated: Instant,
   )
 
   /**
@@ -92,22 +95,46 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceWithUUID<R>>
+
+  suspend fun searchForwardReferencedResources(query: SearchQuery): List<ForwardIncludeSearchResult>
+
+  suspend fun searchReverseReferencedResources(query: SearchQuery): List<ReverseIncludeSearchResult>
 
   suspend fun count(query: SearchQuery): Long
 
   /**
-   * Retrieves all [LocalChangeEntity] s for all [Resource] s, which can be used to update the
-   * remote FHIR server. Each resource will have at most one
-   * [LocalChangeEntity](multiple changes are squashed).
+   * Retrieves all [LocalChange]s for all [Resource]s, which can be used to update the remote FHIR
+   * server.
    */
-  suspend fun getAllLocalChanges(): List<SquashedLocalChange>
+  suspend fun getAllLocalChanges(): List<LocalChange>
+
+  /**
+   * Retrieves all [LocalChange]s for the [Resource] which has the [LocalChange] with the oldest
+   * [LocalChange.timestamp]
+   */
+  suspend fun getAllChangesForEarliestChangedResource(): List<LocalChange>
+
+  /** Retrieves the count of [LocalChange]s stored in the database. */
+  suspend fun getLocalChangesCount(): Int
 
   /** Remove the [LocalChangeEntity] s with given ids. Call this after a successful sync. */
   suspend fun deleteUpdates(token: LocalChangeToken)
 
   /** Remove the [LocalChangeEntity] s with matching resource ids. */
   suspend fun deleteUpdates(resources: List<Resource>)
+
+  /**
+   * Updates the [ResourceEntity.serializedResource] and [ResourceEntity.resourceId] corresponding
+   * to the updatedResource. Updates all the [LocalChangeEntity] for this updated resource as well
+   * as all the [LocalChangeEntity] referring to this resource in their [LocalChangeEntity.payload]
+   * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
+   * updated resource.
+   */
+  suspend fun updateResourceAndReferences(
+    currentResourceId: String,
+    updatedResource: Resource,
+  )
 
   /** Runs the block as a database transaction. */
   suspend fun withTransaction(block: suspend () -> Unit)
@@ -122,27 +149,60 @@ internal interface Database {
   suspend fun clearDatabase()
 
   /**
-   * Retrieve [LocalChangeEntity] for [Resource] with given type and id, which can be used to purge
-   * resource from database. Each resource will have at most one
-   * [LocalChangeEntity](multiple
-   * changes are squashed). If there is no local change for given
-   * [resourceType] and [Resource.id], return `null`.
+   * Retrieve a list of [LocalChange] for [Resource] with given type and id, which can be used to
+   * purge resource from database. If there is no local change for given [resourceType] and
+   * [Resource.id], return an empty list.
+   *
    * @param type The [ResourceType]
    * @param id The resource id [Resource.id]
-   * @return [LocalChangeEntity] A squashed local changes for given [resourceType] and [Resource.id]
-   * . If there is no local change for given [resourceType] and [Resource.id], return `null`.
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   *   [Resource.id] . If there is no local change for given [resourceType] and [Resource.id],
+   *   return empty list.
    */
-  suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange?
+  suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange>
 
   /**
-   * Purge resource from database based on resource type and id without any deletion of data from
-   * the server.
-   * @param type The [ResourceType]
-   * @param id The resource id [Resource.id]
-   * @param isLocalPurge default value is false here resource will not be deleted from
-   * LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   * either sync with server or FORCE_PURGE required") if local change exists. If true this API will
-   * delete resource entry from LocalChangeEntity table.
+   * Retrieve a list of [LocalChange] for [ResourceEntity] with given UUID, which can be used to
+   * purge resource from database. If there is no local change for [ResourceEntity.resourceUuid],
+   * return an empty list.
+   *
+   * @param resourceUuid The resource UUID [ResourceEntity.resourceUuid]
+   * @return [List]<[LocalChange]> A list of local changes for given [resourceType] and
+   *   [Resource.id] . If there is no local change for given [resourceType] and
+   *   [ResourceEntity.resourceUuid], return empty list.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
+
+  /**
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
+   *
+   * @param type The [ResourceType]
+   * @param ids The resource ids [Set]<[Resource.id]>
+   * @param forcePurge default value is false, here resources will not be deleted from
+   *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
+   *   either sync with server or FORCE_PURGE required") if local changes exists. If true this API
+   *   will delete resource entries from LocalChangeEntity table.
+   */
+  suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
+
+  /**
+   * @return List of [LocalChangeResourceReference] associated with the [LocalChangeEntity.id]s. A
+   *   single [LocalChangeEntity] may have one or more [LocalChangeResourceReference] associated
+   *   with it.
+   */
+  suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference>
 }
+
+data class ResourceWithUUID<R>(
+  val uuid: UUID,
+  val resource: R,
+)
+
+data class LocalChangeResourceReference(
+  val localChangeId: Long,
+  val resourceReferenceValue: String,
+  val resourceReferencePath: String?,
+)

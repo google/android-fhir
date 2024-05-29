@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,25 +24,25 @@ import com.google.android.fhir.demo.databinding.PatientListItemViewBinding
 
 /** UI Controller helper class to monitor Patient viewmodel and display list of patients. */
 class PatientItemRecyclerViewAdapter(
-  private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit
+  private val onItemClicked: (PatientListViewModel.PatientItem) -> Unit,
 ) :
   ListAdapter<PatientListViewModel.PatientItem, PatientItemViewHolder>(PatientItemDiffCallback()) {
 
   class PatientItemDiffCallback : DiffUtil.ItemCallback<PatientListViewModel.PatientItem>() {
     override fun areItemsTheSame(
       oldItem: PatientListViewModel.PatientItem,
-      newItem: PatientListViewModel.PatientItem
+      newItem: PatientListViewModel.PatientItem,
     ): Boolean = oldItem.resourceId == newItem.resourceId
 
     override fun areContentsTheSame(
       oldItem: PatientListViewModel.PatientItem,
-      newItem: PatientListViewModel.PatientItem
+      newItem: PatientListViewModel.PatientItem,
     ): Boolean = oldItem.id == newItem.id && oldItem.risk == newItem.risk
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PatientItemViewHolder {
     return PatientItemViewHolder(
-      PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+      PatientListItemViewBinding.inflate(LayoutInflater.from(parent.context), parent, false),
     )
   }
 

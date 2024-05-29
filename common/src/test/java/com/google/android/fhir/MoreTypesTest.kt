@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,7 @@ class MoreTypesTest {
   @Test
   fun equals_coding_differentSystems_shouldReturnFalse() {
     assertThat(
-        equals(Coding("system", "code", "display"), Coding("otherSystem", "code", "display"))
+        equals(Coding("system", "code", "display"), Coding("otherSystem", "code", "display")),
       )
       .isFalse()
   }
@@ -74,7 +74,7 @@ class MoreTypesTest {
   @Test
   fun equals_coding_differentCodes_shouldReturnFalse() {
     assertThat(
-        equals(Coding("system", "code", "display"), Coding("system", "otherCode", "display"))
+        equals(Coding("system", "code", "display"), Coding("system", "otherCode", "display")),
       )
       .isFalse()
   }
@@ -82,7 +82,7 @@ class MoreTypesTest {
   @Test
   fun equals_coding_differentDisplays_shouldReturnTrue() {
     assertThat(
-        equals(Coding("system", "code", "display"), Coding("system", "code", "otherDisplay"))
+        equals(Coding("system", "code", "display"), Coding("system", "code", "otherDisplay")),
       )
       .isTrue()
   }
@@ -105,12 +105,19 @@ class MoreTypesTest {
   }
 
   @Test
-  fun equals_reference_shouldThrowException() {
-    val exception =
-      assertThrows(NotImplementedError::class.java) { equals(Reference(), Reference()) }
+  fun equals_reference_shouldReturnTrue() {
+    assertThat(
+        equals(Reference("Location/123"), Reference("Location/123")),
+      )
+      .isTrue()
+  }
 
-    assertThat(exception.message)
-      .isEqualTo("Comparison for type ${Reference::class.java} not supported.")
+  @Test
+  fun equals_differentReferences_shouldReturnFalse() {
+    assertThat(
+        equals(Reference("Location/123"), Reference("Location/abc")),
+      )
+      .isFalse()
   }
 
   @Test
@@ -253,7 +260,7 @@ class MoreTypesTest {
           Extension(ToolingExtensions.EXT_TRANSLATION).apply {
             addExtension(Extension("lang", StringType("sw")))
             addExtension(Extension("content", StringType("Mwanaume")))
-          }
+          },
         )
       }
 
@@ -270,7 +277,7 @@ class MoreTypesTest {
           Extension(ToolingExtensions.EXT_TRANSLATION).apply {
             addExtension(Extension("lang", StringType("sw-KE")))
             addExtension(Extension("content", StringType("Mwanamke")))
-          }
+          },
         )
       }
 
@@ -287,7 +294,7 @@ class MoreTypesTest {
           Extension(ToolingExtensions.EXT_TRANSLATION).apply {
             addExtension(Extension("lang", StringType("fr-FR")))
             addExtension(Extension("content", StringType("Femme")))
-          }
+          },
         )
       }
 
@@ -304,7 +311,7 @@ class MoreTypesTest {
           Extension(ToolingExtensions.EXT_TRANSLATION).apply {
             addExtension(Extension("lang", StringType("fr")))
             addExtension(Extension("content", StringType("Femme")))
-          }
+          },
         )
       }
 

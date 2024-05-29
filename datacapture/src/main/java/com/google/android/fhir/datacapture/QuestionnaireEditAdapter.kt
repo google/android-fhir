@@ -37,9 +37,9 @@ import com.google.android.fhir.datacapture.views.factories.DropDownViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.EditTextDecimalViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextIntegerViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextMultiLineViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.EditTextQuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.EditTextSingleLineViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.GroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
@@ -54,7 +54,7 @@ internal class QuestionnaireEditAdapter(
   ListAdapter<QuestionnaireAdapterItem, QuestionnaireEditAdapter.ViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireViewHolderType] used to render the
-   * [QuestionnaireViewItem].
+   *   [QuestionnaireViewItem].
    */
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val typedViewType = ViewType.parse(viewType)
@@ -80,9 +80,11 @@ internal class QuestionnaireEditAdapter(
     }
 
     // Map custom widget viewTypes to their corresponding widget factories
-    if (subtype >= numOfCanonicalWidgets)
+    if (subtype >= numOfCanonicalWidgets) {
       return questionnaireItemViewHolderMatchers[subtype - numOfCanonicalWidgets]
-        .factory.create(parent)
+        .factory
+        .create(parent)
+    }
 
     val viewHolderFactory =
       when (QuestionnaireViewHolderType.fromInt(subtype)) {
@@ -97,7 +99,7 @@ internal class QuestionnaireEditAdapter(
         QuestionnaireViewHolderType.RADIO_GROUP -> RadioGroupViewHolderFactory
         QuestionnaireViewHolderType.DROP_DOWN -> DropDownViewHolderFactory
         QuestionnaireViewHolderType.DISPLAY -> DisplayViewHolderFactory
-        QuestionnaireViewHolderType.QUANTITY -> EditTextQuantityViewHolderFactory
+        QuestionnaireViewHolderType.QUANTITY -> QuantityViewHolderFactory
         QuestionnaireViewHolderType.CHECK_BOX_GROUP -> CheckBoxGroupViewHolderFactory
         QuestionnaireViewHolderType.AUTO_COMPLETE -> AutoCompleteViewHolderFactory
         QuestionnaireViewHolderType.DIALOG_SELECT -> QuestionnaireItemDialogSelectViewHolderFactory
@@ -158,6 +160,7 @@ internal class QuestionnaireEditAdapter(
   internal value class ViewType(val viewType: Int) {
     val subtype: Int
       get() = viewType and 0xFFFFFF
+
     val type: Type
       get() = Type.values()[viewType shr 24]
 
@@ -192,7 +195,7 @@ internal class QuestionnaireEditAdapter(
       }
     }
 
-    if (questionnaireViewItem.answerOption.isNotEmpty()) {
+    if (questionnaireViewItem.enabledAnswerOptions.isNotEmpty()) {
       return getChoiceViewHolderType(questionnaireViewItem).value
     }
 
@@ -223,7 +226,7 @@ internal class QuestionnaireEditAdapter(
     return questionnaireItem.itemControl?.viewHolderType
     // Otherwise, choose a sensible UI element automatically
     ?: run {
-        val numOptions = questionnaireViewItem.answerOption.size
+        val numOptions = questionnaireViewItem.enabledAnswerOptions.size
         when {
           // Always use a dialog for questions with a large number of options
           numOptions >= MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG ->

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.contrib.views.barcode
 import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -26,6 +27,7 @@ import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -45,7 +47,6 @@ object BarCodeReaderViewHolderFactory :
         barcodeTextView = itemView.findViewById(R.id.textInputEditText)
         reScanView = itemView.findViewById(R.id.tv_rescan)
         itemView.findViewById<View>(R.id.textInputLayout).setOnClickListener {
-
           // The application is wrapped in a ContextThemeWrapper in QuestionnaireFragment
           // and again in TextInputEditText during layout inflation. As a result, it is
           // necessary to access the base context twice to retrieve the application object
@@ -54,7 +55,7 @@ object BarCodeReaderViewHolderFactory :
 
           context.supportFragmentManager.setFragmentResultListener(
             LiveBarcodeScanningFragment.RESULT_REQUEST_KEY,
-            context
+            context,
           ) { _, result ->
             val barcode = result.getString(LiveBarcodeScanningFragment.RESULT_REQUEST_KEY)?.trim()
 
@@ -68,18 +69,20 @@ object BarCodeReaderViewHolderFactory :
                 }
               }
 
-            if (answer == null) {
-              questionnaireViewItem.clearAnswer()
-            } else {
-              questionnaireViewItem.setAnswer(answer)
-            }
+            context.lifecycleScope.launch {
+              if (answer == null) {
+                questionnaireViewItem.clearAnswer()
+              } else {
+                questionnaireViewItem.setAnswer(answer)
+              }
 
-            setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
+              setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
+            }
           }
           LiveBarcodeScanningFragment()
             .show(
               context.supportFragmentManager,
-              BarCodeReaderViewHolderFactory.javaClass.simpleName
+              BarCodeReaderViewHolderFactory.javaClass.simpleName,
             )
         }
       }
@@ -98,7 +101,7 @@ object BarCodeReaderViewHolderFactory :
 
       private fun setInitial(
         barcode: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent?,
-        reScanView: TextView
+        reScanView: TextView,
       ) {
         barcode?.let {
           it.valueStringType?.value?.toString()?.let { result ->

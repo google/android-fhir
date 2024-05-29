@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,33 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import java.time.chrono.IsoChronology
+import java.time.format.DateTimeFormatterBuilder
+import java.time.format.FormatStyle
 import java.util.Locale
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class DatePickerViewHolderFactoryTest {
   private val context =
-    RuntimeEnvironment.getApplication().apply {
+    Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
       setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
     }
   private val parent = FrameLayout(context)
@@ -52,7 +59,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -67,7 +74,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("")
@@ -80,15 +87,15 @@ class DatePickerViewHolderFactoryTest {
         Questionnaire.QuestionnaireItemComponent().apply { text = "Question?" },
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType())
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(DateType()),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString(),
       )
       .isEqualTo("")
   }
@@ -102,11 +109,11 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
   }
@@ -120,7 +127,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.hint.toString()).isEqualTo("mm/dd/yyyy")
   }
@@ -135,11 +142,11 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("2020/11/19")
   }
@@ -153,11 +160,11 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
   }
@@ -215,7 +222,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, result, _ -> answers = result },
@@ -235,7 +242,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -257,16 +264,18 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, answersForCallback, _ -> answers = answersForCallback },
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.setDraftAnswer("02/07")
+    runTest {
+      questionnaireItem.setDraftAnswer("02/07")
 
-    assertThat(answers!!).isEmpty()
+      assertThat(answers!!).isEmpty()
+    }
   }
 
   @Test
@@ -282,7 +291,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, partialAnswer ->
@@ -291,9 +300,11 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.setAnswer(answer)
+    runTest {
+      questionnaireItem.setAnswer(answer)
 
-    assertThat(partialValue).isNull()
+      assertThat(partialValue).isNull()
+    }
   }
 
   @Test
@@ -305,7 +316,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -320,7 +331,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "02/07"
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
@@ -336,7 +347,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "02/07"
+        draftAnswer = "02/07",
       )
 
     viewHolder.bind(questionnaireItem)
@@ -348,7 +359,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
@@ -376,12 +387,12 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2026, 0, 1))
+              .setValue(DateType(2026, 0, 1)),
           )
         },
         validationResult = Invalid(listOf("Maximum value allowed is:2025-01-01")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -396,7 +407,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        draftAnswer = "11/19/202"
+        draftAnswer = "11/19/202",
       )
 
     viewHolder.bind(itemViewItem)
@@ -422,12 +433,12 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2023, 0, 1))
+              .setValue(DateType(2023, 0, 1)),
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -442,7 +453,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -457,7 +468,7 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.dateInputView.isEnabled).isFalse()
@@ -473,11 +484,11 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2020, 10, 19))
+              .setValue(DateType(2020, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2020")
 
@@ -487,11 +498,11 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(DateType(2021, 10, 19))
+              .setValue(DateType(2021, 10, 19)),
           ),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEqualTo("11/19/2021")
 
@@ -501,9 +512,117 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     assertThat(viewHolder.dateInputView.text.toString()).isEmpty()
+  }
+
+  @Test
+  fun `should use date format in the entryFormat extension`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy-MM-dd"))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy-mm-dd")
+  }
+
+  @Test
+  fun `should set local date input format when entryFormat extension has incorrect format string in Questionnaire`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yMyd"))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
+  }
+
+  @Test
+  fun `should use date format in the entryFormat extension though date separator is missing`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyyMMdd"))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyymmdd")
+  }
+
+  @Test
+  fun `should use date format in the entryFormat after converting it to SHORT FormatStyle`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType("yyyy MMMM dd"))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("yyyy mm dd")
+  }
+
+  @Test
+  fun `should set local date input format when entryFormat extension has empty string in Questionnaire`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          addExtension(EXTENSION_ENTRY_FORMAT_URL, StringType(""))
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault(),
+      )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
+  }
+
+  @Test
+  fun `should set local date input format when no entryFormat extension in Questionnaire`() {
+    setLocale(Locale.US)
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    val localeDatePattern =
+      DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+        FormatStyle.SHORT,
+        null,
+        IsoChronology.INSTANCE,
+        Locale.getDefault(),
+      )
+    assertThat(viewHolder.dateInputView.hint).isEqualTo("mm/dd/yyyy")
   }
 
   @Test
@@ -517,8 +636,8 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -536,8 +655,8 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -552,14 +671,15 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Required")
   }
@@ -572,8 +692,8 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
@@ -588,14 +708,15 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Optional")
   }
@@ -608,8 +729,8 @@ class DatePickerViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)

@@ -1,3 +1,4 @@
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
@@ -34,19 +35,21 @@ android {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
   }
 
   packaging {
     resources.excludes.addAll(
-      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")
+      listOf("META-INF/ASL2.0", "META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"),
     )
   }
 
   configureJacocoTestOptions()
 
-  sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
+  sourceSets {
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+  }
 
   testOptions { animationsDisabled = true }
   kotlin { jvmToolchain(11) }
@@ -54,12 +57,19 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations { all { exclude(module = "xpp3") } }
+configurations {
+  all {
+    exclude(module = "xpp3")
+    exclude(group = "net.sf.saxon", module = "Saxon-HE")
+    removeIncompatibleDependencies()
+  }
+}
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.junit)
@@ -73,20 +83,20 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
   implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.Glide.glide)
+  implementation(libs.glide)
+  implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
-    exclude(group = "net.sf.saxon", module = "Saxon-HE")
   }
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Lifecycle.viewModelKtx)
+  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
 
@@ -99,30 +109,39 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
-  testImplementation(project(":testing"))
+  testImplementation(project(":knowledge")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}")
+    file("../docs/use/api/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.DataCapture.artifactId)
+      moduleName.set(Releases.DataCapture.name)
       moduleVersion.set(Releases.DataCapture.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
-          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java")
+          URL("https://github.com/google/android-fhir/tree/master/datacapture/src/main/java"),
         )
         remoteLineSuffix.set("#L")
       }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

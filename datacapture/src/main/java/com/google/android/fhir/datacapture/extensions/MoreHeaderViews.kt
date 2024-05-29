@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.card.MaterialCardView
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 
 /** Displays `localizedText` if it is not null or empty, or hides the [TextView]. */
 fun TextView.updateTextAndVisibility(localizedText: Spanned? = null) {
@@ -56,9 +57,12 @@ fun initHelpViews(
   helpButton: Button,
   helpCardView: MaterialCardView,
   helpTextView: TextView,
-  questionnaireItem: Questionnaire.QuestionnaireItemComponent
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionnaireResponseItem: QuestionnaireResponseItemComponent,
+  isHelpCardInitiallyVisible: Boolean,
+  helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit,
 ) {
-  helpCardView.visibility = GONE
+  helpCardView.visibility = if (isHelpCardInitiallyVisible) VISIBLE else GONE
   helpButton.visibility =
     if (questionnaireItem.hasHelpButton) {
       VISIBLE
@@ -68,8 +72,14 @@ fun initHelpViews(
   helpButton.setOnClickListener {
     helpCardView.visibility =
       when (helpCardView.visibility) {
-        VISIBLE -> GONE
-        else -> VISIBLE
+        VISIBLE -> {
+          helpCardStateChangedCallback(false, questionnaireResponseItem)
+          GONE
+        }
+        else -> {
+          helpCardStateChangedCallback(true, questionnaireResponseItem)
+          VISIBLE
+        }
       }
   }
   helpTextView.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
@@ -81,11 +91,12 @@ fun initHelpViews(
  */
 fun appendAsteriskToQuestionText(
   context: Context,
-  questionnaireViewItem: QuestionnaireViewItem
+  questionnaireViewItem: QuestionnaireViewItem,
 ): Spanned {
   return SpannableStringBuilder().apply {
     questionnaireViewItem.questionText?.let { append(it) }
-    if (questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
+    if (
+      questionnaireViewItem.questionViewTextConfiguration.showAsterisk &&
         questionnaireViewItem.questionnaireItem.required &&
         !questionnaireViewItem.questionnaireItem.localizedTextSpanned.isNullOrEmpty()
     ) {

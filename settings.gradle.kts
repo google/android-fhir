@@ -3,7 +3,7 @@ import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
 
 plugins {
   id("com.gradle.enterprise") version ("3.10")
-  id("androidx.build.gradle.gcpbuildcache") version "1.0.0-beta01"
+  id("androidx.build.gradle.gcpbuildcache") version "1.0.0-beta05"
   id("org.gradle.toolchains.foojay-resolver-convention") version ("0.5.0")
 }
 
@@ -28,7 +28,18 @@ if (kokoroRun == true) {
   }
 }
 
-include(":benchmark")
+// NECESSARY force of the Jackson to run generateSearchParams in the new version of HAPI (6.8)
+buildscript {
+  dependencies {
+    classpath("com.fasterxml.jackson.core:jackson-core:2.16.0")
+    classpath("com.fasterxml.jackson.core:jackson-annotations:2.15.3")
+    classpath("com.fasterxml.jackson.core:jackson-databind:2.16.0")
+    classpath("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.16.0")
+    classpath("com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.16.0")
+    classpath("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.16.0")
+    classpath("com.fasterxml.jackson.module:jackson-module-kotlin:2.16.0")
+  }
+}
 
 include(":catalog")
 
@@ -36,7 +47,11 @@ include(":common")
 
 include(":contrib:barcode")
 
+include(":contrib:locationwidget")
+
 include(":datacapture")
+
+include(":document")
 
 include(":demo")
 
@@ -48,4 +63,6 @@ include(":workflow")
 
 include(":workflow-testing")
 
-include(":testing")
+include(":workflow:benchmark")
+
+include(":engine:benchmark")

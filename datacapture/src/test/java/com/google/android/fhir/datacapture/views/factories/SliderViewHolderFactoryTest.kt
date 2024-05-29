@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,12 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_DISPLAY_CATEGORY_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SLIDER_STEP_VALUE_URL
-import com.google.android.fhir.datacapture.extensions.INSTRUCTIONS
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
@@ -39,16 +40,16 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class SliderViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply {
+      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val viewHolder = SliderViewHolderFactory.create(parent)
 
@@ -60,7 +61,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -76,12 +77,12 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType(10)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
@@ -98,7 +99,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(10)
@@ -112,7 +113,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).stepSize).isEqualTo(1)
@@ -131,7 +132,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(200)
@@ -145,7 +146,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueTo).isEqualTo(100.0F)
@@ -164,7 +165,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(50)
@@ -178,7 +179,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).valueFrom).isEqualTo(0.0F)
@@ -202,7 +203,7 @@ class SliderViewHolderFactoryTest {
           QuestionnaireResponse.QuestionnaireResponseItemComponent(),
           validationResult = NotValidated,
           answersChangedCallback = { _, _, _, _ -> },
-        )
+        ),
       )
     }
   }
@@ -233,17 +234,17 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType(10)
-            }
+            },
           )
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType(10)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(0.0F)
@@ -267,12 +268,12 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType("75")
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString()).isEqualTo("")
@@ -296,12 +297,12 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType("25")
-            }
+            },
           )
         },
         validationResult = Invalid(listOf("Minimum value allowed is:50")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error).text.toString())
@@ -316,7 +317,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -331,7 +332,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).isEnabled).isFalse()
@@ -346,12 +347,12 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType(10)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(10)
@@ -363,12 +364,12 @@ class SliderViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = IntegerType(12)
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(12)
@@ -384,7 +385,7 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<Slider>(R.id.slider).value).isEqualTo(50)
@@ -401,8 +402,8 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -417,12 +418,12 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Required")
   }
@@ -435,12 +436,12 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
@@ -455,12 +456,12 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEqualTo("Optional")
   }
@@ -473,12 +474,12 @@ class SliderViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString()
+        viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).text.toString(),
       )
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
@@ -493,11 +494,11 @@ class SliderViewHolderFactoryTest {
           coding =
             listOf(
               Coding().apply {
-                code = INSTRUCTIONS
+                code = EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS
                 system = EXTENSION_DISPLAY_CATEGORY_SYSTEM
-              }
+              },
             )
-        }
+        },
       )
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ internal fun QuestionnaireResponse.unpackRepeatedGroups(questionnaire: Questionn
 
 private fun unpackRepeatedGroups(
   questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
-  questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
+  questionnaireResponseItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
   return questionnaireItems
     .zipByLinkId(questionnaireResponseItems) { questionnaireItem, questionnaireResponseItem ->
@@ -98,7 +98,7 @@ private fun unpackRepeatedGroups(
 
 private fun unpackRepeatedGroups(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent
+  questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
   questionnaireResponseItem.item =
     unpackRepeatedGroups(questionnaireItem.item, questionnaireResponseItem.item)

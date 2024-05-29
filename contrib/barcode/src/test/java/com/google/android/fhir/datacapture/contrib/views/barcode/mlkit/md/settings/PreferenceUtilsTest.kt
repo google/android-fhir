@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ class PreferenceUtilsTest {
     PreferenceUtils.saveStringPreference(
       context,
       R.string.pref_key_rear_camera_preview_size,
-      "result"
+      "result",
     )
     val result =
       PreferenceManager.getDefaultSharedPreferences(context)

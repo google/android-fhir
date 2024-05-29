@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.testing.FhirEngineProviderTestRule
 import com.google.android.fhir.workflow.testing.CqlBuilder
+import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
@@ -51,7 +51,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
   private lateinit var fhirOperator: FhirOperator
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val knowledgeManager = KnowledgeManager.createInMemory(context)
+  private val knowledgeManager = KnowledgeManager.create(context = context, inMemory = true)
   private val fhirContext = FhirContext.forCached(FhirVersionEnum.R4)
   private val jsonParser = fhirContext.newJsonParser()
 
@@ -77,7 +77,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
    * 2. load the Immunization records of that patient,
    * 3. load the CQL Library using a `FhirEngineLibraryContentProvider`
    * 4. evaluate if the immunization record presents a Protocol where the number of doses taken
-   * matches the number of required doses or if the number of required doses is null.
+   *    matches the number of required doses or if the number of required doses is null.
    *
    * ```
    * library ImmunityCheck version '1.0.0'
@@ -116,9 +116,9 @@ class FhirOperatorLibraryEvaluateJavaTest {
     // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/ImmunityCheck|1.0.0",
-        "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization")
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
@@ -132,14 +132,17 @@ class FhirOperatorLibraryEvaluateJavaTest {
       library TestGetName version '1.0.0'
       
       define GetName: 'MyName'
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
 
     knowledgeManager.install(writeToFile(library))
 
     // Evaluates expression without any extra data
-    val results = fhirOperator.evaluateLibrary(library.url, setOf("GetName")) as Parameters
+    val results =
+      fhirOperator.evaluateLibrary(libraryUrl = library.url, expressions = setOf("GetName"))
+        as Parameters
 
     assertThat((results.parameterFirstRep.value as StringType).value).isEqualTo("MyName")
   }
@@ -154,7 +157,8 @@ class FhirOperatorLibraryEvaluateJavaTest {
       parameter "MyNumber" Decimal
       
       define SumOne: MyNumber + 1
-      """.trimIndent()
+            """
+        .trimIndent()
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
 
@@ -169,7 +173,12 @@ class FhirOperatorLibraryEvaluateJavaTest {
       }
 
     // Evaluates the library with a parameter
-    val results = fhirOperator.evaluateLibrary(library.url, params, setOf("SumOne")) as Parameters
+    val results =
+      fhirOperator.evaluateLibrary(
+        libraryUrl = library.url,
+        parameters = params,
+        expressions = setOf("SumOne"),
+      ) as Parameters
 
     assertThat((results.parameterFirstRep.value as DecimalType).value).isEqualTo(BigDecimal(2))
   }

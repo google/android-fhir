@@ -75,7 +75,9 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {}
+  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {
+    // Add code to display Toast when sync job  is complete
+  }
 
   private fun initMenu() {
     (requireActivity() as MenuHost).addMenuProvider(
@@ -99,7 +101,7 @@ class PatientListFragment : Fragment() {
         }
       },
       viewLifecycleOwner,
-      Lifecycle.State.RESUMED
+      Lifecycle.State.RESUMED,
     )
   }
 
@@ -116,7 +118,7 @@ class PatientListFragment : Fragment() {
           viewModel.searchPatientsByName(query)
           return true
         }
-      }
+      },
     )
     searchView.setOnQueryTextFocusChangeListener { view, focused ->
       if (!focused) {
@@ -125,7 +127,8 @@ class PatientListFragment : Fragment() {
       }
     }
     requireActivity()
-      .onBackPressedDispatcher.addCallback(
+      .onBackPressedDispatcher
+      .addCallback(
         viewLifecycleOwner,
         object : OnBackPressedCallback(true) {
           override fun handleOnBackPressed() {
@@ -136,7 +139,7 @@ class PatientListFragment : Fragment() {
               activity?.onBackPressed()
             }
           }
-        }
+        },
       )
   }
 

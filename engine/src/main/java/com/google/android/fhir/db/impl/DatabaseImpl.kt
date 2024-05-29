@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,23 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
+import com.google.android.fhir.LocalChange
+import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
-import com.google.android.fhir.db.impl.dao.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.LocalChangeUtils
-import com.google.android.fhir.db.impl.dao.SquashedLocalChange
-import com.google.android.fhir.db.impl.entities.LocalChangeEntity
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
+import com.google.android.fhir.toLocalChange
 import java.time.Instant
+import java.util.UUID
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -45,8 +50,9 @@ import org.hl7.fhir.r4.model.ResourceType
 internal class DatabaseImpl(
   private val context: Context,
   private val iParser: IParser,
+  private val fhirTerser: FhirTerser,
   databaseConfig: DatabaseConfig,
-  private val resourceIndexer: ResourceIndexer
+  private val resourceIndexer: ResourceIndexer,
 ) : com.google.android.fhir.db.Database {
 
   val db: ResourceDatabase
@@ -88,12 +94,22 @@ internal class DatabaseImpl(
             openHelperFactory {
               SQLCipherSupportHelper(
                 it,
-                databaseErrorStrategy = databaseConfig.databaseErrorStrategy
-              ) { DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME) }
+                databaseErrorStrategy = databaseConfig.databaseErrorStrategy,
+              ) {
+                DatabaseEncryptionKeyProvider.getOrCreatePassphrase(DATABASE_PASSPHRASE_NAME)
+              }
             }
           }
 
-          addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+          addMigrations(
+            MIGRATION_1_2,
+            MIGRATION_2_3,
+            MIGRATION_3_4,
+            MIGRATION_4_5,
+            MIGRATION_5_6,
+            MIGRATION_6_7,
+            MIGRATION_7_8,
+          )
         }
         .build()
   }
@@ -105,7 +121,11 @@ internal class DatabaseImpl(
     }
   }
 
-  private val localChangeDao = db.localChangeDao().also { it.iParser = iParser }
+  private val localChangeDao =
+    db.localChangeDao().also {
+      it.iParser = iParser
+      it.fhirTerser = fhirTerser
+    }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
@@ -113,9 +133,10 @@ internal class DatabaseImpl(
       logicalIds.addAll(
         resource.map {
           val timeOfLocalChange = Instant.now()
-          localChangeDao.addInsert(it, timeOfLocalChange)
-          resourceDao.insertLocalResource(it, timeOfLocalChange)
-        }
+          val resourceUuid = resourceDao.insertLocalResource(it, timeOfLocalChange)
+          localChangeDao.addInsert(it, resourceUuid, timeOfLocalChange)
+          it.logicalId
+        },
       )
     }
     return logicalIds
@@ -130,7 +151,7 @@ internal class DatabaseImpl(
       resources.forEach {
         val timeOfLocalChange = Instant.now()
         val oldResourceEntity = selectEntity(it.resourceType, it.logicalId)
-        resourceDao.update(it, timeOfLocalChange)
+        resourceDao.applyLocalUpdate(it, timeOfLocalChange)
         localChangeDao.addUpdate(oldResourceEntity, it, timeOfLocalChange)
       }
     }
@@ -140,14 +161,14 @@ internal class DatabaseImpl(
     resourceId: String,
     resourceType: ResourceType,
     versionId: String,
-    lastUpdated: Instant
+    lastUpdated: Instant,
   ) {
     db.withTransaction {
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
-        lastUpdated
+        lastUpdated,
       )
     }
   }
@@ -167,28 +188,60 @@ internal class DatabaseImpl(
 
   override suspend fun delete(type: ResourceType, id: String) {
     db.withTransaction {
-      val remoteVersionId: String? =
-        try {
-          selectEntity(type, id).versionId
-        } catch (e: ResourceNotFoundException) {
-          null
+      resourceDao.getResourceEntity(id, type)?.let {
+        val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
+        if (rowsDeleted > 0) {
+          localChangeDao.addDelete(
+            resourceId = id,
+            resourceType = type,
+            resourceUuid = it.resourceUuid,
+            remoteVersionId = it.versionId,
+          )
         }
-      val rowsDeleted = resourceDao.deleteResource(resourceId = id, resourceType = type)
-      if (rowsDeleted > 0)
-        localChangeDao.addDelete(
-          resourceId = id,
-          resourceType = type,
-          remoteVersionId = remoteVersionId
-        )
+      }
     }
   }
 
-  override suspend fun <R : Resource> search(query: SearchQuery): List<R> {
+  override suspend fun <R : Resource> search(
+    query: SearchQuery,
+  ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
       resourceDao
         .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { iParser.parseResource(it) as R }
-        .distinctBy { it.id }
+        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
+        .distinctBy { it.uuid }
+    }
+  }
+
+  override suspend fun searchForwardReferencedResources(
+    query: SearchQuery,
+  ): List<ForwardIncludeSearchResult> {
+    return db.withTransaction {
+      resourceDao
+        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          ForwardIncludeSearchResult(
+            it.matchingIndex,
+            it.baseResourceUUID,
+            iParser.parseResource(it.serializedResource) as Resource,
+          )
+        }
+    }
+  }
+
+  override suspend fun searchReverseReferencedResources(
+    query: SearchQuery,
+  ): List<ReverseIncludeSearchResult> {
+    return db.withTransaction {
+      resourceDao
+        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
+        .map {
+          ReverseIncludeSearchResult(
+            it.matchingIndex,
+            it.baseResourceTypeAndId,
+            iParser.parseResource(it.serializedResource) as Resource,
+          )
+        }
     }
   }
 
@@ -198,19 +251,16 @@ internal class DatabaseImpl(
     }
   }
 
-  /**
-   * @returns a list of pairs. Each pair is a token + squashed local change. Each token is a list of
-   * [LocalChangeEntity.id] s of rows of the [LocalChangeEntity].
-   */
-  override suspend fun getAllLocalChanges(): List<SquashedLocalChange> {
-    return db.withTransaction {
-      localChangeDao
-        .getAllLocalChanges()
-        .groupBy { it.resourceId to it.resourceType }
-        .values.map {
-          SquashedLocalChange(LocalChangeToken(it.map { it.id }), LocalChangeUtils.squash(it))
-        }
-    }
+  override suspend fun getAllLocalChanges(): List<LocalChange> {
+    return db.withTransaction { localChangeDao.getAllLocalChanges().map { it.toLocalChange() } }
+  }
+
+  override suspend fun getLocalChangesCount(): Int {
+    return db.withTransaction { localChangeDao.getLocalChangesCount() }
+  }
+
+  override suspend fun getAllChangesForEarliestChangedResource(): List<LocalChange> {
+    return localChangeDao.getAllChangesForEarliestChangedResource().map { it.toLocalChange() }
   }
 
   override suspend fun deleteUpdates(token: LocalChangeToken) {
@@ -232,6 +282,85 @@ internal class DatabaseImpl(
     localChangeDao.discardLocalChanges(resources)
   }
 
+  override suspend fun updateResourceAndReferences(
+    currentResourceId: String,
+    updatedResource: Resource,
+  ) {
+    db.withTransaction {
+      val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
+      val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+      val resourceUuid = currentResourceEntity.resourceUuid
+      updateResourceEntity(resourceUuid, updatedResource)
+
+      val uuidsOfReferringResources =
+        updateLocalChangeResourceIdAndReferences(
+          resourceUuid = resourceUuid,
+          oldResource = oldResource,
+          updatedResource = updatedResource,
+        )
+
+      updateReferringResources(
+        referringResourcesUuids = uuidsOfReferringResources,
+        oldResource = oldResource,
+        updatedResource = updatedResource,
+      )
+    }
+  }
+
+  /**
+   * Calls the [ResourceDao] to update the [ResourceEntity] associated with this resource. The
+   * function updates the resource and resourceId of the [ResourceEntity]
+   */
+  private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
+    resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
+
+  /**
+   * Update the [LocalChange]s to reflect the change in the resource ID. This primarily includes
+   * modifying the [LocalChange.resourceId] for the changes of the affected resource. Also, update
+   * any references in the [LocalChange] which refer to the affected resource.
+   *
+   * The function returns a [List<[UUID]>] which corresponds to the [ResourceEntity.resourceUuid]
+   * which contain references to the affected resource.
+   */
+  private suspend fun updateLocalChangeResourceIdAndReferences(
+    resourceUuid: UUID,
+    oldResource: Resource,
+    updatedResource: Resource,
+  ) =
+    localChangeDao.updateResourceIdAndReferences(
+      resourceUuid = resourceUuid,
+      oldResource = oldResource,
+      updatedResource = updatedResource,
+    )
+
+  /**
+   * Update all [Resource] and their corresponding [ResourceEntity] which refer to the affected
+   * resource. The update of the references in the [Resource] is also expected to reflect in the
+   * [ReferenceIndex] i.e. the references used for search operations should also get updated to
+   * reflect the references with the new resource ID of the referred resource.
+   */
+  private suspend fun updateReferringResources(
+    referringResourcesUuids: List<UUID>,
+    oldResource: Resource,
+    updatedResource: Resource,
+  ) {
+    val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
+    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    referringResourcesUuids.forEach { resourceUuid ->
+      resourceDao.getResourceEntity(resourceUuid)?.let {
+        val referringResource = iParser.parseResource(it.serializedResource) as Resource
+        val updatedReferringResource =
+          addUpdatedReferenceToResource(
+            iParser,
+            referringResource,
+            oldReferenceValue,
+            updatedReferenceValue,
+          )
+        resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
+      }
+    }
+  }
+
   override fun close() {
     db.close()
   }
@@ -240,43 +369,57 @@ internal class DatabaseImpl(
     db.clearAllTables()
   }
 
-  override suspend fun getLocalChange(type: ResourceType, id: String): SquashedLocalChange? {
+  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
     return db.withTransaction {
-      val localChangeEntityList =
-        localChangeDao.getLocalChanges(resourceType = type, resourceId = id)
-      if (localChangeEntityList.isEmpty()) {
-        return@withTransaction null
+      localChangeDao.getLocalChanges(resourceType = type, resourceId = id).map {
+        it.toLocalChange()
       }
-      SquashedLocalChange(
-        LocalChangeToken(localChangeEntityList.map { it.id }),
-        LocalChangeUtils.squash(localChangeEntityList)
-      )
     }
   }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+  override suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange> {
+    return db.withTransaction {
+      localChangeDao.getLocalChanges(resourceUuid = resourceUuid).map { it.toLocalChange() }
+    }
+  }
+
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
     db.withTransaction {
-      // To check resource is present in DB else throw ResourceNotFoundException()
-      selectEntity(type, id)
-      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
-      // If local change is not available simply delete resource
-      if (localChangeEntityList.isEmpty()) {
-        resourceDao.deleteResource(resourceId = id, resourceType = type)
-      } else {
-        // local change is available with FORCE_PURGE the delete resource and discard changes from
-        // localChangeEntity table
-        if (forcePurge) {
+      ids.forEach { id ->
+        // To check resource is present in DB else throw ResourceNotFoundException()
+        selectEntity(type, id)
+        val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+        // If local change is not available simply delete resource
+        if (localChangeEntityList.isEmpty()) {
           resourceDao.deleteResource(resourceId = id, resourceType = type)
-          localChangeDao.discardLocalChanges(
-            token = LocalChangeToken(localChangeEntityList.map { it.id })
-          )
         } else {
-          // local change is available but FORCE_PURGE = false then throw exception
-          throw IllegalStateException(
-            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required"
-          )
+          // local change is available with FORCE_PURGE the delete resource and discard changes from
+          // localChangeEntity table
+          if (forcePurge) {
+            resourceDao.deleteResource(resourceId = id, resourceType = type)
+            localChangeDao.discardLocalChanges(
+              token = LocalChangeToken(localChangeEntityList.map { it.id }),
+            )
+          } else {
+            // local change is available but FORCE_PURGE = false then throw exception
+            throw IllegalStateException(
+              "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
+            )
+          }
         }
       }
+    }
+  }
+
+  override suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference> {
+    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
+      LocalChangeResourceReference(
+        it.localChangeId,
+        it.resourceReferenceValue,
+        it.resourceReferencePath,
+      )
     }
   }
 
@@ -304,5 +447,5 @@ internal class DatabaseImpl(
 data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
-  val databaseErrorStrategy: DatabaseErrorStrategy
+  val databaseErrorStrategy: DatabaseErrorStrategy,
 )

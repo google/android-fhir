@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import java.net.URI
 import java.text.SimpleDateFormat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
@@ -52,115 +53,118 @@ class RegexValidatorTest {
   }
 
   @Test
-  fun boolean_notMatchingRegex_shouldReturnInvalidResult() {
+  fun boolean_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(regex = "true", value = BooleanType(false))
   }
 
   @Test
-  fun boolean_matchingRegex_shouldReturnValidResult() {
+  fun boolean_matchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(regex = "true", value = BooleanType(true))
   }
 
   @Test
-  fun decimal_notMatchingRegex_shouldReturnInvalidResult() {
+  fun decimal_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(regex = "[0-9]+\\.[0-9]+", value = DecimalType(31234))
   }
 
   @Test
-  fun decimal_matchingRegex_shouldReturnValidResult() {
+  fun decimal_matchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(regex = "[0-9]+\\.[0-9]+", value = DecimalType(3.1415926535))
   }
 
   @Test
-  fun int_notMatchingRegex_shouldReturnInvalidResult() {
+  fun int_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(regex = "[0-9]+", value = IntegerType(-1))
   }
 
   @Test
-  fun int_matchingRegex_shouldReturnValidResult() {
+  fun int_matchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(regex = "[0-9]+", value = IntegerType(1234567890))
   }
 
   @Test
-  fun dateType_notMatchingRegex_shouldReturnInvalidResult() {
+  fun dateType_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerNotMatchingRegex(
       regex = "[0-9]{2}-[0-9]{2}-[0-9]{2}",
-      value = DateType(dateFormat.parse("2021-06-01"))
+      value = DateType(dateFormat.parse("2021-06-01")),
     )
   }
 
   @Test
-  fun date_matchingRegex_shouldReturnValidResult() {
+  fun date_matchingRegex_shouldReturnValidResult() = runTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerMatchingRegex(
       regex = "[0-9]{4}-[0-9]{2}-[0-9]{2}",
-      value = DateType(dateFormat.parse("2021-06-01"))
+      value = DateType(dateFormat.parse("2021-06-01")),
     )
   }
 
   @Test
-  fun time_matchingRegex_shouldReturnInvalidResult() {
+  fun time_matchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(regex = "[0-9]{2}:[0-9]{2}", value = TimeType("18:00:59"))
   }
 
   @Test
-  fun time_notMatchingRegex_shouldReturnValidResult() {
+  fun time_notMatchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(regex = "[0-9]{2}:[0-9]{2}:[0-9]{2}", value = TimeType("18:00:59"))
   }
 
   @Test
-  fun string_notMatchingRegex_shouldReturnInvalidResult() {
+  fun string_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = StringType("www.hl7.org")
+      value = StringType("www.hl7.org"),
     )
   }
 
   @Test
-  fun string_matchingRegex_shouldReturnValidResult() {
+  fun string_matchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = StringType("https://www.hl7.org/")
+      value = StringType("https://www.hl7.org/"),
     )
   }
 
   @Test
-  fun uri_notMatchingRegex_shouldReturnInvalidResult() {
+  fun uri_notMatchingRegex_shouldReturnInvalidResult() = runTest {
     checkAnswerNotMatchingRegex(
       regex = "[a-z]+",
-      value = UriType(URI.create("https://www.hl7.org/"))
+      value = UriType(URI.create("https://www.hl7.org/")),
     )
   }
 
   @Test
-  fun uri_matchingRegex_shouldReturnValidResult() {
+  fun uri_matchingRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex(
       regex = "^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]",
-      value = UriType(URI.create("https://www.hl7.org/"))
+      value = UriType(URI.create("https://www.hl7.org/")),
     )
   }
 
   @Test
-  fun invalidRegex_shouldReturnValidResult() {
+  fun invalidRegex_shouldReturnValidResult() = runTest {
     checkAnswerMatchingRegex("[.*", StringType("http://www.google.com"))
   }
 
   @Test
-  fun nonPrimitive_notMatchingRegex_shouldReturnValidResult() {
+  fun nonPrimitive_notMatchingRegex_shouldReturnValidResult() = runTest {
     val requirement =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
           Extension().apply {
             url = REGEX_EXTENSION_URL
             this.setValue(StringType("[0-9]+"))
-          }
+          },
         )
       }
     val response =
       QuestionnaireResponseItemAnswerComponent().apply { this.value = Quantity(1234567.89) }
 
-    val validationResult = RegexValidator.validate(requirement, response, context)
+    val validationResult =
+      RegexValidator.validate(requirement, response, context) {
+        TestExpressionValueEvaluator.evaluate(requirement, it)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -171,22 +175,34 @@ class RegexValidatorTest {
     var context: Context = ApplicationProvider.getApplicationContext()
 
     @JvmStatic
-    fun checkAnswerMatchingRegex(regex: String, value: PrimitiveType<*>) {
+    suspend fun checkAnswerMatchingRegex(regex: String, value: PrimitiveType<*>) {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
+        RegexValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(testComponent.requirement, it)
+        }
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
     }
 
     @JvmStatic
-    fun checkAnswerNotMatchingRegex(regex: String, value: PrimitiveType<*>) {
+    suspend fun checkAnswerNotMatchingRegex(regex: String, value: PrimitiveType<*>) {
       val testComponent = createRegexQuestionnaireTestItem(regex, value)
 
       val validationResult =
-        RegexValidator.validate(testComponent.requirement, testComponent.answer, context)
+        RegexValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(testComponent.requirement, it)
+        }
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)
@@ -196,7 +212,7 @@ class RegexValidatorTest {
     @JvmStatic
     fun createRegexQuestionnaireTestItem(
       regex: String,
-      value: PrimitiveType<*>
+      value: PrimitiveType<*>,
     ): QuestionnaireTestItem {
       val questionnaireItem =
         Questionnaire.QuestionnaireItemComponent().apply {
@@ -204,7 +220,7 @@ class RegexValidatorTest {
             Extension().apply {
               url = REGEX_EXTENSION_URL
               this.setValue(StringType(regex))
-            }
+            },
           )
         }
       val answer = QuestionnaireResponseItemAnswerComponent().apply { this.value = value }

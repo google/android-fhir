@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -28,21 +29,23 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class EditTextDecimalViewHolderFactoryTest {
   private val parent =
     FrameLayout(
-      RuntimeEnvironment.getApplication().apply {
+      Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
         setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
-      }
+      },
     )
   private val viewHolder = EditTextDecimalViewHolderFactory.create(parent)
 
@@ -54,7 +57,7 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -70,18 +73,19 @@ class EditTextDecimalViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = DecimalType("1.1")
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString(),
       )
       .isEqualTo("1.1")
   }
@@ -95,12 +99,12 @@ class EditTextDecimalViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = DecimalType("1.1")
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
     viewHolder.bind(
       QuestionnaireViewItem(
@@ -108,13 +112,82 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputEditText>(R.id.text_input_edit_text)
-          .text.toString()
+          .text
+          .toString(),
+      )
+      .isEqualTo("")
+  }
+
+  @Test
+  fun `should set unit text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.unit_text_view).text.toString())
+      .isEqualTo("kg")
+  }
+
+  @Test
+  fun `should clear unit text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          type = Questionnaire.QuestionnaireItemType.DECIMAL
+          addExtension(
+            Extension().apply {
+              url = "http://hl7.org/fhir/StructureDefinition/questionnaire-unit"
+              setValue(Coding().apply { code = "kg" })
+            },
+          )
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          addAnswer(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = DecimalType("1.1")
+            },
+          )
+        },
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView.findViewById<TextView>(R.id.text_input_edit_text).text.toString(),
       )
       .isEqualTo("")
   }
@@ -190,12 +263,12 @@ class EditTextDecimalViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = DecimalType("3.3")
-            }
+            },
           )
         },
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -220,12 +293,12 @@ class EditTextDecimalViewHolderFactoryTest {
           addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               value = DecimalType("1.1")
-            }
+            },
           )
         },
         validationResult = Invalid(listOf("Minimum value allowed is:2.1")),
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).error)
@@ -240,7 +313,7 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.error_text_at_header).visibility)
@@ -255,11 +328,11 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-      )
+      ),
     )
 
     assertThat(
-        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled
+        viewHolder.itemView.findViewById<TextInputEditText>(R.id.text_input_edit_text).isEnabled,
       )
       .isFalse()
   }
@@ -275,8 +348,8 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = true),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -294,8 +367,8 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showAsterisk = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.question).text.toString())
@@ -310,14 +383,15 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Required")
   }
@@ -330,8 +404,8 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showRequiredText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
@@ -346,14 +420,15 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = true),
+      ),
     )
 
     assertThat(
         viewHolder.itemView
           .findViewById<TextInputLayout>(R.id.text_input_layout)
-          .helperText.toString()
+          .helperText
+          .toString(),
       )
       .isEqualTo("Optional")
   }
@@ -366,11 +441,49 @@ class EditTextDecimalViewHolderFactoryTest {
         QuestionnaireResponse.QuestionnaireResponseItemComponent(),
         validationResult = NotValidated,
         answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false)
-      )
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+      ),
     )
 
     assertThat(viewHolder.itemView.findViewById<TextInputLayout>(R.id.text_input_layout).helperText)
       .isNull()
+  }
+
+  @Test
+  fun `bind again should remove previous text`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        draftAnswer = "1.1.1.1",
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString(),
+      )
+      .isEqualTo("1.1.1.1")
+
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent(),
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+
+    assertThat(
+        viewHolder.itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .text
+          .toString(),
+      )
+      .isEqualTo("")
   }
 }

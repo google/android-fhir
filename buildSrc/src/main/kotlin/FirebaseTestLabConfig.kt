@@ -30,24 +30,23 @@ fun Project.configureFirebaseTestLabForLibraries() {
       mapOf(
         "coverage" to "true",
         "coverageFilePath" to "/sdcard/Download/",
-        "clearPackageData" to "true"
-      )
+        "clearPackageData" to "true",
+      ),
     )
-    flakyTestAttempts.set(3)
     devices.set(
       listOf(
         mapOf(
           "model" to "Nexus6P",
           "version" to
             "${project.extensions.getByType(LibraryExtension::class.java).defaultConfig.minSdk}",
-          "locale" to "en_US"
+          "locale" to "en_US",
         ),
         mapOf(
-          "model" to "panther",
+          "model" to "MediumPhone.arm",
           "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
-          "locale" to "en_US"
+          "locale" to "en_US",
         ),
-      )
+      ),
     )
   }
 }
@@ -61,19 +60,17 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
       mapOf(
         "additionalTestOutputDir" to "/sdcard/Download",
         "no-isolated-storage" to "true",
-        "clearPackageData" to "true"
-      )
+        "clearPackageData" to "true",
+      ),
     )
-    // some of the benchmark tests get timed-out in the default 15m
-    testTimeout.set("45m")
     devices.set(
       listOf(
         mapOf(
           "model" to "panther",
           "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
-          "locale" to "en_US"
+          "locale" to "en_US",
         ),
-      )
+      ),
     )
   }
 }
@@ -83,10 +80,12 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
   debugApk.set(
     project.provider {
       "${project.rootDir}/demo/build/outputs/apk/androidTest/debug/demo-debug-androidTest.apk"
-    }
+    },
   )
   useOrchestrator.set(true)
-  maxTestShards.set(20)
+  flakyTestAttempts.set(1)
+  maxTestShards.set(10)
+  testTimeout.set("45m")
   directoriesToPull.set(listOf("/sdcard/Download"))
   resultsBucket.set("android-fhir-build-artifacts")
   resultsDir.set(
@@ -94,6 +93,6 @@ private fun FlankGradleExtension.commonConfigurationForFirebaseTestLab(project: 
       "${System.getenv("KOKORO_BUILD_ARTIFACTS_SUBDIR")}/firebase/${project.name}"
     } else {
       "${project.name}-${UUID.randomUUID()}"
-    }
+    },
   )
 }

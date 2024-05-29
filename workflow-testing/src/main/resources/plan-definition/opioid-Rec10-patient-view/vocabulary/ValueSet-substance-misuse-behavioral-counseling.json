@@ -1,0 +1,181 @@
+{
+  "resourceType": "ValueSet",
+  "id": "substance-misuse-behavioral-counseling",
+  "meta": {
+    "profile": [
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-computablevalueset",
+      "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-executablevalueset"
+    ]
+  },
+  "extension": [
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-clinical-focus",
+      "valueString": "Counseling and associated procedures for substance misuse"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-dataelement-scope",
+      "valueString": "Procedure"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-inclusion-criteria",
+      "valueString": "Counseling and associated procedures for substance misuse"
+    },
+    {
+      "url": "http://fhir.org/guides/cdc/opioid-cds/StructureDefinition/cdc-valueset-exclusion-criteria",
+      "valueString": "none"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/valueset-author",
+      "valueContactDetail": {
+        "name": "MD Partners, Inc.",
+        "telecom": [
+          {
+            "system": "email",
+            "value": "info@mdpartners.com"
+          }
+        ]
+      }
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "computable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "structured"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+      "valueCode": "executable"
+    },
+    {
+      "url": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-usageWarning",
+      "valueString": "This value set contains a point-in-time expansion enumerating the codes that meet the value set intent. As new versions of the code systems used by the value set are released, the contents of this expansion will need to be updated to incorporate newly defined codes that meet the value set intent. Before, and periodically during production use, the value set expansion contents SHOULD be updated. The value set expansion specifies the timestamp when the expansion was produced, SHOULD contain the parameters used for the expansion, and SHALL contain the codes that are obtained by evaluating the value set definition. If this is ONLY an executable value set, a distributable definition of the value set must be obtained to compute the updated expansion."
+    }
+  ],
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ValueSet/substance-misuse-behavioral-counseling",
+  "name": "substance_misuse_behavioral_counseling",
+  "title": "Substance misuse behavioral counseling",
+  "status": "active",
+  "experimental": true,
+  "date": "2022-05-09T13:00:27-06:00",
+  "publisher": "Centers for Disease Control and Prevention (CDC)",
+  "description": "Counseling and associated procedures for substance misuse",
+  "jurisdiction": [
+    {
+      "coding": [
+        {
+          "system": "urn:iso:std:iso:3166",
+          "code": "US"
+        }
+      ]
+    }
+  ],
+  "purpose": "Counseling and associated procedures for substance misuse that may be used for opioid management",
+  "copyright": "© CDC 2016+.",
+  "compose": {
+    "include": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "313071005"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "424407005"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "423416000"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "720174008"
+          }
+        ]
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108",
+        "filter": [
+          {
+            "property": "concept",
+            "op": "is-a",
+            "value": "720177001"
+          }
+        ]
+      }
+    ]
+  },
+  "expansion": {
+    "identifier": "acad8884-29b2-4765-90ae-be6e05758e92",
+    "timestamp": "2022-05-09T13:00:29-06:00",
+    "contains": [
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "313071005",
+        "display": "Substance abuse counseling"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "60112009",
+        "display": "Drug addiction counseling"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "720174008",
+        "display": "Drug harm reduction program"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "720177001",
+        "display": "Drug relapse prevention program"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "423416000",
+        "display": "Substance use cessation case management"
+      },
+      {
+        "system": "http://snomed.info/sct",
+        "version": "http://snomed.info/sct/731000124108/version/20210901",
+        "code": "424407005",
+        "display": "Substance use cessation education, guidance, and counseling"
+      }
+    ]
+  }
+}

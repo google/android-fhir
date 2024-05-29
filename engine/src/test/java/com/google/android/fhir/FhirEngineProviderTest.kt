@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.google.android.fhir
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import java.lang.IllegalStateException
+import java.io.File
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -52,7 +52,11 @@ class FhirEngineProviderTest {
 
   @Test
   fun build_twiceWithAppContext_afterCleanup_shouldReturnDifferentInstances() {
-    provider.init(FhirEngineConfiguration(testMode = true))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = true,
+      ),
+    )
     val engineOne = provider.getInstance(ApplicationProvider.getApplicationContext())
     provider.cleanup()
     val engineTwo = provider.getInstance(ApplicationProvider.getApplicationContext())
@@ -61,7 +65,11 @@ class FhirEngineProviderTest {
 
   @Test
   fun cleanup_not_in_test_mode_fails() {
-    provider.init(FhirEngineConfiguration(testMode = false))
+    provider.init(
+      FhirEngineConfiguration(
+        testMode = false,
+      ),
+    )
 
     provider.getInstance(ApplicationProvider.getApplicationContext())
 
@@ -86,13 +94,36 @@ class FhirEngineProviderTest {
         serverConfiguration =
           ServerConfiguration(
             "",
-            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6)
-          )
+            NetworkConfiguration(connectionTimeOut = 5, readTimeOut = 4, writeTimeOut = 6),
+          ),
       )
     with(config.serverConfiguration!!.networkConfiguration) {
       assertThat(this.connectionTimeOut).isEqualTo(5)
       assertThat(this.readTimeOut).isEqualTo(4)
       assertThat(this.writeTimeOut).isEqualTo(6)
+    }
+  }
+
+  @Test
+  fun createFhirEngineConfiguration_configureOkHttpCache_shouldHaveOkHttpCache() {
+    val config =
+      FhirEngineConfiguration(
+        serverConfiguration =
+          ServerConfiguration(
+            "",
+            NetworkConfiguration(
+              httpCache =
+                CacheConfiguration(
+                  cacheDir = File("sample-dir", "http_cache"),
+                  // $0.05 worth of phone storage in 2020
+                  maxSize = 50L * 1024L * 1024L, // 50 MiB
+                ),
+            ),
+          ),
+      )
+    with(config.serverConfiguration!!.networkConfiguration) {
+      assertThat(this.httpCache?.maxSize).isEqualTo(50L * 1024L * 1024L)
+      assertThat(this.httpCache?.cacheDir?.path).isEqualTo("sample-dir${File.separator}http_cache")
     }
   }
 }

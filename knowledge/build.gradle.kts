@@ -1,9 +1,10 @@
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.kotlinKsp)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -36,11 +37,7 @@ android {
     }
   }
 
-  compileOptions {
-    isCoreLibraryDesugaringEnabled = true
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-  }
+  compileOptions { isCoreLibraryDesugaringEnabled = true }
 
   packaging {
     resources.excludes.addAll(
@@ -61,7 +58,7 @@ android {
         "META-INF/notice.txt",
         "META-INF/LGPL-3.0.txt",
         "META-INF/sun-jaxb.episode",
-      )
+      ),
     )
   }
   configureJacocoTestOptions()
@@ -70,12 +67,7 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -86,17 +78,21 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
+  api(Dependencies.HapiFhir.guavaCaching)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.Kotlin.stdlib)
+  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Room.ktx)
   implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+  implementation(Dependencies.http)
+  implementation(Dependencies.HapiFhir.fhirCoreConvertors)
+  implementation(Dependencies.apacheCommonsCompress)
 
-  kapt(Dependencies.Room.compiler)
+  ksp(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
@@ -104,24 +100,38 @@ dependencies {
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
+  testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}")
+    file("../docs/use/api/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Knowledge.artifactId)
+      moduleName.set(Releases.Knowledge.name)
       moduleVersion.set(Releases.Knowledge.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/knowledge/src/main/java"),
+        )
+        remoteLineSuffix.set("#L")
+      }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(
-          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list")
+          URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/element-list"),
         )
       }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.commit
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import kotlinx.coroutines.launch
 
 /** A fragment representing Edit Patient screen. This fragment is contained in a [MainActivity]. */
 class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
@@ -53,40 +55,54 @@ class EditPatientFragment : Fragment(R.layout.add_patient_fragment) {
       Toast.makeText(requireContext(), R.string.message_patient_updated, Toast.LENGTH_SHORT).show()
       NavHostFragment.findNavController(this).navigateUp()
     }
+    (activity as MainActivity).setDrawerEnabled(false)
+
+    /** Use the provided cancel|submit buttons from the sdc library */
     childFragmentManager.setFragmentResultListener(
       QuestionnaireFragment.SUBMIT_REQUEST_KEY,
-      viewLifecycleOwner
-    ) { _, _ -> onSubmitAction() }
-    (activity as MainActivity).setDrawerEnabled(false)
+      viewLifecycleOwner,
+    ) { _, _ ->
+      onSubmitAction()
+    }
+    childFragmentManager.setFragmentResultListener(
+      QuestionnaireFragment.CANCEL_REQUEST_KEY,
+      viewLifecycleOwner,
+    ) { _, _ ->
+      NavHostFragment.findNavController(this@EditPatientFragment).navigateUp()
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
     return when (item.itemId) {
       android.R.id.home -> {
-        NavHostFragment.findNavController(this).navigateUp()
+        NavHostFragment.findNavController(this@EditPatientFragment).navigateUp()
         true
       }
-      else -> super.onOptionsItemSelected(item)
+      else -> false
     }
   }
 
   private fun addQuestionnaireFragment(pair: Pair<String, String>) {
-    childFragmentManager.commit {
-      add(
-        R.id.add_patient_container,
-        QuestionnaireFragment.builder()
-          .setQuestionnaire(pair.first)
-          .setQuestionnaireResponse(pair.second)
-          .build(),
-        QUESTIONNAIRE_FRAGMENT_TAG
-      )
+    lifecycleScope.launch {
+      childFragmentManager.commit {
+        add(
+          R.id.add_patient_container,
+          QuestionnaireFragment.builder()
+            .setQuestionnaire(pair.first)
+            .setQuestionnaireResponse(pair.second)
+            .build(),
+          QUESTIONNAIRE_FRAGMENT_TAG,
+        )
+      }
     }
   }
 
   private fun onSubmitAction() {
-    val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    viewModel.updatePatient(questionnaireFragment.getQuestionnaireResponse())
+    lifecycleScope.launch {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
+      viewModel.updatePatient(questionnaireFragment.getQuestionnaireResponse())
+    }
   }
 
   companion object {
