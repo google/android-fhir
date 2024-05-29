@@ -79,6 +79,8 @@ object FhirEngineProvider {
     return getOrCreateFhirService(context).database
   }
 
+  internal fun getFhirEngineConfiguration() = fhirEngineConfiguration
+
   @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
     if (fhirServices == null) {
