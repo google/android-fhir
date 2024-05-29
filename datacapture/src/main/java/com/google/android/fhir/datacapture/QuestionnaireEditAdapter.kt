@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,7 +64,7 @@ internal class QuestionnaireEditAdapter(
         ViewHolder.QuestionHolder(onCreateViewHolderQuestion(parent = parent, subtype = subtype))
       ViewType.Type.REPEATED_GROUP_HEADER -> {
         ViewHolder.RepeatedGroupHeaderHolder(
-          parent.inflate(R.layout.repeated_group_instance_header_view)
+          parent.inflate(R.layout.repeated_group_instance_header_view),
         )
       }
     }
@@ -265,6 +265,7 @@ internal class QuestionnaireEditAdapter(
 
   internal sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     class QuestionHolder(val holder: QuestionnaireItemViewHolder) : ViewHolder(holder.itemView)
+
     class RepeatedGroupHeaderHolder(itemView: View) : ViewHolder(itemView) {
       val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
       val delete: View = itemView.findViewById(R.id.repeated_group_instance_header_delete_button)

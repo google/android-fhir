@@ -167,7 +167,7 @@ data class QuestionnaireViewItem(
     )
   }
 
-  internal fun removeAnswerAt(index: Int) {
+  internal suspend fun removeAnswerAt(index: Int) {
     check(questionnaireItem.repeats) {
       "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
     }
@@ -178,7 +178,7 @@ data class QuestionnaireViewItem(
       questionnaireItem,
       questionnaireResponseItem,
       answers.filterIndexed { currentIndex, _ -> currentIndex != index },
-      null
+      null,
     )
   }
 

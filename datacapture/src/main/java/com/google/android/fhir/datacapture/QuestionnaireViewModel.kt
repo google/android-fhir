@@ -843,11 +843,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             add(
               QuestionnaireAdapterItem.RepeatedGroupHeader(
                 index = index,
-                onDeleteClicked = {
-                  viewModelScope.launch {
-                    question.item.removeAnswerAt(index)
-                  }
-                },
+                onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
                 responses = nestedResponseItemList,
               ),
             )
