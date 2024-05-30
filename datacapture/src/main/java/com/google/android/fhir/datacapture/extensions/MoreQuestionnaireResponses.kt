@@ -117,6 +117,3 @@ private fun unpackRepeatedGroups(
     listOf(questionnaireResponseItem)
   }
 }
-
-internal val Questionnaire.QuestionnaireItemComponent.isRepeatedGroup: Boolean
-  get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats

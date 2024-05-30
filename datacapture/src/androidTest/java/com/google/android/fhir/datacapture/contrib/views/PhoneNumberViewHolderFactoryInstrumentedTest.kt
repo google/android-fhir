@@ -74,8 +74,7 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
             subtype = QuestionnaireViewHolderType.PHONE_NUMBER.value,
           )
           .viewType,
-      )
-    viewHolderFromAdapter as QuestionnaireEditAdapter.ViewHolder.QuestionHolder
+      ) as QuestionnaireEditAdapter.ViewHolder.QuestionHolder
     assertThat(viewHolderFromAdapter.holder).isInstanceOf(viewHolder::class.java)
   }
 
