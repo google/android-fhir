@@ -48,44 +48,32 @@ internal class TransactionBundleGenerator(
   override fun generateUploadRequests(
     mappedPatches: List<OrderedMapping>,
   ): List<BundleUploadRequestMapping> {
-    // Add the combined resource, then if there is space in the Bundle left, add some individual
-    // resource if possible
-    val combined =
-      mappedPatches.filterIsInstance<OrderedMapping.CombinedMapping>().sortedByDescending {
-        it.patchMappings.size
-      }
-    val individual = mappedPatches.filterIsInstance<OrderedMapping.IndividualMapping>()
-
     val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
 
-    val cItr = combined.toMutableList().listIterator()
-    val iItr = individual.listIterator()
-
-    while (cItr.hasNext()) {
-      val bundle = mutableListOf<PatchMapping>()
-      bundle.addAll(cItr.next().patchMappings)
-      cItr.remove()
-
-      while (cItr.hasNext()) {
-        val next = cItr.next()
-        if (bundle.size + next.patchMappings.size <= generatedBundleSize) {
-          bundle.addAll(next.patchMappings)
-          cItr.remove() // get rid from itr as we have added it into the bundle
+    var bundle = mutableListOf<PatchMapping>()
+    mappedPatches.forEach {
+      when (it) {
+        is OrderedMapping.IndividualMapping -> {
+          if (bundle.size < generatedBundleSize) {
+            bundle.add(it.patchMapping)
+          } else {
+            mappingsPerBundle.add(bundle)
+            bundle = mutableListOf(it.patchMapping)
+          }
+        }
+        is OrderedMapping.CombinedMapping -> {
+          if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
+            bundle.addAll(it.patchMappings)
+          } else {
+            mappingsPerBundle.add(bundle)
+            bundle = mutableListOf()
+            bundle.addAll(it.patchMappings)
+          }
         }
       }
-
-      while (iItr.hasNext() && bundle.size < generatedBundleSize) {
-        bundle.add(iItr.next().patchMapping)
-      }
-      mappingsPerBundle.add(bundle)
-
-      // go back to start from any remaining sub-graph
-      while (cItr.hasPrevious()) cItr.previous()
     }
 
-    individual.subList(iItr.nextIndex(), individual.size).chunked(generatedBundleSize).forEach {
-      mappingsPerBundle.add(it.map { it.patchMapping })
-    }
+    if (bundle.isNotEmpty()) mappingsPerBundle.add(bundle)
 
     return mappingsPerBundle.map { patchList ->
       generateBundleRequest(patchList).let { mappedBundleRequest ->

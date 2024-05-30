@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload.patch
 import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
-import timber.log.Timber
+import kotlin.math.min
 
 typealias Node = String
 
@@ -66,7 +66,6 @@ internal object PatchOrdering {
     database: Database,
   ): List<OrderedMapping> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
-
     /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
     multiple LocalChangeResourceReference, one for each resource reference in the
     LocalChange.payload.*/
@@ -76,37 +75,20 @@ internal object PatchOrdering {
         .groupBy { it.localChangeId }
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
-
-    val weakConnectedComponents = weakConnectedComponents(adjacencyList)
-
-    val graphsWithCycles = mutableListOf<Graph>()
-    val graphsWithOutCycles = mutableListOf<Graph>()
-    weakConnectedComponents.forEach {
-      try {
-        checkCycle(it)
-        graphsWithOutCycles.add(it)
-      } catch (e: IllegalStateException) {
-        Timber.i(e)
-        graphsWithCycles.add(it)
+    val stronglyConnected: List<List<Node>> =
+      stronglyConnectedComponents(adjacencyList, resourceIdToPatchMapping.size)
+    val mapping = reduceToSuperNode(stronglyConnected)
+    val updatedGraph = transformGraph(adjacencyList, mapping)
+    val orderedNodes = createTopologicalOrderedList(updatedGraph)
+    val orderedStronglyConnected = superNodeToSSC(orderedNodes, mapping.first)
+    return orderedStronglyConnected.map {
+      val mappings = it.mapNotNull { resourceIdToPatchMapping[it] }
+      if (mappings.size == 1) {
+        OrderedMapping.IndividualMapping(mappings.first())
+      } else {
+        OrderedMapping.CombinedMapping(mappings)
       }
     }
-
-    val nodesPerConnectedGraph: List<List<Node>> =
-      if (graphsWithCycles.isNotEmpty()) {
-        graphsWithCycles.map { graph: Graph ->
-          (graph.keys + graph.values.flatten().toSet()).toList()
-        }
-      } else {
-        emptyList()
-      }
-
-    val combinedGraphWithoutCycles = combineGraphs(graphsWithOutCycles)
-    return nodesPerConnectedGraph
-      .map { it.mapNotNull { resourceIdToPatchMapping[it] } }
-      .map { OrderedMapping.CombinedMapping(it) } +
-      createTopologicalOrderedList(combinedGraphWithoutCycles)
-        .mapNotNull { resourceIdToPatchMapping[it] }
-        .map { OrderedMapping.IndividualMapping(it) }
   }
 
   /**
@@ -175,80 +157,137 @@ internal object PatchOrdering {
     return stack.reversed()
   }
 
-  private fun weakConnectedComponents(diGraph: Graph): List<Graph> {
-    // convert digraph to a graph
-    val graph = mutableMapOf<Node, MutableList<Node>>() // Map<Node, List<Node>>
-    diGraph.forEach { entry ->
-      if (!graph.containsKey(entry.key)) graph[entry.key] = mutableListOf()
-      entry.value.forEach {
-        graph[entry.key]!!.add(it)
-        graph.getOrPut(it) { mutableListOf() }.add(entry.key)
-        // add nodes
+  private fun stronglyConnectedComponents(diGraph: Graph, nodesCount: Int): List<List<Node>> {
+    return sscTarzan(diGraph, nodesCount)
+  }
+
+  private fun reduceToSuperNode(
+    ssc: List<List<Node>>,
+  ): Pair<Map<Node, List<Node>>, Map<Node, Node>> {
+    val superNodesMap = mutableMapOf<Node, List<Node>>()
+    val nodeToSuperNode = mutableMapOf<Node, String>()
+
+    var counter = 0
+    ssc.forEach {
+      superNodesMap[(++counter).toString()] = it
+      it.forEach { nodeToSuperNode[it] = (counter).toString() }
+    }
+
+    return superNodesMap to nodeToSuperNode
+  }
+
+  private fun transformGraph(
+    oldGraph: Graph,
+    nodeMapping: Pair<Map<Node, List<Node>>, Map<Node, Node>>,
+  ): Graph {
+    val newGraph = mutableMapOf<Node, List<Node>>()
+    val (superNodeToNodes, nodeToSuperNode) = nodeMapping
+    // Remove any cyclic dependency from connected components.
+    // reduce them to a single node
+    // replace the ssc nodes with super node
+    oldGraph.forEach {
+      //      println(it.key)
+      val superNode = nodeToSuperNode[it.key]!!
+
+      if (newGraph.containsKey(superNode)) {
+        newGraph[superNode] =
+          (newGraph[superNode]!! + it.value.mapNotNull { nodeToSuperNode[it] })
+            .distinct()
+            .filterNot { superNode == it }
+      } else {
+        newGraph[superNode] = it.value.mapNotNull { nodeToSuperNode[it] }
       }
     }
 
-    // find connected components
-    val connectedComponents = findConnectedComponents(graph)
+    return newGraph
+  }
 
-    // convert connected components back to digraph
-    val connectedDigraphs = mutableListOf<Graph>()
-    connectedComponents.forEach {
-      val connectedDigraph = mutableMapOf<Node, MutableList<Node>>()
-      it.forEach {
-        if (diGraph.containsKey(it)) {
-          connectedDigraph[it] = diGraph[it]!! as MutableList<Node>
+  private fun superNodeToSSC(
+    orderedNodes: List<Node>,
+    mapping: Map<Node, List<Node>>,
+  ): List<List<Node>> {
+    return orderedNodes.mapNotNull { mapping[it] }
+  }
+
+  private fun sscTarzan(diGraph: Graph, nodesCount: Int): List<List<Node>> {
+    // Code inspired from
+    // https://github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
+    var counter = -1
+    val intToNode = mutableMapOf<Int, String>()
+    val nodeToInt = mutableMapOf<String, Int>()
+
+    val graph = MutableList<MutableList<Int>>(nodesCount) { mutableListOf() }
+
+    diGraph.forEach { (key, value) ->
+      val intForKey =
+        nodeToInt[key]
+          ?: let {
+            intToNode[++counter] = key
+            nodeToInt[key] = counter
+            counter
+          }
+
+      value.forEach { node ->
+        val intForValue =
+          nodeToInt[node]
+            ?: let {
+              intToNode[++counter] = node
+              nodeToInt[node] = counter
+              counter
+            }
+        graph[intForKey].add(intForValue)
+      }
+    }
+
+    var id = 0
+    var sccCount = 0
+    val visited = BooleanArray(graph.size)
+    val ids = IntArray(graph.size) { -1 }
+    val low = IntArray(graph.size)
+    val sccs = IntArray(graph.size)
+    val stack = ArrayDeque<Int>()
+
+    fun dfs(at: Int) {
+      low[at] = id++
+      ids[at] = low[at]
+      stack.addFirst(at)
+      visited[at] = true
+      for (to in graph[at]) {
+        if (ids[to] == -1) {
+          dfs(to)
+        }
+        if (visited[to]) {
+          low[at] = min(low[at], low[to])
         }
       }
-      if (connectedDigraph.isNotEmpty()) {
-        connectedDigraphs.add(connectedDigraph)
+
+      // On recursive callback, if we're at the root node (start of SCC)
+      // empty the seen stack until back to root.
+      if (ids[at] == low[at]) {
+        var node: Int = stack.removeFirst()
+        while (true) {
+          visited[node] = false
+          sccs[node] = sccCount
+          if (node == at) break
+          node = stack.removeFirst()
+        }
+        sccCount++
       }
     }
 
-    return connectedDigraphs
-  }
-
-  private fun findConnectedComponents(graph: Graph): List<List<Node>> {
-    val connectedComponents = mutableListOf<MutableList<Node>>()
-    val visited = mutableSetOf<String>()
-    val connectedNodes = mutableListOf<Node>()
-
-    fun dfs(node: Node) {
-      if (visited.add(node)) {
-        connectedNodes.add(node)
-        graph[node]?.forEach { dfs(it) }
+    for (i in 0 until nodesCount) {
+      if (ids[i] == -1) {
+        dfs(i)
       }
     }
 
-    graph.keys.forEach {
-      connectedNodes.clear()
-      dfs(it)
-      if (connectedNodes.isNotEmpty()) {
-        connectedComponents.add(ArrayList(connectedNodes))
+    val lowLinkToConnectedMap = mutableMapOf<Int, MutableList<Int>>()
+    for (i in 0 until nodesCount) {
+      if (!lowLinkToConnectedMap.containsKey(sccs[i])) {
+        lowLinkToConnectedMap[sccs[i]] = mutableListOf()
       }
+      lowLinkToConnectedMap[sccs[i]]!!.add(i)
     }
-    return connectedComponents
-  }
-
-  private fun checkCycle(diGraph: Graph) {
-    val stack = ArrayDeque<String>()
-    val visited = mutableSetOf<String>()
-    val currentPath = mutableSetOf<String>()
-
-    fun dfs(key: String) {
-      check(currentPath.add(key)) { "Detected a cycle." }
-      if (visited.add(key)) {
-        diGraph[key]?.forEach { dfs(it) }
-        stack.addFirst(key)
-      }
-      currentPath.remove(key)
-    }
-
-    diGraph.keys.forEach { dfs(it) }
-  }
-
-  private fun combineGraphs(graphs: List<Graph>): Graph {
-    val combinedGraph = mutableMapOf<Node, List<Node>>()
-    graphs.forEach { combinedGraph.putAll(it) }
-    return combinedGraph
+    return lowLinkToConnectedMap.values.map { it.mapNotNull { intToNode[it] } }
   }
 }

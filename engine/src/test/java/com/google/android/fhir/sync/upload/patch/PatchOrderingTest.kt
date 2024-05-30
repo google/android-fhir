@@ -231,7 +231,7 @@ class PatchOrderingTest {
       val result = patchGenerator.generate(helper.localChanges)
 
       assertThat(result.filterIsInstance<OrderedMapping.CombinedMapping>()).hasSize(2)
-      assertThat(result.filterIsInstance<OrderedMapping.IndividualMapping>()).hasSize(3)
+      assertThat(result.filterIsInstance<OrderedMapping.IndividualMapping>()).hasSize(5)
 
       assertThat(
           result.filterIsInstance<OrderedMapping.CombinedMapping>().map {
@@ -240,7 +240,7 @@ class PatchOrderingTest {
         )
         .containsExactly(
           listOf("patient-1", "related-1"),
-          listOf("patient-2", "related-2", "observation-1", "encounter-1"),
+          listOf("patient-2", "related-2"),
         )
 
       assertThat(
@@ -248,7 +248,13 @@ class PatchOrderingTest {
             it.patchMapping.generatedPatch.resourceId
           },
         )
-        .containsExactly("patient-3", "encounter-2", "observation-2")
+        .containsExactly(
+          "encounter-1",
+          "observation-1",
+          "patient-3",
+          "encounter-2",
+          "observation-2",
+        )
         .inOrder()
     }
 
