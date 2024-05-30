@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.initialExpression
@@ -199,18 +198,16 @@ object ResourceMapper {
     structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
-    val simpleWorkerContext =
-      DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
+    val iWorkerContext =
+      structureMapExtractionContext.workerContext.apply { setExpansionProfile(Parameters()) }
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, iWorkerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
-          simpleWorkerContext,
+          iWorkerContext,
           structureMapExtractionContext.transformSupportServices,
         )
-        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
+        .transform(iWorkerContext, questionnaireResponse, structureMap, this)
     }
   }
 

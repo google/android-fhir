@@ -99,6 +99,16 @@ jobs:
       # This deploys content based on docs/ which ends up in site/
       # to https://google.github.io/android-fhir/ using GitHub Pages.
 
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+          cache: "pipenv"
+      - name: Install PipEnv
+        uses: tiagovrtr/actions-pipenv@v1
+        with:
+          pipenv-version: 2023.12.1
+
       - name: Build Docs Site
         # This 1st step intentionally runs not just on the main ("master") branch
         # but also for all pull requests. This serves to detect doc breakages.

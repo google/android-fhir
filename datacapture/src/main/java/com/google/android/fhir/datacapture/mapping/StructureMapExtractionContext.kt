@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,20 +16,24 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import android.content.Context
 import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.StructureMap
 import org.hl7.fhir.r4.utils.StructureMapUtilities
 
 /** Data used during StructureMap-based extraction. */
 data class StructureMapExtractionContext(
-  /** The application context. */
-  val context: Context,
   /**
    * Optionally pass a custom version of [StructureMapUtilities.ITransformerServices] to support
    * specific use cases.
    */
   val transformSupportServices: StructureMapUtilities.ITransformerServices? = null,
+  /**
+   * Optionally pass a custom version of [IWorkerContext].
+   *
+   * @default [SimpleWorkerContext]
+   */
+  val workerContext: IWorkerContext = SimpleWorkerContext(),
   /**
    * A lambda function which returns a [StructureMap]. Depending on your app this could be
    * hard-coded or use the [String] parameter to fetch the appropriate structure map.
