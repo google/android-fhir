@@ -2478,6 +2478,30 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(zipList.size).isEqualTo(3)
   }
 
+  @Test
+  fun testQuestionnaireItemComponentIsRepeatedGroup() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+      }
+
+    assertThat(question.isRepeatedGroup).isTrue()
+  }
+
+  @Test
+  fun testQuestionnaireItemComponentIsNotRepeatedGroup() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        repeats = false
+      }
+
+    assertThat(question.isRepeatedGroup).isFalse()
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL
