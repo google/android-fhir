@@ -17,6 +17,7 @@
 package com.google.android.fhir.search.query
 
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.index.SearchParamDefinition
@@ -59,6 +60,8 @@ class XFhirQueryTranslatorTest {
           ),
       ),
     )
+
+    provider.getInstance(ApplicationProvider.getApplicationContext())
   }
 
   @After
