@@ -95,6 +95,14 @@ interface FhirEngine : CrudFhirEngine {
   )
 
   /**
+   * Returns the total count of entities available for the given [Search].
+   *
+   * @param search The search criteria to apply.
+   * @return The total number of matching resources.
+   */
+  suspend fun count(search: Search): Long
+
+  /**
    * Returns the timestamp when data was last synchronized, or `null` if no synchronization has
    * occurred yet.
    */
@@ -206,14 +214,6 @@ interface CrudFhirEngine {
    *   references.
    */
   suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
-
-  /**
-   * Returns the total count of entities available for the given [Search].
-   *
-   * @param search The search criteria to apply.
-   * @return The total number of matching resources.
-   */
-  suspend fun count(search: Search): Long
 
   /**
    * Adds support for performing actions on `FhirEngine` as a single atomic transaction where the
