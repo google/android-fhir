@@ -58,7 +58,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * val fhirEngine = FhirEngineProvider.getInstance(this)
  * ```
  */
-interface FhirEngine : BaseFHIREngine {
+interface FhirEngine : CrudFhirEngine {
   /**
    * Synchronizes upload results with the database.
    *
@@ -149,7 +149,7 @@ interface FhirEngine : BaseFHIREngine {
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
 }
 
-interface BaseFHIREngine {
+interface CrudFhirEngine {
   /**
    * Creates one or more FHIR [Resource]s in the local storage. FHIR Engine requires all stored
    * resources to have a logical [Resource.id]. If the `id` is specified in the resource passed to
@@ -219,7 +219,7 @@ interface BaseFHIREngine {
    * Adds support for performing actions on `FhirEngine` as a single atomic transaction where the
    * entire set of changes succeed or fail as a single entity
    */
-  suspend fun withTransaction(block: suspend BaseFHIREngine.() -> Unit)
+  suspend fun withTransaction(block: suspend CrudFhirEngine.() -> Unit)
 }
 
 /**
