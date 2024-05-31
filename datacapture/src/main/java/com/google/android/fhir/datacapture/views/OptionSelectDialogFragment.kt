@@ -136,7 +136,10 @@ internal class OptionSelectDialogFragment(
         SelectedOptions(
           options = currentList.filterIsInstance<OptionSelectRow.Option>().map { it.option },
           otherOptions =
-            currentList.filterIsInstance<OptionSelectRow.OtherEditText>().filter { it.currentText.isNotEmpty() }.map { it.currentText },
+            currentList
+              .filterIsInstance<OptionSelectRow.OtherEditText>()
+              .filter { it.currentText.isNotEmpty() }
+              .map { it.currentText },
         ),
       )
     }
