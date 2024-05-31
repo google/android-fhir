@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import com.google.common.truth.Truth.assertThat
 import java.io.File
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Library
+import org.hl7.fhir.r4.model.MetadataResource
+import org.hl7.fhir.r4.model.PlanDefinition
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -164,10 +166,74 @@ internal class KnowledgeManagerTest {
       .isNotNull()
   }
 
-  private fun writeToFile(library: Library): File {
-    return File(context.filesDir, library.id).apply {
+  @Test
+  fun `for different resources with URL loading by URL should be correct`() = runTest {
+    val commonUrl = "www.sample-url.com"
+    val libraryWithSameUrl =
+      Library().apply {
+        id = "Library/lId"
+        name = "LibraryName"
+        url = commonUrl
+      }
+    val planDefinitionWithSameUrl =
+      PlanDefinition().apply {
+        id = "PlanDefinition/pdId"
+        name = "PlanDefinitionName"
+        url = commonUrl
+      }
+
+    knowledgeManager.install(writeToFile(libraryWithSameUrl))
+    knowledgeManager.install(writeToFile(planDefinitionWithSameUrl))
+
+    val resources = knowledgeDb.knowledgeDao().getResources()
+    assertThat(resources).hasSize(2)
+
+    val libraryLoadedByUrl =
+      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single()
+    assertThat(libraryLoadedByUrl.idElement.toString()).isEqualTo("Library/1")
+
+    val planDefinitionLoadedByUrl =
+      knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
+    assertThat(planDefinitionLoadedByUrl.idElement.toString()).isEqualTo("PlanDefinition/2")
+  }
+
+  @Test
+  fun `for different resources with URL and Version loading by URL should be correct`() = runTest {
+    val commonUrl = "www.sample-url.com"
+    val libraryWithSameUrl =
+      Library().apply {
+        id = "Library/lId"
+        name = "LibraryName"
+        url = commonUrl
+        version = "0"
+      }
+    val planDefinitionWithSameUrl =
+      PlanDefinition().apply {
+        id = "PlanDefinition/pdId"
+        name = "PlanDefinitionName"
+        url = commonUrl
+        version = "0"
+      }
+
+    knowledgeManager.install(writeToFile(libraryWithSameUrl))
+    knowledgeManager.install(writeToFile(planDefinitionWithSameUrl))
+
+    val resources = knowledgeDb.knowledgeDao().getResources()
+    assertThat(resources).hasSize(2)
+
+    val libraryLoadedByUrl =
+      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single()
+    assertThat(libraryLoadedByUrl.idElement.toString()).isEqualTo("Library/1")
+
+    val planDefinitionLoadedByUrl =
+      knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
+    assertThat(planDefinitionLoadedByUrl.idElement.toString()).isEqualTo("PlanDefinition/2")
+  }
+
+  private fun writeToFile(metadataResource: MetadataResource): File {
+    return File(context.filesDir, metadataResource.id).apply {
       this.parentFile?.mkdirs()
-      writeText(jsonParser.encodeResourceToString(library))
+      writeText(jsonParser.encodeResourceToString(metadataResource))
     }
   }
 }
