@@ -1,8 +1,3 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
-import Dependencies.removeIncompatibleDependencies
-
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -47,15 +42,6 @@ android {
 }
 
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
-
-configurations {
-  all {
-    removeIncompatibleDependencies()
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
-  }
-}
 
 dependencies {
   androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)

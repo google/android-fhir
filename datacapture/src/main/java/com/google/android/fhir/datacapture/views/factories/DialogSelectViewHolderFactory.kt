@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
         selectedOptionsJob?.cancel()
       }
 
-      private fun updateAnswers(selectedOptions: SelectedOptions) {
+      private suspend fun updateAnswers(selectedOptions: SelectedOptions) {
         questionnaireViewItem.clearAnswer()
         var answers = arrayOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
         selectedOptions.options

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,10 @@ internal class EditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
   ) {
-  override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+  override suspend fun handleInput(
+    editable: Editable,
+    questionnaireViewItem: QuestionnaireViewItem,
+  ) {
     val input = getValue(editable.toString())
     if (input != null) {
       questionnaireViewItem.setAnswer(input)

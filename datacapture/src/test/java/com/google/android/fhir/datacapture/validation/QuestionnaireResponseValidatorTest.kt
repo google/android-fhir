@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
@@ -78,13 +79,15 @@ class QuestionnaireResponseValidatorTest {
               ),
             ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
-    assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"]!!.single()).isEqualTo(Valid)
+    }
   }
 
   @Test
@@ -110,16 +113,20 @@ class QuestionnaireResponseValidatorTest {
               ),
             ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
-    assertThat(result["a-question"]!!.single())
-      .isEqualTo(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3")),
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"]!!.single())
+        .isEqualTo(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+    }
   }
 
   @Test
@@ -162,20 +169,26 @@ class QuestionnaireResponseValidatorTest {
               ),
             ),
         )
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
-    assertThat(result["a-question"])
-      .containsExactly(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3")),
-      )
-    assertThat(result["a-nested-question"])
-      .containsExactly(
-        Invalid(listOf("The maximum number of characters that are permitted in the answer is: 3")),
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["a-question"])
+        .containsExactly(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+      assertThat(result["a-nested-question"])
+        .containsExactly(
+          Invalid(
+            listOf("The maximum number of characters that are permitted in the answer is: 3"),
+          ),
+        )
+    }
   }
 
   @Test
@@ -231,14 +244,16 @@ class QuestionnaireResponseValidatorTest {
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
-    assertThat(result.keys).containsExactly("q1")
-    assertThat(result["q1"]).containsExactly(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result.keys).containsExactly("q1")
+      assertThat(result["q1"]).containsExactly(Valid)
+    }
   }
 
   @Test
@@ -282,26 +297,30 @@ class QuestionnaireResponseValidatorTest {
         addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-3")))
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
-    assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
+      assertThat(result["question-1"]!!.single()).isEqualTo(Valid)
+    }
   }
 
   @Test
   fun `validation passes if questionnaire response matches questionnaire`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
-      },
-      context,
-    )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/questionnaire-1"
+        },
+        context,
+      )
+    }
   }
 
   @Test
@@ -316,11 +335,13 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `validation passes if questionnaire response does not specify questionnaire`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply { url = "questionnaire-1" },
-      QuestionnaireResponse(),
-      context,
-    )
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply { url = "questionnaire-1" },
+        QuestionnaireResponse(),
+        context,
+      )
+    }
   }
 
   @Test
@@ -370,48 +391,52 @@ class QuestionnaireResponseValidatorTest {
 
   @Test
   fun `validation passes for questionnaire item type DISPLAY`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent(
-            StringType("display-1"),
-            Enumeration(
-              Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.DISPLAY,
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "questionnaire-1"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+              StringType("display-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.DISPLAY,
+              ),
             ),
-          ),
-        )
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
-      },
-      context,
-    )
+          )
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "questionnaire-1"
+          addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("display-1")))
+        },
+        context,
+      )
+    }
   }
 
   @Test
   fun `validation passes for questionnaire item type NULL`() {
-    QuestionnaireResponseValidator.validateQuestionnaireResponse(
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent(
-            StringType("null-1"),
-            Enumeration(
-              Questionnaire.QuestionnaireItemTypeEnumFactory(),
-              Questionnaire.QuestionnaireItemType.NULL,
+    runTest {
+      QuestionnaireResponseValidator.validateQuestionnaireResponse(
+        Questionnaire().apply {
+          url = "questionnaire-1"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent(
+              StringType("null-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.NULL,
+              ),
             ),
-          ),
-        )
-      },
-      QuestionnaireResponse().apply {
-        questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
-      },
-      context,
-    )
+          )
+        },
+        QuestionnaireResponse().apply {
+          questionnaire = "questionnaire-1"
+          addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("null-1")))
+        },
+        context,
+      )
+    }
   }
 
   @Test
@@ -444,15 +469,17 @@ class QuestionnaireResponseValidatorTest {
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        questionnaireResponse,
-        context,
-      )
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          questionnaireResponse,
+          context,
+        )
 
-    assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
-    assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
+      assertThat(result.entries.first().key).isEqualTo("valid-hidden-item")
+      assertThat(result.entries.first().value.first()).isEqualTo(NotValidated)
+    }
   }
 
   @Test
@@ -485,19 +512,21 @@ class QuestionnaireResponseValidatorTest {
         )
       }
 
-    val result =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context,
-        )
-        .entries
-        .first()
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+          .entries
+          .first()
 
-    assertThat(result.key).isEqualTo("valid-hidden-item")
-    assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
-    assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Missing answer for required field.")
+      assertThat(result.key).isEqualTo("valid-hidden-item")
+      assertThat(result.value.first()).isInstanceOf(Invalid::class.java)
+      assertThat((result.value.first() as Invalid).getSingleStringValidationMessage())
+        .isEqualTo("Missing answer for required field.")
+    }
   }
 
   @Test
@@ -1647,11 +1676,13 @@ class QuestionnaireResponseValidatorTest {
   ) {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {
-        QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context,
-        )
+        runTest {
+          QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+        }
       }
     assertThat(exception.message).isEqualTo(message)
   }
@@ -1664,11 +1695,13 @@ class QuestionnaireResponseValidatorTest {
   ) {
     val exception =
       assertThrows(IllegalStateException::class.java) {
-        QuestionnaireResponseValidator.validateQuestionnaireResponse(
-          questionnaire,
-          questionnaireResponse,
-          context,
-        )
+        runTest {
+          QuestionnaireResponseValidator.validateQuestionnaireResponse(
+            questionnaire,
+            questionnaireResponse,
+            context,
+          )
+        }
       }
     assertThat(exception.message).isEqualTo(message)
   }

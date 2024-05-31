@@ -1,0 +1,37 @@
+[
+  {
+    "op": "add",
+    "path": "/activity/-",
+    "value": {
+      "outcomeReference": [
+        {
+          "reference": "Task/6f6e6672-ef2d-4e57-9854-0a04cd0fb001",
+          "display": "Index Case Testing"
+        }
+      ],
+      "detail": {
+        "kind": "Task",
+        "code": {
+          "coding": [
+            {
+              "system": "https://d-tree.org/",
+              "code": "art-client-index-case-testing"
+            }
+          ]
+        },
+        "status": "in-progress",
+        "scheduledPeriod": {
+          "start": "2023-11-15T11:45:40+02:00",
+          "end": "2023-12-14T11:10:34.227+03:00"
+        },
+        "performer": [
+          {
+            "reference": "Practitioner/311015",
+            "display": "John Doe"
+          }
+        ],
+        "description": "Index Case Testing"
+      }
+    }
+  }
+]

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -638,34 +639,36 @@ class QuestionnaireEditAdapterTest {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     val questionnaireResponseItem = QuestionnaireResponse.QuestionnaireResponseItemComponent()
 
-    assertThat(
-        DiffCallbacks.ITEMS.areContentsTheSame(
-          QuestionnaireAdapterItem.Question(
-            QuestionnaireViewItem(
-              questionnaireItem,
-              questionnaireResponseItem,
-              validationResult = NotValidated,
-              answersChangedCallback = { _, _, _, _ -> },
-            ),
-          ),
-          QuestionnaireAdapterItem.Question(
-            QuestionnaireViewItem(
+    runTest {
+      assertThat(
+          DiffCallbacks.ITEMS.areContentsTheSame(
+            QuestionnaireAdapterItem.Question(
+              QuestionnaireViewItem(
                 questionnaireItem,
                 questionnaireResponseItem,
                 validationResult = NotValidated,
                 answersChangedCallback = { _, _, _, _ -> },
-              )
-              .apply {
-                addAnswer(
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    value = StringType("answer")
-                  },
+              ),
+            ),
+            QuestionnaireAdapterItem.Question(
+              QuestionnaireViewItem(
+                  questionnaireItem,
+                  questionnaireResponseItem,
+                  validationResult = NotValidated,
+                  answersChangedCallback = { _, _, _, _ -> },
                 )
-              },
+                .apply {
+                  addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = StringType("answer")
+                    },
+                  )
+                },
+            ),
           ),
-        ),
-      )
-      .isFalse()
+        )
+        .isFalse()
+    }
   }
 
   fun `areContentsTheSame() should return false if the validation results are different`() {

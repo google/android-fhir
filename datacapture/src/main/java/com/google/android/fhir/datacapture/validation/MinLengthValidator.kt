@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
+import org.hl7.fhir.r4.model.Type
 
 /**
  * A validator to check if the answer fulfills the minimum number of permitted characters.
@@ -37,13 +37,13 @@ import org.hl7.fhir.r4.model.PrimitiveType
 internal object MinLengthValidator :
   AnswerExtensionConstraintValidator(
     url = MIN_LENGTH_EXTENSION_URL,
-    predicate = { extension, answer ->
+    predicate = { constraintValue, answer ->
       answer.value.isPrimitive &&
         (answer.value as PrimitiveType<*>).asStringValue().length <
-          (extension.value as IntegerType).value
+          (constraintValue as IntegerType).value
     },
-    messageGenerator = { extension: Extension, context: Context ->
-      context.getString(R.string.min_length_validation_error_msg, extension.value.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.min_length_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 

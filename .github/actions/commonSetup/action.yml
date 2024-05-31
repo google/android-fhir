@@ -8,9 +8,6 @@ runs:
       with:
         distribution: temurin
         java-version: "17"
-    - name: Make files executable
-      shell: bash
-      run: chmod +x ./gradlew
 
     - name: "Setup Gradle"
       uses: gradle/gradle-build-action@v2

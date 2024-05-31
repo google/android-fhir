@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,20 +20,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -41,12 +45,14 @@ internal object RadioGroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.radio_group_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var appContext: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var flow: Flow
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
+        appContext = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         radioGroup = itemView.findViewById(R.id.radio_group)
         flow = itemView.findViewById(R.id.flow)
@@ -124,16 +130,18 @@ internal object RadioGroupViewHolderFactory :
               )
             isChecked = isCurrentlySelected
             setOnClickListener { radioButton ->
-              isCurrentlySelected = !isCurrentlySelected
-              when (isCurrentlySelected) {
-                true -> {
-                  updateAnswer(answerOption)
-                  val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
-                  buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
-                }
-                false -> {
-                  questionnaireViewItem.clearAnswer()
-                  (radioButton as RadioButton).isChecked = false
+              appContext.lifecycleScope.launch {
+                isCurrentlySelected = !isCurrentlySelected
+                when (isCurrentlySelected) {
+                  true -> {
+                    updateAnswer(answerOption)
+                    val buttons = radioGroup.children.asIterable().filterIsInstance<RadioButton>()
+                    buttons.forEach { button -> uncheckIfNotButtonId(radioButton.id, button) }
+                  }
+                  false -> {
+                    questionnaireViewItem.clearAnswer()
+                    (radioButton as RadioButton).isChecked = false
+                  }
                 }
               }
             }
@@ -146,7 +154,9 @@ internal object RadioGroupViewHolderFactory :
         if (button.id != checkedId) button.isChecked = false
       }
 
-      private fun updateAnswer(answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent) {
+      private suspend fun updateAnswer(
+        answerOption: Questionnaire.QuestionnaireItemAnswerOptionComponent,
+      ) {
         questionnaireViewItem.setAnswer(
           QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
             value = answerOption.value

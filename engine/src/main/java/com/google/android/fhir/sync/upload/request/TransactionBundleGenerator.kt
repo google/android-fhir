@@ -16,7 +16,9 @@
 
 package com.google.android.fhir.sync.upload.request
 
+import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Bundle
 
 /** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
@@ -27,21 +29,38 @@ internal class TransactionBundleGenerator(
     (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(patches: List<Patch>): List<BundleUploadRequest> {
-    return patches.chunked(generatedBundleSize).map { generateBundleRequest(it) }
+  override fun generateUploadRequests(
+    mappedPatches: List<PatchMapping>,
+  ): List<BundleUploadRequestMapping> {
+    return mappedPatches.chunked(generatedBundleSize).map { patchList ->
+      generateBundleRequest(patchList).let { mappedBundleRequest ->
+        BundleUploadRequestMapping(
+          splitLocalChanges = mappedBundleRequest.first,
+          generatedRequest = mappedBundleRequest.second,
+        )
+      }
+    }
   }
 
-  private fun generateBundleRequest(patches: List<Patch>): BundleUploadRequest {
+  private fun generateBundleRequest(
+    patches: List<PatchMapping>,
+  ): Pair<List<List<LocalChange>>, BundleUploadRequest> {
+    val splitLocalChanges = mutableListOf<List<LocalChange>>()
     val bundleRequest =
       Bundle().apply {
         type = Bundle.BundleType.TRANSACTION
         patches.forEach {
-          this.addEntry(getBundleEntryComponentGeneratorForPatch(it, useETagForUpload).getEntry(it))
+          splitLocalChanges.add(it.localChanges)
+          this.addEntry(
+            getBundleEntryComponentGeneratorForPatch(it.generatedPatch, useETagForUpload)
+              .getEntry(it.generatedPatch),
+          )
         }
       }
-    return BundleUploadRequest(
-      resource = bundleRequest,
-    )
+    return splitLocalChanges to
+      BundleUploadRequest(
+        resource = bundleRequest,
+      )
   }
 
   companion object Factory {

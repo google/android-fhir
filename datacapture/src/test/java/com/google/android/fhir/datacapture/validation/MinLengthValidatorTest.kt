@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.google.common.truth.Truth.assertThat
 import java.net.URI
 import java.text.SimpleDateFormat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.DecimalType
@@ -52,79 +53,79 @@ class MinLengthValidatorTest {
   }
 
   @Test
-  fun boolean_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun boolean_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 10, value = BooleanType(false))
   }
 
   @Test
-  fun boolean_answerOverMinLength_shouldReturnValidResult() {
+  fun boolean_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 5, value = BooleanType(false))
   }
 
   @Test
-  fun decimal_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun decimal_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 15, value = DecimalType(3.1415926535))
   }
 
   @Test
-  fun decimal_answerOverMinLength_shouldReturnValidResult() {
+  fun decimal_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 10, value = DecimalType(3.1415926535))
   }
 
   @Test
-  fun int_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun int_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 5, value = IntegerType(123))
   }
 
   @Test
-  fun int_answerOverMinLength_shouldReturnValidResult() {
+  fun int_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 10, value = IntegerType(1234567890))
   }
 
   @Test
-  fun dateType_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun dateType_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerUnderMinLength(minLength = 11, value = DateType(dateFormat.parse("2021-06-01")))
   }
 
   @Test
-  fun date_answerOverMinLength_shouldReturnValidResult() {
+  fun date_answerOverMinLength_shouldReturnValidResult() = runTest {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd")
     checkAnswerOverMinLength(minLength = 10, value = DateType(dateFormat.parse("2021-06-01")))
   }
 
   @Test
-  fun time_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun time_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 10, value = TimeType("18:00:59"))
   }
 
   @Test
-  fun time_answerOverMinLength_shouldReturnValidResult() {
+  fun time_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 5, value = TimeType("18:00:59"))
   }
 
   @Test
-  fun string_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun string_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 12, value = StringType("Hello World"))
   }
 
   @Test
-  fun string_answerOverMinLength_shouldReturnValidResult() {
+  fun string_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 5, value = StringType("Hello World"))
   }
 
   @Test
-  fun uri_answerUnderMinLength_shouldReturnInvalidResult() {
+  fun uri_answerUnderMinLength_shouldReturnInvalidResult() = runTest {
     checkAnswerUnderMinLength(minLength = 21, value = UriType(URI.create("https://www.hl7.org/")))
   }
 
   @Test
-  fun uri_answerOverMinLength_shouldReturnValidResult() {
+  fun uri_answerOverMinLength_shouldReturnValidResult() = runTest {
     checkAnswerOverMinLength(minLength = 5, value = UriType(URI.create("https://www.hl7.org/")))
   }
 
   @Test
-  fun nonPrimitiveUnderMinLength_shouldReturnValidResult() {
+  fun nonPrimitiveUnderMinLength_shouldReturnValidResult() = runTest {
     val requirement =
       Questionnaire.QuestionnaireItemComponent().apply {
         addExtension(
@@ -139,7 +140,10 @@ class MinLengthValidatorTest {
         this.value = Quantity(1234567.89)
       }
 
-    val validationResult = MaxLengthValidator.validate(requirement, answer, context)
+    val validationResult =
+      MaxLengthValidator.validate(requirement, answer, context) {
+        TestExpressionValueEvaluator.evaluate(requirement, it)
+      }
 
     assertThat(validationResult.isValid).isTrue()
     assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
@@ -150,22 +154,34 @@ class MinLengthValidatorTest {
     var context: Context = ApplicationProvider.getApplicationContext()
 
     @JvmStatic
-    fun checkAnswerOverMinLength(minLength: Int, value: PrimitiveType<*>) {
+    suspend fun checkAnswerOverMinLength(minLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MinLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(testComponent.requirement, it)
+        }
 
       assertThat(validationResult.isValid).isTrue()
       assertThat(validationResult.errorMessage.isNullOrBlank()).isTrue()
     }
 
     @JvmStatic
-    fun checkAnswerUnderMinLength(minLength: Int, value: PrimitiveType<*>) {
+    suspend fun checkAnswerUnderMinLength(minLength: Int, value: PrimitiveType<*>) {
       val testComponent = createMaxLengthQuestionnaireTestItem(minLength, value)
 
       val validationResult =
-        MinLengthValidator.validate(testComponent.requirement, testComponent.answer, context)
+        MinLengthValidator.validate(
+          testComponent.requirement,
+          testComponent.answer,
+          context,
+        ) {
+          TestExpressionValueEvaluator.evaluate(testComponent.requirement, it)
+        }
 
       assertThat(validationResult.isValid).isFalse()
       assertThat(validationResult.errorMessage)

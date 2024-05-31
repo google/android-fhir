@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <com.google.android.material.textview.MaterialTextView
     android:id="@+id/header"
+    android:layout_marginStart="@dimen/text_margin"
     android:paddingVertical="10dp"
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android"

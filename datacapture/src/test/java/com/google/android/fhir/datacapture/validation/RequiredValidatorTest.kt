@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.validation
 import android.os.Build
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -33,55 +34,71 @@ class RequiredValidatorTest {
 
   @Test
   fun shouldReturnValidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val response =
-      listOf(
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-          value = IntegerType(9)
-        },
-      )
+    runTest {
+      val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+      val questionnaireResponseItem =
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                value = IntegerType(9)
+              },
+            )
+        }
 
-    val validationResult =
-      RequiredValidator.validate(
-        questionnaireItem,
-        response,
-        InstrumentationRegistry.getInstrumentation().context,
-      )
-    assertThat(validationResult.isValid).isTrue()
+      val validationResult =
+        RequiredValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          InstrumentationRegistry.getInstrumentation().context,
+        )
+      assertThat(validationResult.first().isValid).isTrue()
+    }
   }
 
   @Test
   fun shouldReturnInvalidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+    runTest {
+      val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+      val questionnaireResponseItem =
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { answer = listOf() }
 
-    val validationResult =
-      RequiredValidator.validate(
-        questionnaireItem,
-        listOf(),
-        InstrumentationRegistry.getInstrumentation().context,
-      )
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
+      val validationResult =
+        RequiredValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          InstrumentationRegistry.getInstrumentation().context,
+        )
+      assertThat(validationResult.first().isValid).isFalse()
+      assertThat(validationResult.first().errorMessage)
+        .isEqualTo("Missing answer for required field.")
+    }
   }
 
   @Test
   fun noAnswerHasValue_shouldReturnInvalidResult() {
-    val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
-    val response =
-      listOf(
-        // one answer with no value
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
-        // second answer with no value
-        QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
-      )
+    runTest {
+      val questionnaireItem = Questionnaire.QuestionnaireItemComponent().apply { required = true }
+      val questionnaireResponseItem =
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+          answer =
+            listOf(
+              // one answer with no value
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+              // second answer with no value
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+            )
+        }
 
-    val validationResult =
-      RequiredValidator.validate(
-        questionnaireItem,
-        response,
-        InstrumentationRegistry.getInstrumentation().context,
-      )
-    assertThat(validationResult.isValid).isFalse()
-    assertThat(validationResult.errorMessage).isEqualTo("Missing answer for required field.")
+      val validationResult =
+        RequiredValidator.validate(
+          questionnaireItem,
+          questionnaireResponseItem,
+          InstrumentationRegistry.getInstrumentation().context,
+        )
+      assertThat(validationResult.first().isValid).isFalse()
+      assertThat(validationResult.first().errorMessage)
+        .isEqualTo("Missing answer for required field.")
+    }
   }
 }

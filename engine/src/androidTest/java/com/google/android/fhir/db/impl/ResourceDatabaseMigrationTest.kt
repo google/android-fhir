@@ -29,6 +29,7 @@ import java.util.Date
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Task
 import org.junit.Rule
 import org.junit.Test
@@ -291,6 +292,81 @@ class ResourceDatabaseMigrationTest {
     migratedDatabase.close()
     assertThat(retrievedTaskResourceUuid).isEqualTo(localChangeResourceUuid)
     assertThat(localChangeResourceId).isEqualTo(retrievedTaskResourceId)
+  }
+
+  @Test
+  fun migrate7To8_should_execute_with_no_exception(): Unit = runBlocking {
+    val patientId = "patient-001"
+    val patientResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val patient: String =
+      Patient()
+        .apply {
+          id = patientId
+          addName(HumanName().apply { addGiven("Brad") })
+          addGeneralPractitioner(Reference("Practitioner/123"))
+          managingOrganization = Reference("Organization/123")
+          meta.lastUpdated = Date()
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 7).apply {
+      val insertionDate = Date()
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${insertionDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.INSERT)}', '$patient'  );",
+      )
+      val updateDate = Date()
+      val patch =
+        "[{\"op\":\"replace\",\"path\":\"\\/generalPractitioner\\/0\\/reference\",\"value\":\"Practitioner\\/345\"}]"
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${updateDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.UPDATE)}', '$patch'  );",
+      )
+      val deleteDate = Date()
+      execSQL(
+        "INSERT INTO LocalChangeEntity (resourceType, resourceUuid, resourceId, timestamp, type, payload) VALUES ('Patient', '$patientResourceUuid', '$patientId', '${deleteDate.toTimeZoneString()}', '${DbTypeConverters.localChangeTypeToInt(LocalChangeEntity.Type.DELETE)}', ''  );",
+      )
+      close()
+    }
+
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 8, true, MIGRATION_7_8)
+
+    var localChange1Id: Long
+    var localChange2Id: Long
+
+    var localChangeReferences: MutableMap<Long, MutableList<String>>
+
+    migratedDatabase.let { database ->
+      database.query("SELECT id FROM LocalChangeEntity").let {
+        it.moveToFirst()
+        localChange1Id = it.getLong(0)
+        it.moveToNext()
+        localChange2Id = it.getLong(0)
+      }
+
+      database
+        .query(
+          "SELECT localChangeId, resourceReferenceValue FROM LocalChangeResourceReferenceEntity",
+        )
+        .let {
+          var continueToNextRow = it.moveToFirst()
+          localChangeReferences = mutableMapOf()
+          while (continueToNextRow) {
+            val localChangeId = it.getLong(0)
+            val referenceValue = it.getString(1)
+            val existingList = localChangeReferences.getOrDefault(localChangeId, mutableListOf())
+            existingList.add(referenceValue)
+            localChangeReferences[localChangeId] = existingList
+            continueToNextRow = it.moveToNext()
+          }
+        }
+    }
+    migratedDatabase.close()
+    assertThat(localChangeReferences).containsKey(localChange1Id)
+    assertThat(localChangeReferences).containsKey(localChange2Id)
+    assertThat(localChangeReferences[localChange1Id]!!.size).isEqualTo(2)
+    assertThat(localChangeReferences[localChange2Id]!!.size).isEqualTo(1)
+    assertThat(localChangeReferences[localChange1Id]!!)
+      .containsExactly("Practitioner/123", "Organization/123")
+    assertThat(localChangeReferences[localChange2Id]!!).containsExactly("Practitioner/345")
   }
 
   companion object {

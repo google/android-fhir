@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,26 +21,38 @@ import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
 /**
- * Manager that generates the FHIR requests and handles the FHIR responses of a download job.
+ * Manages the process of downloading FHIR resources from a remote server.
  *
- * TODO(jingtang10): What happens after the end of a download job. Should a new download work
+ * Implementations of this interface define how download requests are generated and how responses
+ * are processed to update the local database.
+ */
+
+/* TODO(jingtang10): What happens after the end of a download job. Should a new download work
  *   manager be created or should there be an API to restart a new download job.
  */
 interface DownloadWorkManager {
-  /**
-   * Returns the URL for the next download request, or `null` if there is no more download request
-   * to be issued.
-   */
+  /** Returns the next [DownloadRequest] to be executed, or `null` if there are no more requests. */
   suspend fun getNextRequest(): DownloadRequest?
 
   /* TODO: Generalize the DownloadWorkManager API to not sequentially download resource by type (https://github.com/google/android-fhir/issues/1884) */
   /**
-   * Returns the map of resourceType and URL for summary of total count for each download request
+   * Returns a map of [ResourceType] to URLs that can be used to retrieve the total count of
+   * resources to be downloaded for each type. This information is used for displaying download
+   * progress.
    */
   suspend fun getSummaryRequestUrls(): Map<ResourceType, String>
 
   /**
-   * Processes the download response and returns the resources to be saved to the local database.
+   * Processes the [response] received from the FHIR server.
+   *
+   * This method is responsible for:
+   * * Extracting resources from the response.
+   * * Identifying additional resource URLs to download, for example to handle pagination.
+   * * Returning the resources to be saved to the local database.
+   *
+   * @param response The FHIR resource received from the server, often a
+   *   [List][org.hl7.fhir.r4.model.ListResource] or [Bundle][org.hl7.fhir.r4.model.Bundle].
+   * @return A collection of [Resource]s extracted from the response.
    */
   suspend fun processResponse(response: Resource): Collection<Resource>
 }

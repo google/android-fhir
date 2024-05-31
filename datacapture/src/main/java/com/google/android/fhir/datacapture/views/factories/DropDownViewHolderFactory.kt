@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
@@ -31,11 +33,13 @@ import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import timber.log.Timber
 
@@ -47,13 +51,13 @@ internal object DropDownViewHolderFactory :
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
-      private lateinit var context: Context
+      private lateinit var context: AppCompatActivity
 
       override fun init(itemView: View) {
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
-        context = itemView.context
+        context = itemView.context.tryUnwrapContext()!!
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -113,13 +117,15 @@ internal object DropDownViewHolderFactory :
                 .firstOrNull { it.value.identifierString(context) == selectedItem?.answerId }
                 ?.value
 
-            if (selectedAnswer == null) {
-              questionnaireViewItem.clearAnswer()
-            } else {
-              questionnaireViewItem.setAnswer(
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-                  .setValue(selectedAnswer),
-              )
+            context.lifecycleScope.launch {
+              if (selectedAnswer == null) {
+                questionnaireViewItem.clearAnswer()
+              } else {
+                questionnaireViewItem.setAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                    .setValue(selectedAnswer),
+                )
+              }
             }
           }
 

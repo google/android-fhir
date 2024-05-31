@@ -38,7 +38,10 @@
             "doseNumberPositiveInt": 2,
             "seriesDosesPositiveInt": 2
           }
-        ]
+        ],
+        "location": {
+          "reference": "Location/nairobi-047"
+        }
       }
     }
   ]

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.Database
 
 /**
- * Generates [Patch]es from [LocalChange]s.
+ * Generates [Patch]es from [LocalChange]s and output [List<[PatchMapping]>] to keep a mapping of
+ * the [LocalChange]s to their corresponding generated [Patch]
  *
  * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
  * together with other components in the upload package to fulfill a specific upload strategy.
@@ -33,16 +35,17 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  fun generate(localChanges: List<LocalChange>): List<Patch>
+  suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping>
 }
 
 internal object PatchGeneratorFactory {
   fun byMode(
     mode: PatchGeneratorMode,
+    database: Database,
   ): PatchGenerator =
     when (mode) {
       is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
-      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator.with(database)
     }
 }
 
@@ -54,3 +57,13 @@ internal sealed class PatchGeneratorMode {
 
   object PerChange : PatchGeneratorMode()
 }
+
+/**
+ * Structure to maintain the mapping between [List<[LocalChange]>] and the [Patch] generated from
+ * those changes. This class should be used by any implementation of [PatchGenerator] to output the
+ * [Patch] in this format.
+ */
+internal data class PatchMapping(
+  val localChanges: List<LocalChange>,
+  val generatedPatch: Patch,
+)

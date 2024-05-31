@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,9 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardView = findViewById(R.id.helpCardView),
       helpTextView = findViewById(R.id.helpText),
       questionnaireItem = questionnaireViewItem.questionnaireItem,
+      questionnaireResponseItem = questionnaireViewItem.getQuestionnaireResponseItem(),
+      isHelpCardInitiallyVisible = questionnaireViewItem.isHelpCardOpen,
+      helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     // CQF expression takes precedence over static question text

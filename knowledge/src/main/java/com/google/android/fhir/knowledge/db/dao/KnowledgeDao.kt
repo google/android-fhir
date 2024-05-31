@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ abstract class KnowledgeDao {
   ): Long {
     val resourceMetadata =
       if (resource.url != null && resource.version != null) {
-        getResourceWithUrlAndVersion(resource.url, resource.version)
+        getResourceWithUrlAndVersion(resource.resourceType, resource.url, resource.version)
       } else if (resource.url != null) {
-        getResourceWithUrl(resource.url)
+        getResourceWithUrl(resource.resourceType, resource.url)
       } else {
         getResourcesWithNameAndVersion(resource.resourceType, resource.name, resource.version)
       }
@@ -63,7 +63,7 @@ abstract class KnowledgeDao {
   @Query(
     "DELETE from ResourceMetadataEntity WHERE resourceMetadataId NOT IN (SELECT DISTINCT resourceMetadataId from ImplementationGuideResourceMetadataEntity)",
   )
-  internal abstract suspend fun deleteOrphanedResources()
+  internal abstract suspend fun deleteOrphanedResources(): Int
 
   @Query("SELECT * from ImplementationGuideEntity")
   internal abstract suspend fun getImplementationGuides(): List<ImplementationGuideEntity>
@@ -84,14 +84,18 @@ abstract class KnowledgeDao {
     resourceType: ResourceType,
   ): List<ResourceMetadataEntity>
 
-  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  @Query(
+    "SELECT * from ResourceMetadataEntity WHERE resourceType =:resourceType AND url = :url AND version = :version",
+  )
   internal abstract suspend fun getResourceWithUrlAndVersion(
+    resourceType: ResourceType,
     url: String,
     version: String,
   ): ResourceMetadataEntity?
 
-  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
+  @Query("SELECT * from ResourceMetadataEntity WHERE resourceType = :resourceType AND url = :url")
   internal abstract suspend fun getResourceWithUrl(
+    resourceType: ResourceType,
     url: String,
   ): ResourceMetadataEntity?
 

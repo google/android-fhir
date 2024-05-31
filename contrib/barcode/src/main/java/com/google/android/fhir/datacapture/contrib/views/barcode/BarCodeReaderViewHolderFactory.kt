@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.contrib.views.barcode
 import android.graphics.Typeface
 import android.view.View
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -26,6 +27,7 @@ import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 
@@ -67,13 +69,15 @@ object BarCodeReaderViewHolderFactory :
                 }
               }
 
-            if (answer == null) {
-              questionnaireViewItem.clearAnswer()
-            } else {
-              questionnaireViewItem.setAnswer(answer)
-            }
+            context.lifecycleScope.launch {
+              if (answer == null) {
+                questionnaireViewItem.clearAnswer()
+              } else {
+                questionnaireViewItem.setAnswer(answer)
+              }
 
-            setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
+              setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
+            }
           }
           LiveBarcodeScanningFragment()
             .show(

@@ -20,6 +20,7 @@ import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.HttpAuthenticator
 import java.util.concurrent.TimeUnit
+import okhttp3.Cache
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -106,6 +107,7 @@ internal interface RetrofitHttpService : FhirHttpService {
                 },
               )
             }
+            networkConfiguration.httpCache?.let { this.cache(Cache(it.cacheDir, it.maxSize)) }
           }
           .build()
       return Retrofit.Builder()

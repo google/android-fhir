@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.hl7.fhir.r4.utils.ToolingExtensions
 import org.junit.Assert.assertThrows
@@ -1498,6 +1499,113 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `unitOption should return list of coding for multiple available unit options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "mn", "months"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mn", "months"))))
+  }
+
+  @Test
+  fun `unitOption should return list with single coding for single available unit option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return empty list for no available unit option`() {
+    val question = Questionnaire.QuestionnaireItemComponent()
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(0)
+  }
+
+  @Test
+  fun `unitOption should return list with single coding when initial value of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return list with de-duplicated coding when multiple initial values of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "mo"
+              this.unit = "months"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mo", "months"))))
+  }
+
+  @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -2293,6 +2401,81 @@ class MoreQuestionnaireItemComponentsTest {
       }
 
     assertThat(questionnaireItem.dateEntryFormatOrSystemDefault).isEqualTo("y-MM-dd")
+  }
+
+  @Test
+  fun `should return empty list for empty response item list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf<QuestionnaireResponse.QuestionnaireResponseItemComponent>()
+
+    val result =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(result.size).isEqualTo(0)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and response list`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(2)
+  }
+
+  @Test
+  fun `should return non empty list for valid questionnaire item and repeated response list with same linkId`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
+  }
+
+  @Test
+  fun `should return non empty list for out of order questionnaire item and response item`() {
+    val questionnaireItemComponentList =
+      listOf(
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "1" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "3" },
+        Questionnaire.QuestionnaireItemComponent().apply { linkId = "2" },
+      )
+
+    val questionnaireResponseItemComponentList =
+      listOf(
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "3" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "2" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply { linkId = "1" },
+      )
+
+    val zipList =
+      questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
+    assertThat(zipList.size).isEqualTo(3)
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

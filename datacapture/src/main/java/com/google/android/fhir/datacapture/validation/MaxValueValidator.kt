@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +20,6 @@ import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValueAsString
-import com.google.android.fhir.datacapture.extensions.valueOrCalculateValue
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
@@ -33,22 +30,15 @@ internal object MaxValueValidator :
   AnswerExtensionConstraintValidator(
     url = MAX_VALUE_EXTENSION_URL,
     predicate = {
-      extension: Extension,
+      constraintValue: Type,
       answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
       ->
-      answer.value > extension.value?.valueOrCalculateValue()!!
+      answer.value > constraintValue
     },
-    messageGenerator = { extension: Extension, context: Context ->
+    messageGenerator = { constraintValue: Type, context: Context ->
       context.getString(
         R.string.max_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.getValueAsString(context),
+        constraintValue.getValueAsString(context),
       )
     },
-  ) {
-
-  fun getMaxValue(questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent): Type? {
-    return questionnaireItemComponent.extension
-      .firstOrNull { it.url == MAX_VALUE_EXTENSION_URL }
-      ?.let { it.value?.valueOrCalculateValue() }
-  }
-}
+  )

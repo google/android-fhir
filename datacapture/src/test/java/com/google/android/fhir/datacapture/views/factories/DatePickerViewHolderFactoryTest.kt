@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_FORMAT_URL
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -31,19 +32,20 @@ import java.time.chrono.IsoChronology
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.FormatStyle
 import java.util.Locale
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.RuntimeEnvironment
 
 @RunWith(RobolectricTestRunner::class)
 class DatePickerViewHolderFactoryTest {
   private val context =
-    RuntimeEnvironment.getApplication().apply {
+    Robolectric.buildActivity(AppCompatActivity::class.java).create().get().apply {
       setTheme(com.google.android.material.R.style.Theme_Material3_DayNight)
     }
   private val parent = FrameLayout(context)
@@ -269,9 +271,11 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.setDraftAnswer("02/07")
+    runTest {
+      questionnaireItem.setDraftAnswer("02/07")
 
-    assertThat(answers!!).isEmpty()
+      assertThat(answers!!).isEmpty()
+    }
   }
 
   @Test
@@ -296,9 +300,11 @@ class DatePickerViewHolderFactoryTest {
       )
 
     viewHolder.bind(questionnaireItem)
-    questionnaireItem.setAnswer(answer)
+    runTest {
+      questionnaireItem.setAnswer(answer)
 
-    assertThat(partialValue).isNull()
+      assertThat(partialValue).isNull()
+    }
   }
 
   @Test

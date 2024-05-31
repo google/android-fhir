@@ -91,11 +91,4 @@
         >@style/Theme.MyQuestionnaire.PaginatedLayout</item>
     </style>
 
-    <style name="Theme.Androidfhir.Component">
-        <!-- Customize theme for questionnaires in this application. -->
-        <item
-            name="questionnaire_theme"
-        >@style/Theme.MyQuestionnaire.PaginatedLayout.Component</item>
-    </style>
-
 </resources>

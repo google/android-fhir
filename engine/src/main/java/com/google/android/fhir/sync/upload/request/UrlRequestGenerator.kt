@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchMapping
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -29,8 +30,15 @@ internal class UrlRequestGenerator(
   private val getUrlRequestForPatch: (patch: Patch) -> UrlUploadRequest,
 ) : UploadRequestGenerator {
 
-  override fun generateUploadRequests(patches: List<Patch>): List<UrlUploadRequest> =
-    patches.map { getUrlRequestForPatch(it) }
+  override fun generateUploadRequests(
+    mappedPatches: List<PatchMapping>,
+  ): List<UrlUploadRequestMapping> =
+    mappedPatches.map {
+      UrlUploadRequestMapping(
+        localChanges = it.localChanges,
+        generatedRequest = getUrlRequestForPatch(it.generatedPatch),
+      )
+    }
 
   companion object Factory {
 

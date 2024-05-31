@@ -16,16 +16,14 @@
 
 package com.google.android.fhir.sync.upload.request
 
-import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
-import com.google.android.fhir.sync.upload.patch.Patch
+import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
+import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.updateLocalChange
 import com.google.common.truth.Truth.assertThat
-import java.time.Instant
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Binary
-import org.hl7.fhir.r4.model.HumanName
-import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,8 +31,6 @@ import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class IndividualGeneratorTest {
-
-  private val jsonParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
   @Test
   fun `should return empty list if there are no local changes`() = runTest {
@@ -46,179 +42,99 @@ class IndividualGeneratorTest {
   @Test
   fun `should create a POST request for insert`() = runTest {
     val generator = UrlRequestGenerator.getGenerator(HttpVerb.POST, HttpVerb.PATCH)
+    val patchOutput =
+      PatchMapping(
+        localChanges = listOf(insertionLocalChange),
+        generatedPatch = insertionLocalChange.toPatch(),
+      )
     val requests =
       generator.generateUploadRequests(
-        listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Patch.Type.INSERT,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    },
-                  )
-                },
-              ),
-            timestamp = Instant.now(),
-          ),
-        ),
+        listOf(patchOutput),
       )
 
     with(requests.single()) {
-      assertThat(httpVerb).isEqualTo(HttpVerb.POST)
-      assertThat(url).isEqualTo("Patient")
+      with(generatedRequest) {
+        assertThat(httpVerb).isEqualTo(HttpVerb.POST)
+        assertThat(url).isEqualTo("Patient")
+      }
+
+      assertThat(localChanges).isEqualTo(patchOutput.localChanges)
     }
   }
 
   @Test
   fun `should create a PUT request for insert`() = runTest {
     val generator = UrlRequestGenerator.getDefault()
+    val patchOutput =
+      PatchMapping(
+        localChanges = listOf(insertionLocalChange),
+        generatedPatch = insertionLocalChange.toPatch(),
+      )
     val requests =
       generator.generateUploadRequests(
-        listOf(
-          Patch(
-            resourceType = ResourceType.Patient.name,
-            resourceId = "Patient-001",
-            type = Patch.Type.INSERT,
-            payload =
-              jsonParser.encodeResourceToString(
-                Patient().apply {
-                  id = "Patient-001"
-                  addName(
-                    HumanName().apply {
-                      addGiven("John")
-                      family = "Doe"
-                    },
-                  )
-                },
-              ),
-            timestamp = Instant.now(),
-          ),
-        ),
+        listOf(patchOutput),
       )
 
     with(requests.single()) {
-      assertThat(httpVerb).isEqualTo(HttpVerb.PUT)
-      assertThat(url).isEqualTo("Patient/Patient-001")
+      with(generatedRequest) {
+        assertThat(httpVerb).isEqualTo(HttpVerb.PUT)
+        assertThat(url).isEqualTo("Patient/Patient-001")
+      }
+      assertThat(localChanges).isEqualTo(patchOutput.localChanges)
     }
   }
 
   @Test
   fun `should create a PATCH request for update`() = runTest {
-    val patches =
-      listOf(
-        Patch(
-          resourceType = ResourceType.Patient.name,
-          resourceId = "Patient-002",
-          type = Patch.Type.UPDATE,
-          payload =
-            "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now(),
-        ),
+    val patchOutput =
+      PatchMapping(
+        localChanges = listOf(updateLocalChange),
+        generatedPatch = updateLocalChange.toPatch(),
       )
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val requests = generator.generateUploadRequests(patches)
+    val requests = generator.generateUploadRequests(listOf(patchOutput))
     with(requests.single()) {
-      assertThat(requests.size).isEqualTo(1)
-      assertThat(httpVerb).isEqualTo(HttpVerb.PATCH)
-      assertThat(url).isEqualTo("Patient/Patient-002")
-      assertThat((resource as Binary).data.toString(Charsets.UTF_8))
-        .isEqualTo(
-          "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-        )
+      with(generatedRequest) {
+        assertThat(requests.size).isEqualTo(1)
+        assertThat(httpVerb).isEqualTo(HttpVerb.PATCH)
+        assertThat(url).isEqualTo("Patient/Patient-001")
+        assertThat((resource as Binary).data.toString(Charsets.UTF_8))
+          .isEqualTo(
+            "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
+          )
+      }
+      assertThat(localChanges).isEqualTo(patchOutput.localChanges)
     }
   }
 
   @Test
   fun `should create a DELETE request for delete`() = runTest {
-    val patches =
-      listOf(
-        Patch(
-          resourceType = ResourceType.Patient.name,
-          resourceId = "Patient-001",
-          type = Patch.Type.DELETE,
-          payload =
-            jsonParser.encodeResourceToString(
-              Patient().apply {
-                id = "Patient-001"
-                addName(
-                  HumanName().apply {
-                    addGiven("John")
-                    family = "Doe"
-                  },
-                )
-              },
-            ),
-          timestamp = Instant.now(),
-        ),
+    val patchOutput =
+      PatchMapping(
+        localChanges = listOf(deleteLocalChange),
+        generatedPatch = deleteLocalChange.toPatch(),
       )
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val requests = generator.generateUploadRequests(patches)
+    val requests = generator.generateUploadRequests(listOf(patchOutput))
     with(requests.single()) {
-      assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
-      assertThat(url).isEqualTo("Patient/Patient-001")
+      with(generatedRequest) {
+        assertThat(httpVerb).isEqualTo(HttpVerb.DELETE)
+        assertThat(url).isEqualTo("Patient/Patient-001")
+      }
+      assertThat(localChanges).isEqualTo(patchOutput.localChanges)
     }
   }
 
   @Test
   fun `should return multiple requests in order`() = runTest {
-    val patches =
-      listOf(
-        Patch(
-          resourceType = ResourceType.Patient.name,
-          resourceId = "Patient-001",
-          type = Patch.Type.INSERT,
-          payload =
-            jsonParser.encodeResourceToString(
-              Patient().apply {
-                id = "Patient-001"
-                addName(
-                  HumanName().apply {
-                    addGiven("John")
-                    family = "Doe"
-                  },
-                )
-              },
-            ),
-          timestamp = Instant.now(),
-        ),
-        Patch(
-          resourceType = ResourceType.Patient.name,
-          resourceId = "Patient-002",
-          type = Patch.Type.UPDATE,
-          payload =
-            "[{\"op\":\"replace\",\"path\":\"\\/name\\/0\\/given\\/0\",\"value\":\"Janet\"}]",
-          timestamp = Instant.now(),
-        ),
-        Patch(
-          resourceType = ResourceType.Patient.name,
-          resourceId = "Patient-003",
-          type = Patch.Type.DELETE,
-          payload =
-            jsonParser.encodeResourceToString(
-              Patient().apply {
-                id = "Patient-003"
-                addName(
-                  HumanName().apply {
-                    addGiven("John")
-                    family = "Roe"
-                  },
-                )
-              },
-            ),
-          timestamp = Instant.now(),
-        ),
-      )
+    val patchOutputList =
+      listOf(insertionLocalChange, updateLocalChange, deleteLocalChange).map {
+        PatchMapping(listOf(it), it.toPatch())
+      }
     val generator = UrlRequestGenerator.Factory.getDefault()
-    val result = generator.generateUploadRequests(patches)
+    val result = generator.generateUploadRequests(patchOutputList)
     assertThat(result).hasSize(3)
-    assertThat(result.map { it.httpVerb })
+    assertThat(result.map { it.generatedRequest.httpVerb })
       .containsExactly(HttpVerb.PUT, HttpVerb.PATCH, HttpVerb.DELETE)
       .inOrder()
   }

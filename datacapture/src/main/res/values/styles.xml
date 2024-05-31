@@ -107,7 +107,7 @@
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
-        <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
+        <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
         </item>
         <item name="questionnaireErrorTextStyle">
             @style/Questionnaire.ErrorStyle
@@ -227,12 +227,6 @@
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">
       <item name="android:background">?attr/colorSurface</item>
-      <item
-            name="android:paddingTop"
-        >@dimen/bottom_container_padding_vertical</item>
-      <item
-            name="android:paddingBottom"
-        >@dimen/bottom_container_padding_vertical</item>
     </style>
 
     <style
@@ -396,14 +390,21 @@
         parent="Widget.Material3.Button"
     >
         <item name="android:textAllCaps">false</item>
-        <item name="android:visibility">visible</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
     <style
         name="Questionnaire.CancelButtonStyle"
-        parent="Widget.Material3.Button.OutlinedButton"
+        parent="Widget.Material3.Button.TextButton"
     >
         <item name="android:textAllCaps">false</item>
-        <item name="android:visibility">visible</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Questionnaire.ButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style

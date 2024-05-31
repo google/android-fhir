@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,6 +45,9 @@ import org.hl7.fhir.r4.model.Patient
 
 class DemoQuestionnaireFragment : Fragment() {
   private val viewModel: DemoQuestionnaireViewModel by viewModels()
+  private val componentListViewModel: ComponentListViewModel by viewModels()
+  private val behaviorListViewModel: BehaviorListViewModel by viewModels()
+  private val layoutListViewModel: LayoutListViewModel by viewModels()
   private val args: DemoQuestionnaireFragmentArgs by navArgs()
   private var isErrorState = false
   private lateinit var infoCard: MaterialCardView
@@ -56,7 +59,7 @@ class DemoQuestionnaireFragment : Fragment() {
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
-    requireContext().setTheme(getThemeId())
+    requireContext().setTheme(getThemeId(args.questionnaireTitleKey))
     return inflater.inflate(R.layout.fragment_demo_questionnaire, container, false)
   }
 
@@ -137,7 +140,13 @@ class DemoQuestionnaireFragment : Fragment() {
           setReorderingAllowed(true)
           val questionnaireFragment =
             QuestionnaireFragment.builder()
-              .apply { setQuestionnaire(args.questionnaireJsonStringKey!!) }
+              .apply {
+                setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
+                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                    .LOCATION_WIDGET_PROVIDER,
+                )
+                setQuestionnaire(args.questionnaireJsonStringKey!!)
+              }
               .build()
           add(R.id.container, questionnaireFragment, QUESTIONNAIRE_FRAGMENT_TAG)
         }
@@ -174,6 +183,9 @@ class DemoQuestionnaireFragment : Fragment() {
                 .encodeResourceToString(Patient().apply { id = "P1" })
                 .let { mapOf("patient" to it) },
             )
+            .setSubmitButtonText(
+              getString(com.google.android.fhir.datacapture.R.string.submit_questionnaire),
+            )
             .build(),
           QUESTIONNAIRE_FRAGMENT_TAG,
         )
@@ -181,28 +193,37 @@ class DemoQuestionnaireFragment : Fragment() {
     }
   }
 
-  private fun getThemeId(): Int {
-    return when (args.workflow) {
-      WorkflowType.DEFAULT -> R.style.Theme_Androidfhir_DefaultLayout
-      WorkflowType.COMPONENT,
-      WorkflowType.BEHAVIOR, -> R.style.Theme_Androidfhir_Component
-      WorkflowType.PAGINATED -> R.style.Theme_Androidfhir_PaginatedLayout
+  private fun getThemeId(title: String) =
+    if (
+      layoutListViewModel.isPaginatedLayout(requireContext(), title) ||
+        componentListViewModel.isComponent(requireContext(), title) ||
+        behaviorListViewModel.isBehavior(requireContext(), title)
+    ) {
+      R.style.Theme_Androidfhir_PaginatedLayout
+    } else {
+      R.style.Theme_Androidfhir_DefaultLayout
     }
-  }
 
-  private fun getMenu(): Int? {
-    return when (args.workflow) {
-      WorkflowType.COMPONENT -> R.menu.component_menu
-      else -> null
+  private fun getMenu(): Int? =
+    if (
+      componentListViewModel.isComponent(
+        requireContext(),
+        args.questionnaireTitleKey!!,
+      )
+    ) {
+      R.menu.component_menu
+    } else {
+      null
     }
-  }
 
   private fun onSubmitQuestionnaireClick() {
-    val questionnaireFragment =
-      childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
-    launchQuestionnaireResponseFragment(
-      viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
-    )
+    lifecycleScope.launch {
+      val questionnaireFragment =
+        childFragmentManager.findFragmentByTag(QUESTIONNAIRE_FRAGMENT_TAG) as QuestionnaireFragment
+      launchQuestionnaireResponseFragment(
+        viewModel.getQuestionnaireResponseJson(questionnaireFragment.getQuestionnaireResponse()),
+      )
+    }
   }
 
   private fun launchQuestionnaireResponseFragment(response: String) {
@@ -225,11 +246,4 @@ class DemoQuestionnaireFragment : Fragment() {
   companion object {
     const val QUESTIONNAIRE_FRAGMENT_TAG = "questionnaire-fragment-tag"
   }
-}
-
-enum class WorkflowType {
-  COMPONENT,
-  DEFAULT,
-  PAGINATED,
-  BEHAVIOR,
 }

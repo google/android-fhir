@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,17 +22,19 @@ import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object RequiredValidator : QuestionnaireResponseItemConstraintValidator {
-  override fun validate(
+  override suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-    answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
+    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
-  ): QuestionnaireResponseItemConstraintValidator.Result {
-    if (!questionnaireItem.required || answers.any { it.hasValue() }) {
-      return QuestionnaireResponseItemConstraintValidator.Result(true, null)
+  ): List<ConstraintValidator.Result> {
+    if (!questionnaireItem.required || questionnaireResponseItem.answer.any { it.hasValue() }) {
+      return listOf(ConstraintValidator.Result(true, null))
     }
-    return QuestionnaireResponseItemConstraintValidator.Result(
-      false,
-      context.getString(R.string.required_constraint_validation_error_msg),
+    return listOf(
+      ConstraintValidator.Result(
+        false,
+        context.getString(R.string.required_constraint_validation_error_msg),
+      ),
     )
   }
 }

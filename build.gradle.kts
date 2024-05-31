@@ -7,6 +7,7 @@ buildscript {
   }
   dependencies {
     classpath(Plugins.androidGradlePlugin)
+    classpath(Plugins.kspGradlePlugin)
     classpath(Plugins.benchmarkGradlePlugin)
     classpath(Plugins.flankGradlePlugin)
     classpath(Plugins.kotlinGradlePlugin)

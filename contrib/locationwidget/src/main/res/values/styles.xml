@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <style
+        name="Questionnaire.LocationWidgetButtonStyle"
+        parent="Widget.Material3.Button.TextButton.Icon"
+    >
+        <item name="android:drawableLeft">@drawable/gm_location_on_24</item>
+        <item name="android:drawableTint">?attr/colorPrimary</item>
+        <item name="android:textColor">?attr/colorPrimary</item>
+        <item name="android:textAllCaps">true</item>
+        <item name="android:text">@string/record_gps_location</item>
+        <item name="iconTint">?attr/colorPrimary</item>
+    </style>
+</resources>

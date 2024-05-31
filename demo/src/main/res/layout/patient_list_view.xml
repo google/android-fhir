@@ -25,7 +25,7 @@
     <TextView
         android:id="@+id/patient_count"
         android:text="0 Patients"
-        android:layout_centerHorizontal="true"
+        android:layout_marginStart="@dimen/patient_count_start_margin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
     />
@@ -36,8 +36,6 @@
         android:name="com.google.fhirengine.example.PatientListFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         android:scrollbars="vertical"
         app:layoutManager="LinearLayoutManager"
         tools:context=".PatientListActivity"

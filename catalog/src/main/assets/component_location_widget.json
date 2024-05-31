@@ -1,0 +1,52 @@
+{
+  "resourceType": "Questionnaire",
+  "language": "en",
+  "status": "active",
+  "date": "2020-11-18T07:24:47.111Z",
+  "item": [
+    {
+      "linkId": "location-widget",
+      "type": "group",
+      "text": "Location Widget",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "https://github.com/google/android-fhir/questionnaire-item-control",
+                "code": "location-widget"
+              }
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "linkId": "latitude",
+          "type": "decimal",
+          "required": true,
+          "text": "Latitude",
+          "extension": [
+            {
+              "url": "gps-coordinate",
+              "valueString": "latitude"
+            }
+          ]
+        },
+        {
+          "linkId": "longitude",
+          "type": "decimal",
+          "required": true,
+          "text": "Longitude",
+          "extension": [
+            {
+              "url": "gps-coordinate",
+              "valueString": "longitude"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
