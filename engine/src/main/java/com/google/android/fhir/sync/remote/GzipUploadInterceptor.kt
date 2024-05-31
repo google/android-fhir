@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import okio.buffer
 const val CONTENT_ENCODING_HEADER_NAME = "Content-Encoding"
 
 /** Compresses upload requests with gzip. */
-internal object GzipUploadInterceptor : Interceptor {
+object GzipUploadInterceptor : Interceptor {
   override fun intercept(chain: Interceptor.Chain): Response {
     val uncompressedRequest = chain.request()
     if (uncompressedRequest.body == null) {
