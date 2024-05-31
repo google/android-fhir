@@ -2479,7 +2479,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun testQuestionnaireItemComponentIsRepeatedGroup() {
+  fun `test questionnaireItemComponent is repeatedGroup`() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "1"
@@ -2491,11 +2491,11 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun testQuestionnaireItemComponentIsNotRepeatedGroup() {
+  fun `test questionnaireItemComponent is not RepeatedGroup`() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "1"
-        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        type = Questionnaire.QuestionnaireItemType.GROUP
         repeats = false
       }
 

@@ -628,17 +628,12 @@ class QuestionnaireUiEspressoTest {
       if (noViewFoundException != null) {
         throw noViewFoundException
       }
-      val recyclerView = view as RecyclerView
-      var count = 0
-      for (i in 0 until recyclerView.adapter!!.itemCount) {
-        val holder = recyclerView.findViewHolderForAdapterPosition(i)
-        if (
-          holder?.itemView?.findViewById<View>(R.id.repeated_group_instance_header_title) != null
-        ) {
-          count++
-        }
-      }
-      assertThat(count).isEqualTo(1)
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(1)
     }
   }
 
@@ -667,18 +662,24 @@ class QuestionnaireUiEspressoTest {
       if (noViewFoundException != null) {
         throw noViewFoundException
       }
-      val recyclerView = view as RecyclerView
-      var count = 0
-      for (i in 0 until recyclerView.adapter!!.itemCount) {
-        val holder = recyclerView.findViewHolderForAdapterPosition(i)
-        if (
-          holder?.itemView?.findViewById<View>(R.id.repeated_group_instance_header_title) != null
-        ) {
-          count++
-        }
-      }
-      assertThat(count).isEqualTo(0)
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(0)
     }
+  }
+
+  private fun RecyclerView.countChildViewOccurrences(viewId: Int): Int {
+    var count = 0
+    for (i in 0 until this.adapter!!.itemCount) {
+      val holder = findViewHolderForAdapterPosition(i)
+      if (holder?.itemView?.findViewById<View>(viewId) != null) {
+        count++
+      }
+    }
+    return count
   }
 
   private fun clickChildViewWithId(id: Int) =
