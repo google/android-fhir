@@ -118,7 +118,7 @@ jobs:
 
       - name: Setup GitHub Pages
         if: ${{ github.event_name == 'push' }}
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5
 
       - name: Upload site/ directory as GitHub Pages artifact
         if: ${{ github.event_name == 'push' }}
