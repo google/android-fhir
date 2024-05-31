@@ -20,12 +20,18 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.commitNow
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -50,8 +56,7 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.Calendar
-import java.util.Date
+import java.util.*
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
@@ -603,6 +608,89 @@ class QuestionnaireUiEspressoTest {
       assertThat(linearProgressIndicator.visibility).isEqualTo(View.VISIBLE)
     }
   }
+
+  @Test
+  fun test_repeated_group_is_added() {
+    buildFragmentFromQuestionnaire("/component_repeated_group.json")
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          0,
+          clickChildViewWithId(R.id.add_item),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      val recyclerView = view as RecyclerView
+      var count = 0
+      for (i in 0 until recyclerView.adapter!!.itemCount) {
+        val holder = recyclerView.findViewHolderForAdapterPosition(i)
+        if (
+          holder?.itemView?.findViewById<View>(R.id.repeated_group_instance_header_title) != null
+        ) {
+          count++
+        }
+      }
+      assertThat(count).isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_is_deleted() {
+    buildFragmentFromQuestionnaire("/component_repeated_group.json")
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          0,
+          clickChildViewWithId(R.id.add_item),
+        ),
+      )
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          1,
+          clickChildViewWithId(R.id.repeated_group_instance_header_delete_button),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      val recyclerView = view as RecyclerView
+      var count = 0
+      for (i in 0 until recyclerView.adapter!!.itemCount) {
+        val holder = recyclerView.findViewHolderForAdapterPosition(i)
+        if (
+          holder?.itemView?.findViewById<View>(R.id.repeated_group_instance_header_title) != null
+        ) {
+          count++
+        }
+      }
+      assertThat(count).isEqualTo(0)
+    }
+  }
+
+  private fun clickChildViewWithId(id: Int) =
+    object : ViewAction {
+      override fun getConstraints() = isAssignableFrom(View::class.java)
+
+      override fun getDescription() = "Click on a child view with specified id."
+
+      override fun perform(uiController: UiController?, view: View) {
+        view.findViewById<View>(id)?.performClick()
+      }
+    }
 
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
