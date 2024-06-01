@@ -174,12 +174,10 @@ internal class DatabaseImpl(
   }
 
   override suspend fun select(type: ResourceType, id: String): Resource {
-    return db.withTransaction {
-      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-        iParser.parseResource(it)
-      }
-        ?: throw ResourceNotFoundException(type.name, id)
-    } as Resource
+    return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+      iParser.parseResource(it) as Resource
+    }
+      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun insertSyncedResources(resources: List<Resource>) {
