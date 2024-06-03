@@ -31,9 +31,9 @@ import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.download.BundleDownloadRequest
 import com.google.android.fhir.sync.download.DownloadRequest
 import com.google.android.fhir.sync.download.UrlDownloadRequest
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.sync.upload.request.BundleUploadRequest
 import com.google.android.fhir.sync.upload.request.UploadRequest
 import com.google.android.fhir.sync.upload.request.UrlUploadRequest
@@ -55,21 +55,21 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
 import org.json.JSONObject
 
-val jsonParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+internal val jsonParser: IParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
 /** Asserts that the `expected` and the `actual` FHIR resources are equal. */
-fun assertResourceEquals(expected: Resource?, actual: Resource?) {
+internal fun assertResourceEquals(expected: Resource?, actual: Resource?) {
   assertThat(jsonParser.encodeResourceToString(actual))
     .isEqualTo(jsonParser.encodeResourceToString(expected))
 }
 
 /** Asserts that the `expected` and the `actual` FHIR resources are not equal. */
-fun assertResourceNotEquals(expected: Resource?, actual: Resource?) {
+internal fun assertResourceNotEquals(expected: Resource?, actual: Resource?) {
   assertThat(jsonParser.encodeResourceToString(actual))
     .isNotEqualTo(jsonParser.encodeResourceToString(expected))
 }
 
-fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
+internal fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
   assertThat(actual.length()).isEqualTo(expected.length())
   val actuals = mutableListOf<String>()
   val expecteds = mutableListOf<String>()
@@ -83,7 +83,7 @@ fun assertJsonArrayEqualsIgnoringOrder(actual: JSONArray, expected: JSONArray) {
 }
 
 /** Reads a [Resource] from given file in the `sampledata` dir */
-fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
+internal fun <R : Resource> readFromFile(clazz: Class<R>, filename: String): R {
   val resourceJson = readJsonFromFile(filename)
   return jsonParser.parseResource(clazz, resourceJson.toString()) as R
 }
@@ -96,13 +96,13 @@ private fun readJsonFromFile(filename: String): JSONObject {
 }
 
 /** Reads a [JSONArray] from given file in the `sampledata` dir */
-fun readJsonArrayFromFile(filename: String): JSONArray {
+internal fun readJsonArrayFromFile(filename: String): JSONArray {
   val inputStream = {}.javaClass.getResourceAsStream(filename)
   val content = inputStream!!.bufferedReader(Charsets.UTF_8).readText()
   return JSONArray(content)
 }
 
-object TestDataSourceImpl : DataSource {
+internal object TestDataSourceImpl : DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest) =
     when (downloadRequest) {
@@ -120,7 +120,7 @@ object TestDataSourceImpl : DataSource {
   }
 }
 
-open class TestDownloadManagerImpl(
+internal open class TestDownloadManagerImpl(
   private val queries: List<String> = listOf("Patient?address-city=NAIROBI"),
 ) : DownloadWorkManager {
   private val urls = LinkedList(queries)
@@ -141,7 +141,7 @@ open class TestDownloadManagerImpl(
   }
 }
 
-object TestFhirEngineImpl : FhirEngine {
+internal object TestFhirEngineImpl : FhirEngine {
   override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
   override suspend fun update(vararg resource: Resource) {}
@@ -157,7 +157,7 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
+    uploadStrategy: UploadStrategy,
     upload: suspend (List<LocalChange>) -> Flow<UploadRequestResult>,
   ): Flow<SyncUploadProgress> = flow {
     emit(SyncUploadProgress(1, 1))
@@ -191,8 +191,8 @@ object TestFhirEngineImpl : FhirEngine {
       LocalChange(
         resourceType = type.name,
         resourceId = id,
-        payload = "{ 'resourceType' : '$type', 'id' : '$id' }",
-        token = LocalChangeToken(listOf()),
+        payload = """{ "resourceType" : "$type", "id" : "$id" }""",
+        token = LocalChangeToken(listOf(1)),
         type = LocalChange.Type.INSERT,
         timestamp = Instant.now(),
       ),
@@ -200,9 +200,11 @@ object TestFhirEngineImpl : FhirEngine {
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}
+
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {}
 }
 
-object TestFailingDatasource : DataSource {
+internal object TestFailingDatasource : DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest) =
     when (downloadRequest) {
@@ -221,7 +223,8 @@ object TestFailingDatasource : DataSource {
   }
 }
 
-class BundleDataSource(val onPostBundle: suspend (BundleUploadRequest) -> Resource) : DataSource {
+internal class BundleDataSource(val onPostBundle: suspend (BundleUploadRequest) -> Resource) :
+  DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest): Resource {
     TODO("Not yet implemented")
@@ -231,7 +234,7 @@ class BundleDataSource(val onPostBundle: suspend (BundleUploadRequest) -> Resour
     onPostBundle((request as BundleUploadRequest))
 }
 
-class UrlRequestDataSource(val onUrlRequestSend: suspend (UrlUploadRequest) -> Resource) :
+internal class UrlRequestDataSource(val onUrlRequestSend: suspend (UrlUploadRequest) -> Resource) :
   DataSource {
 
   override suspend fun download(downloadRequest: DownloadRequest): Resource {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,16 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 
 /**
- * Validates [QuestionnaireResponse.QuestionnaireResponseItemComponent] against a particular
+ * Validates [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent] against a particular
  * constraint.
  */
-internal interface AnswerConstraintValidator {
+internal interface AnswerConstraintValidator : ConstraintValidator {
   /**
    * Validates whether the [answer] satisfies any constraints of the [questionnaireItem] according
    * to the [Structured Data Capture Implementation Guide]
@@ -35,15 +37,10 @@ internal interface AnswerConstraintValidator {
    *
    * [Learn more](https://www.hl7.org/fhir/questionnaireresponse.html#link).
    */
-  fun validate(
+  suspend fun validate(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
     context: Context,
-  ): Result
-
-  /**
-   * The validation result containing whether the answer is valid and any error message if it is not
-   * valid.
-   */
-  data class Result(val isValid: Boolean, val errorMessage: String?)
+    expressionEvaluator: suspend (Expression) -> Type?,
+  ): ConstraintValidator.Result
 }

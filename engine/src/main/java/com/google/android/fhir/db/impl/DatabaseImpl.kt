@@ -26,6 +26,7 @@ import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
@@ -382,29 +383,43 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
     db.withTransaction {
-      // To check resource is present in DB else throw ResourceNotFoundException()
-      selectEntity(type, id)
-      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
-      // If local change is not available simply delete resource
-      if (localChangeEntityList.isEmpty()) {
-        resourceDao.deleteResource(resourceId = id, resourceType = type)
-      } else {
-        // local change is available with FORCE_PURGE the delete resource and discard changes from
-        // localChangeEntity table
-        if (forcePurge) {
+      ids.forEach { id ->
+        // To check resource is present in DB else throw ResourceNotFoundException()
+        selectEntity(type, id)
+        val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
+        // If local change is not available simply delete resource
+        if (localChangeEntityList.isEmpty()) {
           resourceDao.deleteResource(resourceId = id, resourceType = type)
-          localChangeDao.discardLocalChanges(
-            token = LocalChangeToken(localChangeEntityList.map { it.id }),
-          )
         } else {
-          // local change is available but FORCE_PURGE = false then throw exception
-          throw IllegalStateException(
-            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
-          )
+          // local change is available with FORCE_PURGE the delete resource and discard changes from
+          // localChangeEntity table
+          if (forcePurge) {
+            resourceDao.deleteResource(resourceId = id, resourceType = type)
+            localChangeDao.discardLocalChanges(
+              token = LocalChangeToken(localChangeEntityList.map { it.id }),
+            )
+          } else {
+            // local change is available but FORCE_PURGE = false then throw exception
+            throw IllegalStateException(
+              "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
+            )
+          }
         }
       }
+    }
+  }
+
+  override suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference> {
+    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
+      LocalChangeResourceReference(
+        it.localChangeId,
+        it.resourceReferenceValue,
+        it.resourceReferencePath,
+      )
     }
   }
 
@@ -429,7 +444,7 @@ internal class DatabaseImpl(
   }
 }
 
-data class DatabaseConfig(
+internal data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
   val databaseErrorStrategy: DatabaseErrorStrategy,
