@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ internal fun isValidDateOnly(date: String) =
  * The logical (unqualified) part of the ID. For example, if the ID is
  * "http://example.com/fhir/Patient/123/_history/456", then this value would be "123".
  */
-val Resource.logicalId: String
+internal val Resource.logicalId: String
   get() {
     return this.idElement?.idPart.orEmpty()
   }
@@ -62,14 +62,14 @@ val Resource.logicalId: String
  * operation success/failure. TODO: pass along the HTTP result (or any other signal) to determine
  * the outcome of an instance level RESTful operation.
  */
-fun Resource.isUploadSuccess(): Boolean {
+internal fun Resource.isUploadSuccess(): Boolean {
   if (!this.resourceType.equals(ResourceType.OperationOutcome)) return false
   val outcome: OperationOutcome = this as OperationOutcome
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
 }
 
-class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
+internal class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
   override fun write(out: JsonWriter, value: OffsetDateTime) {
     out.value(DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(value))
   }
@@ -78,7 +78,7 @@ class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
 }
 
 /** Url for the UCUM system of measures. */
-const val ucumUrl = "http://unitsofmeasure.org"
+internal const val ucumUrl = "http://unitsofmeasure.org"
 
 internal fun percentOf(value: Number, total: Number) =
   if (total == 0) 0.0 else value.toDouble() / total.toDouble()
