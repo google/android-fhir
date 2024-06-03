@@ -87,6 +87,7 @@ internal abstract class ResourceDao {
           resourceId = updatedResource.logicalId,
           serializedResource = iParser.encodeResourceToString(updatedResource),
           lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
+          versionId = updatedResource.meta.versionId,
         )
       updateChanges(entity, updatedResource)
     }
