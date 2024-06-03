@@ -45,7 +45,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
  * http://hl7.org/fhir/R4/search.html
  */
-object XFhirQueryTranslator {
+internal object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
   private val searchParamProvider =

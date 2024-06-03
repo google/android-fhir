@@ -135,7 +135,7 @@ object FhirEngineProvider {
  * `enableEncryptionIfSupported` is true, the FHIR SDK will only enable database encryption on
  * supported devices.
  *
- * WARNING: If database encryption is enabled, devices that are on API 22 (Android 5.1) or lower
+ * **WARNING:** If database encryption is enabled, devices that are on API 22 (Android 5.1) or lower
  * will have an unencrypted database. If those devices are later updated to API 23 or newer, they
  * will encounter an `IllegalStateException`. This is because the database was created without
  * encryption on the older API level, and enabling encryption in the new release will not
@@ -153,11 +153,10 @@ object FhirEngineProvider {
  *   engine with the Search API. These are in addition to the default
  *   [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html) defined in the FHIR
  *   specification. Custom search parameters must be unique and not change existing or default
- *   search parameters.
- *
- * Note: The engine does not automatically reindex resources after new custom search parameters are
- * added. You must manually reindex resources by updating them. Any new CRUD operations on a
- * resource after adding new search parameters will automatically trigger reindexing.
+ *   search parameters.<p> **Note:** The engine does not automatically reindex resources after new
+ *   custom search parameters are added. You must manually reindex resources by updating them. Any
+ *   new CRUD operations on a resource after adding new search parameters will automatically trigger
+ *   reindexing.
  */
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
@@ -167,6 +166,7 @@ data class FhirEngineConfiguration(
   val customSearchParameters: List<SearchParameter>? = null,
 )
 
+/** How database errors should be handled. */
 enum class DatabaseErrorStrategy {
   /**
    * If unspecified, all database errors will be propagated to the call site. The caller shall
