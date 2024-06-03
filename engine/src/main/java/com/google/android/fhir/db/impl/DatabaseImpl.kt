@@ -31,6 +31,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.LocalChangeDao.Companion.SQLITE_IN_OPERATOR_VARIABLE_LIMIT
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
@@ -414,12 +415,14 @@ internal class DatabaseImpl(
   override suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference> {
-    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
-      LocalChangeResourceReference(
-        it.localChangeId,
-        it.resourceReferenceValue,
-        it.resourceReferencePath,
-      )
+    return localChangeIds.chunked(SQLITE_IN_OPERATOR_VARIABLE_LIMIT).flatMap { chunk ->
+      localChangeDao.getReferencesForLocalChanges(chunk).map {
+        LocalChangeResourceReference(
+          it.localChangeId,
+          it.resourceReferenceValue,
+          it.resourceReferencePath,
+        )
+      }
     }
   }
 

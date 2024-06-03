@@ -412,7 +412,10 @@ internal abstract class LocalChangeDao {
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
     val referringLocalChangeIds =
       getLocalChangeReferencesWithValue(oldReferenceValue).map { it.localChangeId }.distinct()
-    val referringLocalChanges = getLocalChanges(referringLocalChangeIds)
+    val referringLocalChanges =
+      referringLocalChangeIds.chunked(SQLITE_IN_OPERATOR_VARIABLE_LIMIT).flatMap {
+        getLocalChanges(it)
+      }
 
     referringLocalChanges.forEach { existingLocalChangeEntity ->
       val updatedLocalChangeEntity =
@@ -498,6 +501,7 @@ internal abstract class LocalChangeDao {
 
   companion object {
     const val DEFAULT_ID_VALUE = 0L
+    const val SQLITE_IN_OPERATOR_VARIABLE_LIMIT = 999
   }
 }
 
