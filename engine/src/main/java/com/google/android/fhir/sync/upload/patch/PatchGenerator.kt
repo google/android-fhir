@@ -20,8 +20,8 @@ import com.google.android.fhir.LocalChange
 import com.google.android.fhir.db.Database
 
 /**
- * Generates [Patch]es from [LocalChange]s and output [List<[OrderedMapping]>] to keep a mapping of
- * the [LocalChange]s to their corresponding generated [Patch]
+ * Generates [Patch]es from [LocalChange]s and output [List<[PatchMappingGroup]>] to keep a mapping
+ * of the [LocalChange]s to their corresponding generated [Patch]
  *
  * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
  * together with other components in the upload package to fulfill a specific upload strategy.
@@ -35,7 +35,7 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  suspend fun generate(localChanges: List<LocalChange>): List<OrderedMapping>
+  suspend fun generate(localChanges: List<LocalChange>): List<PatchMappingGroup>
 }
 
 internal object PatchGeneratorFactory {
@@ -69,18 +69,18 @@ internal data class PatchMapping(
 )
 
 /** Structure to help describe the cyclic nature of ordered [PatchMapping]. */
-internal sealed interface OrderedMapping {
+internal sealed interface PatchMappingGroup {
 
   /**
-   * [IndividualMapping] doesn't have a cyclic dependency on other [IndividualMapping] /
-   * [PatchMapping]. It may however have an acyclic dependency on other [IndividualMapping]s /
+   * [IndividualMappingGroup] doesn't have a cyclic dependency on other [IndividualMappingGroup] /
+   * [PatchMapping]. It may however have an acyclic dependency on other [IndividualMappingGroup]s /
    * [PatchMapping]s.
    */
-  data class IndividualMapping(val patchMapping: PatchMapping) : OrderedMapping
+  data class IndividualMappingGroup(val patchMapping: PatchMapping) : PatchMappingGroup
 
   /**
-   * [CombinedMapping] contains weakly connected [PatchMapping]s where one or more [PatchMapping]s
-   * have a cyclic dependency between each other.
+   * [CombinedMappingGroup] contains strongly connected [PatchMapping]s where one or more
+   * [PatchMapping]s have a cyclic dependency between each other.
    */
-  data class CombinedMapping(val patchMappings: List<PatchMapping>) : OrderedMapping
+  data class CombinedMappingGroup(val patchMappings: List<PatchMapping>) : PatchMappingGroup
 }

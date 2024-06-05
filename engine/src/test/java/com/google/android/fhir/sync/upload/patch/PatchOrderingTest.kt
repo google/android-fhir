@@ -185,7 +185,7 @@ class PatchOrderingTest {
     // we have a different implementation of the topological sort.
     assertThat(
         result.map {
-          (it as OrderedMapping.IndividualMapping).patchMapping.generatedPatch.resourceId
+          (it as PatchMappingGroup.IndividualMappingGroup).patchMapping.generatedPatch.resourceId
         },
       )
       .containsExactly(
@@ -230,11 +230,11 @@ class PatchOrderingTest {
 
       val result = patchGenerator.generate(helper.localChanges)
 
-      assertThat(result.filterIsInstance<OrderedMapping.CombinedMapping>()).hasSize(2)
-      assertThat(result.filterIsInstance<OrderedMapping.IndividualMapping>()).hasSize(5)
+      assertThat(result.filterIsInstance<PatchMappingGroup.CombinedMappingGroup>()).hasSize(2)
+      assertThat(result.filterIsInstance<PatchMappingGroup.IndividualMappingGroup>()).hasSize(5)
 
       assertThat(
-          result.filterIsInstance<OrderedMapping.CombinedMapping>().map {
+          result.filterIsInstance<PatchMappingGroup.CombinedMappingGroup>().map {
             it.patchMappings.map { it.generatedPatch.resourceId }
           },
         )
@@ -244,7 +244,7 @@ class PatchOrderingTest {
         )
 
       assertThat(
-          result.filterIsInstance<OrderedMapping.IndividualMapping>().map {
+          result.filterIsInstance<PatchMappingGroup.IndividualMappingGroup>().map {
             it.patchMapping.generatedPatch.resourceId
           },
         )

@@ -18,8 +18,8 @@ package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
@@ -51,7 +51,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { OrderedMapping.IndividualMapping(it) }
+          .map { PatchMappingGroup.IndividualMappingGroup(it) }
 
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
@@ -75,7 +75,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { OrderedMapping.IndividualMapping(it) }
+          .map { PatchMappingGroup.IndividualMappingGroup(it) }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -123,7 +123,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { OrderedMapping.IndividualMapping(it) }
+          .map { PatchMappingGroup.IndividualMappingGroup(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
@@ -152,7 +152,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { OrderedMapping.IndividualMapping(it) }
+          .map { PatchMappingGroup.IndividualMappingGroup(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -189,7 +189,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         localChanges
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { OrderedMapping.IndividualMapping(it) }
+          .map { PatchMappingGroup.IndividualMappingGroup(it) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -337,5 +337,143 @@ class TransactionBundleGeneratorTest {
         }
       }
     assertThat(exception.localizedMessage).isEqualTo("Update using PUT is not supported.")
+  }
+
+  @Test
+  fun `generate() should not split changes in multiple bundle if combined mapping group has more patches than the permitted size`() =
+    runBlocking {
+      val localChange =
+        LocalChange(
+          resourceType = ResourceType.Patient.name,
+          resourceId = "Patient-00",
+          type = LocalChange.Type.UPDATE,
+          payload = "[]",
+          versionId = "patient-002-version-",
+          timestamp = Instant.now(),
+          token = LocalChangeToken(listOf(1L)),
+        )
+      val patchGroups =
+        List(10) {
+            PatchMapping(
+              localChanges =
+                listOf(
+                  localChange.copy(
+                    resourceId = "Patient-00-$it",
+                    versionId = "patient-002-version-$it",
+                  ),
+                ),
+              generatedPatch = localChange.toPatch(),
+            )
+          }
+          .let { PatchMappingGroup.CombinedMappingGroup(it) }
+      val generator =
+        TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false, bundleSize = 5)
+      val result = generator.generateUploadRequests(listOf(patchGroups))
+
+      assertThat(result).hasSize(1)
+      assertThat(result.single().localChanges.size).isEqualTo(10)
+    }
+
+  @Test
+  fun `generate() should put group mappings in respective bundles`() = runBlocking {
+    val localChange =
+      LocalChange(
+        resourceType = ResourceType.Patient.name,
+        resourceId = "Patient-00",
+        type = LocalChange.Type.UPDATE,
+        payload = "[]",
+        versionId = "patient-002-version-",
+        timestamp = Instant.now(),
+        token = LocalChangeToken(listOf(1L)),
+      )
+
+    val firstGroup =
+      PatchMappingGroup.CombinedMappingGroup(
+        mutableListOf<PatchMapping>().apply {
+          for (i in 1..5) {
+            add(
+              PatchMapping(
+                localChanges =
+                  listOf(
+                    localChange.copy(
+                      resourceId = "Patient-00-$i",
+                      versionId = "patient-002-version-$i",
+                    ),
+                  ),
+                generatedPatch = localChange.toPatch(),
+              ),
+            )
+          }
+        },
+      )
+
+    val secondGroup =
+      PatchMappingGroup.IndividualMappingGroup(
+        PatchMapping(
+          localChanges =
+            listOf(
+              localChange.copy(resourceId = "Patient-00-6", versionId = "patient-002-version-7"),
+            ),
+          generatedPatch = localChange.toPatch(),
+        ),
+      )
+
+    val thirdGroup =
+      PatchMappingGroup.IndividualMappingGroup(
+        PatchMapping(
+          localChanges =
+            listOf(
+              localChange.copy(resourceId = "Patient-00-7", versionId = "patient-002-version-8"),
+            ),
+          generatedPatch = localChange.toPatch(),
+        ),
+      )
+    val fourthGroup =
+      PatchMappingGroup.CombinedMappingGroup(
+        mutableListOf<PatchMapping>().apply {
+          for (i in 9..13) {
+            add(
+              PatchMapping(
+                localChanges =
+                  listOf(
+                    localChange.copy(
+                      resourceId = "Patient-00-$i",
+                      versionId = "patient-002-version-$i",
+                    ),
+                  ),
+                generatedPatch = localChange.toPatch(),
+              ),
+            )
+          }
+        },
+      )
+
+    val patchGroups = listOf(firstGroup, secondGroup, thirdGroup, fourthGroup)
+    val generator =
+      TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false, bundleSize = 5)
+    val result = generator.generateUploadRequests(patchGroups)
+
+    assertThat(result).hasSize(3)
+    assertThat(result[0].localChanges.map { it.resourceId })
+      .containsExactly(
+        "Patient-00-1",
+        "Patient-00-2",
+        "Patient-00-3",
+        "Patient-00-4",
+        "Patient-00-5",
+      )
+      .inOrder()
+    assertThat(result[1].localChanges.map { it.resourceId })
+      .containsExactly("Patient-00-6", "Patient-00-7")
+      .inOrder()
+    assertThat(result[2].localChanges.map { it.resourceId })
+      .containsExactly(
+        "Patient-00-9",
+        "Patient-00-10",
+        "Patient-00-11",
+        "Patient-00-12",
+        "Patient-00-13",
+      )
+      .inOrder()
   }
 }

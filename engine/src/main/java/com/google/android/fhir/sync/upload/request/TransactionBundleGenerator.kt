@@ -17,9 +17,9 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
 import org.hl7.fhir.r4.model.Bundle
 
 /** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
@@ -32,28 +32,29 @@ internal class TransactionBundleGenerator(
 
   /**
    * In order to accommodate cyclic dependencies between [PatchMapping]s and maintain referential
-   * integrity on the server, the [PatchMapping]s in a [OrderedMapping.CombinedMapping] are all put
-   * in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the remaining
-   * space of the [BundleUploadRequestMapping] maybe filled with other
-   * [OrderedMapping.CombinedMapping] or [OrderedMapping.IndividualMapping] mappings.
+   * integrity on the server, the [PatchMapping]s in a [PatchMappingGroup.CombinedMappingGroup] are
+   * all put in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the
+   * remaining space of the [BundleUploadRequestMapping] maybe filled with other
+   * [PatchMappingGroup.CombinedMappingGroup] or [PatchMappingGroup.IndividualMappingGroup]
+   * mappings.
    *
-   * In case a single [OrderedMapping.CombinedMapping] has more [PatchMapping]s than the
+   * In case a single [PatchMappingGroup.CombinedMappingGroup] has more [PatchMapping]s than the
    * [generatedBundleSize], [generatedBundleSize] will be ignored so that all of the dependent
-   * mappings in [OrderedMapping.CombinedMapping] can be sent in a single [Bundle].
+   * mappings in [PatchMappingGroup.CombinedMappingGroup] can be sent in a single [Bundle].
    *
-   * **NOTE: The order of the [OrderedMapping.IndividualMapping] is always maintained and the order
-   * of [OrderedMapping.CombinedMapping] doesn't matter since it contain all the required
-   * [PatchMapping] inside the same [Bundle].**
+   * **NOTE: The order of the [PatchMappingGroup.IndividualMappingGroup] is always maintained and
+   * the order of [PatchMappingGroup.CombinedMappingGroup] doesn't matter since it contain all the
+   * required [PatchMapping] inside the same [Bundle].**
    */
   override fun generateUploadRequests(
-    mappedPatches: List<OrderedMapping>,
+    mappedPatches: List<PatchMappingGroup>,
   ): List<BundleUploadRequestMapping> {
     val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
 
     var bundle = mutableListOf<PatchMapping>()
     mappedPatches.forEach {
       when (it) {
-        is OrderedMapping.IndividualMapping -> {
+        is PatchMappingGroup.IndividualMappingGroup -> {
           if (bundle.size < generatedBundleSize) {
             bundle.add(it.patchMapping)
           } else {
@@ -61,12 +62,14 @@ internal class TransactionBundleGenerator(
             bundle = mutableListOf(it.patchMapping)
           }
         }
-        is OrderedMapping.CombinedMapping -> {
+        is PatchMappingGroup.CombinedMappingGroup -> {
           if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
             bundle.addAll(it.patchMappings)
           } else {
-            mappingsPerBundle.add(bundle)
-            bundle = mutableListOf()
+            if (bundle.isNotEmpty()) {
+              mappingsPerBundle.add(bundle)
+              bundle = mutableListOf()
+            }
             bundle.addAll(it.patchMappings)
           }
         }

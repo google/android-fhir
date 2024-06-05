@@ -19,9 +19,9 @@ package com.google.android.fhir.sync.upload.request
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
-import com.google.android.fhir.sync.upload.patch.OrderedMapping
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -33,17 +33,24 @@ internal class UrlRequestGenerator(
 
   /**
    * Since a [UrlUploadRequest] can only handle a single resource request, the
-   * [OrderedMapping.CombinedMapping.patchMappings] are flattened and handled as
-   * [OrderedMapping.IndividualMapping] mapping to generate [UrlUploadRequestMapping] for each
-   * [PatchMapping].
+   * [PatchMappingGroup.CombinedMappingGroup.patchMappings] are flattened and handled as
+   * [PatchMappingGroup.IndividualMappingGroup] mapping to generate [UrlUploadRequestMapping] for
+   * each [PatchMapping].
+   *
+   * **NOTE**
+   *
+   * Since the referential integrity on the sever may get violated if the subsequent requests have
+   * cyclic dependency on each other, We may introduce configuration for application to provide
+   * server's referential integrity settings and make it illegal to generate [UrlUploadRequest] when
+   * server has strict referential integrity and the requests have cyclic dependency amongst itself.
    */
   override fun generateUploadRequests(
-    mappedPatches: List<OrderedMapping>,
+    mappedPatches: List<PatchMappingGroup>,
   ): List<UrlUploadRequestMapping> =
     mappedPatches
       .map {
         when (it) {
-          is OrderedMapping.IndividualMapping -> {
+          is PatchMappingGroup.IndividualMappingGroup -> {
             listOf(
               UrlUploadRequestMapping(
                 localChanges = it.patchMapping.localChanges,
@@ -51,7 +58,7 @@ internal class UrlRequestGenerator(
               ),
             )
           }
-          is OrderedMapping.CombinedMapping -> {
+          is PatchMappingGroup.CombinedMappingGroup -> {
             it.patchMappings.map {
               UrlUploadRequestMapping(
                 localChanges = it.localChanges,
