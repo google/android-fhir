@@ -165,8 +165,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     questionnaireResponse.extension.add(
       Extension(
         "http://github.com/google-android/questionnaire-launch-timestamp",
-        DateTimeType(Date())
-      )
+        DateTimeType(Date()),
+      ),
     )
     questionnaireResponse.packRepeatedGroups()
   }
