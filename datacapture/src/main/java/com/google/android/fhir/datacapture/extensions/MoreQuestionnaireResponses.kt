@@ -49,13 +49,14 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
     questionnaireResponseItems,
     ->
     questionnaireResponseItems.forEach { it ->
-      if (
-        questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-          questionnaireItem.repeats
-      ) {
-        it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+        if (questionnaireItem.repeats) {
+          it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+        } else {
+          it.item = it.item.packRepeatedGroups(questionnaireItem.item)
+        }
       } else {
-        it.item = it.item.packRepeatedGroups(questionnaireItem.item)
+        it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
       }
     }
 
