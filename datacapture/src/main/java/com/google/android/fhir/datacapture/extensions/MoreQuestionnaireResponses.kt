@@ -42,13 +42,21 @@ internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnai
 }
 
 private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups(
-  questionnaireitems: List<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  return questionnaireitems.zipByLinkIdGroup(this) { questionnaireItem, questionnaireResponseItems,
+  return questionnaireItems.groupByAndZipByLinkId(this) {
+    questionnaireItem,
+    questionnaireResponseItems,
     ->
     questionnaireResponseItems.forEach { it ->
-      it.item = it.item.packRepeatedGroups(questionnaireItem.item)
-      it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+      if (
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          questionnaireItem.repeats
+      ) {
+        it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+      } else {
+        it.item = it.item.packRepeatedGroups(questionnaireItem.item)
+      }
     }
 
     if (

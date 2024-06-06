@@ -848,7 +848,7 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
  * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
  * associated with its questionnaire item linkId.
  */
-internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkIdGroup(
+internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.groupByAndZipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   transform:
     (
