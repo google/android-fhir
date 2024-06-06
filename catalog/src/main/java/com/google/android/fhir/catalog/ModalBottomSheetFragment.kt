@@ -21,10 +21,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.CheckBox
-import android.widget.ImageButton
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -41,9 +39,6 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-
-    val closeButton = view.findViewById<ImageButton>(R.id.closeButtonModalBottomSheet)
-    closeButton.setOnClickListener { NavHostFragment.findNavController(this).navigateUp() }
 
     val showHideErrorCheckBox = view.findViewById<CheckBox>(R.id.errorToggleCheckBox)
     showHideErrorCheckBox.isChecked = args.errorState
