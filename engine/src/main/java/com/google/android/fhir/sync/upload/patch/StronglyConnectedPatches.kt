@@ -18,30 +18,30 @@ package com.google.android.fhir.sync.upload.patch
 
 import kotlin.math.min
 
-internal class StronglyConnectedPatches(private val diGraph: Graph, private val nodesCount: Int) {
+internal object StronglyConnectedPatches {
 
-  fun sscOrdered(ordering: (Graph) -> List<Node>): List<List<Node>> {
-    val stronglyConnected = sscTarzan()
-    val (superNodeToConnectedComponents, connectedComponentNodeToSuperNode) =
-      reduceToSuperNodes(
-        stronglyConnected,
-      )
-    val updatedGraph =
-      transformGraphWithSSCtoGraphWithSuperNodes(diGraph, connectedComponentNodeToSuperNode)
-    val orderedNodes = ordering(updatedGraph)
-    return superNodeToSSC(orderedNodes, superNodeToConnectedComponents)
+  /**
+   * Takes a [directedGraph] and the number of the nodes [nodeCount] in the [directedGraph] and
+   * computes all the strongly connected components in the graph.
+   *
+   * @return An ordered List of strongly connected components of the [directedGraph]. The SCCs are
+   *   topologically ordered which may change based on the ordering algorithm and the [Node]s inside
+   *   a SSC may be ordered randomly depending on the path taken by algorithm to discover the nodes.
+   */
+  fun scc(directedGraph: Graph, nodeCount: Int): List<List<Node>> {
+    return sccTarjan(directedGraph, nodeCount)
   }
 
-  private fun sscTarzan(): List<List<Node>> {
+  private fun sccTarjan(directedGraph: Graph, nodeCount: Int): List<List<Node>> {
     // Code inspired from
     // https://github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
     var counter = -1
     val intToNode = mutableMapOf<Int, String>()
     val nodeToInt = mutableMapOf<String, Int>()
 
-    val graph = MutableList<MutableList<Int>>(nodesCount) { mutableListOf() }
+    val graph = MutableList<MutableList<Int>>(nodeCount) { mutableListOf() }
 
-    diGraph.forEach { (key, value) ->
+    directedGraph.forEach { (key, value) ->
       val intForKey =
         nodeToInt[key]
           ?: let {
@@ -98,74 +98,21 @@ internal class StronglyConnectedPatches(private val diGraph: Graph, private val 
       }
     }
 
-    for (i in 0 until nodesCount) {
+    for (i in 0 until nodeCount) {
       if (ids[i] == -1) {
         dfs(i)
       }
     }
 
-    val lowLinkToConnectedMap = mutableMapOf<Int, MutableList<Int>>()
-    for (i in 0 until nodesCount) {
+    // The algorithm discovers the scc in topological order, so use a sorted map to maintain the
+    // order.
+    val lowLinkToConnectedMap = sortedMapOf<Int, MutableList<Int>>()
+    for (i in 0 until nodeCount) {
       if (!lowLinkToConnectedMap.containsKey(sccs[i])) {
         lowLinkToConnectedMap[sccs[i]] = mutableListOf()
       }
       lowLinkToConnectedMap[sccs[i]]!!.add(i)
     }
     return lowLinkToConnectedMap.values.map { it.mapNotNull { intToNode[it] } }
-  }
-
-  private fun reduceToSuperNodes(
-    ssc: List<List<Node>>,
-  ): Pair<Map<Node, List<Node>>, Map<Node, Node>> {
-    val superNodesMap = mutableMapOf<Node, List<Node>>()
-    val nodeToSuperNode = mutableMapOf<Node, String>()
-
-    var counter = 0
-    ssc.forEach {
-      superNodesMap[(++counter).toString()] = it
-      it.forEach { nodeToSuperNode[it] = (counter).toString() }
-    }
-
-    return superNodesMap to nodeToSuperNode
-  }
-
-  /**
-   * Converts a graph that has ssc to a graph with super nodes as per the provided [nodeToSuperNode]
-   * mapping.
-   *
-   * **Input**
-   * * oldGraph `[A : B, C], [B : A, C], [C : A, B, F], [D : E], [E : D], [F : G]`
-   * * nodeToSuperNode `[A:1, B:1, C:1, D:2, E:2, F:3, G:4]`
-   *
-   * **Output** `[1 : 3], [2], [3: 4]`
-   */
-  private fun transformGraphWithSSCtoGraphWithSuperNodes(
-    oldGraph: Graph,
-    nodeToSuperNode: Map<Node, Node>,
-  ): Graph {
-    val newGraph = mutableMapOf<Node, List<Node>>()
-    // Remove any cyclic dependency from connected components in the graph.
-    // Reduce all the ssc nodes from graph into to a single node in graph.
-    // Replace the ssc nodes with super node.
-    oldGraph.forEach {
-      val superNode = nodeToSuperNode[it.key]!!
-      if (newGraph.containsKey(superNode)) {
-        newGraph[superNode] =
-          (newGraph[superNode]!! + it.value.mapNotNull { nodeToSuperNode[it] })
-            .distinct()
-            .filterNot { superNode == it }
-      } else {
-        newGraph[superNode] = it.value.mapNotNull { nodeToSuperNode[it] }
-      }
-    }
-
-    return newGraph
-  }
-
-  private fun superNodeToSSC(
-    orderedNodes: List<Node>,
-    mapping: Map<Node, List<Node>>,
-  ): List<List<Node>> {
-    return orderedNodes.mapNotNull { mapping[it] }
   }
 }

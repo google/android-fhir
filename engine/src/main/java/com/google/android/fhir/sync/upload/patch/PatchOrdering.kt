@@ -56,9 +56,9 @@ internal object PatchOrdering {
    * retained. Order of D shouldn't matter for the purpose of referential integrity.
    *
    * @return A ordered list of the [PatchMappingGroup] containing:
-   * - [PatchMappingGroup.IndividualMappingGroup] for the [PatchMapping] based on the references to
-   *   other [PatchMapping] if the mappings are acyclic
-   * - [PatchMappingGroup.CombinedMappingGroup] for [PatchMapping]s based on the references to other
+   * - [PatchMappingGroup] with single value for the [PatchMapping] based on the references to other
+   *   [PatchMapping] if the mappings are acyclic
+   * - [PatchMappingGroup] with multiple values for [PatchMapping]s based on the references to other
    *   [PatchMapping]s if the mappings are cyclic.
    */
   suspend fun List<PatchMapping>.orderByReferences(
@@ -75,16 +75,9 @@ internal object PatchOrdering {
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
 
-    return StronglyConnectedPatches(adjacencyList, resourceIdToPatchMapping.size)
-      .sscOrdered { createTopologicalOrderedList(it) }
-      .map {
-        val mappings = it.mapNotNull { resourceIdToPatchMapping[it] }
-        if (mappings.size == 1) {
-          PatchMappingGroup.IndividualMappingGroup(mappings.first())
-        } else {
-          PatchMappingGroup.CombinedMappingGroup(mappings)
-        }
-      }
+    return StronglyConnectedPatches.scc(adjacencyList, resourceIdToPatchMapping.size).map {
+      PatchMappingGroup(it.mapNotNull { resourceIdToPatchMapping[it] })
+    }
   }
 
   /**
@@ -133,23 +126,5 @@ internal object PatchOrdering {
       }
     }
     return references
-  }
-
-  private fun createTopologicalOrderedList(adjacencyList: Map<Node, List<Node>>): List<Node> {
-    val stack = ArrayDeque<String>()
-    val visited = mutableSetOf<String>()
-    val currentPath = mutableSetOf<String>()
-
-    fun dfs(key: String) {
-      check(currentPath.add(key)) { "Detected a cycle." }
-      if (visited.add(key)) {
-        adjacencyList[key]?.forEach { dfs(it) }
-        stack.addFirst(key)
-      }
-      currentPath.remove(key)
-    }
-
-    adjacencyList.keys.forEach { dfs(it) }
-    return stack.reversed()
   }
 }

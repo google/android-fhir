@@ -33,9 +33,8 @@ internal class UrlRequestGenerator(
 
   /**
    * Since a [UrlUploadRequest] can only handle a single resource request, the
-   * [PatchMappingGroup.CombinedMappingGroup.patchMappings] are flattened and handled as
-   * [PatchMappingGroup.IndividualMappingGroup] mapping to generate [UrlUploadRequestMapping] for
-   * each [PatchMapping].
+   * [PatchMappingGroup.patchMappings] are flattened and handled as acyclic mapping to generate
+   * [UrlUploadRequestMapping] for each [PatchMapping].
    *
    * **NOTE**
    *
@@ -48,27 +47,14 @@ internal class UrlRequestGenerator(
     mappedPatches: List<PatchMappingGroup>,
   ): List<UrlUploadRequestMapping> =
     mappedPatches
-      .map {
-        when (it) {
-          is PatchMappingGroup.IndividualMappingGroup -> {
-            listOf(
-              UrlUploadRequestMapping(
-                localChanges = it.patchMapping.localChanges,
-                generatedRequest = getUrlRequestForPatch(it.patchMapping.generatedPatch),
-              ),
-            )
-          }
-          is PatchMappingGroup.CombinedMappingGroup -> {
-            it.patchMappings.map {
-              UrlUploadRequestMapping(
-                localChanges = it.localChanges,
-                generatedRequest = getUrlRequestForPatch(it.generatedPatch),
-              )
-            }
-          }
-        }
-      }
+      .map { it.patchMappings }
       .flatten()
+      .map {
+        UrlUploadRequestMapping(
+          localChanges = it.localChanges,
+          generatedRequest = getUrlRequestForPatch(it.generatedPatch),
+        )
+      }
 
   companion object Factory {
 

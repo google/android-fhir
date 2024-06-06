@@ -183,11 +183,7 @@ class PatchOrderingTest {
     // This order is based on the current implementation of the topological sort in [PatchOrdering],
     // it's entirely possible to generate different order here which is acceptable/correct, should
     // we have a different implementation of the topological sort.
-    assertThat(
-        result.map {
-          (it as PatchMappingGroup.IndividualMappingGroup).patchMapping.generatedPatch.resourceId
-        },
-      )
+    assertThat(result.map { it.patchMappings.single().generatedPatch.resourceId })
       .containsExactly(
         "patient-1",
         "patient-2",
@@ -230,30 +226,17 @@ class PatchOrderingTest {
 
       val result = patchGenerator.generate(helper.localChanges)
 
-      assertThat(result.filterIsInstance<PatchMappingGroup.CombinedMappingGroup>()).hasSize(2)
-      assertThat(result.filterIsInstance<PatchMappingGroup.IndividualMappingGroup>()).hasSize(5)
-
       assertThat(
-          result.filterIsInstance<PatchMappingGroup.CombinedMappingGroup>().map {
-            it.patchMappings.map { it.generatedPatch.resourceId }
-          },
+          result.map { it.patchMappings.map { it.generatedPatch.resourceId } },
         )
         .containsExactly(
           listOf("patient-1", "related-1"),
           listOf("patient-2", "related-2"),
-        )
-
-      assertThat(
-          result.filterIsInstance<PatchMappingGroup.IndividualMappingGroup>().map {
-            it.patchMapping.generatedPatch.resourceId
-          },
-        )
-        .containsExactly(
-          "encounter-1",
-          "observation-1",
-          "patient-3",
-          "encounter-2",
-          "observation-2",
+          listOf("encounter-1"),
+          listOf("observation-1"),
+          listOf("patient-3"),
+          listOf("encounter-2"),
+          listOf("observation-2"),
         )
         .inOrder()
     }

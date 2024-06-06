@@ -70,9 +70,7 @@ class PerResourcePatchGeneratorTest {
     val insertionLocalChange = createInsertLocalChange(patient)
 
     val patches =
-      patchGenerator.generate(listOf(insertionLocalChange)).map {
-        (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
-      }
+      patchGenerator.generate(listOf(insertionLocalChange)).map { it.patchMappings.single() }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -104,9 +102,7 @@ class PerResourcePatchGeneratorTest {
     val updatePatch = readJsonArrayFromFile("/update_patch_1.json")
 
     val patches =
-      patchGenerator.generate(listOf(updateLocalChange1)).map {
-        (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
-      }
+      patchGenerator.generate(listOf(updateLocalChange1)).map { it.patchMappings.single() }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -136,9 +132,7 @@ class PerResourcePatchGeneratorTest {
     val deleteLocalChange = createDeleteLocalChange(remotePatient, 3L)
 
     val patches =
-      patchGenerator.generate(listOf(deleteLocalChange)).map {
-        (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
-      }
+      patchGenerator.generate(listOf(deleteLocalChange)).map { it.patchMappings.single() }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -166,7 +160,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange)).map {
-        (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
+        it.patchMappings.single()
       }
 
     with(patches.single()) {
@@ -326,7 +320,7 @@ class PerResourcePatchGeneratorTest {
 
     val patches =
       patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2)).map {
-        (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
+        it.patchMappings.single()
       }
 
     with(patches.single()) {
@@ -374,7 +368,7 @@ class PerResourcePatchGeneratorTest {
 
       val patches =
         patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2)).map {
-          (it as PatchMappingGroup.IndividualMappingGroup).patchMapping
+          it.patchMappings.single()
         }
 
       with(patches.single().generatedPatch) {
@@ -407,7 +401,7 @@ class PerResourcePatchGeneratorTest {
         .generate(
           listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
         )
-        .map { (it as PatchMappingGroup.IndividualMappingGroup).patchMapping }
+        .map { it.patchMappings.single() }
 
     with(patches.single()) {
       with(generatedPatch) {

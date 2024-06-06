@@ -41,5 +41,5 @@ internal object PerChangePatchGenerator : PatchGenerator {
             ),
         )
       }
-      .map { PatchMappingGroup.IndividualMappingGroup(it) }
+      .map { PatchMappingGroup(listOf(it)) }
 }

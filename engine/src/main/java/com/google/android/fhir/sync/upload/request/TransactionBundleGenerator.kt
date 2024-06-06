@@ -32,19 +32,13 @@ internal class TransactionBundleGenerator(
 
   /**
    * In order to accommodate cyclic dependencies between [PatchMapping]s and maintain referential
-   * integrity on the server, the [PatchMapping]s in a [PatchMappingGroup.CombinedMappingGroup] are
-   * all put in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the
-   * remaining space of the [BundleUploadRequestMapping] maybe filled with other
-   * [PatchMappingGroup.CombinedMappingGroup] or [PatchMappingGroup.IndividualMappingGroup]
-   * mappings.
+   * integrity on the server, the [PatchMapping]s in a [PatchMappingGroup] are all put in a single
+   * [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the remaining space of the
+   * [BundleUploadRequestMapping] maybe filled with other [PatchMappingGroup] mappings.
    *
-   * In case a single [PatchMappingGroup.CombinedMappingGroup] has more [PatchMapping]s than the
-   * [generatedBundleSize], [generatedBundleSize] will be ignored so that all of the dependent
-   * mappings in [PatchMappingGroup.CombinedMappingGroup] can be sent in a single [Bundle].
-   *
-   * **NOTE: The order of the [PatchMappingGroup.IndividualMappingGroup] is always maintained and
-   * the order of [PatchMappingGroup.CombinedMappingGroup] doesn't matter since it contain all the
-   * required [PatchMapping] inside the same [Bundle].**
+   * In case a single [PatchMappingGroup] has more [PatchMapping]s than the [generatedBundleSize],
+   * [generatedBundleSize] will be ignored so that all of the dependent mappings in
+   * [PatchMappingGroup] can be sent in a single [Bundle].
    */
   override fun generateUploadRequests(
     mappedPatches: List<PatchMappingGroup>,
@@ -53,26 +47,14 @@ internal class TransactionBundleGenerator(
 
     var bundle = mutableListOf<PatchMapping>()
     mappedPatches.forEach {
-      when (it) {
-        is PatchMappingGroup.IndividualMappingGroup -> {
-          if (bundle.size < generatedBundleSize) {
-            bundle.add(it.patchMapping)
-          } else {
-            mappingsPerBundle.add(bundle)
-            bundle = mutableListOf(it.patchMapping)
-          }
+      if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
+        bundle.addAll(it.patchMappings)
+      } else {
+        if (bundle.isNotEmpty()) {
+          mappingsPerBundle.add(bundle)
+          bundle = mutableListOf()
         }
-        is PatchMappingGroup.CombinedMappingGroup -> {
-          if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
-            bundle.addAll(it.patchMappings)
-          } else {
-            if (bundle.isNotEmpty()) {
-              mappingsPerBundle.add(bundle)
-              bundle = mutableListOf()
-            }
-            bundle.addAll(it.patchMappings)
-          }
-        }
+        bundle.addAll(it.patchMappings)
       }
     }
 

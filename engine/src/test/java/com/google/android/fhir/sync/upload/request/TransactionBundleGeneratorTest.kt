@@ -51,7 +51,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup.IndividualMappingGroup(it) }
+          .map { PatchMappingGroup(listOf(it)) }
 
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
@@ -75,7 +75,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup.IndividualMappingGroup(it) }
+          .map { PatchMappingGroup(listOf(it)) }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -123,7 +123,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { PatchMappingGroup.IndividualMappingGroup(it) }
+          .map { PatchMappingGroup(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
@@ -152,7 +152,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { PatchMappingGroup.IndividualMappingGroup(it) }
+          .map { PatchMappingGroup(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -189,7 +189,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         localChanges
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup.IndividualMappingGroup(it) }
+          .map { PatchMappingGroup(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -365,7 +365,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             )
           }
-          .let { PatchMappingGroup.CombinedMappingGroup(it) }
+          .let { PatchMappingGroup(it) }
       val generator =
         TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false, bundleSize = 5)
       val result = generator.generateUploadRequests(listOf(patchGroups))
@@ -388,7 +388,7 @@ class TransactionBundleGeneratorTest {
       )
 
     val firstGroup =
-      PatchMappingGroup.CombinedMappingGroup(
+      PatchMappingGroup(
         mutableListOf<PatchMapping>().apply {
           for (i in 1..5) {
             add(
@@ -408,28 +408,32 @@ class TransactionBundleGeneratorTest {
       )
 
     val secondGroup =
-      PatchMappingGroup.IndividualMappingGroup(
-        PatchMapping(
-          localChanges =
-            listOf(
-              localChange.copy(resourceId = "Patient-00-6", versionId = "patient-002-version-7"),
-            ),
-          generatedPatch = localChange.toPatch(),
+      PatchMappingGroup(
+        listOf(
+          PatchMapping(
+            localChanges =
+              listOf(
+                localChange.copy(resourceId = "Patient-00-6", versionId = "patient-002-version-7"),
+              ),
+            generatedPatch = localChange.toPatch(),
+          ),
         ),
       )
 
     val thirdGroup =
-      PatchMappingGroup.IndividualMappingGroup(
-        PatchMapping(
-          localChanges =
-            listOf(
-              localChange.copy(resourceId = "Patient-00-7", versionId = "patient-002-version-8"),
-            ),
-          generatedPatch = localChange.toPatch(),
+      PatchMappingGroup(
+        listOf(
+          PatchMapping(
+            localChanges =
+              listOf(
+                localChange.copy(resourceId = "Patient-00-7", versionId = "patient-002-version-8"),
+              ),
+            generatedPatch = localChange.toPatch(),
+          ),
         ),
       )
     val fourthGroup =
-      PatchMappingGroup.CombinedMappingGroup(
+      PatchMappingGroup(
         mutableListOf<PatchMapping>().apply {
           for (i in 9..13) {
             add(

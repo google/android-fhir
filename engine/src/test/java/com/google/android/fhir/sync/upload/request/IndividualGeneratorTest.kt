@@ -50,7 +50,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup.IndividualMappingGroup(patchOutput)),
+        listOf(PatchMappingGroup(listOf(patchOutput))),
       )
 
     with(requests.single()) {
@@ -73,7 +73,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup.IndividualMappingGroup(patchOutput)),
+        listOf(PatchMappingGroup(listOf(patchOutput))),
       )
 
     with(requests.single()) {
@@ -95,7 +95,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup.IndividualMappingGroup(patchOutput)),
+        listOf(PatchMappingGroup(listOf(patchOutput))),
       )
     with(requests.single()) {
       with(generatedRequest) {
@@ -121,7 +121,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup.IndividualMappingGroup(patchOutput)),
+        listOf(PatchMappingGroup(listOf(patchOutput))),
       )
     with(requests.single()) {
       with(generatedRequest) {
@@ -141,7 +141,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val result =
       generator.generateUploadRequests(
-        patchOutputList.map { PatchMappingGroup.IndividualMappingGroup(it) },
+        patchOutputList.map { PatchMappingGroup(listOf(it)) },
       )
     assertThat(result).hasSize(3)
     assertThat(result.map { it.generatedRequest.httpVerb })

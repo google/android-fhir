@@ -68,19 +68,9 @@ internal data class PatchMapping(
   val generatedPatch: Patch,
 )
 
-/** Structure to help describe the cyclic nature of ordered [PatchMapping]. */
-internal sealed interface PatchMappingGroup {
-
-  /**
-   * [IndividualMappingGroup] doesn't have a cyclic dependency on other [IndividualMappingGroup] /
-   * [PatchMapping]. It may however have an acyclic dependency on other [IndividualMappingGroup]s /
-   * [PatchMapping]s.
-   */
-  data class IndividualMappingGroup(val patchMapping: PatchMapping) : PatchMappingGroup
-
-  /**
-   * [CombinedMappingGroup] contains strongly connected [PatchMapping]s where one or more
-   * [PatchMapping]s have a cyclic dependency between each other.
-   */
-  data class CombinedMappingGroup(val patchMappings: List<PatchMapping>) : PatchMappingGroup
-}
+/**
+ * Structure to describe the cyclic nature of [PatchMapping].
+ * - A single value in [patchMappings] signifies the acyclic nature of the node.
+ * - Multiple values in [patchMappings] signifies the cyclic nature of the nodes among themselves.
+ */
+internal data class PatchMappingGroup(val patchMappings: List<PatchMapping>)
