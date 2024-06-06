@@ -170,7 +170,6 @@ internal object DatePickerViewHolderFactory :
 
         return MaterialDatePicker.Builder.datePicker()
           .setTitleText(R.string.select_date)
-          .setSelection(minDateInMillis)
           .setCalendarConstraints(calendarConstraints)
           .build()
       }
