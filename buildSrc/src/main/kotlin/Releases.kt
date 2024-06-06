@@ -42,38 +42,38 @@ object Releases {
 
   object Common : LibraryArtifact {
     override val artifactId = "common"
-    override val version = "0.1.0-alpha06"
+    override val version = "0.1.0-alpha05"
     override val name = "Android FHIR Common Library"
   }
 
   object Engine : LibraryArtifact {
     override val artifactId = "engine"
-    override val version = "1.0.1"
+    override val version = "1.0.0"
     override val name = "Android FHIR Engine Library"
   }
 
   object DataCapture : LibraryArtifact {
     override val artifactId = "data-capture"
-    override val version = "1.1.1"
+    override val version = "1.1.0"
     override val name = "Android FHIR Structured Data Capture Library"
   }
 
   object Workflow : LibraryArtifact {
     override val artifactId = "workflow"
-    override val version = "0.1.0-alpha05"
+    override val version = "0.1.0-alpha04"
     override val name = "Android FHIR Workflow Library"
   }
 
   object Contrib {
     object Barcode : LibraryArtifact {
       override val artifactId = "contrib-barcode"
-      override val version = "0.1.0-beta4"
+      override val version = "0.1.0-beta3"
       override val name = "Android FHIR Structured Data Capture - Barcode Extensions (contrib)"
     }
 
     object LocationWidget : LibraryArtifact {
       override val artifactId = "contrib-locationwidget"
-      override val version = "0.1.0-alpha02"
+      override val version = "0.1.0-alpha01"
       override val name =
         "Android FHIR Structured Data Capture - Location Widget Extensions (contrib)"
     }
@@ -81,7 +81,7 @@ object Releases {
 
   object Knowledge : LibraryArtifact {
     override val artifactId = "knowledge"
-    override val version = "0.1.0-alpha04"
+    override val version = "0.1.0-alpha03"
     override val name = "Android FHIR Knowledge Manager Library"
   }
 
