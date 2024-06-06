@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,31 +37,37 @@ val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResp
  *
  * See also [unpackRepeatedGroups].
  */
-internal fun QuestionnaireResponse.packRepeatedGroups() {
-  item = item.packRepeatedGroups()
+internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnaire) {
+  item = item.packRepeatedGroups(questionnaire.item)
 }
 
-private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups():
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  forEach { it ->
-    it.item = it.item.packRepeatedGroups()
-    it.answer.forEach { it.item = it.item.packRepeatedGroups() }
-  }
-  val linkIdToPackedResponseItems =
-    groupBy { it.linkId }
-      .mapValues { (linkId, questionnaireResponseItems) ->
-        questionnaireResponseItems.singleOrNull()
-          ?: QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            this.linkId = linkId
-            answer =
-              questionnaireResponseItems.map {
-                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                  item = it.item
-                }
-              }
+private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups(
+  questionnaireitems: List<Questionnaire.QuestionnaireItemComponent>,
+): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  return questionnaireitems.zipByLinkIdGroup(this) { questionnaireItem, questionnaireResponseItems,
+    ->
+    questionnaireResponseItems.forEach { it ->
+      it.item = it.item.packRepeatedGroups(questionnaireItem.item)
+      it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+    }
+
+    if (
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        questionnaireItem.repeats
+    ) {
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        this.linkId = linkId
+        answer =
+          questionnaireResponseItems.map {
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = it.item
+            }
           }
       }
-  return map { it.linkId }.distinct().map { linkIdToPackedResponseItems[it]!! }
+    } else {
+      questionnaireResponseItems.single()
+    }
+  }
 }
 
 /**

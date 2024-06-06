@@ -158,7 +158,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
     }
-    questionnaireResponse.packRepeatedGroups()
+    questionnaireResponse.packRepeatedGroups(questionnaire)
   }
 
   /**

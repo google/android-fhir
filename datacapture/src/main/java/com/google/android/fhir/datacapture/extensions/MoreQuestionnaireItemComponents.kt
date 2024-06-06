@@ -840,6 +840,32 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
 }
 
 /**
+ * Returns a list of values built from the elements of `this` and the
+ * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
+ * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * In case of repeated group item, `questionnaireResponseItemList` will contain
+ * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
+ * associated with its questionnaire item linkId.
+ */
+internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkIdGroup(
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  transform:
+    (
+      Questionnaire.QuestionnaireItemComponent,
+      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    ) -> T,
+): List<T> {
+  val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
+  return map { questionnaireItem ->
+    transform(
+      questionnaireItem,
+      linkIdToQuestionnaireResponseItemListMap[questionnaireItem.linkId] ?: emptyList(),
+    )
+  }
+}
+
+/**
  * Whether the corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] should have
  * [QuestionnaireResponse.QuestionnaireResponseItemComponent]s nested under
  * [QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent]s.
