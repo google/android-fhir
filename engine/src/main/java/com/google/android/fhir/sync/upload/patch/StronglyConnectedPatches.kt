@@ -20,6 +20,8 @@ import kotlin.math.min
 
 internal object StronglyConnectedPatches {
 
+  private const val NOT_VISITED = -1
+
   /**
    * Takes a [directedGraph] and computes all the strongly connected components in the graph.
    *
@@ -36,10 +38,13 @@ internal object StronglyConnectedPatches {
     // Code inspired from
     // https://github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
     var counter = -1
+    // Maps  an Integer value between the range of 0 to nodeCount (excluded) to the Node.
     val intToNode = mutableMapOf<Int, String>()
+    // Maps the Node to an Integer value between the range of 0 to nodeCount (excluded) and is
+    // inverse of [intToNode].
     val nodeToInt = mutableMapOf<String, Int>()
 
-    val graph = MutableList<MutableList<Int>>(nodeCount) { mutableListOf() }
+    val graphOfInts = MutableList<MutableList<Int>>(nodeCount) { mutableListOf() }
 
     directedGraph.forEach { (key, value) ->
       val intForKey =
@@ -58,25 +63,29 @@ internal object StronglyConnectedPatches {
               nodeToInt[node] = counter
               counter
             }
-        graph[intForKey].add(intForValue)
+        graphOfInts[intForKey].add(intForValue)
       }
     }
 
     var id = 0
     var sccCount = 0
-    val visited = BooleanArray(graph.size)
-    val ids = IntArray(graph.size) { -1 }
-    val low = IntArray(graph.size)
-    val sccs = IntArray(graph.size)
+    val visited = BooleanArray(graphOfInts.size)
+    val ids = IntArray(graphOfInts.size) { NOT_VISITED }
+    val low = IntArray(graphOfInts.size)
+    val sccs = IntArray(graphOfInts.size)
     val stack = ArrayDeque<Int>()
 
     fun dfs(at: Int) {
+      // set the low value for the visiting node as the id(visited counter) as we are exploring the
+      // graph.
+      // This later may get updated to the lowest value of the scc.
       low[at] = id++
+      // set the ids as (visited counter) as we are exploring the graph.
       ids[at] = low[at]
       stack.addFirst(at)
       visited[at] = true
-      for (to in graph[at]) {
-        if (ids[to] == -1) {
+      for (to in graphOfInts[at]) {
+        if (ids[to] == NOT_VISITED) {
           dfs(to)
         }
         if (visited[to]) {
@@ -99,7 +108,7 @@ internal object StronglyConnectedPatches {
     }
 
     for (i in 0 until nodeCount) {
-      if (ids[i] == -1) {
+      if (ids[i] == NOT_VISITED) {
         dfs(i)
       }
     }
