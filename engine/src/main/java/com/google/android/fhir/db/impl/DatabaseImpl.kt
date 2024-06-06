@@ -389,7 +389,7 @@ internal class DatabaseImpl(
         // 1. Verify resource presence:
         selectEntity(type, id)
 
-        // 2. Check for local changes and handle accordingly:
+        // 2. Check for local changes (which can only be cleared without syncing in FORCE_PURGE mode):
         val localChanges = localChangeDao.getLocalChanges(type, id)
         if (localChanges.isNotEmpty() && !forcePurge) {
           throw IllegalStateException(
