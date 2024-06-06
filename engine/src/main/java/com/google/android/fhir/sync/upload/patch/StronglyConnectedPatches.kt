@@ -21,14 +21,14 @@ import kotlin.math.min
 internal object StronglyConnectedPatches {
 
   /**
-   * Takes a [directedGraph] and the number of the nodes [nodeCount] in the [directedGraph] and
-   * computes all the strongly connected components in the graph.
+   * Takes a [directedGraph] and computes all the strongly connected components in the graph.
    *
    * @return An ordered List of strongly connected components of the [directedGraph]. The SCCs are
    *   topologically ordered which may change based on the ordering algorithm and the [Node]s inside
    *   a SSC may be ordered randomly depending on the path taken by algorithm to discover the nodes.
    */
-  fun scc(directedGraph: Graph, nodeCount: Int): List<List<Node>> {
+  fun scc(directedGraph: Graph): List<List<Node>> {
+    val nodeCount = (directedGraph.values.flatten().toSet() + directedGraph.keys).size
     return sccTarjan(directedGraph, nodeCount)
   }
 

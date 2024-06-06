@@ -75,7 +75,7 @@ internal object PatchOrdering {
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
 
-    return StronglyConnectedPatches.scc(adjacencyList, resourceIdToPatchMapping.size).map {
+    return StronglyConnectedPatches.scc(adjacencyList).map {
       PatchMappingGroup(it.mapNotNull { resourceIdToPatchMapping[it] })
     }
   }

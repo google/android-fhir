@@ -39,7 +39,7 @@ class StronglyConnectedPatchesTest {
     graph.addEdge("6", "7")
     graph.addEdge("7", "8")
 
-    val result = StronglyConnectedPatches.scc(graph, 9)
+    val result = StronglyConnectedPatches.scc(graph)
 
     assertThat(result)
       .containsExactly(
@@ -55,7 +55,7 @@ class StronglyConnectedPatchesTest {
   @Test
   fun `sscOrdered empty graph should return empty result`() {
     val graph = mutableMapOf<String, MutableList<String>>()
-    val result = StronglyConnectedPatches.scc(graph, 0)
+    val result = StronglyConnectedPatches.scc(graph)
     assertThat(result).isEmpty()
   }
 
@@ -63,7 +63,7 @@ class StronglyConnectedPatchesTest {
   fun `sscOrdered  graph with single node should return single scc`() {
     val graph = mutableMapOf<String, MutableList<String>>()
     graph.addNode("0")
-    val result = StronglyConnectedPatches.scc(graph, 1)
+    val result = StronglyConnectedPatches.scc(graph)
     assertThat(result).containsExactly(listOf("0"))
   }
 
@@ -72,7 +72,7 @@ class StronglyConnectedPatchesTest {
     val graph = mutableMapOf<String, MutableList<String>>()
     graph.addNode("0")
     graph.addNode("1")
-    val result = StronglyConnectedPatches.scc(graph, 2)
+    val result = StronglyConnectedPatches.scc(graph)
     assertThat(result).containsExactly(listOf("0"), listOf("1"))
   }
 
@@ -80,7 +80,7 @@ class StronglyConnectedPatchesTest {
   fun `sscOrdered  graph with two acyclic node should return two scc in order`() {
     val graph = mutableMapOf<String, MutableList<String>>()
     graph.addEdge("1", "0")
-    val result = StronglyConnectedPatches.scc(graph, 2)
+    val result = StronglyConnectedPatches.scc(graph)
     assertThat(result).containsExactly(listOf("0"), listOf("1")).inOrder()
   }
 
@@ -89,7 +89,7 @@ class StronglyConnectedPatchesTest {
     val graph = mutableMapOf<String, MutableList<String>>()
     graph.addEdge("0", "1")
     graph.addEdge("1", "0")
-    val result = StronglyConnectedPatches.scc(graph, 2)
+    val result = StronglyConnectedPatches.scc(graph)
     assertThat(result).containsExactly(listOf("0", "1"))
   }
 }
