@@ -440,7 +440,7 @@ internal class DatabaseImpl(
   }
 }
 
-data class DatabaseConfig(
+internal data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
   val databaseErrorStrategy: DatabaseErrorStrategy,
