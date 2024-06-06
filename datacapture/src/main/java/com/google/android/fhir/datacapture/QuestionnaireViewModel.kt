@@ -154,7 +154,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
         questionnaire.item.forEach {
-          questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+          if (it.type != Questionnaire.QuestionnaireItemType.GROUP || !it.repeats) {
+            questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
+          }
         }
       }
     }

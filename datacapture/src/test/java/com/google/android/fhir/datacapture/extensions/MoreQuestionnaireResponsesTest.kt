@@ -75,6 +75,32 @@ class MoreQuestionnaireResponsesTest {
   }
 
   @Test
+  fun `should pack repeated groups with no answers`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-item"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+              },
+            )
+          },
+        )
+      }
+
+    assertResourceEquals(
+      QuestionnaireResponse().apply { packRepeatedGroups(questionnaire) },
+      QuestionnaireResponse(),
+    )
+  }
+
+  @Test
   fun `should pack repeated groups with single set of answers`() {
     val questionnaire =
       Questionnaire().apply {
