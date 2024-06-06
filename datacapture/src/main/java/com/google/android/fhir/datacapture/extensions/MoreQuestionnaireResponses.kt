@@ -56,7 +56,7 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
         questionnaireItem.repeats
     ) {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        this.linkId = linkId
+        this.linkId = questionnaireItem.linkId
         answer =
           questionnaireResponseItems.map {
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
