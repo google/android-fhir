@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.UriType
  * [LocalChangeEntity]. See [https://www.hl7.org/fhir/http.html#transaction] for more info regarding
  * the supported [Bundle.HTTPVerb].
  */
-abstract class BundleEntryComponentGenerator(
+internal abstract class BundleEntryComponentGenerator(
   private val httpVerb: Bundle.HTTPVerb,
   private val useETagForUpload: Boolean,
 ) {
