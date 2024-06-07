@@ -860,7 +860,6 @@ internal inline fun <T> groupByAndZipByLinkId(
   val linkIdToQuestionnaireItemListMap = questionnaireItemList.groupBy { it.linkId }
   val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
   return (linkIdToQuestionnaireItemListMap.keys + linkIdToQuestionnaireResponseItemListMap.keys)
-    .distinct()
     .map { linkId ->
       transform(
         linkIdToQuestionnaireItemListMap[linkId] ?: emptyList(),
