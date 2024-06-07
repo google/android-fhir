@@ -94,9 +94,16 @@ class MoreQuestionnaireResponsesTest {
         )
       }
 
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply { linkId = "repeated-group" },
+        )
+      }
+
     assertResourceEquals(
+      questionnaireResponse,
       QuestionnaireResponse().apply { packRepeatedGroups(questionnaire) },
-      QuestionnaireResponse(),
     )
   }
 

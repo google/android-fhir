@@ -44,39 +44,51 @@ internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnai
 private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups(
   questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
 ): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  return questionnaireItems.groupByAndZipByLinkId(this) {
-    questionnaireItem,
-    questionnaireResponseItems,
-    ->
-    questionnaireResponseItems.forEach { it ->
-      if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-        if (questionnaireItem.repeats) {
-          it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
-        } else {
-          it.item = it.item.packRepeatedGroups(questionnaireItem.item)
-        }
-      } else {
-        it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+  return groupByAndZipByLinkId(questionnaireItems, this) {
+      questionnaireItems,
+      questionnaireResponseItems,
+      ->
+      if (questionnaireItems.isEmpty()) {
+        // If there's no questionnaire item, simply keep the response items. In other words, do not
+        // delete hanging questionnaire responses automatically. This is useful for validation
+        // workflow to identify invalid responses.
+        return@groupByAndZipByLinkId questionnaireResponseItems
       }
-    }
 
-    if (
-      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-        questionnaireItem.repeats
-    ) {
-      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        this.linkId = questionnaireItem.linkId
-        answer =
-          questionnaireResponseItems.map {
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              item = it.item
-            }
+      val questionnaireItem = questionnaireItems.single()
+
+      questionnaireResponseItems.forEach { it ->
+        if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+          if (questionnaireItem.repeats) {
+            it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+          } else {
+            it.item = it.item.packRepeatedGroups(questionnaireItem.item)
           }
+        } else {
+          it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+        }
       }
-    } else {
-      questionnaireResponseItems.single()
+
+      if (
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          questionnaireItem.repeats
+      ) {
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            this.linkId = questionnaireItem.linkId
+            answer =
+              questionnaireResponseItems.map {
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  item = it.item
+                }
+              }
+          },
+        )
+      } else {
+        questionnaireResponseItems
+      }
     }
-  }
+    .flatten()
 }
 
 /**

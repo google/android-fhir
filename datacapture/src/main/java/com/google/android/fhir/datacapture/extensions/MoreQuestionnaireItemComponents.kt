@@ -848,21 +848,25 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
  * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
  * associated with its questionnaire item linkId.
  */
-internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.groupByAndZipByLinkId(
+internal inline fun <T> groupByAndZipByLinkId(
+  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   transform:
     (
-      Questionnaire.QuestionnaireItemComponent,
+      List<Questionnaire.QuestionnaireItemComponent>,
       List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     ) -> T,
 ): List<T> {
+  val linkIdToQuestionnaireItemListMap = questionnaireItemList.groupBy { it.linkId }
   val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
-  return map { questionnaireItem ->
-    transform(
-      questionnaireItem,
-      linkIdToQuestionnaireResponseItemListMap[questionnaireItem.linkId] ?: emptyList(),
-    )
-  }
+  return (linkIdToQuestionnaireItemListMap.keys + linkIdToQuestionnaireResponseItemListMap.keys)
+    .distinct()
+    .map { linkId ->
+      transform(
+        linkIdToQuestionnaireItemListMap[linkId] ?: emptyList(),
+        linkIdToQuestionnaireResponseItemListMap[linkId] ?: emptyList(),
+      )
+    }
 }
 
 /**
