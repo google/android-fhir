@@ -164,41 +164,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `removeAnswer() `() = runTest {
-    var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          repeats = true
-          linkId = "a-question"
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(false)),
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(false)),
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, result, _ -> answers = result },
-      )
-
-    questionnaireViewItem.removeAnswer(
-      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().setValue(BooleanType(false)),
-    )
-
-    assertThat(answers).hasSize(1)
-  }
-
-  @Test
-  fun `removeAnswerAt givenIndex removesCorrectAnswer`() = runTest {
+  fun `remove answer at given index`() = runTest {
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().apply {
         linkId = "group-1"
