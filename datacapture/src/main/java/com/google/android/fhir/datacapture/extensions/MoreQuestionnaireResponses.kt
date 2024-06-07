@@ -30,12 +30,22 @@ val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResp
  * correctly. This is because they are flattened out and nested directly under the parent in the
  * FHIR data format.
  *
- * More details: https://build.fhir.org/questionnaireresponse.html#link.
+ * More details on the structure of questionnaire responses:
+ * https://build.fhir.org/questionnaireresponse.html#link.
+ *
+ * Specifically, this function will go through the items in the questionnaire response, and if
+ * multiple questionnaire response items exist for the same repeated group (identified by the link
+ * id), they will be converted into answers under the same questionnaire response item so that there
+ * is a 1:1 relationship from questionnaire item for the repeated group to questionnaire response
+ * item for the same repeated group.
  *
  * This function should be called before the questionnaire view model accepts an
  * application-provided questionnaire response.
  *
  * See also [unpackRepeatedGroups].
+ *
+ * @throws IllegalArgumentException if more than one sibling questionnaire items (nested under the
+ *   questionnaire root or the same parent item) share the same id
  */
 internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnaire) {
   item = item.packRepeatedGroups(questionnaire.item)
