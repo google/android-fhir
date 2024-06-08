@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -86,15 +86,18 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.joinToString(
-      separator = " ${operation.logicalOperator} ",
-      prefix = if (size > 1) "(" else "",
-      postfix = if (size > 1) ")" else "",
-    ) {
-      if (it.params.size > 1) {
-        "(${it.condition})"
-      } else {
-        it.condition
+    this.chunked(50) { conditionParams ->
+        conditionParams.joinToString(
+          separator = " ${operation.logicalOperator} ",
+          prefix = if (size > 1) "(" else "",
+          postfix = if (size > 1) ")" else "",
+        ) {
+          if (it.params.size > 1) {
+            "(${it.condition})"
+          } else {
+            it.condition
+          }
+        }
       }
-    }
+      .joinToString(separator = " ${operation.logicalOperator} ")
 }
