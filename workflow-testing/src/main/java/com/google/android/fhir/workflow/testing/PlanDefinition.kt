@@ -378,10 +378,10 @@ object PlanDefinition : Loadable() {
       assertEquals(count, generatedCarePlan.contained.size)
     }
 
-    fun hasOperationOutcome() {
+    fun hasRequestGroup() {
       assertTrue(
         generatedCarePlan.getContained().stream().anyMatch { r ->
-          r.resourceType.equals(ResourceType.OperationOutcome)
+          r.resourceType.equals(ResourceType.RequestGroup)
         },
       )
     }
