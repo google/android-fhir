@@ -28,11 +28,11 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.ResourceConsolidatorFactory
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -81,7 +81,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-    database.purge(type, id, forcePurge)
+    database.purge(type, setOf(id), forcePurge)
+  }
+
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
+    database.purge(type, ids, forcePurge)
   }
 
   override suspend fun syncDownload(
@@ -128,11 +132,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
+    uploadStrategy: UploadStrategy,
     upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
   ): Flow<SyncUploadProgress> = flow {
-    val resourceConsolidator = DefaultResourceConsolidator(database)
-    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
+    val resourceConsolidator =
+      ResourceConsolidatorFactory.byHttpVerb(uploadStrategy.requestGeneratorMode, database)
+    val localChangeFetcher =
+      LocalChangeFetcherFactory.byMode(uploadStrategy.localChangesFetchMode, database)
 
     emit(
       SyncUploadProgress(

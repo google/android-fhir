@@ -7,7 +7,8 @@
 
   "features": {
     // https://github.com/akhildevelops/devcontainer-features/issues/7
-    "ghcr.io/akhildevelops/devcontainer-features/android-cli:0": {}
+    "ghcr.io/akhildevelops/devcontainer-features/android-cli:0": {},
+    "ghcr.io/devcontainers-contrib/features/pipenv:2": {}
 
     // https://github.com/CASL0/devcontainer-features/issues/4
     // "ghcr.io/casl0/devcontainer-features/android-sdk:1": {}
