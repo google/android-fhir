@@ -25,10 +25,12 @@ fun Project.configureLicensee() {
     allow("BSD-2-Clause")
     allow("BSD-3-Clause")
     allow("MIT")
+    allow("EPL-1.0")
+    allow("LGPL-2.1-only")
 
     ignoreDependencies("com.ibm.icu", "icu4j") {
       because(
-        "ICU uses an ICU license that was mispaced and cannot be loaded by this tool right now",
+        "ICU uses an ICU license that was misplaced and cannot be loaded by this tool right now",
       )
     }
 
@@ -72,14 +74,20 @@ fun Project.configureLicensee() {
     }
 
     // Jakarta XML Binding API
-    allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "2.3.3") {
+    allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "4.0.1") {
       because("BSD 3-clause.")
     }
 
     // Jakarta Activation API 2.1 Specification
-    allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
+    allowDependency("jakarta.activation", "jakarta.activation-api", "2.1.2") {
       because(
         "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php",
+      )
+    }
+
+    allowDependency("jakarta.annotation", "jakarta.annotation-api", "2.1.1") {
+      because(
+        "Licensed under Eclipse EPL-2.0 license http://www.eclipse.org/legal/epl-2.0'",
       )
     }
 
@@ -108,7 +116,7 @@ fun Project.configureLicensee() {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
     // ANTLR 4
-    allowDependency("org.antlr", "antlr4-runtime", "4.10.1") {
+    allowDependency("org.antlr", "antlr4-runtime", "4.13.1") {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
 

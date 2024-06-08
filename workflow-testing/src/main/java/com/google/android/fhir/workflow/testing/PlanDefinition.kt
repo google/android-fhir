@@ -18,7 +18,6 @@ package com.google.android.fhir.workflow.testing
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
-import ca.uhn.fhir.rest.api.EncodingEnum
 import java.io.IOException
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.Bundle
@@ -41,7 +40,6 @@ import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.InMemoryFhirRepository
 import org.opencds.cqf.fhir.utility.repository.Repositories
-import org.opencds.cqf.fhir.utility.repository.ig.IgConventions
 import org.skyscreamer.jsonassert.JSONAssert
 
 object PlanDefinition : Loadable() {
@@ -152,8 +150,6 @@ object PlanDefinition : Loadable() {
         IGInputStreamStructureRepository(
           fhirContext,
           repositoryPath ?: ".",
-          IgConventions.FLAT, // ===>>> Not sure is this is right.
-          EncodingEnum.JSON,
         )
       if (dataRepository == null && contentRepository == null && terminologyRepository == null) {
         return local
