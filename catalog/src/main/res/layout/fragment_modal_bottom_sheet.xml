@@ -7,7 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".ModalBottomSheetFragment"
 >
-
   <TextView
         android:id="@+id/optionsTextView"
         android:layout_width="wrap_content"
@@ -19,13 +18,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />
-
-  <Button
-        style="@style/Widget.App.MaterialComponents.Button"
-        android:id="@+id/errorToggleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+  <CheckBox
+        android:id="@+id/errorToggleCheckBox"
+        style="@style/Questionnaire.CheckBoxStyle"
+        android:layout_width="280dp"
+        android:layout_height="68dp"
+        android:layout_marginTop="24dp"
         android:layout_marginBottom="116dp"
         android:text="@string/show_error_state"
         android:textAllCaps="false"
@@ -34,5 +32,4 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/optionsTextView"
     />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
