@@ -20,8 +20,6 @@ import kotlin.math.min
 
 internal object StronglyConnectedPatches {
 
-  private const val NOT_VISITED = -1
-
   /**
    * Takes a [directedGraph] and computes all the strongly connected components in the graph.
    *
@@ -30,98 +28,55 @@ internal object StronglyConnectedPatches {
    *   a SSC may be ordered randomly depending on the path taken by algorithm to discover the nodes.
    */
   fun scc(directedGraph: Graph): List<List<Node>> {
-    val nodeCount = (directedGraph.values.flatten().toSet() + directedGraph.keys).size
-    return sccTarjan(directedGraph, nodeCount)
+    return findSCCWithTarjan(directedGraph)
   }
 
-  private fun sccTarjan(directedGraph: Graph, nodeCount: Int): List<List<Node>> {
-    // Code inspired from
-    // https://github.com/williamfiset/Algorithms/blob/master/src/main/java/com/williamfiset/algorithms/graphtheory/TarjanSccSolverAdjacencyList.java
-    var counter = -1
-    // Maps  an Integer value between the range of 0 to nodeCount (excluded) to the Node.
-    val intToNode = mutableMapOf<Int, String>()
-    // Maps the Node to an Integer value between the range of 0 to nodeCount (excluded) and is
-    // inverse of [intToNode].
-    val nodeToInt = mutableMapOf<String, Int>()
+  private fun findSCCWithTarjan(diGraph: Graph): List<List<Node>> {
+    val connectedComponents = mutableListOf<List<Node>>()
+    val currentLowValueForEachNode = mutableMapOf<Node, Int>()
+    var exploringCounter = 0
+    val assignedLowValueForEachNode = mutableMapOf<Node, Int>()
+    val nodesCurrentlyInStack = mutableSetOf<Node>()
+    val visitedNodes = mutableSetOf<Node>()
+    val stack = ArrayDeque<Node>()
 
-    val graphOfInts = MutableList<MutableList<Int>>(nodeCount) { mutableListOf() }
-
-    directedGraph.forEach { (key, value) ->
-      val intForKey =
-        nodeToInt[key]
-          ?: let {
-            intToNode[++counter] = key
-            nodeToInt[key] = counter
-            counter
-          }
-
-      value.forEach { node ->
-        val intForValue =
-          nodeToInt[node]
-            ?: let {
-              intToNode[++counter] = node
-              nodeToInt[node] = counter
-              counter
-            }
-        graphOfInts[intForKey].add(intForValue)
-      }
-    }
-
-    var id = 0
-    var sccCount = 0
-    val visited = BooleanArray(graphOfInts.size)
-    val ids = IntArray(graphOfInts.size) { NOT_VISITED }
-    val low = IntArray(graphOfInts.size)
-    val sccs = IntArray(graphOfInts.size)
-    val stack = ArrayDeque<Int>()
-
-    fun dfs(at: Int) {
-      // set the low value for the visiting node as the id(visited counter) as we are exploring the
-      // graph.
-      // This later may get updated to the lowest value of the scc.
-      low[at] = id++
-      // set the ids as (visited counter) as we are exploring the graph.
-      ids[at] = low[at]
+    fun dfs(at: Node) {
+      currentLowValueForEachNode[at] = ++exploringCounter
+      assignedLowValueForEachNode[at] = exploringCounter
+      visitedNodes.add(at)
       stack.addFirst(at)
-      visited[at] = true
-      for (to in graphOfInts[at]) {
-        if (ids[to] == NOT_VISITED) {
-          dfs(to)
+      nodesCurrentlyInStack.add(at)
+
+      diGraph[at]?.forEach {
+        if (!visitedNodes.contains(it)) {
+          dfs(it)
         }
-        if (visited[to]) {
-          low[at] = min(low[at], low[to])
+
+        if (nodesCurrentlyInStack.contains(it)) {
+          currentLowValueForEachNode[at] =
+            min(currentLowValueForEachNode[at]!!, currentLowValueForEachNode[it]!!)
         }
       }
 
-      // On recursive callback, if we're at the root node (start of SCC)
-      // empty the seen stack until back to root.
-      if (ids[at] == low[at]) {
-        var node: Int = stack.removeFirst()
+      // We have found the head node in the scc.
+      if (currentLowValueForEachNode[at] == assignedLowValueForEachNode[at]) {
+        val connected = mutableListOf<Node>()
         while (true) {
-          visited[node] = false
-          sccs[node] = sccCount
-          if (node == at) break
-          node = stack.removeFirst()
+          val node = stack.removeFirst()
+          connected.add(node)
+          nodesCurrentlyInStack.remove(node)
+          if (node == at || stack.isEmpty()) break
         }
-        sccCount++
+        connectedComponents.add(connected.reversed())
       }
     }
 
-    for (i in 0 until nodeCount) {
-      if (ids[i] == NOT_VISITED) {
-        dfs(i)
+    diGraph.keys.forEach {
+      if (!visitedNodes.contains(it)) {
+        dfs(it)
       }
     }
 
-    // The algorithm discovers the scc in topological order, so use a sorted map to maintain the
-    // order.
-    val lowLinkToConnectedMap = sortedMapOf<Int, MutableList<Int>>()
-    for (i in 0 until nodeCount) {
-      if (!lowLinkToConnectedMap.containsKey(sccs[i])) {
-        lowLinkToConnectedMap[sccs[i]] = mutableListOf()
-      }
-      lowLinkToConnectedMap[sccs[i]]!!.add(i)
-    }
-    return lowLinkToConnectedMap.values.map { it.mapNotNull { intToNode[it] } }
+    return connectedComponents
   }
 }

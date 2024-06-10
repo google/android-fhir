@@ -43,13 +43,14 @@ class StronglyConnectedPatchesTest {
 
     assertThat(result)
       .containsExactly(
-        listOf("0"),
         listOf("1", "2"),
+        listOf("0"),
         listOf("3", "4", "5"),
-        listOf("7"),
         listOf("8"),
+        listOf("7"),
         listOf("6"),
       )
+      .inOrder()
   }
 
   @Test
