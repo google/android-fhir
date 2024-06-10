@@ -645,12 +645,6 @@ class QuestionnaireUiEspressoTest {
     )
 
     onView(withId(R.id.questionnaire_edit_recycler_view))
-      //      .perform(
-      //        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-      //          0,
-      //          clickChildViewWithId(R.id.add_item),
-      //        ),
-      //      )
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
           1,
