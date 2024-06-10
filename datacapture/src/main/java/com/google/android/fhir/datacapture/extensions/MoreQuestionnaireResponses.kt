@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,9 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import java.util.Date
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -117,5 +120,21 @@ private fun unpackRepeatedGroups(
     }
   } else {
     listOf(questionnaireResponseItem)
+  }
+}
+
+/** Adds a launch timestamp as an extension to the Questionnaire Response */
+internal fun QuestionnaireResponse.addLaunchTimestamp() {
+  val noLaunchTimeStampExists =
+    this.extension.none {
+      it.url == "http://github.com/google-android/questionnaire-launch-timestamp"
+    }
+  if (noLaunchTimeStampExists) {
+    this.extension.add(
+      Extension(
+        "http://github.com/google-android/questionnaire-launch-timestamp",
+        DateTimeType(Date()),
+      ),
+    )
   }
 }
