@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -195,5 +196,41 @@ class GroupViewHolderFactoryTest {
 
     assertThat(viewHolder.itemView.findViewById<View>(R.id.add_item).visibility)
       .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun `test repeated group is read only view`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          type = Questionnaire.QuestionnaireItemType.GROUP
+          repeats = true
+          readOnly = true
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isFalse()
+  }
+
+  @Test
+  fun `test repeated group is not read only`() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply {
+          text = "Question?"
+          type = Questionnaire.QuestionnaireItemType.GROUP
+          repeats = true
+          readOnly = false
+        },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      ),
+    )
+    assertThat((viewHolder.itemView.findViewById<Button>(R.id.add_item).isEnabled)).isTrue()
   }
 }
