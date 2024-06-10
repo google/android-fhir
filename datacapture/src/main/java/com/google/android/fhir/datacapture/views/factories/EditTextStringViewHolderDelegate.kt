@@ -63,6 +63,7 @@ internal class EditTextStringViewHolderDelegate :
     textInputEditText: TextInputEditText,
     textInputLayout: TextInputLayout,
   ) {
+    println("updateUI Called")
     val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
     if ((text != textInputEditText.text.toString())) {
       textInputEditText.text?.clear()

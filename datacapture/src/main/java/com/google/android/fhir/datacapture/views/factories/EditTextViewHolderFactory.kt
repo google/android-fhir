@@ -52,7 +52,6 @@ internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId:
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
-  private var lastQuestionnaireViewItemId: String? = null
 
   private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
@@ -102,8 +101,14 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
     displayValidationResult(questionnaireViewItem.validationResult)
 
-    if (lastQuestionnaireViewItemId != questionnaireViewItem.questionnaireItem.id) {
-      lastQuestionnaireViewItemId = questionnaireViewItem.questionnaireItem.id
+    if (!textInputEditText.isFocused) {
+      /**
+       * We should only update an EditText programmatically when its not in focus. Following should
+       * and does work for 2 scenarios:-
+       * 1. When user scrolls to a new question and same ViewHolder is utilised by the RecyclerView,
+       *    the EditText content should be updated for that [QuestionnaireViewItem]
+       * 2. When the current item is readOnly, then it's value may get updated by expressions.
+       */
       textInputEditText.removeTextChangedListener(textWatcher)
       updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
