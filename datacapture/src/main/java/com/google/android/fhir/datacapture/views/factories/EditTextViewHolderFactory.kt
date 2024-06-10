@@ -52,6 +52,7 @@ internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId:
 abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputType: Int) :
   QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
+  private var lastQuestionnaireViewItemId: String? = null
 
   private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
@@ -74,7 +75,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
     textInputEditText.setOnEditorActionListener { view, actionId, _ ->
       if (actionId != EditorInfo.IME_ACTION_NEXT) {
-        false
+        return@setOnEditorActionListener false
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
@@ -101,18 +102,21 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     }
     displayValidationResult(questionnaireViewItem.validationResult)
 
-    textInputEditText.removeTextChangedListener(textWatcher)
-    updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
+    if (lastQuestionnaireViewItemId != questionnaireViewItem.questionnaireItem.id) {
+      lastQuestionnaireViewItemId = questionnaireViewItem.questionnaireItem.id
+      textInputEditText.removeTextChangedListener(textWatcher)
+      updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
-    unitTextView?.apply {
-      text = questionnaireViewItem.questionnaireItem.unit?.code
-      visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
-    }
-
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
+      unitTextView?.apply {
+        text = questionnaireViewItem.questionnaireItem.unit?.code
+        visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
       }
+
+      textWatcher =
+        textInputEditText.doAfterTextChanged { editable: Editable? ->
+          context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
+        }
+    }
   }
 
   private fun displayValidationResult(validationResult: ValidationResult) {
