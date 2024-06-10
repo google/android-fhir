@@ -639,15 +639,18 @@ class QuestionnaireUiEspressoTest {
 
   @Test
   fun test_repeated_group_is_deleted() {
-    buildFragmentFromQuestionnaire("/component_repeated_group.json")
+    buildFragmentFromQuestionnaire(
+      "/component_repeated_group.json",
+      responseFileName = "/repeated_group_response.json",
+    )
 
     onView(withId(R.id.questionnaire_edit_recycler_view))
-      .perform(
-        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
-          0,
-          clickChildViewWithId(R.id.add_item),
-        ),
-      )
+      //      .perform(
+      //        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+      //          0,
+      //          clickChildViewWithId(R.id.add_item),
+      //        ),
+      //      )
       .perform(
         RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
           1,
@@ -696,21 +699,25 @@ class QuestionnaireUiEspressoTest {
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
     isReviewMode: Boolean = false,
+    responseFileName: String? = null,
   ): QuestionnaireFragment {
     val questionnaireJsonString = readFileFromAssets(fileName)
-    val questionnaireFragment =
+    val builder =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
         .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
-        .build()
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add(R.id.container_holder, questionnaireFragment)
+
+    responseFileName?.let { builder.setQuestionnaireResponse(readFileFromAssets(it)) }
+
+    return builder.build().also { fragment ->
+      activityScenarioRule.scenario.onActivity { activity ->
+        activity.supportFragmentManager.commitNow {
+          setReorderingAllowed(true)
+          add(R.id.container_holder, fragment)
+        }
       }
     }
-    return questionnaireFragment
   }
 
   private fun buildFragmentFromQuestionnaire(

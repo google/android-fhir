@@ -1,0 +1,32 @@
+{
+  "resourceType": "QuestionnaireResponse",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Repeated Group",
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Sample date question",
+          "answer": [
+            {
+              "valueDate": "2024-06-03"
+            }
+          ]
+        },
+        {
+          "linkId": "1-2",
+          "text": "Sample dropdown question",
+          "answer": [
+            {
+              "valueCoding": {
+                "code": "answer-a",
+                "display": "A"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
