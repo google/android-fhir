@@ -3705,88 +3705,85 @@ class QuestionnaireViewModelTest {
           "item": [
             {
               "linkId": "12.0",
-              "answer": [
+              "item": [
                 {
+                  "linkId": "12.6",
                   "item": [
                     {
-                      "linkId": "12.6",
+                      "linkId": "12.6.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "live-birth",
+                            "display": "Live Birth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
                       "item": [
                         {
-                          "linkId": "12.6.1",
+                          "linkId": "12.6.3.1",
                           "answer": [
                             {
                               "valueCoding": {
-                                "code": "live-birth",
-                                "display": "Live Birth"
+                                "code": "male",
+                                "display": "Male"
                               }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "male",
-                                    "display": "Male"
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1"
                             }
                           ]
                         }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "item": [
+                    },
                     {
-                      "linkId": "12.6",
+                      "linkId": "12.6.4",
                       "item": [
                         {
-                          "linkId": "12.6.1",
+                          "linkId": "12.6.4.1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {            
+              "linkId": "12.0",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "still-birth",
+                            "display": "Stillbirth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
+                      "item": [
+                        {
+                          "linkId": "12.6.3.1"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.4",
+                      "item": [
+                        {
+                          "linkId": "12.6.4.1",
                           "answer": [
                             {
                               "valueCoding": {
-                                "code": "still-birth",
-                                "display": "Stillbirth"
+                                "code": "FSB",
+                                "display": "FSB"
                               }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1"
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "FSB",
-                                    "display": "FSB"
-                                  }
-                                }
-                              ]
                             }
                           ]
                         }
