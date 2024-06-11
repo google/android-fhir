@@ -62,7 +62,6 @@ object PhoneNumberViewHolderFactory :
       override fun updateInputTextUI(
         questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
-        textInputLayout: TextInputLayout,
       ) {
         val text =
           questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
@@ -71,7 +70,10 @@ object PhoneNumberViewHolderFactory :
         }
       }
 
-      override fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem) {
+      override fun updateValidationTextUI(
+        questionnaireViewItem: QuestionnaireViewItem,
+        textInputLayout: TextInputLayout,
+      ) {
         textInputLayout.error =
           getValidationErrorMessage(
             textInputLayout.context,

@@ -53,7 +53,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
 
   private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
-  protected lateinit var textInputLayout: TextInputLayout
+  private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
@@ -98,19 +98,32 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
     }
 
-    // Validation is updated everytime the view is bound
-    updateValidationTextUI(questionnaireViewItem)
+    /**
+     * Ensures that any validation errors or warnings are immediately reflected in the UI whenever
+     * the view is bound to a new or updated item.
+     */
+    updateValidationTextUI(questionnaireViewItem, textInputLayout)
 
     /**
-     * We should only update an EditText programmatically when its not in focus. Following should
-     * and does work for 2 scenarios:-
-     * 1. When user scrolls to a new question and same ViewHolder is utilised by the RecyclerView,
-     *    the EditText content should be updated for that [QuestionnaireViewItem]
-     * 2. When the current item is readOnly, then it's value may get updated by expressions.
+     * Updates the EditText *only* if the EditText is not currently focused.
+     *
+     * This is done to avoid disrupting the user's typing experience and prevent conflicts if they
+     * are actively editing the field. Updating the text programmatically is safe in the following
+     * scenarios:
+     * 1. **ViewHolder Reuse:** When the same ViewHolder is being used to display a different
+     *    QuestionnaireViewItem, the EditText needs to be updated with the new item's content.
+     * 2. **Read-Only Items:** When the item is read-only, its value may change dynamically due to
+     *    expressions, and the EditText needs to reflect this updated value.
+     *
+     * The following actions are performed if the EditText is not focused:
+     * - Removes any existing text change listener.
+     * - Updates the input text UI based on the QuestionnaireViewItem.
+     * - Updates the unit text view (if applicable).
+     * - Attaches a new text change listener to handle user input.
      */
     if (!textInputEditText.isFocused) {
       textInputEditText.removeTextChangedListener(textWatcher)
-      updateInputTextUI(questionnaireViewItem, textInputEditText, textInputLayout)
+      updateInputTextUI(questionnaireViewItem, textInputEditText)
 
       unitTextView?.apply {
         text = questionnaireViewItem.questionnaireItem.unit?.code
@@ -133,12 +146,15 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   /** Handles user input from the `editable` and updates the questionnaire. */
   abstract suspend fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
 
-  /** Handles the UI update. */
+  /** Handles the update of [textInputEditText].text. */
   abstract fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
-    textInputLayout: TextInputLayout,
   )
 
-  abstract fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem)
+  /** Handles the update of [textInputLayout].error. */
+  abstract fun updateValidationTextUI(
+    questionnaireViewItem: QuestionnaireViewItem,
+    textInputLayout: TextInputLayout,
+  )
 }

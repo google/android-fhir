@@ -62,7 +62,6 @@ internal class EditTextStringViewHolderDelegate :
   override fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
-    textInputLayout: TextInputLayout,
   ) {
     val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
     if ((text != textInputEditText.text.toString())) {
@@ -71,7 +70,10 @@ internal class EditTextStringViewHolderDelegate :
     }
   }
 
-  override fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem) {
+  override fun updateValidationTextUI(
+    questionnaireViewItem: QuestionnaireViewItem,
+    textInputLayout: TextInputLayout,
+  ) {
     textInputLayout.error =
       getValidationErrorMessage(
         textInputLayout.context,

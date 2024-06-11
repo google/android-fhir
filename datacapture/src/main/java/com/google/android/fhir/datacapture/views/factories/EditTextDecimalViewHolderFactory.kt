@@ -47,7 +47,6 @@ internal object EditTextDecimalViewHolderFactory :
       override fun updateInputTextUI(
         questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
-        textInputLayout: TextInputLayout,
       ) {
         val questionnaireItemViewItemDecimalAnswer =
           questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
@@ -65,7 +64,10 @@ internal object EditTextDecimalViewHolderFactory :
         }
       }
 
-      override fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem) {
+      override fun updateValidationTextUI(
+        questionnaireViewItem: QuestionnaireViewItem,
+        textInputLayout: TextInputLayout,
+      ) {
         textInputLayout.error =
           getValidationErrorMessage(
             textInputLayout.context,
