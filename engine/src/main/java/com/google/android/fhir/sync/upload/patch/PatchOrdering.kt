@@ -20,9 +20,26 @@ import androidx.annotation.VisibleForTesting
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 
-typealias Node = String
+/** Represents a resource e.g. 'Patient/123' , 'Encounter/123'. */
+internal typealias Node = String
 
-typealias Graph = Map<Node, List<Node>>
+/**
+ * Represents a collection of resources with reference to other resource represented as an edge.
+ * e.g. Two Patient resources p1 and p2, each with an encounter and subsequent observation will be
+ * represented as follows
+ *
+ * ```
+ * [
+ *   'Patient/p1' : [],
+ *   'Patient/p2' : [],
+ *   'Encounter/e1' : ['Patient/p1'],  // Encounter.subject
+ *   'Encounter/e2' : ['Patient/p2'],  // Encounter.subject
+ *   'Observation/o1' : ['Patient/p1', 'Encounter/e1'], // Observation.subject, Observation.encounter
+ *   'Observation/o2' : ['Patient/p2', 'Encounter/e2'], // Observation.subject, Observation.encounter
+ *  ]
+ *  ```
+ */
+internal typealias Graph = Map<Node, List<Node>>
 
 /**
  * Orders the [PatchMapping]s to maintain referential integrity during upload.

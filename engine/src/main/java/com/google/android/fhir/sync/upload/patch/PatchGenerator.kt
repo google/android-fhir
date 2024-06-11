@@ -72,5 +72,8 @@ internal data class PatchMapping(
  * Structure to describe the cyclic nature of [PatchMapping].
  * - A single value in [patchMappings] signifies the acyclic nature of the node.
  * - Multiple values in [patchMappings] signifies the cyclic nature of the nodes among themselves.
+ *
+ * [PatchMappingGroup] is used by the engine to make sure that related resources get uploaded to the
+ * server in the same request to maintain the referential integrity of resources during creation.
  */
 internal data class PatchMappingGroup(val patchMappings: List<PatchMapping>)
