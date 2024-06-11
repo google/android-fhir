@@ -62,6 +62,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -72,6 +73,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -334,28 +336,31 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
-      // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
-      questionnaireResponseItem.answer = answers.toList()
-      when {
-        (questionnaireResponseItem.answer.isNotEmpty()) -> {
-          draftAnswerMap.remove(questionnaireResponseItem)
-        }
-        else -> {
-          if (draftAnswer == null) {
+      withContext(Dispatchers.Default) {
+        // TODO(jingtang10): update the questionnaire response item pre-order list and the parent
+        // map
+        questionnaireResponseItem.answer = answers.toList()
+        when {
+          (questionnaireResponseItem.answer.isNotEmpty()) -> {
             draftAnswerMap.remove(questionnaireResponseItem)
-          } else {
-            draftAnswerMap[questionnaireResponseItem] = draftAnswer
+          }
+          else -> {
+            if (draftAnswer == null) {
+              draftAnswerMap.remove(questionnaireResponseItem)
+            } else {
+              draftAnswerMap[questionnaireResponseItem] = draftAnswer
+            }
           }
         }
-      }
-      if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
-        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
-      }
-      modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+        if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
+          questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+        }
+        modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
+        updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
 
-      modificationCount.update { it + 1 }
+        modificationCount.update { it + 1 }
+      }
     }
 
   private val expressionEvaluator: ExpressionEvaluator =

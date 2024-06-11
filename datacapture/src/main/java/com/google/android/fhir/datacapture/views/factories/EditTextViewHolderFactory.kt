@@ -32,11 +32,9 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
-import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.unit
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
@@ -99,7 +97,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
       helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
     }
-    displayValidationResult(questionnaireViewItem.validationResult)
+    updateValidationTextUI(questionnaireViewItem)
 
     if (!textInputEditText.isFocused) {
       /**
@@ -110,23 +108,19 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
        * 2. When the current item is readOnly, then it's value may get updated by expressions.
        */
       textInputEditText.removeTextChangedListener(textWatcher)
-      updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
+      updateInputTextUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
       unitTextView?.apply {
         text = questionnaireViewItem.questionnaireItem.unit?.code
         visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
       }
 
+      // TextWatcher is set only once for each question item in scenario 1
       textWatcher =
         textInputEditText.doAfterTextChanged { editable: Editable? ->
           context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
         }
     }
-  }
-
-  private fun displayValidationResult(validationResult: ValidationResult) {
-    textInputLayout.error =
-      getValidationErrorMessage(textInputLayout.context, questionnaireViewItem, validationResult)
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {
@@ -138,9 +132,11 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   abstract suspend fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
 
   /** Handles the UI update. */
-  abstract fun updateUI(
+  abstract fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
     textInputLayout: TextInputLayout,
   )
+
+  abstract fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem)
 }

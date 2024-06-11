@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.text.Editable
 import android.text.InputType
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -58,7 +59,7 @@ internal class EditTextStringViewHolderDelegate :
     }
   }
 
-  override fun updateUI(
+  override fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
     textInputLayout: TextInputLayout,
@@ -68,5 +69,14 @@ internal class EditTextStringViewHolderDelegate :
       textInputEditText.text?.clear()
       textInputEditText.append(text)
     }
+  }
+
+  override fun updateValidationTextUI(questionnaireViewItem: QuestionnaireViewItem) {
+    textInputLayout.error =
+      getValidationErrorMessage(
+        textInputLayout.context,
+        questionnaireViewItem,
+        questionnaireViewItem.validationResult,
+      )
   }
 }
