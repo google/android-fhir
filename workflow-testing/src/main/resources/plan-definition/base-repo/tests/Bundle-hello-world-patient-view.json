@@ -1,0 +1,40 @@
+{
+  "resourceType": "Bundle",
+  "id": "hello-world-patient-view",
+  "type": "collection",
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "RequestGroup",
+        "id": "hello-world-patient-view",
+        "instantiatesCanonical": [
+          "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/hello-world-patient-view|1.0.0"
+        ],
+        "status": "draft",
+        "intent": "proposal",
+        "subject": {
+          "reference": "helloworld-patient-1"
+        },
+        "encounter": {
+          "reference": "helloworld-patient-1-encounter-1"
+        },
+        "action": [
+          {
+            "title": "Hello World!",
+            "description": "The CDS Service is alive and communicating successfully!",
+            "condition": [
+              {
+                "kind": "start",
+                "expression": {
+                  "description": "Whether or not a Hello World! card should be returned",
+                  "language": "text/cql.identifier",
+                  "expression": "Main Action Condition Expression Is True"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

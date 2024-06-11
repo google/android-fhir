@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,14 +25,15 @@ import org.gradle.api.tasks.TaskAction
 import org.hl7.fhir.r4.model.Bundle
 
 @CacheableTask
-abstract class GenerateSourcesTask : DefaultTask() {
+abstract class GenerateSearchParamsTask : DefaultTask() {
   @OutputDirectory val srcOutputDir = project.objects.directoryProperty()
+
   @OutputDirectory val testOutputDir = project.objects.directoryProperty()
 
   @TaskAction
   fun generateCode() {
     val bundle =
-      GenerateSourcesTask::class.java.getResourceAsStream("/search-parameters.json").use {
+      GenerateSearchParamsTask::class.java.getResourceAsStream("/search-parameters.json").use {
         checkNotNull(it) { "Failed to get search-parameters.json" }
         FhirContext.forCached(FhirVersionEnum.R4)
           .newJsonParser()
@@ -47,7 +48,7 @@ abstract class GenerateSourcesTask : DefaultTask() {
     SearchParameterRepositoryGenerator.generate(
       bundle = bundle,
       outputPath = srcOut,
-      testOutputPath = testOut
+      testOutputPath = testOut,
     )
   }
 }

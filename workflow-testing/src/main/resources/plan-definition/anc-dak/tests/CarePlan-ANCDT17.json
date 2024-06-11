@@ -1,0 +1,112 @@
+{
+  "resourceType": "CarePlan",
+  "id": "ANCDT17",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "ANCDT17",
+      "instantiatesCanonical": [
+        "http://fhir.org/guides/who/anc-cds/PlanDefinition/ANCDT17"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "Patient/5946f880-b197-400b-9caa-a3c661d23041"
+      },
+      "encounter": {
+        "reference": "Encounter/helloworld-patient-1-encounter-1"
+      },
+      "action": [
+        {
+          "title": "ANC.DT.17 Pre-eclampsia, severe pre-eclampsia and hypertension diagnosis",
+          "action": [
+            {
+              "id": "1",
+              "title": "Refer urgently to a hospital",
+              "description": "Refer urgently to a hospital",
+              "textEquivalent": "Symptom(s) of severe pre-eclampsia! Refer urgently to hospital!\nWoman has hypertension. If she is experiencing a symptom of severe pre-eclampsia, then refer urgently to the hospital for further investigation and management.\n\nProcedure\n– Give magnesium sulphate\n– Give appropriate anti-hypertensives\n– Revise the birth plan\n– Refer urgently to hospital",
+              "documentation": [
+                {
+                  "type": "citation",
+                  "label": "Pregnancy, childbirth, postpartum and newborn care guide (IMPAC) (2015): recommendation C3 (1)\nManaging complications guide (IMPAC) (2017): Section S-53, Table S-12 (5)"
+                }
+              ],
+              "condition": [
+                {
+                  "kind": "applicability",
+                  "expression": {
+                    "description": "((((((((((((((((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Severe headache\"))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Severe headache\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Blurred vision\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Blurred vision\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Epigastric pain\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Epigastric pain\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Dizziness\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Dizziness\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Vomiting\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"Vomiting\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"++\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"++\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"+++\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"+++\")))\n  OR ((\"Systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 140 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"++++\")))\n  OR ((\"Diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 90 mmHg)\n  AND (\"Symptoms of severe pre-eclampsia\" = \"None\")\n  AND (\"Urine dipstick result – protein\" = \"++++\"))",
+                    "language": "text/cql-identifier",
+                    "expression": "Should Refer urgently to a hospital"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "3",
+              "title": "Refer urgently to a hospital",
+              "description": "Refer urgently to a hospital 3",
+              "textEquivalent": "Woman has severe hypertension. If SBP is 160 mmHg or higher and/or DBP is 110 mmHg or higher, then refer urgently to the hospital for further investigation and management.",
+              "documentation": [
+                {
+                  "type": "citation",
+                  "label": "Managing complications guide (IMPAC) (2017): S-61 (5)\nWHO pre-eclampsia and eclampsia recommendations (2011): 4 (7)"
+                }
+              ],
+              "condition": [
+                {
+                  "kind": "applicability",
+                  "expression": {
+                    "description": "((((\"Systolic blood pressure\" ≥ 160 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 160 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"+\"))\n  OR ((\"Diastolic blood pressure\" ≥ 110 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 110 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"+\")))\n  OR ((\"Systolic blood pressure\" ≥ 160 mmHg)\n  AND (\"Repeat systolic blood pressure\" ≥ 160 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"None\")))\n  OR ((\"Diastolic blood pressure\" ≥ 110 mmHg)\n  AND (\"Repeat diastolic blood pressure\" ≥ 110 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"None\"))",
+                    "language": "text/cql-identifier",
+                    "expression": "Should Refer urgently to a hospital 3"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "4",
+              "title": "Conduct hypertension counselling",
+              "description": "Conduct hypertension counselling",
+              "textEquivalent": "Woman has hypertension – SBP of 140 mmHg or higher and/or DBP of 90 mmHg or higher and no proteinuria.\n\nCounselling:\n– Advice to reduce workload and to rest\n– Advise on danger signs\n– Reassess at the next contact or in 1 week if 8 months pregnant\n– If hypertension persists after 1 week or at next contact, refer to hospital or discuss case with the doctor, if available",
+              "documentation": [
+                {
+                  "type": "citation",
+                  "label": "Pregnancy, childbirth, postpartum and newborn care guide (IMPAC) (2015): C3 (1)"
+                }
+              ],
+              "condition": [
+                {
+                  "kind": "applicability",
+                  "expression": {
+                    "description": "((((\"Existing chronic health conditions\" = \"Hypertension\")\n  OR ((140 mmHg ≤ \"Systolic blood pressure\" < 160 mmHg)\n  AND (140 mmHg ≤ \"Repeat systolic blood pressure\" < 160 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"+\")))\n  OR ((90 mmHg ≤ \"Diastolic blood pressure\" < 110 mmHg)\n  AND (90 mmHg ≤ \"Repeat diastolic blood pressure\" < 110 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"+\")))\n  OR ((140 mmHg ≤ \"Systolic blood pressure\" < 160 mmHg)\n  AND (140 mmHg ≤ \"Repeat systolic blood pressure\" < 160 mmHg)\n  AND (Urine dipstick result – protein\" = \"None\")))\n  OR ((90 mmHg ≤ \"Diastolic blood pressure\" < 110 mmHg)\n  AND (90 mmHg ≤ \"Repeat diastolic blood pressure\" < 110 mmHg)\n  AND (\"Urine dipstick result – protein\" = \"None\"))",
+                    "language": "text/cql-identifier",
+                    "expression": "Should Conduct hypertension counselling"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://fhir.org/guides/who/anc-cds/PlanDefinition/ANCDT17"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "Patient/5946f880-b197-400b-9caa-a3c661d23041"
+  },
+  "encounter": {
+    "reference": "Encounter/helloworld-patient-1-encounter-1"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/ANCDT17"
+      }
+    }
+  ]
+}

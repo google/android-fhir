@@ -1,13 +1,13 @@
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
 configureRuler()
 
 android {
+  namespace = "com.google.android.fhir.demo"
   compileSdk = Sdk.compileSdk
   defaultConfig {
     applicationId = Releases.Demo.applicationId
@@ -18,24 +18,23 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
   }
   buildTypes {
-    getByName("release") {
+    release {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
-  buildFeatures { viewBinding = true }
+  buildFeatures {
+    buildConfig = true
+    viewBinding = true
+  }
   compileOptions {
     // Flag to enable support for the new language APIs
     // See https://developer.android.com/studio/write/java8-support
     isCoreLibraryDesugaringEnabled = true
+  }
 
-    sourceCompatibility = Java.sourceCompatibility
-    targetCompatibility = Java.targetCompatibility
-  }
-  kotlinOptions { jvmTarget = Java.kotlinJvmTarget.toString() }
-  packagingOptions {
-    resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt"))
-  }
+  packaging { resources.excludes.addAll(listOf("META-INF/ASL-2.0.txt", "META-INF/LGPL-3.0.txt")) }
+  kotlin { jvmToolchain(11) }
 }
 
 dependencies {
@@ -47,6 +46,7 @@ dependencies {
   implementation(Dependencies.Androidx.activity)
   implementation(Dependencies.Androidx.appCompat)
   implementation(Dependencies.Androidx.constraintLayout)
+  implementation(Dependencies.Androidx.datastorePref)
   implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Androidx.recyclerView)
   implementation(Dependencies.Androidx.workRuntimeKtx)

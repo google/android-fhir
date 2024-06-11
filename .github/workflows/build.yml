@@ -12,59 +12,73 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: "GitHub Actions: Build"
+name: "Build"
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events for the `master` branch
 on:
   push:
-    branches: [ master ]
-    tags:
-      build*
+    branches: [master]
+    tags: build*
   pull_request:
-    branches: [ master ]
+    # The branches below must be a subset of the branches above
+    branches: [master]
+  schedule:
+    # Run once a week (even if no new code or PRs) to detect random regressions
+    - cron: "12 13 * * 2"
+
 env:
   # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
   # See https://github.com/marketplace/actions/gradle-build-action?version=v2.1.1#cache-debugging-and-analysis
   GRADLE_BUILD_ACTION_CACHE_DEBUG_ENABLED: true
   GRADLE_BUILD_ACTION_CACHE_KEY_PREFIX: "fhir" # change this to invalidate cache
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+
+concurrency:
+  # github.head_ref uniquely identifies Pull Requests (but is not available when building branches like main or master)
+  # github.ref is the fallback used when building for workflows triggered by push
+  # Note that || are fallback values (not "concatenations")
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true # Use e.g. ${{ github.ref != 'refs/heads/main' }} (or master, until #2180) to only cancel for PRs not on branch
+
+  # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
+    runs-on: ubuntu-22.04-8core
+    timeout-minutes: 60
+    permissions:
+      actions: read
+      contents: read
 
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - name: Cancel previous
-        uses: styfle/cancel-workflow-action@0.7.0
-        with:
-          access_token: ${{ github.token }}
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           # Fetch origin/master for spotless ratchet to work
           # https://github.com/diffplug/spotless/issues/1242
           fetch-depth: 0
+
       - name: Setup machine
         uses: ./.github/actions/commonSetup
 
       - name: Spotless check
-        run: ./gradlew spotlessCheck --scan --stacktrace
+        run: ./gradlew spotlessCheck --scan --full-stacktrace
 
-      - name: Build with Gradle
-        run: ./gradlew build --scan --stacktrace
+      - name: Build (full) with Gradle
+        run: ./gradlew build --scan --full-stacktrace
 
       - name: Check with Gradle
-        run: ./gradlew check --scan --stacktrace
+        run: ./gradlew check --scan --full-stacktrace
 
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
       - name: Upload maven repo
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: maven-repository
           path: build/ci-repo
@@ -76,7 +90,56 @@ jobs:
       # Upload the build dir for all the modules for diagnosis
       - name: Upload build dir
         if: ${{ failure() }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: build
           path: build.zip
+
+      # Steps that follow are related to the Documentation Web Site
+      # This deploys content based on docs/ which ends up in site/
+      # to https://google.github.io/android-fhir/ using GitHub Pages.
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+          cache: "pipenv"
+      - name: Install PipEnv
+        uses: tiagovrtr/actions-pipenv@v1
+        with:
+          pipenv-version: 2023.12.1
+
+      - name: Build Docs Site
+        # This 1st step intentionally runs not just on the main ("master") branch
+        # but also for all pull requests. This serves to detect doc breakages.
+        # (But the following steps, which do the actual deploy, only run for
+        #  the main branch, of course.)
+        run: ./build-docs.bash
+
+      - name: Setup GitHub Pages
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload site/ directory as GitHub Pages artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "site/"
+
+  deploy-website:
+    needs: build
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    # https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+    # Sets required permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # https://github.com/actions/deploy-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

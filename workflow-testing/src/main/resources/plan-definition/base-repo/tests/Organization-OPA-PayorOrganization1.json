@@ -1,0 +1,21 @@
+{
+  "resourceType": "Organization",
+  "id": "OPA-PayorOrganization1",
+  "meta": {
+    "versionId": "1",
+    "lastUpdated": "2022-12-01T17:16:05.159+00:00"
+  },
+  "name": "Palmetto GBA",
+  "address": [
+    {
+      "use": "work",
+      "line": [
+        "111 Dogwood Ave"
+      ],
+      "city": "Columbia",
+      "state": "SC",
+      "postalCode": "29999",
+      "country": "US"
+    }
+  ]
+}

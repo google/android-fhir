@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -64,8 +65,10 @@ class QuestionnaireViewModelParameterizedTest(
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()
-        is DataCaptureConfig.Provider
-    ) { "Few tests require a custom application class that implements DataCaptureConfig.Provider" }
+        is DataCaptureConfig.Provider,
+    ) {
+      "Few tests require a custom application class that implements DataCaptureConfig.Provider"
+    }
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
   }
 
@@ -79,24 +82,26 @@ class QuestionnaireViewModelParameterizedTest(
             linkId = "a-link-id"
             text = "Yes or no?"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    assertResourceEquals(
-      viewModel.getQuestionnaireResponse(),
-      QuestionnaireResponse().apply {
-        this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
-        addItem(
-          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            linkId = "a-link-id"
-            text = "Yes or no?"
-          }
-        )
-      }
-    )
+    runTest {
+      assertResourceEquals(
+        viewModel.getQuestionnaireResponse(),
+        QuestionnaireResponse().apply {
+          this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+              linkId = "a-link-id"
+              text = "Yes or no?"
+            },
+          )
+        },
+      )
+    }
   }
 
   @Test
@@ -109,7 +114,7 @@ class QuestionnaireViewModelParameterizedTest(
             linkId = "a-link-id"
             text = "Basic question"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
-          }
+          },
         )
       }
     val questionnaireResponse =
@@ -122,15 +127,15 @@ class QuestionnaireViewModelParameterizedTest(
             addAnswer(
               QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                 value = BooleanType(true)
-              }
+              },
             )
-          }
+          },
         )
       }
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   private fun createQuestionnaireViewModel(
@@ -156,7 +161,7 @@ class QuestionnaireViewModelParameterizedTest(
       if (questionnaireResponseSource == QuestionnaireResponseSource.STRING) {
         state.set(
           EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-          printer.encodeResourceToString(questionnaireResponse)
+          printer.encodeResourceToString(questionnaireResponse),
         )
       } else if (questionnaireResponseSource == QuestionnaireResponseSource.URI) {
         val questionnaireResponseFile = File(context.cacheDir, "test_questionnaire_response")
@@ -189,7 +194,7 @@ class QuestionnaireViewModelParameterizedTest(
         arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.URI),
         arrayOf(QuestionnaireSource.URI, QuestionnaireResponseSource.STRING),
         arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.URI),
-        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING)
+        arrayOf(QuestionnaireSource.STRING, QuestionnaireResponseSource.STRING),
       )
   }
 }
@@ -197,11 +202,11 @@ class QuestionnaireViewModelParameterizedTest(
 /** The source of questionnaire. */
 enum class QuestionnaireSource {
   STRING,
-  URI
+  URI,
 }
 
 /** The source of questionnaire-response. */
 enum class QuestionnaireResponseSource {
   STRING,
-  URI
+  URI,
 }

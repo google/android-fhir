@@ -37,14 +37,19 @@
         name="Theme.Questionnaire"
         parent="Theme.Material3.DayNight.NoActionBar"
     >
+        <item name="questionnaireGroupTypeHeaderStyle">
+            @style/Questionnaire.GroupTypeHeaderStyle
+        </item>
         <item name="questionnaireGroupTypeQuestionTextStyle">
             @style/TextAppearance.Material3.TitleMedium
+        </item>
+        <item name="questionnaireQuestionHeaderStyle">
+            @style/Questionnaire.QuestionHeaderStyle
         </item>
         <item
             name="questionnaireQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
-
-      <item
+        <item
             name="questionnaireReviewModeQuestionTextStyle"
         >@style/TextAppearance.Material3.TitleMedium</item>
         <item
@@ -58,8 +63,17 @@
             name="questionnaireHelpTextStyle"
         >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="questionnaireHelpButtonStyle">
-            @style/Widget.MaterialComponents.Button.TextButton.Icon
+            @style/Questionnaire.HelpIconStyle
         </item>
+        <item name="questionnaireMediaImageStyle">
+            @style/Questionnaire.MediaImageStyle
+        </item>
+      <item
+            name="questionnaireBottomNavContainerStyle"
+        >@style/Questionnaire.BottomNavContainerStyle</item>
+      <item
+            name="questionnaireBottomNavContainerDividerStyle"
+        >@style/Questionnaire.BottomNavContainerDividerStyle</item>
         <item
             name="questionnaireReviewModeAnswerTextStyle"
         >@style/Questionnaire.ReviewModeAnswerStyle</item>
@@ -84,12 +98,16 @@
         </item>
         <item
             name="questionnaireTextInputEditTextStyle"
-        >@style/TextAppearance.Material3.BodyLarge
+        >@style/Questionnaire.TextInputEditTextStyle
         </item>
+      <item
+            name="questionnaireMultiLineTextInputEditTextStyle"
+        >@style/Questionnaire.MultiLineTextInputEditTextStyle
+      </item>
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
-        <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
+        <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
         </item>
         <item name="questionnaireErrorTextStyle">
             @style/Questionnaire.ErrorStyle
@@ -106,6 +124,10 @@
         <item
             name="questionnaireSubmitButtonStyle"
         >@style/Questionnaire.SubmitButtonStyle
+        </item>
+        <item
+            name="questionnaireCancelButtonStyle"
+        >@style/Questionnaire.CancelButtonStyle
         </item>
         <item
             name="questionnaireEditButtonStyle"
@@ -162,6 +184,14 @@
         </item>
     </style>
 
+    <style name="Questionnaire.GroupTypeHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
+    <style name="Questionnaire.QuestionHeaderStyle" parent="">
+        <item name="android:paddingBottom">@dimen/header_padding_bottom</item>
+    </style>
+
     <style
         name="Questionnaire.HelpStyle"
         parent="TextAppearance.Material3.TitleSmall"
@@ -174,6 +204,37 @@
         parent="TextAppearance.Material3.BodyMedium"
     >
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
+
+    <style name="Questionnaire.MediaImageStyle" parent="">
+        <item name="android:maxWidth">@dimen/item_media_image_max_width</item>
+        <item name="android:maxHeight">@dimen/item_media_image_max_width</item>
+        <item name="android:layout_gravity">center</item>
+        <item
+            name="android:layout_marginTop"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginBottom"
+        >@dimen/item_media_image_margin_vertical</item>
+        <item
+            name="android:layout_marginStart"
+        >@dimen/item_media_image_margin_horizontal</item>
+        <item
+            name="android:layout_marginEnd"
+        >@dimen/item_media_image_margin_horizontal</item>
+
+    </style>
+
+    <style name="Questionnaire.BottomNavContainerStyle" parent="">
+      <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style
+        name="Questionnaire.BottomNavContainerDividerStyle"
+        parent="Widget.Material3.MaterialDivider"
+    >
+      <item name="android:visibility">visible</item>
+      <item name="dividerColor">@color/item_border_color</item>
     </style>
 
     <style
@@ -225,6 +286,13 @@
         <!--        Override default theme box stroke color to improve contrast of disabled widget. -->
         <item name="boxStrokeColor">@color/box_stroke_color</item>
     </style>
+
+  <style
+        name="Questionnaire.MultiLineTextInputEditTextStyle"
+        parent="Questionnaire.TextInputEditTextStyle"
+    >
+    <item name="android:minLines">3</item>
+  </style>
 
     <style
         name="Questionnaire.TextInputEditTextStyle"
@@ -280,7 +348,7 @@
         <item
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
-        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
     </style>
 
     <style
@@ -293,12 +361,21 @@
         <item
             name="android:background"
         >@drawable/questionnaire_item_checkbox_background</item>
-        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:padding">@dimen/option_item_padding</item>
         <item
             name="android:paddingStart"
-        >@dimen/padding_between_text_and_icon</item>
-        <item name="android:paddingEnd">@dimen/padding_after_text</item>
+        >@dimen/option_item_between_text_and_icon_padding</item>
+        <item
+            name="android:paddingEnd"
+        >@dimen/option_item_after_text_padding</item>
     </style>
+
+  <style
+        name="Questionnaire.HelpIconStyle"
+        parent="Widget.MaterialComponents.Button.TextButton.Icon"
+    >
+    <item name="android:padding">@dimen/help_icon_padding</item>
+  </style>
 
     <style
         name="Questionnaire.EditButtonStyle"
@@ -312,9 +389,22 @@
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
     >
-        <item name="android:text">@string/submit_questionnaire</item>
         <item name="android:textAllCaps">false</item>
-        <item name="android:visibility">visible</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+    <style
+        name="Questionnaire.CancelButtonStyle"
+        parent="Widget.Material3.Button.TextButton"
+    >
+        <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Questionnaire.ButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style
@@ -323,7 +413,7 @@
     >
         <item name="icon">@drawable/ic_camera</item>
         <item name="iconTint">?attr/colorPrimary</item>
-        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
         <item name="android:text">@string/take_photo</item>
     </style>
 
@@ -339,7 +429,7 @@
         parent="Widget.Material3.Button.OutlinedButton"
     >
         <item name="iconTint">?attr/colorPrimary</item>
-        <item name="iconSize">@dimen/attachment_icon_button_size</item>
+        <item name="iconSize">@dimen/attachment_action_button_icon_size</item>
     </style>
 
     <style
@@ -378,8 +468,11 @@
         <item name="android:textColor">?attr/colorError</item>
         <item name="android:text">@string/delete</item>
         <item name="android:visibility">visible</item>
-        <item name="android:paddingRight">@dimen/padding_default</item>
-        <item name="android:paddingLeft">@dimen/padding_default</item>
+        <item
+            name="android:paddingRight"
+        >@dimen/attachment_action_button_padding_horizontal</item>
+        <item
+            name="android:paddingLeft"
+        >@dimen/attachment_action_button_padding_horizontal</item>
     </style>
-
 </resources>

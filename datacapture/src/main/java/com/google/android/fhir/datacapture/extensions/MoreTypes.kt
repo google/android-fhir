@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,16 +27,14 @@ import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
-import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
-import org.hl7.fhir.r4.model.TimeType
 import org.hl7.fhir.r4.model.Type
 import org.hl7.fhir.r4.model.UriType
 
@@ -57,39 +55,52 @@ fun Type.asStringValue(): String {
  * [Questionnaire.QuestionnaireItemAnswerOptionComponent].
  */
 fun Type.displayString(context: Context): String =
-  when (this) {
-    is Attachment -> this.url ?: context.getString(R.string.not_answered)
+  getDisplayString(this, context) ?: context.getString(R.string.not_answered)
+
+/** Returns value as string depending on the [Type] of element. */
+fun Type.getValueAsString(context: Context): String =
+  getValueString(this) ?: context.getString(R.string.not_answered)
+
+/**
+ * Returns the unique identifier of a [Type]. Used to differentiate between item answer options that
+ * may have similar display strings
+ */
+fun Type.identifierString(context: Context): String =
+  id
+    ?: when (this) {
+      is Coding ->
+        arrayOf("${this.system.orEmpty()}${this.version.orEmpty()}", this.code.orEmpty())
+          .joinToString(if (this.hasSystem().or(this.hasVersion()) && this.hasCode()) "|" else "")
+      is Reference -> this.reference ?: displayString(context)
+      else -> displayString(context)
+    }
+
+private fun getDisplayString(type: Type, context: Context): String? =
+  when (type) {
+    is Coding -> type.displayElement.getLocalizedText() ?: type.display ?: type.code
+    is StringType -> type.getLocalizedText() ?: type.asStringValue()
+    is DateType -> type.localDate?.format()
+    is DateTimeType -> "${type.localDate.format()} ${type.localTime.toLocalizedString(context)}"
+    is Reference -> type.display ?: type.reference
+    is Attachment -> type.url
     is BooleanType -> {
-      when (this.value) {
+      when (type.value) {
         true -> context.getString(R.string.yes)
         false -> context.getString(R.string.no)
-        null -> context.getString(R.string.not_answered)
+        null -> null
       }
     }
-    is Coding -> {
-      val display = this.displayElement.getLocalizedText() ?: this.display
-      if (display.isNullOrEmpty()) {
-        this.code ?: context.getString(R.string.not_answered)
-      } else display
-    }
-    is DateType -> this.localDate?.format() ?: context.getString(R.string.not_answered)
-    is DateTimeType -> "${this.localDate.format()} ${this.localTime.toLocalizedString(context)}"
-    is DecimalType,
-    is IntegerType -> (this as PrimitiveType<*>).valueAsString
-        ?: context.getString(R.string.not_answered)
-    is Quantity -> this.value.toString()
-    is Reference -> {
-      val display = this.display
-      if (display.isNullOrEmpty()) {
-        this.reference ?: context.getString(R.string.not_answered)
-      } else display
-    }
-    is StringType -> this.getLocalizedText()
-        ?: this.valueAsString ?: context.getString(R.string.not_answered)
-    is TimeType,
-    is UriType -> (this as PrimitiveType<*>).valueAsString
-        ?: context.getString(R.string.not_answered)
-    else -> context.getString(R.string.not_answered)
+    is Quantity -> type.value.toString()
+    else -> (type as? PrimitiveType<*>)?.valueAsString
+  }
+
+/**
+ * Returns the string representation for [PrimitiveType] or [Quantity], otherwise defaults to null
+ */
+private fun getValueString(type: Type): String? =
+  when (type) {
+    is Quantity -> type.value?.toString()
+    else -> (type as? PrimitiveType<*>)?.asStringValue()
   }
 
 /** Converts StringType to toUriType. */
@@ -111,3 +122,19 @@ internal fun StringType.toIdType(): IdType {
 internal fun Coding.toCodeType(): CodeType {
   return CodeType(code)
 }
+
+/**
+ * Converts Quantity to Coding type. The resulting Coding properties are equivalent of Coding.system
+ * = Quantity.system Coding.code = Quantity.code Coding.display = Quantity.unit
+ */
+internal fun Quantity.toCoding(): Coding {
+  return Coding(this.system, this.code, this.unit)
+}
+
+internal fun Type.hasValue(): Boolean = !getValueString(this).isNullOrBlank()
+
+internal val Type.cqfCalculatedValueExpression
+  get() = this.getExtensionByUrl(EXTENSION_CQF_CALCULATED_VALUE_URL)?.value as? Expression
+
+internal const val EXTENSION_CQF_CALCULATED_VALUE_URL: String =
+  "http://hl7.org/fhir/StructureDefinition/cqf-calculatedValue"

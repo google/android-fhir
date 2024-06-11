@@ -1,0 +1,168 @@
+{
+  "resourceType": "CarePlan",
+  "id": "opioidcds-10-patient-view",
+  "contained": [
+    {
+      "resourceType": "RequestGroup",
+      "id": "opioidcds-10-patient-view",
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+          "valueReference": {
+            "reference": "#apply-outcome-opioidcds-10-patient-view"
+          }
+        }
+      ],
+      "instantiatesCanonical": [
+        "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/opioidcds-10-patient-view|2022.1.0"
+      ],
+      "status": "draft",
+      "intent": "proposal",
+      "subject": {
+        "reference": "example-rec-10-patient-view-POS-Cocaine-drugs"
+      },
+      "encounter": {
+        "reference": "example-rec-10-patient-view-POS-Cocaine-drugs-prefetch"
+      },
+      "action": [
+        {
+          "title": "Annual Urine Screening Check",
+          "description": "Patients on opioid therapy should have a urine drug test performed every 12 months. For guidance on counseling patients regarding the purpose of urine toxicology test, review the draft CDC 2022 Opioid Prescribing Guideline Recommendation 10 page 140 lines 3441 - 3446.",
+          "documentation": [
+            {
+              "type": "documentation",
+              "display": "CDC guideline for prescribing opioids for chronic pain",
+              "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids",
+              "document": {
+                "url": "https://www.federalregister.gov/documents/2022/02/10/2022-02802/proposed-2022-cdc-clinical-practice-guideline-for-prescribing-opioids"
+              }
+            },
+            {
+              "type": "documentation",
+              "document": {
+                "extension": [
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-strengthOfRecommendation",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "system": "http://terminology.hl7.org/CodeSystem/recommendation-strength",
+                          "code": "weak",
+                          "display": "Weak"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "url": "http://hl7.org/fhir/StructureDefinition/cqf-qualityOfEvidence",
+                    "valueCodeableConcept": {
+                      "coding": [
+                        {
+                          "system": "http://terminology.hl7.org/CodeSystem/evidence-quality",
+                          "code": "very-low",
+                          "display": "Very Low quality"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          ],
+          "condition": [
+            {
+              "kind": "applicability",
+              "expression": {
+                "description": "Patient has not had a urine screening in the past 12 months",
+                "language": "text/cql.identifier",
+                "expression": "Is Perform Drug Screen Recommendation Applicable?"
+              }
+            }
+          ],
+          "type": {
+            "coding": [
+              {
+                "system": "http://terminology.hl7.org/CodeSystem/action-type",
+                "code": "create",
+                "display": "Create"
+              }
+            ]
+          },
+          "resource": {
+            "reference": "ServiceRequest/opioidcds-urine-screening-request"
+          },
+          "action": [
+            {
+              "description": "Will perform urine screening"
+            },
+            {
+              "description": "Not for chronic pain management. Snooze 3 months"
+            },
+            {
+              "description": "N/A - see comment, snooze 3 months"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "resourceType": "ServiceRequest",
+      "id": "opioidcds-urine-screening-request",
+      "instantiatesCanonical": [
+        "http://fhir.org/guides/cdc/opioid-cds/ActivityDefinition/opioidcds-urine-screening-request"
+      ],
+      "status": "draft",
+      "intent": "order",
+      "priority": "urgent",
+      "code": {
+        "coding": [
+          {
+            "system": "http://snomed.info/sct",
+            "code": "310627008",
+            "display": "Urine drug screening (procedure)"
+          }
+        ]
+      },
+      "subject": {
+        "reference": "example-rec-10-patient-view-POS-Cocaine-drugs"
+      }
+    },
+    {
+      "resourceType": "OperationOutcome",
+      "id": "apply-outcome-opioidcds-10-patient-view",
+      "issue": [
+        {
+          "severity": "error",
+          "code": "exception",
+          "diagnostics": "DynamicValue expression Indicator encountered exception: Please use the priority path when setting indicator values when using FHIR R4 or higher for CDS Hooks evaluation"
+        }
+      ]
+    }
+  ],
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/uv/crmi/StructureDefinition/crmi-messages",
+      "valueReference": {
+        "reference": "#apply-outcome-opioidcds-10-patient-view"
+      }
+    }
+  ],
+  "instantiatesCanonical": [
+    "http://fhir.org/guides/cdc/opioid-cds/PlanDefinition/opioidcds-10-patient-view|2022.1.0"
+  ],
+  "status": "draft",
+  "intent": "proposal",
+  "subject": {
+    "reference": "example-rec-10-patient-view-POS-Cocaine-drugs"
+  },
+  "encounter": {
+    "reference": "example-rec-10-patient-view-POS-Cocaine-drugs-prefetch"
+  },
+  "activity": [
+    {
+      "reference": {
+        "reference": "#RequestGroup/opioidcds-10-patient-view"
+      }
+    }
+  ]
+}

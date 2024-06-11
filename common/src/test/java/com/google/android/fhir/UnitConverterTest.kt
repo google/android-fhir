@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,5 +47,14 @@ class UnitConverterTest {
     assertThat(exception)
       .hasMessageThat()
       .isEqualTo("Missing numerical value in the canonical UCUM value")
+  }
+
+  @Test
+  fun `should return original code and value if fails to convert Cel to K`() {
+    val canonicalValue =
+      UnitConverter.getCanonicalFormOrOriginal(UcumValue("Cel", BigDecimal.valueOf(37.0)))
+
+    assertThat(canonicalValue.code).isEqualTo("Cel")
+    assertThat(canonicalValue.value.toDouble()).isEqualTo(37.0)
   }
 }

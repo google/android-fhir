@@ -29,5 +29,4 @@
     <dimen name="barcode_reticle_stroke_width">4dp</dimen>
     <dimen name="barcode_reticle_corner_radius">8dp</dimen>
     <dimen name="check_box_item_gap">16dp</dimen>
-    <dimen name="padding_default">16dp</dimen>
 </resources>

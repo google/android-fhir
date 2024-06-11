@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,34 +19,26 @@ package com.google.android.fhir.datacapture.validation
 import android.content.Context
 import com.google.android.fhir.compareTo
 import com.google.android.fhir.datacapture.R
-import org.hl7.fhir.r4.model.Extension
-import org.hl7.fhir.r4.model.Questionnaire
+import com.google.android.fhir.datacapture.extensions.getValueAsString
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Type
 
 internal const val MIN_VALUE_EXTENSION_URL = "http://hl7.org/fhir/StructureDefinition/minValue"
+
 /** A validator to check if the value of an answer is at least the permitted value. */
 internal object MinValueValidator :
   AnswerExtensionConstraintValidator(
     url = MIN_VALUE_EXTENSION_URL,
     predicate = {
-      extension: Extension,
-      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent ->
-      answer.value < extension.value?.valueOrCalculateValue()!!
+      constraintValue: Type,
+      answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
+      ->
+      answer.value < constraintValue
     },
-    { extension: Extension, context: Context ->
+    messageGenerator = { constraintValue: Type, context: Context ->
       context.getString(
         R.string.min_value_validation_error_msg,
-        extension.value?.valueOrCalculateValue()?.primitiveValue()
+        constraintValue.getValueAsString(context),
       )
-    }
-  ) {
-
-  internal fun getMinValue(
-    questionnaireItemComponent: Questionnaire.QuestionnaireItemComponent
-  ): Type? {
-    return questionnaireItemComponent.extension
-      .firstOrNull { it.url == MIN_VALUE_EXTENSION_URL }
-      ?.let { it.value?.valueOrCalculateValue() }
-  }
-}
+    },
+  )

@@ -17,7 +17,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/padding_modal_card"
+    android:padding="@dimen/dialog_padding"
 >
 
     <TextView
@@ -25,7 +25,7 @@
         style="?attr/questionnaireDialogTitleStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_quarter_size"
+        android:layout_marginBottom="@dimen/dialog_title_margin_bottom"
         tools:text="What type of head pain?"
     />
 
@@ -43,7 +43,7 @@
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="@dimen/padding_default"
+        android:layout_marginTop="@dimen/dialog_option_scroll_margin_top"
         android:scrollbars="vertical"
         android:layout_weight="1"
         tools:listitem="@layout/option_item_multi"
@@ -60,7 +60,7 @@
             style="?attr/questionnaireDialogButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_half_size"
+            android:padding="@dimen/dialog_confirmation_button_padding"
             android:text="@android:string/cancel"
         />
 
@@ -75,7 +75,7 @@
             style="?attr/questionnaireDialogButtonStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_half_size"
+            android:padding="@dimen/dialog_confirmation_button_padding"
             android:text="@string/save"
         />
     </LinearLayout>

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Google LLC
+ * Copyright 2021-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.camera
 /** Draws the graphic to indicate the barcode result is in loading. */
 internal class BarcodeLoadingGraphic(
   overlay: GraphicOverlay,
-  private val loadingAnimator: ValueAnimator
+  private val loadingAnimator: ValueAnimator,
 ) : BarcodeGraphicBase(overlay) {
 
   private val boxClockwiseCoordinates: Array<PointF> =
@@ -34,7 +34,7 @@ internal class BarcodeLoadingGraphic(
       PointF(boxRect.left, boxRect.top),
       PointF(boxRect.right, boxRect.top),
       PointF(boxRect.right, boxRect.bottom),
-      PointF(boxRect.left, boxRect.bottom)
+      PointF(boxRect.left, boxRect.bottom),
     )
   private val coordinateOffsetBits: Array<Point> =
     arrayOf(Point(1, 0), Point(0, 1), Point(-1, 0), Point(0, -1))
@@ -73,7 +73,7 @@ internal class BarcodeLoadingGraphic(
       if (lineLen >= pathLen) {
         path.lineTo(
           lastPathPoint.x + pathLen * coordinateOffsetBits[index].x,
-          lastPathPoint.y + pathLen * coordinateOffsetBits[index].y
+          lastPathPoint.y + pathLen * coordinateOffsetBits[index].y,
         )
         break
       }

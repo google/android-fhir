@@ -17,5 +17,5 @@
     style="?attr/questionnaireRadioButtonStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:drawablePadding="@dimen/item_margin_horizontal"
+    android:drawablePadding="@dimen/icon_drawable_padding"
 />

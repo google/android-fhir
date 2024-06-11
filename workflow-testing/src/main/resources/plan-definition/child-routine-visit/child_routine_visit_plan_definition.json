@@ -70,7 +70,6 @@
                 }
               }
             ],
-            "definitionCanonical":"http://hl7.org/fhir/R4/questionnaire.html",
             "definitionUri": "https://fhir.labs.smartregister.org/fhir/Questionnaire/105056",
             "transform": "https://fhir.labs.smartregister.org/fhir/StructureMap/105121",
             "timingTiming": {

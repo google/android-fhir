@@ -1,0 +1,19 @@
+{
+  "resourceType": "ActivityDefinition",
+  "id": "complete-questionnaire",
+  "url": "http://fhir.org/guides/cdc/opioid-cds/ActivityDefinition/complete-questionnaire",
+  "name": "ActivityDefinition_CompleteQuestionnaire",
+  "title": "CompleteQuestionnaire",
+  "status": "draft",
+  "description": "Create a task to complete a Questionnaire.",
+  "library": [],
+  "kind": "Task",
+  "productCodeableConcept": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/CodeSystem/task-code",
+        "code": "approve"
+      }
+    ]
+  }
+}

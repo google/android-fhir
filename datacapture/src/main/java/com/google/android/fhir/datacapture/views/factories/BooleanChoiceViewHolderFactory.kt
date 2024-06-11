@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,23 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.RadioButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.helper.widget.Flow
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
@@ -37,6 +42,7 @@ internal object BooleanChoiceViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.boolean_choice_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var context: AppCompatActivity
       private lateinit var header: HeaderView
       private lateinit var radioGroup: ConstraintLayout
       private lateinit var yesRadioButton: RadioButton
@@ -46,6 +52,7 @@ internal object BooleanChoiceViewHolderFactory :
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
+        context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         radioGroup = itemView.findViewById(R.id.radio_constraint_layout)
         yesRadioButton = itemView.findViewById(R.id.yes_radio_button)
@@ -56,6 +63,7 @@ internal object BooleanChoiceViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         this.questionnaireViewItem = questionnaireViewItem
         header.bind(questionnaireViewItem)
+        header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
         val choiceOrientation =
           questionnaireViewItem.questionnaireItem.choiceOrientation
             ?: ChoiceOrientationTypes.VERTICAL
@@ -91,31 +99,37 @@ internal object BooleanChoiceViewHolderFactory :
         }
 
         yesRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
-          ) {
-            questionnaireViewItem.clearAnswer()
-            yesRadioButton.isChecked = false
-          } else {
-            questionnaireViewItem.setAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(true)
-              }
-            )
+          context.lifecycleScope.launch {
+            if (
+              questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() == true
+            ) {
+              questionnaireViewItem.clearAnswer()
+              yesRadioButton.isChecked = false
+            } else {
+              questionnaireViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(true)
+                },
+              )
+            }
           }
         }
 
         noRadioButton.setOnClickListener {
-          if (questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
-              false
-          ) {
-            questionnaireViewItem.clearAnswer()
-            noRadioButton.isChecked = false
-          } else {
-            questionnaireViewItem.setAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                value = BooleanType(false)
-              }
-            )
+          context.lifecycleScope.launch {
+            if (
+              questionnaireViewItem.answers.singleOrNull()?.valueBooleanType?.booleanValue() ==
+                false
+            ) {
+              questionnaireViewItem.clearAnswer()
+              noRadioButton.isChecked = false
+            } else {
+              questionnaireViewItem.setAnswer(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  value = BooleanType(false)
+                },
+              )
+            }
           }
         }
 
@@ -130,22 +144,23 @@ internal object BooleanChoiceViewHolderFactory :
       }
 
       private fun RadioButton.setLayoutParamsByOrientation(
-        choiceOrientation: ChoiceOrientationTypes
+        choiceOrientation: ChoiceOrientationTypes,
       ) {
         layoutParams =
-          ViewGroup.LayoutParams(
+          LinearLayout.LayoutParams(
             when (choiceOrientation) {
-              ChoiceOrientationTypes.HORIZONTAL -> ViewGroup.LayoutParams.WRAP_CONTENT
+              ChoiceOrientationTypes.HORIZONTAL -> 0
               ChoiceOrientationTypes.VERTICAL -> ViewGroup.LayoutParams.MATCH_PARENT
             },
-            ViewGroup.LayoutParams.WRAP_CONTENT
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            1.0f,
           )
       }
 
       private fun displayValidationResult(validationResult: ValidationResult) {
         when (validationResult) {
           is NotValidated,
-          Valid -> header.showErrorText(isErrorTextVisible = false)
+          Valid, -> header.showErrorText(isErrorTextVisible = false)
           is Invalid -> {
             header.showErrorText(errorText = validationResult.getSingleStringValidationMessage())
           }
