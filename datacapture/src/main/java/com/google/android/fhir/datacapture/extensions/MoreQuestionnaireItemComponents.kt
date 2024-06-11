@@ -985,6 +985,9 @@ private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
   }
 }
 
+internal val Questionnaire.QuestionnaireItemComponent.isRepeatedGroup: Boolean
+  get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats
+
 // TODO: Move this elsewhere.
 val Resource.logicalId: String
   get() {
