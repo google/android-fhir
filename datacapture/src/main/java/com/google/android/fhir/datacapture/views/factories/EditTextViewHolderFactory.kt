@@ -97,16 +97,18 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
       helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
     }
+
+    // Validation is updated everytime the view is bound
     updateValidationTextUI(questionnaireViewItem)
 
+    /**
+     * We should only update an EditText programmatically when its not in focus. Following should
+     * and does work for 2 scenarios:-
+     * 1. When user scrolls to a new question and same ViewHolder is utilised by the RecyclerView,
+     *    the EditText content should be updated for that [QuestionnaireViewItem]
+     * 2. When the current item is readOnly, then it's value may get updated by expressions.
+     */
     if (!textInputEditText.isFocused) {
-      /**
-       * We should only update an EditText programmatically when its not in focus. Following should
-       * and does work for 2 scenarios:-
-       * 1. When user scrolls to a new question and same ViewHolder is utilised by the RecyclerView,
-       *    the EditText content should be updated for that [QuestionnaireViewItem]
-       * 2. When the current item is readOnly, then it's value may get updated by expressions.
-       */
       textInputEditText.removeTextChangedListener(textWatcher)
       updateInputTextUI(questionnaireViewItem, textInputEditText, textInputLayout)
 
