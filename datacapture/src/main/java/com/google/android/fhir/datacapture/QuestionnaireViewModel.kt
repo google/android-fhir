@@ -39,6 +39,7 @@ import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
+import com.google.android.fhir.datacapture.extensions.isPage
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
@@ -480,9 +481,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       EntryMode.PRIOR_EDIT,
       EntryMode.RANDOM, -> {
         val previousPageIndex =
-          pages!!.indexOfLast {
-            it.index < currentPageIndexFlow.value!! && it.enabled && !it.hidden
-          }
+          pages!!.last { it.index < currentPageIndexFlow.value!! && it.enabled && !it.hidden }.index
         check(previousPageIndex != -1) {
           "Can't call goToPreviousPage() if no preceding page is enabled"
         }
@@ -500,18 +499,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       EntryMode.SEQUENTIAL, -> {
         validateCurrentPageItems {
           val nextPageIndex =
-            pages!!.indexOfFirst {
-              it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
-            }
+            pages!!
+              .first { it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden }
+              .index
           check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
           currentPageIndexFlow.value = nextPageIndex
         }
       }
       EntryMode.RANDOM -> {
         val nextPageIndex =
-          pages!!.indexOfFirst {
-            it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
-          }
+          pages!!
+            .first { it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden }
+            .index
         check(nextPageIndex != -1) { "Can't call goToNextPage() if no following page is enabled" }
         currentPageIndexFlow.value = nextPageIndex
       }
@@ -925,18 +924,22 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private suspend fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
-      questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
+      questionnaire.item.zip(questionnaireResponse.item).mapIndexedNotNull {
         index,
         (questionnaireItem, questionnaireResponseItem),
         ->
-        QuestionnairePage(
-          index,
-          enablementEvaluator.evaluate(
-            questionnaireItem,
-            questionnaireResponseItem,
-          ),
-          questionnaireItem.isHidden,
-        )
+        questionnaireItem
+          .takeIf { it.isPage }
+          ?.let {
+            QuestionnairePage(
+              index,
+              enablementEvaluator.evaluate(
+                questionnaireItem,
+                questionnaireResponseItem,
+              ),
+              questionnaireItem.isHidden,
+            )
+          }
       }
     } else {
       null
