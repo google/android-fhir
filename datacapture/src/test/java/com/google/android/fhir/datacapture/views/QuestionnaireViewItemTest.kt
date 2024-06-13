@@ -164,6 +164,91 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
+  fun `remove answer at given index`() = runTest {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-item-1"
+              type = Questionnaire.QuestionnaireItemType.STRING
+            },
+          )
+      }
+
+    val responseItem1 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 1")
+            },
+          )
+      }
+
+    val responseItem2 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "2"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 2")
+            },
+          )
+      }
+
+    val responseItem3 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "3"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 3")
+            },
+          )
+      }
+
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "group-1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem1)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem2)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem3)
+            },
+          )
+      }
+
+    var updatedAnswers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+      listOf()
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem = questionnaireItem,
+        questionnaireResponseItem = questionnaireResponseItem,
+        validationResult = NotValidated,
+        answersChangedCallback = { _, responseItem, result, _ -> updatedAnswers = result },
+      )
+
+    questionnaireViewItem.removeAnswerAt(1)
+
+    assertThat(updatedAnswers.size).isEqualTo(2)
+    assertThat(updatedAnswers.first().item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 1")
+    assertThat(updatedAnswers.last().item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 3")
+  }
+
+  @Test
   fun hasAnswerOption_questionnaireItemRepeats_shouldReturnTrue() {
     val questionnaireViewItem =
       QuestionnaireViewItem(

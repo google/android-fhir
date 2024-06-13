@@ -80,7 +80,7 @@ internal object GroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        // No user input
+        addItemButton.isEnabled = !isReadOnly
       }
     }
 }
