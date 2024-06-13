@@ -36,57 +36,57 @@ internal object StronglyConnectedPatches {
    * https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm.
    */
   private fun findSCCWithTarjan(diGraph: Graph): List<List<Node>> {
-    val nodeCount = (diGraph.keys + diGraph.values.flatten().toSet()).size
-    val sccs = mutableListOf<List<Node>>()
-    val lowLinks = mutableMapOf<Node, Int>()
-    var exploringCounter = 0
-    val discoveryTimes = mutableMapOf<Node, Int>()
+    // Ideally the graph.keys should have all the nodes in the graph. But use values as well in case
+    // the input graph looks something like [ N1: [N2] ].
+    val nodeToIndex =
+      (diGraph.keys + diGraph.values.flatten().toSet())
+        .mapIndexed { index, s -> s to index }
+        .toMap()
 
-    val visitedNodes = BooleanArray(nodeCount)
-    val nodesCurrentlyInStack = BooleanArray(nodeCount)
+    val sccs = mutableListOf<List<Node>>()
+    val lowLinks = IntArray(nodeToIndex.size)
+    var exploringCounter = 0
+    val discoveryTimes = IntArray(nodeToIndex.size)
+
+    val visitedNodes = BooleanArray(nodeToIndex.size)
+    val nodesCurrentlyInStack = BooleanArray(nodeToIndex.size)
     val stack = ArrayDeque<Node>()
 
-    fun visited(node: Node) = discoveryTimes[node]?.let { visitedNodes[it] } ?: false
-
-    /**
-     * Discovery time of each Node is unique, starts with 0 and is linearly incremented. Thus, it
-     * can be used to map (index) each node in an array.
-     */
-    fun Node.discoveryIndex() = discoveryTimes[this] ?: -1
+    fun Node.index() = nodeToIndex[this]!!
 
     fun dfs(at: Node) {
-      lowLinks[at] = exploringCounter
-      discoveryTimes[at] = exploringCounter
+      lowLinks[at.index()] = exploringCounter
+      discoveryTimes[at.index()] = exploringCounter
       visitedNodes[exploringCounter] = true
       exploringCounter++
       stack.addFirst(at)
-      nodesCurrentlyInStack[at.discoveryIndex()] = true
+      nodesCurrentlyInStack[at.index()] = true
 
       diGraph[at]?.forEach {
-        if (!visited(it)) {
+        if (!visitedNodes[it.index()]) {
           dfs(it)
         }
 
-        if (nodesCurrentlyInStack[it.discoveryIndex()]) {
-          lowLinks[at] = min(lowLinks[at]!!, lowLinks[it]!!)
+        if (nodesCurrentlyInStack[it.index()]) {
+          lowLinks[at.index()] = min(lowLinks[at.index()], lowLinks[it.index()])
         }
       }
 
       // We have found the head node in the scc.
-      if (lowLinks[at] == discoveryTimes[at]) {
+      if (lowLinks[at.index()] == discoveryTimes[at.index()]) {
         val connected = mutableListOf<Node>()
         var node: Node
         do {
           node = stack.removeFirst()
           connected.add(node)
-          nodesCurrentlyInStack[node.discoveryIndex()] = false
+          nodesCurrentlyInStack[node.index()] = false
         } while (node != at && stack.isNotEmpty())
         sccs.add(connected.reversed())
       }
     }
 
     diGraph.keys.forEach {
-      if (!visited(it)) {
+      if (!visitedNodes[it.index()]) {
         dfs(it)
       }
     }
