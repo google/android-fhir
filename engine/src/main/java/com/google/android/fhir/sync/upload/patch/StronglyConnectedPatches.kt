@@ -36,27 +36,38 @@ internal object StronglyConnectedPatches {
    * https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm.
    */
   private fun findSCCWithTarjan(diGraph: Graph): List<List<Node>> {
+    val nodeCount = (diGraph.keys + diGraph.values.flatten().toSet()).size
     val sccs = mutableListOf<List<Node>>()
     val lowLinks = mutableMapOf<Node, Int>()
     var exploringCounter = 0
     val discoveryTimes = mutableMapOf<Node, Int>()
-    val nodesCurrentlyInStack = mutableSetOf<Node>()
-    val visitedNodes = mutableSetOf<Node>()
+
+    val visitedNodes = BooleanArray(nodeCount)
+    val nodesCurrentlyInStack = BooleanArray(nodeCount)
     val stack = ArrayDeque<Node>()
 
+    fun visited(node: Node) = discoveryTimes[node]?.let { visitedNodes[it] } ?: false
+
+    /**
+     * Discovery time of each Node is unique, starts with 0 and is linearly incremented. Thus, it
+     * can be used to map (index) each node in an array.
+     */
+    fun Node.discoveryIndex() = discoveryTimes[this] ?: -1
+
     fun dfs(at: Node) {
-      lowLinks[at] = ++exploringCounter
+      lowLinks[at] = exploringCounter
       discoveryTimes[at] = exploringCounter
-      visitedNodes.add(at)
+      visitedNodes[exploringCounter] = true
+      exploringCounter++
       stack.addFirst(at)
-      nodesCurrentlyInStack.add(at)
+      nodesCurrentlyInStack[at.discoveryIndex()] = true
 
       diGraph[at]?.forEach {
-        if (!visitedNodes.contains(it)) {
+        if (!visited(it)) {
           dfs(it)
         }
 
-        if (nodesCurrentlyInStack.contains(it)) {
+        if (nodesCurrentlyInStack[it.discoveryIndex()]) {
           lowLinks[at] = min(lowLinks[at]!!, lowLinks[it]!!)
         }
       }
@@ -68,14 +79,14 @@ internal object StronglyConnectedPatches {
         do {
           node = stack.removeFirst()
           connected.add(node)
-          nodesCurrentlyInStack.remove(node)
+          nodesCurrentlyInStack[node.discoveryIndex()] = false
         } while (node != at && stack.isNotEmpty())
         sccs.add(connected.reversed())
       }
     }
 
     diGraph.keys.forEach {
-      if (!visitedNodes.contains(it)) {
+      if (!visited(it)) {
         dfs(it)
       }
     }
