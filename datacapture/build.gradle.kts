@@ -21,6 +21,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
+    consumerProguardFile("proguard-rules.pro")
   }
 
   buildFeatures { viewBinding = true }
