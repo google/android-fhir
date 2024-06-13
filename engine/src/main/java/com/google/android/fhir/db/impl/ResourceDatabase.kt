@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -64,14 +64,14 @@ internal abstract class ResourceDatabase : RoomDatabase() {
   abstract fun localChangeDao(): LocalChangeDao
 }
 
-val MIGRATION_1_2 =
+internal val MIGRATION_1_2 =
   object : Migration(1, 2) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL("DROP table if exists SyncedResourceEntity")
     }
   }
 
-val MIGRATION_2_3 =
+internal val MIGRATION_2_3 =
   object : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
@@ -80,7 +80,7 @@ val MIGRATION_2_3 =
     }
   }
 
-val MIGRATION_3_4 =
+internal val MIGRATION_3_4 =
   object : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
@@ -105,7 +105,7 @@ val MIGRATION_3_4 =
     }
   }
 
-val MIGRATION_4_5 =
+internal val MIGRATION_4_5 =
   object : Migration(4, 5) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
@@ -115,7 +115,7 @@ val MIGRATION_4_5 =
   }
 
 /** Changes column type of [LocalChangeEntity.timestamp] from [String] to [java.time.Instant]. */
-val MIGRATION_5_6 =
+internal val MIGRATION_5_6 =
   object : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
@@ -133,7 +133,7 @@ val MIGRATION_5_6 =
   }
 
 /** Add column resourceUuid in [LocalChangeEntity] */
-val MIGRATION_6_7 =
+internal val MIGRATION_6_7 =
   object : Migration(6, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(
@@ -155,7 +155,7 @@ val MIGRATION_6_7 =
   }
 
 /** Create [LocalChangeResourceReferenceEntity] */
-val MIGRATION_7_8 =
+internal val MIGRATION_7_8 =
   object : Migration(7, 8) {
     override fun migrate(database: SupportSQLiteDatabase) {
       database.execSQL(

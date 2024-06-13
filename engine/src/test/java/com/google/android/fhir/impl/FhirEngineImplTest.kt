@@ -30,10 +30,10 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -323,7 +323,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         localChanges.addAll(it)
         flowOf(
           UploadRequestResult.Success(
@@ -356,7 +356,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         flowOf(
           UploadRequestResult.Failure(
             it,
@@ -481,6 +481,23 @@ class FhirEngineImplTest {
       )
     assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
   }
+
+  @Test
+  fun `purge() multiple with local change and force purge true should purge resources`() =
+    runBlocking {
+      val ids = fhirEngine.create(TEST_PATIENT_1, TEST_PATIENT_2)
+
+      fhirEngine.purge(ResourceType.Patient, ids.toSet(), true)
+
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, TEST_PATIENT_1_ID) }
+      }
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { fhirEngine.get(ResourceType.Patient, TEST_PATIENT_2_ID) }
+      }
+      assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_1_ID)).isEmpty()
+      assertThat(fhirEngine.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID)).isEmpty()
+    }
 
   @Test
   fun `purge() with local change and force purge false should throw IllegalStateException`() =
@@ -745,6 +762,26 @@ class FhirEngineImplTest {
         .containsExactly("patient-id-update")
         .inOrder()
     }
+
+  @Test
+  fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
+    fhirEngine
+      .syncUpload(UploadStrategy.SingleResourcePost) {
+        flowOf(
+          UploadRequestResult.Success(
+            listOf(
+              ResourceUploadResponseMapping(
+                it,
+                TEST_PATIENT_1,
+              ),
+            ),
+          ),
+        )
+      }
+      .collect {}
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"

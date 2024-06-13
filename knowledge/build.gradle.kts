@@ -113,14 +113,14 @@ dependencies {
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
+    file("../docs/use/api/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Knowledge.artifactId)
+      moduleName.set(Releases.Knowledge.name)
       moduleVersion.set(Releases.Knowledge.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
