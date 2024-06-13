@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload.request
 
 import com.google.android.fhir.sync.upload.patch.PatchMapping
-import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
@@ -50,7 +50,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup(listOf(patchOutput))),
+        listOf(StronglyConnectedPatchMappings(listOf(patchOutput))),
       )
 
     with(requests.single()) {
@@ -73,7 +73,7 @@ class IndividualGeneratorTest {
       )
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup(listOf(patchOutput))),
+        listOf(StronglyConnectedPatchMappings(listOf(patchOutput))),
       )
 
     with(requests.single()) {
@@ -95,7 +95,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup(listOf(patchOutput))),
+        listOf(StronglyConnectedPatchMappings(listOf(patchOutput))),
       )
     with(requests.single()) {
       with(generatedRequest) {
@@ -121,7 +121,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val requests =
       generator.generateUploadRequests(
-        listOf(PatchMappingGroup(listOf(patchOutput))),
+        listOf(StronglyConnectedPatchMappings(listOf(patchOutput))),
       )
     with(requests.single()) {
       with(generatedRequest) {
@@ -141,7 +141,7 @@ class IndividualGeneratorTest {
     val generator = UrlRequestGenerator.Factory.getDefault()
     val result =
       generator.generateUploadRequests(
-        patchOutputList.map { PatchMappingGroup(listOf(it)) },
+        patchOutputList.map { StronglyConnectedPatchMappings(listOf(it)) },
       )
     assertThat(result).hasSize(3)
     assertThat(result.map { it.generatedRequest.httpVerb })

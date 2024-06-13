@@ -21,7 +21,7 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
-import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -33,8 +33,8 @@ internal class UrlRequestGenerator(
 
   /**
    * Since a [UrlUploadRequest] can only handle a single resource request, the
-   * [PatchMappingGroup.patchMappings] are flattened and handled as acyclic mapping to generate
-   * [UrlUploadRequestMapping] for each [PatchMapping].
+   * [StronglyConnectedPatchMappings.patchMappings] are flattened and handled as acyclic mapping to
+   * generate [UrlUploadRequestMapping] for each [PatchMapping].
    *
    * **NOTE**
    *
@@ -44,7 +44,7 @@ internal class UrlRequestGenerator(
    * server has strict referential integrity and the requests have cyclic dependency amongst itself.
    */
   override fun generateUploadRequests(
-    mappedPatches: List<PatchMappingGroup>,
+    mappedPatches: List<StronglyConnectedPatchMappings>,
   ): List<UrlUploadRequestMapping> =
     mappedPatches
       .map { it.patchMappings }

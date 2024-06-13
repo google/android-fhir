@@ -31,18 +31,22 @@ internal object StronglyConnectedPatches {
     return findSCCWithTarjan(directedGraph)
   }
 
+  /**
+   * Finds strongly connected components in topological order. See
+   * https://en.wikipedia.org/wiki/Tarjan%27s_strongly_connected_components_algorithm.
+   */
   private fun findSCCWithTarjan(diGraph: Graph): List<List<Node>> {
-    val connectedComponents = mutableListOf<List<Node>>()
-    val currentLowValueForEachNode = mutableMapOf<Node, Int>()
+    val sccs = mutableListOf<List<Node>>()
+    val lowLinks = mutableMapOf<Node, Int>()
     var exploringCounter = 0
-    val assignedLowValueForEachNode = mutableMapOf<Node, Int>()
+    val discoveryTimes = mutableMapOf<Node, Int>()
     val nodesCurrentlyInStack = mutableSetOf<Node>()
     val visitedNodes = mutableSetOf<Node>()
     val stack = ArrayDeque<Node>()
 
     fun dfs(at: Node) {
-      currentLowValueForEachNode[at] = ++exploringCounter
-      assignedLowValueForEachNode[at] = exploringCounter
+      lowLinks[at] = ++exploringCounter
+      discoveryTimes[at] = exploringCounter
       visitedNodes.add(at)
       stack.addFirst(at)
       nodesCurrentlyInStack.add(at)
@@ -53,21 +57,20 @@ internal object StronglyConnectedPatches {
         }
 
         if (nodesCurrentlyInStack.contains(it)) {
-          currentLowValueForEachNode[at] =
-            min(currentLowValueForEachNode[at]!!, currentLowValueForEachNode[it]!!)
+          lowLinks[at] = min(lowLinks[at]!!, lowLinks[it]!!)
         }
       }
 
       // We have found the head node in the scc.
-      if (currentLowValueForEachNode[at] == assignedLowValueForEachNode[at]) {
+      if (lowLinks[at] == discoveryTimes[at]) {
         val connected = mutableListOf<Node>()
-        while (true) {
-          val node = stack.removeFirst()
+        var node: Node
+        do {
+          node = stack.removeFirst()
           connected.add(node)
           nodesCurrentlyInStack.remove(node)
-          if (node == at || stack.isEmpty()) break
-        }
-        connectedComponents.add(connected.reversed())
+        } while (node != at && stack.isNotEmpty())
+        sccs.add(connected.reversed())
       }
     }
 
@@ -77,6 +80,6 @@ internal object StronglyConnectedPatches {
       }
     }
 
-    return connectedComponents
+    return sccs
   }
 }

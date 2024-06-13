@@ -72,15 +72,15 @@ internal object PatchOrdering {
    * {D} (UPDATE), then B,C needs to go before the resource A so that referential integrity is
    * retained. Order of D shouldn't matter for the purpose of referential integrity.
    *
-   * @return A ordered list of the [PatchMappingGroup] containing:
-   * - [PatchMappingGroup] with single value for the [PatchMapping] based on the references to other
-   *   [PatchMapping] if the mappings are acyclic
-   * - [PatchMappingGroup] with multiple values for [PatchMapping]s based on the references to other
-   *   [PatchMapping]s if the mappings are cyclic.
+   * @return A ordered list of the [StronglyConnectedPatchMappings] containing:
+   * - [StronglyConnectedPatchMappings] with single value for the [PatchMapping] based on the
+   *   references to other [PatchMapping] if the mappings are acyclic
+   * - [StronglyConnectedPatchMappings] with multiple values for [PatchMapping]s based on the
+   *   references to other [PatchMapping]s if the mappings are cyclic.
    */
-  suspend fun List<PatchMapping>.orderByReferences(
+  suspend fun List<PatchMapping>.sccOrderByReferences(
     database: Database,
-  ): List<PatchMappingGroup> {
+  ): List<StronglyConnectedPatchMappings> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
     /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
     multiple LocalChangeResourceReference, one for each resource reference in the
@@ -93,7 +93,7 @@ internal object PatchOrdering {
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
 
     return StronglyConnectedPatches.scc(adjacencyList).map {
-      PatchMappingGroup(it.mapNotNull { resourceIdToPatchMapping[it] })
+      StronglyConnectedPatchMappings(it.mapNotNull { resourceIdToPatchMapping[it] })
     }
   }
 

@@ -25,7 +25,9 @@ import com.google.android.fhir.LocalChange
  * maintain an audit trail.
  */
 internal object PerChangePatchGenerator : PatchGenerator {
-  override suspend fun generate(localChanges: List<LocalChange>): List<PatchMappingGroup> =
+  override suspend fun generate(
+    localChanges: List<LocalChange>,
+  ): List<StronglyConnectedPatchMappings> =
     localChanges
       .map {
         PatchMapping(
@@ -41,5 +43,5 @@ internal object PerChangePatchGenerator : PatchGenerator {
             ),
         )
       }
-      .map { PatchMappingGroup(listOf(it)) }
+      .map { StronglyConnectedPatchMappings(listOf(it)) }
 }

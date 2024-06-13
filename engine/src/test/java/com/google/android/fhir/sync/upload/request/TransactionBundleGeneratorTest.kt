@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload.request
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.sync.upload.patch.PatchMapping
-import com.google.android.fhir.sync.upload.patch.PatchMappingGroup
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.deleteLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.insertionLocalChange
 import com.google.android.fhir.sync.upload.request.RequestGeneratorTestUtils.toPatch
@@ -51,7 +51,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup(listOf(it)) }
+          .map { StronglyConnectedPatchMappings(listOf(it)) }
 
       val generator = TransactionBundleGenerator.Factory.getDefault()
       val result = generator.generateUploadRequests(patches)
@@ -75,7 +75,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         listOf(insertionLocalChange, updateLocalChange, deleteLocalChange)
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup(listOf(it)) }
+          .map { StronglyConnectedPatchMappings(listOf(it)) }
       val generator =
         TransactionBundleGenerator.Factory.getGenerator(
           Bundle.HTTPVerb.PUT,
@@ -123,7 +123,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { PatchMappingGroup(listOf(it)) }
+          .map { StronglyConnectedPatchMappings(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false)
       val result = generator.generateUploadRequests(patches)
 
@@ -152,7 +152,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             ),
           )
-          .map { PatchMappingGroup(listOf(it)) }
+          .map { StronglyConnectedPatchMappings(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -189,7 +189,7 @@ class TransactionBundleGeneratorTest {
       val patches =
         localChanges
           .map { PatchMapping(listOf(it), it.toPatch()) }
-          .map { PatchMappingGroup(listOf(it)) }
+          .map { StronglyConnectedPatchMappings(listOf(it)) }
       val generator = TransactionBundleGenerator.Factory.getDefault(useETagForUpload = true)
       val result = generator.generateUploadRequests(patches)
 
@@ -365,7 +365,7 @@ class TransactionBundleGeneratorTest {
               generatedPatch = localChange.toPatch(),
             )
           }
-          .let { PatchMappingGroup(it) }
+          .let { StronglyConnectedPatchMappings(it) }
       val generator =
         TransactionBundleGenerator.Factory.getDefault(useETagForUpload = false, bundleSize = 5)
       val result = generator.generateUploadRequests(listOf(patchGroups))
@@ -388,7 +388,7 @@ class TransactionBundleGeneratorTest {
       )
 
     val firstGroup =
-      PatchMappingGroup(
+      StronglyConnectedPatchMappings(
         mutableListOf<PatchMapping>().apply {
           for (i in 1..5) {
             add(
@@ -408,7 +408,7 @@ class TransactionBundleGeneratorTest {
       )
 
     val secondGroup =
-      PatchMappingGroup(
+      StronglyConnectedPatchMappings(
         listOf(
           PatchMapping(
             localChanges =
@@ -421,7 +421,7 @@ class TransactionBundleGeneratorTest {
       )
 
     val thirdGroup =
-      PatchMappingGroup(
+      StronglyConnectedPatchMappings(
         listOf(
           PatchMapping(
             localChanges =
@@ -433,7 +433,7 @@ class TransactionBundleGeneratorTest {
         ),
       )
     val fourthGroup =
-      PatchMappingGroup(
+      StronglyConnectedPatchMappings(
         mutableListOf<PatchMapping>().apply {
           for (i in 9..13) {
             add(
