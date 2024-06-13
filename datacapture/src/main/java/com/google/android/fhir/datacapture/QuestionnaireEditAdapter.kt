@@ -118,7 +118,8 @@ internal class QuestionnaireEditAdapter(
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
         holder as ViewHolder.RepeatedGroupHeaderHolder
-        holder.header.text = "Group ${item.index + 1}"
+        holder.header.text =
+          holder.header.context.getString(R.string.repeated_group, "${item.index + 1}", item.title)
         holder.delete.setOnClickListener { item.onDeleteClicked() }
       }
     }

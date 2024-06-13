@@ -847,6 +847,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 index = index,
                 onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
                 responses = nestedResponseItemList,
+                title = question.item.questionText?.toString() ?: "",
               ),
             )
           }
