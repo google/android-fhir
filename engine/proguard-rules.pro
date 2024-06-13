@@ -3,6 +3,7 @@
 	# 2. In HAPI Strucures, ClassLoader is used to load classes from different packages that are hardcoded.
 -keep class ca.uhn.fhir.** { *; }
 -keep class org.hl7.fhir.**  { *; }
+-keep class com.ctc.wstx.stax.**  { *; }
 # Used by HapiWorkerContext (fhirpath engine in QuestionnaireViewModel)
 -keep class com.github.benmanes.caffeine.cache.**  { *; }
 ## hapi libs ends
