@@ -57,7 +57,7 @@ internal object StronglyConnectedPatches {
     fun dfs(at: Node) {
       lowLinks[at.index()] = exploringCounter
       discoveryTimes[at.index()] = exploringCounter
-      visitedNodes[exploringCounter] = true
+      visitedNodes[at.index()] = true
       exploringCounter++
       stack.addFirst(at)
       nodesCurrentlyInStack[at.index()] = true
