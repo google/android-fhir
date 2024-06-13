@@ -1717,7 +1717,7 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
                 """
@@ -1737,7 +1737,7 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value DESC
                 """
@@ -1759,7 +1759,7 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN NumberIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_value ASC
                 """
@@ -1785,7 +1785,7 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
@@ -2041,9 +2041,9 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         LEFT JOIN DateTimeIndexEntity c
-        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
+        ON a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from ASC, c.index_from ASC
                 """
@@ -2062,9 +2062,9 @@ class SearchTest {
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         LEFT JOIN DateIndexEntity b
-        ON a.resourceType = b.resourceType AND a.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         LEFT JOIN DateTimeIndexEntity c
-        ON a.resourceType = c.resourceType AND a.resourceUuid = c.resourceUuid AND c.index_name = ?
+        ON a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
         ORDER BY b.index_from DESC, c.index_from DESC
                 """
@@ -2374,7 +2374,7 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           LEFT JOIN StringIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+          ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
@@ -2433,7 +2433,7 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
@@ -2448,7 +2448,7 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
@@ -2592,9 +2592,9 @@ class SearchTest {
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
         LEFT JOIN DateIndexEntity b
-        ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+        ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
         LEFT JOIN DateTimeIndexEntity c
-        ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
+        ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
@@ -2669,9 +2669,9 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+          ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
+          ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
@@ -2686,9 +2686,9 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
-          ON re.resourceType = b.resourceType AND re.resourceUuid = b.resourceUuid AND b.index_name = ?
+          ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
-          ON re.resourceType = c.resourceType AND re.resourceUuid = c.resourceUuid AND c.index_name = ?
+          ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
