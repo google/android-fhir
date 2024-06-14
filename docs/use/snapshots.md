@@ -5,7 +5,7 @@ The latest version of the Android FHIR SDK libraries can be utilized during the 
 These SNAPSHOT versions are updated with each commit to the main branch and are considered unstable.
 
 
-**So, please use them for test purposes and in development stages and Do NOT use them in production**
+So, please use them for test purposes and in development stages, but do **NOT use them in production**
 
 
 These SNAPSHOT Artifacts are pushed on GitHub packages: https://github.com/google?tab=packages&repo_name=android-fhir
