@@ -22,7 +22,6 @@ import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.ResourceNotFoundException
-import com.google.android.fhir.delete
 import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
@@ -48,13 +47,18 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Practitioner
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -792,33 +796,54 @@ class FhirEngineImplTest {
         id = patient01ID
         gender = Enumerations.AdministrativeGender.FEMALE
       }
-    val patient02ID = "patient-02"
-    val patient02 =
-      Patient().apply {
-        id = patient02ID
-        gender = Enumerations.AdministrativeGender.MALE
+    val patient01AppointmentID = "appointment-01"
+    val patient01Appointment =
+      Appointment().apply {
+        id = patient01AppointmentID
+        status = Appointment.AppointmentStatus.BOOKED
+        addParticipant(
+          Appointment.AppointmentParticipantComponent().apply {
+            actor = Reference("${patient01.resourceType}/$patient01ID")
+          },
+        )
       }
-    val patient03ID = "patient-03"
-    val patient03 =
-      Patient().apply {
-        id = patient03ID
-        gender = Enumerations.AdministrativeGender.FEMALE
-      }
+    fhirEngine.create(patient01, patient01Appointment)
 
-    fhirEngine.create(patient01)
-    assertThat(fhirEngine.get<Patient>(patient01ID).gender)
-      .isEqualTo(Enumerations.AdministrativeGender.FEMALE)
+    // Fulfill appointment with related Encounter/Observation
+    val patient01AppointmentEncounterID = "enc-01"
+    val patient01AppointmentEncounter =
+      Encounter().apply {
+        id = patient01AppointmentEncounterID
+        subject = Reference("${patient01.resourceType}/$patient01ID")
+        addAppointment(Reference("${patient01Appointment.resourceType}/$patient01AppointmentID"))
+      }
+    val patient01AppointmentEncounterObservationID = "obs-01"
+    val patient01AppointmentEncounterObservation =
+      Observation().apply {
+        id = patient01AppointmentEncounterObservationID
+        encounter =
+          Reference(
+            "${patient01AppointmentEncounter.resourceType}/$patient01AppointmentEncounterID",
+          )
+      }
+    val updatedAppointment =
+      patient01Appointment.copy().apply { status = Appointment.AppointmentStatus.FULFILLED }
+
     fhirEngine.withTransaction {
-      fhirEngine.create(patient02, patient03)
-      patient01.gender = Enumerations.AdministrativeGender.FEMALE
-      fhirEngine.update(patient01)
-      fhirEngine.delete<Patient>(patient01ID)
+      this.create(patient01AppointmentEncounter, patient01AppointmentEncounterObservation)
+      this.update(updatedAppointment)
     }
-    assertResourceEquals(patient02, fhirEngine.get<Patient>(patient02ID))
-    assertResourceEquals(patient03, fhirEngine.get<Patient>(patient03ID))
-    assertThrows(ResourceNotFoundException::class.java) {
-      runBlocking { fhirEngine.get<Patient>(patient01ID) }
-    }
+
+    assertThat(
+        fhirEngine.get<Encounter>(patient01AppointmentEncounterID).appointmentFirstRep.reference,
+      )
+      .isEqualTo("Appointment/$patient01AppointmentID")
+    assertThat(
+        fhirEngine.get<Observation>(patient01AppointmentEncounterObservationID).encounter.reference,
+      )
+      .isEqualTo("Encounter/$patient01AppointmentEncounterID")
+    assertThat(fhirEngine.get<Appointment>(patient01AppointmentID).status)
+      .isEqualTo(Appointment.AppointmentStatus.FULFILLED)
   }
 
   @Test
@@ -829,40 +854,64 @@ class FhirEngineImplTest {
         id = patient01ID
         gender = Enumerations.AdministrativeGender.FEMALE
       }
-    val patient02ID = "patient-02"
-    val patient02 =
-      Patient().apply {
-        id = patient02ID
-        gender = Enumerations.AdministrativeGender.MALE
+    val patient01AppointmentID = "appointment-01"
+    val patient01Appointment =
+      Appointment().apply {
+        id = patient01AppointmentID
+        status = Appointment.AppointmentStatus.BOOKED
+        addParticipant(
+          Appointment.AppointmentParticipantComponent().apply {
+            actor = Reference("${patient01.resourceType}/$patient01ID")
+          },
+        )
       }
-    val patient03ID = "patient-03"
-    val patient03 =
-      Patient().apply {
-        id = patient03ID
-        gender = Enumerations.AdministrativeGender.FEMALE
-      }
-    val patient03Updated =
-      patient03.copy().apply { gender = Enumerations.AdministrativeGender.MALE }
+    fhirEngine.create(patient01, patient01Appointment)
 
-    fhirEngine.create(patient03)
+    // Fulfill appointment with related Encounter/Observation
+    val patient01AppointmentEncounterID = "enc-01"
+    val patient01AppointmentEncounter =
+      Encounter().apply {
+        id = patient01AppointmentEncounterID
+        subject = Reference("${patient01.resourceType}/$patient01ID")
+        addAppointment(Reference("${patient01Appointment.resourceType}/$patient01AppointmentID"))
+      }
+    val patient01AppointmentEncounterObservationID = "obs-01"
+    val patient01AppointmentEncounterObservation =
+      Observation().apply {
+        id = patient01AppointmentEncounterObservationID
+        encounter =
+          Reference(
+            "${patient01AppointmentEncounter.resourceType}/$patient01AppointmentEncounterID",
+          )
+      }
+
     try {
       fhirEngine.withTransaction {
-        this.create(patient01)
-        this.create(patient02)
-        this.update(patient03Updated)
-        this.get(ResourceType.Patient, "non_existent_patient_id")
-          as Patient // Force ResourceNotFoundException
+        this.create(patient01AppointmentEncounter, patient01AppointmentEncounterObservation)
+        // Get non-existent practitioner to force ResourceNotFoundException
+        val nonExistentPractitioner =
+          this.get(ResourceType.Practitioner, "non_existent_practitioner_id") as Practitioner
+        val updatedAppointment =
+          patient01Appointment.copy().apply {
+            status = Appointment.AppointmentStatus.FULFILLED
+            addParticipant(
+              Appointment.AppointmentParticipantComponent().apply {
+                actor = Reference("Practitioner/${nonExistentPractitioner.logicalId}")
+              },
+            )
+          }
+        this.update(updatedAppointment)
       }
     } catch (_: ResourceNotFoundException) {}
 
     assertThrows(ResourceNotFoundException::class.java) {
-      runBlocking { fhirEngine.get<Patient>(patient01ID) }
+      runBlocking { fhirEngine.get<Encounter>(patient01AppointmentEncounterID) }
     }
     assertThrows(ResourceNotFoundException::class.java) {
-      runBlocking { fhirEngine.get<Patient>(patient02ID) }
+      runBlocking { fhirEngine.get<Observation>(patient01AppointmentEncounterObservationID) }
     }
-    assertResourceEquals(patient03, fhirEngine.get<Patient>(patient03ID))
-    assertResourceNotEquals(patient03Updated, fhirEngine.get<Patient>(patient03ID))
+    assertThat(fhirEngine.get<Appointment>(patient01AppointmentID).status)
+      .isEqualTo(Appointment.AppointmentStatus.BOOKED)
   }
 
   companion object {
