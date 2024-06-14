@@ -44,7 +44,7 @@ dependencies {
 ```
 In this snippet, the environment variables `GPR_USER`/`GPR_KEY` can be used as well.
 
-Then the file `local.properties` will need to be created a root folder:
+Then the file `local.properties` will need to be created in the project root folder:
 
 ```dotenv
 sdk.dir=<path to Android SDK>
