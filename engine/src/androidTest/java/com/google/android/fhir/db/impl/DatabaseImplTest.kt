@@ -4089,48 +4089,57 @@ class DatabaseImplTest {
 
   @Test
   fun included_results_should_have_distinct_resources() = runBlocking {
-    // A person has multiple first names. Searching a group including Patient  sorted by
-    // Patient.GIVEN should return single copy of of the Patient resource.
+    /**
+     * A person has multiple first names. Searching a group including Patient sorted by
+     * Patient.GIVEN should return single copy of of the Patient resource.
+     *
+     * In order to sort Patients by given name, engine joins ResourceEntity table with
+     * StringIndexEntity table which may result in multiple rows for a single Patient if the person
+     * has more than one given name.
+     *
+     * So the expectation is that the search result should only include distinct Patients and not
+     * repeated Patients (one for each given name).
+     */
     val group =
       Group().apply {
         id = "group"
-        addMember(Group.GroupMemberComponent(Reference("Patient/multiple-first-names")))
+        addMember(Group.GroupMemberComponent(Reference("Patient/p1")))
+        addMember(Group.GroupMemberComponent(Reference("Patient/p2")))
       }
-    val patient =
+    val p1 =
       Patient().apply {
-        id = "multiple-first-names"
+        id = "p1"
         addName(
           HumanName().apply {
-            family = "LastName"
-            addGiven("FirstName-01")
-            addGiven("FirstName-02")
-            addGiven("FirstName-03")
+            family = "Cooper"
+            addGiven("3")
+            addGiven("1")
           },
         )
       }
 
-    database.insert(group, patient)
+    val p2 =
+      Patient().apply {
+        id = "p2"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("2")
+            addGiven("4")
+          },
+        )
+      }
+    database.insert(group, p1, p2)
 
     val result =
       Search(ResourceType.Group)
-        .apply {
-          include<Patient>(Group.MEMBER) {
-            filter(
-              Patient.GIVEN,
-              {
-                value = "FirstName"
-                modifier = StringFilterModifier.STARTS_WITH
-              },
-            )
-            sort(Patient.GIVEN, Order.ASCENDING)
-          }
-        }
+        .apply { include<Patient>(Group.MEMBER) { sort(Patient.GIVEN, Order.ASCENDING) } }
         .execute<Patient>(database)
 
     assertThat(result)
       .comparingElementsUsing(SearchResultCorrespondence)
       .displayingDiffsPairedBy { it.resource.logicalId }
-      .contains(SearchResult(group, mapOf(Group.MEMBER.paramName to listOf(patient)), null))
+      .contains(SearchResult(group, mapOf(Group.MEMBER.paramName to listOf(p2, p1)), null))
   }
 
   @Test
