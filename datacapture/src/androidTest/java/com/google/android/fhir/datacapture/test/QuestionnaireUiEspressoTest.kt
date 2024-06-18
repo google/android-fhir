@@ -20,12 +20,18 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.commitNow
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -246,12 +252,14 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.typeTextIntoFocusedView("01052005"))
 
     onView(withId(R.id.time_input_layout)).perform(clickIcon(true))
+    clickOnText("AM")
     clickOnText("6")
     clickOnText("10")
     clickOnText("OK")
 
     runTest {
       val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      // check Locale
       assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
     }
   }
@@ -602,24 +610,109 @@ class QuestionnaireUiEspressoTest {
     }
   }
 
+  @Test
+  fun test_repeated_group_is_added() {
+    buildFragmentFromQuestionnaire("/component_repeated_group.json")
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          0,
+          clickChildViewWithId(R.id.add_item),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_is_deleted() {
+    buildFragmentFromQuestionnaire(
+      "/component_repeated_group.json",
+      responseFileName = "/repeated_group_response.json",
+    )
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          1,
+          clickChildViewWithId(R.id.repeated_group_instance_header_delete_button),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(0)
+    }
+  }
+
+  private fun RecyclerView.countChildViewOccurrences(viewId: Int): Int {
+    var count = 0
+    for (i in 0 until this.adapter!!.itemCount) {
+      val holder = findViewHolderForAdapterPosition(i)
+      if (holder?.itemView?.findViewById<View>(viewId) != null) {
+        count++
+      }
+    }
+    return count
+  }
+
+  private fun clickChildViewWithId(id: Int) =
+    object : ViewAction {
+      override fun getConstraints() = isAssignableFrom(View::class.java)
+
+      override fun getDescription() = "Click on a child view with specified id."
+
+      override fun perform(uiController: UiController?, view: View) {
+        view.findViewById<View>(id)?.performClick()
+      }
+    }
+
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
     isReviewMode: Boolean = false,
+    responseFileName: String? = null,
   ): QuestionnaireFragment {
     val questionnaireJsonString = readFileFromAssets(fileName)
-    val questionnaireFragment =
+    val builder =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
         .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
-        .build()
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add(R.id.container_holder, questionnaireFragment)
+
+    responseFileName?.let { builder.setQuestionnaireResponse(readFileFromAssets(it)) }
+
+    return builder.build().also { fragment ->
+      activityScenarioRule.scenario.onActivity { activity ->
+        activity.supportFragmentManager.commitNow {
+          setReorderingAllowed(true)
+          add(R.id.container_holder, fragment)
+        }
       }
     }
-    return questionnaireFragment
   }
 
   private fun buildFragmentFromQuestionnaire(

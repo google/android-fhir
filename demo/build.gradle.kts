@@ -1,7 +1,6 @@
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
@@ -20,7 +19,7 @@ android {
   }
   buildTypes {
     release {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }

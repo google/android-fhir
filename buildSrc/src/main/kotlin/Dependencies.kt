@@ -48,7 +48,6 @@ object Dependencies {
     const val structuresDstu2Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu2"
     const val structuresDstu3Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-dstu3"
     const val structuresR4Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4"
-    const val structuresR4bModule = "ca.uhn.hapi.fhir:hapi-fhir-structures-r4b"
     const val structuresR5Module = "ca.uhn.hapi.fhir:hapi-fhir-structures-r5"
 
     const val validationModule = "ca.uhn.hapi.fhir:hapi-fhir-validation"
@@ -67,26 +66,11 @@ object Dependencies {
 
     const val guavaCachingModule = "ca.uhn.hapi.fhir:hapi-fhir-caching-guava"
 
-    const val fhirBase = "$fhirBaseModule:${Versions.hapiFhir}"
-    const val fhirClient = "$fhirClientModule:${Versions.hapiFhir}"
-    const val structuresDstu2 = "$structuresDstu2Module:${Versions.hapiFhir}"
-    const val structuresDstu3 = "$structuresDstu3Module:${Versions.hapiFhir}"
     const val structuresR4 = "$structuresR4Module:${Versions.hapiFhir}"
-    const val structuresR4b = "$structuresR4bModule:${Versions.hapiFhir}"
-    const val structuresR5 = "$structuresR5Module:${Versions.hapiFhir}"
 
     const val validation = "$validationModule:${Versions.hapiFhir}"
-    const val validationDstu3 = "$validationDstu3Module:${Versions.hapiFhir}"
     const val validationR4 = "$validationR4Module:${Versions.hapiFhir}"
-    const val validationR5 = "$validationR5Module:${Versions.hapiFhir}"
 
-    const val fhirCoreDstu2 = "$fhirCoreDstu2Module:${Versions.hapiFhirCore}"
-    const val fhirCoreDstu2016 = "$fhirCoreDstu2016Module:${Versions.hapiFhirCore}"
-    const val fhirCoreDstu3 = "$fhirCoreDstu3Module:${Versions.hapiFhirCore}"
-    const val fhirCoreR4 = "$fhirCoreR4Module:${Versions.hapiFhirCore}"
-    const val fhirCoreR4b = "$fhirCoreR4bModule:${Versions.hapiFhirCore}"
-    const val fhirCoreR5 = "$fhirCoreR5Module:${Versions.hapiFhirCore}"
-    const val fhirCoreUtils = "$fhirCoreUtilsModule:${Versions.hapiFhirCore}"
     const val fhirCoreConvertors = "$fhirCoreConvertorsModule:${Versions.hapiFhirCore}"
 
     const val guavaCaching = "$guavaCachingModule:${Versions.hapiFhir}"
@@ -249,7 +233,7 @@ object Dependencies {
 
     object Kotlin {
       const val kotlinCoroutinesCore = "1.7.2"
-      const val stdlib = "1.8.20"
+      const val stdlib = "1.9.22"
     }
 
     const val androidFhirCommon = "0.1.0-alpha05"
@@ -330,7 +314,7 @@ object Dependencies {
   }
 
   fun hapiFhirConstraints(): Map<String, DependencyConstraint.() -> Unit> {
-    return mutableMapOf<String, DependencyConstraint.() -> Unit>(
+    return mutableMapOf(
       guavaModule to { version { strictly(Versions.guava) } },
       HapiFhir.fhirBaseModule to { version { strictly(Versions.hapiFhir) } },
       HapiFhir.fhirClientModule to { version { strictly(Versions.hapiFhir) } },

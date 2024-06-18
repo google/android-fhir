@@ -44,6 +44,7 @@ import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.IntegerType
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
@@ -112,6 +113,27 @@ internal const val EXTENSION_ITEM_MEDIA =
 internal const val EXTENSION_MAX_SIZE = "http://hl7.org/fhir/StructureDefinition/maxSize"
 
 internal const val EXTENSION_MIME_TYPE = "http://hl7.org/fhir/StructureDefinition/mimeType"
+
+/**
+ * Extension for questionnaire and its items, representing a rule that must be satisfied before
+ * [QuestionnaireResponse] can be considered valid.
+ *
+ * See https://hl7.org/fhir/extensions/StructureDefinition-questionnaire-constraint.html.
+ */
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_URL =
+  "http://hl7.org/fhir/StructureDefinition/questionnaire-constraint"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_KEY = "key"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_REQUIREMENTS = "requirements"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_SEVERITY = "severity"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_EXPRESSION = "expression"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_HUMAN = "human"
+
+internal const val EXTENSION_QUESTIONNAIRE_CONSTRAINT_LOCATION = "location"
 
 /**
  * Extension for questionnaire items of integer and decimal types including a single unit to be
@@ -775,6 +797,14 @@ internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
   }.map { Questionnaire.QuestionnaireItemAnswerOptionComponent(it) }
 }
 
+/** See http://hl7.org/fhir/constraint-severity */
+enum class ConstraintSeverityTypes(
+  val code: String,
+) {
+  ERROR("error"),
+  WARNING("warning"),
+}
+
 // ********************************************************************************************** //
 //                                                                                                //
 // Utilities: zip with questionnaire response item list, nested items, create response items,     //
@@ -807,6 +837,35 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
     }
       ?: emptyList()
   }
+}
+
+/**
+ * Returns a list of values built from the elements of `this` and the
+ * `questionnaireResponseItemList` with the same linkId using the provided `transform` function
+ * applied to each pair of questionnaire item and questionnaire response item.
+ *
+ * In case of repeated group item, `questionnaireResponseItemList` will contain
+ * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
+ * associated with its questionnaire item linkId.
+ */
+internal inline fun <T> groupByAndZipByLinkId(
+  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+  transform:
+    (
+      List<Questionnaire.QuestionnaireItemComponent>,
+      List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    ) -> T,
+): List<T> {
+  val linkIdToQuestionnaireItemListMap = questionnaireItemList.groupBy { it.linkId }
+  val linkIdToQuestionnaireResponseItemListMap = questionnaireResponseItemList.groupBy { it.linkId }
+  return (linkIdToQuestionnaireItemListMap.keys + linkIdToQuestionnaireResponseItemListMap.keys)
+    .map { linkId ->
+      transform(
+        linkIdToQuestionnaireItemListMap[linkId] ?: emptyList(),
+        linkIdToQuestionnaireResponseItemListMap[linkId] ?: emptyList(),
+      )
+    }
 }
 
 /**
@@ -925,6 +984,9 @@ private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
     it.item.flattenInto(output)
   }
 }
+
+internal val Questionnaire.QuestionnaireItemComponent.isRepeatedGroup: Boolean
+  get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats
 
 // TODO: Move this elsewhere.
 val Resource.logicalId: String
