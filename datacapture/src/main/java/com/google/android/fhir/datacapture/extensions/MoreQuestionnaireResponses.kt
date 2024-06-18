@@ -87,13 +87,11 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
           QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
             this.linkId = questionnaireItem.linkId
             answer =
-              questionnaireResponseItems
-                .map {
-                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                    item = it.item
-                  }
+              questionnaireResponseItems.map {
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  item = it.item
                 }
-                .filter { it.item.isNotEmpty() }
+              }
           },
         )
       } else {
