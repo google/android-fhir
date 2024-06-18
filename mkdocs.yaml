@@ -42,7 +42,7 @@ nav:
               - use/WFL/Compile-and-Execute-CQL.md
       - use/Extensions.md
       - API Doc: use/api.md
-      - Use Snapshots: use/snapshots.md
+      - Use Snapshots: use/Snapshots.md
   - Contributors:
       - Contributing: contrib/index.md
       - Codespaces: contrib/codespaces.md
