@@ -16,21 +16,33 @@
 
 package com.google.android.fhir.workflow.activity
 
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.search
+import com.google.android.fhir.getResourceClass
 import java.util.UUID
 import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.CommunicationRequest
+import org.hl7.fhir.r4.model.EpisodeOfCare
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Immunization
+import org.hl7.fhir.r4.model.MedicationDispense
+import org.hl7.fhir.r4.model.MedicationDispense.MedicationDispenseSubstitutionComponent
+import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.MedicationRequest.MedicationRequestSubstitutionComponent
+import org.hl7.fhir.r4.model.Procedure
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
+import org.opencds.cqf.fhir.api.Repository
 
 abstract class ActivityFlow2<R : Resource, E : Resource>
-internal constructor(val fhirEngine: FhirEngine) {
+internal constructor(val fhirEngine: Repository) {
 
-  private val Reference.searchByIdQuery
-    get() = reference.split("/").joinToString("?_id=")
+  private val Reference.`class`
+    get() = getResourceClass<Resource>(reference.split("/")[0])
+
+  private val Reference.idType
+    get() = IdType(reference)
 
   var proposal: R? = null
   var plan: R? = null
@@ -88,9 +100,8 @@ internal constructor(val fhirEngine: FhirEngine) {
       val basedOn = inputPlan.getBasedOn()
       check(basedOn != null) { "${plan.resourceType}.basedOn shouldn't be null" }
 
-      val basedOnProposal =
-        fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
-      check(basedOnProposal != null) { "Couldn't find ${basedOn.searchByIdQuery} in the database." }
+      val basedOnProposal = fhirEngine.read(plan.javaClass, basedOn.idType)?.let { Request(it) }
+      check(basedOnProposal != null) { "Couldn't find ${basedOn.reference} in the database." }
 
       check(basedOnProposal.intent == Request.Intent.PROPOSAL) {
         "Proposal is still in ${basedOnProposal.intent} state."
@@ -151,8 +162,8 @@ internal constructor(val fhirEngine: FhirEngine) {
       val basedOn = inputOrder.getBasedOn()
       check(basedOn != null) { "${order.resourceType}.basedOn shouldn't be null" }
 
-      val basedOnResource =
-        fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+      val basedOnResource = fhirEngine.read(order.javaClass, basedOn.idType)?.let { Request(it) }
+
       check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
       check(
@@ -208,8 +219,8 @@ internal constructor(val fhirEngine: FhirEngine) {
       val basedOn = inputEvent.getBasedOn()
       check(basedOn != null) { "${event.resourceType}.basedOn shouldn't be null" }
 
-      val basedOnResource =
-        fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+      val basedOnResource = fhirEngine.read(basedOn.`class`, basedOn.idType)?.let { Request(it) }
+
       check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
       check(basedOnResource.intent == Request.Intent.ORDER) {
@@ -238,15 +249,41 @@ internal constructor(val fhirEngine: FhirEngine) {
 
   companion object {
 
-    fun sendMessage(engine: FhirEngine, resource: CommunicationRequest) =
+    fun sendMessage(engine: Repository, resource: CommunicationRequest) =
       CommunicationActivityFlow(engine).apply { init(resource) }
 
-    fun collectInformation(engine: FhirEngine, resource: Task) =
+    fun collectInformation(engine: Repository, resource: Task) =
       CollectInformationFlow(engine).apply { init(resource) }
+
+    fun orderMedication(engine: Repository, resource: MedicationRequest) =
+      OrderMedicationFlow(engine).apply { init(resource) }
+
+    fun recommendImmunization(engine: Repository, resource: MedicationRequest) =
+      RecommendImmunization(engine).apply { init(resource) }
+
+    fun orderService(engine: Repository, resource: ServiceRequest) =
+      OrderService(engine).apply { init(resource) }
+
+    fun enrollPatient(engine: Repository, resource: Task) =
+      EnrollPatient(engine).apply { init(resource) }
+
+    fun generateReport(engine: Repository, resource: Task) =
+      NotImplementedError("Not implemented yet.")
+
+    fun proposeDiagnosis(engine: Repository, resource: Task) =
+      NotImplementedError("Not implemented yet.")
+
+    fun recordDetectedIssue(engine: Repository, resource: Task) =
+      NotImplementedError("Not implemented yet.")
+
+    fun recordInference(engine: Repository, resource: Task) =
+      NotImplementedError("Not implemented yet.")
+
+    fun reportFlag(engine: Repository, resource: Task) = NotImplementedError("Not implemented yet.")
   }
 }
 
-class CommunicationActivityFlow(engine: FhirEngine) :
+class CommunicationActivityFlow(engine: Repository) :
   ActivityFlow2<CommunicationRequest, Communication>(engine) {
 
   override fun createEventResource(order: CommunicationRequest) =
@@ -255,15 +292,19 @@ class CommunicationActivityFlow(engine: FhirEngine) :
       status = Communication.CommunicationStatus.PREPARATION
       category = order.category
       priority = Communication.CommunicationPriority.fromCode(order.priority?.toCode())
+      medium = order.medium
       subject = order.subject
       about = order.about
       encounter = order.encounter
       recipient = order.recipient
+      sender = order.sender
+      reasonCode = order.reasonCode
+      reasonReference = order.reasonReference
       order.payload.forEach { addPayload(Communication.CommunicationPayloadComponent(it.content)) }
     }
 }
 
-class CollectInformationFlow(engine: FhirEngine) :
+class CollectInformationFlow(engine: Repository) :
   ActivityFlow2<Task, QuestionnaireResponse>(engine) {
 
   override fun createEventResource(order: Task) =
@@ -271,6 +312,69 @@ class CollectInformationFlow(engine: FhirEngine) :
       id = UUID.randomUUID().toString()
       status = QuestionnaireResponse.QuestionnaireResponseStatus.INPROGRESS
       subject = order.`for`
-      encounter = order.encounter
+      //      encounter = order.encounter
     }
+}
+
+class OrderMedicationFlow(engine: Repository) :
+  ActivityFlow2<MedicationRequest, MedicationDispense>(engine) {
+  override fun createEventResource(order: MedicationRequest) =
+    MedicationDispense().apply {
+      id = UUID.randomUUID().toString()
+      status = MedicationDispense.MedicationDispenseStatus.PREPARATION
+
+      if (order.hasCategory() && order.category.size == 1) {
+        // Only set category if single, otherwise let application fill it in.
+        category = order.category.first()
+      }
+
+      medication = order.medication
+      subject = order.subject
+      context = order.encounter
+      if (order.hasSubstitution()) {
+        substitution = order.substitution.toMedicationDispenseSubstitutionComponent()
+      }
+      note = order.note
+      dosageInstruction = order.dosageInstruction
+      detectedIssue = order.detectedIssue
+      eventHistory = order.eventHistory
+    }
+
+  private fun MedicationRequestSubstitutionComponent.toMedicationDispenseSubstitutionComponent() =
+    MedicationDispenseSubstitutionComponent().apply {
+      id = this@toMedicationDispenseSubstitutionComponent.id
+      extension = this@toMedicationDispenseSubstitutionComponent.extension
+      modifierExtension = this@toMedicationDispenseSubstitutionComponent.modifierExtension
+      allowed = this@toMedicationDispenseSubstitutionComponent.allowed
+      if (this@toMedicationDispenseSubstitutionComponent.hasReason()) {
+        addReason(this@toMedicationDispenseSubstitutionComponent.reason)
+      }
+    }
+}
+
+class RecommendImmunization(engine: Repository) :
+  ActivityFlow2<MedicationRequest, Immunization>(engine) {
+  override fun createEventResource(order: MedicationRequest) =
+    Immunization().apply {
+      patient = order.subject
+      reasonCode = order.reasonCode
+      reasonReference = order.reasonReference
+    }
+}
+
+class OrderService(engine: Repository) : ActivityFlow2<ServiceRequest, Procedure>(engine) {
+  override fun createEventResource(order: ServiceRequest) =
+    Procedure().apply {
+      code = order.code
+      subject = order.subject
+      //    encounter = order.encounter
+      reasonCode = order.reasonCode
+      reasonReference = order.reasonReference
+      bodySite = order.bodySite
+    }
+}
+
+class EnrollPatient(engine: Repository) : ActivityFlow2<Task, EpisodeOfCare>(engine) {
+
+  override fun createEventResource(order: Task) = EpisodeOfCare().apply { patient = order.`for` }
 }

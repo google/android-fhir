@@ -22,16 +22,20 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.workflow.repositories.FhirEngineRepository
+import com.google.android.fhir.workflow.runBlockingOnWorkerThread
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestPayloadComponent
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -120,7 +124,7 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun `communication request flow2`() = runBlocking {
+  fun `communication request flow2`() = runBlockingOnWorkerThread {
     val proposalJson =
       """
    {
@@ -156,7 +160,11 @@ class ActivityFlowTest {
     fhirEngine.create(proposalFromCarePlan)
 
     println(" Staring Plan with Proposal ${proposalFromCarePlan.typeAndId}")
-    val sendMessageFlow = ActivityFlow2.sendMessage(fhirEngine, proposalFromCarePlan)
+    val sendMessageFlow =
+      ActivityFlow2.sendMessage(
+        FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine),
+        proposalFromCarePlan,
+      )
     sendMessageFlow.startPlan { payload.first().content = StringType("Hello in Proposal") }
 
     assertThat(sendMessageFlow.plan).isInstanceOf(CommunicationRequest::class.java)
@@ -207,7 +215,7 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun `communication request flow3`() = runBlocking {
+  fun `communication request flow3`() = runBlockingOnWorkerThread {
     val proposalJson =
       """
            {
@@ -239,7 +247,10 @@ class ActivityFlowTest {
     fhirEngine.create(proposalFromCarePlan)
 
     val sendMessageFlow =
-      ActivityFlow2.sendMessage(fhirEngine, proposalFromCarePlan)
+      ActivityFlow2.sendMessage(
+          FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine),
+          proposalFromCarePlan,
+        )
         .startPlan {
           // Change the message in the Proposal Request
           payload.first().content = StringType("Hello in Proposal")
@@ -292,6 +303,118 @@ class ActivityFlowTest {
     assertThat(communicationEvent.payload.map { it.content.primitiveValue() })
       .containsExactly("Hello in Proposal", "Hello in Plan", "Hello in Order", "Hello in Event")
       .inOrder()
+  }
+
+  @Ignore("Test not complete yet")
+  @Test
+  fun `order a medication`(): Unit = runBlockingOnWorkerThread {
+    val medicationRequest =
+      """
+      {
+        "resourceType" : "MedicationRequest",
+        "id" : "dm-scenario4",
+        "text" : {
+          "status" : "generated",
+          "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>status</b>: active</p><p><b>intent</b>: order</p><p><b>priority</b>: routine</p><p><b>medication</b>: <span title=\"Codes: {http://snomed.info/sct 376988009}\">Levothyroxine sodium 75 microgram oral tablet</span></p><p><b>subject</b>: <a href=\"Patient-dm-scenario4.html\">Generated Summary: active; Example Patient; gender: female; birthDate: 1990-10-01; </a></p><p><b>reasonCode</b>: <span title=\"Codes: {http://snomed.info/sct 40930008}\">Hypothyroidism (disorder)</span></p><h3>DosageInstructions</h3><table class=\"grid\"><tr><td>-</td></tr><tr><td>*</td></tr></table><blockquote><p><b>dispenseRequest</b></p><p><b>validityPeriod</b>: 2015-01-15 --&gt; 2016-01-15</p><p><b>quantity</b>: 100 Tab</p><h3>ExpectedSupplyDurations</h3><table class=\"grid\"><tr><td>-</td></tr><tr><td>*</td></tr></table></blockquote></div>"
+        },
+        "status" : "active",
+        "intent" : "order",
+        "priority" : "routine",
+        "medicationCodeableConcept" : {
+          "coding" : [
+            {
+              "system" : "http://snomed.info/sct",
+              "code" : "376988009",
+              "display" : "Levothyroxine sodium 75 microgram oral tablet"
+            }
+          ]
+        },
+        "subject" : {
+          "reference" : "Patient/dm-scenario4"
+        },
+        "reasonCode" : [
+          {
+            "coding" : [
+              {
+                "system" : "http://snomed.info/sct",
+                "code" : "40930008",
+                "display" : "Hypothyroidism (disorder)"
+              }
+            ]
+          }
+        ],
+        "dosageInstruction" : [
+          {
+            "sequence" : 1,
+            "text" : "75mcg daily",
+            "timing" : {
+              "repeat" : {
+                "frequency" : 1,
+                "period" : 1,
+                "periodUnit" : "d"
+              }
+            },
+            "route" : {
+              "coding" : [
+                {
+                  "system" : "http://snomed.info/sct",
+                  "code" : "26643006",
+                  "display" : "Oral Route (qualifier value)"
+                }
+              ]
+            },
+            "doseAndRate" : [
+              {
+                "type" : {
+                  "coding" : [
+                    {
+                      "system" : "http://terminology.hl7.org/CodeSystem/dose-rate-type",
+                      "code" : "ordered",
+                      "display" : "Ordered"
+                    }
+                  ]
+                },
+                "doseQuantity" : {
+                  "value" : 75,
+                  "unit" : "mcg",
+                  "system" : "http://unitsofmeasure.org",
+                  "code" : "ug"
+                }
+              }
+            ]
+          }
+        ],
+        "dispenseRequest" : {
+          "validityPeriod" : {
+            "start" : "2015-01-15",
+            "end" : "2016-01-15"
+          },
+          "quantity" : {
+            "value" : 100,
+            "unit" : "Tab",
+            "system" : "http://terminology.hl7.org/CodeSystem/v3-orderableDrugForm",
+            "code" : "TAB"
+          },
+          "expectedSupplyDuration" : {
+            "value" : 30,
+            "unit" : "days",
+            "system" : "http://unitsofmeasure.org",
+            "code" : "d"
+          }
+        }
+      }
+        """
+        .trimIndent()
+        .let { FhirContext.forR4Cached().newJsonParser().parseResource(it) as MedicationRequest }
+    fhirEngine.create(medicationRequest)
+
+    ActivityFlow2.orderMedication(
+        FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine),
+        medicationRequest,
+      )
+      .startPlan {}
+
+    TODO("Finish test")
   }
 }
 
