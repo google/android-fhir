@@ -129,7 +129,7 @@
 
     <!--   Style for Add another repeated group item button. -->
     <attr name="questionnaireAddRepeatedGroupButtonStyle" format="reference" />
-    <!--   Style for Add another repeated group item button. -->
+    <!--   Style for Delete repeated group item button. -->
     <attr
         name="questionnaireDeleteRepeatedGroupButtonStyle"
         format="reference"

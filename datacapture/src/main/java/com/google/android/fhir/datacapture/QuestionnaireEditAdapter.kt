@@ -18,7 +18,6 @@ package com.google.android.fhir.datacapture
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -43,6 +42,7 @@ import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
@@ -64,7 +64,9 @@ internal class QuestionnaireEditAdapter(
         ViewHolder.QuestionHolder(onCreateViewHolderQuestion(parent = parent, subtype = subtype))
       ViewType.Type.REPEATED_GROUP_HEADER -> {
         ViewHolder.RepeatedGroupHeaderHolder(
-          parent.inflate(R.layout.repeated_group_instance_header_view),
+          RepeatedGroupHeaderItemViewHolder(
+            parent.inflate(R.layout.repeated_group_instance_header_view),
+          ),
         )
       }
     }
@@ -118,13 +120,7 @@ internal class QuestionnaireEditAdapter(
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
         holder as ViewHolder.RepeatedGroupHeaderHolder
-        holder.header.text =
-          holder.header.context.getString(
-            R.string.repeated_group_title,
-            "${item.index + 1}",
-            item.title,
-          )
-        holder.delete.setOnClickListener { item.onDeleteClicked() }
+        holder.viewHolder.bind(item)
       }
     }
   }
@@ -271,10 +267,8 @@ internal class QuestionnaireEditAdapter(
   internal sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     class QuestionHolder(val holder: QuestionnaireItemViewHolder) : ViewHolder(holder.itemView)
 
-    class RepeatedGroupHeaderHolder(itemView: View) : ViewHolder(itemView) {
-      val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
-      val delete: View = itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
-    }
+    class RepeatedGroupHeaderHolder(val viewHolder: RepeatedGroupHeaderItemViewHolder) :
+      ViewHolder(viewHolder.itemView)
   }
 
   internal companion object {

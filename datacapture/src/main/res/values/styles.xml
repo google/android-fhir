@@ -397,7 +397,6 @@
         name="Questionnaire.AddRepeatedGroupButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-    <item name="android:text">@string/group_header_add_item_button</item>
     <item name="android:textAllCaps">false</item>
     <item name="cornerRadius">4dp</item>
     <item name="icon">@drawable/add_24px</item>
@@ -411,7 +410,6 @@
         name="Questionnaire.DeleteRepeatedGroupButtonStyle"
         parent="Widget.Material3.Button.OutlinedButton"
     >
-    <item name="android:text">@string/delete</item>
     <item name="android:textAllCaps">false</item>
     <item name="android:textColor">@color/mtrl_error</item>
     <item name="cornerRadius">4dp</item>
