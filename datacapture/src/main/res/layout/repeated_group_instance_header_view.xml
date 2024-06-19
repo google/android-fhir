@@ -30,11 +30,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
     />
-    <ImageView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/repeated_group_instance_header_delete_button"
+        style="?attr/questionnaireDeleteRepeatedGroupButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:padding="@dimen/padding_between_text_and_icon"
-        android:src="@drawable/ic_delete"
+        android:layout_gravity="center_horizontal"
+        android:text="@string/delete"
     />
 </LinearLayout>

@@ -133,6 +133,14 @@
             name="questionnaireEditButtonStyle"
         >@style/Questionnaire.EditButtonStyle
         </item>
+        <item
+            name="questionnaireAddRepeatedGroupButtonStyle"
+        >@style/Questionnaire.AddRepeatedGroupButtonStyle
+        </item>
+        <item
+            name="questionnaireDeleteRepeatedGroupButtonStyle"
+        >@style/Questionnaire.DeleteRepeatedGroupButtonStyle
+        </item>
         <item name="questionnaireDialogButtonStyle">
             @style/Widget.Material3.Button.TextButton.Dialog
         </item>
@@ -384,6 +392,32 @@
         <item name="android:text">@string/edit_button_text</item>
         <item name="android:textAllCaps">false</item>
     </style>
+
+  <style
+        name="Questionnaire.AddRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/add_24px</item>
+    <item
+            name="strokeColor"
+        >@color/m3_text_button_foreground_color_selector</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+  </style>
+
+  <style
+        name="Questionnaire.DeleteRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="android:textColor">@color/mtrl_error</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/delete_24px</item>
+    <item name="strokeColor">@color/mtrl_error</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+    <item name="iconTint">@color/mtrl_error</item>
+  </style>
 
     <style
         name="Questionnaire.SubmitButtonStyle"
