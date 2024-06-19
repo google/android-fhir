@@ -6,9 +6,9 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.benchmark"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 

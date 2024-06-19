@@ -5,10 +5,10 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.document"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
 
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     consumerProguardFiles("consumer-rules.pro")
   }

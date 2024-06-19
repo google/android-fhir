@@ -13,8 +13,8 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.common"
-  compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+  compileSdk = Sdk.COMPILE_SDK
+  defaultConfig { minSdk = Sdk.MIN_SDK }
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
 }

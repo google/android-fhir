@@ -7,8 +7,8 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.workflow.testing"
-  compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+  compileSdk = Sdk.COMPILE_SDK
+  defaultConfig { minSdk = Sdk.MIN_SDK }
   kotlin { jvmToolchain(11) }
 }
 
