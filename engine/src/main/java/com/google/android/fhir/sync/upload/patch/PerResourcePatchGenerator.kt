@@ -23,7 +23,7 @@ import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
 import com.google.android.fhir.db.Database
-import com.google.android.fhir.sync.upload.patch.PatchOrdering.orderByReferences
+import com.google.android.fhir.sync.upload.patch.PatchOrdering.sccOrderByReferences
 
 /**
  * Generates a [Patch] for all [LocalChange]es made to a single FHIR resource.
@@ -35,8 +35,10 @@ import com.google.android.fhir.sync.upload.patch.PatchOrdering.orderByReferences
 internal class PerResourcePatchGenerator private constructor(val database: Database) :
   PatchGenerator {
 
-  override suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
-    return generateSquashedChangesMapping(localChanges).orderByReferences(database)
+  override suspend fun generate(
+    localChanges: List<LocalChange>,
+  ): List<StronglyConnectedPatchMappings> {
+    return generateSquashedChangesMapping(localChanges).sccOrderByReferences(database)
   }
 
   @androidx.annotation.VisibleForTesting

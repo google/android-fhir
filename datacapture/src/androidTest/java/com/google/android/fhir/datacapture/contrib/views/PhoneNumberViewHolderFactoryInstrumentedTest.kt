@@ -65,7 +65,7 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
   }
 
   @Test
-  fun createViewHolder_shouldReturn_phoneNumberViewHolder() {
+  fun createViewHolder_phoneNumberViewHolderFactory_returnsViewHolder() {
     val viewHolderFromAdapter =
       questionnaireEditAdapter.createViewHolder(
         parent,
@@ -74,8 +74,13 @@ class PhoneNumberViewHolderFactoryInstrumentedTest {
             subtype = QuestionnaireViewHolderType.PHONE_NUMBER.value,
           )
           .viewType,
+      ) as QuestionnaireEditAdapter.ViewHolder.QuestionHolder
+    assertThat(
+        viewHolderFromAdapter.holder.itemView
+          .findViewById<TextInputEditText>(R.id.text_input_edit_text)
+          .visibility,
       )
-    assertThat(viewHolderFromAdapter).isInstanceOf(viewHolder::class.java)
+      .isEqualTo(View.VISIBLE)
   }
 
   @Test
