@@ -69,8 +69,9 @@ The versions `<...-version>` can be found in https://github.com/google?tab=packa
 The complete documentation can be found in the section [Declaring a changing version](https://docs.gradle.org/current/userguide/dynamic_versions.html#sub:declaring_dependency_with_changing_version).
 
 To summarize:
-- By default, Gradle caches changing versions of dependencies for **24 hours**
-- Dependency caching can be [controlled programmatically](https://docs.gradle.org/current/userguide/dynamic_versions.html#sec:controlling_dependency_caching_programmatically)
-- The `--refresh-dependencies` option in command line tells Gradle to ignore all cached versions
+
+* By default, Gradle caches changing versions of dependencies for **24 hours**
+* Dependency caching can be [controlled programmatically](https://docs.gradle.org/current/userguide/dynamic_versions.html#sec:controlling_dependency_caching_programmatically)
+* The `--refresh-dependencies` option in command line tells Gradle to ignore all cached versions
 
 
