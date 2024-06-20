@@ -4,7 +4,7 @@ You can test the latest Android FHIR SDK libraries using the snapshot versions p
 
 They are unreleased versions of the library built from the `HEAD` of the main branch and have the `-SNAPSHOT` suffix in their version numbers.
 
-They can be found here: https://github.com/orgs/google/packages?repo_name=android-fhir
+They can be found [here](https://github.com/orgs/google/packages?repo_name=android-fhir).
 
 > :warning: The snapshots are for testing and development purposes only. They are not QA tested and not production ready. Do **NOT** use them in production.
 
