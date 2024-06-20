@@ -1,0 +1,113 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "nobirthcontrolmethod-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/LA 14550-0/\">LA 14550-0</a></td><td>Sexual abstinence</td></tr><tr><td><a href=\"https://loinc.org/LA 27925-9/\">LA 27925-9</a></td><td>Same sex partner</td></tr><tr><td><a href=\"https://loinc.org/LA 46-8/\">LA 46-8</a></td><td>Other</td></tr><tr><td><a href=\"https://loinc.org/LA 27927-5/\">LA 27927-5</a></td><td>Sterile for non-contraceptive reasons</td></tr><tr><td><a href=\"https://loinc.org/LA 27928-3/\">LA 27928-3</a></td><td>Seeking pregnancy</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/162171002\">162171002</a></td><td>Sexual abstinence</td></tr><tr><td><a href=\"http://snomed.info/id/77386006\">77386006</a></td><td>Currently pregnant</td></tr><tr><td><a href=\"http://snomed.info/id/454361000124100\">454361000124100</a></td><td>Same sex partner</td></tr><tr><td><a href=\"http://snomed.info/id/74964007\">74964007</a></td><td>Other</td></tr><tr><td><a href=\"http://snomed.info/id/182856006\">182856006</a></td><td>Out of stock</td></tr><tr><td><a href=\"http://snomed.info/id/15296000\">15296000</a></td><td>Sterile for non-contraceptive reasons</td></tr><tr><td><a href=\"http://snomed.info/id/9789007\">9789007</a></td><td>Sterile for non-contraceptive reasons</td></tr><tr><td><a href=\"http://snomed.info/id/454411000124108\">454411000124108</a></td><td>Seeking pregnancy</td></tr></table></li><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-icd10.html\"><code>http://hl7.org/fhir/sid/icd-10</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>T38.4</td><td>Side effects from contraception</td></tr><tr><td>Z76.89</td><td>Out of stock</td></tr><tr><td>Z31.9</td><td>Sterile for non-contraceptive reasons</td></tr></table></li><li>Include these codes as defined in <code>http://who.int/cg/CodeSystem/extended-content</code><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>Other</td><td>Other</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/nobirthcontrolmethod-values",
+  "version" : "0.1.0",
+  "name" : "nobirthcontrolmethod-values",
+  "title" : "Reason for no contraceptive method - Reported at intake values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Reason for no contraceptive method - Reported at intake element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "LA 14550-0",
+        "display" : "Sexual abstinence"
+      },
+      {
+        "code" : "LA 27925-9",
+        "display" : "Same sex partner"
+      },
+      {
+        "code" : "LA 46-8",
+        "display" : "Other"
+      },
+      {
+        "code" : "LA 27927-5",
+        "display" : "Sterile for non-contraceptive reasons"
+      },
+      {
+        "code" : "LA 27928-3",
+        "display" : "Seeking pregnancy"
+      }]
+    },
+    {
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "162171002",
+        "display" : "Sexual abstinence"
+      },
+      {
+        "code" : "77386006",
+        "display" : "Currently pregnant"
+      },
+      {
+        "code" : "454361000124100",
+        "display" : "Same sex partner"
+      },
+      {
+        "code" : "74964007",
+        "display" : "Other"
+      },
+      {
+        "code" : "182856006",
+        "display" : "Out of stock"
+      },
+      {
+        "code" : "15296000",
+        "display" : "Sterile for non-contraceptive reasons"
+      },
+      {
+        "code" : "9789007",
+        "display" : "Sterile for non-contraceptive reasons"
+      },
+      {
+        "code" : "454411000124108",
+        "display" : "Seeking pregnancy"
+      }]
+    },
+    {
+      "system" : "http://hl7.org/fhir/sid/icd-10",
+      "concept" : [{
+        "code" : "T38.4",
+        "display" : "Side effects from contraception"
+      },
+      {
+        "code" : "Z76.89",
+        "display" : "Out of stock"
+      },
+      {
+        "code" : "Z31.9",
+        "display" : "Sterile for non-contraceptive reasons"
+      }]
+    },
+    {
+      "system" : "http://who.int/cg/CodeSystem/extended-content",
+      "concept" : [{
+        "code" : "Other",
+        "display" : "Other"
+      }]
+    }]
+  }
+}

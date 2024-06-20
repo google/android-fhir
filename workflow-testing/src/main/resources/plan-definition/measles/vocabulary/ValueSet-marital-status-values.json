@@ -1,0 +1,56 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "marital-status-values",
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html\"><code>http://terminology.hl7.org/CodeSystem/v3-MaritalStatus</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html#v3-MaritalStatus-U\">U</a></td><td>Unmarried</td><td>Currently not in a marriage contract.</td></tr><tr><td><a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html#v3-MaritalStatus-M\">M</a></td><td>Married</td><td>A current marriage contract is active</td></tr><tr><td><a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html#v3-MaritalStatus-D\">D</a></td><td>Divorced</td><td>Marriage contract has been declared dissolved and inactive</td></tr><tr><td><a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html#v3-MaritalStatus-W\">W</a></td><td>Widowed</td><td>The spouse has died</td></tr><tr><td><a href=\"http://terminology.hl7.org/5.2.0/CodeSystem-v3-MaritalStatus.html#v3-MaritalStatus-UNK\">UNK</a></td><td>Unknown</td><td/></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/marital-status-values",
+  "version" : "0.1.0",
+  "name" : "marital-status-values",
+  "title" : "Marital Status values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Marital Status element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/v3-MaritalStatus",
+      "concept" : [{
+        "code" : "U",
+        "display" : "Unmarried"
+      },
+      {
+        "code" : "M",
+        "display" : "Married"
+      },
+      {
+        "code" : "D",
+        "display" : "Divorced"
+      },
+      {
+        "code" : "W",
+        "display" : "Widowed"
+      },
+      {
+        "code" : "UNK",
+        "display" : "Unknown"
+      }]
+    }]
+  }
+}

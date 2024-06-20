@@ -1,0 +1,24 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-deceased-f",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "deceasedcalciumadult-f",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "1995-04-08",
+  "gender": "female",
+  "deceasedBoolean": true
+}

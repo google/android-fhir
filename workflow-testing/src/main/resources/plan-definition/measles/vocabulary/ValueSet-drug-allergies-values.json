@@ -1,0 +1,62 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "drug-allergies-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p>This value set includes codes based on the following rules:</p><ul><li>Include these codes as defined in <a href=\"http://loinc.org\"><code>http://loinc.org</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"https://loinc.org/la32-8/\">la32-8</a></td><td>None</td></tr><tr><td><a href=\"https://loinc.org/la12688-0/\">la12688-0</a></td><td>Don't know</td></tr></table></li><li>Include these codes as defined in <a href=\"http://www.nlm.nih.gov/research/umls/rxnorm\"><code>http://www.nlm.nih.gov/research/umls/rxnorm</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>70618</td><td>Penicillin</td></tr><tr><td>117466</td><td>PrEP tenofovir disoproxil fumarate</td></tr></table></li><li>Include these codes as defined in <code>http://who.int/cg/CodeSystem/extended-content</code><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td>Other</td><td>Other</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/drug-allergies-values",
+  "version" : "0.1.0",
+  "name" : "drug-allergies-values",
+  "title" : "Drug allergies values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Drug allergies element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://loinc.org",
+      "concept" : [{
+        "code" : "la32-8",
+        "display" : "None"
+      },
+      {
+        "code" : "la12688-0",
+        "display" : "Don't know"
+      }]
+    },
+    {
+      "system" : "http://www.nlm.nih.gov/research/umls/rxnorm",
+      "concept" : [{
+        "code" : "70618",
+        "display" : "Penicillin"
+      },
+      {
+        "code" : "117466",
+        "display" : "PrEP tenofovir disoproxil fumarate"
+      }]
+    },
+    {
+      "system" : "http://who.int/cg/CodeSystem/extended-content",
+      "concept" : [{
+        "code" : "Other",
+        "display" : "Other"
+      }]
+    }]
+  }
+}

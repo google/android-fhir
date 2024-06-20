@@ -241,4 +241,82 @@ class PlanDefinitionProcessorJavaTest {
       .packagePlanDefinition()
       .hasEntry(20)
   }
+
+  @Test
+  fun testMeasles()  {
+    val planDefinitionID = "IMMZDTUmbrella"
+    val patientID = "IMMZ-Patient-enadult-m"
+    val repository =
+      TestRepositoryFactory.createRepository(
+        fhirContext,
+        "/plan-definition/measles",
+      )
+    var careplan = PlanDefinition.Assert.that(planDefinitionID, patientID, null, null)
+      .withRepository(repository)
+      .withExpectedCarePlanId(IdType("CarePlan", "IMMZDTUmbrella"))
+      .apply()
+
+
+    return  careplan.equalsToExpected()
+
+  }
+
+  @Test
+  fun testCHE() {
+
+
+    val planDefinitionID = "che.pd.01"
+    val patientID = "Test-patient"
+    val encounterID = "Test-encounter"
+    val repository =
+      TestRepositoryFactory.createRepository(
+        fhirContext,
+        "/plan-definition/measles",
+      )
+    var careplan = PlanDefinition.Assert.that(planDefinitionID, patientID, encounterID, null)
+      .withRepository(repository)
+      .withExpectedCarePlanId(IdType("CarePlan", "IMMZD2DTMeasles"))
+      .apply()
+
+
+    return  careplan.equalsToExpected()
+  }
+
+  @Test
+  fun testProposeDiagnosis() {
+    val repository =
+      TestRepositoryFactory.createRepository(
+        fhirContext,
+        "/plan-definition/measles",
+      )
+    var careplan = PlanDefinition.Assert.that(
+      "emcaredt012",
+      "Test-patient",
+      "Test-encounter"
+    ).withRepository(repository)
+      .withExpectedCarePlanId(IdType("CarePlan", "IMMZD2DTMeasles"))
+      .apply()
+
+    return  careplan.equalsToExpected()
+  }
+
+  @Test
+  fun testCollectWith() {
+    val repository =
+      TestRepositoryFactory.createRepository(
+        fhirContext,
+        "/plan-definition/measles",
+      )
+    var careplan = PlanDefinition.Assert.that(
+      "emcaredt012",
+      "Test-patient",
+      "Test-encounter"
+    )
+      .withRepository(repository)
+      .withExpectedCarePlanId(IdType("CarePlan", "IMMZD2DTMeasles"))
+      .apply()
+
+    return  careplan.equalsToExpected()
+  }
+
 }

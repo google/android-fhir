@@ -1,0 +1,23 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-enteen-m",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "protactiniumteen-m",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "2006-11-08",
+  "gender": "male"
+}

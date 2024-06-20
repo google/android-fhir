@@ -275,10 +275,10 @@ class IGInputStreamStructureRepository(
   }
 
   override fun <B : IBaseBundle, T : IBaseResource> search(
-    bundleType: Class<B>,
+    bundleType: Class<B>?,
     resourceType: Class<T>,
-    searchParameters: MutableMap<String, List<IQueryParameterType>>,
-    headers: Map<String, String>,
+    searchParameters: MutableMap<String, List<IQueryParameterType>>?,
+    headers: Map<String, String>?,
   ): B {
     val builder = BundleBuilder(fhirContext)
     val resourceIdMap = readLocation(resourceType)

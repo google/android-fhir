@@ -1,0 +1,52 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "reason-for-referral-values",
+  "text" : {
+    "status" : "generated",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://www.snomed.org/\"><code>http://snomed.info/sct</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td></tr><tr><td><a href=\"http://snomed.info/id/86395003\">86395003</a></td><td>Family planning procedure</td></tr><tr><td><a href=\"http://snomed.info/id/305930006\">305930006</a></td><td>Family planning procedure</td></tr><tr><td><a href=\"http://snomed.info/id/306228005\">306228005</a></td><td>Screening referral</td></tr><tr><td><a href=\"http://snomed.info/id/306206005\">306206005</a></td><td>Other referral</td></tr></table></li></ul></div>"
+  },
+  "url" : "http://fhir.org/guides/who/core/ValueSet/reason-for-referral-values",
+  "version" : "0.1.0",
+  "name" : "reason-for-referral-values",
+  "title" : "Reason for referral values",
+  "status" : "draft",
+  "experimental" : false,
+  "date" : "2023-10-20T00:28:58+02:00",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Codes representing possible values for the Reason for referral element",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "immutable" : true,
+  "compose" : {
+    "include" : [{
+      "system" : "http://snomed.info/sct",
+      "concept" : [{
+        "code" : "86395003",
+        "display" : "Family planning procedure"
+      },
+      {
+        "code" : "305930006",
+        "display" : "Family planning procedure"
+      },
+      {
+        "code" : "306228005",
+        "display" : "Screening referral"
+      },
+      {
+        "code" : "306206005",
+        "display" : "Other referral"
+      }]
+    }]
+  }
+}

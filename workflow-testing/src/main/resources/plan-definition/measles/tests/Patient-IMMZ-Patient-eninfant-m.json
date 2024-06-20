@@ -1,0 +1,23 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-eninfant-m",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "seleniuminfant-m",
+      "use": "official"
+    }
+  ],
+  "address": [
+    {
+      "use": "home",
+      "district": "reporter"
+    }
+  ],
+  "birthDate": "2022-04-28",
+  "gender": "male"
+}
