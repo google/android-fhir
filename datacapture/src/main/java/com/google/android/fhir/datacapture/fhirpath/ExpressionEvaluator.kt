@@ -214,6 +214,24 @@ internal class ExpressionEvaluator(
   }
 
   /**
+   * Returns a pair of item and the calculated and evaluated value of the [questionnaireItem]
+   * parameter.
+   */
+  suspend fun evaluateCalculatedExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+  ): ItemToAnswersPair {
+    val evaluatedAnswer =
+      evaluateExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireItem.calculatedExpression!!,
+      )
+        .map { it.castToType(it) }
+    return questionnaireItem to evaluatedAnswer
+  }
+
+  /**
    * Evaluates variable expression defined at questionnaire item level and returns the evaluated
    * result.
    *
