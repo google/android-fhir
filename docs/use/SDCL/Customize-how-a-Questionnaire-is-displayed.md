@@ -95,7 +95,7 @@ When constructing your QuestionnaireFragment using the builder pattern, utilize 
 ## Localize questionnaires
 
 When rendering your questionnaire, the library will look for the
-[translation extension]([http://hl7.org/fhir/extension-translation.html](https://build.fhir.org/ig/HL7/fhir-extensions/StructureDefinition-translation.html)), and if
+[translation extension](https://www.hl7.org/fhir/R4/languages.html##ext), and if
 the lang element matches the application default locale, will use the value of
 the content element of the extension instead of the text element of the
 questionnaire item. You can also use the
