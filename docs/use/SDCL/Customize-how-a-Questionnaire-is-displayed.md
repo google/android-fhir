@@ -77,55 +77,25 @@ questions. However, if you want to render a question in a way not described in
 the FHIR standard of the SDC implementation guide, you can create a custom
 component.
 
-### Create a custom component
+### 1. Create a factory of custom ViewHolderFactoryMatchersProvider
+Develop a class that implements the [QuestionnaireItemViewHolderFactoryMatchersProviderFactory](https://github.com/google/android-fhir/blob/ced8527a5481972591615ad4364487e89130fb6e/datacapture/src/main/java/com/google/android/fhir/datacapture/QuestionnaireFragment.kt#L563) interface. This class acts as a registry for associating custom widgets with their corresponding view holder factories. ([example](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory.kt))
 
-In order to create a custom component:
+As part of this you need to define:-
 
-1. Create a layout for the custom component
-    ([example](https://github.com/google/android-fhir/blob/master/catalog/src/main/res/layout/custom_number_picker_layout.xml)).
-2. Create a class for your component that implements
-    `QuestionnaireItemViewHolderFactory`
-    ([example](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/CustomNumberPickerFactory.kt)).
-    In that class:
-    1. Pass the layout resource for your custom component in the constructor of
-        your custom factory.
-    2. Override the `getQuestionnaireItemViewHolderDelegate()` function. It
-        must return a `QuestionnaireItemViewHolderDelegate` which implements the
-        following functions:
-3. `init`: a delegate function for the `init` function of
-    `RecyclerView.ViewHolder`
-4. `bind`: a delegate function for the `bind` function of
-    `RecyclerView.ViewHolder`
-5. `displayValidationResult`: displays the validation result for the answer(s)
-    provided by the user
-6. `setReadOnly`: configures the UI based on the read-only status of the
-    questionnaire item
+1. factory: The custom component factory to use.
+2. matches: A predicate function which, given a
+    [`Questionnaire.QuestionnaireItemComponent`](https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Questionnaire.QuestionnaireItemComponent.html), returns true if the factory should apply to that item.
 
-### Apply a custom component to questions
+### 2. Register the above factory with datacapture library via DataCaptureConfig
+Within your [DataCaptureConfig](https://github.com/google/android-fhir/blob/ced8527a5481972591615ad4364487e89130fb6e/datacapture/src/main/java/com/google/android/fhir/datacapture/DataCaptureConfig.kt#L35) object, assign the custom factory matchers provider to the `questionnaireItemViewHolderFactoryMatchersProviderFactory` property. This step makes your provider available for resolving view holders during questionnaire rendering. ([example](https://github.com/google/android-fhir/blob/ced8527a5481972591615ad4364487e89130fb6e/catalog/src/main/java/com/google/android/fhir/catalog/CatalogApplication.kt#L42C5-L47C8))
 
-Now that you have defined the custom widget and its behavior, it is time to
-configure the Structured Data Capture Library in order for the custom widget to
-be applied to the appropriate questions.
-
-1. Create a QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher
-    ([example](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/CustomQuestionnaireFragment.kt#L26))
-    that defines:
-    1. factory: The custom component factory to use.
-    2. matches: A predicate function which, given a
-    [`Questionnaire.QuestionnaireItemComponent`](https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Questionnaire.QuestionnaireItemComponent.html),
-    returns true if the factory should apply to that item.
-2. Create a custom implementation of `QuestionnaireFragment` that
-    overrides `getCustomQuestionnaireItemViewHolderFactoryMatchers`
-    ([example](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/CustomQuestionnaireFragment.kt#L22)).
-    It should return a list that contains your
-    `QuestionnaireItemViewHolderFactoryMatcher`.
-3. When rendering your questionnaire, use your custom implementation of
-    <code>QuestionnaireFragment</code> instead.
+### 3. Configure the QuestionnaireFragment Builder
+When constructing your QuestionnaireFragment using the builder pattern, utilize the `setCustomQuestionnaireItemViewHolderFactoryMatchersProvider` method. Provide the appropriate string identifier to specify which custom widgets to use. ([example](https://github.com/google/android-fhir/blob/ced8527a5481972591615ad4364487e89130fb6e/catalog/src/main/java/com/google/android/fhir/catalog/DemoQuestionnaireFragment.kt#L142C13-L150C23))
 
 ## Localize questionnaires
 
 When rendering your questionnaire, the library will look for the
-[translation extension](http://hl7.org/fhir/extension-translation.html), and if
+[translation extension]([http://hl7.org/fhir/extension-translation.html](https://build.fhir.org/ig/HL7/fhir-extensions/StructureDefinition-translation.html)), and if
 the lang element matches the application default locale, will use the value of
 the content element of the extension instead of the text element of the
 questionnaire item. You can also use the
