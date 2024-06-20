@@ -137,4 +137,6 @@
     <string name="required">Required</string>
     <string name="required_text_and_new_line">Required\n</string>
     <string name="space_asterisk">\u0020\u002a</string>
+    <string name="repeated_group_title">%1$s. %2$s</string>
+    <string name="add_repeated_group_item">Add %1$s</string>
 </resources>
