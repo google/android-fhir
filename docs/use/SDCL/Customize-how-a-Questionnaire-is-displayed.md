@@ -79,10 +79,6 @@ component.
 
 ### Create a custom component
 
-## Integrating Custom Widgets into FHIR Questionnaires
-
-This guide outlines the step-by-step process to create and incorporate custom widgets into FHIR questionnaires using the Android FHIR SDK.
-
 1. **Create a Layout for the Custom Component:**
 
    Design a layout file (XML) to define the visual structure and appearance of your custom widget.
