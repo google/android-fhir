@@ -52,11 +52,10 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/add_item"
+        style="?attr/questionnaireAddRepeatedGroupButtonStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:orientation="vertical"
-        android:text="@string/group_header_add_item_button"
     />
 
 </LinearLayout>
