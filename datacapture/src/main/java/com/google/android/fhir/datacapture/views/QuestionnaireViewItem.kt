@@ -177,7 +177,7 @@ data class QuestionnaireViewItem(
     answersChangedCallback(
       questionnaireItem,
       questionnaireResponseItem,
-      answers.filterIndexed { currentIndex, _ -> currentIndex != index },
+      questionnaireResponseItem.answer.filterIndexed { currentIndex, _ -> currentIndex != index },
       null,
     )
   }
