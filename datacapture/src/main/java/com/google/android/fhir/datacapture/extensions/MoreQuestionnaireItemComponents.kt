@@ -915,7 +915,9 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
         !repeats
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
-        this.addItem(it.createQuestionnaireResponseItem())
+        if (!it.isRepeatedGroup) {
+          this.addItem(it.createQuestionnaireResponseItem())
+        }
       }
     }
   }
