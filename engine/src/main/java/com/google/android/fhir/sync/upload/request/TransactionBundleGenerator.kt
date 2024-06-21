@@ -97,6 +97,7 @@ internal class TransactionBundleGenerator(
     private val createMapping =
       mapOf(
         Bundle.HTTPVerb.PUT to this::putForCreateBasedBundleComponentMapper,
+        Bundle.HTTPVerb.POST to this::postForCreateBasedBundleComponentMapper,
       )
 
     private val updateMapping =
@@ -142,6 +143,10 @@ internal class TransactionBundleGenerator(
     private fun putForCreateBasedBundleComponentMapper(
       useETagForUpload: Boolean,
     ): BundleEntryComponentGenerator = HttpPutForCreateEntryComponentGenerator(useETagForUpload)
+
+    private fun postForCreateBasedBundleComponentMapper(
+      useETagForUpload: Boolean,
+    ): BundleEntryComponentGenerator = HttpPostForCreateEntryComponentGenerator(useETagForUpload)
 
     private fun patchForUpdateBasedBundleComponentMapper(
       useETagForUpload: Boolean,

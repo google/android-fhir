@@ -260,22 +260,6 @@ class TransactionBundleGeneratorTest {
   }
 
   @Test
-  fun `getGenerator() should through exception for create by POST`() {
-    val exception =
-      assertThrows(IllegalArgumentException::class.java) {
-        runBlocking {
-          TransactionBundleGenerator.Factory.getGenerator(
-            Bundle.HTTPVerb.POST,
-            Bundle.HTTPVerb.PATCH,
-            generatedBundleSize = 500,
-            useETagForUpload = true,
-          )
-        }
-      }
-    assertThat(exception.localizedMessage).isEqualTo("Creation using POST is not supported.")
-  }
-
-  @Test
   fun `getGenerator() should through exception for update by DELETE`() {
     val exception =
       assertThrows(IllegalArgumentException::class.java) {

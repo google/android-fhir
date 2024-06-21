@@ -64,6 +64,30 @@ internal interface Database {
   )
 
   /**
+   * Updates existing [Resource] present in the [ResourceEntity]. It updates [Resource.id],
+   * metadata, and reference values of the dependent resources. This method is more suitable if
+   * [preSyncResourceId] and post-sync resourceId [postSyncResource] are different. However, even if
+   * [preSyncResourceId] and post-sync resourceId are the same, it still updates the reference value
+   * of referring resources, which is just redundant.
+   *
+   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
+   * @param postSyncResourceID The [Resource.id] of the resource after synchronization.
+   * @param postSyncResourceVersionId The version id of the resource after synchronization.
+   * @param postSyncResourceLastUpdated The last modified time of the resource after
+   *   synchronization.
+   * @param dependentResources The dependent resources for which the reference value will be
+   *   changed.
+   */
+  suspend fun updateResourcesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    dependentResources: List<UUID> = emptyList(),
+  )
+
+  /**
    * Selects the FHIR resource of type `clazz` with `id`.
    *
    * @param <R> The resource type
@@ -194,6 +218,21 @@ internal interface Database {
   suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference>
+
+  /**
+   * Retrieves a list of UUIDs for resources that reference [preSyncResourceId]. [preSyncResourceId]
+   * can be referenced as the reference value in other resources, returning those resource UUIDs.
+   * Essentially, [LocalChangeResourceReference] contains
+   * [LocalChangeResourceReference.resourceReferenceValue] and
+   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
+   *
+   * @param preSyncResource The resource that is being referenced.
+   * @return A list of UUIDs of resources that reference [preSyncResource].
+   */
+  suspend fun getResourceUuidsThatReferenceTheGivenResource(
+    preSyncResourceId: String,
+    resourceType: ResourceType,
+  ): List<UUID>
 }
 
 internal data class ResourceWithUUID<R>(
