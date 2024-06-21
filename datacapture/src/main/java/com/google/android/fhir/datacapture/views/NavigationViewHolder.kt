@@ -48,10 +48,6 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   private fun View.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
     when (navigationViewState) {
-      QuestionnaireNavigationViewUIState.Disabled -> {
-        visibility = View.VISIBLE
-        isEnabled = false
-      }
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
