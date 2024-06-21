@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Task
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -357,6 +358,38 @@ class LocalChangeDaoTest {
     assertThat(localChangeResourceReferences[2].resourceReferenceValue)
       .isEqualTo(practitionerReference)
   }
+
+  @Test
+  fun updateResourceIdAndReferences_shouldSafelyUpdateLocalChangesReferencesAboveSQLiteInOpLimit() =
+    runBlocking {
+      val localPatientId = "local-patient-id"
+      val patientResourceUuid = UUID.randomUUID()
+      val localPatient = Patient().apply { id = localPatientId }
+      val patientCreationTime = Instant.now()
+      localChangeDao.addInsert(localPatient, patientResourceUuid, patientCreationTime)
+
+      val countAboveLimit = LocalChangeDao.SQLITE_LIMIT_MAX_VARIABLE_NUMBER * 10
+      (1..countAboveLimit).forEach {
+        val taskResourceUuid = UUID.randomUUID()
+        val task =
+          Task().apply {
+            id = "local-task-$it"
+            `for` = Reference("Patient/$localPatientId")
+          }
+        val taskCreationTime = Instant.now()
+        localChangeDao.addInsert(task, taskResourceUuid, taskCreationTime)
+      }
+
+      val updatedPatientId = "synced-patient-id"
+      val updatedLocalPatient = localPatient.copy().apply { id = updatedPatientId }
+      val updatedReferences =
+        localChangeDao.updateResourceIdAndReferences(
+          patientResourceUuid,
+          oldResource = localPatient,
+          updatedResource = updatedLocalPatient,
+        )
+      assertThat(updatedReferences.size).isEqualTo(countAboveLimit)
+    }
 
   @Test
   fun getReferencesForLocalChanges_should_return_all_changes(): Unit = runBlocking {
