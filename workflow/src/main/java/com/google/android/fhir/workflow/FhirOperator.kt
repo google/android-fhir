@@ -40,7 +40,7 @@ import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
 import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
-import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
+import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.ProxyRepository
 
@@ -120,6 +120,7 @@ internal constructor(
     subjectId: String? = null,
     practitioner: String? = null,
     additionalData: IBaseBundle? = null,
+    parameters: Parameters? = null,
   ): MeasureReport {
     val subject =
       if (!practitioner.isNullOrBlank()) {
@@ -139,6 +140,7 @@ internal constructor(
         /* reportType = */ reportType,
         /* subjectIds = */ listOf(subject),
         /* additionalData = */ additionalData,
+        /* parameters = */ parameters,
       )
 
     // add subject reference for non-individual reportTypes
@@ -180,13 +182,11 @@ internal constructor(
     encounterId: String?,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ IdType("PlanDefinition", planDefinitionId),
-      /* canonical = */ null,
-      /* planDefinition = */ null,
+      /* planDefinition = */ Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionId)),
       /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ null,
-      /* organizationId = */ null,
+      /* encounter = */ encounterId,
+      /* practitioner = */ null,
+      /* organization = */ null,
       /* userType = */ null,
       /* userLanguage = */ null,
       /* userTaskContext = */ null,
@@ -218,13 +218,11 @@ internal constructor(
     prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ null,
-      /* canonical = */ planDefinition,
-      /* planDefinition = */ null,
+      /* planDefinition = */ Eithers.forLeft3(planDefinition),
       /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ practitionerId,
-      /* organizationId = */ organizationId,
+      /* encounter = */ encounterId,
+      /* practitioner = */ practitionerId,
+      /* organization = */ organizationId,
       /* userType = */ userType,
       /* userLanguage = */ userLanguage,
       /* userTaskContext = */ userTaskContext,
@@ -256,13 +254,11 @@ internal constructor(
     prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ null,
-      /* canonical = */ null,
-      /* planDefinition = */ planDefinition,
+      /* planDefinition = */ Eithers.forRight3(planDefinition),
       /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ practitionerId,
-      /* organizationId = */ organizationId,
+      /* encounter = */ encounterId,
+      /* practitioner = */ practitionerId,
+      /* organization = */ organizationId,
       /* userType = */ userType,
       /* userLanguage = */ userLanguage,
       /* userTaskContext = */ userTaskContext,

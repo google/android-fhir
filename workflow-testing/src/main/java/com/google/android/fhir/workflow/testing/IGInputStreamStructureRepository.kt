@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,14 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.model.api.IQueryParameterType
 import ca.uhn.fhir.parser.IParser
-import ca.uhn.fhir.rest.api.EncodingEnum
 import ca.uhn.fhir.rest.api.MethodOutcome
 import ca.uhn.fhir.rest.param.TokenParam
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException
 import ca.uhn.fhir.util.BundleBuilder
 import com.google.common.collect.ImmutableMap
+import com.google.common.collect.Sets
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.Locale
 import java.util.Objects
 import java.util.function.Consumer
 import org.hl7.fhir.instance.model.api.IBaseBundle
@@ -40,9 +39,7 @@ import org.opencds.cqf.fhir.api.Repository
 import org.opencds.cqf.fhir.utility.Ids
 import org.opencds.cqf.fhir.utility.dstu3.AttachmentUtil
 import org.opencds.cqf.fhir.utility.matcher.ResourceMatcher
-import org.opencds.cqf.fhir.utility.repository.IGLayoutMode
 import org.opencds.cqf.fhir.utility.repository.Repositories
-import org.opencds.cqf.fhir.utility.repository.ResourceCategory
 
 /**
  * This class implements the Repository interface on onto a directory structure that matches the
@@ -51,11 +48,9 @@ import org.opencds.cqf.fhir.utility.repository.ResourceCategory
 class IGInputStreamStructureRepository(
   private val fhirContext: FhirContext,
   private val root: String? = null,
-  private val layoutMode: IGLayoutMode = IGLayoutMode.DIRECTORY,
-  private val encodingEnum: EncodingEnum = EncodingEnum.JSON,
 ) : Loadable(), Repository {
   private val resourceCache: MutableMap<String, IBaseResource> = HashMap()
-  private val parser: IParser = parserForEncoding(fhirContext, encodingEnum)
+  private val parser: IParser = fhirContext.newJsonParser()
   private val resourceMatcher: ResourceMatcher = Repositories.getResourceMatcher(fhirContext)
 
   fun clearCache() {
@@ -71,13 +66,8 @@ class IGInputStreamStructureRepository(
   }
 
   protected fun fileNameForLayoutAndEncoding(resourceType: String, resourceId: String): String {
-    val name = resourceId + fileExtensions[encodingEnum]
-    return if (layoutMode === IGLayoutMode.DIRECTORY) {
-      // TODO: case sensitivity!!
-      resourceType.lowercase(Locale.getDefault()) + "/" + name
-    } else {
-      "$resourceType-$name"
-    }
+    val name = "$resourceId.json"
+    return "$resourceType-$name"
   }
 
   protected fun <T : IBaseResource?> directoryForType(resourceType: Class<T>): String {
@@ -89,12 +79,7 @@ class IGInputStreamStructureRepository(
   }
 
   protected fun <T : IBaseResource?> directoryForResource(resourceType: Class<T>): String {
-    val directory = directoryForType(resourceType)
-    return if (layoutMode === IGLayoutMode.DIRECTORY) {
-      directory + "/" + resourceType.simpleName.lowercase(Locale.getDefault())
-    } else {
-      directory
-    }
+    return directoryForType(resourceType)
   }
 
   protected fun <T : IBaseResource, I : IIdType> readLocation(
@@ -178,19 +163,13 @@ class IGInputStreamStructureRepository(
     val inputFiles = listFiles(location)
 
     for (file in inputFiles) {
-      if (
-        layoutMode.equals(IGLayoutMode.DIRECTORY) ||
-          (layoutMode.equals(IGLayoutMode.TYPE_PREFIX) &&
-            file.startsWith(resourceClass.simpleName + "-"))
-      ) {
-        try {
-          val r = this.readLocation<T, IIdType>(resourceClass, "$location/$file")
-          if (r.fhirType() == resourceClass.simpleName) {
-            resources[r.idElement.toUnqualifiedVersionless()] = r
-          }
-        } catch (e: RuntimeException) {
-          e.printStackTrace()
+      try {
+        val r = this.readLocation<T, IIdType>(resourceClass, "$location/$file")
+        if (r.fhirType() == resourceClass.simpleName) {
+          resources[r.idElement.toUnqualifiedVersionless()] = r
         }
+      } catch (e: RuntimeException) {
+        e.printStackTrace()
       }
     }
     return resources
@@ -282,7 +261,7 @@ class IGInputStreamStructureRepository(
   ): B {
     val builder = BundleBuilder(fhirContext)
     val resourceIdMap = readLocation(resourceType)
-    if (searchParameters == null || searchParameters.isEmpty()) {
+    if (searchParameters.isEmpty()) {
       resourceIdMap.values.forEach(
         Consumer { theResource: T ->
           builder.addCollectionEntry(
@@ -442,30 +421,43 @@ class IGInputStreamStructureRepository(
   }
 
   companion object {
+
+    enum class ResourceCategory {
+      DATA,
+      TERMINOLOGY,
+      CONTENT,
+      ;
+
+      companion object {
+        private val TERMINOLOGY_RESOURCES: Set<String> =
+          Sets.newHashSet(*arrayOf("ValueSet", "CodeSystem"))
+        private val CONTENT_RESOURCES: Set<String> =
+          Sets.newHashSet(
+            *arrayOf(
+              "Library",
+              "Questionnaire",
+              "Measure",
+              "PlanDefinition",
+              "StructureDefinition",
+              "ActivityDefinition",
+            ),
+          )
+
+        fun forType(resourceType: String): ResourceCategory {
+          return if (TERMINOLOGY_RESOURCES.contains(resourceType)) {
+            TERMINOLOGY
+          } else {
+            if (CONTENT_RESOURCES.contains(resourceType)) CONTENT else DATA
+          }
+        }
+      }
+    }
+
     private val categoryDirectories: Map<ResourceCategory, String> =
       ImmutableMap.Builder<ResourceCategory, String>()
         .put(ResourceCategory.CONTENT, "resources")
         .put(ResourceCategory.DATA, "tests")
         .put(ResourceCategory.TERMINOLOGY, "vocabulary")
         .build()
-    private val fileExtensions: Map<EncodingEnum?, String> =
-      ImmutableMap.Builder<EncodingEnum?, String>()
-        .put(EncodingEnum.JSON, ".json")
-        .put(EncodingEnum.XML, ".xml")
-        .put(EncodingEnum.RDF, ".rdf")
-        .build()
-
-    private fun parserForEncoding(
-      fhirContext: FhirContext,
-      encodingEnum: EncodingEnum?,
-    ): IParser {
-      return when (encodingEnum) {
-        EncodingEnum.JSON -> fhirContext.newJsonParser()
-        EncodingEnum.XML -> fhirContext.newXmlParser()
-        EncodingEnum.RDF -> fhirContext.newRDFParser()
-        EncodingEnum.NDJSON -> throw IllegalArgumentException("NDJSON is not supported")
-        else -> throw IllegalArgumentException("NDJSON is not supported")
-      }
-    }
   }
 }

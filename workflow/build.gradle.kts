@@ -63,6 +63,7 @@ android {
         "META-INF/sun-jaxb.episode",
         "META-INF/*.kotlin_module",
         "readme.html",
+        "META-INF/INDEX.LIST",
       ),
     )
   }
