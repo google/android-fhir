@@ -30,10 +30,10 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.assertResourceNotEquals
 import com.google.android.fhir.testing.readFromFile
@@ -348,7 +348,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         localChanges.addAll(it)
         flowOf(
           UploadRequestResult.Success(
@@ -381,7 +381,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
         flowOf(
           UploadRequestResult.Failure(
             it,
@@ -787,6 +787,26 @@ class FhirEngineImplTest {
         .containsExactly("patient-id-update")
         .inOrder()
     }
+
+  @Test
+  fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
+    fhirEngine
+      .syncUpload(UploadStrategy.SingleResourcePost) {
+        flowOf(
+          UploadRequestResult.Success(
+            listOf(
+              ResourceUploadResponseMapping(
+                it,
+                TEST_PATIENT_1,
+              ),
+            ),
+          ),
+        )
+      }
+      .collect {}
+    assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
 
   companion object {
     private const val TEST_PATIENT_1_ID = "test_patient_1"

@@ -19,9 +19,9 @@ package com.google.android.fhir
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -101,16 +101,6 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list of resources matching the [Search] specifications.
    *
-   * Example:
-   * ```
-   * fhirEngine.search<Patient> {
-   *  filter(Patient.GIVEN, {
-   *    value = "Kiran"
-   *    modifier = StringFilterModifier.MATCHES_EXACTLY
-   *  })
-   * }
-   * ```
-   *
    * @param search The search criteria to apply.
    * @return A list of [SearchResult] objects containing the matching resources and any included
    *   references.
@@ -131,7 +121,7 @@ interface FhirEngine {
    */
   @Deprecated("To be deprecated.")
   suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
+    uploadStrategy: UploadStrategy,
     upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
   ): Flow<SyncUploadProgress>
 

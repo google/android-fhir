@@ -21,6 +21,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
+    consumerProguardFile("proguard-rules.pro")
   }
 
   buildFeatures { viewBinding = true }
@@ -123,14 +124,14 @@ dependencies {
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
+    file("../docs/use/api/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.DataCapture.artifactId)
+      moduleName.set(Releases.DataCapture.name)
       moduleVersion.set(Releases.DataCapture.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(

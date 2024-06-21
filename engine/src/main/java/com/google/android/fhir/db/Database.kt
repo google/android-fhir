@@ -205,12 +205,12 @@ internal interface Database {
   ): List<LocalChangeResourceReference>
 }
 
-data class ResourceWithUUID<R>(
+internal data class ResourceWithUUID<R>(
   val uuid: UUID,
   val resource: R,
 )
 
-data class LocalChangeResourceReference(
+internal data class LocalChangeResourceReference(
   val localChangeId: Long,
   val resourceReferenceValue: String,
   val resourceReferencePath: String?,

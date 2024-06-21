@@ -90,3 +90,7 @@ lint/tmp/
 # Note: The docs/ directory is our SOURCE (in MD),
 # and the site/ directory is our TARGET (in HTML)
 site/
+# but the Dokka API Doc is generated into docs/
+# (which is slightly confusing, but helps mkdocs to validate links)
+# so we ignore that here, as it's a built artifact that should not be committed
+docs/use/api/*/**
