@@ -43,6 +43,7 @@ import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DecimalType
 import org.hl7.fhir.r4.model.DomainResource
+import org.hl7.fhir.r4.model.ElementDefinition
 import org.hl7.fhir.r4.model.Enumeration
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
@@ -476,18 +477,23 @@ object ResourceMapper {
             questionnaireItem.definition.lastIndexOf("#") + 1,
             questionnaireItem.definition.lastIndexOf("."),
           )
-        if (
-          isExtensionSupportedByProfile(
+        val extensionElementDefinition =
+          getExtensionElementDefinitionOrNull(
             structureDefinition = it,
             extensionForType = extensionForType,
             fieldName = fieldName,
           )
-        ) {
-          addDefinitionBasedCustomExtension(questionnaireItem, questionnaireResponseItem, base)
-          return
-        } else {
+        if (extensionElementDefinition == null) {
           Timber.w(
             "Extension for field '$fieldName' is not defined in StructureDefinition of ${base.fhirType()}, so field is ignored",
+          )
+        } else {
+          addDefinitionBasedCustomExtension(
+            questionnaireItem,
+            questionnaireResponseItem,
+            base,
+            fieldName,
+            extensionElementDefinition,
           )
         }
       }
@@ -495,22 +501,22 @@ object ResourceMapper {
   }
 }
 
-private fun isExtensionSupportedByProfile(
+private fun getExtensionElementDefinitionOrNull(
   structureDefinition: StructureDefinition,
   extensionForType: String,
   fieldName: String,
-): Boolean {
+): ElementDefinition? {
   // Partial ElementDefinition from StructureDefinition to check extension is
   //  "id": "Patient.address.extension:address-preferred",
   //  "path": "Patient.address.extension",
   val listOfElementDefinition =
     structureDefinition.snapshot.element.filter { it.path.equals("$extensionForType.extension") }
   listOfElementDefinition.forEach {
-    if (it.id.substringAfterLast(":").equals(fieldName)) {
-      return true
+    if (it.id.substringAfterLast(":") == fieldName) {
+      return it
     }
   }
-  return false
+  return null
 }
 
 /**
@@ -519,6 +525,8 @@ private fun isExtensionSupportedByProfile(
  * @param questionnaireItem QuestionnaireItemComponent with details for extension
  * @param questionnaireResponseItem QuestionnaireResponseItemComponent for response value
  * @param base
+ * @param fieldName
+ * @param elementDefinition
  * - resource's Base class instance See
  *   https://hapifhir.io/hapi-fhir/docs/model/profiles_and_extensions.html#extensions for more on
  *   custom extensions
@@ -527,22 +535,24 @@ private fun addDefinitionBasedCustomExtension(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   base: Base,
+  fieldName: String,
+  elementDefinition: ElementDefinition,
 ) {
+  // Create an extension
+  val extension =
+    Extension().apply {
+      url =
+        elementDefinition.type?.firstOrNull()?.profile?.firstOrNull()?.valueAsString
+          ?: questionnaireItem.definition
+      setValue(questionnaireResponseItem.answer.first().value)
+    }
+
   if (base is Type) {
-    // Create an extension
-    val ext = Extension()
-    ext.url = questionnaireItem.definition
-    ext.setValue(questionnaireResponseItem.answer.first().value)
     // Add the extension to the resource
-    base.addExtension(ext)
+    base.addExtension(extension)
   }
   if (base is DomainResource) {
-    // Create an extension
-    val ext = Extension()
-    ext.url = questionnaireItem.definition
-    ext.setValue(questionnaireResponseItem.answer.first().value)
-    // Add the extension to the resource
-    base.addExtension(ext)
+    base.addExtension(extension)
   }
 }
 
