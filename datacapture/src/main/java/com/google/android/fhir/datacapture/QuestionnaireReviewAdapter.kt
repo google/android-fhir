@@ -38,6 +38,7 @@ internal class QuestionnaireReviewAdapter :
           LayoutInflater.from(parent.context)
             .inflate(R.layout.pagination_navigation_view, parent, false),
         )
+      QuestionnaireEditAdapter.ViewType.Type.REPEATED_GROUP_HEADER -> TODO()
     }
   }
 
@@ -51,6 +52,7 @@ internal class QuestionnaireReviewAdapter :
         holder as NavigationViewHolder
         holder.bind(item.questionnaireNavigationUIState)
       }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
     }
   }
 
@@ -71,6 +73,7 @@ internal class QuestionnaireReviewAdapter :
         type = QuestionnaireEditAdapter.ViewType.Type.NAVIGATION
         subtype = 0xFFFFFF
       }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> TODO()
     }
     return QuestionnaireEditAdapter.ViewType.from(type = type, subtype = subtype).viewType
   }

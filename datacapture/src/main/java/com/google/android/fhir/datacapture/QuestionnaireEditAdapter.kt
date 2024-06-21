@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -71,10 +70,10 @@ internal class QuestionnaireEditAdapter(
           ),
         )
       }
-      ViewType.Type.REPEATED_GROUP_HEADER -> {
-        ViewHolder.NaigationHolder(
+      ViewType.Type.NAVIGATION -> {
+        ViewHolder.NavigationHolder(
           NavigationViewHolder(
-            parent.inflate(R.layout.pagination_navigation_view, parent, false),
+            parent.inflate(R.layout.pagination_navigation_view),
           ),
         )
       }
@@ -121,19 +120,19 @@ internal class QuestionnaireEditAdapter(
     return viewHolderFactory.create(parent)
   }
 
-  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (val item = getItem(position)) {
       is QuestionnaireAdapterItem.Question -> {
-        holder as QuestionnaireItemViewHolder
-        holder.bind(item.item)
+        holder as ViewHolder.QuestionHolder
+        holder.holder.bind(item.item)
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
         holder as ViewHolder.RepeatedGroupHeaderHolder
         holder.viewHolder.bind(item)
       }
       is QuestionnaireAdapterItem.Navigation -> {
-        holder as NavigationViewHolder
-        holder.bind(item.questionnaireNavigationUIState)
+        holder as ViewHolder.NavigationHolder
+        holder.viewHolder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
@@ -192,6 +191,7 @@ internal class QuestionnaireEditAdapter(
       QUESTION,
       REPEATED_GROUP_HEADER,
       NAVIGATION,
+    }
   }
 
   /**
@@ -286,7 +286,7 @@ internal class QuestionnaireEditAdapter(
 
     class RepeatedGroupHeaderHolder(val viewHolder: RepeatedGroupHeaderItemViewHolder) :
       ViewHolder(viewHolder.itemView)
-      
+
     class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
   }
 
