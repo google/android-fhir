@@ -1,0 +1,88 @@
+site_name: Android FHIR SDK
+site_url: https://google.github.io/android-fhir/
+repo_url: https://github.com/google/android-fhir/
+edit_uri: blob/master/docs/
+copyright: Copyright 2024 The Android FHIR SDK Authors
+
+nav:
+  - Home: index.md
+  - faq.md
+  - Users:
+      - FHIR Engine Library:
+          - Introduction: use/FEL/index.md
+          - Getting Started: use/FEL/Getting-started.md
+          - Guides:
+              - use/FEL/Manage-FHIR-resources-locally.md
+              - use/FEL/Search-FHIR-resources.md
+              - use/FEL/Sync-data-with-FHIR-server.md
+              - use/FEL/Privacy-Security.md
+          - use/FEL/Demo-app.md
+          - Reference:
+              - use/FEL/FHIR-search-specification-support.md
+      - Structured Data Capture Library:
+          - Introduction: use/SDCL/index.md
+          - Getting Started: use/SDCL/Getting-Started.md
+          - Guides:
+              - use/SDCL/Use-QuestionnaireFragment.md
+              - use/SDCL/Use-QuestionnaireResponseValidator.md
+              - use/SDCL/Use-ResourceMapper.md
+              - use/SDCL/Customize-how-a-Questionnaire-is-displayed.md
+              - use/SDCL/Reference-external-data.md
+              - use/SDCL/Author-questionnaires.md
+          - Demo App: use/SDCL/Demo-app.md
+          - Reference:
+              - FHIR specification support: use/SDCL/FHIR-specification-support.md
+      - Workflow Library:
+          - Introduction: use/WFL/index.md
+          - use/WFL/Getting-Started.md
+          - Guides:
+              - use/WFL/Generate-A-Care-Plan.md
+              - use/WFL/Evaluate-a-Measure.md
+              - use/WFL/Evaluate-a-Library.md
+              - use/WFL/Compile-and-Execute-CQL.md
+      - use/Extensions.md
+      - API Doc: use/api.md
+      - Use Snapshots: use/Snapshots.md
+  - Contributors:
+      - Contributing: contrib/index.md
+      - Codespaces: contrib/codespaces.md
+      - Documentation: contrib/docs.md
+      - contrib/dependencies.md
+      - Roadmap: contrib/roadmap.md
+
+# The following settings were originally partially inspired by
+# https://github.com/enola-dev/enola/blob/main/mkdocs.yaml
+
+theme:
+  name: material
+  features:
+    - content.action.edit
+    - content.code.copy
+    - navigation.expand
+    - navigation.footer
+    - navigation.instant
+    - navigation.tracking
+    - navigation.path
+    - navigation.top
+    - search.suggest
+    - search.share
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - minify:
+      minify_html: true
+
+# https://www.mkdocs.org/user-guide/configuration/#validation
+# Nota Bene: There is no "error" level in MkDocs, but the build-docs.bash script
+# uses "mkdocs build --strict", which cause MkDocs to abort the build on any warnings.
+validation:
+  nav:
+    not_found: warn
+    absolute_links: warn
+    omitted_files: warn
+  links:
+    anchors: warn
+    not_found: warn
+    absolute_links: warn
+    unrecognized_links: warn

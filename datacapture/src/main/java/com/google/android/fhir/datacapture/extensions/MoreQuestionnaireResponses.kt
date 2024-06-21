@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,38 +30,75 @@ val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResp
  * correctly. This is because they are flattened out and nested directly under the parent in the
  * FHIR data format.
  *
- * More details: https://build.fhir.org/questionnaireresponse.html#link.
+ * More details on the structure of questionnaire responses:
+ * https://build.fhir.org/questionnaireresponse.html#link.
+ *
+ * Specifically, this function will go through the items in the questionnaire response, and if
+ * multiple questionnaire response items exist for the same repeated group (identified by the link
+ * id), they will be converted into answers under the same questionnaire response item so that there
+ * is a 1:1 relationship from questionnaire item for the repeated group to questionnaire response
+ * item for the same repeated group.
  *
  * This function should be called before the questionnaire view model accepts an
  * application-provided questionnaire response.
  *
  * See also [unpackRepeatedGroups].
+ *
+ * @throws IllegalArgumentException if more than one sibling questionnaire items (nested under the
+ *   questionnaire root or the same parent item) share the same id
  */
-internal fun QuestionnaireResponse.packRepeatedGroups() {
-  item = item.packRepeatedGroups()
+internal fun QuestionnaireResponse.packRepeatedGroups(questionnaire: Questionnaire) {
+  item = item.packRepeatedGroups(questionnaire.item)
 }
 
-private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups():
-  List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
-  forEach { it ->
-    it.item = it.item.packRepeatedGroups()
-    it.answer.forEach { it.item = it.item.packRepeatedGroups() }
-  }
-  val linkIdToPackedResponseItems =
-    groupBy { it.linkId }
-      .mapValues { (linkId, questionnaireResponseItems) ->
-        questionnaireResponseItems.singleOrNull()
-          ?: QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-            this.linkId = linkId
+private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packRepeatedGroups(
+  questionnaireItems: List<Questionnaire.QuestionnaireItemComponent>,
+): List<QuestionnaireResponse.QuestionnaireResponseItemComponent> {
+  return groupByAndZipByLinkId(questionnaireItems, this) {
+      questionnaireItems,
+      questionnaireResponseItems,
+      ->
+      if (questionnaireItems.isEmpty()) {
+        // If there's no questionnaire item, simply keep the response items. In other words, do not
+        // delete hanging questionnaire responses automatically. This is useful for validation
+        // workflow to identify invalid responses.
+        return@groupByAndZipByLinkId questionnaireResponseItems
+      }
+
+      val questionnaireItem = questionnaireItems.single()
+
+      questionnaireResponseItems.forEach { it ->
+        if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
+          if (questionnaireItem.repeats) {
+            it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+          } else {
+            it.item = it.item.packRepeatedGroups(questionnaireItem.item)
+          }
+        } else {
+          it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
+        }
+      }
+
+      if (
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+          questionnaireItem.repeats
+      ) {
+        listOf(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            this.linkId = questionnaireItem.linkId
             answer =
               questionnaireResponseItems.map {
                 QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
                   item = it.item
                 }
               }
-          }
+          },
+        )
+      } else {
+        questionnaireResponseItems
       }
-  return map { it.linkId }.distinct().map { linkIdToPackedResponseItems[it]!! }
+    }
+    .flatten()
 }
 
 /**
@@ -105,9 +142,7 @@ private fun unpackRepeatedGroups(
   questionnaireResponseItem.answer.forEach {
     it.item = unpackRepeatedGroups(questionnaireItem.item, it.item)
   }
-  return if (
-    questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP && questionnaireItem.repeats
-  ) {
+  return if (questionnaireItem.isRepeatedGroup) {
     questionnaireResponseItem.answer.map {
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
         linkId = questionnaireItem.linkId

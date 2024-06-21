@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
  * http://hl7.org/fhir/R4/search.html
  */
-object XFhirQueryTranslator {
+internal object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
 

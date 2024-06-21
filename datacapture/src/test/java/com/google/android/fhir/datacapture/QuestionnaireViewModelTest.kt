@@ -3869,88 +3869,85 @@ class QuestionnaireViewModelTest {
           "item": [
             {
               "linkId": "12.0",
-              "answer": [
+              "item": [
                 {
+                  "linkId": "12.6",
                   "item": [
                     {
-                      "linkId": "12.6",
+                      "linkId": "12.6.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "live-birth",
+                            "display": "Live Birth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
                       "item": [
                         {
-                          "linkId": "12.6.1",
+                          "linkId": "12.6.3.1",
                           "answer": [
                             {
                               "valueCoding": {
-                                "code": "live-birth",
-                                "display": "Live Birth"
+                                "code": "male",
+                                "display": "Male"
                               }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "male",
-                                    "display": "Male"
-                                  }
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1"
                             }
                           ]
                         }
                       ]
-                    }
-                  ]
-                },
-                {
-                  "item": [
+                    },
                     {
-                      "linkId": "12.6",
+                      "linkId": "12.6.4",
                       "item": [
                         {
-                          "linkId": "12.6.1",
+                          "linkId": "12.6.4.1"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {            
+              "linkId": "12.0",
+              "item": [
+                {
+                  "linkId": "12.6",
+                  "item": [
+                    {
+                      "linkId": "12.6.1",
+                      "answer": [
+                        {
+                          "valueCoding": {
+                            "code": "still-birth",
+                            "display": "Stillbirth"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.3",
+                      "item": [
+                        {
+                          "linkId": "12.6.3.1"
+                        }
+                      ]
+                    },
+                    {
+                      "linkId": "12.6.4",
+                      "item": [
+                        {
+                          "linkId": "12.6.4.1",
                           "answer": [
                             {
                               "valueCoding": {
-                                "code": "still-birth",
-                                "display": "Stillbirth"
+                                "code": "FSB",
+                                "display": "FSB"
                               }
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.3",
-                          "item": [
-                            {
-                              "linkId": "12.6.3.1"
-                            }
-                          ]
-                        },
-                        {
-                          "linkId": "12.6.4",
-                          "item": [
-                            {
-                              "linkId": "12.6.4.1",
-                              "answer": [
-                                {
-                                  "valueCoding": {
-                                    "code": "FSB",
-                                    "display": "FSB"
-                                  }
-                                }
-                              ]
                             }
                           ]
                         }
@@ -4285,36 +4282,36 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
-    fun repeatedGroupA() =
+    fun getQuestionnaireAdapterItemListA() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-a"
+        it.asQuestionOrNull()?.questionnaireItem?.linkId == "repeated-group-a"
       }
 
-    fun repeatedGroupB() =
+    fun getQuestionnaireAdapterItemListB() =
       viewModel.getQuestionnaireItemViewItemList().single {
-        it.asQuestion().questionnaireItem.linkId == "repeated-group-b"
+        it.asQuestionOrNull()?.questionnaireItem?.linkId == "repeated-group-b"
       }
     viewModel.runViewModelBlocking {
       // Calling addAnswer out of order should not result in the answers in the response being out
       // of order; all of the answers to repeated-group-a should come before repeated-group-b.
       repeat(times = 2) {
-        repeatedGroupA()
+        getQuestionnaireAdapterItemListA()
           .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               item =
-                repeatedGroupA()
+                getQuestionnaireAdapterItemListA()
                   .asQuestion()
                   .questionnaireItem
                   .getNestedQuestionnaireResponseItems()
             },
           )
-        repeatedGroupB()
+        getQuestionnaireAdapterItemListB()
           .asQuestion()
           .addAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
               item =
-                repeatedGroupB()
+                getQuestionnaireAdapterItemListB()
                   .asQuestion()
                   .questionnaireItem
                   .getNestedQuestionnaireResponseItems()
@@ -4324,18 +4321,25 @@ class QuestionnaireViewModelTest {
 
       assertThat(
           viewModel.getQuestionnaireItemViewItemList().map {
-            it.asQuestion().questionnaireItem.linkId
+            when (it) {
+              is QuestionnaireAdapterItem.Question -> it.item.questionnaireItem.linkId
+              is QuestionnaireAdapterItem.RepeatedGroupHeader -> "RepeatedGroupHeader:${it.index}"
+            }
           },
         )
         .containsExactly(
           "repeated-group-a",
+          "RepeatedGroupHeader:0",
           "nested-item-a",
           "another-nested-item-a",
+          "RepeatedGroupHeader:1",
           "nested-item-a",
           "another-nested-item-a",
           "repeated-group-b",
+          "RepeatedGroupHeader:0",
           "nested-item-b",
           "another-nested-item-b",
+          "RepeatedGroupHeader:1",
           "nested-item-b",
           "another-nested-item-b",
         )
