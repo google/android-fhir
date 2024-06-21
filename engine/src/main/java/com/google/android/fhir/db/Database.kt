@@ -40,6 +40,15 @@ internal interface Database {
   suspend fun <R : Resource> insert(vararg resource: R): List<String>
 
   /**
+   * Inserts a list of local `resources` into the FHIR resource database. If any of the resources
+   * already exists, it will be overwritten.
+   *
+   * @param <R> The resource type
+   * @return the logical IDs of the newly created resources.
+   */
+  suspend fun <R : Resource> insertLocalOnly(vararg resource: R): List<String>
+
+  /**
    * Inserts a list of remote `resources` into the FHIR resource database. If any of the resources
    * already exists, it will be overwritten.
    *
