@@ -26,27 +26,24 @@ import com.google.android.fhir.datacapture.R
 class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
   fun bind(questionnaireNavigationUIState: QuestionnaireNavigationUIState) {
-    itemView.findViewById<View>(R.id.cancel_questionnaire).apply {
-      updateState(questionnaireNavigationUIState.navCancel)
-    }
-
-    itemView.findViewById<View>(R.id.pagination_previous_button).apply {
-      updateState(questionnaireNavigationUIState.navPrevious)
-    }
-
-    itemView.findViewById<View>(R.id.pagination_next_button).apply {
-      updateState(questionnaireNavigationUIState.navNext)
-    }
-
-    itemView.findViewById<View>(R.id.review_mode_button).apply {
-      updateState(questionnaireNavigationUIState.navReview)
-    }
-    itemView.findViewById<View>(R.id.submit_questionnaire).apply {
-      updateState(questionnaireNavigationUIState.navSubmit)
-    }
+    itemView
+      .findViewById<Button>(R.id.cancel_questionnaire)
+      .updateState(questionnaireNavigationUIState.navCancel)
+    itemView
+      .findViewById<Button>(R.id.pagination_previous_button)
+      .updateState(questionnaireNavigationUIState.navPrevious)
+    itemView
+      .findViewById<Button>(R.id.pagination_next_button)
+      .updateState(questionnaireNavigationUIState.navNext)
+    itemView
+      .findViewById<Button>(R.id.review_mode_button)
+      .updateState(questionnaireNavigationUIState.navReview)
+    itemView
+      .findViewById<Button>(R.id.submit_questionnaire)
+      .updateState(questionnaireNavigationUIState.navSubmit)
   }
 
-  private fun View.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
+  private fun Button.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
     when (navigationViewState) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
