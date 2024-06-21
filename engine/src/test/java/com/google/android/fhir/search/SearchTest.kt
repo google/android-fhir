@@ -22,6 +22,8 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.search.filter.FilterCriteria
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -31,6 +33,7 @@ import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -2724,6 +2727,51 @@ class SearchTest {
         "code",
         "44054006",
         "http://snomed.info/sct",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with large list of patient reference`() {
+    val patientIdReferenceList = (1..500).map { "Patient/patient-$it" }
+    val patientIdList =
+      patientIdReferenceList.map<String, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = it }
+      }
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply { filter(CarePlan.SUBJECT, *patientIdList.toTypedArray()) }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+        SELECT a.resourceUuid, a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM ReferenceIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ? OR index_value = ?)
+        )
+            """
+          .trimIndent(),
+      )
+    val paramConditionListsSubstring = queryString.substring(queryString.indexOf("(index_value"))
+    val extractTextInBracketsRegex = Regex("\\((.*?)\\)")
+    assertThat(
+        extractTextInBracketsRegex.findAll(paramConditionListsSubstring).all {
+          it.value.split("OR").size <= FilterCriteria.CONDITION_PARAMS_CHUNK_SIZE
+        },
+      )
+      .isTrue()
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        *patientIdReferenceList.toTypedArray(),
       )
       .inOrder()
   }

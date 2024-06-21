@@ -86,7 +86,7 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.chunked(50) { conditionParams ->
+    this.chunked(CONDITION_PARAMS_CHUNK_SIZE) { conditionParams ->
         conditionParams.joinToString(
           separator = " ${operation.logicalOperator} ",
           prefix = if (size > 1) "(" else "",
@@ -100,4 +100,14 @@ internal sealed class FilterCriteria(
         }
       }
       .joinToString(separator = " ${operation.logicalOperator} ")
+
+  companion object {
+    /**
+     * Represents the number of [ConditionParam]s that can be wrapped within a bracket
+     *
+     * This is to prevent SQLite expression tree exceeding max depth of 1000 See
+     * https://www.sqlite.org/limits.html for Maximum Depth Of An Expression Tree
+     */
+    const val CONDITION_PARAMS_CHUNK_SIZE = 50
+  }
 }
