@@ -113,7 +113,7 @@ component.
 
 4. **Create a `QuestionnaireItemViewHolderFactoryMatchersProviderFactory`:**
 
-   Create a factory class (e.g., `ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory`) that implements this interface. It acts as a central registry for your custom widget associations.
+   Create a factory class that implements this interface. It acts as a central registry for your custom widget associations.
 
     * Example: This [example factory class](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory.kt) demonstrates this.
 
