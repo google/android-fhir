@@ -20,14 +20,12 @@ set -euox pipefail
 rm -rf site/
 mkdir -p site/
 
-# TODO https://github.com/google/android-fhir/issues/2232 Add mkdocs generation
-
+# We need to generate the Dokka API Doc into docs/use/api/ *before* running mkdocs,
+# so that it can validate the links to it and make sure that they are not broken.
 ./gradlew dokkaHtml
-mkdir -p site/api/
-mv docs/data-capture site/api/
-mv docs/engine site/api/
-mv docs/knowledge site/api/
-mv docs/workflow site/api/
 
-cp -R docs/index.html site/
-
+# "install --deploy" is better than "sync", because it checks that the Pipfile.lock
+# is up-to-date with the Pipfile before installing. If it's not, it will fail the
+# installation. This is useful for ensuring strict dependency control during CI.
+pipenv install --deploy
+pipenv run mkdocs build --strict
