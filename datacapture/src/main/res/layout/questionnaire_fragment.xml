@@ -52,7 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/questionnaire_bottom_navigation_recycler_view"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_container_frame"
         app:layout_constraintTop_toBottomOf="@+id/questionnaire_progress_indicator"
     />
 
@@ -61,19 +61,19 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:scrollbars="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/questionnaire_bottom_navigation_recycler_view"
+        app:layout_constraintBottom_toTopOf="@+id/bottom_nav_container_frame"
         app:layout_constraintTop_toBottomOf="@+id/review_mode_edit_button"
     />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/questionnaire_bottom_navigation_recycler_view"
-        android:layout_width="0dp"
+    <FrameLayout
+        android:id="@+id/bottom_nav_container_frame"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:listitem="@layout/pagination_navigation_view"
-        tools:itemCount="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-    />
+    >
+        <include layout="@layout/pagination_navigation_view" />
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

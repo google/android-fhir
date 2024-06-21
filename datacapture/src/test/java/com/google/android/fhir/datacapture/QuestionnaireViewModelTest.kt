@@ -4324,6 +4324,7 @@ class QuestionnaireViewModelTest {
             when (it) {
               is QuestionnaireAdapterItem.Question -> it.item.questionnaireItem.linkId
               is QuestionnaireAdapterItem.RepeatedGroupHeader -> "RepeatedGroupHeader:${it.index}"
+              is QuestionnaireAdapterItem.Navigation -> TODO()
             }
           },
         )

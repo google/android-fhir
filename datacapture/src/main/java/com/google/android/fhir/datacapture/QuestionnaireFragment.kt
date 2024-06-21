@@ -33,6 +33,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import kotlinx.coroutines.launch
@@ -93,8 +94,11 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
-    val bottomNavigationRecyclerView =
-      view.findViewById<RecyclerView>(R.id.questionnaire_bottom_navigation_recycler_view)
+
+    // This container frame floats at the bottom of the view to make navigation controls visible at
+    // all times when the user scrolls. Use
+    // [QuestionnaireFragment.Builder.setShowNavigationInDefaultLongScroll] to disable this.
+    val bottomNavContainerFrame = view.findViewById<View>(R.id.bottom_nav_container_frame)
 
     viewModel.setOnCancelButtonClickListener {
       QuestionnaireCancelDialogFragment()
@@ -137,10 +141,6 @@ class QuestionnaireFragment : Fragment() {
     questionnaireReviewRecyclerView.adapter = questionnaireReviewAdapter
     questionnaireReviewRecyclerView.layoutManager = LinearLayoutManager(view.context)
 
-    val bottomNavigationAdapter = QuestionnaireNavigationAdapter()
-    bottomNavigationRecyclerView.adapter = bottomNavigationAdapter
-    bottomNavigationRecyclerView.layoutManager = LinearLayoutManager(view.context)
-
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
       viewModel.questionnaireStateFlow.collect { state ->
@@ -151,15 +151,18 @@ class QuestionnaireFragment : Fragment() {
             questionnaireReviewAdapter.submitList(
               state.items,
             )
-            bottomNavigationAdapter.submitList(state.bottomNavItems)
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
-
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
               } else {
                 View.GONE
               }
+
+            // Set bottom navigation
+            bottomNavContainerFrame.visibility = View.VISIBLE
+            NavigationViewHolder(bottomNavContainerFrame)
+              .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
 
             // Hide progress indicator
             questionnaireProgressIndicator.visibility = View.GONE
@@ -168,9 +171,13 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireReviewRecyclerView.visibility = View.GONE
             questionnaireEditAdapter.submitList(state.items)
-            bottomNavigationAdapter.submitList(state.bottomNavItems)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
             reviewModeEditButton.visibility = View.GONE
+
+            // Set bottom navigation
+            bottomNavContainerFrame.visibility = View.VISIBLE
+            NavigationViewHolder(bottomNavContainerFrame)
+              .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
 
             // Set progress indicator
             questionnaireProgressIndicator.visibility = View.VISIBLE
@@ -206,7 +213,7 @@ class QuestionnaireFragment : Fragment() {
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
-            bottomNavigationRecyclerView.visibility = View.GONE
+            bottomNavContainerFrame.visibility = View.GONE
           }
         }
       }
