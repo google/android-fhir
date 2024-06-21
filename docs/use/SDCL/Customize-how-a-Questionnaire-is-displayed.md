@@ -81,7 +81,7 @@ component.
 
 This guide outlines the step-by-step process to create and incorporate custom widgets into FHIR questionnaires using the Android FHIR SDK.
 
-Note: Examples given below are all from the catalog app in this repository. We recommend you try out the application to see these concepts in action.
+Note: Examples given below are all from the [catalog](https://github.com/google/android-fhir/tree/master/catalog) app in this repository. We recommend you try out the application to see these concepts in action.
 
 1. **Create a Layout for the Custom Component:**
 
