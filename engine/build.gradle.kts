@@ -48,6 +48,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    consumerProguardFile("proguard-rules.pro")
 
     javaCompileOptions {
       annotationProcessorOptions {
