@@ -1,5 +1,3 @@
-import Dependencies.forceGuava
-
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -24,8 +22,8 @@ android {
 
   buildTypes {
     release {
-      isMinifyEnabled = false
-      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+      isMinifyEnabled = true
+      proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
   compileOptions {
@@ -41,8 +39,6 @@ android {
   }
   kotlin { jvmToolchain(11) }
 }
-
-configurations { all { forceGuava() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
@@ -62,6 +58,7 @@ dependencies {
   implementation(project(path = ":datacapture"))
   implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
+  implementation(project(path = ":contrib:locationwidget"))
 
   testImplementation(Dependencies.junit)
 }

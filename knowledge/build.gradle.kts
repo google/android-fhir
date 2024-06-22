@@ -1,10 +1,10 @@
-import Dependencies.forceGuava
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.kotlinKsp)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -67,13 +67,7 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    forceGuava()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
@@ -98,7 +92,7 @@ dependencies {
   implementation(Dependencies.HapiFhir.fhirCoreConvertors)
   implementation(Dependencies.apacheCommonsCompress)
 
-  kapt(Dependencies.Room.compiler)
+  ksp(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
@@ -109,18 +103,31 @@ dependencies {
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
+    file("../docs/use/api/${Releases.Knowledge.artifactId}/${Releases.Knowledge.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Knowledge.artifactId)
+      moduleName.set(Releases.Knowledge.name)
       moduleVersion.set(Releases.Knowledge.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
+      sourceLink {
+        localDirectory.set(file("src/main/java"))
+        remoteUrl.set(
+          URL("https://github.com/google/android-fhir/tree/master/knowledge/src/main/java"),
+        )
+        remoteLineSuffix.set("#L")
+      }
       externalDocumentationLink {
         url.set(URL("https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/"))
         packageListUrl.set(

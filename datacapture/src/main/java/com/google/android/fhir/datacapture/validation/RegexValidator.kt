@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.asStringValue
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
-import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.PrimitiveType
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.Type
 import timber.log.Timber
 
 /**
@@ -37,22 +37,22 @@ internal object RegexValidator :
     url = REGEX_EXTENSION_URL,
     predicate =
       predicate@{
-        extension: Extension,
+        constraintValue: Type,
         answer: QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
         ->
-        if (!extension.value.isPrimitive || !answer.value.isPrimitive) {
+        if (!constraintValue.isPrimitive || !answer.value.isPrimitive) {
           return@predicate false
         }
         try {
-          val pattern = Pattern.compile((extension.value as PrimitiveType<*>).asStringValue())
+          val pattern = Pattern.compile((constraintValue as PrimitiveType<*>).asStringValue())
           !pattern.matcher(answer.value.asStringValue()).matches()
         } catch (e: PatternSyntaxException) {
-          Timber.w("Can't parse regex: " + extension.value, e)
+          Timber.w("Can't parse regex: $constraintValue", e)
           false
         }
       },
-    messageGenerator = { extension: Extension, context: Context ->
-      context.getString(R.string.regex_validation_error_msg, extension.value.primitiveValue())
+    messageGenerator = { constraintValue: Type, context: Context ->
+      context.getString(R.string.regex_validation_error_msg, constraintValue.primitiveValue())
     },
   )
 

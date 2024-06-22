@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package com.google.android.fhir.impl
 
 import android.content.Context
-import com.google.android.fhir.DatastoreUtil
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
@@ -28,14 +28,16 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.execute
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.Resolved
-import com.google.android.fhir.sync.upload.DefaultResourceConsolidator
 import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
+import com.google.android.fhir.sync.upload.ResourceConsolidatorFactory
 import com.google.android.fhir.sync.upload.SyncUploadProgress
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onEach
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -67,7 +69,7 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
-    return DatastoreUtil(context).readLastSyncTimestamp()
+    return FhirEngineProvider.getFhirDataStore(context).readLastSyncTimestamp()
   }
 
   override suspend fun clearDatabase() {
@@ -79,7 +81,11 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-    database.purge(type, id, forcePurge)
+    database.purge(type, setOf(id), forcePurge)
+  }
+
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
+    database.purge(type, ids, forcePurge)
   }
 
   override suspend fun syncDownload(
@@ -126,11 +132,13 @@ internal class FhirEngineImpl(private val database: Database, private val contex
       .intersect(database.getAllLocalChanges().map { it.resourceId }.toSet())
 
   override suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> UploadSyncResult),
+    uploadStrategy: UploadStrategy,
+    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
   ): Flow<SyncUploadProgress> = flow {
-    val resourceConsolidator = DefaultResourceConsolidator(database)
-    val localChangeFetcher = LocalChangeFetcherFactory.byMode(localChangesFetchMode, database)
+    val resourceConsolidator =
+      ResourceConsolidatorFactory.byHttpVerb(uploadStrategy.requestGeneratorMode, database)
+    val localChangeFetcher =
+      LocalChangeFetcherFactory.byMode(uploadStrategy.localChangesFetchMode, database)
 
     emit(
       SyncUploadProgress(
@@ -141,23 +149,22 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
     while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
-      val uploadSyncResult = upload(localChanges)
-
-      resourceConsolidator.consolidate(uploadSyncResult)
-      when (uploadSyncResult) {
-        is UploadSyncResult.Success -> emit(localChangeFetcher.getProgress())
-        is UploadSyncResult.Failure -> {
-          with(localChangeFetcher.getProgress()) {
-            emit(
-              SyncUploadProgress(
-                remaining = remaining,
-                initialTotal = initialTotal,
-                uploadError = uploadSyncResult.syncError,
-              ),
-            )
+      val uploadRequestResult =
+        upload(localChanges)
+          .onEach { result ->
+            resourceConsolidator.consolidate(result)
+            val newProgress =
+              when (result) {
+                is UploadRequestResult.Success -> localChangeFetcher.getProgress()
+                is UploadRequestResult.Failure ->
+                  localChangeFetcher.getProgress().copy(uploadError = result.uploadError)
+              }
+            emit(newProgress)
           }
-          break
-        }
+          .firstOrNull { it is UploadRequestResult.Failure }
+
+      if (uploadRequestResult is UploadRequestResult.Failure) {
+        break
       }
     }
   }

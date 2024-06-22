@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,17 +27,19 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
-import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.extensions.unit
-import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.launch
 
 internal abstract class EditTextViewHolderFactory(@LayoutRes override val resId: Int) :
   QuestionnaireItemViewHolderFactory(resId) {
@@ -49,13 +51,15 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   QuestionnaireItemViewHolderDelegate {
   override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
+  private lateinit var context: AppCompatActivity
   private lateinit var header: HeaderView
-  protected lateinit var textInputLayout: TextInputLayout
+  private lateinit var textInputLayout: TextInputLayout
   private lateinit var textInputEditText: TextInputEditText
   private var unitTextView: TextView? = null
   private var textWatcher: TextWatcher? = null
 
   override fun init(itemView: View) {
+    context = itemView.context.tryUnwrapContext()!!
     header = itemView.findViewById(R.id.header)
     textInputLayout = itemView.findViewById(R.id.text_input_layout)
     textInputEditText = itemView.findViewById(R.id.text_input_edit_text)
@@ -68,7 +72,7 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
     // https://stackoverflow.com/questions/13614101/fatal-crash-focus-search-returned-a-view-that-wasnt-able-to-take-focus/47991577
     textInputEditText.setOnEditorActionListener { view, actionId, _ ->
       if (actionId != EditorInfo.IME_ACTION_NEXT) {
-        false
+        return@setOnEditorActionListener false
       }
       view.focusSearch(FOCUS_DOWN)?.requestFocus(FOCUS_DOWN) ?: false
     }
@@ -78,9 +82,11 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
             as InputMethodManager)
           .hideSoftInputFromWindow(view.windowToken, 0)
 
-        // Update answer even if the text box loses focus without any change. This will mark the
-        // questionnaire response item as being modified in the view model and trigger validation.
-        handleInput(textInputEditText.editableText, questionnaireViewItem)
+        context.lifecycleScope.launch {
+          // Update answer even if the text box loses focus without any change. This will mark the
+          // questionnaire response item as being modified in the view model and trigger validation.
+          handleInput(textInputEditText.editableText, questionnaireViewItem)
+        }
       }
     }
   }
@@ -91,25 +97,45 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
       hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
       helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
     }
-    displayValidationResult(questionnaireViewItem.validationResult)
 
-    textInputEditText.removeTextChangedListener(textWatcher)
-    updateUI(questionnaireViewItem, textInputEditText, textInputLayout)
+    /**
+     * Ensures that any validation errors or warnings are immediately reflected in the UI whenever
+     * the view is bound to a new or updated item.
+     */
+    updateValidationTextUI(questionnaireViewItem, textInputLayout)
 
-    unitTextView?.apply {
-      text = questionnaireViewItem.questionnaireItem.unit?.code
-      visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
-    }
+    /**
+     * Updates the EditText *only* if the EditText is not currently focused.
+     *
+     * This is done to avoid disrupting the user's typing experience and prevent conflicts if they
+     * are actively editing the field. Updating the text programmatically is safe in the following
+     * scenarios:
+     * 1. **ViewHolder Reuse:** When the same ViewHolder is being used to display a different
+     *    QuestionnaireViewItem, the EditText needs to be updated with the new item's content.
+     * 2. **Read-Only Items:** When the item is read-only, its value may change dynamically due to
+     *    expressions, and the EditText needs to reflect this updated value.
+     *
+     * The following actions are performed if the EditText is not focused:
+     * - Removes any existing text change listener.
+     * - Updates the input text UI based on the QuestionnaireViewItem.
+     * - Updates the unit text view (if applicable).
+     * - Attaches a new text change listener to handle user input.
+     */
+    if (!textInputEditText.isFocused) {
+      textInputEditText.removeTextChangedListener(textWatcher)
+      updateInputTextUI(questionnaireViewItem, textInputEditText)
 
-    textWatcher =
-      textInputEditText.doAfterTextChanged { editable: Editable? ->
-        handleInput(editable!!, questionnaireViewItem)
+      unitTextView?.apply {
+        text = questionnaireViewItem.questionnaireItem.unit?.code
+        visibility = if (text.isNullOrEmpty()) GONE else VISIBLE
       }
-  }
 
-  private fun displayValidationResult(validationResult: ValidationResult) {
-    textInputLayout.error =
-      getValidationErrorMessage(textInputLayout.context, questionnaireViewItem, validationResult)
+      // TextWatcher is set only once for each question item in scenario 1
+      textWatcher =
+        textInputEditText.doAfterTextChanged { editable: Editable? ->
+          context.lifecycleScope.launch { handleInput(editable!!, questionnaireViewItem) }
+        }
+    }
   }
 
   override fun setReadOnly(isReadOnly: Boolean) {
@@ -118,12 +144,17 @@ abstract class QuestionnaireItemEditTextViewHolderDelegate(private val rawInputT
   }
 
   /** Handles user input from the `editable` and updates the questionnaire. */
-  abstract fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
+  abstract suspend fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem)
 
-  /** Handles the UI update. */
-  abstract fun updateUI(
+  /** Handles the update of [textInputEditText].text. */
+  abstract fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
+  )
+
+  /** Handles the update of [textInputLayout].error. */
+  abstract fun updateValidationTextUI(
+    questionnaireViewItem: QuestionnaireViewItem,
     textInputLayout: TextInputLayout,
   )
 }

@@ -1,13 +1,10 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
 import codegen.GenerateSearchParamsTask
 import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.kotlinKsp)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -41,6 +38,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    consumerProguardFile("proguard-rules.pro")
 
     javaCompileOptions {
       annotationProcessorOptions {
@@ -87,11 +85,9 @@ configurations {
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
+    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
     exclude(module = "jcl-over-slf4j")
-
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
   }
 }
 
@@ -139,12 +135,13 @@ dependencies {
   implementation(Dependencies.timber)
   implementation(Dependencies.truth)
 
-  kapt(Dependencies.Room.compiler)
+  ksp(Dependencies.Room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)
@@ -152,16 +149,25 @@ dependencies {
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}/${Releases.Engine.version}"))
+  outputDirectory.set(
+    file("../docs/use/api/${Releases.Engine.artifactId}/${Releases.Engine.version}"),
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Engine.artifactId)
+      moduleName.set(Releases.Engine.name)
       moduleVersion.set(Releases.Engine.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(

@@ -1,6 +1,4 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
+import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
 plugins {
@@ -23,6 +21,7 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
+    consumerProguardFile("proguard-rules.pro")
   }
 
   buildFeatures { viewBinding = true }
@@ -47,7 +46,11 @@ android {
 
   configureJacocoTestOptions()
 
-  sourceSets { getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) } }
+  sourceSets {
+    getByName("androidTest").apply { resources.setSrcDirs(listOf("sampledata")) }
+
+    getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
+  }
 
   testOptions { animationsDisabled = true }
   kotlin { jvmToolchain(11) }
@@ -59,9 +62,7 @@ configurations {
   all {
     exclude(module = "xpp3")
     exclude(group = "net.sf.saxon", module = "Saxon-HE")
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
+    removeIncompatibleDependencies()
   }
 }
 
@@ -69,6 +70,7 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
+  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   androidTestImplementation(Dependencies.AndroidxTest.rules)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.junit)
@@ -108,18 +110,28 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(project(":knowledge")) {
+    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+  }
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
   outputDirectory.set(
-    file("../docs/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
+    file("../docs/use/api/${Releases.DataCapture.artifactId}/${Releases.DataCapture.version}"),
   )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.DataCapture.artifactId)
+      moduleName.set(Releases.DataCapture.name)
       moduleVersion.set(Releases.DataCapture.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(

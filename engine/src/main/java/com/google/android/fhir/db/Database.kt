@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package com.google.android.fhir.db
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.impl.dao.IndexedIdAndResource
+import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.search.SearchQuery
@@ -94,9 +95,11 @@ internal interface Database {
    */
   suspend fun delete(type: ResourceType, id: String)
 
-  suspend fun <R : Resource> search(query: SearchQuery): List<R>
+  suspend fun <R : Resource> search(query: SearchQuery): List<ResourceWithUUID<R>>
 
-  suspend fun searchReferencedResources(query: SearchQuery): List<IndexedIdAndResource>
+  suspend fun searchForwardReferencedResources(query: SearchQuery): List<ForwardIncludeSearchResult>
+
+  suspend fun searchReverseReferencedResources(query: SearchQuery): List<ReverseIncludeSearchResult>
 
   suspend fun count(query: SearchQuery): Long
 
@@ -171,15 +174,35 @@ internal interface Database {
   suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
 
   /**
-   * Purge resource from database based on resource type and id without any deletion of data from
-   * the server.
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
    *
    * @param type The [ResourceType]
-   * @param id The resource id [Resource.id]
-   * @param isLocalPurge default value is false here resource will not be deleted from
+   * @param ids The resource ids [Set]<[Resource.id]>
+   * @param forcePurge default value is false, here resources will not be deleted from
    *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   *   either sync with server or FORCE_PURGE required") if local change exists. If true this API
-   *   will delete resource entry from LocalChangeEntity table.
+   *   either sync with server or FORCE_PURGE required") if local changes exists. If true this API
+   *   will delete resource entries from LocalChangeEntity table.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
+
+  /**
+   * @return List of [LocalChangeResourceReference] associated with the [LocalChangeEntity.id]s. A
+   *   single [LocalChangeEntity] may have one or more [LocalChangeResourceReference] associated
+   *   with it.
+   */
+  suspend fun getLocalChangeResourceReferences(
+    localChangeIds: List<Long>,
+  ): List<LocalChangeResourceReference>
 }
+
+internal data class ResourceWithUUID<R>(
+  val uuid: UUID,
+  val resource: R,
+)
+
+internal data class LocalChangeResourceReference(
+  val localChangeId: Long,
+  val resourceReferenceValue: String,
+  val resourceReferencePath: String?,
+)

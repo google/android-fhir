@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,26 +19,32 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
+import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.GroupHeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 
 internal object GroupViewHolderFactory :
   QuestionnaireItemViewHolderFactory(R.layout.group_header_view) {
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemViewHolderDelegate {
+      private lateinit var context: AppCompatActivity
       private lateinit var header: GroupHeaderView
       private lateinit var error: TextView
       private lateinit var addItemButton: Button
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
 
       override fun init(itemView: View) {
+        context = itemView.context.tryUnwrapContext()!!
         header = itemView.findViewById(R.id.header)
         error = itemView.findViewById(R.id.error)
         addItemButton = itemView.findViewById(R.id.add_item)
@@ -46,16 +52,23 @@ internal object GroupViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
+        addItemButton.text =
+          context.getString(
+            R.string.add_repeated_group_item,
+            questionnaireViewItem.questionText ?: "",
+          )
         addItemButton.visibility =
           if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
         addItemButton.setOnClickListener {
-          questionnaireViewItem.addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-              // TODO(jingtang10): This can be removed since we already do this in the
-              // answerChangedCallback in the QuestionnaireViewModel.
-              item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
-            },
-          )
+          context.lifecycleScope.launch {
+            questionnaireViewItem.addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                // TODO(jingtang10): This can be removed since we already do this in the
+                // answerChangedCallback in the QuestionnaireViewModel.
+                item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
+              },
+            )
+          }
         }
         displayValidationResult(questionnaireViewItem.validationResult)
       }
@@ -72,7 +85,7 @@ internal object GroupViewHolderFactory :
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
-        // No user input
+        addItemButton.isEnabled = !isReadOnly
       }
     }
 }

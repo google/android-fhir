@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,7 +94,7 @@ private fun validateLaunchContextExtension(launchExtension: Extension) {
       false
     }
 
-  if (nameCoding.system != EXTENSION_LAUNCH_CONTEXT || !isValidResourceType) {
+  if (nameCoding.system != CODE_SYSTEM_LAUNCH_CONTEXT || !isValidResourceType) {
     error(
       "The extension:name and/or extension:type do not follow the format specified in $EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT",
     )
@@ -139,7 +139,8 @@ internal const val EXTENSION_ENTRY_MODE_URL: String =
 internal const val EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT =
   "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-launchContext"
 
-internal const val EXTENSION_LAUNCH_CONTEXT = "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext"
+internal const val CODE_SYSTEM_LAUNCH_CONTEXT =
+  "http://hl7.org/fhir/uv/sdc/CodeSystem/launchContext"
 
 val Questionnaire.entryMode: EntryMode?
   get() {

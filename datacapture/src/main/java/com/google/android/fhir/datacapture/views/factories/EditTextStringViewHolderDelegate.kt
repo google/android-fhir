@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.text.Editable
 import android.text.InputType
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -34,7 +35,10 @@ internal class EditTextStringViewHolderDelegate :
   QuestionnaireItemEditTextViewHolderDelegate(
     InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES,
   ) {
-  override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+  override suspend fun handleInput(
+    editable: Editable,
+    questionnaireViewItem: QuestionnaireViewItem,
+  ) {
     val input = getValue(editable.toString())
     if (input != null) {
       questionnaireViewItem.setAnswer(input)
@@ -55,14 +59,26 @@ internal class EditTextStringViewHolderDelegate :
     }
   }
 
-  override fun updateUI(
+  override fun updateInputTextUI(
     questionnaireViewItem: QuestionnaireViewItem,
     textInputEditText: TextInputEditText,
-    textInputLayout: TextInputLayout,
   ) {
     val text = questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value ?: ""
     if ((text != textInputEditText.text.toString())) {
-      textInputEditText.setText(text)
+      textInputEditText.text?.clear()
+      textInputEditText.append(text)
     }
+  }
+
+  override fun updateValidationTextUI(
+    questionnaireViewItem: QuestionnaireViewItem,
+    textInputLayout: TextInputLayout,
+  ) {
+    textInputLayout.error =
+      getValidationErrorMessage(
+        textInputLayout.context,
+        questionnaireViewItem,
+        questionnaireViewItem.validationResult,
+      )
   }
 }
