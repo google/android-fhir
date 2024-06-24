@@ -76,14 +76,9 @@ class QuestionnaireItemViewHolder(
 internal class RepeatedGroupHeaderItemViewHolder(
   itemView: View,
 ) : RecyclerView.ViewHolder(itemView) {
-
-  private val header: TextView
-  private val delete: View
-
-  init {
-    header = itemView.findViewById(R.id.repeated_group_instance_header_title)
-    delete = itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
-  }
+  private val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
+  private val delete: View =
+    itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
 
   fun bind(repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader) {
     header.text =
