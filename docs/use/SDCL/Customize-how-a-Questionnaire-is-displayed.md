@@ -89,7 +89,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
 
     * Example: See this [example location_widget_view.xml](https://github.com/google/android-fhir/blob/master/contrib/locationwidget/src/main/res/layout/location_widget_view.xml).
 
-2. **Create a `QuestionnaireItemViewHolderFactory` Class:**
+2. Create a `QuestionnaireItemViewHolderFactory` class
 
    Implement a class that extends [QuestionnaireItemViewHolderFactory](https://github.com/google/android-fhir/blob/master/datacapture/src/main/java/com/google/android/fhir/datacapture/views/factories/QuestionnaireItemViewHolderFactory.kt#L35). This class will be responsible for creating and managing the view holder for your custom component.
 
