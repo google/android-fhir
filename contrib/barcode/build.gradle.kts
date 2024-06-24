@@ -29,6 +29,11 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https://developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
 
   packaging {
     resources.excludes.addAll(
@@ -58,6 +63,8 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.mockitoInline)
   androidTestImplementation(Dependencies.truth)
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(project(":datacapture"))
   implementation(Dependencies.Androidx.coreKtx)
