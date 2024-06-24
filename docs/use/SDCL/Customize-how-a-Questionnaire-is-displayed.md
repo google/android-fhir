@@ -115,7 +115,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
     * `factory`: The custom `ViewHolderFactory` instance.
     * `matches`: A predicate function that takes a [`Questionnaire.QuestionnaireItemComponent`](https://hapifhir.io/hapi-fhir/apidocs/hapi-fhir-structures-r4/org/hl7/fhir/r4/model/Questionnaire.QuestionnaireItemComponent.html) and returns `true` if this factory is suitable for rendering that item.
 
-4. **Create a `QuestionnaireItemViewHolderFactoryMatchersProviderFactory`:**
+4. Create a `QuestionnaireItemViewHolderFactoryMatchersProviderFactory`
 
    Create a factory class that implements this interface. It acts as a central registry for your custom widget associations.
 
