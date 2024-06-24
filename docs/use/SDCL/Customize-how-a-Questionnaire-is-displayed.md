@@ -83,7 +83,7 @@ This guide outlines the step-by-step process to create and incorporate custom wi
 
 Note: Examples given below are all from the [catalog](https://github.com/google/android-fhir/tree/master/catalog) application in this repository. We recommend you try out the application to see these concepts in action.
 
-1. **Create a Layout for the Custom Component:**
+1. Create a layout for the Custom Component
 
    Design an XML layout file to define the visual structure and appearance of your custom widget.
 
