@@ -121,7 +121,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
 
     * Example: This [example factory class](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory.kt) demonstrates this.
 
-5. **Register the Factory in `DataCaptureConfig`:**
+5. Register the Factory in `DataCaptureConfig`
 
    In your `DataCaptureConfig` object, set the `questionnaireItemViewHolderFactoryMatchersProviderFactory` property to your custom factory instance.
 
