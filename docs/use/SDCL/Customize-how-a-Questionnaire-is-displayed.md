@@ -85,7 +85,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
 
 1. **Create a Layout for the Custom Component:**
 
-   Design a layout file (XML) to define the visual structure and appearance of your custom widget.
+   Design an XML layout file to define the visual structure and appearance of your custom widget.
 
     * Example: See this [example location_widget_view.xml](https://github.com/google/android-fhir/blob/master/contrib/locationwidget/src/main/res/layout/location_widget_view.xml).
 
