@@ -127,7 +127,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
 
     * Example: See how this is done in [this code](https://github.com/google/android-fhir/blob/master/catalog/src/main/java/com/google/android/fhir/catalog/CatalogApplication.kt#L42C5-L47C8).
 
-6. **Use the Custom Widget in Your Questionnaire Fragment:**
+6. Use the Custom Widget in Your Questionnaire Fragment
 
    When building your `QuestionnaireFragment`, call the `setCustomQuestionnaireItemViewHolderFactoryMatchersProvider` method on the builder, providing the string identifier associated with your custom widget.
 
