@@ -104,7 +104,7 @@ Note: Examples given below are all from the [catalog](https://github.com/google/
         * `displayValidationResult`: Displays validation feedback for user input.
         * `setReadOnly`: Configures the UI for read-only mode.
 
-3. **Create `QuestionnaireItemViewHolderFactoryMatcher` Objects:**
+3. Create `QuestionnaireItemViewHolderFactoryMatcher` Objects
 
    For each custom `ViewHolderFactory`, create a corresponding factory matcher object - [QuestionnaireItemViewHolderFactoryMatcher](https://github.com/google/android-fhir/blob/master/datacapture/src/main/java/com/google/android/fhir/datacapture/QuestionnaireFragment.kt#L538)
 
