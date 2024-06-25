@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,9 @@
 package com.google.android.fhir.search.query
 
 import android.os.Build
+import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.FhirEngineConfiguration
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.index.SearchParamDefinition
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -26,7 +29,10 @@ import com.google.android.fhir.search.query.XFhirQueryTranslator.translate
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.SearchParameter
+import org.junit.After
 import org.junit.Assert.assertThrows
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -35,6 +41,33 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [Build.VERSION_CODES.P])
 class XFhirQueryTranslatorTest {
+  private val provider: FhirEngineProvider = FhirEngineProvider
+
+  @Before
+  fun setUp() {
+    provider.init(
+      FhirEngineConfiguration(
+        customSearchParameters =
+          listOf(
+            SearchParameter().apply {
+              addBase("Patient")
+              name = "maritalStatus"
+              code = "maritalStatus"
+              type = Enumerations.SearchParamType.TOKEN
+              expression = "Patient.maritalStatus.coding.code"
+              description = "Search the maritalStatus of Patient"
+            },
+          ),
+      ),
+    )
+
+    provider.getInstance(ApplicationProvider.getApplicationContext())
+  }
+
+  @After
+  fun tearDown() {
+    provider.forceCleanup()
+  }
 
   @Test
   fun `translate() should add descending sort for sort param with hyphen`() {
@@ -358,6 +391,16 @@ class XFhirQueryTranslatorTest {
       assertThat(this.parameter.paramName).isEqualTo("_profile")
       assertThat(this.filters.first().value)
         .isEqualTo("http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient")
+    }
+  }
+
+  @Test
+  fun `translate() should consider custom search parameter through fhir engine configuration`() {
+    val search = translate("Patient?maritalStatus=M")
+
+    search.tokenFilterCriteria.first().run {
+      assertThat(this.parameter.paramName).isEqualTo("maritalStatus")
+      assertThat(this.filters.first().value!!.tokenFilters.first().code).isEqualTo("M")
     }
   }
 }
