@@ -19,21 +19,6 @@ import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.kotlin.dsl.exclude
 
 object Dependencies {
-
-  object Androidx {
-    const val activity = "androidx.activity:activity:${Versions.Androidx.activity}"
-    const val appCompat = "androidx.appcompat:appcompat:${Versions.Androidx.appCompat}"
-    const val constraintLayout =
-      "androidx.constraintlayout:constraintlayout:${Versions.Androidx.constraintLayout}"
-    const val coreKtx = "androidx.core:core-ktx:${Versions.Androidx.coreKtx}"
-    const val datastorePref =
-      "androidx.datastore:datastore-preferences:${Versions.Androidx.datastorePref}"
-    const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.Androidx.fragmentKtx}"
-    const val recyclerView = "androidx.recyclerview:recyclerview:${Versions.Androidx.recyclerView}"
-    const val sqliteKtx = "androidx.sqlite:sqlite-ktx:${Versions.Androidx.sqliteKtx}"
-    const val workRuntimeKtx = "androidx.work:work-runtime-ktx:${Versions.Androidx.workRuntimeKtx}"
-  }
-
   object Cql {
     const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
     const val evaluatorFhirJackson =
@@ -106,30 +91,11 @@ object Dependencies {
     const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.stdlib}"
   }
 
-  object Lifecycle {
-    const val liveDataKtx =
-      "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.Androidx.lifecycle}"
-    const val runtime = "androidx.lifecycle:lifecycle-runtime:${Versions.Androidx.lifecycle}"
-    const val viewModelKtx =
-      "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.Androidx.lifecycle}"
-  }
-
-  object Navigation {
-    const val navFragmentKtx =
-      "androidx.navigation:navigation-fragment-ktx:${Versions.Androidx.navigation}"
-    const val navUiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.Androidx.navigation}"
-  }
+  object Navigation
 
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
-  }
-
-  object Room {
-    const val compiler = "androidx.room:room-compiler:${Versions.Androidx.room}"
-    const val ktx = "androidx.room:room-ktx:${Versions.Androidx.room}"
-    const val runtime = "androidx.room:room-runtime:${Versions.Androidx.room}"
-    const val testing = "androidx.room:room-testing:${Versions.Androidx.room}"
   }
 
   object Mlkit {
@@ -157,7 +123,6 @@ object Dependencies {
 
   const val desugarJdkLibs = "com.android.tools:desugar_jdk_libs:${Versions.desugarJdkLibs}"
   const val fhirUcum = "org.fhir:ucum:${Versions.fhirUcum}"
-  const val gson = "com.google.code.gson:gson:${Versions.gson}"
 
   const val guavaModule = "com.google.guava:guava"
   const val guava = "$guavaModule:${Versions.guava}"
@@ -188,8 +153,6 @@ object Dependencies {
       "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
     const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
     const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
-    const val workTestingRuntimeKtx =
-      "androidx.work:work-testing:${Versions.Androidx.workRuntimeKtx}"
   }
 
   object Espresso {
@@ -212,20 +175,6 @@ object Dependencies {
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-    object Androidx {
-      const val activity = "1.7.2"
-      const val appCompat = "1.6.1"
-      const val constraintLayout = "2.1.4"
-      const val coreKtx = "1.10.1"
-      const val datastorePref = "1.0.0"
-      const val fragmentKtx = "1.6.0"
-      const val lifecycle = "2.6.1"
-      const val navigation = "2.6.0"
-      const val recyclerView = "1.3.0"
-      const val room = "2.5.2"
-      const val sqliteKtx = "2.3.1"
-      const val workRuntimeKtx = "2.8.1"
-    }
 
     object Cql {
       const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
@@ -243,7 +192,6 @@ object Dependencies {
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
     const val fhirUcum = "1.0.3"
-    const val gson = "2.9.1"
     const val guava = "32.1.3-android"
 
     const val hapiFhir = "6.8.0"

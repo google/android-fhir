@@ -95,10 +95,10 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.core)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.Room.testing)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.room.testing)
+  androidTestImplementation(libs.androidx.work.testing)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
@@ -115,18 +115,12 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.Androidx.datastorePref)
-  implementation(Dependencies.Androidx.sqliteKtx)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
@@ -134,12 +128,17 @@ dependencies {
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
   implementation(Dependencies.truth)
+  implementation(libs.androidx.datastore.preferences)
+  implementation(libs.androidx.lifecycle.livedata)
+  implementation(libs.androidx.room.room)
+  implementation(libs.androidx.room.runtime)
+  implementation(libs.androidx.sqlite)
+  implementation(libs.androidx.work.runtime)
 
-  ksp(Dependencies.Room.compiler)
+  ksp(libs.androidx.room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
   testImplementation(Dependencies.junit)
@@ -149,6 +148,7 @@ dependencies {
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.work.testing)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
