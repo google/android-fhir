@@ -98,7 +98,7 @@ class FhirOperatorTest {
 
     assertThat(
         fhirOperator.generateCarePlan(
-          canonical =
+          planDefinitionCanonical =
             CanonicalType(
               "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0",
             ),
@@ -116,7 +116,8 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        canonical = CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
+        planDefinitionCanonical =
+          CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
         subject = "Patient/Patient-Example",
       )
 
@@ -138,7 +139,8 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        canonical = CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
+        planDefinitionCanonical =
+          CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
         subject = "Patient/Female-Patient-Example",
       )
 

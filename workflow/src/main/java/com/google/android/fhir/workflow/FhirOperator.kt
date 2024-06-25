@@ -156,8 +156,8 @@ internal constructor(
    */
   @WorkerThread
   fun generateCarePlan(
-    id: String? = null,
-    canonical: CanonicalType? = null,
+    planDefinitionId: String? = null,
+    planDefinitionCanonical: CanonicalType? = null,
     planDefinition: PlanDefinition? = null,
     subject: String,
     encounterId: String? = null,
@@ -174,8 +174,8 @@ internal constructor(
     prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ id?.let { IdType("PlanDefinition", it) },
-      /* canonical = */ canonical,
+      /* id = */ planDefinitionId?.let { IdType("PlanDefinition", it) },
+      /* canonical = */ planDefinitionCanonical,
       /* planDefinition = */ planDefinition,
       /* subject = */ subject,
       /* encounterId = */ encounterId,
