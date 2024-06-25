@@ -19,6 +19,7 @@ package com.google.android.fhir
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.index.SearchParamDefinitionsProvider
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
@@ -99,6 +100,15 @@ object FhirEngineProvider {
     }
     return checkNotNull(fhirServices)
   }
+
+  /**
+   * Returns the [SearchParamDefinitionsProvider] instance created in [FhirServices] class once the
+   * [FhirServices] class has been created, ie, which is when [FhirEngine] instance has been asked
+   * for by the application.
+   *
+   * If this method is called without creating [FhirEngine] instance, this will return null.
+   */
+  internal fun getSearchParamProvider() = fhirServices?.searchParamProvider
 
   @Synchronized
   fun cleanup() {
