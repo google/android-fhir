@@ -48,6 +48,9 @@ import timber.log.Timber
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
+private const val MIN_VALUE = "-9223372036854775808"
+private const val MAX_VALUE = "9223372036854775808"
+
 internal suspend fun <R : Resource> Search.execute(database: Database): List<SearchResult<R>> {
   val baseResources = database.search<R>(getQuery())
   val includedResources =
@@ -132,11 +135,12 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
 
   return revIncludes
     .map {
-      val (join, order) = it.search.getSortOrder(otherTable = "re")
+      val (join, order) =
+        it.search.getSortOrder(otherTable = "re", groupByColumn = "rie.index_value")
       args.addAll(join.args)
       val filterQuery = generateFilterQuery(it)
       """
-      SELECT DISTINCT rie.index_name, rie.index_value, re.serializedResource
+      SELECT rie.index_name, rie.index_value, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceUuid = rie.resourceUuid
@@ -194,11 +198,12 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
 
   return forwardIncludes
     .map {
-      val (join, order) = it.search.getSortOrder(otherTable = "re")
+      val (join, order) =
+        it.search.getSortOrder(otherTable = "re", groupByColumn = "rie.resourceuuid")
       args.addAll(join.args)
       val filterQuery = generateFilterQuery(it)
       """
-      SELECT DISTINCT rie.index_name, rie.resourceUuid, re.serializedResource
+      SELECT rie.index_name, rie.resourceUuid, re.serializedResource
       FROM ResourceEntity re
       JOIN ReferenceIndexEntity rie
       ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -221,6 +226,7 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
 private fun Search.getSortOrder(
   otherTable: String,
   isReferencedSearch: Boolean = false,
+  groupByColumn: String = "",
 ): Pair<SearchQuery, String> {
   var sortJoinStatement = ""
   var sortOrderStatement = ""
@@ -255,16 +261,32 @@ private fun Search.getSortOrder(
         .joinToString(separator = "\n")
     sortTableNames.forEach { _ -> args.add(sort.paramName) }
 
+    val havingColumn =
+      when (sort) {
+        is StringClientParam,
+        is NumberClientParam, -> "IFNULL(b.index_value,0)"
+        is DateClientParam -> "IFNULL(b.index_from,0) + IFNULL(c.index_from,0)"
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+      }
+
+    sortOrderStatement +=
+      """
+      GROUP BY $otherTable.resourceUuid ${if (groupByColumn.isNotEmpty()) ", $groupByColumn" else "" }
+      HAVING ${if (order == Order.ASCENDING) "MIN($havingColumn) >= $MIN_VALUE" else "MAX($havingColumn) >= $MIN_VALUE"}
+      
+            """
+        .trimIndent()
+    val defaultValue = if (order == Order.ASCENDING) MAX_VALUE else MIN_VALUE
     sortTableNames.forEachIndexed { index, sortTableName ->
       val tableAlias = 'b' + index
       sortOrderStatement +=
         if (index == 0) {
           """
-            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
+            ORDER BY IFNULL($tableAlias.${sortTableName.columnName}, $defaultValue) ${order.sqlString}
           """
             .trimIndent()
         } else {
-          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
+          ", IFNULL($tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName}, $defaultValue) ${order.sqlString}"
         }
     }
   }

@@ -76,6 +76,8 @@ import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Organization
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Period
+import org.hl7.fhir.r4.model.Person
+import org.hl7.fhir.r4.model.Person.PersonLinkComponent
 import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Quantity
 import org.hl7.fhir.r4.model.Reference
@@ -3682,6 +3684,124 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients() =
+    runBlocking {
+      val person1 =
+        Person().apply {
+          id = "person-1"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("First")
+            },
+          )
+          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
+        }
+
+      val person2 =
+        Person().apply {
+          id = "person-2"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("Second")
+            },
+          )
+          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+        }
+
+      val person3 =
+        Person().apply {
+          id = "person-3"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("Third")
+            },
+          )
+          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+        }
+
+      val patient01 =
+        Patient().apply {
+          id = "pa-01"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Gorden"
+            },
+          )
+        }
+
+      val patient02 =
+        Patient().apply {
+          id = "pa-02"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Bond"
+            },
+          )
+        }
+
+      val patient03 =
+        Patient().apply {
+          id = "pa-03"
+          addName(
+            HumanName().apply {
+              addGiven("Jamie")
+              family = "Bond"
+            },
+          )
+        }
+
+      database.insert(person1, person2, person3, patient01, patient02, patient03)
+
+      val result =
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Jame"
+                modifier = StringFilterModifier.STARTS_WITH
+              },
+            )
+
+            revInclude(ResourceType.Person, Person.LINK) { sort(Person.NAME, Order.ASCENDING) }
+          }
+          .execute<Patient>(database)
+
+      assertThat(result)
+        .comparingElementsUsing(SearchResultCorrespondence)
+        .displayingDiffsPairedBy { it.resource.logicalId }
+        .containsExactly(
+          SearchResult(
+            patient01,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person3)),
+          ),
+          SearchResult(
+            patient02,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person2)),
+          ),
+          SearchResult(
+            patient03,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
+          ),
+        )
+        .inOrder()
+    }
+
+  @Test
   fun search_patient_and_revInclude_encounters_sorted_by_date_descending(): Unit = runBlocking {
     val patient01 =
       Patient().apply {
@@ -4087,18 +4207,18 @@ class DatabaseImplTest {
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
 
-  @Test
+  @Test // https://github.com/google/android-fhir/issues/2512
   fun included_results_should_have_distinct_resources() = runBlocking {
     /**
-     * A person has multiple first names. Searching a group including Patient sorted by
-     * Patient.GIVEN should return single copy of of the Patient resource.
+     * This tests that the search query does not return duplicated resources as a result of sorting
+     * by a field that has multiple index values. For example, searching a group of patients sorted
+     * by Patient.GIVEN should return a single copy of each patient even if some of them might have
+     * mulitple given names indexed.
      *
-     * In order to sort Patients by given name, engine joins ResourceEntity table with
-     * StringIndexEntity table which may result in multiple rows for a single Patient if the person
-     * has more than one given name.
-     *
-     * So the expectation is that the search result should only include distinct Patients and not
-     * repeated Patients (one for each given name).
+     * Whilst sorting, the resource table and the relevant index table are joined, which could
+     * result in multiple rows for a single resource if there are multiple index values for the
+     * particular index used in the sorting criteria. This is prevented by adding the `DISTINCT`
+     * keyword in the generated SQL query.
      */
     val group =
       Group().apply {
@@ -4131,12 +4251,22 @@ class DatabaseImplTest {
       }
     database.insert(group, p1, p2)
 
-    val result =
+    val ascendingResult =
       Search(ResourceType.Group)
         .apply { include<Patient>(Group.MEMBER) { sort(Patient.GIVEN, Order.ASCENDING) } }
         .execute<Patient>(database)
 
-    assertThat(result)
+    assertThat(ascendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .contains(SearchResult(group, mapOf(Group.MEMBER.paramName to listOf(p1, p2)), null))
+
+    val descendingResult =
+      Search(ResourceType.Group)
+        .apply { include<Patient>(Group.MEMBER) { sort(Patient.GIVEN, Order.DESCENDING) } }
+        .execute<Patient>(database)
+
+    assertThat(descendingResult)
       .comparingElementsUsing(SearchResultCorrespondence)
       .displayingDiffsPairedBy { it.resource.logicalId }
       .contains(SearchResult(group, mapOf(Group.MEMBER.paramName to listOf(p2, p1)), null))
@@ -4144,67 +4274,83 @@ class DatabaseImplTest {
 
   @Test
   fun revIncluded_results_should_have_distinct_resources() = runBlocking {
-    // An encounter has multiple location and Searching a group revIncluding encounter with results
-    // sorted by Encounter.LOCATION_PERIOD should return single copy of the Encounter resource.
+    val practitioner =
+      Practitioner().apply {
+        id = "practitioner-1"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("James")
+          },
+        )
+      }
+    val p1 =
+      Patient().apply {
+        id = "p1"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("3")
+            addGiven("1")
+          },
+        )
 
-    val group =
-      Group().apply {
-        id = "group"
-        addMember(Group.GroupMemberComponent(Reference("Patient/multiple-first-names")))
+        addGeneralPractitioner(Reference("Practitioner/practitioner-1"))
       }
 
-    val encounter =
-      Encounter().apply {
-        id = "encounter-multiple-locations"
-
-        subject = Reference("Group/group")
-
-        addLocation().apply {
-          location = Reference("Location/1")
-          period =
-            Period().apply {
-              startElement = DateTimeType("2024-03-13T10:00:00-05:30")
-              endElement = DateTimeType("2024-03-13T10:30:00-05:30")
-            }
-        }
-
-        addLocation().apply {
-          location = Reference("Location/2")
-          period =
-            Period().apply {
-              startElement = DateTimeType("2024-03-13T11:00:00-05:30")
-              endElement = DateTimeType("2024-03-13T11:30:00-05:30")
-            }
-        }
-
-        addLocation().apply {
-          location = Reference("Location/3")
-          period =
-            Period().apply {
-              startElement = DateTimeType("2024-03-13T09:00:00-05:30")
-              endElement = DateTimeType("2024-03-13T09:30:00-05:30")
-            }
-        }
+    val p2 =
+      Patient().apply {
+        id = "p2"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("2")
+            addGiven("4")
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/practitioner-1"))
       }
-    database.insert(group, encounter)
 
-    val result =
-      Search(ResourceType.Group)
+    database.insert(practitioner, p1, p2)
+    val ascendingResult =
+      Search(ResourceType.Practitioner)
         .apply {
-          revInclude<Encounter>(Encounter.SUBJECT) {
-            sort(Encounter.LOCATION_PERIOD, Order.ASCENDING)
-          }
+          revInclude<Patient>(Patient.GENERAL_PRACTITIONER) { sort(Patient.GIVEN, Order.ASCENDING) }
         }
         .execute<Patient>(database)
 
-    assertThat(result)
+    assertThat(ascendingResult)
       .comparingElementsUsing(SearchResultCorrespondence)
       .displayingDiffsPairedBy { it.resource.logicalId }
       .contains(
         SearchResult(
-          group,
+          practitioner,
           null,
-          mapOf(Pair(ResourceType.Encounter, Encounter.SUBJECT.paramName) to listOf(encounter)),
+          mapOf(
+            Pair(ResourceType.Patient, Patient.GENERAL_PRACTITIONER.paramName) to listOf(p1, p2),
+          ),
+        ),
+      )
+
+    val descendingResult =
+      Search(ResourceType.Practitioner)
+        .apply {
+          revInclude<Patient>(Patient.GENERAL_PRACTITIONER) {
+            sort(Patient.GIVEN, Order.DESCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(descendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .contains(
+        SearchResult(
+          practitioner,
+          null,
+          mapOf(
+            Pair(ResourceType.Patient, Patient.GENERAL_PRACTITIONER.paramName) to listOf(p2, p1),
+          ),
         ),
       )
   }
@@ -4302,6 +4448,264 @@ class DatabaseImplTest {
           mapOf(Pair(ResourceType.Encounter, Encounter.SUBJECT.paramName) to listOf(encounter)),
         ),
       )
+  }
+
+  @Test
+  fun sort_repeated_values_of_type_string_should_return_distinct_values() = runBlocking {
+    val p1 =
+      Patient().apply {
+        id = "p1"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("3")
+            addGiven("1")
+          },
+        )
+      }
+
+    val p2 =
+      Patient().apply {
+        id = "p2"
+        addName(
+          HumanName().apply {
+            family = "Cooper"
+            addGiven("2")
+            addGiven("4")
+          },
+        )
+      }
+    database.insert(p1, p2)
+
+    val ascendingResult =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.FAMILY,
+            {
+              value = "Cooper"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+          sort(Patient.GIVEN, Order.ASCENDING)
+        }
+        .execute<Patient>(database)
+    println("ASC: $ascendingResult")
+    assertThat(ascendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(p1, null, null),
+        SearchResult(p2, null, null),
+      )
+      .inOrder()
+
+    val descendingResult =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.FAMILY,
+            {
+              value = "Cooper"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+          sort(Patient.GIVEN, Order.DESCENDING)
+        }
+        .execute<Patient>(database)
+
+    println("DESC: $descendingResult")
+    assertThat(descendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(p2, null, null),
+        SearchResult(p1, null, null),
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun sort_repeated_values_of_type_date_should_return_distinct_values() = runBlocking {
+    val e1 =
+      Encounter().apply {
+        id = "encounter-multiple-locations-1"
+
+        subject = Reference("Group/group")
+
+        addLocation().apply {
+          location = Reference("Location/3")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T09:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T09:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/2")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T11:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T11:30:00-05:30")
+            }
+        }
+      }
+
+    val e2 =
+      Encounter().apply {
+        id = "encounter-multiple-locations-2"
+
+        subject = Reference("Group/group")
+
+        addLocation().apply {
+          location = Reference("Location/1")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T10:00:00-05:30")
+              endElement = DateTimeType("2024-03-13T10:30:00-05:30")
+            }
+        }
+
+        addLocation().apply {
+          location = Reference("Location/2")
+          period =
+            Period().apply {
+              startElement = DateTimeType("2024-03-13T11:30:00-05:30")
+              endElement = DateTimeType("2024-03-13T12:00:00-05:30")
+            }
+        }
+      }
+
+    database.insert(e1, e2)
+
+    val ascendingResult =
+      Search(ResourceType.Encounter)
+        .apply { sort(Encounter.LOCATION_PERIOD, Order.ASCENDING) }
+        .execute<Patient>(database)
+
+    assertThat(ascendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(e1, null, null),
+        SearchResult(e2, null, null),
+      )
+      .inOrder()
+
+    val descendingResult =
+      Search(ResourceType.Encounter)
+        .apply { sort(Encounter.LOCATION_PERIOD, Order.DESCENDING) }
+        .execute<Patient>(database)
+
+    assertThat(descendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(e2, null, null),
+        SearchResult(e1, null, null),
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun sort_repeated_values_of_type_numeric_should_return_distinct_values() = runBlocking {
+    val r1 =
+      RiskAssessment().apply {
+        id = "ris-01"
+        subject = Reference("Patient/risk-patient")
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.8)
+          },
+        )
+
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.5)
+          },
+        )
+      }
+
+    val r2 =
+      RiskAssessment().apply {
+        id = "ris-02"
+        subject = Reference("Patient/risk-patient")
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.6)
+          },
+        )
+
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.9)
+          },
+        )
+      }
+
+    val r3 =
+      RiskAssessment().apply {
+        id = "ris-03"
+        subject = Reference("Patient/risk-patient")
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.2)
+          },
+        )
+
+        addPrediction(
+          RiskAssessment.RiskAssessmentPredictionComponent().apply {
+            probability = DecimalType(0.4)
+          },
+        )
+      }
+    database.insert(r1, r2, r3)
+    val ascendingResult =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              value = BigDecimal.valueOf(0.4)
+              prefix = ParamPrefixEnum.GREATERTHAN
+            },
+          )
+          sort(RiskAssessment.PROBABILITY, Order.ASCENDING)
+        }
+        .execute<Patient>(database)
+
+    assertThat(ascendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(r1, null, null),
+        SearchResult(r2, null, null),
+      )
+      .inOrder()
+
+    val descendingResult =
+      Search(ResourceType.RiskAssessment)
+        .apply {
+          filter(
+            RiskAssessment.PROBABILITY,
+            {
+              value = BigDecimal.valueOf(0.4)
+              prefix = ParamPrefixEnum.GREATERTHAN
+            },
+          )
+          sort(RiskAssessment.PROBABILITY, Order.DESCENDING)
+        }
+        .execute<Patient>(database)
+
+    assertThat(descendingResult)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(r2, null, null),
+        SearchResult(r1, null, null),
+      )
+      .inOrder()
   }
 
   private companion object {
