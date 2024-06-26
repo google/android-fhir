@@ -59,14 +59,14 @@ dependencies {
   androidTestImplementation(Dependencies.truth)
 
   implementation(project(":datacapture"))
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Mlkit.barcodeScanning)
   implementation(Dependencies.Mlkit.objectDetection)
   implementation(Dependencies.Mlkit.objectDetectionCustom)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Androidx.appCompat)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
