@@ -40,14 +40,22 @@ internal interface FilterCriterion {
  * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
  * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
  * [StringParamFilterCriterion.value] as "John" and other as "Jane."
+ *
+ * @param filters list of [FilterCriterion]s
+ * @param operation [Operation]
+ * @param param Search param
+ * @param entityTableName Representative entity table used
+ * @param chunkSize Number of filter [ConditionParam]s in a chunk to be grouped/wrapped in a
+ *   bracket. Chunking can be used to prevent SQLite fail with error 'Expression tree exceeding max
+ *   depth of 1000' (https://www.sqlite.org/limits.html).
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
   val param: IParam,
   private val entityTableName: String,
+  open val chunkSize: Int,
 ) {
-
   /**
    * Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. In case a
    * particular FilterCriteria wants to return [SearchQuery] in custom manner, it should override
@@ -86,7 +94,7 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.chunked(CONDITION_PARAMS_CHUNK_SIZE) { conditionParams ->
+    this.chunked(chunkSize) { conditionParams ->
         conditionParams.joinToString(
           separator = " ${operation.logicalOperator} ",
           prefix = if (size > 1) "(" else "",
@@ -102,12 +110,6 @@ internal sealed class FilterCriteria(
       .joinToString(separator = " ${operation.logicalOperator} ")
 
   companion object {
-    /**
-     * Represents the number of [ConditionParam]s that can be wrapped within a bracket
-     *
-     * This is to prevent SQLite expression tree exceeding max depth of 1000 See
-     * https://www.sqlite.org/limits.html for Maximum Depth Of An Expression Tree
-     */
-    const val CONDITION_PARAMS_CHUNK_SIZE = 50
+    const val DEFAULT_CONDITION_PARAMS_CHUNK_SIZE = 50
   }
 }

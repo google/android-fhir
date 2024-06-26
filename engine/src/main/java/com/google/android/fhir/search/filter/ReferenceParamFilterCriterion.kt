@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,4 +38,5 @@ internal data class ReferenceParamFilterCriteria(
   val parameter: ReferenceClientParam,
   override val filters: List<ReferenceParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity")
+  override val chunkSize: Int,
+) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity", chunkSize)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,21 +68,25 @@ class Search(
     stringParameter: StringClientParam,
     vararg init: StringParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
-    stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
+    stringFilterCriteria.add(
+      StringParamFilterCriteria(stringParameter, filters, operation, chunkSize),
+    )
   }
 
   override fun filter(
     referenceParameter: ReferenceClientParam,
     vararg init: ReferenceParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<ReferenceParamFilterCriterion>()
     init.forEach { ReferenceParamFilterCriterion(referenceParameter).apply(it).also(filters::add) }
     referenceFilterCriteria.add(
-      ReferenceParamFilterCriteria(referenceParameter, filters, operation),
+      ReferenceParamFilterCriteria(referenceParameter, filters, operation, chunkSize),
     )
   }
 
@@ -90,50 +94,61 @@ class Search(
     dateParameter: DateClientParam,
     vararg init: DateParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<DateParamFilterCriterion>()
     init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
-    dateTimeFilterCriteria.add(DateClientParamFilterCriteria(dateParameter, filters, operation))
+    dateTimeFilterCriteria.add(
+      DateClientParamFilterCriteria(dateParameter, filters, operation, chunkSize),
+    )
   }
 
   override fun filter(
     quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<QuantityParamFilterCriterion>()
     init.forEach { QuantityParamFilterCriterion(quantityParameter).apply(it).also(filters::add) }
-    quantityFilterCriteria.add(QuantityParamFilterCriteria(quantityParameter, filters, operation))
+    quantityFilterCriteria.add(
+      QuantityParamFilterCriteria(quantityParameter, filters, operation, chunkSize),
+    )
   }
 
   override fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<TokenParamFilterCriterion>()
     init.forEach { TokenParamFilterCriterion(tokenParameter).apply(it).also(filters::add) }
-    tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation))
+    tokenFilterCriteria.add(TokenParamFilterCriteria(tokenParameter, filters, operation, chunkSize))
   }
 
   override fun filter(
     numberParameter: NumberClientParam,
     vararg init: NumberParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<NumberParamFilterCriterion>()
     init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
-    numberFilterCriteria.add(NumberParamFilterCriteria(numberParameter, filters, operation))
+    numberFilterCriteria.add(
+      NumberParamFilterCriteria(numberParameter, filters, operation, chunkSize),
+    )
   }
 
   override fun filter(
     uriParam: UriClientParam,
     vararg init: UriParamFilterCriterion.() -> Unit,
     operation: Operation,
+    chunkSize: Int,
   ) {
     val filters = mutableListOf<UriParamFilterCriterion>()
     init.forEach { UriParamFilterCriterion(uriParam).apply(it).also(filters::add) }
-    uriFilterCriteria.add(UriFilterCriteria(uriParam, filters, operation))
+    uriFilterCriteria.add(UriFilterCriteria(uriParam, filters, operation, chunkSize))
   }
 
   override fun sort(parameter: StringClientParam, order: Order) {

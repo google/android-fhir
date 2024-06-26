@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,16 +72,23 @@ internal data class DateClientParamFilterCriteria(
   val parameter: DateClientParam,
   override val filters: List<DateParamFilterCriterion>,
   override val operation: Operation,
-) : FilterCriteria(filters, operation, parameter, "") {
+  override val chunkSize: Int,
+) : FilterCriteria(filters, operation, parameter, "", chunkSize) {
 
   override fun query(type: ResourceType): SearchQuery {
     val filterCriteria =
       listOf(
-        DateFilterCriteria(parameter, filters.filter { it.value!!.date != null }, operation),
+        DateFilterCriteria(
+          parameter,
+          filters.filter { it.value!!.date != null },
+          operation,
+          chunkSize,
+        ),
         DateTimeFilterCriteria(
           parameter,
           filters.filter { it.value!!.dateTime != null },
           operation,
+          chunkSize,
         ),
       )
 
@@ -106,12 +113,14 @@ internal data class DateClientParamFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
     override val operation: Operation,
-  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity")
+    override val chunkSize: Int,
+  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity", chunkSize)
 
   /** Internal class used to generate query for DateTime type Criterion */
   private data class DateTimeFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
     override val operation: Operation,
-  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity")
+    override val chunkSize: Int,
+  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity", chunkSize)
 }
