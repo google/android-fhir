@@ -32,5 +32,9 @@ internal sealed interface QuestionnaireAdapterItem {
     val onDeleteClicked: () -> Unit,
     /** Responses nested under this header. */
     val responses: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
+    val title: String,
   ) : QuestionnaireAdapterItem
+
+  data class Navigation(val questionnaireNavigationUIState: QuestionnaireNavigationUIState) :
+    QuestionnaireAdapterItem
 }
