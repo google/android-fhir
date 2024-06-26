@@ -51,13 +51,13 @@ configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   implementation(project(":datacapture"))
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.playServicesLocation)
   implementation(Dependencies.Kotlin.kotlinCoroutinesPlay)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Androidx.appCompat)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
 
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
   testImplementation(Dependencies.Kotlin.kotlinTestJunit)
