@@ -4490,7 +4490,6 @@ class DatabaseImplTest {
           sort(Patient.GIVEN, Order.ASCENDING)
         }
         .execute<Patient>(database)
-    println("ASC: $ascendingResult")
     assertThat(ascendingResult)
       .comparingElementsUsing(SearchResultCorrespondence)
       .displayingDiffsPairedBy { it.resource.logicalId }
@@ -4514,7 +4513,6 @@ class DatabaseImplTest {
         }
         .execute<Patient>(database)
 
-    println("DESC: $descendingResult")
     assertThat(descendingResult)
       .comparingElementsUsing(SearchResultCorrespondence)
       .displayingDiffsPairedBy { it.resource.logicalId }
