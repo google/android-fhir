@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
-import java.lang.IllegalArgumentException
 import java.util.TimeZone
 import kotlin.reflect.KSuspendFunction1
 import org.hl7.fhir.r4.model.Bundle
@@ -99,7 +98,7 @@ class FhirOperatorTest {
 
     assertThat(
         fhirOperator.generateCarePlan(
-          planDefinition =
+          planDefinitionCanonical =
             CanonicalType(
               "http://hl7.org/fhir/us/ecr/PlanDefinition/plandefinition-RuleFilters-1.0.0",
             ),
@@ -117,7 +116,8 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinition = CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
+        planDefinitionCanonical =
+          CanonicalType("http://localhost/PlanDefinition/MedRequest-Example"),
         subject = "Patient/Patient-Example",
       )
 
@@ -139,7 +139,8 @@ class FhirOperatorTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinition = CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
+        planDefinitionCanonical =
+          CanonicalType("http://example.com/PlanDefinition/Plan-Definition-Example"),
         subject = "Patient/Female-Patient-Example",
       )
 

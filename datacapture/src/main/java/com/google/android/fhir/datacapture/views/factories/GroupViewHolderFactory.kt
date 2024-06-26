@@ -52,6 +52,11 @@ internal object GroupViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
+        addItemButton.text =
+          context.getString(
+            R.string.add_repeated_group_item,
+            questionnaireViewItem.questionText ?: "",
+          )
         addItemButton.visibility =
           if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
         addItemButton.setOnClickListener {
