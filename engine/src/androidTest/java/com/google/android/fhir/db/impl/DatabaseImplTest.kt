@@ -3766,7 +3766,7 @@ class DatabaseImplTest {
             filter(
               Patient.GIVEN,
               {
-                value = "Jame"
+                value = "Jam"
                 modifier = StringFilterModifier.STARTS_WITH
               },
             )
