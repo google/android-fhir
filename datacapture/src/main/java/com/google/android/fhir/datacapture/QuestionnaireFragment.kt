@@ -160,9 +160,13 @@ class QuestionnaireFragment : Fragment() {
               }
 
             // Set bottom navigation
-            bottomNavContainerFrame.visibility = View.VISIBLE
-            NavigationViewHolder(bottomNavContainerFrame)
-              .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+            if (state.bottomNavItems.isNotEmpty()) {
+              bottomNavContainerFrame.visibility = View.VISIBLE
+              NavigationViewHolder(bottomNavContainerFrame)
+                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+            } else {
+              bottomNavContainerFrame.visibility = View.GONE
+            }
 
             // Hide progress indicator
             questionnaireProgressIndicator.visibility = View.GONE
@@ -175,9 +179,13 @@ class QuestionnaireFragment : Fragment() {
             reviewModeEditButton.visibility = View.GONE
 
             // Set bottom navigation
-            bottomNavContainerFrame.visibility = View.VISIBLE
-            NavigationViewHolder(bottomNavContainerFrame)
-              .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+            if (state.bottomNavItems.isNotEmpty()) {
+              bottomNavContainerFrame.visibility = View.VISIBLE
+              NavigationViewHolder(bottomNavContainerFrame)
+                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+            } else {
+              bottomNavContainerFrame.visibility = View.GONE
+            }
 
             // Set progress indicator
             questionnaireProgressIndicator.visibility = View.VISIBLE
