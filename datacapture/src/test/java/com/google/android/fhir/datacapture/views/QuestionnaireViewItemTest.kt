@@ -923,7 +923,7 @@ class QuestionnaireViewItemTest {
     assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option1", "option2")
   }
 
-  // https://github.com/google/android-fhir/pull/2576
+  // https://github.com/google/android-fhir/pull/2593
   @Test
   fun `answers property should match response item component answers`() {
     val questionnaireItem =
