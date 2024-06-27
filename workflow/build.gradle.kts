@@ -98,7 +98,7 @@ dependencies {
   implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
+  implementation(project(":engine")) { exclude(module = "truth") }
   implementation(Dependencies.androidFhirKnowledge)
   implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
