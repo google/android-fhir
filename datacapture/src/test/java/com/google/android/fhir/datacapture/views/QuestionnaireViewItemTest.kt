@@ -922,4 +922,84 @@ class QuestionnaireViewItemTest {
 
     assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option1", "option2")
   }
+
+  @Test
+  fun `answers property should match response item component answers`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "repeated-group-1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "1"
+              type = Questionnaire.QuestionnaireItemType.STRING
+            },
+          )
+      }
+
+    val responseItem1 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 1")
+            },
+          )
+      }
+
+    val responseItem2 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 2")
+            },
+          )
+      }
+
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "group-1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem1)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem2)
+            },
+          )
+      }
+
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem = questionnaireItem,
+        questionnaireResponseItem = questionnaireResponseItem,
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    assertThat(questionnaireViewItem.answers.size).isEqualTo(2)
+    assertThat(
+        questionnaireViewItem.answers.first().item.first().answer.first().valueStringType.value,
+      )
+      .isEqualTo("Answer 1")
+    assertThat(questionnaireViewItem.answers[1].item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 2")
+
+    assertThat(
+        questionnaireViewItem.answers.first().item.first().answer.first() ===
+          questionnaireResponseItem.answer.first().item.first().answer.first(),
+      )
+      .isTrue()
+    assertThat(
+        questionnaireViewItem.answers[1].item.first().answer.first() ===
+          questionnaireResponseItem.answer[1].item.first().answer.first(),
+      )
+      .isTrue()
+  }
 }
