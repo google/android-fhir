@@ -963,7 +963,7 @@ class QuestionnaireViewItemTest {
 
     val questionnaireResponseItem =
       QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-        linkId = "group-1"
+        linkId = "repeated-group-1"
         answer =
           listOf(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
