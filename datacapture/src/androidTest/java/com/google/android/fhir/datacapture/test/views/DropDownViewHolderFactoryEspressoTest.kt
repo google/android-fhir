@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -272,6 +272,33 @@ class DropDownViewHolderFactoryEspressoTest {
           .count,
       )
       .isEqualTo(3)
+  }
+
+  @Test
+  fun shouldShowDropDownWhenClearIconIsClicked() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        createAnswerOptions("Coding 1", "Coding 2", "Coding 3", "Add", "Subtract"),
+        responseValueStringOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    val autoCompleteTextView =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete)
+
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      autoCompleteTextView.setText("Some Text")
+    }
+
+    // Delay the execution to allow the view hierarchy to be fully initialized
+    Thread.sleep(1000)
+
+    // Click the clear icon
+    onView(withId(R.id.clearIcon)).perform(click())
+
+    // Verify that the drop-down is shown
+    onView(withText("Coding 1")).inRoot(isPlatformPopup()).check(matches(isDisplayed()))
   }
 
   @Test
