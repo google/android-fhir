@@ -8,11 +8,11 @@ configureRuler()
 
 android {
   namespace = "com.google.android.fhir.catalog"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     applicationId = Releases.Catalog.applicationId
-    minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
+    minSdk = Sdk.MIN_SDK
+    targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner

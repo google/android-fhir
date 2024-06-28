@@ -329,7 +329,8 @@ internal object DiffCallbacks {
           }
           is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
             newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-              oldItem.responses == newItem.responses
+              oldItem.responses.size == newItem.responses.size &&
+              oldItem.responses.zip(newItem.responses).all { (a, b) -> a.equalsShallow(b) }
           }
           is QuestionnaireAdapterItem.Navigation -> {
             newItem is QuestionnaireAdapterItem.Navigation &&

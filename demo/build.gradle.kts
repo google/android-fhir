@@ -8,11 +8,11 @@ configureRuler()
 
 android {
   namespace = "com.google.android.fhir.demo"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     applicationId = Releases.Demo.applicationId
-    minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
+    minSdk = Sdk.MIN_SDK
+    targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Demo.versionCode
     versionName = Releases.Demo.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
