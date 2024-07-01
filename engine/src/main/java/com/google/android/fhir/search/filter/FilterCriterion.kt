@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,14 +40,22 @@ internal interface FilterCriterion {
  * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
  * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
  * [StringParamFilterCriterion.value] as "John" and other as "Jane."
+ *
+ * @param filters list of [FilterCriterion]s
+ * @param operation [Operation]
+ * @param param Search param
+ * @param entityTableName Representative entity table used
+ * @param chunkSize Number of filter [ConditionParam]s in a chunk to be grouped/wrapped in a
+ *   bracket. Chunking can be used to prevent SQLite fail with error 'Expression tree exceeding max
+ *   depth of 1000' (https://www.sqlite.org/limits.html).
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
   val param: IParam,
   private val entityTableName: String,
+  open val chunkSize: Int,
 ) {
-
   /**
    * Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. In case a
    * particular FilterCriteria wants to return [SearchQuery] in custom manner, it should override
@@ -86,15 +94,22 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.joinToString(
-      separator = " ${operation.logicalOperator} ",
-      prefix = if (size > 1) "(" else "",
-      postfix = if (size > 1) ")" else "",
-    ) {
-      if (it.params.size > 1) {
-        "(${it.condition})"
-      } else {
-        it.condition
+    this.chunked(chunkSize) { conditionParams ->
+        conditionParams.joinToString(
+          separator = " ${operation.logicalOperator} ",
+          prefix = if (size > 1) "(" else "",
+          postfix = if (size > 1) ")" else "",
+        ) {
+          if (it.params.size > 1) {
+            "(${it.condition})"
+          } else {
+            it.condition
+          }
+        }
       }
-    }
+      .joinToString(separator = " ${operation.logicalOperator} ")
+
+  companion object {
+    const val DEFAULT_CONDITION_PARAMS_CHUNK_SIZE = 50
+  }
 }
