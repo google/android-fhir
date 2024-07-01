@@ -1719,7 +1719,9 @@ class SearchTest {
         LEFT JOIN StringIndexEntity b
         ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value ASC
+        GROUP BY a.resourceUuid
+        HAVING MIN(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, 9223372036854775808) ASC
                 """
           .trimIndent(),
       )
@@ -1739,7 +1741,9 @@ class SearchTest {
         LEFT JOIN StringIndexEntity b
         ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value DESC
+        GROUP BY a.resourceUuid
+        HAVING MAX(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, -9223372036854775808) DESC
                 """
           .trimIndent(),
       )
@@ -1761,7 +1765,9 @@ class SearchTest {
         LEFT JOIN NumberIndexEntity b
         ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_value ASC
+        GROUP BY a.resourceUuid
+        HAVING MIN(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, 9223372036854775808) ASC
                 """
           .trimIndent(),
       )
@@ -1791,7 +1797,9 @@ class SearchTest {
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
-        ORDER BY b.index_value ASC
+        GROUP BY a.resourceUuid
+        HAVING MIN(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, 9223372036854775808) ASC
         LIMIT ? OFFSET ?
                 """
           .trimIndent(),
@@ -2045,8 +2053,10 @@ class SearchTest {
         LEFT JOIN DateTimeIndexEntity c
         ON a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from ASC, c.index_from ASC
-                """
+        GROUP BY a.resourceUuid
+        HAVING MIN(IFNULL(b.index_from,0) + IFNULL(c.index_from,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_from, 9223372036854775808) ASC, IFNULL(c.index_from, 9223372036854775808) ASC
+        """
           .trimIndent(),
       )
   }
@@ -2066,7 +2076,9 @@ class SearchTest {
         LEFT JOIN DateTimeIndexEntity c
         ON a.resourceUuid = c.resourceUuid AND c.index_name = ?
         WHERE a.resourceType = ?
-        ORDER BY b.index_from DESC, c.index_from DESC
+        GROUP BY a.resourceUuid
+        HAVING MAX(IFNULL(b.index_from,0) + IFNULL(c.index_from,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_from, -9223372036854775808) DESC, IFNULL(c.index_from, -9223372036854775808) DESC
                 """
           .trimIndent(),
       )
@@ -2277,7 +2289,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2319,7 +2331,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2369,7 +2381,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+          SELECT rie.index_name, rie.resourceUuid, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2380,7 +2392,9 @@ class SearchTest {
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND index_value = ?
           )
-          ORDER BY b.index_value DESC
+          GROUP BY re.resourceUuid , rie.resourceuuid
+          HAVING MAX(IFNULL(b.index_value,0)) >= -9223372036854775808
+          ORDER BY IFNULL(b.index_value, -9223372036854775808) DESC
           )
           """
           .trimIndent(),
@@ -2428,7 +2442,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+        SELECT rie.index_name, rie.resourceUuid, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2439,11 +2453,13 @@ class SearchTest {
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-        ORDER BY b.index_value DESC
+        GROUP BY re.resourceUuid , rie.resourceuuid
+        HAVING MAX(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, -9223372036854775808) DESC
         )
         UNION ALL
         SELECT * FROM (
-        SELECT  rie.index_name, rie.resourceUuid, re.serializedResource
+        SELECT rie.index_name, rie.resourceUuid, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceType||"/"||re.resourceId = rie.index_value
@@ -2454,7 +2470,9 @@ class SearchTest {
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
-        ORDER BY b.index_value DESC
+        GROUP BY re.resourceUuid , rie.resourceuuid
+        HAVING MAX(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, -9223372036854775808) DESC
         )
         """
           .trimIndent(),
@@ -2496,7 +2514,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
+          SELECT rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
@@ -2534,7 +2552,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, re.serializedResource
+        SELECT rie.index_name, rie.index_value, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
@@ -2587,7 +2605,7 @@ class SearchTest {
       .isEqualTo(
         """
         SELECT * FROM (
-        SELECT  rie.index_name, rie.index_value, re.serializedResource
+        SELECT rie.index_name, rie.index_value, re.serializedResource
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
@@ -2600,7 +2618,9 @@ class SearchTest {
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
-        ORDER BY b.index_from DESC, c.index_from DESC
+        GROUP BY re.resourceUuid , rie.index_value
+        HAVING MAX(IFNULL(b.index_from,0) + IFNULL(c.index_from,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_from, -9223372036854775808) DESC, IFNULL(c.index_from, -9223372036854775808) DESC
         )
             """
           .trimIndent(),
@@ -2664,7 +2684,7 @@ class SearchTest {
       .isEqualTo(
         """
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
+          SELECT rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
@@ -2677,11 +2697,13 @@ class SearchTest {
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
           )
-          ORDER BY b.index_from DESC, c.index_from DESC
+          GROUP BY re.resourceUuid , rie.index_value
+          HAVING MAX(IFNULL(b.index_from,0) + IFNULL(c.index_from,0)) >= -9223372036854775808
+          ORDER BY IFNULL(b.index_from, -9223372036854775808) DESC, IFNULL(c.index_from, -9223372036854775808) DESC
           )
           UNION ALL
           SELECT * FROM (
-          SELECT  rie.index_name, rie.index_value, re.serializedResource
+          SELECT rie.index_name, rie.index_value, re.serializedResource
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
@@ -2694,7 +2716,9 @@ class SearchTest {
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
           )
-          ORDER BY b.index_from DESC, c.index_from DESC
+          GROUP BY re.resourceUuid , rie.index_value
+          HAVING MAX(IFNULL(b.index_from,0) + IFNULL(c.index_from,0)) >= -9223372036854775808
+          ORDER BY IFNULL(b.index_from, -9223372036854775808) DESC, IFNULL(c.index_from, -9223372036854775808) DESC
           )
           """
           .trimIndent(),
