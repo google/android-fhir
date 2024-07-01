@@ -84,15 +84,15 @@ dependencies {
 
   implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
-  implementation(Dependencies.Lifecycle.liveDataKtx)
-  implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.timber)
   implementation(Dependencies.http)
   implementation(Dependencies.HapiFhir.fhirCoreConvertors)
   implementation(Dependencies.apacheCommonsCompress)
+  implementation(libs.androidx.lifecycle.livedata)
+  implementation(libs.androidx.room.room)
+  implementation(libs.androidx.room.runtime)
 
-  ksp(Dependencies.Room.compiler)
+  ksp(libs.androidx.room.compiler)
 
   testImplementation(Dependencies.AndroidxTest.archCore)
   testImplementation(Dependencies.AndroidxTest.core)

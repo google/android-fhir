@@ -23,9 +23,10 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.index.SearchParamDefinition
-import com.google.android.fhir.index.getSearchParamList
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -47,6 +48,8 @@ import org.hl7.fhir.r4.model.ResourceType
 internal object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
+  private val searchParamProvider =
+    FhirEngineProvider.getSearchParamProvider() ?: SearchParamDefinitionsProviderImpl()
 
   /**
    * Translates the basic x-fhir-query string defined in
@@ -177,7 +180,7 @@ internal object XFhirQueryTranslator {
     }
 
   private val ResourceType.resourceSearchParameters
-    get() = getSearchParamList(getResourceClass<Resource>(this).newInstance())
+    get() = searchParamProvider.get(getResourceClass<Resource>(this).newInstance())
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
