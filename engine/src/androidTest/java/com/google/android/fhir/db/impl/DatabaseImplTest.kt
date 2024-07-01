@@ -29,6 +29,7 @@ import com.google.android.fhir.SearchParamName
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
+import com.google.android.fhir.db.impl.dao.LocalChangeDao
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.Operation
@@ -83,6 +84,7 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
+import org.hl7.fhir.r4.model.Task
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
@@ -4085,6 +4087,31 @@ class DatabaseImplTest {
     assertThat(searchedObservations.size).isEqualTo(1)
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
+
+  @Test
+  fun getLocalChangeResourceReferences_shouldSafelyReturnReferencesAboveSQLiteInOpLimit() =
+    runBlocking {
+      val patientsCount = LocalChangeDao.SQLITE_LIMIT_MAX_VARIABLE_NUMBER * 7
+      val locallyCreatedPatients =
+        (1..patientsCount).map {
+          Patient().apply {
+            id = "local-patient-id$it"
+            name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("$it"))))
+          }
+        }
+      database.insert(*locallyCreatedPatients.toTypedArray())
+      val locallyCreatedPatientTasks =
+        locallyCreatedPatients.mapIndexed { index, patient ->
+          Task().apply {
+            `for` = Reference("Patient/${patient.logicalId}")
+            id = "local-observation-$index"
+          }
+        }
+      database.insert(*locallyCreatedPatientTasks.toTypedArray())
+      val localChangeIds = database.getAllLocalChanges().flatMap { it.token.ids }
+      val localChangeResourceReferences = database.getLocalChangeResourceReferences(localChangeIds)
+      assertThat(localChangeResourceReferences.size).isEqualTo(locallyCreatedPatients.size)
+    }
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
