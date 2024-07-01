@@ -417,6 +417,61 @@ class QuestionnaireFragmentTest {
     }
   }
 
+  fun `show bottom navigation container when setShowNavigationInDefaultLongScroll is set to false`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragment<QuestionnaireFragment>(
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(questionnaireJson)
+          .setShowNavigationInDefaultLongScroll(false)
+          .buildArgs(),
+      )
+    scenario.moveToState(Lifecycle.State.RESUMED)
+    scenario.withFragment {
+      val bottomNavContainer = requireView().findViewById<View>(R.id.bottom_nav_container_frame)
+      assertThat(bottomNavContainer.visibility).isEqualTo(View.VISIBLE)
+      assertThat(bottomNavContainer.findViewById<View>(R.id.submit_questionnaire).isEnabled)
+        .isTrue()
+    }
+  }
+
+  @Test
+  fun `hide the bottom navigation container when setShowNavigationInDefaultLongScroll is set to true`() {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "a-link-id"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+    val questionnaireJson = parser.encodeResourceToString(questionnaire)
+    val scenario =
+      launchFragment<QuestionnaireFragment>(
+        QuestionnaireFragment.builder()
+          .setQuestionnaire(questionnaireJson)
+          .setShowNavigationInDefaultLongScroll(true)
+          .buildArgs(),
+      )
+    scenario.moveToState(Lifecycle.State.RESUMED)
+    scenario.withFragment {
+      val bottomNavContainer = requireView().findViewById<View>(R.id.bottom_nav_container_frame)
+      assertThat(bottomNavContainer.visibility).isEqualTo(View.GONE)
+    }
+  }
+
   object QuestionnaireItemViewHolderFactoryMatchersProviderFactoryTestImpl :
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory {
     override fun get(
