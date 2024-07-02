@@ -108,6 +108,8 @@ dependencies {
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
+  testImplementation(Dependencies.Room.ktx)
+  testImplementation(Dependencies.Room.runtime)
   testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
   testImplementation(project(mapOf("path" to ":knowledge")))
