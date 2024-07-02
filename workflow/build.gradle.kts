@@ -82,17 +82,16 @@ dependencies {
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.jsonAssert)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
+  androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.guavaCaching)
 
-  implementation(Dependencies.Androidx.coreKtx)
   implementation(Dependencies.Cql.evaluator)
   implementation(Dependencies.Cql.evaluatorFhirJackson)
   implementation(Dependencies.HapiFhir.guavaCaching)
@@ -103,6 +102,7 @@ dependencies {
   implementation(Dependencies.androidFhirKnowledge)
   implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
+  implementation(libs.androidx.core)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)

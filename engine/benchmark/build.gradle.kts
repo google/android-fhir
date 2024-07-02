@@ -44,16 +44,16 @@ android {
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
 dependencies {
-  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
   androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
   androidTestImplementation(Dependencies.AndroidxTest.extJunit)
   androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.mockWebServer)
   androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.work.runtime)
+  androidTestImplementation(libs.androidx.work.testing)
 
   androidTestImplementation(project(":engine"))
   // for test json files only
