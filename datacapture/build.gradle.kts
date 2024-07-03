@@ -67,19 +67,20 @@ configurations {
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  androidTestImplementation(Dependencies.AndroidxTest.rules)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
-  androidTestImplementation(Dependencies.Espresso.espressoContrib) {
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.espresso.contrib) {
     // build fails with error "Duplicate class found" (org.checkerframework.checker.*)
     exclude(group = "org.checkerframework", module = "checker")
   }
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.kotlinx.coroutines.test)
+  androidTestImplementation(libs.truth)
+
   api(Dependencies.HapiFhir.structuresR4)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
@@ -89,8 +90,6 @@ dependencies {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
-  implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
@@ -100,19 +99,21 @@ dependencies {
   implementation(libs.androidx.fragment)
   implementation(libs.androidx.lifecycle.viewmodel)
   implementation(libs.glide)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.core)
 
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
   testImplementation(project(":knowledge")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.androidx.fragment.testing)
+  androidTestImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  androidTestImplementation(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

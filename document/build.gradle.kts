@@ -46,14 +46,14 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockWebServer)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.truth)
 
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
 }
