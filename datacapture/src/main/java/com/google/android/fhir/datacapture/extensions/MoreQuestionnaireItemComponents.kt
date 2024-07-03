@@ -974,8 +974,7 @@ private fun QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
  * Flatten a nested list of [Questionnaire.QuestionnaireItemComponent] recursively and returns a
  * flat list of all items into list embedded at any level
  */
-fun List<QuestionnaireItemComponent>.flattened():
-  List<QuestionnaireItemComponent> =
+fun List<QuestionnaireItemComponent>.flattened(): List<QuestionnaireItemComponent> =
   mutableListOf<QuestionnaireItemComponent>().also { flattenInto(it) }
 
 private fun List<QuestionnaireItemComponent>.flattenInto(
