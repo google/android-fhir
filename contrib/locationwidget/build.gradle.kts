@@ -57,7 +57,7 @@ dependencies {
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
-  implementation(libs.kotlinx.coroutines.play)
+  implementation(libs.kotlinx.coroutines.playservices)
 
   testImplementation(Dependencies.robolectric)
   testImplementation(libs.androidx.fragment.testing)
