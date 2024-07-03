@@ -57,8 +57,8 @@ dependencies {
   androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(libs.androidx.work.runtime)
+  androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)

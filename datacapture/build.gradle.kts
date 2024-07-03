@@ -84,11 +84,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.Androidx.appCompat)
-  implementation(Dependencies.Androidx.constraintLayout)
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(libs.glide)
   implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
@@ -96,10 +91,15 @@ dependencies {
   }
   implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
   implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Lifecycle.viewModelKtx)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
+  implementation(libs.androidx.lifecycle.viewmodel)
+  implementation(libs.glide)
 
   testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.AndroidxTest.fragmentTesting)
