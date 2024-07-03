@@ -33,6 +33,11 @@ android {
 }
 
 dependencies {
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   implementation(Dependencies.material)
   implementation(Dependencies.androidFhirEngine)
   implementation(Dependencies.Retrofit.coreRetrofit)
@@ -44,8 +49,6 @@ dependencies {
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
 
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
@@ -53,7 +56,4 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.truth)
-
-  androidTestImplementation(libs.androidx.test.espresso.core)
-  androidTestImplementation(libs.androidx.test.ext.junit)
 }

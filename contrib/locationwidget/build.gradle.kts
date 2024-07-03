@@ -50,6 +50,14 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
+  androidTestImplementation(libs.androidx.fragment.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.truth)
+
   implementation(project(":datacapture"))
   implementation(Dependencies.playServicesLocation)
   implementation(Dependencies.material)
@@ -64,12 +72,4 @@ dependencies {
   testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.truth)
-
-  androidTestImplementation(libs.androidx.fragment.testing)
-  androidTestImplementation(libs.androidx.test.core)
-  androidTestImplementation(libs.androidx.test.ext.junit)
-  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
-  androidTestImplementation(libs.androidx.test.rules)
-  androidTestImplementation(libs.androidx.test.runner)
-  androidTestImplementation(libs.truth)
 }

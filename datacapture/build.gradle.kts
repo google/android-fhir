@@ -110,10 +110,10 @@ dependencies {
   }
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.fragment.testing)
-  androidTestImplementation(libs.junit)
+  testImplementation(libs.junit)
   testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.kotlinx.coroutines.test)
-  androidTestImplementation(libs.truth)
+  testImplementation(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

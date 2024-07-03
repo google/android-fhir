@@ -102,19 +102,15 @@ dependencies {
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
-  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
-  // Guave Caching must be individually loaded instead.
-  implementation(Dependencies.HapiFhir.guavaCaching)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
+  // Guava Caching must be individually loaded instead.
+  implementation(Dependencies.HapiFhir.guavaCaching)
   // Validation to load system types into FhirPath's Context
   // The loading happens via a ResourceStream in XML and thus
   // XML parsers are also necessary.
   implementation(Dependencies.HapiFhir.validationR4)
-  implementation(Dependencies.woodstox)
-  implementation(Dependencies.xerces)
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
@@ -126,6 +122,8 @@ dependencies {
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
+  implementation(Dependencies.woodstox)
+  implementation(Dependencies.xerces)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.livedata)
   implementation(libs.androidx.room.room)
