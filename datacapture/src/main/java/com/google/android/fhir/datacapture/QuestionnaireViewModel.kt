@@ -347,7 +347,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
-      // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
       when {
         (questionnaireResponseItem.answer.isNotEmpty()) -> {
@@ -363,6 +362,19 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
         questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+
+        // If nested items are added to the answer, the enablement evaluator needs to be
+        // reinitialized in order for it to rebuild the pre-order map and parent map of
+        // questionnaire response items to reflect the new structure of the questionnaire response
+        // to correctly calculate calculate enable when statements.
+        enablementEvaluator =
+          EnablementEvaluator(
+            questionnaire,
+            questionnaireResponse,
+            questionnaireItemParentMap,
+            questionnaireLaunchContextMap,
+            xFhirQueryResolver,
+          )
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
@@ -380,7 +392,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       xFhirQueryResolver,
     )
 
-  private val enablementEvaluator: EnablementEvaluator =
+  private var enablementEvaluator: EnablementEvaluator =
     EnablementEvaluator(
       questionnaire,
       questionnaireResponse,
