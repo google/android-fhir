@@ -3193,9 +3193,38 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showNavigationInLongScroll = true)
       val questionnaireState = viewModel.questionnaireStateFlow.first()
-      println(questionnaireState.items)
+      assertThat(questionnaireState.bottomNavItems.isEmpty()).isTrue()
       assertThat(questionnaireState.items.last())
         .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
+      val navigationItem = questionnaireState.items.last() as QuestionnaireAdapterItem.Navigation
+      assertThat(navigationItem.questionnaireNavigationUIState.navSubmit.isEnabled).isTrue()
+    }
+
+  fun `EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL not setting should not add navigation item to questionnaireState items`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "a-linkId"
+              type = Questionnaire.QuestionnaireItemType.BOOLEAN
+            },
+          )
+        }
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      val questionnaireState = viewModel.questionnaireStateFlow.first()
+      assertThat(questionnaireState.items.map { it::class.java })
+        .doesNotContain(QuestionnaireAdapterItem.Navigation::class.java)
+      assertThat(questionnaireState.bottomNavItems.isNotEmpty()).isTrue()
+      assertThat(
+          questionnaireState.bottomNavItems
+            .single()
+            .questionnaireNavigationUIState
+            .navSubmit
+            .isEnabled,
+        )
+        .isTrue()
     }
 
   // ==================================================================== //
