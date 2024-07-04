@@ -26,11 +26,16 @@ import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.runBlockingOnWorkerThread
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
+import java.lang.Exception
+import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestPayloadComponent
+import org.hl7.fhir.r4.model.MarkdownType
 import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.StringType
@@ -190,7 +195,7 @@ class ActivityFlowTest {
 
     sendMessageFlow
       .endOrder { status = CommunicationRequest.CommunicationRequestStatus.ACTIVE }
-      .startPerform {
+      .startPerform<CommunicationRequest> {
         addPayload(
           CommunicationRequestPayloadComponent(StringType("Hello in Order")),
         )
@@ -266,7 +271,7 @@ class ActivityFlowTest {
           )
         }
         .endOrder { status = CommunicationRequest.CommunicationRequestStatus.ACTIVE }
-        .startPerform {
+        .startPerform<CommunicationRequest> {
           // Update the order resource to add a new message
           addPayload(
             CommunicationRequestPayloadComponent(StringType("Hello in Order")),
@@ -415,6 +420,160 @@ class ActivityFlowTest {
       .startPlan {}
 
     TODO("Finish test")
+  }
+
+  @Test
+  fun `communication request flow5`(): Unit = runBlockingOnWorkerThread {
+    val communicationRequest1 =
+      CommunicationRequest().apply {
+        id = "com-req-01"
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        subject = Reference("Patient/pat-01")
+        addPayload().apply { content = StringType("Proposal") }
+      }
+    fhirEngine.create(communicationRequest1)
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+
+    ActivityFlow3.of(repository, communicationRequest1)
+      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+
+    val communicationRequest2 =
+      CommunicationRequest().apply {
+        id = "com-req-02"
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        subject = Reference("Patient/pat-01")
+        addPayload().apply { content = StringType("Proposal") }
+      }
+    fhirEngine.create(communicationRequest2)
+
+    ActivityFlow3.of(repository, communicationRequest2)
+      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+      .startOrder {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Order") }
+      }
+      .endOrder { addPayload().apply { content = StringType("End Order") } }
+
+    val communicationRequest3 =
+      CommunicationRequest().apply {
+        id = "com-req-03"
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        subject = Reference("Patient/pat-01")
+        addPayload().apply { content = StringType("Proposal") }
+      }
+    fhirEngine.create(communicationRequest3)
+
+    ActivityFlow3.of(repository, communicationRequest3)
+      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+      .startOrder {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Order") }
+      }
+      .endOrder { addPayload().apply { content = StringType("End Order") } }
+      .startPerform(Communication::class.java) {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Perform") }
+      }
+
+    val communicationRequest4 =
+      CommunicationRequest().apply {
+        id = "com-req-04"
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        subject = Reference("Patient/pat-01")
+        addPayload().apply { content = StringType("Proposal") }
+      }
+    fhirEngine.create(communicationRequest4)
+
+    ActivityFlow3.of(repository, communicationRequest4)
+      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+      .startOrder {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Order") }
+      }
+      .endOrder { addPayload().apply { content = StringType("End Order") } }
+      .startPerform(Communication::class.java) {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Perform") }
+      }
+      .endPerform { addPayload().apply { content = StringType("End Perform") } }
+
+    val medicationRequest1 =
+      MedicationRequest().apply {
+        id = "med-req-01"
+        subject = Reference("Patient/pat-01")
+        intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+
+        addNote(Annotation(MarkdownType("Proposal")))
+      }
+
+    fhirEngine.create(medicationRequest1)
+
+    ActivityFlow3.of(repository, medicationRequest1)
+      .startPlan {
+        status = MedicationRequest.MedicationRequestStatus.ACTIVE
+        addNote(Annotation(MarkdownType("Start Plan")))
+      }
+      .endPlan { addNote(Annotation(MarkdownType("End Plan"))) }
+      .startOrder {
+        status = MedicationRequest.MedicationRequestStatus.ACTIVE
+        addNote(Annotation(MarkdownType("Start Order")))
+      }
+      .endOrder { addNote(Annotation(MarkdownType("End Order"))) }
+
+    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
+      println(
+        "Flow #${index + 1} Request ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State ${_flow.currentIntent()}",
+      )
+
+      if (_flow.requestResource is CommunicationRequest) {
+        println(
+          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map { it.contentStringType.value }.joinToString()} -- ",
+        )
+      } else if (_flow.requestResource is MedicationRequest) {
+        println(
+          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text }.joinToString()} -- ",
+        )
+      }
+    }
+
+    // Lets resume a flow that is in Order state
+    val communicationFlowInOrder =
+      ActivityFlow3.of(repository, "pat-01")
+        .filterIsInstance<ActivityFlow3<CommunicationRequest>>()
+        .first { it.currentIntent() == ActivityFlow3.RequestIntent.ORDER }
+
+    assertFailsWith(Exception::class) {
+      communicationFlowInOrder.startPlan {
+        // should throw exception
+      }
+    }
+
+    communicationFlowInOrder
+      .startPerform(Communication::class.java) {
+        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+        addPayload().apply { content = StringType("Start Perform after resume") }
+      }
+      .endPerform { addPayload().apply { content = StringType("End Perform after resume") } }
+
+    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
+      println(
+        "Flow #${index + 1} Request ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State ${_flow.currentIntent()}",
+      )
+
+      if (_flow.requestResource is CommunicationRequest) {
+        println(
+          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map { it.contentStringType.value }.joinToString()} -- ",
+        )
+      } else if (_flow.requestResource is MedicationRequest) {
+        println(
+          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text }.joinToString()} -- ",
+        )
+      }
+    }
   }
 }
 

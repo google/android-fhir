@@ -112,6 +112,7 @@ dependencies {
   testImplementation(Dependencies.xmlUnit)
   testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
+  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
