@@ -104,8 +104,8 @@ class MoreQuestionnaireResponseItemComponentsTest {
     assertThat(nestedItems).hasSize(2)
     assertThat(nestedItems.map { it.linkId })
       .containsExactly("nested-question-1", "nested-question-2")
-    assertThat(nestedItems.first().answer.single().value).isNull()
-    assertThat(nestedItems.last().answer.single().value).isNull()
+    assertThat(nestedItems.first().answer).isEmpty()
+    assertThat(nestedItems.last().answer).isEmpty()
   }
 
   @Test
