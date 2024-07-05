@@ -108,7 +108,16 @@ object Sync {
     return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
   }
 
-  /** Gets the worker info for the [FhirSyncWorker] */
+  /**
+   * Retrieves the work information for a specific unique work name as a flow of pairs containing
+   * the work state and the corresponding progress data if available.
+   *
+   * @param context The application context.
+   * @param workName The unique name of the work to retrieve information for.
+   * @return A flow emitting pairs of [WorkInfo.State] and [SyncJobStatus]. The flow will emit only
+   *   when the progress data contains a non-empty key-value map and includes a key of type [String]
+   *   with the name "StateType".
+   */
   @PublishedApi
   internal fun getWorkerInfo(context: Context, workName: String) =
     WorkManager.getInstance(context)
@@ -304,20 +313,10 @@ object Sync {
     }
 
   /**
-   * Only call this API when syncJobStatusFromWorkManager is null. Create a [CurrentSyncJobStatus]
+   * Only call this API when syncJobStatus From WorkManager is null. Create a [CurrentSyncJobStatus]
    * from [WorkInfo.State]. (Note: syncJobStatusFromDataStore is updated as lastSynJobStatus, which
    * is the terminalSyncJobStatus.)
    */
-  private fun handleNullWorkManagerStatusForPeriodicSync(
-    workInfoState: WorkInfo.State,
-  ): CurrentSyncJobStatus =
-    when (workInfoState) {
-      RUNNING -> Running(SyncJobStatus.Started())
-      ENQUEUED -> Enqueued
-      CANCELLED -> Cancelled
-      else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
-    }
-
   private fun handleNullWorkManagerStatusForPeriodicSync(
     workInfoState: WorkInfo.State,
     syncJobStatusFromDataStore: SyncJobStatus?,

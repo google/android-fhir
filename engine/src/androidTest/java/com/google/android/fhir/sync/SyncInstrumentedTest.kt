@@ -106,7 +106,7 @@ class SyncInstrumentedTest {
   }
 
   @Test
-  fun oneTime_worker_nextExecutionAfterSucceeded() {
+  fun oneTimeSync_currentSyncJobStatusSucceeded_nextCurrentSyncJobStatusShouldBeRunning() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
@@ -160,7 +160,7 @@ class SyncInstrumentedTest {
   }
 
   @Test
-  fun oneTime_worker_nextExecutionAfterFailed() {
+  fun oneTimeSync_currentSyncJobStatusFailed_nextCurrentSyncJobStatusShouldBeRunning() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
