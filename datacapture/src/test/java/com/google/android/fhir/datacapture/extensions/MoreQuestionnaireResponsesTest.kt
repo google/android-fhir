@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,11 @@ package com.google.android.fhir.datacapture.extensions
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
+import junit.framework.TestCase.assertNull
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -553,5 +557,37 @@ class MoreQuestionnaireResponsesTest {
   private fun assertResourceEquals(expected: Resource, actual: Resource) {
     assertThat(iParser.encodeResourceToString(actual))
       .isEqualTo(iParser.encodeResourceToString(expected))
+  }
+
+  @Test
+  fun `test launchTimestamp added correctly`() {
+    val questionnaireResponse = QuestionnaireResponse()
+    val dateTimeType = DateTimeType("2024-07-05T00:00:00Z")
+    questionnaireResponse.launchTimestamp = dateTimeType
+
+    val launchTimestamp = questionnaireResponse.launchTimestamp
+    assertNotNull(launchTimestamp)
+    assertEquals(dateTimeType, launchTimestamp)
+  }
+
+  @Test
+  fun `test getLaunchTimestamp when extension does not exist`() {
+    val questionnaireResponse = QuestionnaireResponse()
+
+    val launchTimestamp = questionnaireResponse.launchTimestamp
+    assertNull(launchTimestamp)
+  }
+
+  @Test
+  fun `test setLaunchTimestamp should not override previously added extension if any`() {
+    val questionnaireResponse = QuestionnaireResponse()
+    val oldDateTimeType = DateTimeType("2024-07-01T00:00:00Z")
+    val newDateTimeType = DateTimeType("2024-07-05T00:00:00Z")
+    questionnaireResponse.launchTimestamp = oldDateTimeType
+    questionnaireResponse.launchTimestamp = newDateTimeType
+
+    val launchTimestamp = questionnaireResponse.launchTimestamp
+    assertNotNull(launchTimestamp)
+    assertEquals(oldDateTimeType, launchTimestamp)
   }
 }
