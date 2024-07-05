@@ -41,6 +41,7 @@ import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
 import com.google.android.fhir.datacapture.extensions.launchTimestamp
+import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
@@ -156,14 +157,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           }
         // Retain the hierarchy and order of items within the questionnaire as specified in the
         // standard. See https://www.hl7.org/fhir/questionnaireresponse.html#notes.
-        questionnaire.item.forEach {
-          questionnaireResponse.addItem(it.createQuestionnaireResponseItem())
-        }
+        questionnaire.item
+          .filterNot { it.isRepeatedGroup }
+          .forEach { questionnaireResponse.addItem(it.createQuestionnaireResponseItem()) }
       }
     }
     // Add extension for questionnaire launch time stamp
     questionnaireResponse.launchTimestamp = DateTimeType(Date())
-    questionnaireResponse.packRepeatedGroups()
+    questionnaireResponse.packRepeatedGroups(questionnaire)
   }
 
   /**
@@ -774,7 +775,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       val isHelpCard = itemHelpCard != null
       val isHelpCardOpen = openedHelpCardSet.contains(questionnaireResponseItem)
       // Add an item for the question itself
-      add(
+
+      val question =
         QuestionnaireAdapterItem.Question(
           QuestionnaireViewItem(
             questionnaireItem,
@@ -818,8 +820,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
           ),
-        ),
-      )
+        )
+      add(question)
 
       // Add nested questions after the parent item. We need to get the questionnaire items and
       // (possibly multiple sets of) matching questionnaire response items and generate the adapter
@@ -836,11 +838,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // For background, see https://build.fhir.org/questionnaireresponse.html#link.
       buildList {
           // Case 1
-          add(questionnaireResponseItem.item)
+          if (!questionnaireItem.isRepeatedGroup) {
+            add(questionnaireResponseItem.item)
+          }
           // Case 2 and 3
           addAll(questionnaireResponseItem.answer.map { it.item })
         }
-        .forEach { nestedResponseItemList ->
+        .forEachIndexed { index, nestedResponseItemList ->
+          if (questionnaireItem.isRepeatedGroup) {
+            // Case 3
+            add(
+              QuestionnaireAdapterItem.RepeatedGroupHeader(
+                index = index,
+                onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
+                responses = nestedResponseItemList,
+                title = question.item.questionText?.toString() ?: "",
+              ),
+            )
+          }
           addAll(
             getQuestionnaireAdapterItems(
               // If nested display item is identified as instructions or flyover, then do not create
