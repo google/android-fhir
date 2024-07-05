@@ -16,11 +16,13 @@
 
 package com.google.android.fhir.datacapture.extensions
 
-import java.util.Date
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+
+internal const val EXTENSION_LAUNCH_TIMESTAMP: String =
+  "http://github.com/google-android/questionnaire-launch-timestamp"
 
 /** Pre-order list of all questionnaire response items in the questionnaire. */
 val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -124,17 +126,19 @@ private fun unpackRepeatedGroups(
 }
 
 /** Adds a launch timestamp as an extension to the Questionnaire Response */
-internal fun QuestionnaireResponse.addLaunchTimestamp() {
-  val noLaunchTimeStampExists =
-    this.extension.none {
-      it.url == "http://github.com/google-android/questionnaire-launch-timestamp"
-    }
-  if (noLaunchTimeStampExists) {
-    this.extension.add(
-      Extension(
-        "http://github.com/google-android/questionnaire-launch-timestamp",
-        DateTimeType(Date()),
-      ),
-    )
+internal var QuestionnaireResponse.launchTimestamp: DateTimeType?
+  get() {
+    val extension = this.extension.firstOrNull { it.url == EXTENSION_LAUNCH_TIMESTAMP }
+    return extension?.value as? DateTimeType
   }
-}
+  set(value) {
+    val noLaunchTimeStampExists = this.extension.none { it.url == EXTENSION_LAUNCH_TIMESTAMP }
+    if (noLaunchTimeStampExists) {
+      this.extension.add(
+        Extension(
+          EXTENSION_LAUNCH_TIMESTAMP,
+          value,
+        ),
+      )
+    }
+  }
