@@ -33,7 +33,6 @@ import com.google.android.fhir.sync.upload.LocalChangeFetcherFactory
 import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
-import java.time.OffsetDateTime
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
@@ -46,51 +45,39 @@ import org.hl7.fhir.r4.model.ResourceType
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: Resource): List<String> {
-    return withContext(Dispatchers.IO) { database.insert(*resource) }
-  }
+  override suspend fun create(vararg resource: Resource) =
+    withContext(Dispatchers.IO) { database.insert(*resource) }
 
-  override suspend fun get(type: ResourceType, id: String): Resource {
-    return withContext(Dispatchers.IO) { database.select(type, id) }
-  }
+  override suspend fun get(type: ResourceType, id: String) =
+    withContext(Dispatchers.IO) { database.select(type, id) }
 
-  override suspend fun update(vararg resource: Resource) {
-    return withContext(Dispatchers.IO) { database.update(*resource) }
-  }
+  override suspend fun update(vararg resource: Resource) =
+    withContext(Dispatchers.IO) { database.update(*resource) }
 
-  override suspend fun delete(type: ResourceType, id: String) {
-    return withContext(Dispatchers.IO) { database.delete(type, id) }
-  }
+  override suspend fun delete(type: ResourceType, id: String) =
+    withContext(Dispatchers.IO) { database.delete(type, id) }
 
-  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {
-    return withContext(Dispatchers.IO) { search.execute(database) }
-  }
+  override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> =
+    withContext(Dispatchers.IO) { search.execute(database) }
 
-  override suspend fun count(search: Search): Long {
-    return withContext(Dispatchers.IO) { search.count(database) }
-  }
+  override suspend fun count(search: Search) =
+    withContext(Dispatchers.IO) { search.count(database) }
 
-  override suspend fun getLastSyncTimeStamp(): OffsetDateTime? {
-    return withContext(Dispatchers.IO) {
+  override suspend fun getLastSyncTimeStamp() =
+    withContext(Dispatchers.IO) {
       FhirEngineProvider.getFhirDataStore(context).readLastSyncTimestamp()
     }
-  }
 
-  override suspend fun clearDatabase() {
-    return withContext(Dispatchers.IO) { database.clearDatabase() }
-  }
+  override suspend fun clearDatabase() = withContext(Dispatchers.IO) { database.clearDatabase() }
 
-  override suspend fun getLocalChanges(type: ResourceType, id: String): List<LocalChange> {
-    return withContext(Dispatchers.IO) { database.getLocalChanges(type, id) }
-  }
+  override suspend fun getLocalChanges(type: ResourceType, id: String) =
+    withContext(Dispatchers.IO) { database.getLocalChanges(type, id) }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
-    return withContext(Dispatchers.IO) { database.purge(type, setOf(id), forcePurge) }
-  }
+  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) =
+    withContext(Dispatchers.IO) { database.purge(type, setOf(id), forcePurge) }
 
-  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
-    return withContext(Dispatchers.IO) { database.purge(type, ids, forcePurge) }
-  }
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) =
+    withContext(Dispatchers.IO) { database.purge(type, ids, forcePurge) }
 
   override suspend fun syncDownload(
     conflictResolver: ConflictResolver,
