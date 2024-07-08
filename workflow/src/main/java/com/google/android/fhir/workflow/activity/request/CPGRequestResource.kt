@@ -1,0 +1,150 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package com.google.android.fhir.workflow.activity.request
+
+import com.google.android.fhir.logicalId
+import org.hl7.fhir.r4.model.CommunicationRequest
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.Task
+
+sealed class CPGRequestResource<R>(internal open val resource: R) where R : Resource {
+
+  val resourceType: ResourceType
+    get() = resource.resourceType
+
+  val logicalId: String
+    get() = resource.logicalId
+
+  abstract fun setIntent(intent: Intent)
+
+  abstract fun getIntent(): Intent
+
+  abstract fun setStatus(status: Status)
+
+  abstract fun getStatus(): Status
+
+  abstract fun setBasedOn(reference: Reference)
+
+  abstract fun getBasedOn(): Reference?
+
+  fun update(update: R.() -> Unit) {
+    resource.update()
+  }
+
+  fun copy(id: String, status: Status, intent: Intent): CPGRequestResource<R> {
+    val parent: CPGRequestResource<R> = this
+    return of(parent.resource.copy() as R).apply {
+      resource.idElement = IdType.of(resource).setValue(id)
+      setStatus(status)
+      setIntent(intent)
+      setBasedOn(Reference("${parent.resource.resourceType}/${parent.resource.logicalId}"))
+    }
+  }
+
+  fun asReference() = Reference("${resource.resourceType}/${resource.logicalId}")
+
+  companion object {
+
+    fun <R : Resource> of(resource: R): CPGRequestResource<R> {
+      return when (resource) {
+        is Task -> of(resource) as CPGRequestResource<R>
+        is MedicationRequest -> of(resource) as CPGRequestResource<R>
+        is ServiceRequest -> of(resource) as CPGRequestResource<R>
+        is CommunicationRequest -> of(resource) as CPGRequestResource<R>
+        else -> {
+          throw IllegalArgumentException("Unknown CPG Request type ${resource::class}.")
+        }
+      }
+    }
+
+    fun of(resource: Task) = CPGTaskRequest(resource)
+
+    fun of(resource: MedicationRequest) = CPGMedicationRequest(resource)
+
+    fun of(resource: ServiceRequest) = CPGServiceRequest(resource)
+
+    fun of(resource: CommunicationRequest) = CPGCommunicationRequest(resource)
+  }
+}
+
+enum class Intent(val code: String) {
+  PROPOSAL("proposal"),
+  PLAN("plan"),
+  DIRECTIVE("directive"),
+  ORDER("order"),
+  ORIGINALORDER("original-order"),
+  REFLEXORDER("reflex-order"),
+  FILLERORDER("filler-order"),
+  INSTANCEORDER("instance-order"),
+  OPTION("option"),
+  NULL("null"),
+  ;
+
+  companion object {
+    fun of(code: String): Intent {
+      return when (code) {
+        "proposal" -> PROPOSAL
+        "plan" -> PLAN
+        "directive" -> DIRECTIVE
+        "order" -> ORDER
+        "original-order" -> ORIGINALORDER
+        "reflex-order" -> REFLEXORDER
+        "filler-order" -> FILLERORDER
+        "instance-order" -> INSTANCEORDER
+        "option" -> OPTION
+        else -> NULL
+      }
+    }
+  }
+}
+
+/**
+ * This may not represent all the Request Resource status. For the activity flow, we may ony be
+ * interested in a few values and they should be represented here.
+ */
+enum class Status(val string: String) {
+  DRAFT("draft"),
+  ACTIVE("active"),
+  ONHOLD("on-hold"),
+  REVOKED("revoked"),
+  COMPLETED("completed"),
+  ENTEREDINERROR("entered-in-error"),
+  UNKNOWN("unknown"),
+  NULL("null"),
+  ;
+
+  companion object {
+    fun of(code: String): Status {
+      return when (code) {
+        "draft" -> DRAFT
+        "active" -> ACTIVE
+        "on-hold" -> ONHOLD
+        "revoked" -> REVOKED
+        "completed" -> COMPLETED
+        "entered-in-error" -> ENTEREDINERROR
+        "unknown" -> UNKNOWN
+        "null" -> NULL
+        else -> NULL
+      }
+    }
+  }
+}

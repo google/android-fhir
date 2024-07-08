@@ -22,6 +22,15 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.workflow.activity.event.CPGCommunicationEvent
+import com.google.android.fhir.workflow.activity.event.CPGMedicationAdministrationEvent
+import com.google.android.fhir.workflow.activity.event.CPGMedicationDispenseEvent
+import com.google.android.fhir.workflow.activity.event.CPGObservationEvent
+import com.google.android.fhir.workflow.activity.event.CPGProcedureEvent
+import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.request.Intent
 import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.runBlockingOnWorkerThread
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
@@ -34,10 +43,13 @@ import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.CommunicationRequest.CommunicationRequestPayloadComponent
 import org.hl7.fhir.r4.model.MarkdownType
+import org.hl7.fhir.r4.model.MedicationAdministration
+import org.hl7.fhir.r4.model.MedicationDispense
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
 import org.junit.Ignore
@@ -422,6 +434,168 @@ class ActivityFlowTest {
     TODO("Finish test")
   }
 
+  //  @Test
+  //  fun `communication request flow5`(): Unit = runBlockingOnWorkerThread {
+  //    val communicationRequest1 =
+  //      CommunicationRequest().apply {
+  //        id = "com-req-01"
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        subject = Reference("Patient/pat-01")
+  //        addPayload().apply { content = StringType("Proposal") }
+  //      }
+  //    fhirEngine.create(communicationRequest1)
+  //    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+  //
+  //    ActivityFlow3.of(repository, communicationRequest1)
+  //      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+  //      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+  //
+  //    val communicationRequest2 =
+  //      CommunicationRequest().apply {
+  //        id = "com-req-02"
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        subject = Reference("Patient/pat-01")
+  //        addPayload().apply { content = StringType("Proposal") }
+  //      }
+  //    fhirEngine.create(communicationRequest2)
+  //
+  //    ActivityFlow3.of(repository, communicationRequest2)
+  //      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+  //      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+  //      .startOrder {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Order") }
+  //      }
+  //      .endOrder { addPayload().apply { content = StringType("End Order") } }
+  //
+  //    val communicationRequest3 =
+  //      CommunicationRequest().apply {
+  //        id = "com-req-03"
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        subject = Reference("Patient/pat-01")
+  //        addPayload().apply { content = StringType("Proposal") }
+  //      }
+  //    fhirEngine.create(communicationRequest3)
+  //
+  //    ActivityFlow3.of(repository, communicationRequest3)
+  //      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+  //      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+  //      .startOrder {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Order") }
+  //      }
+  //      .endOrder { addPayload().apply { content = StringType("End Order") } }
+  //      .startPerform(Communication::class.java) {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Perform") }
+  //      }
+  //
+  //    val communicationRequest4 =
+  //      CommunicationRequest().apply {
+  //        id = "com-req-04"
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        subject = Reference("Patient/pat-01")
+  //        addPayload().apply { content = StringType("Proposal") }
+  //      }
+  //    fhirEngine.create(communicationRequest4)
+  //
+  //    ActivityFlow3.of(repository, communicationRequest4)
+  //      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
+  //      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+  //      .startOrder {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Order") }
+  //      }
+  //      .endOrder { addPayload().apply { content = StringType("End Order") } }
+  //      .startPerform(Communication::class.java) {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Perform") }
+  //      }
+  //      .endPerform { addPayload().apply { content = StringType("End Perform") } }
+  //
+  //    val medicationRequest1 =
+  //      MedicationRequest().apply {
+  //        id = "med-req-01"
+  //        subject = Reference("Patient/pat-01")
+  //        intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+  //
+  //        addNote(Annotation(MarkdownType("Proposal")))
+  //      }
+  //
+  //    fhirEngine.create(medicationRequest1)
+  //
+  //    ActivityFlow3.of(repository, medicationRequest1)
+  //      .startPlan {
+  //        status = MedicationRequest.MedicationRequestStatus.ACTIVE
+  //        addNote(Annotation(MarkdownType("Start Plan")))
+  //      }
+  //      .endPlan { addNote(Annotation(MarkdownType("End Plan"))) }
+  //      .startOrder {
+  //        status = MedicationRequest.MedicationRequestStatus.ACTIVE
+  //        addNote(Annotation(MarkdownType("Start Order")))
+  //      }
+  //      .endOrder { addNote(Annotation(MarkdownType("End Order"))) }
+  //
+  //    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
+  //      println(
+  //        "Flow #${index + 1} Request
+  // ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State
+  // ${_flow.currentIntent()}",
+  //      )
+  //
+  //      if (_flow.requestResource is CommunicationRequest) {
+  //        println(
+  //          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map {
+  // it.contentStringType.value }.joinToString()} -- ",
+  //        )
+  //      } else if (_flow.requestResource is MedicationRequest) {
+  //        println(
+  //          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text
+  // }.joinToString()} -- ",
+  //        )
+  //      }
+  //    }
+  //
+  //    // Lets resume a flow that is in Order state
+  //    val communicationFlowInOrder =
+  //      ActivityFlow3.of(repository, "pat-01")
+  //        .filterIsInstance<ActivityFlow3<CommunicationRequest>>()
+  //        .first { it.currentIntent() == ActivityFlow3.RequestIntent.ORDER }
+  //
+  //    assertFailsWith(Exception::class) {
+  //      communicationFlowInOrder.startPlan {
+  //        // should throw exception
+  //      }
+  //    }
+  //
+  //    communicationFlowInOrder
+  //      .startPerform(Communication::class.java) {
+  //        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+  //        addPayload().apply { content = StringType("Start Perform after resume") }
+  //      }
+  //      .endPerform { addPayload().apply { content = StringType("End Perform after resume") } }
+  //
+  //    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
+  //      println(
+  //        "Flow #${index + 1} Request
+  // ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State
+  // ${_flow.currentIntent()}",
+  //      )
+  //
+  //      if (_flow.requestResource is CommunicationRequest) {
+  //        println(
+  //          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map {
+  // it.contentStringType.value }.joinToString()} -- ",
+  //        )
+  //      } else if (_flow.requestResource is MedicationRequest) {
+  //        println(
+  //          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text
+  // }.joinToString()} -- ",
+  //        )
+  //      }
+  //    }
+  //  }
+
   @Test
   fun `communication request flow5`(): Unit = runBlockingOnWorkerThread {
     val communicationRequest1 =
@@ -434,9 +608,9 @@ class ActivityFlowTest {
     fhirEngine.create(communicationRequest1)
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
 
-    ActivityFlow3.of(repository, communicationRequest1)
-      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
-      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+    ActivityFlow4.of(repository, CPGRequestResource.of(communicationRequest1))
+      .startPlan { update { addPayload().apply { content = StringType("Start Plan") } } }
+      .endPlan { update { addPayload().apply { content = StringType("End Plan") } } }
 
     val communicationRequest2 =
       CommunicationRequest().apply {
@@ -447,14 +621,16 @@ class ActivityFlowTest {
       }
     fhirEngine.create(communicationRequest2)
 
-    ActivityFlow3.of(repository, communicationRequest2)
-      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
-      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+    ActivityFlow4.of(repository, CPGRequestResource.of(communicationRequest2))
+      .startPlan { update { addPayload().apply { content = StringType("Start Plan") } } }
+      .endPlan { update { addPayload().apply { content = StringType("End Plan") } } }
       .startOrder {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Order") }
+        update {
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          addPayload().apply { content = StringType("Start Order") }
+        }
       }
-      .endOrder { addPayload().apply { content = StringType("End Order") } }
+      .endOrder { update { addPayload().apply { content = StringType("End Order") } } }
 
     val communicationRequest3 =
       CommunicationRequest().apply {
@@ -465,18 +641,22 @@ class ActivityFlowTest {
       }
     fhirEngine.create(communicationRequest3)
 
-    ActivityFlow3.of(repository, communicationRequest3)
-      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
-      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+    ActivityFlow4.of(repository, CPGRequestResource.of(communicationRequest3))
+      .startPlan { update { addPayload().apply { content = StringType("Start Plan") } } }
+      .endPlan { update { addPayload().apply { content = StringType("End Plan") } } }
       .startOrder {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Order") }
+        update {
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          addPayload().apply { content = StringType("Start Order") }
+        }
       }
-      .endOrder { addPayload().apply { content = StringType("End Order") } }
-      .startPerform(Communication::class.java) {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Perform") }
-      }
+      .endOrder { update { addPayload().apply { content = StringType("End Order") } } }
+    //      .startPerform(Communication::class.java) {
+    //       update {
+    //         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+    //         addPayload().apply { content = StringType("Start Perform") }
+    //       }
+    //      }
 
     val communicationRequest4 =
       CommunicationRequest().apply {
@@ -487,19 +667,25 @@ class ActivityFlowTest {
       }
     fhirEngine.create(communicationRequest4)
 
-    ActivityFlow3.of(repository, communicationRequest4)
-      .startPlan { addPayload().apply { content = StringType("Start Plan") } }
-      .endPlan { addPayload().apply { content = StringType("End Plan") } }
+    ActivityFlow4.of(repository, CPGRequestResource.of(communicationRequest4))
+      //    CPG_CommunicationActivityFlow(repository, CPGRequestResource.of(communicationRequest4),
+      // null)
+      .startPlan { update { addPayload().apply { content = StringType("Start Plan") } } }
+      .endPlan { update { addPayload().apply { content = StringType("End Plan") } } }
       .startOrder {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Order") }
+        update {
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          addPayload().apply { content = StringType("Start Order") }
+        }
       }
-      .endOrder { addPayload().apply { content = StringType("End Order") } }
-      .startPerform(Communication::class.java) {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Perform") }
-      }
-      .endPerform { addPayload().apply { content = StringType("End Perform") } }
+      .endOrder { update { addPayload().apply { content = StringType("End Order") } } }
+    //      .startPerform(Communication::class.java) {
+    //        update {
+    //          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+    //          addPayload().apply { content = StringType("Start Perform") }
+    //        }
+    //      }
+    //      .endPerform { addPayload().apply { content = StringType("End Perform") } }
 
     val medicationRequest1 =
       MedicationRequest().apply {
@@ -512,39 +698,52 @@ class ActivityFlowTest {
 
     fhirEngine.create(medicationRequest1)
 
-    ActivityFlow3.of(repository, medicationRequest1)
+    ActivityFlow4.of(repository, CPGRequestResource.of(medicationRequest1))
       .startPlan {
-        status = MedicationRequest.MedicationRequestStatus.ACTIVE
-        addNote(Annotation(MarkdownType("Start Plan")))
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Plan")))
+        }
       }
-      .endPlan { addNote(Annotation(MarkdownType("End Plan"))) }
+      .endPlan { update { addNote(Annotation(MarkdownType("End Plan"))) } }
       .startOrder {
-        status = MedicationRequest.MedicationRequestStatus.ACTIVE
-        addNote(Annotation(MarkdownType("Start Order")))
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Order")))
+        }
       }
-      .endOrder { addNote(Annotation(MarkdownType("End Order"))) }
+      .endOrder { update { addNote(Annotation(MarkdownType("End Order"))) } }
+      .startPerform(klass = CPGMedicationDispenseEvent(MedicationDispense()).javaClass) {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Perform")))
+        }
+      }
+      .endPerform { update {} }
 
-    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
+    ActivityFlow4.of(repository, "pat-01").forEachIndexed { index, _flow ->
       println(
-        "Flow #${index + 1} Request ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State ${_flow.currentIntent()}",
+        "Flow #${index + 1} Request ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State ${_flow.intent()}",
       )
 
-      if (_flow.requestResource is CommunicationRequest) {
+      if (_flow.requestResource is CPGCommunicationRequest) {
         println(
-          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map { it.contentStringType.value }.joinToString()} -- ",
+          "   Request Payload ${(_flow.requestResource as CPGCommunicationRequest).resource.payload.map { it.contentStringType.value }.joinToString()} -- ",
         )
-      } else if (_flow.requestResource is MedicationRequest) {
+      } else if (_flow.requestResource is CPGMedicationRequest) {
         println(
-          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text }.joinToString()} -- ",
+          "   Request Payload ${(_flow.requestResource as CPGMedicationRequest).resource.note.map { it.text }.joinToString()} -- ",
         )
       }
     }
 
     // Lets resume a flow that is in Order state
     val communicationFlowInOrder =
-      ActivityFlow3.of(repository, "pat-01")
-        .filterIsInstance<ActivityFlow3<CommunicationRequest>>()
-        .first { it.currentIntent() == ActivityFlow3.RequestIntent.ORDER }
+      ActivityFlow4.of(repository, "pat-01")
+        .filterIsInstance<
+          ActivityFlow4<CPGCommunicationRequest, CPGCommunicationEvent>,
+        >()
+        .first { it.intent() == Intent.ORDER }
 
     assertFailsWith(Exception::class) {
       communicationFlowInOrder.startPlan {
@@ -552,28 +751,140 @@ class ActivityFlowTest {
       }
     }
 
+    //      Failing
+    //      val communicationFlowInOrder2 =
+    //        ActivityFlow4.of(repository, "pat-01")
+    //          .filterIsInstance<ActivityFlow4<CPGResource<Appointment>()
+    //          .first { it.intent() == Intent.ORDER }
+
     communicationFlowInOrder
-      .startPerform(Communication::class.java) {
-        status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-        addPayload().apply { content = StringType("Start Perform after resume") }
+      .startPerform(CPGCommunicationEvent(Communication()).javaClass) {
+        update {
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Perform after resume")))
+        }
       }
-      .endPerform { addPayload().apply { content = StringType("End Perform after resume") } }
-
-    ActivityFlow3.of(repository, "pat-01").forEachIndexed { index, _flow ->
-      println(
-        "Flow #${index + 1} Request ${_flow.requestResource.resourceType}/${_flow.requestResource.logicalId} -- State ${_flow.currentIntent()}",
-      )
-
-      if (_flow.requestResource is CommunicationRequest) {
-        println(
-          "   Request Payload ${(_flow.requestResource as CommunicationRequest).payload.map { it.contentStringType.value }.joinToString()} -- ",
-        )
-      } else if (_flow.requestResource is MedicationRequest) {
-        println(
-          "   Request Payload ${(_flow.requestResource as MedicationRequest).note.map { it.text }.joinToString()} -- ",
-        )
+      .endPerform {
+        update { addPayload().apply { content = StringType("End Perform after resume") } }
       }
-    }
+  }
+
+  @Test
+  fun `test order service`() = runBlockingOnWorkerThread {
+    val serviceRequestFromCarePlan =
+      ServiceRequest().apply {
+        id = "service-request"
+        subject = Reference("Patient/patient-001")
+      }
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+
+    val flow = ActivityFlow4.of(repository, CPGRequestResource.of(serviceRequestFromCarePlan))
+
+    flow
+      .startPlan {
+        update {
+          status = ServiceRequest.ServiceRequestStatus.ACTIVE
+          addNote().apply { text = "Start Plan annotation.." }
+        }
+      }
+      .endPlan { update { addNote().apply { text = "End Plan annotation.." } } }
+      .startOrder {
+        update {
+          status = ServiceRequest.ServiceRequestStatus.ACTIVE
+          addNote().apply { text = "Start order annotation.." }
+        }
+      }
+      .endOrder {
+        update {
+          status = ServiceRequest.ServiceRequestStatus.ACTIVE
+          addNote().apply { text = "End order annotation.." }
+        }
+      }
+
+    val performFlow =
+      ActivityFlow4.of(repository, "patient-001")
+        .filterIsInstance<CPGServiceRequestActivity>()
+        .first()
+
+    performFlow
+      .startPerform(klass = CPGProcedureEvent::class.java) {
+        update {
+          status = ServiceRequest.ServiceRequestStatus.ACTIVE
+          addNote().apply { text = "Start Perform procedure annotation.." }
+        }
+      }
+      .endPerform { update {} }
+
+    performFlow
+      .startPerform(klass = CPGObservationEvent::class.java) {
+        update {
+          status = ServiceRequest.ServiceRequestStatus.ACTIVE
+          addNote().apply { text = "Start Perform observation annotation.." }
+        }
+      }
+      .endPerform { update {} }
+  }
+
+  @Test
+  fun `test order medication`() = runBlockingOnWorkerThread {
+    val medicationRequest =
+      MedicationRequest().apply {
+        id = "med-req-01"
+        subject = Reference("Patient/pat-01")
+        intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+
+        addNote(Annotation(MarkdownType("Proposal")))
+      }
+
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    val flow = ActivityFlow4.of(repository, CPGRequestResource.of(medicationRequest))
+
+    flow
+      .startPlan {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Plan")))
+        }
+      }
+      .endPlan { update { addNote(Annotation(MarkdownType("End Plan"))) } }
+      .startOrder {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Start Order")))
+        }
+      }
+      .endOrder { update { addNote(Annotation(MarkdownType("End Order"))) } }
+
+    val performFlow =
+      ActivityFlow4.of(repository, "pat-01")
+        .filterIsInstance<CPGMedicationRequestActivity>()
+        .first()
+
+    performFlow
+      .startPerform(CPGMedicationDispenseEvent::class.java) {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Perform Order for dispense")))
+        }
+      }
+      .endPerform {
+        update {
+        status = MedicationDispense.MedicationDispenseStatus.INPROGRESS
+        }
+      }
+
+    performFlow
+      .startPerform(CPGMedicationAdministrationEvent::class.java) {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Perform Order for administration")))
+        }
+      }
+      .endPerform {
+        update {
+        status = MedicationAdministration.MedicationAdministrationStatus.INPROGRESS
+        }
+      }
   }
 }
 

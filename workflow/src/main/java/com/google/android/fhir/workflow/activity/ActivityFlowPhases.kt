@@ -16,31 +16,32 @@
 
 package com.google.android.fhir.workflow.activity
 
-import org.hl7.fhir.r4.model.Resource
+import com.google.android.fhir.workflow.activity.event.CPGEventResource
+import com.google.android.fhir.workflow.activity.request.CPGRequestResource
 
-fun interface StartPlan<R : Resource> {
-  suspend fun startPlan(init: R.() -> Unit): EndPlan<R>
+fun interface StartPlan<R : CPGRequestResource<*>, E : CPGEventResource<*>> {
+  suspend fun startPlan(init: R.() -> Unit): EndPlan<R, E>
 }
 
 // Would set proposal as completed
-fun interface EndPlan<R : Resource> {
-  suspend fun endPlan(init: R.() -> Unit): StartOrder<R>
+fun interface EndPlan<R : CPGRequestResource<*>, E : CPGEventResource<*>> {
+  suspend fun endPlan(init: R.() -> Unit): StartOrder<R, E>
 }
 
-fun interface StartOrder<R : Resource> {
-  suspend fun startOrder(init: R.() -> Unit): EndOrder<R>
+fun interface StartOrder<R : CPGRequestResource<*>, E : CPGEventResource<*>> {
+  suspend fun startOrder(init: R.() -> Unit): EndOrder<R, E>
 }
 
 // Would set plan as completed
-interface EndOrder<R : Resource> {
-  suspend fun endOrder(init: R.() -> Unit): StartPerform<R>
+interface EndOrder<R : CPGRequestResource<*>, E : CPGEventResource<*>> {
+  suspend fun endOrder(init: R.() -> Unit): StartPerform<R, E>
 }
 
-interface StartPerform<R : Resource> {
-  suspend fun <E : Resource> startPerform(klass: Class<E>, init: R.() -> Unit): EndPerform<E>
+interface StartPerform<R : CPGRequestResource<*>, E : CPGEventResource<*>> {
+  suspend fun <D : E> startPerform(klass: Class<D>, init: R.() -> Unit): EndPerform<D>
 }
 
 // Would set order as completed
-interface EndPerform<E : Resource> {
+interface EndPerform<E : CPGEventResource<*>> {
   suspend fun endPerform(init: E.() -> Unit)
 }

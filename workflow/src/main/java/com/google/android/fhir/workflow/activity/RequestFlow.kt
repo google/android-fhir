@@ -233,7 +233,7 @@ internal class PerformFlow<E : Resource> constructor(private val type: Class<E>)
           } as E
         }
 
-//        EnrollPatient
+        //        EnrollPatient
         EpisodeOfCare::class -> {
           EpisodeOfCare().apply { patient = this@toEvent.`for` } as E
         }
@@ -318,7 +318,7 @@ internal class PerformFlow<E : Resource> constructor(private val type: Class<E>)
 
     private fun <E : Resource> ServiceRequest.toEvent(type: Class<E>): E {
       return when (type.newInstance()) {
-//        OrderService
+        //        OrderService
         Procedure::class -> {
           Procedure().apply {
             code = this@toEvent.code
@@ -329,13 +329,12 @@ internal class PerformFlow<E : Resource> constructor(private val type: Class<E>)
             bodySite = this@toEvent.bodySite
           } as E
         }
-
-        else -> throw IllegalArgumentException(
-          IllegalArgumentException("Unable to create Event of type ${type::class} "),
-        )
+        else ->
+          throw IllegalArgumentException(
+            IllegalArgumentException("Unable to create Event of type ${type::class} "),
+          )
       }
-//      OrderService
-
+      //      OrderService
     }
 
     private fun MedicationRequest.MedicationRequestSubstitutionComponent
