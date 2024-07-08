@@ -36,6 +36,7 @@ import org.hl7.fhir.r4.model.Medication
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.ResourceType
+import timber.log.Timber
 
 class IPSRenderer(private val document: IPSDocument?) {
 
@@ -99,97 +100,111 @@ class IPSRenderer(private val document: IPSDocument?) {
       }
     }
     entries?.forEach { entry ->
-      when (entry.resource.resourceType) {
-        ResourceType.Immunization -> {
-          val date = (entry.resource as Immunization).occurrenceDateTimeType.valueAsString
-          val vaccine = (entry.resource as Immunization).vaccineCode.coding[0].display
-          val row = TableRow(context)
-          val dateTextView = createTextView(context, date)
-          val vaccineHorizontalTextView = createTextView(context, vaccine)
-          val horizontalScrollView = createHorizontalScrollView(context, vaccineHorizontalTextView)
-          row.addView(dateTextView)
-          row.addView(horizontalScrollView)
-          row.setBackgroundColor(Color.LTGRAY)
-          immunizationTable.addView(row)
-          val separator = createSeparator(context)
-          immunizationTable.addView(separator)
-          immunizationSection.visibility = View.VISIBLE
-        }
-        ResourceType.Patient -> {
-          val patient = (entry.resource as Patient)
-          val patientText =
-            "Name: ${patient.name.first().givenAsSingleString} ${patient.name.first().family} \nBirth Date: ${patient.birthDateElement.valueAsString}"
-          val row = createRowWithTextViewAndScrollView(context, patientText)
-          patientTable.addView(row)
-          val separator = createSeparator(context)
-          patientTable.addView(separator)
-        }
-        ResourceType.AllergyIntolerance -> {
-          val allergyEntry = (entry.resource as AllergyIntolerance)
-          val allergy = allergyEntry.code.coding[0].display
-          val code = allergyEntry.clinicalStatus.coding.firstOrNull()?.code
-          println(code)
-          if (code == "active" || allergyEntry.code.coding[0].code == "no-allergy-info") {
-            val categories = allergyEntry.category.joinToString(" - ") { it.valueAsString }
-            val allergyText =
-              "${allergyEntry.type?.name ?: ""} - $categories - Criticality: ${allergyEntry.criticality?.name ?: "undefined"}\n$allergy (${allergyEntry.code.coding[0].code})"
-            val row = createRowWithTextViewAndScrollView(context, allergyText)
-            allergiesTable.addView(row)
+      if (entry.resource != null) {
+        when (entry.resource.resourceType) {
+          ResourceType.Immunization -> {
+            val date = (entry.resource as Immunization).occurrenceDateTimeType.valueAsString
+            val vaccine = (entry.resource as Immunization).vaccineCode.coding[0].display
+            val row = TableRow(context)
+            val dateTextView = createTextView(context, date)
+            val vaccineHorizontalTextView = createTextView(context, vaccine)
+            val horizontalScrollView =
+              createHorizontalScrollView(context, vaccineHorizontalTextView)
+            row.addView(dateTextView)
+            row.addView(horizontalScrollView)
+            row.setBackgroundColor(Color.LTGRAY)
+            immunizationTable.addView(row)
             val separator = createSeparator(context)
-            allergiesTable.addView(separator)
-            allergiesSection.visibility = View.VISIBLE
+            immunizationTable.addView(separator)
+            immunizationSection.visibility = View.VISIBLE
           }
-        }
-        ResourceType.Observation -> {
-          val observation = entry.resource as Observation
-          val date = observation.effectiveDateTimeType.valueAsString
-          val resultName = observation.code.coding.firstOrNull()?.display
-          val value =
-            if (observation.hasValueCodeableConcept()) {
-              observation.valueCodeableConcept.coding.firstOrNull()?.display
-            } else {
-              "${observation.valueQuantity.value}${observation.valueQuantity.unit}"
-            }
-          val category =
-            (entry.resource as Observation).category.firstOrNull()?.coding?.firstOrNull()?.code
-          if (resultName != null) {
-            val resultsDisplay =
-              "Name: $resultName \nDate/Time: $date \nValue: $value\nCategory: $category"
-            val row = createRowWithTextViewAndScrollView(context, resultsDisplay)
-            resultsTable.addView(row)
+
+          ResourceType.Patient -> {
+            val patient = (entry.resource as Patient)
+            val patientText =
+              "Name: ${patient.name.first().givenAsSingleString} ${patient.name.first().family} \nBirth Date: ${patient.birthDateElement.valueAsString}"
+            val row = createRowWithTextViewAndScrollView(context, patientText)
+            patientTable.addView(row)
             val separator = createSeparator(context)
-            resultsTable.addView(separator)
-            resultsSection.visibility = View.VISIBLE
+            patientTable.addView(separator)
           }
-        }
-        ResourceType.Medication -> {
-          val medication = (entry.resource as Medication).code.coding
-          val medicationDisplays =
-            medication.joinToString("\n") { "${it.display} (${it.code}) (${it.system})" }
-          val row = createRowWithTextViewAndScrollView(context, medicationDisplays)
-          medicationTable.addView(row)
-          val separator = createSeparator(context)
-          medicationTable.addView(separator)
-          medicationSection.visibility = View.VISIBLE
-        }
-        ResourceType.Condition -> {
-          val problem = (entry.resource as Condition).code.coding
-          if (
-            (entry.resource as Condition).clinicalStatus.coding.firstOrNull()?.code == "active" ||
-              problem[0].code == "no-problem-info"
-          ) {
-            if (problem != null) {
-              val conditionDisplay =
-                problem.joinToString("\n") { "${it.display} (${it.code}) \n(${it.system})" }
-              val row = createRowWithTextViewAndScrollView(context, conditionDisplay)
-              problemsTable.addView(row)
+
+          ResourceType.AllergyIntolerance -> {
+            val allergyEntry = (entry.resource as AllergyIntolerance)
+            val allergy = allergyEntry.code.coding[0].display
+            val code = allergyEntry.clinicalStatus.coding.firstOrNull()?.code
+            println(code)
+            if (code == "active" || allergyEntry.code.coding[0].code == "no-allergy-info") {
+              val categories = allergyEntry.category.joinToString(" - ") { it.valueAsString }
+              val allergyText =
+                "${allergyEntry.type?.name ?: ""} - $categories - Criticality: ${allergyEntry.criticality?.name ?: "undefined"}\n$allergy (${allergyEntry.code.coding[0].code})"
+              val row = createRowWithTextViewAndScrollView(context, allergyText)
+              allergiesTable.addView(row)
               val separator = createSeparator(context)
-              problemsTable.addView(separator)
-              problemSection.visibility = View.VISIBLE
+              allergiesTable.addView(separator)
+              allergiesSection.visibility = View.VISIBLE
             }
           }
+
+          ResourceType.Observation -> {
+            val observation = entry.resource as Observation
+            val date = observation.effectiveDateTimeType.valueAsString
+            val resultName = observation.code.coding.firstOrNull()?.display
+            val value =
+              if (observation.hasValueCodeableConcept()) {
+                observation.valueCodeableConcept.coding.firstOrNull()?.display
+              } else {
+                "${observation.valueQuantity.value}${observation.valueQuantity.unit}"
+              }
+            val category =
+              (entry.resource as Observation).category.firstOrNull()?.coding?.firstOrNull()?.code
+            if (resultName != null) {
+              val resultsDisplay =
+                "Name: $resultName \nDate/Time: $date \nValue: $value\nCategory: $category"
+              val row = createRowWithTextViewAndScrollView(context, resultsDisplay)
+              resultsTable.addView(row)
+              val separator = createSeparator(context)
+              resultsTable.addView(separator)
+              resultsSection.visibility = View.VISIBLE
+            }
+          }
+
+          ResourceType.Medication -> {
+            val medication = (entry.resource as Medication).code.coding
+            val medicationDisplays =
+              medication.joinToString("\n") { "${it.display} (${it.code}) (${it.system})" }
+            val row = createRowWithTextViewAndScrollView(context, medicationDisplays)
+            medicationTable.addView(row)
+            val separator = createSeparator(context)
+            medicationTable.addView(separator)
+            medicationSection.visibility = View.VISIBLE
+          }
+
+          ResourceType.Condition -> {
+            val problem = (entry.resource as Condition).code.coding
+            if (
+              (entry.resource as Condition).clinicalStatus.coding.firstOrNull()?.code == "active" ||
+              problem[0].code == "no-problem-info"
+            ) {
+              if (problem != null) {
+                val conditionDisplay =
+                  problem.joinToString("\n") { "${it.display} (${it.code}) \n(${it.system})" }
+                val row = createRowWithTextViewAndScrollView(context, conditionDisplay)
+                problemsTable.addView(row)
+                val separator = createSeparator(context)
+                problemsTable.addView(separator)
+                problemSection.visibility = View.VISIBLE
+              }
+            }
+          }
+
+          else -> {
+            println("JEIJORJERIE")
+          }
         }
-        else -> {}
+      }
+      else {
+        Timber.tag("IPSRenderer").w("Skipping entry with null resource: %s", entry)
       }
     }
     addGapToTable(immunizationTable, 30)
