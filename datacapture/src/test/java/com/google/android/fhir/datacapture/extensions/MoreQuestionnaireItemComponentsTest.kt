@@ -2478,6 +2478,123 @@ class MoreQuestionnaireItemComponentsTest {
     assertThat(zipList.size).isEqualTo(3)
   }
 
+  @Test
+  fun `should not nest items if question has no nested items`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should not nest items if group has no nested items`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should nest items under question with nested questions`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `should nest items under each repeated answer of question with nested questions`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        repeats = true
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `should not nest items under non repeated group`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = false
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should nest items under repeated group`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `test questionnaireItemComponent is repeatedGroup`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+      }
+
+    assertThat(question.isRepeatedGroup).isTrue()
+  }
+
+  @Test
+  fun `test questionnaireItemComponent is not RepeatedGroup`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = false
+      }
+
+    assertThat(question.isRepeatedGroup).isFalse()
+  }
+
   private val displayCategoryExtensionWithInstructionsCode =
     Extension().apply {
       url = EXTENSION_DISPLAY_CATEGORY_URL

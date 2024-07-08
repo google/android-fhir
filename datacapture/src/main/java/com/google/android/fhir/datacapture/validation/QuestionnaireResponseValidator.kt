@@ -233,7 +233,7 @@ object QuestionnaireResponseValidator {
     }
     checkQuestionnaireResponseItems(
       questionnaire.item,
-      questionnaireResponse.copy().apply { packRepeatedGroups() }.item,
+      questionnaireResponse.copy().apply { packRepeatedGroups(questionnaire) }.item,
     )
   }
 
