@@ -40,8 +40,8 @@ import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
-import com.google.android.fhir.datacapture.extensions.launchTimestamp
 import com.google.android.fhir.datacapture.extensions.isRepeatedGroup
+import com.google.android.fhir.datacapture.extensions.launchTimestamp
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.extensions.maxValueCqfCalculatedValueExpression
