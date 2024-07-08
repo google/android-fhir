@@ -1,7 +1,6 @@
 plugins {
   id(Plugins.BuildPlugins.application)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
   id(Plugins.BuildPlugins.navSafeArgs)
 }
 
@@ -20,7 +19,7 @@ android {
   }
   buildTypes {
     release {
-      isMinifyEnabled = false
+      isMinifyEnabled = true
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
     }
   }
@@ -39,32 +38,32 @@ android {
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.Androidx.activity)
-  implementation(Dependencies.Androidx.appCompat)
-  implementation(Dependencies.Androidx.constraintLayout)
-  implementation(Dependencies.Androidx.datastorePref)
-  implementation(Dependencies.Androidx.fragmentKtx)
-  implementation(Dependencies.Androidx.recyclerView)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Lifecycle.liveDataKtx)
-  implementation(Dependencies.Lifecycle.runtime)
-  implementation(Dependencies.Lifecycle.viewModelKtx)
-  implementation(Dependencies.Navigation.navFragmentKtx)
-  implementation(Dependencies.Navigation.navUiKtx)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(libs.androidx.activity)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.datastore.preferences)
+  implementation(libs.androidx.fragment)
+  implementation(libs.androidx.lifecycle.livedata)
+  implementation(libs.androidx.lifecycle.runtime)
+  implementation(libs.androidx.lifecycle.viewmodel)
+  implementation(libs.androidx.navigation.fragment)
+  implementation(libs.androidx.navigation.ui)
+  implementation(libs.androidx.recyclerview)
+  implementation(libs.androidx.work.runtime)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.kotlinx.coroutines.core)
   implementation(project(":datacapture")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
   }
   implementation(project(":engine"))
 
-  testImplementation(Dependencies.junit)
+  testImplementation(libs.junit)
 }

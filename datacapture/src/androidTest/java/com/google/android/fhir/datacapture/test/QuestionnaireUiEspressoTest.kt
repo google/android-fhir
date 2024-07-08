@@ -20,12 +20,18 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.fragment.app.commitNow
+import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.action.ViewActions.typeText
 import androidx.test.espresso.assertion.ViewAssertions
+import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
+import androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
@@ -52,6 +58,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
@@ -148,40 +155,44 @@ class QuestionnaireUiEspressoTest {
     // e.g whether 000001 or 1 is input, the answer saved will be 1.
     buildFragmentFromQuestionnaire("/text_questionnaire_integer.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(0)
+    runTest {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(0)
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("001")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
+        .isEqualTo(1)
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueIntegerType.value)
-      .isEqualTo(1)
   }
 
   @Test
   fun decimalTextEdit_typingZeroBeforeAnyIntegerShouldKeepZeroDisplayed() {
     buildFragmentFromQuestionnaire("/text_questionnaire_decimal.json")
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.0))
+    runTest {
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("0."))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.0))
 
-    onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
+      onView(withId(R.id.text_input_edit_text)).perform(typeText("01"))
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
 
-    onView(withId(R.id.text_input_edit_text)).check { view, _ ->
-      assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      onView(withId(R.id.text_input_edit_text)).check { view, _ ->
+        assertThat((view as TextInputEditText).text.toString()).isEqualTo("0.01")
+      }
+
+      assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
+        .isEqualTo(BigDecimal.valueOf(0.01))
     }
-
-    assertThat(getQuestionnaireResponse().item.first().answer.first().valueDecimalType.value)
-      .isEqualTo(BigDecimal.valueOf(0.01))
   }
 
   @Test
@@ -226,8 +237,10 @@ class QuestionnaireUiEspressoTest {
 
     onView(withId(R.id.time_input_layout)).check { view, _ -> assertThat(view.isEnabled).isTrue() }
 
-    assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
-    assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    runTest {
+      assertThat(getQuestionnaireResponse().item.size).isEqualTo(1)
+      assertThat(getQuestionnaireResponse().item.first().answer.size).isEqualTo(0)
+    }
   }
 
   @Test
@@ -244,9 +257,11 @@ class QuestionnaireUiEspressoTest {
     clickOnText("10")
     clickOnText("OK")
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
-
-    assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    runTest {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateTimeType
+      // check Locale
+      assertThat(answer.localDateTime).isEqualTo(LocalDateTime.of(2005, 1, 5, 6, 10))
+    }
   }
 
   @Test
@@ -277,8 +292,10 @@ class QuestionnaireUiEspressoTest {
       assertThat(actualError).isEqualTo(null)
     }
 
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
-    assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    runTest {
+      val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType
+      assertThat(answer.localDate).isEqualTo(LocalDate.of(2005, 1, 5))
+    }
   }
 
   @Test
@@ -312,17 +329,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val today = DateTimeType.today().valueAsString
-    val answer = getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
 
-    assertThat(answer).isEqualTo(today)
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
+    runTest {
+      val answer =
+        getQuestionnaireResponse().item.first().answer.first().valueDateType.valueAsString
+      assertThat(answer).isEqualTo(today)
 
-    assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+      assertThat(validationResult["link-1"]?.first()).isEqualTo(Valid)
+    }
   }
 
   @Test
@@ -356,15 +376,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val maxDateAllowed = maxDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    runTest {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Maximum value allowed is:$maxDateAllowed")
+    }
   }
 
   @Test
@@ -398,15 +423,20 @@ class QuestionnaireUiEspressoTest {
       .perform(ViewActions.click())
 
     val minDateAllowed = minDate.valueAsString
-    val validationResult =
-      QuestionnaireResponseValidator.validateQuestionnaireResponse(
-        questionnaire,
-        getQuestionnaireResponse(),
-        context,
-      )
 
-    assertThat((validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage())
-      .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    runTest {
+      val validationResult =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire,
+          getQuestionnaireResponse(),
+          context,
+        )
+
+      assertThat(
+          (validationResult["link-1"]?.first() as Invalid).getSingleStringValidationMessage(),
+        )
+        .isEqualTo("Minimum value allowed is:$minDateAllowed")
+    }
   }
 
   @Test
@@ -580,24 +610,109 @@ class QuestionnaireUiEspressoTest {
     }
   }
 
+  @Test
+  fun test_repeated_group_is_added() {
+    buildFragmentFromQuestionnaire("/component_repeated_group.json")
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          0,
+          clickChildViewWithId(R.id.add_item),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun test_repeated_group_is_deleted() {
+    buildFragmentFromQuestionnaire(
+      "/component_repeated_group.json",
+      responseFileName = "/repeated_group_response.json",
+    )
+
+    onView(withId(R.id.questionnaire_edit_recycler_view))
+      .perform(
+        RecyclerViewActions.actionOnItemAtPosition<ViewHolder>(
+          1,
+          clickChildViewWithId(R.id.repeated_group_instance_header_delete_button),
+        ),
+      )
+
+    onView(ViewMatchers.withId(R.id.questionnaire_edit_recycler_view)).check {
+      view,
+      noViewFoundException,
+      ->
+      if (noViewFoundException != null) {
+        throw noViewFoundException
+      }
+      assertThat(
+          (view as RecyclerView).countChildViewOccurrences(
+            R.id.repeated_group_instance_header_title,
+          ),
+        )
+        .isEqualTo(0)
+    }
+  }
+
+  private fun RecyclerView.countChildViewOccurrences(viewId: Int): Int {
+    var count = 0
+    for (i in 0 until this.adapter!!.itemCount) {
+      val holder = findViewHolderForAdapterPosition(i)
+      if (holder?.itemView?.findViewById<View>(viewId) != null) {
+        count++
+      }
+    }
+    return count
+  }
+
+  private fun clickChildViewWithId(id: Int) =
+    object : ViewAction {
+      override fun getConstraints() = isAssignableFrom(View::class.java)
+
+      override fun getDescription() = "Click on a child view with specified id."
+
+      override fun perform(uiController: UiController?, view: View) {
+        view.findViewById<View>(id)?.performClick()
+      }
+    }
+
   private fun buildFragmentFromQuestionnaire(
     fileName: String,
     isReviewMode: Boolean = false,
+    responseFileName: String? = null,
   ): QuestionnaireFragment {
     val questionnaireJsonString = readFileFromAssets(fileName)
-    val questionnaireFragment =
+    val builder =
       QuestionnaireFragment.builder()
         .setQuestionnaire(questionnaireJsonString)
         .setShowCancelButton(true)
         .showReviewPageBeforeSubmit(isReviewMode)
-        .build()
-    activityScenarioRule.scenario.onActivity { activity ->
-      activity.supportFragmentManager.commitNow {
-        setReorderingAllowed(true)
-        add(R.id.container_holder, questionnaireFragment)
+
+    responseFileName?.let { builder.setQuestionnaireResponse(readFileFromAssets(it)) }
+
+    return builder.build().also { fragment ->
+      activityScenarioRule.scenario.onActivity { activity ->
+        activity.supportFragmentManager.commitNow {
+          setReorderingAllowed(true)
+          add(R.id.container_holder, fragment)
+        }
       }
     }
-    return questionnaireFragment
   }
 
   private fun buildFragmentFromQuestionnaire(
@@ -620,7 +735,7 @@ class QuestionnaireUiEspressoTest {
   private fun readFileFromAssets(filename: String) =
     javaClass.getResourceAsStream(filename)!!.bufferedReader().use { it.readText() }
 
-  private fun getQuestionnaireResponse(): QuestionnaireResponse {
+  private suspend fun getQuestionnaireResponse(): QuestionnaireResponse {
     var testQuestionnaireFragment: QuestionnaireFragment? = null
     activityScenarioRule.scenario.onActivity { activity ->
       testQuestionnaireFragment =

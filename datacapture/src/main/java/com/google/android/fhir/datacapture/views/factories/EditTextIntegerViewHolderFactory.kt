@@ -23,6 +23,7 @@ import android.text.Editable
 import android.text.InputType
 import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -37,7 +38,10 @@ internal object EditTextIntegerViewHolderFactory :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
-      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+      override suspend fun handleInput(
+        editable: Editable,
+        questionnaireViewItem: QuestionnaireViewItem,
+      ) {
         val input = editable.toString()
         if (input.isEmpty()) {
           questionnaireViewItem.clearAnswer()
@@ -55,10 +59,9 @@ internal object EditTextIntegerViewHolderFactory :
         }
       }
 
-      override fun updateUI(
+      override fun updateInputTextUI(
         questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
-        textInputLayout: TextInputLayout,
       ) {
         val answer =
           questionnaireViewItem.answers.singleOrNull()?.valueIntegerType?.value?.toString()
@@ -75,11 +78,22 @@ internal object EditTextIntegerViewHolderFactory :
         } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
           textInputEditText.setText(draftAnswer)
         }
+      }
 
+      override fun updateValidationTextUI(
+        questionnaireViewItem: QuestionnaireViewItem,
+        textInputLayout: TextInputLayout,
+      ) {
+        textInputLayout.error =
+          getValidationErrorMessage(
+            textInputLayout.context,
+            questionnaireViewItem,
+            questionnaireViewItem.validationResult,
+          )
         // Update error message if draft answer present
-        if (draftAnswer != null) {
+        if (questionnaireViewItem.draftAnswer != null) {
           textInputLayout.error =
-            textInputEditText.context.getString(
+            textInputLayout.context.getString(
               R.string.integer_format_validation_error_msg,
               formatInteger(Int.MIN_VALUE),
               formatInteger(Int.MAX_VALUE),

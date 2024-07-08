@@ -248,7 +248,7 @@ private fun Search.getSortOrder(
           //  spotless:off
       """
       LEFT JOIN ${sortTableName.tableName} $tableAlias
-      ON $otherTable.resourceType = $tableAlias.resourceType AND $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+      ON $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
       """
         //  spotless:on
         }

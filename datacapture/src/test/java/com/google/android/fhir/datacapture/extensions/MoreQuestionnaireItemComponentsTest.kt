@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1499,6 +1499,113 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
+  fun `unitOption should return list of coding for multiple available unit options`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "mn", "months"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mn", "months"))))
+  }
+
+  @Test
+  fun `unitOption should return list with single coding for single available unit option`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addExtension(
+          EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL,
+          Coding("http://unit.org", "yr", "years"),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return empty list for no available unit option`() {
+    val question = Questionnaire.QuestionnaireItemComponent()
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(0)
+  }
+
+  @Test
+  fun `unitOption should return list with single coding when initial value of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(1)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+  }
+
+  @Test
+  fun `unitOption should return list with de-duplicated coding when multiple initial values of type quantity is defined`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "yr"
+              this.unit = "years"
+            },
+          ),
+        )
+        addInitial(
+          Questionnaire.QuestionnaireItemInitialComponent(
+            Quantity().apply {
+              this.system = "http://unit.org"
+              this.code = "mo"
+              this.unit = "months"
+            },
+          ),
+        )
+      }
+
+    val result = question.unitOption
+
+    assertThat(result).hasSize(2)
+    assertThat((result[0].equalsDeep(Coding("http://unit.org", "yr", "years"))))
+    assertThat((result[1].equalsDeep(Coding("http://unit.org", "mo", "months"))))
+  }
+
+  @Test
   fun createQuestionResponseWithoutGroupAndNestedQuestions() {
     val question =
       Questionnaire.QuestionnaireItemComponent().apply {
@@ -2369,6 +2476,123 @@ class MoreQuestionnaireItemComponentsTest {
     val zipList =
       questionnaireItemComponentList.zipByLinkId(questionnaireResponseItemComponentList) { _, _ -> }
     assertThat(zipList.size).isEqualTo(3)
+  }
+
+  @Test
+  fun `should not nest items if question has no nested items`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should not nest items if group has no nested items`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should nest items under question with nested questions`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `should nest items under each repeated answer of question with nested questions`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.BOOLEAN
+        repeats = true
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `should not nest items under non repeated group`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = false
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isFalse()
+  }
+
+  @Test
+  fun `should nest items under repeated group`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "2"
+            type = Questionnaire.QuestionnaireItemType.BOOLEAN
+          },
+        )
+      }
+
+    assertThat(question.shouldHaveNestedItemsUnderAnswers).isTrue()
+  }
+
+  @Test
+  fun `test questionnaireItemComponent is repeatedGroup`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+      }
+
+    assertThat(question.isRepeatedGroup).isTrue()
+  }
+
+  @Test
+  fun `test questionnaireItemComponent is not RepeatedGroup`() {
+    val question =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = false
+      }
+
+    assertThat(question.isRepeatedGroup).isFalse()
   }
 
   private val displayCategoryExtensionWithInstructionsCode =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,10 +32,13 @@ import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
+import org.hl7.fhir.r4.context.IWorkerContext
+import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MetadataResource
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
 /**
@@ -130,8 +133,8 @@ internal constructor(
     val resourceEntities =
       when {
         url != null && version != null ->
-          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(url, version))
-        url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(url))
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(resType, url, version))
+        url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(resType, url))
         id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
         name != null && version != null ->
           listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
@@ -187,6 +190,34 @@ internal constructor(
       )
 
     return knowledgeDao.insertResource(igId, res)
+  }
+
+  /**
+   * Loads and initializes a worker context with the specified npm packages.
+   *
+   * This
+   * [sample](https://github.com/google/android-fhir/blob/385dc32f2706ad5520c121bf39478a105a5d46eb/datacapture/src/test/java/com/google/android/fhir/datacapture/mapping/ResourceMapperTest.kt#L3065)
+   * test demonstrates how to use `loadWorkerContext` API.
+   *
+   * @param npmPackages The npm packages to be loaded into the worker context.
+   * @param allowLoadingDuplicates Flag indicating whether loading duplicate packages is allowed.
+   *   Default is true.
+   * @param loader Custom resource loader for the worker context. Default is null, meaning the
+   *   default loader will be used.
+   * @return An initialized instance of [IWorkerContext].
+   */
+  suspend fun loadWorkerContext(
+    vararg npmPackages: NpmPackage,
+    allowLoadingDuplicates: Boolean = true,
+    loader: SimpleWorkerContext.IContextResourceLoader? = null,
+  ): IWorkerContext {
+    return withContext(Dispatchers.IO) {
+      val simpleWorkerContext = SimpleWorkerContext()
+      simpleWorkerContext.apply {
+        isAllowLoadingDuplicates = allowLoadingDuplicates
+        npmPackages.forEach { npmPackage -> loadFromPackage(npmPackage, loader) }
+      }
+    }
   }
 
   private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {

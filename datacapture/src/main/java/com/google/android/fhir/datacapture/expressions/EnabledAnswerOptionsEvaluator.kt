@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,12 +55,12 @@ import org.hl7.fhir.r4.model.ValueSet
 internal class EnabledAnswerOptionsEvaluator(
   private val questionnaire: Questionnaire,
   private val questionnaireResponse: QuestionnaireResponse,
-  private val xFhirQueryResolver: XFhirQueryResolver?,
-  private val externalValueSetResolver: ExternalAnswerValueSetResolver?,
   private val questionnaireItemParentMap:
     Map<QuestionnaireItemComponent, QuestionnaireItemComponent> =
     emptyMap(),
   private val questionnaireLaunchContextMap: Map<String, Resource>? = emptyMap(),
+  private val xFhirQueryResolver: XFhirQueryResolver? = null,
+  private val externalValueSetResolver: ExternalAnswerValueSetResolver? = null,
 ) {
 
   private val expressionEvaluator =
@@ -69,6 +69,7 @@ internal class EnabledAnswerOptionsEvaluator(
       questionnaireResponse,
       questionnaireItemParentMap,
       questionnaireLaunchContextMap,
+      xFhirQueryResolver,
     )
 
   private val answerValueSetMap =
@@ -100,8 +101,6 @@ internal class EnabledAnswerOptionsEvaluator(
       answerOptions(
         questionnaireItem,
         questionnaireResponseItem,
-        questionnaireResponse,
-        questionnaireItemParentMap,
       )
 
     if (questionnaireItem.answerOptionsToggleExpressions.isEmpty()) {
@@ -139,8 +138,6 @@ internal class EnabledAnswerOptionsEvaluator(
   private suspend fun answerOptions(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     when {
       questionnaireItem.answerOption.isNotEmpty() -> questionnaireItem.answerOption
@@ -150,8 +147,6 @@ internal class EnabledAnswerOptionsEvaluator(
         resolveAnswerExpression(
           questionnaireItem,
           questionnaireResponseItem,
-          questionnaireResponse,
-          questionnaireItemParentMap,
         )
       else -> emptyList()
     }
@@ -200,33 +195,27 @@ internal class EnabledAnswerOptionsEvaluator(
   private suspend fun resolveAnswerExpression(
     item: QuestionnaireItemComponent,
     responseItem: QuestionnaireResponseItemComponent,
-    questionnaireResponse: QuestionnaireResponse,
-    questionnaireItemParentMap: Map<QuestionnaireItemComponent, QuestionnaireItemComponent>,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     // Check cache first for database queries
     val answerExpression = item.answerExpression ?: return emptyList()
 
     return when {
       answerExpression.isXFhirQuery -> {
-        xFhirQueryResolver?.let { xFhirQueryResolver ->
-          val xFhirExpressionString =
-            expressionEvaluator.createXFhirQueryFromExpression(
-              item,
-              answerExpression,
-            )
-          if (answerExpressionMap.containsKey(xFhirExpressionString)) {
-            answerExpressionMap[xFhirExpressionString]
-          }
-
-          val data = xFhirQueryResolver.resolve(xFhirExpressionString)
-          val options = item.extractAnswerOptions(data)
-
-          answerExpressionMap[xFhirExpressionString] = options
-          options
+        checkNotNull(xFhirQueryResolver) {
+          "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig."
         }
-          ?: error(
-            "XFhirQueryResolver cannot be null. Please provide the XFhirQueryResolver via DataCaptureConfig.",
-          )
+        val variablesMap = expressionEvaluator.extractItemDependentVariables(answerExpression, item)
+        val xFhirExpressionString =
+          expressionEvaluator.createXFhirQueryFromExpression(answerExpression, variablesMap)
+        if (answerExpressionMap.containsKey(xFhirExpressionString)) {
+          answerExpressionMap[xFhirExpressionString]
+        }
+
+        val data = xFhirQueryResolver.resolve(xFhirExpressionString)
+        val options = item.extractAnswerOptions(data)
+
+        answerExpressionMap[xFhirExpressionString] = options
+        options
       }
       answerExpression.isFhirPath -> {
         val data = expressionEvaluator.evaluateExpression(item, responseItem, answerExpression)
@@ -239,9 +228,9 @@ internal class EnabledAnswerOptionsEvaluator(
     }
   }
 
-  private fun evaluateAnswerOptionsToggleExpressions(
+  private suspend fun evaluateAnswerOptionsToggleExpressions(
     item: QuestionnaireItemComponent,
-    questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
     answerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent>,
   ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
     val results =

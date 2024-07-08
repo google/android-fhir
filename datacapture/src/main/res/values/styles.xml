@@ -107,7 +107,7 @@
         <item
             name="questionnaireChipStyle"
         >@style/Widget.Material3.Chip.Input</item>
-        <item name="questionnaireButtonStyle">@style/Widget.Material3.Button
+        <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
         </item>
         <item name="questionnaireErrorTextStyle">
             @style/Questionnaire.ErrorStyle
@@ -132,6 +132,14 @@
         <item
             name="questionnaireEditButtonStyle"
         >@style/Questionnaire.EditButtonStyle
+        </item>
+        <item
+            name="questionnaireAddRepeatedGroupButtonStyle"
+        >@style/Questionnaire.AddRepeatedGroupButtonStyle
+        </item>
+        <item
+            name="questionnaireDeleteRepeatedGroupButtonStyle"
+        >@style/Questionnaire.DeleteRepeatedGroupButtonStyle
         </item>
         <item name="questionnaireDialogButtonStyle">
             @style/Widget.Material3.Button.TextButton.Dialog
@@ -227,12 +235,6 @@
 
     <style name="Questionnaire.BottomNavContainerStyle" parent="">
       <item name="android:background">?attr/colorSurface</item>
-      <item
-            name="android:paddingTop"
-        >@dimen/bottom_container_padding_vertical</item>
-      <item
-            name="android:paddingBottom"
-        >@dimen/bottom_container_padding_vertical</item>
     </style>
 
     <style
@@ -391,17 +393,52 @@
         <item name="android:textAllCaps">false</item>
     </style>
 
+  <style
+        name="Questionnaire.AddRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/add_24px</item>
+    <item
+            name="strokeColor"
+        >@color/m3_text_button_foreground_color_selector</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+  </style>
+
+  <style
+        name="Questionnaire.DeleteRepeatedGroupButtonStyle"
+        parent="Widget.Material3.Button.OutlinedButton"
+    >
+    <item name="android:textAllCaps">false</item>
+    <item name="android:textColor">@color/mtrl_error</item>
+    <item name="cornerRadius">4dp</item>
+    <item name="icon">@drawable/delete_24px</item>
+    <item name="strokeColor">@color/mtrl_error</item>
+    <item name="android:paddingLeft">@dimen/m3_btn_text_btn_padding_left</item>
+    <item name="iconTint">@color/mtrl_error</item>
+  </style>
+
     <style
         name="Questionnaire.SubmitButtonStyle"
         parent="Widget.Material3.Button"
     >
         <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
     <style
         name="Questionnaire.CancelButtonStyle"
         parent="Widget.Material3.Button.TextButton"
     >
         <item name="android:textAllCaps">false</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style name="Questionnaire.ButtonStyle" parent="Widget.Material3.Button">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
     </style>
 
     <style

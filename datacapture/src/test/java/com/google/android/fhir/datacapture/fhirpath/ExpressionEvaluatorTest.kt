@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture.fhirpath
 
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ANSWER_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_CALCULATED_EXPRESSION_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
@@ -28,6 +29,7 @@ import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
+import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Expression
@@ -322,6 +324,43 @@ class ExpressionEvaluatorTest {
     }
 
   @Test
+  fun `resource should exists with variable expression that uses x-fhir-query`() = runBlocking {
+    val questionnaire =
+      Questionnaire().apply {
+        addExtension().apply {
+          url = EXTENSION_VARIABLE_URL
+          setValue(
+            Expression().apply {
+              name = "A"
+              language = "application/x-fhir-query"
+              expression = "Patient?name=fikri"
+            },
+          )
+        }
+      }
+
+    val patient = Patient().apply { addName().apply { addGiven("fikri") } }
+
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        questionnaire,
+        QuestionnaireResponse(),
+        xFhirQueryResolver =
+          XFhirQueryResolver {
+            return@XFhirQueryResolver listOf(patient)
+          },
+      )
+
+    val result =
+      expressionEvaluator.evaluateQuestionnaireVariableExpression(
+        questionnaire.variableExpressions.first(),
+      )
+
+    val resultAsResourceList = (result as Bundle).entry.map { it.resource }
+    assertThat(resultAsResourceList).contains(patient)
+  }
+
+  @Test
   fun `should throw illegal argument exception with missing expression name for questionnaire variables`() {
     assertThrows(IllegalArgumentException::class.java) {
       runBlocking {
@@ -350,7 +389,7 @@ class ExpressionEvaluatorTest {
 
   @Test
   fun `should throw illegal argument exception with missing exception language for questionnaire variables`() {
-    assertThrows(IllegalArgumentException::class.java) {
+    assertThrows(UnsupportedOperationException::class.java) {
       runBlocking {
         val questionnaire =
           Questionnaire().apply {
@@ -376,8 +415,36 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `should throw illegal argument exception with unsupported expression language for questionnaire variables`() {
-    assertThrows(IllegalArgumentException::class.java) {
+  fun `should throw illegal state exception with missing x-fhir-query resolver for questionnaire variables`() {
+    assertThrows(IllegalStateException::class.java) {
+      runBlocking {
+        val questionnaire =
+          Questionnaire().apply {
+            id = "a-questionnaire"
+            addExtension().apply {
+              url = EXTENSION_VARIABLE_URL
+              setValue(
+                Expression().apply {
+                  name = "X"
+                  expression = "Patient?name=fikri"
+                  language = "application/x-fhir-query"
+                },
+              )
+            }
+          }
+
+        val expressionEvaluator = ExpressionEvaluator(questionnaire, QuestionnaireResponse())
+
+        expressionEvaluator.evaluateQuestionnaireVariableExpression(
+          questionnaire.variableExpressions.first(),
+        )
+      }
+    }
+  }
+
+  @Test
+  fun `should throw unsupported operation exception with cql expression language for questionnaire variables`() {
+    assertThrows(UnsupportedOperationException::class.java) {
       runBlocking {
         val questionnaire =
           Questionnaire().apply {
@@ -388,7 +455,7 @@ class ExpressionEvaluatorTest {
                 Expression().apply {
                   name = "X"
                   expression = "1"
-                  language = "application/x-fhir-query"
+                  language = "text/cql"
                 },
               )
             }
@@ -849,7 +916,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
 
@@ -881,7 +947,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
@@ -914,7 +979,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=male")
@@ -946,7 +1010,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
     assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
@@ -978,7 +1041,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John")
@@ -1028,7 +1090,6 @@ class ExpressionEvaluatorTest {
 
     val expressionsToEvaluate =
       expressionEvaluator.createXFhirQueryFromExpression(
-        Questionnaire.QuestionnaireItemComponent(),
         expression,
       )
     assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
@@ -1092,13 +1153,21 @@ class ExpressionEvaluatorTest {
         questionnaireLaunchContextMap = null,
       )
 
-    val result =
-      expressionEvaluator.createXFhirQueryFromExpression(
-        questionnaire.item[0].item[0],
-        questionnaire.item[0].item[0].answerExpression!!,
-      )
+    runBlocking {
+      val variablesMap =
+        expressionEvaluator.extractItemDependentVariables(
+          questionnaire.item[0].item[0].answerExpression!!,
+          questionnaire.item[0],
+        )
 
-    assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+      val result =
+        expressionEvaluator.createXFhirQueryFromExpression(
+          questionnaire.item[0].item[0].answerExpression!!,
+          variablesMap,
+        )
+
+      assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+    }
   }
 
   @Test
@@ -1159,12 +1228,20 @@ class ExpressionEvaluatorTest {
         questionnaireLaunchContextMap = emptyMap(),
       )
 
-    val result =
-      expressionEvaluator.createXFhirQueryFromExpression(
-        questionnaire.item[0].item[0],
-        questionnaire.item[0].item[0].answerExpression!!,
-      )
+    runBlocking {
+      val variablesMap =
+        expressionEvaluator.extractItemDependentVariables(
+          questionnaire.item[0].item[0].answerExpression!!,
+          questionnaire.item[0],
+        )
 
-    assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+      val result =
+        expressionEvaluator.createXFhirQueryFromExpression(
+          questionnaire.item[0].item[0].answerExpression!!,
+          variablesMap,
+        )
+
+      assertThat(result).isEqualTo("Patient?address-city=1&gender=2")
+    }
   }
 }

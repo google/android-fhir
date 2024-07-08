@@ -23,14 +23,18 @@ import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.maxValue
+import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
+import org.hl7.fhir.r4.model.Type
 
 /**
  * Data item for [QuestionnaireItemViewHolder] in [RecyclerView].
@@ -55,28 +59,33 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
  * @param validationResult the [ValidationResult] of the answer(s) against the `questionnaireItem`
  * @param answersChangedCallback the callback to notify the view model that the answers have been
  *   changed for the [QuestionnaireResponse.QuestionnaireResponseItemComponent]
- * @param resolveAnswerValueSet the callback to resolve the answer value set and return the answer
- * @param resolveAnswerExpression the callback to resolve answer options when answer-expression
- *   extension exists options
+ * @param enabledAnswerOptions the enabled answer options in [questionnaireItem]
+ * @param minAnswerValue the inclusive lower bound on the range of allowed answer values, that may
+ *   be used for widgets that check for bounds and change behavior based on the min allowed answer
+ *   value, e.g the Slider widget
+ * @param maxAnswerValue the inclusive upper bound on the range of allowed answer values, that may
+ *   be used for widgets that check for bounds and change behavior based on the max allowed answer
+ *   value, e.g the Slider widget
  * @param draftAnswer the draft input that cannot be stored in the [QuestionnaireResponse].
  * @param enabledDisplayItems the enabled display items in the given [questionnaireItem]
- * @param showOptionalText the optional text is being added to the end of the question text
  * @param questionViewTextConfiguration configuration to show asterisk, required and optional text
  *   in the header view.
  */
 data class QuestionnaireViewItem(
   val questionnaireItem: Questionnaire.QuestionnaireItemComponent,
-  private val questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
+  private val questionnaireResponseItem: QuestionnaireResponseItemComponent,
   val validationResult: ValidationResult,
   internal val answersChangedCallback:
-    (
+    suspend (
       Questionnaire.QuestionnaireItemComponent,
-      QuestionnaireResponse.QuestionnaireResponseItemComponent,
+      QuestionnaireResponseItemComponent,
       List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>,
       Any?,
     ) -> Unit,
   val enabledAnswerOptions: List<Questionnaire.QuestionnaireItemAnswerOptionComponent> =
     questionnaireItem.answerOption.ifEmpty { emptyList() },
+  val minAnswerValue: Type? = questionnaireItem.minValue,
+  val maxAnswerValue: Type? = questionnaireItem.maxValue,
   val draftAnswer: Any? = null,
   val enabledDisplayItems: List<Questionnaire.QuestionnaireItemComponent> = emptyList(),
   val questionViewTextConfiguration: QuestionTextConfiguration = QuestionTextConfiguration(),
@@ -101,10 +110,10 @@ data class QuestionnaireViewItem(
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
-    questionnaireResponseItem.answer.map { it.copy() }
+    questionnaireResponseItem.answer
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
-  fun setAnswer(
+  suspend fun setAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -120,12 +129,12 @@ data class QuestionnaireViewItem(
   }
 
   /** Clears existing answers and any draft answer. */
-  fun clearAnswer() {
+  suspend fun clearAnswer() {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), null)
   }
 
   /** Adds an answer to the existing answers and removes the draft answer. */
-  fun addAnswer(
+  suspend fun addAnswer(
     questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -141,7 +150,7 @@ data class QuestionnaireViewItem(
   }
 
   /** Removes an answer from the existing answers, as well as any draft answer. */
-  fun removeAnswer(
+  suspend fun removeAnswer(
     vararg questionnaireResponseItemAnswerComponent:
       QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent,
   ) {
@@ -158,11 +167,26 @@ data class QuestionnaireViewItem(
     )
   }
 
+  internal suspend fun removeAnswerAt(index: Int) {
+    check(questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+    }
+    require(index in answers.indices) {
+      "removeAnswerAt($index), but ${questionnaireItem.linkId} only has ${answers.size} answers"
+    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers.filterIndexed { currentIndex, _ -> currentIndex != index },
+      null,
+    )
+  }
+
   /**
    * Updates the draft answer stored in `QuestionnaireViewModel`. This clears any actual answer for
    * the question.
    */
-  fun setDraftAnswer(draftAnswer: Any? = null) {
+  suspend fun setDraftAnswer(draftAnswer: Any? = null) {
     answersChangedCallback(questionnaireItem, questionnaireResponseItem, listOf(), draftAnswer)
   }
 

@@ -1,21 +1,22 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.kts.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+## HAPI Strucutres need to be kept beause
+	# 1. Reflection is used in resource extraction as the FHIR Path expression is then translated to field names to locate data elements in FHIR resources.
+	# 2. In HAPI Strucures, ClassLoader is used to load classes from different packages that are hardcoded.
+-keep class ca.uhn.fhir.** { *; }
+-keep class org.hl7.fhir.**  { *; }
+# Used by hapi's XmlUtil which is internally used by hapi's FHIRPathEngine.
+-keep class com.ctc.wstx.stax.**  { *; }
+# Used by HapiWorkerContext (fhirpath engine in QuestionnaireViewModel)
+-keep class com.github.benmanes.caffeine.cache.**  { *; }
+## hapi libs ends
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+## sqlcipher starts
+# see (https://github.com/sqlcipher/android-database-sqlcipher/tree/master#proguard)
+-keep,includedescriptorclasses class net.sqlcipher.** { *; }
+-keep,includedescriptorclasses interface net.sqlcipher.** { *; }
+## sqlcipher ends
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+## retrofit starts
+# see (https://github.com/square/retrofit/issues/3539)
+-keep class com.google.android.fhir.sync.remote.RetrofitHttpService { *; }
+## retrofit ends
+-ignorewarnings

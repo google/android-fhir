@@ -18,15 +18,14 @@ name: "Build"
 # events for the `master` branch
 on:
   push:
-    branches: [ master ]
-    tags:
-      build*
+    branches: [master]
+    tags: build*
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [ master ]
+    branches: [master]
   schedule:
     # Run once a week (even if no new code or PRs) to detect random regressions
-    - cron: '12 13 * * 2'
+    - cron: "12 13 * * 2"
 
 env:
   # Allow precise monitoring of the save/restore of Gradle User Home by `gradle-build-action`
@@ -50,13 +49,13 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: write
 
     strategy:
       fail-fast: false
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: Checkout Repo
         uses: actions/checkout@v4
@@ -77,9 +76,21 @@ jobs:
       - name: Check with Gradle
         run: ./gradlew check --scan --full-stacktrace
 
+      - name: Publish Maven packages to GitHub Packages
+        if: ${{ github.event_name == 'push' }}
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_URL: 'https://maven.pkg.github.com/google/android-fhir'
+          # Use SNAPSHOT Prefix to follow Maven convention
+          ARTIFACT_VERSION_SUFFIX: SNAPSHOT
+
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
-      - name: Upload maven repo
+        env:
+          ARTIFACT_VERSION_SUFFIX: build_${{ github.run_id }}
+
+      - name: Upload artifact maven-repository.zip
         uses: actions/upload-artifact@v4
         with:
           name: maven-repository
@@ -96,3 +107,52 @@ jobs:
         with:
           name: build
           path: build.zip
+
+      # Steps that follow are related to the Documentation Web Site
+      # This deploys content based on docs/ which ends up in site/
+      # to https://google.github.io/android-fhir/ using GitHub Pages.
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+          cache: "pipenv"
+      - name: Install PipEnv
+        uses: tiagovrtr/actions-pipenv@v1
+        with:
+          pipenv-version: 2023.12.1
+
+      - name: Build Docs Site
+        # This 1st step intentionally runs not just on the main ("master") branch
+        # but also for all pull requests. This serves to detect doc breakages.
+        # (But the following steps, which do the actual deploy, only run for
+        #  the main branch, of course.)
+        run: ./build-docs.bash
+
+      - name: Setup GitHub Pages
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload site/ directory as GitHub Pages artifact
+        if: ${{ github.event_name == 'push' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "site/"
+
+  deploy-website:
+    needs: build
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    # https://docs.github.com/en/actions/security-guides/automatic-token-authentication
+    # Sets required permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      # https://github.com/actions/deploy-pages
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

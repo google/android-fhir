@@ -22,6 +22,8 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
+import com.google.android.fhir.db.Database
+import com.google.android.fhir.sync.upload.patch.PatchOrdering.sccOrderByReferences
 
 /**
  * Generates a [Patch] for all [LocalChange]es made to a single FHIR resource.
@@ -30,10 +32,18 @@ import com.google.android.fhir.LocalChange.Type
  * maintain an audit trail, but instead, multiple changes made to the same FHIR resource on the
  * client can be recorded as a single change on the server.
  */
-internal object PerResourcePatchGenerator : PatchGenerator {
+internal class PerResourcePatchGenerator private constructor(val database: Database) :
+  PatchGenerator {
 
-  override fun generate(localChanges: List<LocalChange>): List<PatchMapping> {
-    return localChanges
+  override suspend fun generate(
+    localChanges: List<LocalChange>,
+  ): List<StronglyConnectedPatchMappings> {
+    return generateSquashedChangesMapping(localChanges).sccOrderByReferences(database)
+  }
+
+  @androidx.annotation.VisibleForTesting
+  internal fun generateSquashedChangesMapping(localChanges: List<LocalChange>) =
+    localChanges
       .groupBy { it.resourceType to it.resourceId }
       .values
       .mapNotNull { resourceLocalChanges ->
@@ -44,7 +54,6 @@ internal object PerResourcePatchGenerator : PatchGenerator {
           )
         }
       }
-  }
 
   private fun mergeLocalChangesForSingleResource(localChanges: List<LocalChange>): Patch? {
     // TODO (maybe this should throw exception when two entities don't have the same versionID)
@@ -137,5 +146,21 @@ internal object PerResourcePatchGenerator : PatchGenerator {
     val mergedNode = objectMapper.createArrayNode()
     mergedOperations.values.flatten().forEach(mergedNode::add)
     return objectMapper.writeValueAsString(mergedNode)
+  }
+
+  companion object {
+
+    @Volatile private lateinit var _instance: PerResourcePatchGenerator
+
+    @Synchronized
+    fun with(database: Database): PerResourcePatchGenerator {
+      if (!::_instance.isInitialized) {
+        _instance = PerResourcePatchGenerator(database)
+      } else if (_instance.database != database) {
+        _instance = PerResourcePatchGenerator(database)
+      }
+
+      return _instance
+    }
   }
 }

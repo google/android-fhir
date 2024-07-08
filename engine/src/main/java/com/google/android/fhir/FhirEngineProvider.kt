@@ -18,6 +18,8 @@ package com.google.android.fhir
 
 import android.content.Context
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
+import com.google.android.fhir.db.Database
+import com.google.android.fhir.index.SearchParamDefinitionsProvider
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.FhirDataStore
 import com.google.android.fhir.sync.HttpAuthenticator
@@ -25,16 +27,22 @@ import com.google.android.fhir.sync.remote.HttpLogger
 import java.io.File
 import org.hl7.fhir.r4.model.SearchParameter
 
-/** The provider for [FhirEngine] instance. */
+/**
+ * Provides access to the [FhirEngine] instance.
+ *
+ * Use [init] to initialize the engine with a custom configuration. Otherwise, the default
+ * configuration will be used. Call [getInstance] to retrieve the engine instance.
+ */
 object FhirEngineProvider {
   private var fhirEngineConfiguration: FhirEngineConfiguration? = null
   private var fhirServices: FhirServices? = null
 
   /**
-   * Initializes the [FhirEngine] singleton with a custom Configuration.
+   * Initializes the [FhirEngine] singleton with a custom [FhirEngineConfiguration]. This must be
+   * done only once; we recommend doing this in the `onCreate()` function of your Application class.
    *
-   * This method throws [IllegalStateException] if it is called multiple times. It throws
-   * [NullPointerException] if [FhirEngineConfiguration.context] is null.
+   * @throws IllegalStateException if called multiple times.
+   * @throws NullPointerException if `FhirEngineConfiguration.context` is null.
    */
   @Synchronized
   fun init(fhirEngineConfiguration: FhirEngineConfiguration) {
@@ -68,6 +76,11 @@ object FhirEngineProvider {
   }
 
   @Synchronized
+  internal fun getFhirDatabase(context: Context): Database {
+    return getOrCreateFhirService(context).database
+  }
+
+  @Synchronized
   private fun getOrCreateFhirService(context: Context): FhirServices {
     if (fhirServices == null) {
       fhirEngineConfiguration = fhirEngineConfiguration ?: FhirEngineConfiguration()
@@ -88,6 +101,15 @@ object FhirEngineProvider {
     return checkNotNull(fhirServices)
   }
 
+  /**
+   * Returns the [SearchParamDefinitionsProvider] instance created in [FhirServices] class once the
+   * [FhirServices] class has been created, ie, which is when [FhirEngine] instance has been asked
+   * for by the application.
+   *
+   * If this method is called without creating [FhirEngine] instance, this will return null.
+   */
+  internal fun getSearchParamProvider() = fhirServices?.searchParamProvider
+
   @Synchronized
   fun cleanup() {
     check(fhirEngineConfiguration?.testMode == true) {
@@ -104,34 +126,47 @@ object FhirEngineProvider {
 }
 
 /**
- * A configuration which describes the database setup and error recovery.
+ * Configuration for the FHIR Engine, including database setup, error recovery, server connection,
+ * and custom search parameters.
  *
- * Database encryption is only available on API 23 or above. If enableEncryptionIfSupported is true,
- * FHIR SDK will only enable database encryption on API 23 or above.
+ * **Database Encryption:**
  *
- * WARNING: Your app may try to decrypt an unencrypted database from a device which was previously
- * on API 22 but later upgraded to API 23. When this happens, an [IllegalStateException] is thrown.
+ * Database encryption is only available on API 23 (Android 6.0) or above. If
+ * `enableEncryptionIfSupported` is true, the FHIR SDK will only enable database encryption on
+ * supported devices.
+ *
+ * **WARNING:** If database encryption is enabled, devices that are on API 22 (Android 5.1) or lower
+ * will have an unencrypted database. If those devices are later updated to API 23 or newer, they
+ * will encounter an `IllegalStateException`. This is because the database was created without
+ * encryption on the older API level, and enabling encryption in the new release will not
+ * retroactively encrypt the existing database, causing the app to try to decrypt an unencrypted
+ * database.
+ *
+ * @property enableEncryptionIfSupported Enables database encryption if supported by the device.
+ *   Defaults to false.
+ * @property databaseErrorStrategy The strategy to handle database errors. Defaults to
+ *   [DatabaseErrorStrategy.UNSPECIFIED].
+ * @property serverConfiguration Optional configuration for connecting to a remote FHIR server.
+ * @property testMode Whether to run the engine in test mode (using an in-memory database). Defaults
+ *   to false.
+ * @property customSearchParameters Additional search parameters to be used for querying the FHIR
+ *   engine with the Search API. These are in addition to the default
+ *   [search parameters](https://www.hl7.org/fhir/searchparameter-registry.html) defined in the FHIR
+ *   specification. Custom search parameters must be unique and not change existing or default
+ *   search parameters.<p> **Note:** The engine does not automatically reindex resources after new
+ *   custom search parameters are added. You must manually reindex resources by updating them. Any
+ *   new CRUD operations on a resource after adding new search parameters will automatically trigger
+ *   reindexing.
  */
 data class FhirEngineConfiguration(
   val enableEncryptionIfSupported: Boolean = false,
   val databaseErrorStrategy: DatabaseErrorStrategy = UNSPECIFIED,
   val serverConfiguration: ServerConfiguration? = null,
   val testMode: Boolean = false,
-  /**
-   * Additional search parameters to be used to query FHIR engine using the search API. These are in
-   * addition to the default search parameters defined in
-   * [FHIR](https://www.hl7.org/fhir/searchparameter-registry.html). The search parameters should be
-   * unique and not change the existing/default search parameters and it may lead to unexpected
-   * search behaviour.
-   *
-   * NOTE: The engine doesn't reindex resources after a new [SearchParameter] is added to the
-   * engine. It is the responsibility of the app developer to reindex the resources by updating
-   * them. Any new CRUD operations on a resource after a new [SearchParameter] is added will result
-   * in the reindexing of the resource.
-   */
   val customSearchParameters: List<SearchParameter>? = null,
 )
 
+/** How database errors should be handled. */
 enum class DatabaseErrorStrategy {
   /**
    * If unspecified, all database errors will be propagated to the call site. The caller shall
@@ -148,36 +183,51 @@ enum class DatabaseErrorStrategy {
   RECREATE_AT_OPEN,
 }
 
-/** A configuration to provide necessary params for network connection. */
+/**
+ * Configuration for connecting to a remote FHIR server.
+ *
+ * @property baseUrl The base URL of the remote FHIR server.
+ * @property networkConfiguration Configuration for network connection parameters. Defaults to
+ *   [NetworkConfiguration].
+ * @property authenticator An optional [HttpAuthenticator] for providing HTTP authorization headers.
+ * @property httpLogger Logs the communication between the engine and the remote server. Defaults to
+ *   [HttpLogger.NONE].
+ */
 data class ServerConfiguration(
-  /** Url of the remote FHIR server. */
   val baseUrl: String,
-  /** A configuration to provide the network connection parameters. */
   val networkConfiguration: NetworkConfiguration = NetworkConfiguration(),
-  /** An [HttpAuthenticator] for providing HTTP authorization header. */
   val authenticator: HttpAuthenticator? = null,
-  /** Logs the communication between the engine and the remote server. */
   val httpLogger: HttpLogger = HttpLogger.NONE,
 )
 
-/** A configuration to provide the network connection parameters. */
+/**
+ * Configuration for network connection parameters used when communicating with a remote FHIR
+ * server.
+ *
+ * @property connectionTimeOut Connection timeout in seconds. Defaults to 10 seconds.
+ * @property readTimeOut Read timeout in seconds for network connections. Defaults to 10 seconds.
+ * @property writeTimeOut Write timeout in seconds for network connections. Defaults to 10 seconds.
+ * @property uploadWithGzip Enables compression of requests when uploading to a server that supports
+ *   gzip. Defaults to false.
+ * @property httpCache Optional [CacheConfiguration] to enable Cache-Control headers for network
+ *   requests.
+ */
 data class NetworkConfiguration(
-  /** Connection timeout (in seconds). The default is 10 seconds. */
   val connectionTimeOut: Long = 10,
-  /** Read timeout (in seconds) for network connection. The default is 10 seconds. */
   val readTimeOut: Long = 10,
-  /** Write timeout (in seconds) for network connection. The default is 10 seconds. */
   val writeTimeOut: Long = 10,
-  /** Compresses requests when uploading to a server that supports gzip. */
   val uploadWithGzip: Boolean = false,
-  /** Cache setting to enable Cache-Control Header */
   val httpCache: CacheConfiguration? = null,
 )
 
-/** Cache configuration wrapper */
+/**
+ * Configuration for HTTP caching of network requests.
+ *
+ * @property cacheDir The directory used for caching, e.g., `File(application.cacheDir,
+ *   "http_cache")`.
+ * @property maxSize The maximum size of the cache in bits, e.g., `50L * 1024L * 1024L` for 50 MiB.
+ */
 data class CacheConfiguration(
-  /** Cache directory eg: File(application.cacheDir, "http_cache") */
   val cacheDir: File,
-  /** Cache size in bits eg: 50L * 1024L * 1024L // 50 MiB */
   val maxSize: Long,
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ package com.google.android.fhir.datacapture.views.factories
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.QuestionnaireAdapterItem
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.MediaView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -50,7 +52,7 @@ abstract class QuestionnaireItemViewHolderFactory(@LayoutRes open val resId: Int
  *
  * This is used by [QuestionnaireItemAdapter] to initialize views and bind items in [RecyclerView].
  */
-open class QuestionnaireItemViewHolder(
+class QuestionnaireItemViewHolder(
   itemView: View,
   private val delegate: QuestionnaireItemViewHolderDelegate,
 ) : RecyclerView.ViewHolder(itemView) {
@@ -62,11 +64,30 @@ open class QuestionnaireItemViewHolder(
     itemMediaView = itemView.findViewById(R.id.item_media)
   }
 
-  open fun bind(questionnaireViewItem: QuestionnaireViewItem) {
+  fun bind(questionnaireViewItem: QuestionnaireViewItem) {
     delegate.questionnaireViewItem = questionnaireViewItem
     delegate.bind(questionnaireViewItem)
     itemMediaView.bind(questionnaireViewItem.questionnaireItem)
     delegate.setReadOnly(questionnaireViewItem.questionnaireItem.readOnly)
+  }
+}
+
+/** The [RecyclerView.ViewHolder] for [QuestionnaireAdapterItem.RepeatedGroupHeader]. */
+internal class RepeatedGroupHeaderItemViewHolder(
+  itemView: View,
+) : RecyclerView.ViewHolder(itemView) {
+  private val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
+  private val delete: View =
+    itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
+
+  fun bind(repeatedGroupHeader: QuestionnaireAdapterItem.RepeatedGroupHeader) {
+    header.text =
+      header.context.getString(
+        R.string.repeated_group_title,
+        "${repeatedGroupHeader.index + 1}",
+        repeatedGroupHeader.title,
+      )
+    delete.setOnClickListener { repeatedGroupHeader.onDeleteClicked() }
   }
 }
 

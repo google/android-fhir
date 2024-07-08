@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package com.google.android.fhir.datacapture.mapping
 
-import com.google.android.fhir.datacapture.DataCapture
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.initialExpression
@@ -199,18 +198,16 @@ object ResourceMapper {
     structureMapExtractionContext: StructureMapExtractionContext,
   ): Bundle {
     val structureMapProvider = structureMapExtractionContext.structureMapProvider
-    val simpleWorkerContext =
-      DataCapture.getConfiguration(structureMapExtractionContext.context)
-        .simpleWorkerContext
-        .apply { setExpansionProfile(Parameters()) }
-    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, simpleWorkerContext)
+    val iWorkerContext =
+      structureMapExtractionContext.workerContext.apply { setExpansionProfile(Parameters()) }
+    val structureMap = structureMapProvider(questionnaire.targetStructureMap!!, iWorkerContext)
 
     return Bundle().apply {
       StructureMapUtilities(
-          simpleWorkerContext,
+          iWorkerContext,
           structureMapExtractionContext.transformSupportServices,
         )
-        .transform(simpleWorkerContext, questionnaireResponse, structureMap, this)
+        .transform(iWorkerContext, questionnaireResponse, structureMap, this)
     }
   }
 
@@ -737,7 +734,7 @@ private fun Questionnaire.createResource(): Resource? =
  * objects and throws exception otherwise. This extension function takes care of the conversion
  * based on the input and expected [Type].
  */
-private fun Base.asExpectedType(
+fun Base.asExpectedType(
   questionnaireItemType: Questionnaire.QuestionnaireItemType? = null,
 ): Type {
   return when {

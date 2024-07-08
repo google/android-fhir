@@ -52,6 +52,9 @@
     <string
         name="behavior_name_dynamic_question_text"
     >Dynamic question text</string>
+    <string
+        name="behavior_name_questionnaire_constraint"
+    >Questionnaire constraint</string>
     <string name="component_name_initial_value">Initial Value</string>
     <string
         name="behavior_name_calculated_expression_info"
@@ -71,7 +74,6 @@
     >Below is the JSON code</string>
     <string name="submit">Submit</string>
     <string name="show_error_state">Show error state</string>
-    <string name="hide_error_state">Hide error state</string>
     <string name="options">Options</string>
     <string name="error">Error</string>
     <string name="widgets">Widgets</string>

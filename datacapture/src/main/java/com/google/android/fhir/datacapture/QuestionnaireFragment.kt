@@ -21,7 +21,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import androidx.annotation.VisibleForTesting
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.core.content.res.use
@@ -34,8 +33,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.validation.Invalid
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.android.material.progressindicator.LinearProgressIndicator
+import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Questionnaire
 import timber.log.Timber
 
@@ -93,23 +94,18 @@ class QuestionnaireFragment : Fragment() {
       view.findViewById<RecyclerView>(R.id.questionnaire_edit_recycler_view)
     val questionnaireReviewRecyclerView =
       view.findViewById<RecyclerView>(R.id.questionnaire_review_recycler_view)
-    val paginationPreviousButton = view.findViewById<View>(R.id.pagination_previous_button)
-    paginationPreviousButton.setOnClickListener { viewModel.goToPreviousPage() }
-    val paginationNextButton = view.findViewById<View>(R.id.pagination_next_button)
-    paginationNextButton.setOnClickListener { viewModel.goToNextPage() }
-    view.findViewById<Button>(R.id.cancel_questionnaire).setOnClickListener {
+
+    // This container frame floats at the bottom of the view to make navigation controls visible at
+    // all times when the user scrolls. Use
+    // [QuestionnaireFragment.Builder.setShowNavigationInDefaultLongScroll] to disable this.
+    val bottomNavContainerFrame = view.findViewById<View>(R.id.bottom_nav_container_frame)
+
+    viewModel.setOnCancelButtonClickListener {
       QuestionnaireCancelDialogFragment()
         .show(requireActivity().supportFragmentManager, QuestionnaireCancelDialogFragment.TAG)
     }
-
-    view
-      .findViewById<Button>(R.id.submit_questionnaire)
-      .apply {
-        text =
-          requireArguments()
-            .getString(EXTRA_SUBMIT_BUTTON_TEXT, getString(R.string.submit_questionnaire))
-      }
-      .setOnClickListener {
+    viewModel.setOnSubmitButtonClickListener {
+      lifecycleScope.launch {
         viewModel.validateQuestionnaireAndUpdateUI().let { validationMap ->
           if (validationMap.values.flatten().filterIsInstance<Invalid>().isEmpty()) {
             setFragmentResult(SUBMIT_REQUEST_KEY, Bundle.EMPTY)
@@ -124,23 +120,16 @@ class QuestionnaireFragment : Fragment() {
           }
         }
       }
+    }
     val questionnaireProgressIndicator: LinearProgressIndicator =
       view.findViewById(R.id.questionnaire_progress_indicator)
     val questionnaireEditAdapter =
       QuestionnaireEditAdapter(questionnaireItemViewHolderFactoryMatchersProvider.get())
     val questionnaireReviewAdapter = QuestionnaireReviewAdapter()
 
-    val submitButton = requireView().findViewById<Button>(R.id.submit_questionnaire)
-    val cancelButton = requireView().findViewById<Button>(R.id.cancel_questionnaire)
-
     val reviewModeEditButton =
       view.findViewById<View>(R.id.review_mode_edit_button).apply {
         setOnClickListener { viewModel.setReviewMode(false) }
-      }
-
-    val reviewModeButton =
-      view.findViewById<View>(R.id.review_mode_button).apply {
-        setOnClickListener { viewModel.setReviewMode(true) }
       }
 
     questionnaireEditRecyclerView.adapter = questionnaireEditAdapter
@@ -160,23 +149,24 @@ class QuestionnaireFragment : Fragment() {
             // Set items
             questionnaireEditRecyclerView.visibility = View.GONE
             questionnaireReviewAdapter.submitList(
-              state.items.filterIsInstance<QuestionnaireAdapterItem.Question>(),
+              state.items,
             )
             questionnaireReviewRecyclerView.visibility = View.VISIBLE
-
-            // Set button visibility
-            submitButton.visibility = if (displayMode.showSubmitButton) View.VISIBLE else View.GONE
-            cancelButton.visibility = if (displayMode.showCancelButton) View.VISIBLE else View.GONE
-
-            reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility =
               if (displayMode.showEditButton) {
                 View.VISIBLE
               } else {
                 View.GONE
               }
-            paginationPreviousButton.visibility = View.GONE
-            paginationNextButton.visibility = View.GONE
+
+            // Set bottom navigation
+            if (state.bottomNavItems.isNotEmpty()) {
+              bottomNavContainerFrame.visibility = View.VISIBLE
+              NavigationViewHolder(bottomNavContainerFrame)
+                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+            } else {
+              bottomNavContainerFrame.visibility = View.GONE
+            }
 
             // Hide progress indicator
             questionnaireProgressIndicator.visibility = View.GONE
@@ -186,24 +176,15 @@ class QuestionnaireFragment : Fragment() {
             questionnaireReviewRecyclerView.visibility = View.GONE
             questionnaireEditAdapter.submitList(state.items)
             questionnaireEditRecyclerView.visibility = View.VISIBLE
-
-            // Set button visibility
-            submitButton.visibility =
-              if (displayMode.pagination.showSubmitButton) View.VISIBLE else View.GONE
-            cancelButton.visibility =
-              if (displayMode.pagination.showCancelButton) View.VISIBLE else View.GONE
-            reviewModeButton.visibility =
-              if (displayMode.pagination.showReviewButton) View.VISIBLE else View.GONE
             reviewModeEditButton.visibility = View.GONE
 
-            if (displayMode.pagination.isPaginated) {
-              paginationPreviousButton.visibility =
-                if (displayMode.pagination.hasPreviousPage) View.VISIBLE else View.GONE
-              paginationNextButton.visibility =
-                if (displayMode.pagination.hasNextPage) View.VISIBLE else View.GONE
+            // Set bottom navigation
+            if (state.bottomNavItems.isNotEmpty()) {
+              bottomNavContainerFrame.visibility = View.VISIBLE
+              NavigationViewHolder(bottomNavContainerFrame)
+                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
             } else {
-              paginationPreviousButton.visibility = View.GONE
-              paginationNextButton.visibility = View.GONE
+              bottomNavContainerFrame.visibility = View.GONE
             }
 
             // Set progress indicator
@@ -238,13 +219,9 @@ class QuestionnaireFragment : Fragment() {
           is DisplayMode.InitMode -> {
             questionnaireReviewRecyclerView.visibility = View.GONE
             questionnaireEditRecyclerView.visibility = View.GONE
-            paginationPreviousButton.visibility = View.GONE
-            paginationNextButton.visibility = View.GONE
             questionnaireProgressIndicator.visibility = View.GONE
-            submitButton.visibility = View.GONE
-            cancelButton.visibility = View.GONE
-            reviewModeButton.visibility = View.GONE
             reviewModeEditButton.visibility = View.GONE
+            bottomNavContainerFrame.visibility = View.GONE
           }
         }
       }
@@ -298,7 +275,7 @@ class QuestionnaireFragment : Fragment() {
    * Returns a [QuestionnaireResponse][org.hl7.fhir.r4.model.QuestionnaireResponse] populated with
    * any answers that are present on the rendered [QuestionnaireFragment] when it is called.
    */
-  fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
+  suspend fun getQuestionnaireResponse() = viewModel.getQuestionnaireResponse()
 
   fun clearAllAnswers() = viewModel.clearAllAnswers()
 
@@ -422,6 +399,14 @@ class QuestionnaireFragment : Fragment() {
      */
     fun setShowCancelButton(value: Boolean) = apply { args.add(EXTRA_SHOW_CANCEL_BUTTON to value) }
 
+    /**
+     * A [Boolean] extra to show questionnaire page as a default/long scroll with the
+     * previous/next/submit buttons anchored to bottom/end of page. Default is false.
+     */
+    fun setShowNavigationInDefaultLongScroll(value: Boolean) = apply {
+      args.add(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL to value)
+    }
+
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
     /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
@@ -520,6 +505,9 @@ class QuestionnaireFragment : Fragment() {
     internal const val EXTRA_SHOW_REQUIRED_TEXT = "show-required-text"
 
     internal const val EXTRA_SUBMIT_BUTTON_TEXT = "submit-button-text"
+
+    internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
+      "show-navigation-in-default-long-scroll"
 
     fun builder() = Builder()
   }

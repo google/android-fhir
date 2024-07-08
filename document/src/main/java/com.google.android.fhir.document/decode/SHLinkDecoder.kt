@@ -47,35 +47,44 @@ import com.google.android.fhir.document.IPSDocument
  * Send a POST request to the manifest URL with a header of "Content-Type":"application/json" and a
  * body with a "Recipient", a "Passcode" if the "P" flag is present and optionally
  * "embeddedLengthMax":INT. Example request body:
- * ```
- * {
- *   "files" : [
- *     {
- *       "contentType": "application/smart-health-card",
- *       "location":"https://bucket.cloud.example..."
- *     },
- *     {
- *       "contentType": "application/smart-health-card",
- *       "embedded":"eyJhb..."
- *     }
- *   ]
- * }
+ *
+ *  ```
+ *  {
+ *    "recipient" : "example_name",
+ *    "passcode" : "example_passcode"
+ *  }
+ *  ```
  * ```
  *
- * A location or an embedding can be returned. The embedded data is a JWE token which can be decoded
- * with the key. If the resource is stored in a location, a single GET request can be made to
- * retrieve the data.
+ * If the POST request is successful, a list of files is returned.
+ * Example response:
+ *
+ * ```
+ *
+ * { "files" :
+ * [ { "contentType": "application/smart-health-card", "location":"https://bucket.cloud.example..." }, { "contentType": "application/smart-health-card", "embedded":"eyJhb..." } ]
+ * }
+ *
+ * ```
+ *
+ * A file can be one of two types:
+ * - Location: If the resource is stored in a location, a single GET request can be made to retrieve the data.
+ * - Embedded: If the file type is embedded, the data is a JWE token which can be decoded with the SHL-specific key.
  */
 interface SHLinkDecoder {
 
   /**
-   * Decode and decompress a Smart Health Link (SHL) into an [IPSDocument] object.
+   * Decodes and decompresses a Smart Health Link (SHL) into an [IPSDocument] object.
    *
    * @param shLink The full Smart Health Link.
-   * @param jsonData The JSON data to be posted to the manifest. The JSON must contain a 'recipient'
-   *   and, if the P flag is present in the SHL payload, a passcode. For example: `{"recipient":
-   *   "Example SHL Client", "passcode": "123"}`
+   * @param recipient The recipient for the manifest request.
+   * @param passcode The passcode for the manifest request (optional, will be null if the P flag is
+   *   not present in the SHL payload).
    * @return An [IPSDocument] object if decoding is successful, otherwise null.
    */
-  suspend fun decodeSHLinkToDocument(shLink: String, jsonData: String): IPSDocument?
+  suspend fun decodeSHLinkToDocument(
+    shLink: String,
+    recipient: String,
+    passcode: String?,
+  ): IPSDocument?
 }

@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.views.factories
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -30,7 +31,10 @@ internal object EditTextDecimalViewHolderFactory :
 
   override fun getQuestionnaireItemViewHolderDelegate() =
     object : QuestionnaireItemEditTextViewHolderDelegate(DECIMAL_INPUT_TYPE) {
-      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+      override suspend fun handleInput(
+        editable: Editable,
+        questionnaireViewItem: QuestionnaireViewItem,
+      ) {
         editable.toString().toDoubleOrNull()?.let {
           questionnaireViewItem.setAnswer(
             QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
@@ -40,10 +44,9 @@ internal object EditTextDecimalViewHolderFactory :
           ?: questionnaireViewItem.setDraftAnswer(editable.toString())
       }
 
-      override fun updateUI(
+      override fun updateInputTextUI(
         questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
-        textInputLayout: TextInputLayout,
       ) {
         val questionnaireItemViewItemDecimalAnswer =
           questionnaireViewItem.answers.singleOrNull()?.valueDecimalType?.value?.toString()
@@ -59,10 +62,22 @@ internal object EditTextDecimalViewHolderFactory :
         } else if (draftAnswer != null && draftAnswer != textInputEditText.text.toString()) {
           textInputEditText.setText(draftAnswer)
         }
+      }
+
+      override fun updateValidationTextUI(
+        questionnaireViewItem: QuestionnaireViewItem,
+        textInputLayout: TextInputLayout,
+      ) {
+        textInputLayout.error =
+          getValidationErrorMessage(
+            textInputLayout.context,
+            questionnaireViewItem,
+            questionnaireViewItem.validationResult,
+          )
         // Update error message if draft answer present
-        if (draftAnswer != null) {
+        if (questionnaireViewItem.draftAnswer != null) {
           textInputLayout.error =
-            textInputEditText.context.getString(R.string.decimal_format_validation_error_msg)
+            textInputLayout.context.getString(R.string.decimal_format_validation_error_msg)
         }
       }
     }

@@ -27,6 +27,7 @@ import okhttp3.mockwebserver.RecordedRequest
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,13 +76,19 @@ class SHLinkDecoderImplTest {
 
   private val getLocationResponse = "locationData"
   private val exampleSHL =
-    "shlink:/eyJsYWJlbCI6IkN1c3RvbSBEYXRhc2V0IDExIiwidXJsIjoiaHR0cHM6Ly9hcGkudmF4eC5saW5rL2FwaS9zaGwveFJ4M2Q0QzNROE0wbnhaejZmc1ZYdGYyLW5QTDlwUXdBb2RRZVVYNzFqYyIsImZsYWciOiIiLCJrZXkiOiI0RXNvSFF3WXdTLU8wVW43WkNBQXlSMnQ2TVJ3WjJpSndLMFlZTnBNcEZFIn0"
-  private val exampleJsonData = "{\"passcode\": \"\", \"recipient\": \"Example SHL Client\"}"
+    "shlink:/eyJsYWJlbCI6IkN1c3RvbSBEYXRhc2V0IDExIiwidXJsIjoiaHR0cHM6Ly9hcGkudmF4eC5saW5rL2FwaS9zaGwveFJ4M2Q0QzNROE0wbnhaejZmc1ZYdGYyLW5QTDlwUXdBb2RRZVVYNzFqYyIsImZsYWciOiIiLCJrZXkiOiI0RXNvSFF3WXdTLU8wVW43WkNBQXlSMnQ2TVJ3WjJpSndLM0hhY2hpbmcifQ=="
   private val filesWithEmbedded =
     "{\"files\": [{\"contentType\": \"application/smart-health-card\", \"embedded\": \"embeddedData\"}]}"
   private val filesWithLocation =
     "{\"files\": [{\"contentType\": \"application/smart-health-card\", \"location\": \"https://api.vaxx.link/api/shl/xRx3d4C3Q8M0nxZz6fsVXtf2-nPL9pQwAodQeUX71jc/file/EGxABJF-Co4oplPtLN87HpSlydj9K_BhCip1sGUvevY?ticket=...\"}]}"
-  private val testBundleString = "{\"resourceType\" : \"Bundle\"}"
+  private val testBundleString =
+    """
+    {
+      "resourceType": "Bundle",
+      "id": "bundle-example"
+    }
+    """
+      .trimIndent()
 
   @Before
   fun setUp() {
@@ -107,10 +114,11 @@ class SHLinkDecoderImplTest {
     val result =
       shLinkDecoderImpl.decodeSHLinkToDocument(
         exampleSHL,
-        exampleJsonData,
+        "",
+        "",
       )
-    assertThat(result).isNotNull()
-    assertThat(result!!.document).isNotNull()
+
+    assertThat(result?.document?.id).isEqualTo("Bundle/bundle-example")
   }
 
   @Test
@@ -127,8 +135,13 @@ class SHLinkDecoderImplTest {
       `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
       `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
 
-      val result = shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
-      assertThat(result).isNotNull()
+      val result =
+        shLinkDecoderImpl.decodeSHLinkToDocument(
+          exampleSHL,
+          "",
+          "",
+        )
+
       assertThat(result!!.document).isNotNull()
 
       val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
@@ -145,65 +158,86 @@ class SHLinkDecoderImplTest {
     }
 
   @Test
-  fun `test decodeSHLinkToDocument with no data stored at the external location provided`() =
-    runBlocking {
-      val mockResponse =
-        MockResponse()
-          .setResponseCode(200)
-          .setBody(
-            filesWithLocation,
+  fun `test decodeSHLinkToDocument with no data stored at the external location provided`() {
+    val mockResponse =
+      MockResponse()
+        .setResponseCode(200)
+        .setBody(
+          filesWithLocation,
+        )
+    mockWebServer.enqueue(mockResponse)
+
+    val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody("")
+    mockWebServer.enqueue(mockGetLocationResponse)
+
+    `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
+    `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
+    `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
+    `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
+
+    val error =
+      assertThrows(Error::class.java) {
+        runBlocking {
+          shLinkDecoderImpl.decodeSHLinkToDocument(
+            exampleSHL,
+            "",
+            "",
           )
-      mockWebServer.enqueue(mockResponse)
-
-      val mockGetLocationResponse = MockResponse().setResponseCode(200).setBody("")
-      mockWebServer.enqueue(mockGetLocationResponse)
-
-      `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
-      `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
-      `when`(readSHLinkUtils.decodeShc(anyString(), anyString())).thenReturn(testBundleString)
-      `when`(readSHLinkUtils.extractVerifiableCredential(testBundleString)).thenReturn("")
-
-      val result = runCatching {
-        shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
+        }
       }
-      assertThat(result.isFailure).isTrue()
-      assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
-    }
-
-  @Test
-  fun `test decodeSHLinkToDocument with an invalid SHL passed in`() = runBlocking {
-    val result = runCatching {
-      shLinkDecoderImpl.decodeSHLinkToDocument("invalidLink", exampleJsonData)
-    }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
-    assertThat(result.exceptionOrNull()!!.message).isEqualTo("Not a valid SHLink")
+    assertThat(error.message).contains("No data found at the given location")
   }
 
   @Test
-  fun `test decodeSHLinkToDocument with an empty SHL passed in`() = runBlocking {
-    val result = runCatching { shLinkDecoderImpl.decodeSHLinkToDocument("", exampleJsonData) }
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(IllegalArgumentException::class)
-    assertThat(result.exceptionOrNull()!!.message).isEqualTo("Not a valid SHLink")
+  fun `test decodeSHLinkToDocument with an invalid SHL passed in`() {
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        runBlocking {
+          shLinkDecoderImpl.decodeSHLinkToDocument(
+            "invalidLink",
+            "",
+            "",
+          )
+        }
+      }
+    assertThat(exception.message).isEqualTo("Not a valid SHLink")
   }
 
   @Test
-  fun `test decodeSHLinkToDocument with an unsuccessful POST to the manifest URL`() = runBlocking {
+  fun `test decodeSHLinkToDocument with an empty SHL passed in`() {
+    val exception =
+      assertThrows(IllegalArgumentException::class.java) {
+        runBlocking {
+          shLinkDecoderImpl.decodeSHLinkToDocument(
+            "",
+            "",
+            "",
+          )
+        }
+      }
+    assertThat(exception.message).isEqualTo("Not a valid SHLink")
+  }
+
+  @Test
+  fun `test decodeSHLinkToDocument with an unsuccessful POST to the manifest URL`() {
     val mockResponse =
       MockResponse().setResponseCode(500).setBody(manifestFileResponseWithLocation.toString())
     mockWebServer.enqueue(mockResponse)
 
-    val jsonData = "test json data"
-
     `when`(readSHLinkUtils.extractUrl("fullLink")).thenReturn("extractedJson")
     `when`(readSHLinkUtils.decodeUrl("extractedJson")).thenReturn("{}".toByteArray())
 
-    val result = runCatching { shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, jsonData) }
-
-    assertThat(result.isFailure).isTrue()
-    assertThat(result.exceptionOrNull()!!::class).isEqualTo(Error::class)
-    assertThat(result.exceptionOrNull()!!.message).contains("Error posting to the manifest:")
+    val exception =
+      assertThrows(Error::class.java) {
+        runBlocking {
+          shLinkDecoderImpl.decodeSHLinkToDocument(
+            exampleSHL,
+            "",
+            "",
+          )
+        }
+      }
+    assertThat(exception.message).contains("Error posting to the manifest:")
   }
 
   @Test
@@ -222,8 +256,13 @@ class SHLinkDecoderImplTest {
         "{\"vc\": {\"credentialSubject\":{\"fhirBundle\":{\"resourceType\":\"Bundle\"}}}}",
       )
 
-    val result = shLinkDecoderImpl.decodeSHLinkToDocument(exampleSHL, exampleJsonData)
-    assertThat(result).isNotNull()
+    val result =
+      shLinkDecoderImpl.decodeSHLinkToDocument(
+        exampleSHL,
+        "",
+        "",
+      )
+
     assertThat(result!!.document).isNotNull()
 
     val recordedRequestGetManifest: RecordedRequest = mockWebServer.takeRequest()
