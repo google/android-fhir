@@ -53,7 +53,6 @@ dependencies {
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockWebServer)
-
   testImplementation(libs.junit)
   testImplementation(libs.kotlinx.coroutines.test)
   testImplementation(libs.truth)
