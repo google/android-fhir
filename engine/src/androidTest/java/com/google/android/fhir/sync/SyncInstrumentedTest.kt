@@ -19,6 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -105,11 +106,48 @@ class SyncInstrumentedTest {
   }
 
   @Test
+  fun oneTimeSync_currentSyncJobStatusSucceeded_nextCurrentSyncJobStatusShouldBeRunning() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<CurrentSyncJobStatus>()
+    val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
+    runBlocking {
+      Sync.oneTimeSync<TestSyncWorker>(context = context)
+        .transformWhile {
+          states.add(it)
+          emit(it is CurrentSyncJobStatus.Succeeded)
+          it !is CurrentSyncJobStatus.Succeeded
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+
+      Sync.oneTimeSync<TestSyncWorker>(context = context)
+        .transformWhile {
+          nextExecutionStates.add(it)
+          emit(it is CurrentSyncJobStatus.Succeeded)
+          it !is CurrentSyncJobStatus.Succeeded
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+    assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+    assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Succeeded::class.java)
+    assertThat(nextExecutionStates.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+  }
+
+  @Test
   fun oneTime_worker_failedSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(context = context)
+      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          context = context,
+          RetryConfiguration(
+            BackoffCriteria(
+              BackoffPolicy.LINEAR,
+              30,
+              TimeUnit.SECONDS,
+            ),
+            0,
+          ),
+        )
         .transformWhile {
           states.add(it)
           emit(it is CurrentSyncJobStatus.Failed)
@@ -119,6 +157,53 @@ class SyncInstrumentedTest {
     }
     assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
+  }
+
+  @Test
+  fun oneTimeSync_currentSyncJobStatusFailed_nextCurrentSyncJobStatusShouldBeRunning() {
+    WorkManagerTestInitHelper.initializeTestWorkManager(context)
+    val states = mutableListOf<CurrentSyncJobStatus>()
+    val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
+    runBlocking {
+      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          context = context,
+          RetryConfiguration(
+            BackoffCriteria(
+              BackoffPolicy.LINEAR,
+              30,
+              TimeUnit.SECONDS,
+            ),
+            0,
+          ),
+        )
+        .transformWhile {
+          states.add(it)
+          emit(it is CurrentSyncJobStatus.Failed)
+          it !is CurrentSyncJobStatus.Failed
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+
+      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          context = context,
+          RetryConfiguration(
+            BackoffCriteria(
+              BackoffPolicy.LINEAR,
+              30,
+              TimeUnit.SECONDS,
+            ),
+            0,
+          ),
+        )
+        .transformWhile {
+          nextExecutionStates.add(it)
+          emit(it is CurrentSyncJobStatus.Failed)
+          it !is CurrentSyncJobStatus.Failed
+        }
+        .shareIn(this, SharingStarted.Eagerly, 5)
+    }
+    assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+    assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
+    assertThat(nextExecutionStates.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
   }
 
   @Test
