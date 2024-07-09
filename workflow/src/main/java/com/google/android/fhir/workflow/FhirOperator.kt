@@ -206,54 +206,10 @@ internal constructor(
    * from a worker thread or it may throw [BlockingMainThreadException] exception.
    */
   @WorkerThread
-  @Deprecated(
-    "Use generateCarePlan with the planDefinition's url instead.",
-    ReplaceWith("this.generateCarePlan(CanonicalType, String)"),
-  )
-  fun generateCarePlan(planDefinitionId: String, subject: String): IBaseResource {
-    return generateCarePlan(planDefinitionId, subject, encounterId = null)
-  }
-
-  /**
-   * Generates a [CarePlan] based on the provided inputs.
-   *
-   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
-   * from a worker thread or it may throw [BlockingMainThreadException] exception.
-   */
-  @WorkerThread
-  @Deprecated(
-    "Use generateCarePlan with the planDefinition's url instead.",
-    ReplaceWith("this.generateCarePlan(CanonicalType, String, String)"),
-  )
   fun generateCarePlan(
-    planDefinitionId: String,
-    subject: String,
-    encounterId: String?,
-  ): IBaseResource {
-    return planDefinitionProcessor.apply(
-      /* id = */ IdType("PlanDefinition", planDefinitionId),
-      /* canonical = */ null,
-      /* planDefinition = */ null,
-      /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ null,
-      /* organizationId = */ null,
-      /* userType = */ null,
-      /* userLanguage = */ null,
-      /* userTaskContext = */ null,
-      /* setting = */ null,
-      /* settingContext = */ null,
-      /* parameters = */ null,
-      /* useServerData = */ null,
-      /* bundle = */ null,
-      /* prefetchData = */ null,
-      libraryProcessor,
-    ) as IBaseResource
-  }
-
-  @WorkerThread
-  fun generateCarePlan(
-    planDefinition: CanonicalType,
+    planDefinitionId: String? = null,
+    planDefinitionCanonical: CanonicalType? = null,
+    planDefinition: PlanDefinition? = null,
     subject: String,
     encounterId: String? = null,
     practitionerId: String? = null,
@@ -269,46 +225,8 @@ internal constructor(
     prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ null,
-      /* canonical = */ planDefinition,
-      /* planDefinition = */ null,
-      /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ practitionerId,
-      /* organizationId = */ organizationId,
-      /* userType = */ userType,
-      /* userLanguage = */ userLanguage,
-      /* userTaskContext = */ userTaskContext,
-      /* setting = */ setting,
-      /* settingContext = */ settingContext,
-      /* parameters = */ parameters,
-      /* useServerData = */ useServerData,
-      /* bundle = */ bundle,
-      /* prefetchData = */ prefetchData,
-      libraryProcessor,
-    ) as IBaseResource
-  }
-
-  @WorkerThread
-  fun generateCarePlan(
-    planDefinition: PlanDefinition,
-    subject: String,
-    encounterId: String? = null,
-    practitionerId: String? = null,
-    organizationId: String? = null,
-    userType: IBaseDatatype? = null,
-    userLanguage: IBaseDatatype? = null,
-    userTaskContext: IBaseDatatype? = null,
-    setting: IBaseDatatype? = null,
-    settingContext: IBaseDatatype? = null,
-    parameters: IBaseParameters? = null,
-    useServerData: Boolean? = null,
-    bundle: IBaseBundle? = null,
-    prefetchData: IBaseParameters? = null,
-  ): IBaseResource {
-    return planDefinitionProcessor.apply(
-      /* id = */ null,
-      /* canonical = */ null,
+      /* id = */ planDefinitionId?.let { IdType("PlanDefinition", it) },
+      /* canonical = */ planDefinitionCanonical,
       /* planDefinition = */ planDefinition,
       /* subject = */ subject,
       /* encounterId = */ encounterId,
@@ -328,7 +246,7 @@ internal constructor(
   }
 
   /** Checks if the Resource ID contains a type and if not, adds a default type */
-  fun checkAndAddType(id: String, defaultType: String): String {
+  private fun checkAndAddType(id: String, defaultType: String): String {
     return if (id.indexOf("/") == -1) "$defaultType/$id" else id
   }
 

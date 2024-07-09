@@ -110,7 +110,7 @@ data class QuestionnaireViewItem(
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
-    questionnaireResponseItem.answer.map { it.copy() }
+    questionnaireResponseItem.answer
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
   suspend fun setAnswer(

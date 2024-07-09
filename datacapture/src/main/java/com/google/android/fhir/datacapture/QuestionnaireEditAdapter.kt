@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
@@ -66,6 +67,13 @@ internal class QuestionnaireEditAdapter(
         ViewHolder.RepeatedGroupHeaderHolder(
           RepeatedGroupHeaderItemViewHolder(
             parent.inflate(R.layout.repeated_group_instance_header_view),
+          ),
+        )
+      }
+      ViewType.Type.NAVIGATION -> {
+        ViewHolder.NavigationHolder(
+          NavigationViewHolder(
+            parent.inflate(R.layout.pagination_navigation_view),
           ),
         )
       }
@@ -122,6 +130,10 @@ internal class QuestionnaireEditAdapter(
         holder as ViewHolder.RepeatedGroupHeaderHolder
         holder.viewHolder.bind(item)
       }
+      is QuestionnaireAdapterItem.Navigation -> {
+        holder as ViewHolder.NavigationHolder
+        holder.viewHolder.bind(item.questionnaireNavigationUIState)
+      }
     }
   }
 
@@ -142,6 +154,10 @@ internal class QuestionnaireEditAdapter(
         type = ViewType.Type.REPEATED_GROUP_HEADER
         // All of the repeated group headers will be rendered identically
         subtype = 0
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        type = ViewType.Type.NAVIGATION
+        subtype = 0xFFFFFF
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -174,6 +190,7 @@ internal class QuestionnaireEditAdapter(
     enum class Type {
       QUESTION,
       REPEATED_GROUP_HEADER,
+      NAVIGATION,
     }
   }
 
@@ -269,6 +286,8 @@ internal class QuestionnaireEditAdapter(
 
     class RepeatedGroupHeaderHolder(val viewHolder: RepeatedGroupHeaderItemViewHolder) :
       ViewHolder(viewHolder.itemView)
+
+    class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
   }
 
   internal companion object {
@@ -296,6 +315,7 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
               oldItem.index == newItem.index
           }
+          is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
         }
 
       override fun areContentsTheSame(
@@ -310,6 +330,10 @@ internal object DiffCallbacks {
           is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
             newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
               oldItem.responses == newItem.responses
+          }
+          is QuestionnaireAdapterItem.Navigation -> {
+            newItem is QuestionnaireAdapterItem.Navigation &&
+              oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
         }
     }
