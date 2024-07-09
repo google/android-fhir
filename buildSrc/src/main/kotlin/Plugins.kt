@@ -35,8 +35,7 @@ object Plugins {
   const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.androidGradlePlugin}"
   const val benchmarkGradlePlugin =
     "androidx.benchmark:benchmark-gradle-plugin:${Versions.benchmarkPlugin}"
-  const val kotlinGradlePlugin =
-    "org.jetbrains.kotlin:kotlin-gradle-plugin:${Dependencies.Versions.Kotlin.stdlib}"
+  const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22"
   const val navSafeArgsGradlePlugin = "androidx.navigation:navigation-safe-args-gradle-plugin:2.6.0"
   const val rulerGradlePlugin = "com.spotify.ruler:ruler-gradle-plugin:1.2.1"
   const val flankGradlePlugin = "com.osacky.flank.gradle:fladle:0.17.4"
