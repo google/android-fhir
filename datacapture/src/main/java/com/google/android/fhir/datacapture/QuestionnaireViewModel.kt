@@ -552,14 +552,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .onEach {
         if (it.index == 0) {
           expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-          val itemsToBeCalculated =
-            questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
-          itemsToBeCalculated.forEach { qItem ->
-            val qrItem =
-              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
-                ?: return@forEach
-            updateQuestionnaireResponseItemWithCalculatedExpression(qItem, qrItem)
-          }
+          evaluateAllCalculatedExpressions()
           modificationCount.update { count -> count + 1 }
         }
       }
@@ -569,6 +562,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         SharingStarted.Lazily,
         initialValue = QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode),
       )
+
+  private suspend fun evaluateAllCalculatedExpressions() {
+    val itemsToBeCalculated =
+      questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
+    itemsToBeCalculated.forEach { qItem ->
+      val qrItem =
+        questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
+          ?: return@forEach
+      updateQuestionnaireResponseItemWithCalculatedExpression(qItem, qrItem)
+    }
+  }
 
   /**
    * Evaluate all items with [calculatedExpression] that reference the given [questionnaireItem]
