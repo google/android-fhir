@@ -52,8 +52,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.asStringValue
+import com.google.android.fhir.datacapture.extensions.createNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.entryMode
-import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -4332,7 +4332,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListA()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
         getQuestionnaireAdapterItemListB()
@@ -4343,7 +4343,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListB()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
       }
