@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -328,7 +329,7 @@ internal object DiffCallbacks {
               QUESTIONS.areContentsTheSame(oldItem, newItem)
           }
           is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+            if (newItem is QuestionnaireAdapterItem.RepeatedGroupHeader) {
               // The `onDeleteClicked` function is a function closure generated in the questionnaire
               // viewmodel with a reference to the parent questionnaire view item. When it is
               // invoked, it deletes the current repeated group instance from the parent
@@ -344,7 +345,12 @@ internal object DiffCallbacks {
               // version includes a different `onDeleteClicked` function referencing a parent item
               // with a different list of children. As a result clicking the delete function might
               // result in deleting from an old list.
-              (oldItem.onDeleteClicked == newItem.onDeleteClicked)
+              @SuppressLint("DiffUtilEquals")
+              val onDeleteClickedCallbacksEqual = oldItem.onDeleteClicked == newItem.onDeleteClicked
+              onDeleteClickedCallbacksEqual
+            } else {
+              false
+            }
           }
           is QuestionnaireAdapterItem.Navigation -> {
             newItem is QuestionnaireAdapterItem.Navigation &&
