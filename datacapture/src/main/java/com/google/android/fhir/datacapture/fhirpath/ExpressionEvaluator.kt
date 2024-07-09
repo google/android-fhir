@@ -223,10 +223,10 @@ internal class ExpressionEvaluator(
   ): ItemToAnswersPair {
     val evaluatedAnswer =
       evaluateExpression(
-        questionnaireItem,
-        questionnaireResponseItem,
-        questionnaireItem.calculatedExpression!!,
-      )
+          questionnaireItem,
+          questionnaireResponseItem,
+          questionnaireItem.calculatedExpression!!,
+        )
         .map { it.castToType(it) }
     return questionnaireItem to evaluatedAnswer
   }
