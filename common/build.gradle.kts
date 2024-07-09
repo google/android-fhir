@@ -36,11 +36,11 @@ dependencies {
 
   implementation(Dependencies.fhirUcum)
 
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

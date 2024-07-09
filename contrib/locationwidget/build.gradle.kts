@@ -60,26 +60,26 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
+  androidTestImplementation(libs.androidx.fragment.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.truth)
+
   implementation(project(":datacapture"))
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.playServicesLocation)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesPlay)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Androidx.appCompat)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
+  implementation(libs.kotlinx.coroutines.playservices)
 
-  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
-
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  androidTestImplementation(Dependencies.AndroidxTest.rules)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.fragment.testing)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
 }
