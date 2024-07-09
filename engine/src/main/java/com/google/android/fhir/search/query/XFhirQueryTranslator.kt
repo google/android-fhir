@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,10 @@ import ca.uhn.fhir.rest.gclient.ReferenceClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
+import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.index.SearchParamDefinition
-import com.google.android.fhir.index.getSearchParamList
+import com.google.android.fhir.index.SearchParamDefinitionsProviderImpl
 import com.google.android.fhir.isValidDateOnly
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
@@ -44,9 +45,11 @@ import org.hl7.fhir.r4.model.ResourceType
  * http://build.fhir.org/ig/HL7/sdc/expressions.html#x-fhir-query-enhancements and
  * http://hl7.org/fhir/R4/search.html
  */
-object XFhirQueryTranslator {
+internal object XFhirQueryTranslator {
   private const val XFHIR_QUERY_SORT_PARAM = "_sort"
   private const val XFHIR_QUERY_COUNT_PARAM = "_count"
+  private val searchParamProvider =
+    FhirEngineProvider.getSearchParamProvider() ?: SearchParamDefinitionsProviderImpl()
 
   /**
    * Translates the basic x-fhir-query string defined in
@@ -177,7 +180,7 @@ object XFhirQueryTranslator {
     }
 
   private val ResourceType.resourceSearchParameters
-    get() = getSearchParamList(getResourceClass<Resource>(this).newInstance())
+    get() = searchParamProvider.get(getResourceClass<Resource>(this).newInstance())
 
   /** Parse string key-val map to SearchParamDefinition-Value map */
   private fun Map<String, String>.toSearchParamDefinitionValueMap(
