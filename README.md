@@ -7,7 +7,7 @@ healthcare applications using the [HL7® FHIR® standard](https://www.hl7.org/fh
 aims to accelerate the adoption of FHIR by making it easy to incorporate FHIR into new and existing
 mobile applications.
 
-See [documentation](google.github.io/android-fhir/).
+See [documentation](https://google.github.io/android-fhir/).
 
 ## Disclaimer
 
