@@ -887,29 +887,52 @@ internal val QuestionnaireItemComponent.shouldHaveNestedItemsUnderAnswers: Boole
   get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || repeats)
 
 /**
- * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
- * items in the [Questionnaire.QuestionnaireItemComponent].
+ * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s corresponding to
+ * the nested items under the questionnaire item.
+ *
+ * The list can be added as nested items under answers in a corresponding questionnaire response
+ * item. This may be because
+ * 1. the questionnaire item is a question with nested questions, in which case each answer in the
+ *    questionnaire response item needs to have the same nested questions, or
+ * 2. the questionnaire item is a repeated group, in which case each answer in the questionnaire
+ *    response item represents an instance of the repeated group, and needs to have the same nested
+ *    questions.
  *
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-fun QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+internal fun QuestionnaireItemComponent.createNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
 
 /**
- * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
- * [Questionnaire.QuestionnaireItemComponent].
+ * Creates a corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] for the
+ * questionnaire item with the following properties:
+ * - same `linkId` as the questionnaire item,
+ * - any initial answer(s) specified either in the `initial` element or as `initialSelected`
+ *   `answerOption`(s),
+ * - any nested questions under the initial answers (there will be no user input yet since this is
+ *   just being created) if this is a question with nested questions, and
+ * - any nested questions if this is a non-repeated group.
+ *
+ * Note that although initial answers to a repeated group may be interpreted as initial instances of
+ * the repeated group in the in-memory representation of questionnaire response, they are not
+ * defined as such in the standard. As a result, we are not treating them as such in this function
+ * to be conformant.
  *
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
+internal fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
-    if (shouldHaveNestedItemsUnderAnswers && answer.isNotEmpty()) {
-      this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
+    if (
+      type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.item.isNotEmpty() &&
+        answer.isNotEmpty()
+    ) {
+      this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
     } else if (
       this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
         !repeats
