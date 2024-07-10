@@ -8,12 +8,12 @@ then, a consortium of app developers have been contributing to the project.
 
 We host a fortnightly Android FHIR SDK Developers Call every other Thursday.
 
-> OHS Developers Call: Android FHIR SDK
-> Every other Thursday · 10:00 – 11:00
-> Time zone: Europe/London
-> Google Meet joining info
-> Video call link: https://meet.google.com/woo-hecp-ufr
-> Or dial: (GB) +44 20 3956 2102 PIN: 937 593 189#
+> OHS Developers Call: Android FHIR SDK  
+> Every other Thursday · 10:00 – 11:00  
+> Time zone: Europe/London  
+> Google Meet joining info  
+> Video call link: https://meet.google.com/woo-hecp-ufr  
+> Or dial: (GB) +44 20 3956 2102 PIN: 937 593 189#  
 > More phone numbers: https://tel.meet/woo-hecp-ufr?pin=8022014824840
 
 Subscribe to
