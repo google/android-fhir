@@ -379,9 +379,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateAnswerWithAffectedCalculatedExpression(
-        questionnaireItem,
-      )
+      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
 
       modificationCount.update { it + 1 }
     }
