@@ -5,8 +5,6 @@ alongside its code in [the `docs/` folder its git repo](https://github.com/googl
 
 The <https://google.github.io/android-fhir/> website is automatically generated from this with Continous Integration.
 
-This website is built using [Material](https://squidfunk.github.io/mkdocs-material/) for [MkDocs](https://www.mkdocs.org/).
-
 ## Contribute
 
 Contributions to the documentation are very welcome, and should typically be made together with code contributions.
@@ -23,3 +21,15 @@ To generate the website, for simplicity we recommend using [GitHub Codespaces](c
 
 1. Confirm Codespace's _"Port Forward"_ prompt to open `https://...app.github.dev`, et voilà!
 
+## Implementation Details
+
+The website is built using [Material](https://squidfunk.github.io/mkdocs-material/) for [MkDocs](https://www.mkdocs.org/).
+
+The [`Build` GitHub Action](https://github.com/google/android-fhir/actions/workflows/build.yml)
+(see [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml)) has the required steps
+which runs the [`build-docs.bash`](https://github.com/google/android-fhir/blob/master/build-docs.bash) script which generates the HTML in the `site/` directory.
+That `site/` directory is intentionally on `.gitignore` and only created dynamically during the build process, but not commited into the Git repository.
+
+The basic docs related build steps intentionally runs for every PR, which helps to detect broken doc before merge (AKA "pre-submit"). The PRs do however obviously NOT actually update
+the live <https://google.github.io/android-fhir/> website; that of course only happens for builds of the default `master` branch! (The way this works technically is due to the
+automagical combination of `on: push: branches: [master]` and `if: ${{ github.event_name == 'push' }}` in `build.yml`.)
