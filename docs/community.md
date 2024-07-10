@@ -20,8 +20,8 @@ Subscribe to
 the [OHS Developer Community Calendar](https://calendar.google.com/calendar/u/0?cid=Y19lMjAzMzkyMjY5MDFjYzM1MGE1YTVkNmEyODhkOTgxNDc0MTZlYzk0MzViNGU2OTAyMTgwNTMwM2QxNDgzNmEzQGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20)
 to see event details and other OHS events.
 
-Ask to join the [OHS Developers Google Group](ohs-developers-external@google.com) to receive the
-Google Calendar invitation and the latest updates.
+Ask to join the [OHS Developers Google Group](mailto:ohs-developers-external@google.com) to receive
+the Google Calendar invitation and the latest updates.
 
 ## Raise an issue
 
