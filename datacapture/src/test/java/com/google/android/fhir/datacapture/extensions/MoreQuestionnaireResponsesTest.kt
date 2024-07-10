@@ -701,7 +701,7 @@ class MoreQuestionnaireResponsesTest {
   }
 
   @Test
-  fun `test launchTimestamp added correctly`() {
+  fun `should add launchTimestamp`() {
     val questionnaireResponse = QuestionnaireResponse()
     val dateTimeType = DateTimeType("2024-07-05T00:00:00Z")
     questionnaireResponse.launchTimestamp = dateTimeType
