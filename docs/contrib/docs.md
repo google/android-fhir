@@ -30,6 +30,5 @@ The [`Build` GitHub Action](https://github.com/google/android-fhir/actions/workf
 which runs the [`build-docs.bash`](https://github.com/google/android-fhir/blob/master/build-docs.bash) script which generates the HTML in the `site/` directory.
 That `site/` directory is intentionally on `.gitignore` and only created dynamically during the build process, but not commited into the Git repository.
 
-The basic docs related build steps intentionally runs for every PR, which helps to detect broken doc before merge (AKA "pre-submit"). The PRs do however obviously NOT actually update
-the live <https://google.github.io/android-fhir/> website; that of course only happens for builds of the default `master` branch! (The way this works technically is due to the
-automagical combination of `on: push: branches: [master]` and `if: ${{ github.event_name == 'push' }}` in `build.yml`.)
+The docs related build steps run for every PR, to help detect broken doc before merge. However, these runs do not update
+the live website, which only happens for builds of the `master` branch (notice `on: push: branches: [master]` and `if: ${{ github.event_name == 'push' }}` in [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml).)
