@@ -30,3 +30,6 @@ That `site/` directory is created dynamically during the build process but never
 
 The docs related build steps run for every PR, to help detect broken doc before merge. However, these runs do not update
 the live website, which only happens for builds of the `master` branch (notice `on: push: branches: [master]` and `if: ${{ github.event_name == 'push' }}` in [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml).)
+
+The publication works by using the [`upload-pages-artifact`](https://github.com/actions/upload-pages-artifact) action to package the generated HTML from the `site/` directory,
+and uploading this artifact to a staging area on GitHub, and the [`deploy-pages`](https://github.com/actions/deploy-pages) action to actually publish that artifact to the live website.
