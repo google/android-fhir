@@ -20,11 +20,11 @@ dependencies {
   compileOnly(Dependencies.Cql.evaluatorFhirUtilities)
   compileOnly(project(":engine")) { exclude(module = "truth") }
 
-  compileOnly(Dependencies.junit)
   compileOnly(Dependencies.jsonAssert)
   compileOnly(Dependencies.woodstox)
   compileOnly(Dependencies.xmlUnit)
-  compileOnly(Dependencies.truth)
+  compileOnly(libs.junit)
+  compileOnly(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

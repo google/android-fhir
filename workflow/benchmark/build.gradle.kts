@@ -48,17 +48,17 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.Cql.evaluator)
   androidTestImplementation(Dependencies.Cql.evaluatorFhirJackson)
   androidTestImplementation(Dependencies.Cql.evaluatorFhirUtilities)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-  androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(libs.androidx.benchmark.junit4)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.work.runtime)
+  androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.kotlinx.coroutines.android)
+  androidTestImplementation(libs.truth)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
