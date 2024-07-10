@@ -201,7 +201,8 @@ internal class ExpressionEvaluator(
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
-        // to properly use %context we will need the corresponding response item of the questionnaire item that has calculated expression, but we won't do that now
+        // to properly use %context we will need the corresponding response item of the
+        // questionnaire item that has calculated expression, but we won't do that now
         val updatedAnswer =
           evaluateExpression(
               item,
@@ -214,18 +215,18 @@ internal class ExpressionEvaluator(
   }
 
   /**
-   * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem].
-   * A [NullPointerException] will be thrown if [calculatedExpression] is not present.
+   * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem]. A
+   * [NullPointerException] will be thrown if [calculatedExpression] is not present.
    */
   suspend fun evaluateCalculatedExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ): List<Type> {
     return evaluateExpression(
-      questionnaireItem,
-      questionnaireResponseItem,
-      questionnaireItem.calculatedExpression!!,
-    )
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireItem.calculatedExpression!!,
+      )
       .map { it.castToType(it) }
   }
 

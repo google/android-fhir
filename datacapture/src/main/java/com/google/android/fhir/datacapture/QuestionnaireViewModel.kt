@@ -581,9 +581,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         getQuestionnaireState()
       }
       .withIndex()
-      .onEach {
-        initializeCalculatedExpression(it)
-      }
+      .onEach { initializeCalculatedExpression(it) }
       .map { it.value }
       .stateIn(
         viewModelScope,
@@ -596,7 +594,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           ),
       )
 
-  private suspend fun initializeCalculatedExpression(indexedValue: IndexedValue<QuestionnaireState>) {
+  private suspend fun initializeCalculatedExpression(
+    indexedValue: IndexedValue<QuestionnaireState>,
+  ) {
     if (indexedValue.index == 0) {
       expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
       evaluateAllCalculatedExpressions()
@@ -657,9 +657,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Updates the answer(s) in the questionnaire response item with the evaluation result of the calculated expression if
+   * Updates the answer(s) in the questionnaire response item with the evaluation result of the
+   * calculated expression if
    * - there is a calculated expression in the questionnaire item, and
-   * - there is no user provided answer to the questionnaire response item (user input should always take precedence over calculated answers).
+   * - there is no user provided answer to the questionnaire response item (user input should always
+   *   take precedence over calculated answers).
    *
    * Do nothing, otherwise.
    */
@@ -677,9 +679,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     if (answers.isEmpty()) return
     if (questionnaireResponseItem.answer.hasDifferentAnswerSet(answers)) {
       questionnaireResponseItem.answer =
-        answers.map {
-          QuestionnaireResponseItemAnswerComponent().apply { value = it }
-        }
+        answers.map { QuestionnaireResponseItemAnswerComponent().apply { value = it } }
     }
   }
 

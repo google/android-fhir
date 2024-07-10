@@ -687,7 +687,7 @@ class ExpressionEvaluatorTest {
 
     val result =
       expressionEvaluator.evaluateAllAffectedCalculatedExpressions(
-          questionnaire.item.elementAt(1),
+        questionnaire.item.elementAt(1),
       )
 
     assertThat(result.first().second.first().asStringValue())
@@ -758,7 +758,7 @@ class ExpressionEvaluatorTest {
 
       val result =
         expressionEvaluator.evaluateAllAffectedCalculatedExpressions(
-            questionnaire.item.elementAt(1),
+          questionnaire.item.elementAt(1),
         )
 
       assertThat(result.first().second.first().asStringValue())
@@ -795,7 +795,7 @@ class ExpressionEvaluatorTest {
 
       val result =
         expressionEvaluator.evaluateAllAffectedCalculatedExpressions(
-            questionnaire.item.elementAt(0),
+          questionnaire.item.elementAt(0),
         )
 
       assertThat(result.first().second.first().asStringValue()).isEqualTo("Questionnaire A")
@@ -831,7 +831,7 @@ class ExpressionEvaluatorTest {
 
       val result =
         expressionEvaluator.evaluateAllAffectedCalculatedExpressions(
-            questionnaire.item.elementAt(0),
+          questionnaire.item.elementAt(0),
         )
 
       assertThat(result.first().second.first().asStringValue()).isEqualTo("Question = Reason")
