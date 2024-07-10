@@ -25,10 +25,8 @@ To generate the website, for simplicity we recommend using [GitHub Codespaces](c
 
 The website is built using [Material](https://squidfunk.github.io/mkdocs-material/) for [MkDocs](https://www.mkdocs.org/).
 
-The [`Build` GitHub Action](https://github.com/google/android-fhir/actions/workflows/build.yml)
-(see [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml)) has the required steps
-which runs the [`build-docs.bash`](https://github.com/google/android-fhir/blob/master/build-docs.bash) script which generates the HTML in the `site/` directory.
-That `site/` directory is intentionally on `.gitignore` and only created dynamically during the build process, but not commited into the Git repository.
+The GitHub Action [`Build`](https://github.com/google/android-fhir/actions/workflows/build.yml) (defined in [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml)) runs the [`build-docs.bash`](https://github.com/google/android-fhir/blob/master/build-docs.bash) script to generate the HTML in the `site/` directory.
+That `site/` directory is created dynamically during the build process but never commited into the Git repository since it is included in the `.gitignore` file.
 
 The docs related build steps run for every PR, to help detect broken doc before merge. However, these runs do not update
 the live website, which only happens for builds of the `master` branch (notice `on: push: branches: [master]` and `if: ${{ github.event_name == 'push' }}` in [`build.yml`](https://github.com/google/android-fhir/blob/master/.github/workflows/build.yml).)
