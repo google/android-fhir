@@ -28,9 +28,9 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
-import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
 import com.google.android.fhir.datacapture.extensions.calculatedExpression
+import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
@@ -362,7 +362,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
-        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+        questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
 
         // If nested items are added to the answer, the enablement evaluator needs to be
         // reinitialized in order for it to rebuild the pre-order map and parent map of
