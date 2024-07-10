@@ -188,9 +188,8 @@ internal class ExpressionEvaluator(
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
-  suspend fun evaluateCalculatedExpressions(
+  suspend fun evaluateAllAffectedCalculatedExpressions(
     questionnaireItem: QuestionnaireItemComponent,
-    updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -202,10 +201,11 @@ internal class ExpressionEvaluator(
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
+        // to properly use %context we will need the corresponding response item of the questionnaire item that has calculated expression, but we won't do that now
         val updatedAnswer =
           evaluateExpression(
               item,
-              updatedQuestionnaireResponseItemComponent,
+              null,
               item.calculatedExpression!!,
             )
             .map { it.castToType(it) }
@@ -214,21 +214,19 @@ internal class ExpressionEvaluator(
   }
 
   /**
-   * Returns a pair of item and the calculated and evaluated value of the [questionnaireItem]
-   * parameter.
+   * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem].
+   * A [NullPointerException] will be thrown if [calculatedExpression] is not present.
    */
   suspend fun evaluateCalculatedExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
-  ): ItemToAnswersPair {
-    val evaluatedAnswer =
-      evaluateExpression(
-          questionnaireItem,
-          questionnaireResponseItem,
-          questionnaireItem.calculatedExpression!!,
-        )
-        .map { it.castToType(it) }
-    return questionnaireItem to evaluatedAnswer
+  ): List<Type> {
+    return evaluateExpression(
+      questionnaireItem,
+      questionnaireResponseItem,
+      questionnaireItem.calculatedExpression!!,
+    )
+      .map { it.castToType(it) }
   }
 
   /**

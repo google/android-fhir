@@ -379,9 +379,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItemsWithCalculatedExpression(
+      updateAnswerWithAffectedCalculatedExpression(
         questionnaireItem,
-        questionnaireResponseItem,
       )
 
       modificationCount.update { it + 1 }
@@ -583,11 +582,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       }
       .withIndex()
       .onEach {
-        if (it.index == 0) {
-          expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-          evaluateAllCalculatedExpressions()
-          modificationCount.update { count -> count + 1 }
-        }
+        initializeCalculatedExpression(it)
       }
       .map { it.value }
       .stateIn(
@@ -601,6 +596,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           ),
       )
 
+  private suspend fun initializeCalculatedExpression(indexedValue: IndexedValue<QuestionnaireState>) {
+    if (indexedValue.index == 0) {
+      expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
+      evaluateAllCalculatedExpressions()
+      modificationCount.update { count -> count + 1 }
+    }
+  }
+
   private suspend fun evaluateAllCalculatedExpressions() {
     val itemsToBeCalculated =
       questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
@@ -608,12 +611,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       val qrItem =
         questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
           ?: return@forEach
-      updateQuestionnaireResponseItemWithCalculatedExpression(qItem, qrItem)
+      updateAnswerWithCalculatedExpression(qItem, qrItem)
     }
   }
 
   /**
-   * Evaluate all items with [calculatedExpression] that reference the given [questionnaireItem]
+   * Updates all items that has [calculatedExpression] that reference the given [questionnaireItem]
    * within their calculations.
    *
    * If item X has a [calculatedExpression], but that item does not reference the given
@@ -623,17 +626,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    *
    * @param questionnaireItem The questionnaire item referenced by other items through
    *   [calculatedExpression].
-   * @param updatedQuestionnaireResponseItem The response item corresponding to the specified
-   *   questionnaire item.
    */
-  private suspend fun updateDependentQuestionnaireResponseItemsWithCalculatedExpression(
+  private suspend fun updateAnswerWithAffectedCalculatedExpression(
     questionnaireItem: QuestionnaireItemComponent,
-    updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
     expressionEvaluator
-      .evaluateCalculatedExpressions(
+      .evaluateAllAffectedCalculatedExpressions(
         questionnaireItem,
-        updatedQuestionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -658,27 +657,27 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   /**
-   * Evaluate the given [questionnaireItem] which has [calculatedExpression].
+   * Updates the answer(s) in the questionnaire response item with the evaluation result of the calculated expression if
+   * - there is a calculated expression in the questionnaire item, and
+   * - there is no user provided answer to the questionnaire response item (user input should always take precedence over calculated answers).
    *
-   * @param questionnaireItem To be evaluated questionnaire item that has [calculatedExpression].
-   * @param questionnaireResponseItem The response item corresponding to the specified questionnaire
-   *   item.
+   * Do nothing, otherwise.
    */
-  private suspend fun updateQuestionnaireResponseItemWithCalculatedExpression(
+  private suspend fun updateAnswerWithCalculatedExpression(
     questionnaireItem: QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponseItemComponent,
   ) {
     if (questionnaireItem.calculatedExpression == null) return
     if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) return
-    val itemToAnswersPair =
+    val answers =
       expressionEvaluator.evaluateCalculatedExpression(
         questionnaireItem,
         questionnaireResponseItem,
       )
-    if (itemToAnswersPair.second.isEmpty()) return
-    if (questionnaireResponseItem.answer.hasDifferentAnswerSet(itemToAnswersPair.second)) {
+    if (answers.isEmpty()) return
+    if (questionnaireResponseItem.answer.hasDifferentAnswerSet(answers)) {
       questionnaireResponseItem.answer =
-        itemToAnswersPair.second.map {
+        answers.map {
           QuestionnaireResponseItemAnswerComponent().apply { value = it }
         }
     }
