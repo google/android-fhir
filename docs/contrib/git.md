@@ -2,13 +2,15 @@
 
 This page documents [Git](https://git-scm.com) tips for contributors to this project.
 
+This project generally follows [these guidelines](https://github.com/google/fhir-data-pipes/blob/master/doc/review_process.md) from our `fhir-data-pipes` sister project.
+
 ## Usage
 
 ### Edit on GitHub Web UI
 
 To make simple single file changes, notably e.g. to `docs/*.md` Markdown files,
 it can be convenient to simply click the _"Pencil" button_ on GitHub's Web UI
-to _Edit in place._
+to _Edit in place._ For a more fully fledged IDE for docs, see [Docs](docs.md).
 
 The only minor drawback with this is that, if you have committer privileges,
 then this will create a branch on the "real" (upstream / origin) repository,
@@ -45,8 +47,10 @@ Using the standard `git` CLI client, you would typically do the following:
 
        git checkout THAT-BRANCH-NAME
        ... do some work ...
-       git commit --amend
-       git push --force YOUR-UID
+       git commit -a -m "Incorporated review feedback."
+       git push --force-with-lease YOUR-UID
+
+Note that, as per [these guidelines](https://github.com/google/fhir-data-pipes/blob/master/doc/review_process.md) we do not `commit --amend`. (Maintainers will _"squash"_ when merging PRs.)
 
 ### Locally with GitHub's CLI
 
