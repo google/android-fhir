@@ -19,9 +19,6 @@ package com.google.android.fhir.datacapture.extensions
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
-import junit.framework.TestCase.assertNull
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
@@ -707,20 +704,20 @@ class MoreQuestionnaireResponsesTest {
     questionnaireResponse.launchTimestamp = dateTimeType
 
     val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertNotNull(launchTimestamp)
-    assertEquals(dateTimeType, launchTimestamp)
+    assertThat(launchTimestamp).isNotNull()
+    assertThat(dateTimeType).isEqualTo(launchTimestamp)
   }
 
   @Test
-  fun `test getLaunchTimestamp when extension does not exist`() {
+  fun `launchTimestamp should be null when not added`() {
     val questionnaireResponse = QuestionnaireResponse()
 
     val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertNull(launchTimestamp)
+    assertThat(launchTimestamp).isNull()
   }
 
   @Test
-  fun `test setLaunchTimestamp should not override previously added extension if any`() {
+  fun `launchTimestamp should not update if already exists`() {
     val questionnaireResponse = QuestionnaireResponse()
     val oldDateTimeType = DateTimeType("2024-07-01T00:00:00Z")
     val newDateTimeType = DateTimeType("2024-07-05T00:00:00Z")
@@ -728,7 +725,7 @@ class MoreQuestionnaireResponsesTest {
     questionnaireResponse.launchTimestamp = newDateTimeType
 
     val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertNotNull(launchTimestamp)
-    assertEquals(oldDateTimeType, launchTimestamp)
+    assertThat(launchTimestamp).isNotNull()
+    assertThat(oldDateTimeType).isEqualTo(launchTimestamp)
   }
 }
