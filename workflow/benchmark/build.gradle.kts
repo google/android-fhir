@@ -8,9 +8,9 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.workflow.benchmark"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 
@@ -40,6 +40,13 @@ android {
       ),
     )
   }
+
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   kotlin { jvmToolchain(11) }
 }
 
@@ -68,6 +75,8 @@ dependencies {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
   }
   androidTestImplementation(project(":workflow-testing"))
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
