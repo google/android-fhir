@@ -38,6 +38,13 @@ android {
       ),
     )
   }
+
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   kotlin { jvmToolchain(11) }
 }
 
@@ -58,4 +65,6 @@ dependencies {
   androidTestImplementation(project(":engine"))
   // for test json files only
   androidTestImplementation(project(":workflow-testing"))
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 }
