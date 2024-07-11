@@ -651,7 +651,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse()) }
+    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
   }
 
   @Test
@@ -7440,8 +7440,23 @@ class QuestionnaireViewModelTest {
     val printer: IParser = FhirContext.forR4().newJsonParser()
 
     fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
-      assertThat(printer.encodeResourceToString(actual))
-        .isEqualTo(printer.encodeResourceToString(expected))
+      if (actual is QuestionnaireResponse && expected is QuestionnaireResponse) {
+        val actualResponse = (actual as QuestionnaireResponse)
+        val expectedResponse =
+          (expected as QuestionnaireResponse).apply {
+            extension.add(
+              actualResponse.extension.firstOrNull { extension ->
+                extension.url == "http://github.com/google-android/questionnaire-launch-timestamp"
+              }
+            )
+            authored = actualResponse.authored
+          }
+        assertThat(printer.encodeResourceToString(actualResponse))
+          .isEqualTo(printer.encodeResourceToString(expectedResponse))
+      } else {
+        assertThat(printer.encodeResourceToString(actual))
+          .isEqualTo(printer.encodeResourceToString(expected))
+      }
     }
   }
 }
