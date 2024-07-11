@@ -3,47 +3,19 @@
   "item": [
     {
       "linkId": "a-birthdate",
-      "text": "Birth Date (select age to auto calculate if not known)",
-      "type": "date",
+      "text": "Date of birth",
+      "type": "date"
+    },
+    {
+      "linkId": "a-age-years",
+      "text": "Age",
+      "type": "integer",
       "extension": [
         {
           "url": "http://hl7.org/fhir/uv/sdc/StructureDefinition/sdc-questionnaire-calculatedExpression",
           "valueExpression": {
             "language": "text/fhirpath",
-            "expression": "%resource.repeat(item).where(linkId='a-age-years' and answer.empty().not()).select(today() - answer.value)"
-          }
-        }
-      ]
-    },
-    {
-      "linkId": "a-age-years",
-      "text": "Age",
-      "type": "quantity",
-      "extension": [
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
-          "valueCoding": {
-            "system": "http://unitsofmeasure.org",
-            "code": "years",
-            "display": "years"
-          }
-        },
-        {
-          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-unitOption",
-          "valueCoding": {
-            "system": "http://unitsofmeasure.org",
-            "code": "months",
-            "display": "months"
-          }
-        }
-      ],
-      "initial": [
-        {
-          "valueQuantity": {
-            "value": 1,
-            "unit": "months",
-            "system": "http://unitsofmeasure.org",
-            "code": "months"
+            "expression": "%resource.repeat(item).where(linkId='a-birthdate' and answer.empty().not()).select(iif(answer.value + 1 year > today(),0,iif(answer.value + 2 year > today(),1,iif(answer.value + 3 year > today(),2,iif(answer.value + 4 year > today(),3,iif(answer.value + 5 year > today(),4,iif(answer.value + 6 year > today(),5,iif(answer.value + 7 year > today(),6,7))))))))"
           }
         }
       ]
