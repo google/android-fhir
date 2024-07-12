@@ -12,11 +12,6 @@ To make simple single file changes, notably e.g. to `docs/*.md` Markdown files,
 it can be convenient to simply click the _"Pencil" button_ on GitHub's Web UI
 to _Edit in place._ For a more fully fledged IDE for docs, see [Docs](docs.md).
 
-The only minor drawback with this is that, if you have committer privileges,
-then this will create a branch on the "real" (upstream / origin) repository,
-instead of on your fork. While in general this is not recommended, it's OK
-in this case, as such branches get automatically deleted on merge of PRs.
-
 ### Locally with Git CLI
 
 Using the standard `git` CLI client, you would typically do the following:
