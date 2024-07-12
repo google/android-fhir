@@ -6,9 +6,9 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.benchmark"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 
@@ -38,24 +38,33 @@ android {
       ),
     )
   }
+
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   kotlin { jvmToolchain(11) }
 }
 
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
   androidTestImplementation(Dependencies.Retrofit.coreRetrofit)
-  androidTestImplementation(Dependencies.junit)
   androidTestImplementation(Dependencies.mockWebServer)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.benchmark.junit4)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.runtime)
   androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.kotlinx.coroutines.android)
+  androidTestImplementation(libs.truth)
 
   androidTestImplementation(project(":engine"))
   // for test json files only
   androidTestImplementation(project(":workflow-testing"))
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 }

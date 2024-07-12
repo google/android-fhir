@@ -16,9 +16,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.knowledge"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.knowledge"
@@ -70,20 +70,20 @@ afterEvaluate { configureFirebaseTestLabForLibraries() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.kotlinx.coroutines.test)
+  androidTestImplementation(libs.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.guavaCaching)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.core)
   implementation(Dependencies.timber)
   implementation(Dependencies.http)
   implementation(Dependencies.HapiFhir.fhirCoreConvertors)
@@ -94,15 +94,15 @@ dependencies {
 
   ksp(libs.androidx.room.compiler)
 
-  testImplementation(Dependencies.AndroidxTest.archCore)
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.junit)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.arch.core.testing)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
