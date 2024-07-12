@@ -18,7 +18,7 @@ We use the following workflow:
 
 1. Maintainers, or other Contributors, will now review the PR. They may add comments requesting changes.
 
-1. When maintainers update PRs to make changes requested by reviewers, those should be added as
+1. When contributors update PRs to make changes requested by reviewers, those should be added as
    additional new single commits per round of review,
    typically with a generic message such as _"Incorporated review feedback."_
    Do NOT squash (or amend) these review updates into the original commit.
