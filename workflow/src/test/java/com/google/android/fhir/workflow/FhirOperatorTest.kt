@@ -26,7 +26,6 @@ import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
-import java.io.InputStream
 import java.util.TimeZone
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.MetadataResource
