@@ -159,7 +159,7 @@ class SmartImmunizationAndroidTest {
 
     val carePlan =
       fhirOperator.generateCarePlan(
-        planDefinition =
+        planDefinitionCanonical =
           CanonicalType(
             "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
           ),
