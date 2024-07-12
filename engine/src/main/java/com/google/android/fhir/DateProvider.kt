@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 /** The DateProvider Instance [FhirEngine] uses for date/time related operations. */
-object DateProvider {
+internal object DateProvider {
   lateinit var clock: Clock
   private var fixed = false
   // TODO possibly provide more customization options

@@ -1,3 +1,5 @@
+import Dependencies.removeIncompatibleDependencies
+
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
@@ -11,32 +13,28 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.common"
-  compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+  compileSdk = Sdk.COMPILE_SDK
+  defaultConfig { minSdk = Sdk.MIN_SDK }
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
 }
 
-configurations {
-  all {
-    exclude(module = "xpp3")
-    exclude(module = "hapi-fhir-caching-caffeine")
-    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
-
-    resolutionStrategy { force("com.google.guava:guava:32.1.2-android") }
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  // REVERT to DEPENDENCIES LATER
-  api("ca.uhn.hapi.fhir:hapi-fhir-structures-r4:6.8.0")
-  api("ca.uhn.hapi.fhir:hapi-fhir-caching-guava:6.8.0")
+  api(Dependencies.HapiFhir.structuresR4)
 
   implementation(Dependencies.fhirUcum)
 
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+    }
+  }
 }

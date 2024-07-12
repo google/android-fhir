@@ -1,4 +1,3 @@
-import Dependencies.forceGuava
 import Dependencies.removeIncompatibleDependencies
 
 plugins {
@@ -9,9 +8,9 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.workflow.benchmark"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidBenchmarkRunner
   }
 
@@ -41,30 +40,32 @@ android {
       ),
     )
   }
+
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https = //developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   kotlin { jvmToolchain(11) }
 }
 
 afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 
-configurations {
-  all {
-    removeIncompatibleDependencies()
-    forceGuava()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.benchmarkJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.Cql.evaluator)
   androidTestImplementation(Dependencies.Cql.evaluatorFhirJackson)
   androidTestImplementation(Dependencies.Cql.evaluatorFhirUtilities)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-  androidTestImplementation(Dependencies.truth)
-  androidTestImplementation(Dependencies.Androidx.workRuntimeKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
+  androidTestImplementation(libs.androidx.benchmark.junit4)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.work.runtime)
+  androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.kotlinx.coroutines.android)
+  androidTestImplementation(libs.truth)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
@@ -74,4 +75,12 @@ dependencies {
     exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
   }
   androidTestImplementation(project(":workflow-testing"))
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      androidTestImplementation(libName, constraints)
+    }
+  }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,16 @@
 
 package com.google.android.fhir.datacapture
 
+import android.annotation.SuppressLint
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
+import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
@@ -39,6 +44,7 @@ import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
@@ -46,16 +52,32 @@ internal class QuestionnaireEditAdapter(
   private val questionnaireItemViewHolderMatchers:
     List<QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher> =
     emptyList(),
-) : ListAdapter<QuestionnaireAdapterItem, QuestionnaireItemViewHolder>(DiffCallbacks.ITEMS) {
+) :
+  ListAdapter<QuestionnaireAdapterItem, QuestionnaireEditAdapter.ViewHolder>(DiffCallbacks.ITEMS) {
   /**
    * @param viewType the integer value of the [QuestionnaireViewHolderType] used to render the
    *   [QuestionnaireViewItem].
    */
-  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QuestionnaireItemViewHolder {
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
     val typedViewType = ViewType.parse(viewType)
     val subtype = typedViewType.subtype
     return when (typedViewType.type) {
-      ViewType.Type.QUESTION -> onCreateViewHolderQuestion(parent = parent, subtype = subtype)
+      ViewType.Type.QUESTION ->
+        ViewHolder.QuestionHolder(onCreateViewHolderQuestion(parent = parent, subtype = subtype))
+      ViewType.Type.REPEATED_GROUP_HEADER -> {
+        ViewHolder.RepeatedGroupHeaderHolder(
+          RepeatedGroupHeaderItemViewHolder(
+            parent.inflate(R.layout.repeated_group_instance_header_view),
+          ),
+        )
+      }
+      ViewType.Type.NAVIGATION -> {
+        ViewHolder.NavigationHolder(
+          NavigationViewHolder(
+            parent.inflate(R.layout.pagination_navigation_view),
+          ),
+        )
+      }
     }
   }
 
@@ -99,10 +121,19 @@ internal class QuestionnaireEditAdapter(
     return viewHolderFactory.create(parent)
   }
 
-  override fun onBindViewHolder(holder: QuestionnaireItemViewHolder, position: Int) {
+  override fun onBindViewHolder(holder: ViewHolder, position: Int) {
     when (val item = getItem(position)) {
       is QuestionnaireAdapterItem.Question -> {
-        holder.bind(item.item)
+        holder as ViewHolder.QuestionHolder
+        holder.holder.bind(item.item)
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+        holder as ViewHolder.RepeatedGroupHeaderHolder
+        holder.viewHolder.bind(item)
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        holder as ViewHolder.NavigationHolder
+        holder.viewHolder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
@@ -119,6 +150,15 @@ internal class QuestionnaireEditAdapter(
       is QuestionnaireAdapterItem.Question -> {
         type = ViewType.Type.QUESTION
         subtype = getItemViewTypeForQuestion(item.item)
+      }
+      is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+        type = ViewType.Type.REPEATED_GROUP_HEADER
+        // All of the repeated group headers will be rendered identically
+        subtype = 0
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        type = ViewType.Type.NAVIGATION
+        subtype = 0xFFFFFF
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -150,6 +190,8 @@ internal class QuestionnaireEditAdapter(
 
     enum class Type {
       QUESTION,
+      REPEATED_GROUP_HEADER,
+      NAVIGATION,
     }
   }
 
@@ -240,6 +282,15 @@ internal class QuestionnaireEditAdapter(
       ?: QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE
   }
 
+  internal sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class QuestionHolder(val holder: QuestionnaireItemViewHolder) : ViewHolder(holder.itemView)
+
+    class RepeatedGroupHeaderHolder(val viewHolder: RepeatedGroupHeaderItemViewHolder) :
+      ViewHolder(viewHolder.itemView)
+
+    class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
+  }
+
   internal companion object {
     // Choice questions are rendered as dialogs if they have at least this many options
     const val MINIMUM_NUMBER_OF_ANSWER_OPTIONS_FOR_DIALOG = 10
@@ -261,6 +312,11 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areItemsTheSame(oldItem, newItem)
           }
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
+              oldItem.index == newItem.index
+          }
+          is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
         }
 
       override fun areContentsTheSame(
@@ -271,6 +327,34 @@ internal object DiffCallbacks {
           is QuestionnaireAdapterItem.Question -> {
             newItem is QuestionnaireAdapterItem.Question &&
               QUESTIONS.areContentsTheSame(oldItem, newItem)
+          }
+          is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
+            if (newItem is QuestionnaireAdapterItem.RepeatedGroupHeader) {
+              // The `onDeleteClicked` function is a function closure generated in the questionnaire
+              // viewmodel with a reference to the parent questionnaire view item. When it is
+              // invoked, it deletes the current repeated group instance from the parent
+              // questionnaire view item by removing it from the list of children in the parent
+              // questionnaire view.
+              // In other words, although the `onDeleteClicked` function is not a data field, it is
+              // a function closure with references to data structures. Because
+              // `RepeatedGroupHeader` does not include any other data fields besides the index, it
+              // is particularly important to distinguish between different `RepeatedGroupHeader`s
+              // by the `onDeleteClicked` function.
+              // If this check is not here, an old RepeatedGroupHeader might be mistakenly
+              // considered up-to-date and retained in the recycler view even though a newer
+              // version includes a different `onDeleteClicked` function referencing a parent item
+              // with a different list of children. As a result clicking the delete function might
+              // result in deleting from an old list.
+              @SuppressLint("DiffUtilEquals")
+              val onDeleteClickedCallbacksEqual = oldItem.onDeleteClicked == newItem.onDeleteClicked
+              onDeleteClickedCallbacksEqual
+            } else {
+              false
+            }
+          }
+          is QuestionnaireAdapterItem.Navigation -> {
+            newItem is QuestionnaireAdapterItem.Navigation &&
+              oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
         }
     }

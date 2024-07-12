@@ -1,13 +1,10 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
 import codegen.GenerateSearchParamsTask
 import java.net.URL
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
   id(Plugins.BuildPlugins.kotlinAndroid)
-  id(Plugins.BuildPlugins.kotlinKapt)
+  id(Plugins.BuildPlugins.kotlinKsp)
   id(Plugins.BuildPlugins.mavenPublish)
   jacoco
   id(Plugins.BuildPlugins.dokka).version(Plugins.Versions.dokka)
@@ -35,12 +32,13 @@ kotlin {
 
 android {
   namespace = "com.google.android.fhir"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
+    consumerProguardFile("proguard-rules.pro")
 
     javaCompileOptions {
       annotationProcessorOptions {
@@ -87,79 +85,87 @@ configurations {
     exclude(module = "jakarta.activation-api")
     exclude(module = "javax.activation")
     exclude(module = "jakarta.xml.bind-api")
-
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
+    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(module = "jcl-over-slf4j")
   }
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  androidTestImplementation(Dependencies.Room.testing)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.room.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.truth)
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
 
-  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
-  // Guave Caching must be individually loaded instead.
-  implementation(Dependencies.HapiFhir.guavaCaching)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
+  // We have removed the dependency on Caffeine from HAPI due to conflicts with android
+  // Guava Caching must be individually loaded instead.
+  implementation(Dependencies.HapiFhir.guavaCaching)
   // Validation to load system types into FhirPath's Context
   // The loading happens via a ResourceStream in XML and thus
   // XML parsers are also necessary.
   implementation(Dependencies.HapiFhir.validationR4)
-  implementation(Dependencies.woodstox)
-  implementation(Dependencies.xerces)
-
-  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
-
-  implementation(Dependencies.Androidx.datastorePref)
-  implementation(Dependencies.Androidx.sqliteKtx)
-  implementation(Dependencies.Androidx.workRuntimeKtx)
   implementation(Dependencies.HapiFhir.validation) {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.Kotlin.stdlib)
-  implementation(Dependencies.Lifecycle.liveDataKtx)
   implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.Room.ktx)
-  implementation(Dependencies.Room.runtime)
   implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.jsonToolsPatch)
   implementation(Dependencies.sqlcipher)
   implementation(Dependencies.timber)
-  implementation(Dependencies.truth)
+  implementation(Dependencies.woodstox)
+  implementation(Dependencies.xerces)
+  implementation(libs.androidx.datastore.preferences)
+  implementation(libs.androidx.lifecycle.livedata)
+  implementation(libs.androidx.room.room)
+  implementation(libs.androidx.room.runtime)
+  implementation(libs.androidx.sqlite)
+  implementation(libs.androidx.work.runtime)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.truth)
 
-  kapt(Dependencies.Room.compiler)
+  ksp(libs.androidx.room.compiler)
 
-  testImplementation(Dependencies.AndroidxTest.archCore)
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
-  testImplementation(Dependencies.Kotlin.kotlinCoroutinesTest)
-  testImplementation(Dependencies.junit)
+  testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.mockWebServer)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.arch.core.testing)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.androidx.work.testing)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.kotlinx.coroutines.test)
+  testImplementation(libs.truth)
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Engine.artifactId}/${Releases.Engine.version}"))
+  outputDirectory.set(
+    file("../docs/use/api/${Releases.Engine.artifactId}/${Releases.Engine.version}"),
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Engine.artifactId)
+      moduleName.set(Releases.Engine.name)
       moduleVersion.set(Releases.Engine.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.StringType
@@ -41,38 +42,40 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
 
   @Test
   fun `createCustomView with an invalid questionnaire response validation result`() {
-    val questionnaire =
-      Questionnaire().apply {
-        url = "questionnaire-1"
-        addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "name-id"
-            this.required = true
-            text = "First Name"
-            type = Questionnaire.QuestionnaireItemType.STRING
-          },
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          url = "questionnaire-1"
+          addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "name-id"
+              this.required = true
+              text = "First Name"
+              type = Questionnaire.QuestionnaireItemType.STRING
+            },
+          )
+        }
+      val questionnaireResponse =
+        QuestionnaireResponse().apply {
+          this.questionnaire = "questionnaire-1"
+          addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("name-id")))
+        }
+      val scenario =
+        launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
+          initialState = Lifecycle.State.CREATED,
+          factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse),
         )
-      }
-    val questionnaireResponse =
-      QuestionnaireResponse().apply {
-        this.questionnaire = "questionnaire-1"
-        addItem(QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("name-id")))
-      }
-    val scenario =
-      launchFragmentInContainer<QuestionnaireValidationErrorMessageDialogFragment>(
-        initialState = Lifecycle.State.CREATED,
-        factory = createDialogFragmentFactoryForTests(questionnaire, questionnaireResponse),
-      )
 
-    val result = scenario.withFragment { onCreateCustomView() }
+      val result = scenario.withFragment { onCreateCustomView() }
 
-    assertThat(result.findViewById<TextView>(R.id.dialog_title).text).isEqualTo("Errors found")
-    assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
-      .isEqualTo("Fix the following questions:")
-    assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
+      assertThat(result.findViewById<TextView>(R.id.dialog_title).text).isEqualTo("Errors found")
+      assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
+        .isEqualTo("Fix the following questions:")
+      assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
+    }
   }
 
-  private fun createTestValidationErrorViewModel(
+  private suspend fun createTestValidationErrorViewModel(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
   ) =
@@ -87,15 +90,16 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
       )
     }
 
-  private fun createDialogFragmentFactoryForTests(
+  private suspend fun createDialogFragmentFactoryForTests(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
   ): FragmentFactory {
     val fragmentFactory: FragmentFactory = mock()
+    val viewModel = createTestValidationErrorViewModel(questionnaire, questionnaireResponse)
     val factory =
       object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
-          return createTestValidationErrorViewModel(questionnaire, questionnaireResponse) as T
+          return viewModel as T
         }
       }
 

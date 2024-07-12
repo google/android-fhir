@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 package com.google.android.fhir.datacapture.validation
 
 import android.content.Context
+import com.google.android.fhir.datacapture.XFhirQueryResolver
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
+import com.google.android.fhir.datacapture.fhirpath.ExpressionEvaluator
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.Resource
@@ -52,7 +54,7 @@ object QuestionnaireResponseValidator {
    *
    * See http://www.hl7.org/fhir/questionnaireresponse.html#link for more information.
    */
-  fun validateQuestionnaireResponse(
+  suspend fun validateQuestionnaireResponse(
     questionnaire: Questionnaire,
     questionnaireResponse: QuestionnaireResponse,
     context: Context,
@@ -60,6 +62,7 @@ object QuestionnaireResponseValidator {
       Map<Questionnaire.QuestionnaireItemComponent, Questionnaire.QuestionnaireItemComponent> =
       mapOf(),
     launchContextMap: Map<String, Resource>? = mapOf(),
+    xFhirQueryResolver: XFhirQueryResolver? = null,
   ): Map<String, List<ValidationResult>> {
     require(
       questionnaireResponse.questionnaire == null ||
@@ -68,29 +71,43 @@ object QuestionnaireResponseValidator {
       "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
 
+    val enablementEvaluator =
+      EnablementEvaluator(
+        questionnaire,
+        questionnaireResponse,
+        questionnaireItemParentMap,
+        launchContextMap,
+        xFhirQueryResolver,
+      )
+    val questionnaireResponseItemValidator =
+      QuestionnaireResponseItemValidator(
+        ExpressionEvaluator(
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          launchContextMap,
+        ),
+      )
     val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
 
     validateQuestionnaireResponseItems(
       questionnaire.item,
       questionnaireResponse.item,
       context,
-      EnablementEvaluator(
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap,
-        launchContextMap,
-      ),
+      enablementEvaluator,
+      questionnaireResponseItemValidator,
       linkIdToValidationResultMap,
     )
 
     return linkIdToValidationResultMap
   }
 
-  private fun validateQuestionnaireResponseItems(
+  private suspend fun validateQuestionnaireResponseItems(
     questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    questionnaireResponseItemValidator: QuestionnaireResponseItemValidator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -118,6 +135,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem,
           context,
           enablementEvaluator,
+          questionnaireResponseItemValidator,
           linkIdToValidationResultMap,
         )
       }
@@ -125,11 +143,12 @@ object QuestionnaireResponseValidator {
     return linkIdToValidationResultMap
   }
 
-  private fun validateQuestionnaireResponseItem(
+  private suspend fun validateQuestionnaireResponseItem(
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
+    questionnaireResponseItemValidator: QuestionnaireResponseItemValidator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -143,6 +162,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem.item,
           context,
           enablementEvaluator,
+          questionnaireResponseItemValidator,
           linkIdToValidationResultMap,
         )
       else -> {
@@ -156,15 +176,16 @@ object QuestionnaireResponseValidator {
             it.item,
             context,
             enablementEvaluator,
+            questionnaireResponseItemValidator,
             linkIdToValidationResultMap,
           )
         }
 
         linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
         linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
-          QuestionnaireResponseItemValidator.validate(
+          questionnaireResponseItemValidator.validate(
             questionnaireItem,
-            questionnaireResponseItem.answer,
+            questionnaireResponseItem,
             context,
           ),
         )
@@ -212,7 +233,7 @@ object QuestionnaireResponseValidator {
     }
     checkQuestionnaireResponseItems(
       questionnaire.item,
-      questionnaireResponse.copy().apply { packRepeatedGroups() }.item,
+      questionnaireResponse.copy().apply { packRepeatedGroups(questionnaire) }.item,
     )
   }
 

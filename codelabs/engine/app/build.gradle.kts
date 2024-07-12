@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.google.android.fhir.codelabs.engine"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -49,6 +49,6 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    implementation("com.google.android.fhir:engine:0.1.0-beta04")
+    implementation("com.google.android.fhir:engine:0.1.0-beta05")
     implementation("androidx.fragment:fragment-ktx:1.6.1")
 }

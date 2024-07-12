@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFailsWith
+import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateType
@@ -42,7 +43,7 @@ class QuestionnaireViewItemTest {
   private val context = ApplicationProvider.getApplicationContext<Application>()
 
   @Test
-  fun `addAnswer() should throw exception if question does not allow repeated answers`() {
+  fun `addAnswer() should throw exception if question does not allow repeated answers`() = runTest {
     val questionnaireViewItem =
       QuestionnaireViewItem(
         Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
@@ -70,7 +71,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `addAnswer() should add answer to QuestionnaireResponseItem`() {
+  fun `addAnswer() should add answer to QuestionnaireResponseItem`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -96,39 +97,40 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `removeAnswer() should throw exception if question does not allow repeated answers`() {
-    val questionnaireViewItem =
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-          addAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-        },
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-      )
+  fun `removeAnswer() should throw exception if question does not allow repeated answers`() =
+    runTest {
+      val questionnaireViewItem =
+        QuestionnaireViewItem(
+          Questionnaire.QuestionnaireItemComponent().apply { linkId = "a-question" },
+          QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(true)),
+            )
+            addAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(true)),
+            )
+          },
+          validationResult = NotValidated,
+          answersChangedCallback = { _, _, _, _ -> },
+        )
 
-    val errorMessage =
-      assertFailsWith<IllegalStateException> {
-          questionnaireViewItem.removeAnswer(
-            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
-              .setValue(BooleanType(true)),
-          )
-        }
-        .localizedMessage
+      val errorMessage =
+        assertFailsWith<IllegalStateException> {
+            questionnaireViewItem.removeAnswer(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent()
+                .setValue(BooleanType(true)),
+            )
+          }
+          .localizedMessage
 
-    assertThat(errorMessage)
-      .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
-  }
+      assertThat(errorMessage)
+        .isEqualTo("Questionnaire item with linkId a-question does not allow repeated answers")
+    }
 
   @Test
-  fun `removeAnswer() should remove answer from QuestionnaireResponseItem`() {
+  fun `removeAnswer() should remove answer from QuestionnaireResponseItem`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -159,6 +161,91 @@ class QuestionnaireViewItemTest {
     )
 
     assertThat(answers).hasSize(1)
+  }
+
+  @Test
+  fun `remove answer at given index`() = runTest {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "group-1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "nested-item-1"
+              type = Questionnaire.QuestionnaireItemType.STRING
+            },
+          )
+      }
+
+    val responseItem1 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 1")
+            },
+          )
+      }
+
+    val responseItem2 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "2"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 2")
+            },
+          )
+      }
+
+    val responseItem3 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "3"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 3")
+            },
+          )
+      }
+
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "group-1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem1)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem2)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem3)
+            },
+          )
+      }
+
+    var updatedAnswers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
+      listOf()
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem = questionnaireItem,
+        questionnaireResponseItem = questionnaireResponseItem,
+        validationResult = NotValidated,
+        answersChangedCallback = { _, responseItem, result, _ -> updatedAnswers = result },
+      )
+
+    questionnaireViewItem.removeAnswerAt(1)
+
+    assertThat(updatedAnswers.size).isEqualTo(2)
+    assertThat(updatedAnswers.first().item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 1")
+    assertThat(updatedAnswers.last().item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 3")
   }
 
   @Test
@@ -378,7 +465,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameResponse() should return false for null and non-null answers`() {
+  fun `hasTheSameResponse() should return false for null and non-null answers`() = runTest {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -406,7 +493,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameResponse() should return false for non-null and null answers`() {
+  fun `hasTheSameResponse() should return false for non-null and null answers`() = runTest {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -478,7 +565,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `hasTheSameResponse() should return true for the same answers`() {
+  fun `hasTheSameResponse() should return true for the same answers`() = runTest {
     assertThat(
         QuestionnaireViewItem(
             Questionnaire.QuestionnaireItemComponent(),
@@ -709,7 +796,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `update partial answer`() {
+  fun `update partial answer`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     var partialAnswer: Any? = null
     val questionnaireViewItem =
@@ -730,7 +817,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `no partial answer for addAnswer`() {
+  fun `no partial answer for addAnswer`() = runTest {
     var answers = listOf<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>()
     var partialAnswer: Any? = null
     val questionnaireViewItem =
@@ -757,7 +844,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `no partial answer for removeAnswer`() {
+  fun `no partial answer for removeAnswer`() = runTest {
     var partialAnswer: Any? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -779,7 +866,7 @@ class QuestionnaireViewItemTest {
   }
 
   @Test
-  fun `no partial answer for setAnswer`() {
+  fun `no partial answer for setAnswer`() = runTest {
     var partialAnswer: Any? = null
     val questionnaireViewItem =
       QuestionnaireViewItem(
@@ -834,5 +921,86 @@ class QuestionnaireViewItemTest {
     val enabledOptions = questionnaireViewItem.enabledAnswerOptions
 
     assertThat(enabledOptions.map { it.valueCoding.code }).containsExactly("option1", "option2")
+  }
+
+  // https://github.com/google/android-fhir/pull/2593
+  @Test
+  fun `answers property should match response item component answers`() {
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().apply {
+        linkId = "repeated-group-1"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        item =
+          listOf(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "1"
+              type = Questionnaire.QuestionnaireItemType.STRING
+            },
+          )
+      }
+
+    val responseItem1 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 1")
+            },
+          )
+      }
+
+    val responseItem2 =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              value = StringType("Answer 2")
+            },
+          )
+      }
+
+    val questionnaireResponseItem =
+      QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
+        linkId = "repeated-group-1"
+        answer =
+          listOf(
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem1)
+            },
+            QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+              item = listOf(responseItem2)
+            },
+          )
+      }
+
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        questionnaireItem = questionnaireItem,
+        questionnaireResponseItem = questionnaireResponseItem,
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+
+    assertThat(questionnaireViewItem.answers.size).isEqualTo(2)
+    assertThat(
+        questionnaireViewItem.answers.first().item.first().answer.first().valueStringType.value,
+      )
+      .isEqualTo("Answer 1")
+    assertThat(questionnaireViewItem.answers[1].item.first().answer.first().valueStringType.value)
+      .isEqualTo("Answer 2")
+
+    assertThat(
+        questionnaireViewItem.answers.first().item.first().answer.first() ===
+          questionnaireResponseItem.answer.first().item.first().answer.first(),
+      )
+      .isTrue()
+    assertThat(
+        questionnaireViewItem.answers[1].item.first().answer.first() ===
+          questionnaireResponseItem.answer[1].item.first().answer.first(),
+      )
+      .isTrue()
   }
 }

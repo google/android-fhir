@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import com.google.android.fhir.DateProvider
 import com.google.android.fhir.FhirServices
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
+import com.google.android.fhir.SearchParamName
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.ResourceNotFoundException
@@ -39,18 +40,21 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
-import com.google.android.fhir.sync.upload.UploadSyncResult
+import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
+import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy.AllChangesSquashedBundlePut
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
 import com.google.android.fhir.testing.readJsonArrayFromFile
 import com.google.android.fhir.versionId
+import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CarePlan
@@ -80,6 +84,7 @@ import org.hl7.fhir.r4.model.RiskAssessment
 import org.hl7.fhir.r4.model.SearchParameter
 import org.hl7.fhir.r4.model.StringType
 import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -234,6 +239,23 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun getAllChangesForEarliestChangedResource_withMultipleChanges_shouldReturnFirstChange() =
+    runBlocking {
+      val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
+      database.insert(patient)
+      database.insert(TEST_PATIENT_2)
+      database.update(
+        TEST_PATIENT_1.copy().apply { gender = Enumerations.AdministrativeGender.FEMALE },
+      )
+      assertThat(
+          database.getAllChangesForEarliestChangedResource().all {
+            it.resourceId.equals(TEST_PATIENT_1.logicalId)
+          },
+        )
+        .isTrue()
+    }
+
+  @Test
   fun clearDatabase_shouldClearAllTablesData() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
@@ -261,7 +283,7 @@ class DatabaseImplTest {
 
   @Test
   fun purge_withLocalChangeAndForcePurgeTrue_shouldPurgeResource() = runBlocking {
-    database.purge(ResourceType.Patient, TEST_PATIENT_1_ID, true)
+    database.purge(ResourceType.Patient, setOf(TEST_PATIENT_1_ID), true)
     // after purge the resource is not available in database
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -278,7 +300,7 @@ class DatabaseImplTest {
   fun purge_withLocalChangeAndForcePurgeFalse_shouldThrowIllegalStateException() = runBlocking {
     val resourceIllegalStateException =
       assertThrows(IllegalStateException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_1_ID) }
+        runBlocking { database.purge(ResourceType.Patient, setOf(TEST_PATIENT_1_ID)) }
       }
     assertThat(resourceIllegalStateException.message)
       .isEqualTo(
@@ -293,7 +315,7 @@ class DatabaseImplTest {
     assertThat(database.getLocalChanges(ResourceType.Patient, TEST_PATIENT_2_ID)).isEmpty()
     assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
-    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID)
+    database.purge(TEST_PATIENT_2.resourceType, setOf(TEST_PATIENT_2_ID))
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -310,7 +332,7 @@ class DatabaseImplTest {
 
     assertResourceEquals(TEST_PATIENT_2, database.select(ResourceType.Patient, TEST_PATIENT_2_ID))
 
-    database.purge(TEST_PATIENT_2.resourceType, TEST_PATIENT_2_ID, true)
+    database.purge(TEST_PATIENT_2.resourceType, setOf(TEST_PATIENT_2_ID), true)
 
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
@@ -324,7 +346,7 @@ class DatabaseImplTest {
   fun purge_resourceNotAvailable_shouldThrowResourceNotFoundException() = runBlocking {
     val resourceNotFoundException =
       assertThrows(ResourceNotFoundException::class.java) {
-        runBlocking { database.purge(ResourceType.Patient, TEST_PATIENT_2_ID) }
+        runBlocking { database.purge(ResourceType.Patient, setOf(TEST_PATIENT_2_ID)) }
       }
     assertThat(resourceNotFoundException.message)
       .isEqualTo(
@@ -530,17 +552,21 @@ class DatabaseImplTest {
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
-      .syncUpload(LocalChangesFetchMode.AllChanges) {
+      .syncUpload(AllChangesSquashedBundlePut) {
         it
           .first { it.resourceId == "remote-patient-3" }
           .let {
-            UploadSyncResult.Success(
-              it.token,
-              listOf(
-                Patient().apply {
-                  id = it.resourceId
-                  meta = remoteMeta
-                },
+            flowOf(
+              UploadRequestResult.Success(
+                listOf(
+                  ResourceUploadResponseMapping(
+                    listOf(it),
+                    Patient().apply {
+                      id = it.resourceId
+                      meta = remoteMeta
+                    },
+                  ),
+                ),
               ),
             )
           }
@@ -748,7 +774,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    val ids = results.map { it.id }
+    val ids = results.map { it.resource.id }
     assertThat(ids)
       .containsExactly("RiskAssessment/$largerId", "RiskAssessment/$smallerId")
       .inOrder()
@@ -778,7 +804,7 @@ class DatabaseImplTest {
         Search(ResourceType.Patient).apply { filter(Patient.GIVEN, { value = "eve" }) }.getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -820,7 +846,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -873,7 +899,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("Patient/${patient.id}")
+    assertThat(result.single().resource.id).isEqualTo("Patient/${patient.id}")
   }
 
   @Test
@@ -928,7 +954,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -985,7 +1011,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1043,7 +1069,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1101,7 +1127,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1159,7 +1185,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1216,7 +1242,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1274,7 +1300,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1332,7 +1358,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1390,7 +1416,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.single().id).isEqualTo("RiskAssessment/${riskAssessment.id}")
+    assertThat(result.single().resource.id).isEqualTo("RiskAssessment/${riskAssessment.id}")
   }
 
   @Test
@@ -1445,7 +1471,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1497,7 +1523,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1548,7 +1574,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1598,7 +1624,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1648,7 +1674,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1698,7 +1724,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1748,7 +1774,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1798,7 +1824,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1848,7 +1874,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1898,7 +1924,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Patient/1")
+    assertThat(result.single().resource.id).isEqualTo("Patient/1")
   }
 
   @Test
@@ -1955,7 +1981,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2019,7 +2045,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2083,7 +2109,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2147,7 +2173,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2211,7 +2237,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2275,7 +2301,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2339,7 +2365,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2403,7 +2429,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.single().id).isEqualTo("Observation/1")
+    assertThat(result.single().resource.id).isEqualTo("Observation/1")
   }
 
   @Test
@@ -2420,7 +2446,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.filter { it.id == patient.id }).hasSize(1)
+    assertThat(result.filter { it.resource.id == patient.id }).hasSize(1)
   }
 
   @Test
@@ -2483,7 +2509,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("100").inOrder()
   }
 
   @Test
@@ -2529,7 +2555,7 @@ class DatabaseImplTest {
           }
           .getQuery(),
       )
-    assertThat(result.map { it.logicalId }).containsExactly("100").inOrder()
+    assertThat(result.map { it.resource.logicalId }).containsExactly("100").inOrder()
   }
 
   @Test
@@ -2555,7 +2581,7 @@ class DatabaseImplTest {
               .apply { sort(Patient.BIRTHDATE, Order.DESCENDING) }
               .getQuery(),
           )
-          .map { it.id },
+          .map { it.resource.id },
       )
       .containsExactly("Patient/younger-patient", "Patient/older-patient", "Patient/test_patient_1")
   }
@@ -2583,7 +2609,7 @@ class DatabaseImplTest {
               .apply { sort(Patient.BIRTHDATE, Order.ASCENDING) }
               .getQuery(),
           )
-          .map { it.id },
+          .map { it.resource.id },
       )
       .containsExactly("Patient/test_patient_1", "Patient/older-patient", "Patient/younger-patient")
   }
@@ -2672,7 +2698,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
       .inOrder()
   }
@@ -2747,7 +2773,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.vaccineCode.codingFirstRep.code })
+    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
       .inOrder()
   }
@@ -2839,7 +2865,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString })
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
       .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
       .inOrder()
   }
@@ -2903,7 +2929,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
 
   @Test
@@ -2964,7 +2990,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
+    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString }).contains("Darcy Smith")
   }
 
   @Test
@@ -2989,7 +3015,7 @@ class DatabaseImplTest {
           .getQuery(),
       )
 
-    assertThat(result.map { it.logicalId })
+    assertThat(result.map { it.resource.logicalId })
       .containsAtLeast("patient-test-002", "patient-test-003", "patient-test-001")
       .inOrder()
   }
@@ -3079,20 +3105,21 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
-            revIncluded = null,
-          ),
-          SearchResult(
-            patient02,
-            included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
-            revIncluded = null,
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp01)),
+          revIncluded = null,
+        ),
+        SearchResult(
+          patient02,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03)),
+          revIncluded = null,
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3169,22 +3196,23 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            patient01,
-            included = null,
-            revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1)),
-          ),
-          SearchResult(
-            patient02,
-            included = null,
-            revIncluded =
-              mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
-          ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = null,
+          revIncluded =
+            mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con1)),
+        ),
+        SearchResult(
+          patient02,
+          included = null,
+          revIncluded =
+            mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
         ),
       )
+      .inOrder()
   }
 
   @Test
@@ -3488,48 +3516,574 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .isEqualTo(
-        listOf(
-          SearchResult(
-            resources["pa-01"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-              "organization" to listOf(resources["org-01"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!),
-            ),
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          resources["pa-01"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            "organization" to listOf(resources["org-01"]!!),
           ),
-          SearchResult(
-            resources["pa-02"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-              "organization" to listOf(resources["org-02"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!),
-            ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-01"]!!, resources["con-03-pa-01"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-01"]!!, resources["en-02-pa-01"]!!),
           ),
-          SearchResult(
-            resources["pa-03"]!!,
-            mapOf(
-              "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
-            ),
-            mapOf(
-              Pair(ResourceType.Condition, "subject") to
-                listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
-              Pair(ResourceType.Encounter, "subject") to
-                listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
-            ),
+        ),
+        SearchResult(
+          resources["pa-02"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+            "organization" to listOf(resources["org-02"]!!),
+          ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-02"]!!, resources["con-03-pa-02"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-02"]!!, resources["en-02-pa-02"]!!),
+          ),
+        ),
+        SearchResult(
+          resources["pa-03"]!!,
+          mapOf(
+            "general-practitioner" to listOf(resources["gp-01"]!!, resources["gp-02"]!!),
+          ),
+          mapOf(
+            Pair(ResourceType.Condition, "subject") to
+              listOf(resources["con-01-pa-03"]!!, resources["con-03-pa-03"]!!),
+            Pair(ResourceType.Encounter, "subject") to
+              listOf(resources["en-01-pa-03"]!!, resources["en-02-pa-03"]!!),
           ),
         ),
       )
+      .inOrder()
+  }
+
+  @Test
+  fun search_patient_and_include_practitioners_sorted_by_family_descending(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-04"))
+        managingOrganization = Reference("Organization/org-01")
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+        addGeneralPractitioner(Reference("Practitioner/gp-03"))
+        addGeneralPractitioner(Reference("Practitioner/gp-04"))
+        managingOrganization = Reference("Organization/org-03")
+      }
+    val patients = listOf(patient01, patient02)
+
+    val gp01 =
+      Practitioner().apply {
+        id = "gp-01"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-01"
+            addGiven("General-01")
+          },
+        )
+        active = true
+      }
+    val gp02 =
+      Practitioner().apply {
+        id = "gp-02"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-02"
+            addGiven("General-02")
+          },
+        )
+        active = true
+      }
+    val gp03 =
+      Practitioner().apply {
+        id = "gp-03"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-03"
+            addGiven("General-03")
+          },
+        )
+        active = true
+      }
+
+    val gp04 =
+      Practitioner().apply {
+        id = "gp-04"
+        addName(
+          HumanName().apply {
+            family = "Practitioner-04"
+            addGiven("General-04")
+          },
+        )
+        active = false
+      }
+
+    val practitioners = listOf(gp01, gp02, gp03, gp04)
+
+    database.insertRemote(*(patients + practitioners).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          include<Practitioner>(Patient.GENERAL_PRACTITIONER) {
+            filter(Practitioner.ACTIVE, { value = of(true) })
+            sort(Practitioner.FAMILY, Order.DESCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp02, gp01)),
+          revIncluded = null,
+        ),
+        SearchResult(
+          patient02,
+          included = mapOf(Patient.GENERAL_PRACTITIONER.paramName to listOf(gp03, gp02)),
+          revIncluded = null,
+        ),
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun search_patient_and_revInclude_encounters_sorted_by_date_descending(): Unit = runBlocking {
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-01"))
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          },
+        )
+        addGeneralPractitioner(Reference("Practitioner/gp-02"))
+      }
+    val patients = listOf(patient01, patient02)
+
+    // encounters for patient 1
+    val enc1_1 =
+      Encounter().apply {
+        id = "enc1-01"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 1, 1).value
+            end = DateType(2010, 1, 2).value
+          }
+      }
+    val enc1_2 =
+      Encounter().apply {
+        id = "enc1-02"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.CANCELLED
+        period =
+          Period().apply {
+            start = DateType(2010, 2, 1).value
+            end = DateType(2010, 2, 2).value
+          }
+      }
+
+    val enc1_3 =
+      Encounter().apply {
+        id = "enc1-03"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 3, 1).value
+            end = DateType(2010, 3, 2).value
+          }
+      }
+
+    val enc1_4 =
+      Encounter().apply {
+        id = "enc1-04"
+        subject = Reference("Patient/pa-01")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2010, 4, 1).value
+            end = DateType(2010, 4, 2).value
+          }
+      }
+
+    // encounters for patient 2
+    val enc2_1 =
+      Encounter().apply {
+        id = "enc2-01"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 1, 1).value
+            end = DateType(2020, 1, 2).value
+          }
+      }
+    val enc2_2 =
+      Encounter().apply {
+        id = "enc2-02"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.CANCELLED
+        period =
+          Period().apply {
+            start = DateType(2020, 2, 1).value
+            end = DateType(2020, 2, 2).value
+          }
+      }
+
+    val enc2_3 =
+      Encounter().apply {
+        id = "enc2-03"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 3, 1).value
+            end = DateType(2020, 3, 2).value
+          }
+      }
+
+    val enc2_4 =
+      Encounter().apply {
+        id = "enc2-04"
+        subject = Reference("Patient/pa-02")
+        status = Encounter.EncounterStatus.ARRIVED
+        period =
+          Period().apply {
+            start = DateType(2020, 4, 1).value
+            end = DateType(2020, 4, 2).value
+          }
+      }
+
+    val encounters = listOf(enc1_1, enc1_2, enc1_3, enc1_4, enc2_1, enc2_2, enc2_3, enc2_4)
+    database.insertRemote(*(patients + encounters).toTypedArray())
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "James"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          revInclude<Encounter>(Encounter.SUBJECT) {
+            filter(
+              Encounter.STATUS,
+              {
+                value =
+                  of(
+                    Coding(
+                      "http://hl7.org/fhir/encounter-status",
+                      Encounter.EncounterStatus.ARRIVED.toCode(),
+                      "",
+                    ),
+                  )
+              },
+            )
+            sort(Encounter.DATE, Order.DESCENDING)
+          }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = null,
+          revIncluded =
+            mapOf(
+              (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                listOf(enc1_4, enc1_3, enc1_1),
+            ),
+        ),
+        SearchResult(
+          patient02,
+          included = null,
+          revIncluded =
+            mapOf(
+              (ResourceType.Encounter to Encounter.SUBJECT.paramName) to
+                listOf(enc2_4, enc2_3, enc2_1),
+            ),
+        ),
+      )
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateResourceEntityResourceId() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+    // Retrieving ResourceEntity so that we have the resourceUuid available for assertions
+    val patientResourceEntity =
+      database.selectEntity(locallyCreatedPatient.resourceType, locallyCreatedPatientResourceId)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // check if resource is fetch-able by its new server assigned ID
+    val updatedPatientResourceEntity =
+      database.selectEntity(remotelyCreatedPatient.resourceType, remotelyCreatedPatient.id)
+    assertThat(updatedPatientResourceEntity.resourceUuid)
+      .isEqualTo(patientResourceEntity.resourceUuid)
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateLocalChangeResourceId() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+    val patientResourceEntity =
+      database.selectEntity(locallyCreatedPatient.resourceType, locallyCreatedPatientResourceId)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // check if resource is fetch-able by its new server assigned ID
+    val patientLocalChanges = database.getLocalChanges(patientResourceEntity.resourceUuid)
+    assertThat(patientLocalChanges.all { it.resourceId == remotelyCreatedPatientResourceId })
+      .isTrue()
+  }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringLocalChangesOfInsertType() =
+    runBlocking {
+      // create a patient
+      val locallyCreatedPatientResourceId = "local-patient-1"
+      val locallyCreatedPatient =
+        Patient().apply {
+          id = locallyCreatedPatientResourceId
+          name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+        }
+      database.insert(locallyCreatedPatient)
+
+      // create an observation for the patient
+      val locallyCreatedObservationResourceId = "local-observation-1"
+      val locallyCreatedPatientObservation =
+        Observation().apply {
+          subject = Reference("Patient/$locallyCreatedPatientResourceId")
+          addPerformer(Reference("Practitioner/123"))
+          id = locallyCreatedObservationResourceId
+        }
+      database.insert(locallyCreatedPatientObservation)
+
+      // pretend that the resource has been created on the server with an updated ID
+      val remotelyCreatedPatientResourceId = "remote-patient-1"
+      val remotelyCreatedPatient =
+        locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+      // perform updates
+      database.updateResourceAndReferences(
+        locallyCreatedPatientResourceId,
+        remotelyCreatedPatient,
+      )
+
+      // verify that Observation's LocalChanges are updated with new patient ID reference
+      val updatedObservationLocalChanges =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(updatedObservationLocalChanges.size).isEqualTo(1)
+      val observationLocalChange = updatedObservationLocalChanges[0]
+      assertThat(observationLocalChange.type).isEqualTo(LocalChange.Type.INSERT)
+      val observationLocalChangePayload =
+        services.parser.parseResource(observationLocalChange.payload) as Observation
+      assertThat(observationLocalChangePayload.subject.reference)
+        .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+    }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringLocalChangesOfUpdateType() =
+    runBlocking {
+      // create a patient
+      val locallyCreatedPatientResourceId = "local-patient-1"
+      val locallyCreatedPatient =
+        Patient().apply {
+          id = locallyCreatedPatientResourceId
+          name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+        }
+      database.insert(locallyCreatedPatient)
+
+      // create an observation for the patient
+      val locallyCreatedObservationResourceId = "local-observation-1"
+      val locallyCreatedPatientObservation =
+        Observation().apply {
+          subject = Reference("Patient/$locallyCreatedPatientResourceId")
+          addPerformer(Reference("Practitioner/123"))
+          id = locallyCreatedObservationResourceId
+        }
+      database.insert(locallyCreatedPatientObservation)
+      database.update(
+        locallyCreatedPatientObservation.copy().apply {
+          performer = listOf(Reference("Patient/$locallyCreatedPatientResourceId"))
+        },
+      )
+
+      // pretend that the resource has been created on the server with an updated ID
+      val remotelyCreatedPatientResourceId = "remote-patient-1"
+      val remotelyCreatedPatient =
+        locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+      // perform updates
+      database.updateResourceAndReferences(
+        locallyCreatedPatientResourceId,
+        remotelyCreatedPatient,
+      )
+
+      // verify that Observation's LocalChanges are updated with new patient ID reference
+      val updatedObservationLocalChanges =
+        database.getLocalChanges(
+          locallyCreatedPatientObservation.resourceType,
+          locallyCreatedObservationResourceId,
+        )
+      assertThat(updatedObservationLocalChanges.size).isEqualTo(2)
+      val observationLocalChange2 = updatedObservationLocalChanges[1]
+      assertThat(observationLocalChange2.type).isEqualTo(LocalChange.Type.UPDATE)
+      // payload =
+      // [{"op":"replace","path":"\/performer\/0\/reference","value":"Patient\/remote-patient-1"}]
+      val observationLocalChange2Payload = JSONArray(observationLocalChange2.payload)
+      val patch = observationLocalChange2Payload.get(0) as JSONObject
+      val referenceValue = patch.getString("value")
+      assertThat(referenceValue).isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+    }
+
+  @Test
+  fun updateResourceAndReferences_shouldUpdateReferencesInReferringResource() = runBlocking {
+    // create a patient
+    val locallyCreatedPatientResourceId = "local-patient-1"
+    val locallyCreatedPatient =
+      Patient().apply {
+        id = locallyCreatedPatientResourceId
+        name = listOf(HumanName().setFamily("Family").setGiven(listOf(StringType("First Name"))))
+      }
+    database.insert(locallyCreatedPatient)
+
+    // create an observation for the patient
+    val locallyCreatedObservationResourceId = "local-observation-1"
+    val locallyCreatedPatientObservation =
+      Observation().apply {
+        subject = Reference("Patient/$locallyCreatedPatientResourceId")
+        addPerformer(Reference("Practitioner/123"))
+        id = locallyCreatedObservationResourceId
+      }
+    database.insert(locallyCreatedPatientObservation)
+
+    // pretend that the resource has been created on the server with an updated ID
+    val remotelyCreatedPatientResourceId = "remote-patient-1"
+    val remotelyCreatedPatient =
+      locallyCreatedPatient.apply { id = remotelyCreatedPatientResourceId }
+
+    // perform updates
+    database.updateResourceAndReferences(
+      locallyCreatedPatientResourceId,
+      remotelyCreatedPatient,
+    )
+
+    // verify that Observation is updated with new patient ID reference
+    val updatedObservationResource =
+      database.select(
+        locallyCreatedPatientObservation.resourceType,
+        locallyCreatedObservationResourceId,
+      ) as Observation
+    assertThat(updatedObservationResource.subject.reference)
+      .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
+
+    // verify that Observation is searchable i.e. ReferenceIndex is updated with new patient ID
+    // reference
+    val searchedObservations =
+      database
+        .search<Observation>(
+          Search(ResourceType.Observation)
+            .apply {
+              filter(
+                Observation.SUBJECT,
+                { value = "Patient/$remotelyCreatedPatientResourceId" },
+              )
+            }
+            .getQuery(),
+        )
+        .map { it.resource }
+    assertThat(searchedObservations.size).isEqualTo(1)
+    assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
 
   private companion object {
@@ -3553,5 +4107,78 @@ class DatabaseImplTest {
     }
 
     @JvmStatic @Parameters(name = "encrypted={0}") fun data(): Array<Boolean> = arrayOf(true, false)
+
+    /**
+     * [Correspondence] to provide a custom [equalityCheck] for the [SearchResult]s. Also provides a
+     * custom diff formatting for failing cases.
+     */
+    val SearchResultCorrespondence: Correspondence<SearchResult<Resource>, SearchResult<Resource>> =
+      Correspondence.from<SearchResult<Resource>, SearchResult<Resource>>(
+          ::equalityCheck,
+          "is shallow equals (by logical id comparison) to the ",
+        )
+        .formattingDiffsUsing(::formatDiff)
+
+    private fun <R : Resource> equalityCheck(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): Boolean {
+      return equalsShallow(actual.resource, expected.resource) &&
+        equalsShallow(actual.included, expected.included) &&
+        equalsShallow(actual.revIncluded, expected.revIncluded)
+    }
+
+    private fun equalsShallow(first: Resource, second: Resource) =
+      first.resourceType == second.resourceType && first.logicalId == second.logicalId
+
+    private fun equalsShallow(first: List<Resource>, second: List<Resource>) =
+      first.size == second.size &&
+        first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
+
+    private fun equalsShallow(
+      first: Map<SearchParamName, List<Resource>>?,
+      second: Map<SearchParamName, List<Resource>>?,
+    ) =
+      if (first != null && second != null && first.size == second.size) {
+        first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+          x.key == y.key && equalsShallow(x.value, y.value)
+        }
+      } else {
+        first?.size == second?.size
+      }
+
+    @JvmName("equalsShallowRevInclude")
+    private fun equalsShallow(
+      first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+      second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+    ) =
+      if (first != null && second != null && first.size == second.size) {
+        first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
+          x.key == y.key && equalsShallow(x.value, y.value)
+        }
+      } else {
+        first?.size == second?.size
+      }
+
+    /**
+     * Ideally, this functions should highlight the diff between the [actual] and [expected]. But,
+     * we are just highlighting the ids of resources contained in the [SearchResult].
+     */
+    private fun <R : Resource> formatDiff(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): String {
+      return "Expected : ${expected.asString()} \n Actual ${actual.asString()}"
+    }
+
+    private fun <R : Resource> SearchResult<R>.asString(): String {
+      return "SearchResult[ resource: " +
+        resource.logicalId +
+        ", Included : " +
+        included?.map { it.key + ": " + it.value.joinToString { it.logicalId } } +
+        ", RevIncluded : " +
+        revIncluded?.map { it.key.toString() + ": " + it.value.joinToString { it.logicalId } } +
+        "]"
+    }
   }
 }

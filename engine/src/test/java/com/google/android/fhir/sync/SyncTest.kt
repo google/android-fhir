@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
 import com.google.android.fhir.testing.TestFhirEngineImpl
@@ -43,6 +44,8 @@ class SyncTest {
     override fun getDownloadWorkManager(): DownloadWorkManager = TestDownloadManagerImpl()
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
+
+    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
   }
 
   @Test
@@ -51,6 +54,7 @@ class SyncTest {
       Sync.createOneTimeWorkRequest(
         RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3),
         PassingPeriodicSyncWorker::class.java,
+        "unique-name",
       )
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
     assertThat(workRequest.workSpec.backoffDelayDuration).isEqualTo(TimeUnit.SECONDS.toMillis(30))
@@ -59,7 +63,8 @@ class SyncTest {
 
   @Test
   fun createOneTimeWorkRequest_withoutRetryConfiguration_shouldHaveZeroMaxTries() {
-    val workRequest = Sync.createOneTimeWorkRequest(null, PassingPeriodicSyncWorker::class.java)
+    val workRequest =
+      Sync.createOneTimeWorkRequest(null, PassingPeriodicSyncWorker::class.java, "unique-name")
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)
     //    Not checking [workRequest.workSpec.backoffPolicy] and
     // [workRequest.workSpec.backoffDelayDuration] as they have default values.
@@ -75,6 +80,7 @@ class SyncTest {
             RetryConfiguration(BackoffCriteria(BackoffPolicy.LINEAR, 30, TimeUnit.SECONDS), 3),
         ),
         PassingPeriodicSyncWorker::class.java,
+        "unique-name",
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.backoffPolicy).isEqualTo(BackoffPolicy.LINEAR)
@@ -91,6 +97,7 @@ class SyncTest {
           retryConfiguration = null,
         ),
         PassingPeriodicSyncWorker::class.java,
+        "unique-name",
       )
     assertThat(workRequest.workSpec.intervalDuration).isEqualTo(TimeUnit.MINUTES.toMillis(20))
     assertThat(workRequest.workSpec.input.getInt(MAX_RETRIES_ALLOWED, 0)).isEqualTo(0)
