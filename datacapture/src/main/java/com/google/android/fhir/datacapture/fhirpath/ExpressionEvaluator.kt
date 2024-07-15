@@ -188,9 +188,8 @@ internal class ExpressionEvaluator(
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
-  suspend fun evaluateCalculatedExpressions(
+  suspend fun evaluateAllAffectedCalculatedExpressions(
     questionnaireItem: QuestionnaireItemComponent,
-    updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -202,15 +201,34 @@ internal class ExpressionEvaluator(
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
+        // TODO: Pass the questionnaire response item corresponding to the
+        //  questionnaire item with the calculated expression for the FHIRPath supplement
+        //  `%context`.
         val updatedAnswer =
           evaluateExpression(
               item,
-              updatedQuestionnaireResponseItemComponent,
+              null,
               item.calculatedExpression!!,
             )
             .map { it.castToType(it) }
         item to updatedAnswer
       }
+  }
+
+  /**
+   * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem]. A
+   * [NullPointerException] will be thrown if [calculatedExpression] is not present.
+   */
+  suspend fun evaluateCalculatedExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+  ): List<Type> {
+    return evaluateExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireItem.calculatedExpression!!,
+      )
+      .map { it.castToType(it) }
   }
 
   /**

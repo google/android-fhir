@@ -15,9 +15,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.workflow"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -107,6 +107,8 @@ dependencies {
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.xmlUnit)
+  testImplementation(libs.androidx.room.room)
+  testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
