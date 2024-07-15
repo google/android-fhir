@@ -24,6 +24,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
+import androidx.work.WorkInfo.State.BLOCKED
 import androidx.work.WorkInfo.State.CANCELLED
 import androidx.work.WorkInfo.State.ENQUEUED
 import androidx.work.WorkInfo.State.FAILED
@@ -309,7 +310,7 @@ object Sync {
         }
           ?: error("Inconsistent terminal syncJobStatus.")
       CANCELLED -> Cancelled
-      else -> error("Inconsistent WorkInfo.State: $workInfoState.")
+      BLOCKED -> CurrentSyncJobStatus.Blocked
     }
 
   /**
@@ -328,6 +329,7 @@ object Sync {
           ?: Enqueued
       }
       CANCELLED -> Cancelled
+      BLOCKED -> CurrentSyncJobStatus.Blocked
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
     }
 

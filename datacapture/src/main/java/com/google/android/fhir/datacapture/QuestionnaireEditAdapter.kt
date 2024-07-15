@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.datacapture
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -328,8 +329,28 @@ internal object DiffCallbacks {
               QUESTIONS.areContentsTheSame(oldItem, newItem)
           }
           is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-              oldItem.responses == newItem.responses
+            if (newItem is QuestionnaireAdapterItem.RepeatedGroupHeader) {
+              // The `onDeleteClicked` function is a function closure generated in the questionnaire
+              // viewmodel with a reference to the parent questionnaire view item. When it is
+              // invoked, it deletes the current repeated group instance from the parent
+              // questionnaire view item by removing it from the list of children in the parent
+              // questionnaire view.
+              // In other words, although the `onDeleteClicked` function is not a data field, it is
+              // a function closure with references to data structures. Because
+              // `RepeatedGroupHeader` does not include any other data fields besides the index, it
+              // is particularly important to distinguish between different `RepeatedGroupHeader`s
+              // by the `onDeleteClicked` function.
+              // If this check is not here, an old RepeatedGroupHeader might be mistakenly
+              // considered up-to-date and retained in the recycler view even though a newer
+              // version includes a different `onDeleteClicked` function referencing a parent item
+              // with a different list of children. As a result clicking the delete function might
+              // result in deleting from an old list.
+              @SuppressLint("DiffUtilEquals")
+              val onDeleteClickedCallbacksEqual = oldItem.onDeleteClicked == newItem.onDeleteClicked
+              onDeleteClickedCallbacksEqual
+            } else {
+              false
+            }
           }
           is QuestionnaireAdapterItem.Navigation -> {
             newItem is QuestionnaireAdapterItem.Navigation &&
