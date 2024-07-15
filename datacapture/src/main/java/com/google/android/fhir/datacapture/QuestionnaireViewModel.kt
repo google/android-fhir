@@ -579,7 +579,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         getQuestionnaireState()
       }
       .withIndex()
-      .onEach { initializeCalculatedExpression(it) }
+      .onEach {
+        if (it.index == 0) {
+          initializeCalculatedExpressions()
+          modificationCount.update { count -> count + 1 }
+        }
+      }
       .map { it.value }
       .stateIn(
         viewModelScope,
@@ -592,20 +597,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           ),
       )
 
-  private suspend fun initializeCalculatedExpression(
-    indexedValue: IndexedValue<QuestionnaireState>,
-  ) {
-    if (indexedValue.index == 0) {
-      expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-      evaluateAllCalculatedExpressions()
-      modificationCount.update { count -> count + 1 }
-    }
-  }
-
-  private suspend fun evaluateAllCalculatedExpressions() {
+  /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
+  private suspend fun initializeCalculatedExpressions() {
+    expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
     val itemsToBeCalculated =
       questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
     itemsToBeCalculated.forEach { qItem ->
+      // TODO: Traverse the two trees in parallel and match based on the pairs, the current
+      // implementation does not work well with nested items and repeated groups
+      // https://github.com/google/android-fhir/issues/2618
       val qrItem =
         questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
           ?: return@forEach

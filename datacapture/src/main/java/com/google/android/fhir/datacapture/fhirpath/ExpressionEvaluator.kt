@@ -201,8 +201,9 @@ internal class ExpressionEvaluator(
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
-        // to properly use %context we will need the corresponding response item of the
-        // questionnaire item that has calculated expression, but we won't do that now
+        // TODO: Pass the questionnaire response item corresponding to the
+        //  questionnaire item with the calculated expression for the FHIRPath supplement
+        //  `%context`.
         val updatedAnswer =
           evaluateExpression(
               item,
