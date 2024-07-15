@@ -118,7 +118,6 @@ class IPSRenderer(private val document: IPSDocument?) {
             immunizationTable.addView(separator)
             immunizationSection.visibility = View.VISIBLE
           }
-
           ResourceType.Patient -> {
             val patient = (entry.resource as Patient)
             val patientText =
@@ -128,7 +127,6 @@ class IPSRenderer(private val document: IPSDocument?) {
             val separator = createSeparator(context)
             patientTable.addView(separator)
           }
-
           ResourceType.AllergyIntolerance -> {
             val allergyEntry = (entry.resource as AllergyIntolerance)
             val allergy = allergyEntry.code.coding[0].display
@@ -145,7 +143,6 @@ class IPSRenderer(private val document: IPSDocument?) {
               allergiesSection.visibility = View.VISIBLE
             }
           }
-
           ResourceType.Observation -> {
             val observation = entry.resource as Observation
             val date = observation.effectiveDateTimeType.valueAsString
@@ -168,7 +165,6 @@ class IPSRenderer(private val document: IPSDocument?) {
               resultsSection.visibility = View.VISIBLE
             }
           }
-
           ResourceType.Medication -> {
             val medication = (entry.resource as Medication).code.coding
             val medicationDisplays =
@@ -179,12 +175,11 @@ class IPSRenderer(private val document: IPSDocument?) {
             medicationTable.addView(separator)
             medicationSection.visibility = View.VISIBLE
           }
-
           ResourceType.Condition -> {
             val problem = (entry.resource as Condition).code.coding
             if (
               (entry.resource as Condition).clinicalStatus.coding.firstOrNull()?.code == "active" ||
-              problem[0].code == "no-problem-info"
+                problem[0].code == "no-problem-info"
             ) {
               if (problem != null) {
                 val conditionDisplay =
@@ -197,13 +192,11 @@ class IPSRenderer(private val document: IPSDocument?) {
               }
             }
           }
-
           else -> {
             println("JEIJORJERIE")
           }
         }
-      }
-      else {
+      } else {
         Timber.tag("IPSRenderer").w("Skipping entry with null resource: %s", entry)
       }
     }
