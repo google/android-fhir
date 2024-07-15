@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,10 @@
 package com.google.android.fhir.datacapture.extensions
 
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.DecimalType
+import org.hl7.fhir.r4.model.IntegerType
+import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.junit.Test
@@ -66,5 +70,101 @@ class MoreQuestionnaireResponseItemComponentsTest {
         questionnaireResponseItem21,
         questionnaireResponseItem22,
       )
+  }
+
+  @Test
+  fun `should copy nested item to childless answer`() {
+    val questionnaireItem =
+      QuestionnaireItemComponent().apply {
+        linkId = "question"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "nested-question-1"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "nested-question-2"
+            type = Questionnaire.QuestionnaireItemType.DECIMAL
+          },
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponseItemComponent().apply {
+        linkId = "question"
+        addAnswer(QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent())
+      }
+
+    questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
+
+    val nestedItems = questionnaireResponseItem.answer.single().item
+    assertThat(nestedItems).hasSize(2)
+    assertThat(nestedItems.map { it.linkId })
+      .containsExactly("nested-question-1", "nested-question-2")
+    assertThat(nestedItems.first().answer).isEmpty()
+    assertThat(nestedItems.last().answer).isEmpty()
+  }
+
+  @Test
+  fun `should not copy nested item to existing answer with children`() {
+    val questionnaireItem =
+      QuestionnaireItemComponent().apply {
+        linkId = "question"
+        type = Questionnaire.QuestionnaireItemType.GROUP
+        repeats = true
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "nested-question-1"
+            type = Questionnaire.QuestionnaireItemType.INTEGER
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "nested-question-2"
+            type = Questionnaire.QuestionnaireItemType.DECIMAL
+          },
+        )
+      }
+    val questionnaireResponseItem =
+      QuestionnaireResponseItemComponent().apply {
+        linkId = "question"
+        addAnswer(
+          QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-1"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = IntegerType(1)
+                  },
+                )
+              },
+            )
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-question-2"
+                addAnswer(
+                  QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                    value = DecimalType(1.0)
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
+
+    val nestedItems = questionnaireResponseItem.answer.single().item
+    assertThat(nestedItems).hasSize(2)
+    assertThat(nestedItems.map { it.linkId })
+      .containsExactly("nested-question-1", "nested-question-2")
+    assertThat(nestedItems.first().answer.single().valueIntegerType.value).isEqualTo(1)
+    assertThat(nestedItems.last().answer.single().valueDecimalType.value.toString())
+      .isEqualTo("1.0")
   }
 }

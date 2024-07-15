@@ -13,9 +13,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -29,6 +29,12 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https://developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   packaging {
     resources.excludes.addAll(
       listOf(
@@ -57,6 +63,8 @@ dependencies {
   androidTestImplementation(libs.androidx.test.rules)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.truth)
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(project(":datacapture"))
   implementation(Dependencies.Mlkit.barcodeScanning)
