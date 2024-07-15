@@ -28,6 +28,7 @@ import com.google.android.fhir.workflow.activity.event.CPGMedicationDispenseEven
 import com.google.android.fhir.workflow.activity.event.CPGObservationEvent
 import com.google.android.fhir.workflow.activity.event.CPGProcedureEvent
 import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGImmunizationRequest
 import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.request.Intent
@@ -35,7 +36,6 @@ import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.runBlockingOnWorkerThread
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
-import java.lang.Exception
 import kotlin.test.assertFailsWith
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Annotation
@@ -698,7 +698,7 @@ class ActivityFlowTest {
 
     fhirEngine.create(medicationRequest1)
 
-    ActivityFlow4.of(repository, CPGRequestResource.of(medicationRequest1))
+    ActivityFlow4.of(repository, CPGMedicationRequest(medicationRequest1))
       .startPlan {
         update {
           status = MedicationRequest.MedicationRequestStatus.ACTIVE
@@ -837,7 +837,7 @@ class ActivityFlowTest {
       }
 
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
-    val flow = ActivityFlow4.of(repository, CPGRequestResource.of(medicationRequest))
+    val flow = ActivityFlow4.of(repository, CPGMedicationRequest(medicationRequest))
 
     flow
       .startPlan {
@@ -860,19 +860,20 @@ class ActivityFlowTest {
         .filterIsInstance<CPGMedicationRequestActivity>()
         .first()
 
-    performFlow
-      .startPerform(CPGMedicationDispenseEvent::class.java) {
-        update {
-          status = MedicationRequest.MedicationRequestStatus.ACTIVE
-          addNote(Annotation(MarkdownType("Perform Order for dispense")))
-        }
-      }
-      .endPerform {
-        update {
-        status = MedicationDispense.MedicationDispenseStatus.INPROGRESS
-        }
-      }
+    //    performFlow
+    //       .startPerform(CPGMedicationDispenseEvent::class.java) {
+    //         update {
+    //           status = MedicationRequest.MedicationRequestStatus.ACTIVE
+    //           addNote(Annotation(MarkdownType("Perform Order for dispense")))
+    //         }
+    //       }
+    //       .endPerform {
+    //         update {
+    //           status = MedicationDispense.MedicationDispenseStatus.INPROGRESS
+    //         }
+    //       }
 
+    // ---- Alternate ----
     performFlow
       .startPerform(CPGMedicationAdministrationEvent::class.java) {
         update {
@@ -881,10 +882,53 @@ class ActivityFlowTest {
         }
       }
       .endPerform {
+        update { status = MedicationAdministration.MedicationAdministrationStatus.INPROGRESS }
+      }
+  }
+
+  @Test
+  fun `test task based`() = runBlockingOnWorkerThread {
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+
+    val flow =
+      ActivityFlow4.of(
+        repository,
+        CPGImmunizationRequest(
+          MedicationRequest().apply {
+            id = "immunization-request-01"
+            subject = Reference("Patient/pa-1001")
+            intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+            meta.apply {
+              addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationrequest")
+            }
+          },
+        ),
+      )
+
+    flow
+      .startPlan {
         update {
-        status = MedicationAdministration.MedicationAdministrationStatus.INPROGRESS
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote().apply { text = "ImmunizationRequest start plan.." }
         }
       }
+      .endPlan {
+        update {
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote().apply { text = "ImmunizationRequest end plan.." }
+        }
+      }
+
+    val allFlows = ActivityFlow4.of(repository, "pa-1001")
+    allFlows.first().let { println("${it.requestResource is CPGImmunizationRequest} ") }
+
+    println(
+      " CPGRecommendImmunizationActivity ${allFlows.filterIsInstance<CPGServiceRequestActivity>()}",
+    )
+
+    println(
+      " CPGMedicationRequestActivity ${allFlows.filterIsInstance<CPGMedicationRequestActivity>()}",
+    )
   }
 }
 

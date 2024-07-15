@@ -38,4 +38,6 @@ class CPGServiceRequest(override val resource: ServiceRequest) :
   }
 
   override fun getBasedOn() = resource.basedOn.lastOrNull()
+
+  override fun copy(r: ServiceRequest) = CPGServiceRequest(r)
 }

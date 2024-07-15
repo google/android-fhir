@@ -19,7 +19,7 @@ package com.google.android.fhir.workflow.activity.request
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 
-class CPGMedicationRequest(override val resource: MedicationRequest) :
+class CPGImmunizationRequest(override val resource: MedicationRequest) :
   CPGRequestResource<MedicationRequest>(resource) {
   override fun setIntent(intent: Intent) {
     resource.intent = MedicationRequest.MedicationRequestIntent.fromCode(intent.code)
@@ -39,5 +39,5 @@ class CPGMedicationRequest(override val resource: MedicationRequest) :
 
   override fun getBasedOn() = resource.basedOn.lastOrNull()
 
-  override fun copy(r: MedicationRequest) = CPGMedicationRequest(r)
+  override fun copy(r: MedicationRequest) = CPGImmunizationRequest(r)
 }

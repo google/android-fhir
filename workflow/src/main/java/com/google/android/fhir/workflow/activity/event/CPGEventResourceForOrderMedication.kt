@@ -21,11 +21,25 @@ import java.util.UUID
 import org.hl7.fhir.r4.model.MedicationAdministration
 import org.hl7.fhir.r4.model.MedicationDispense
 import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.MedicationStatement
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
 abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val resource: R) :
-  CPGEventResource<R>(resource)
+  CPGEventResource<R>(resource) {
+
+  companion object {
+
+    fun from(request: CPGMedicationRequest, eventClass: Class<*>) =
+      when (eventClass) {
+        CPGMedicationDispenseEvent::class.java -> CPGMedicationDispenseEvent.from(request)
+        CPGMedicationAdministrationEvent::class.java ->
+          CPGMedicationAdministrationEvent.from(request)
+        CPGMedicationStatementEvent::class.java -> CPGMedicationStatementEvent.from(request)
+        else -> throw IllegalArgumentException(" Unknown Event type $eventClass")
+      }
+  }
+}
 
 class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
   CPGEventResourceForOrderMedication<MedicationDispense>(resource) {
@@ -86,18 +100,61 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
 class CPGMedicationAdministrationEvent(override val resource: MedicationAdministration) :
   CPGEventResourceForOrderMedication<MedicationAdministration>(resource) {
   override fun setStatus(status: EventStatus) {
-    TODO("Not yet implemented")
+    resource.status = MedicationAdministration.MedicationAdministrationStatus.fromCode(status.code)
   }
 
-  override fun getStatus(): EventStatus {
-    TODO("Not yet implemented")
-  }
+  override fun getStatus() = EventStatus.of(resource.status.toCode())
 
   override fun setBasedOn(reference: Reference) {
-    TODO("Not yet implemented")
+    resource.request = reference
   }
 
-  override fun getBasedOn(): Reference? {
-    TODO("Not yet implemented")
+  override fun getBasedOn(): Reference = resource.request
+
+  companion object {
+    fun from(request: CPGMedicationRequest): CPGMedicationAdministrationEvent {
+      return CPGMedicationAdministrationEvent(
+        MedicationAdministration().apply {
+          id = UUID.randomUUID().toString()
+          status = MedicationAdministration.MedicationAdministrationStatus.UNKNOWN
+          subject = request.resource.subject
+          medication = request.resource.medication
+          this.request = request.asReference()
+          medication = request.resource.medication
+        },
+      )
+    }
+  }
+}
+
+class CPGMedicationStatementEvent(override val resource: MedicationStatement) :
+  CPGEventResourceForOrderMedication<MedicationStatement>(resource) {
+  override fun setStatus(status: EventStatus) {
+    resource.status = MedicationStatement.MedicationStatementStatus.fromCode(status.code)
+  }
+
+  override fun getStatus() = EventStatus.of(resource.status.toCode())
+
+  override fun setBasedOn(reference: Reference) {
+    resource.addBasedOn(reference)
+  }
+
+  override fun getBasedOn(): Reference? = resource.basedOn.firstOrNull()
+
+  companion object {
+    fun from(request: CPGMedicationRequest): CPGMedicationStatementEvent {
+      return CPGMedicationStatementEvent(
+        MedicationStatement().apply {
+          id = UUID.randomUUID().toString()
+          status = MedicationStatement.MedicationStatementStatus.UNKNOWN
+          subject = request.resource.subject
+          medication = request.resource.medication
+          addBasedOn(request.asReference())
+          addDerivedFrom(request.asReference())
+          informationSource = request.asReference()
+          medication = request.resource.medication
+        },
+      )
+    }
   }
 }

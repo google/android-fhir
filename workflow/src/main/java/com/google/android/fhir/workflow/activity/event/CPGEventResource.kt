@@ -47,10 +47,10 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
   //  abstract fun from(request: CPGRequestResource<*>) : CPGEventResource<R>
 
   companion object {
-    fun of(request: CPGRequestResource<*>): CPGEventResource<*> {
+    fun of(request: CPGRequestResource<*>, eventClass: Class<*>): CPGEventResource<*> {
       return when (request) {
         is CPGCommunicationRequest -> CPGCommunicationEvent.from(request)
-        is CPGMedicationRequest -> CPGMedicationDispenseEvent.from(request)
+        is CPGMedicationRequest -> CPGEventResourceForOrderMedication.from(request, eventClass)
         else -> {
           throw IllegalArgumentException("Unknown CPG Request type ${request::class}.")
         }

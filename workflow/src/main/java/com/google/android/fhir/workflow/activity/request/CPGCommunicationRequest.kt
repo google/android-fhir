@@ -52,4 +52,6 @@ class CPGCommunicationRequest(override val resource: CommunicationRequest) :
   }
 
   override fun getBasedOn() = resource.basedOn.lastOrNull()
+
+  override fun copy(r: CommunicationRequest) = CPGCommunicationRequest(r)
 }

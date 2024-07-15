@@ -50,9 +50,11 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
     resource.update()
   }
 
+  internal abstract fun copy(r: R): CPGRequestResource<R>
+
   fun copy(id: String, status: Status, intent: Intent): CPGRequestResource<R> {
     val parent: CPGRequestResource<R> = this
-    return of(parent.resource.copy() as R).apply {
+    return copy(parent.resource.copy() as R).apply {
       resource.idElement = IdType.of(resource).setValue(id)
       setStatus(status)
       setIntent(intent)
@@ -64,25 +66,59 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
 
   companion object {
 
-    fun <R : Resource> of(resource: R): CPGRequestResource<R> {
-      return when (resource) {
-        is Task -> of(resource) as CPGRequestResource<R>
-        is MedicationRequest -> of(resource) as CPGRequestResource<R>
-        is ServiceRequest -> of(resource) as CPGRequestResource<R>
-        is CommunicationRequest -> of(resource) as CPGRequestResource<R>
+    fun <R : Resource> of(klass: CPGRequestResource<*>, resource: R): CPGRequestResource<R> {
+      return when (klass::class.java) {
+        CPGCommunicationRequest::class.java ->
+          CPGCommunicationRequest(resource as CommunicationRequest)
+        CPGMedicationRequest::class.java -> CPGMedicationRequest(resource as MedicationRequest)
+        CPGImmunizationRequest::class.java -> CPGImmunizationRequest(resource as MedicationRequest)
+        CPGServiceRequest::class.java -> CPGServiceRequest(resource as ServiceRequest)
         else -> {
           throw IllegalArgumentException("Unknown CPG Request type ${resource::class}.")
         }
       }
+        as CPGRequestResource<R>
     }
 
-    fun of(resource: Task) = CPGTaskRequest(resource)
+//    fun of(resource: Task) = CPGTaskRequest(resource)
 
-    fun of(resource: MedicationRequest) = CPGMedicationRequest(resource)
+    fun of(resource: MedicationRequest) =
+      if (
+        resource.meta.hasProfile(
+          "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest",
+        )
+      ) {
+        CPGMedicationRequest(resource)
+      } else if (
+        resource.meta.hasProfile(
+          "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationrequest",
+        )
+      ) {
+        CPGImmunizationRequest(resource)
+      } else {
+        throw IllegalArgumentException("Unknown cpg profile")
+      }
 
     fun of(resource: ServiceRequest) = CPGServiceRequest(resource)
 
     fun of(resource: CommunicationRequest) = CPGCommunicationRequest(resource)
+
+    /**
+     * the resource.meta.profile describes the activity and should be used to create particular cpg
+     * request
+     */
+    fun <R : Resource> of(resource: R): CPGRequestResource<R> {
+      return when (resource) {
+        is Task -> of(resource)
+        is MedicationRequest -> of(resource)
+        is ServiceRequest -> of(resource)
+        is CommunicationRequest -> of(resource)
+        else -> {
+          throw IllegalArgumentException("Unknown CPG Request type ${resource::class}.")
+        }
+      }
+        as CPGRequestResource<R>
+    }
   }
 }
 

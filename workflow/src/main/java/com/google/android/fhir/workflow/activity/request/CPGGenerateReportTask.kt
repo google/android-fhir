@@ -16,26 +16,8 @@
 
 package com.google.android.fhir.workflow.activity.request
 
-import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Task
 
-abstract class CPGTaskRequest internal constructor(override val resource: Task) :
-  CPGRequestResource<Task>(resource) {
-  override fun setIntent(intent: Intent) {
-    resource.intent = Task.TaskIntent.fromCode(intent.code)
-  }
-
-  override fun getIntent() = Intent.of(resource.intent.toCode())
-
-  override fun setStatus(status: Status) {
-    resource.status = Task.TaskStatus.fromCode(status.string)
-  }
-
-  override fun getStatus() = Status.of(resource.status.toCode())
-
-  override fun setBasedOn(reference: Reference) {
-    resource.addBasedOn(reference)
-  }
-
-  override fun getBasedOn() = resource.basedOn.lastOrNull()
+class CPGGenerateReportTask(override val resource: Task) : CPGTaskRequest(resource) {
+  override fun copy(r: Task) = CPGGenerateReportTask(r)
 }

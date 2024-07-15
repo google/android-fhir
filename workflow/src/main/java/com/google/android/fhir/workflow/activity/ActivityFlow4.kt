@@ -23,8 +23,10 @@ import com.google.android.fhir.workflow.activity.event.CPGCommunicationEvent
 import com.google.android.fhir.workflow.activity.event.CPGEventForOrderService
 import com.google.android.fhir.workflow.activity.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.event.CPGEventResourceForOrderMedication
+import com.google.android.fhir.workflow.activity.event.CPGImmunizationEvent
 import com.google.android.fhir.workflow.activity.event.EventStatus
 import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGImmunizationRequest
 import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.request.CPGServiceRequest
@@ -93,17 +95,8 @@ internal constructor(
     // The caller could still call with any event resource, but we can fail fast by checking the
     // compatibility of request and event types.
     requestResource.init()
-    return ActivityFlow4(repository, requestResource, _startPerform(requestResource))
-      as EndPerform<D>
+    return ActivityFlow4(repository, requestResource, _startPerform(requestResource, klass) as D)
   }
-
-  //   override suspend fun <D : E> startPerform(
-  //     klass: Class<out D>,
-  //     init: R.() -> Unit
-  //   ): EndPerform<out D> {
-  //     requestResource.init()
-  //    return ActivityFlow4(repository, requestResource, startPerform( requestResource) as D)
-  //   }
 
   override suspend fun endPerform(init: E.() -> Unit) {
     checkNotNull(eventResource) { "No event generated." }
@@ -120,7 +113,11 @@ internal constructor(
       "Proposal is still in ${inputProposal.getStatus()} status."
     }
 
-    repository.update(inputProposal.resource)
+    try {
+      repository.create(inputProposal.resource)
+    } catch (e: Exception) {
+      repository.update(inputProposal.resource)
+    }
 
     val planRequest: CPGRequestResource<*> =
       inputProposal.copy(
@@ -137,7 +134,7 @@ internal constructor(
 
     val basedOnProposal =
       repository.read(inputPlan.resource.javaClass, basedOn.idType)?.let {
-        CPGRequestResource.of(it)
+        CPGRequestResource.of(inputPlan, it)
       }
     check(basedOnProposal != null) { "Couldn't find ${basedOn.reference} in the database." }
 
@@ -189,7 +186,7 @@ internal constructor(
 
     val basedOnResource =
       repository.read(inputOrder.resource.javaClass, basedOn.idType)?.let {
-        CPGRequestResource.of(it)
+        CPGRequestResource.of(inputOrder, it)
       }
 
     check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
@@ -220,7 +217,7 @@ internal constructor(
     repository.update(basedOnResource.resource)
   }
 
-  private fun _startPerform(inputOrder: R): E {
+  private fun _startPerform(inputOrder: R, eventClass: Class<*>): E {
     check(inputOrder.getIntent() == Intent.ORDER) {
       "Order is still in ${inputOrder.getIntent()} state."
     }
@@ -231,7 +228,7 @@ internal constructor(
 
     repository.update(inputOrder.resource)
 
-    val eventRequest = CPGEventResource.of(inputOrder)
+    val eventRequest = CPGEventResource.of(inputOrder, eventClass)
     eventRequest.setStatus(EventStatus.PREPARATION)
     eventRequest.setBasedOn(inputOrder.asReference())
     return eventRequest as E
@@ -281,7 +278,7 @@ internal constructor(
     // order medication
     fun of(
       repository: Repository,
-      resource: CPGMedicationRequest, /*, event: CPGMedicationDispenseResource?*/
+      resource: CPGMedicationRequest,
     ): CPGMedicationRequestActivity = ActivityFlow4(repository, resource)
 
     // Order a service
@@ -291,6 +288,16 @@ internal constructor(
     ): ActivityFlow4<CPGServiceRequest, CPGEventForOrderService<*>> =
       ActivityFlow4(repository, resource)
 
+    fun of(
+      repository: Repository,
+      resource: CPGImmunizationRequest,
+    ): CPGRecommendImmunizationActivity = ActivityFlow4(repository, resource)
+
+    /**
+     * This returns a list of flows and because of type erasure, its not possible to do a
+     * filterInstance with specific CPG resource types. Instead, use list.filter and check the cpg
+     * type of the [ActivityFlow4.requestResource] instead.
+     */
     fun of(
       repository: Repository,
       patientId: String,
@@ -395,11 +402,16 @@ internal data class RequestChain<R : CPGRequestResource<*>>(
   var basedOn: RequestChain<R>?,
 )
 
-typealias CPGCommunicationActivity =
-  ActivityFlow4<CPGCommunicationRequest, CPGCommunicationEvent>
+// Send a message
+typealias CPGCommunicationActivity = ActivityFlow4<CPGCommunicationRequest, CPGCommunicationEvent>
 
-typealias CPGServiceRequestActivity =
-  ActivityFlow4<CPGServiceRequest, CPGEventForOrderService<*>>
+// Order a service
+typealias CPGServiceRequestActivity = ActivityFlow4<CPGServiceRequest, CPGEventForOrderService<*>>
 
+// Order a medication
 typealias CPGMedicationRequestActivity =
   ActivityFlow4<CPGMedicationRequest, CPGEventResourceForOrderMedication<*>>
+
+// Recommend an immunization
+typealias CPGRecommendImmunizationActivity =
+  ActivityFlow4<CPGImmunizationRequest, CPGImmunizationEvent>

@@ -16,18 +16,14 @@
 
 package com.google.android.fhir.workflow.activity.event
 
-import org.hl7.fhir.r4.model.Observation
-import org.hl7.fhir.r4.model.Procedure
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Condition
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 
-abstract class CPGEventForOrderService<out R : Resource>(override val resource: R) :
-  CPGEventResource<R>(resource)
-
-class CPGProcedureEvent(override val resource: Procedure) :
-  CPGEventForOrderService<Procedure>(resource) {
+class CPGCondition(override val resource: Condition) : CPGEventResource<Condition>(resource) {
+  // clinical status http://hl7.org/fhir/ValueSet/condition-clinical
   override fun setStatus(status: EventStatus) {
-    TODO("Not yet implemented")
+    resource.clinicalStatus = CodeableConcept()
   }
 
   override fun getStatus(): EventStatus {
@@ -41,24 +37,6 @@ class CPGProcedureEvent(override val resource: Procedure) :
   override fun getBasedOn(): Reference? {
     TODO("Not yet implemented")
   }
-}
 
-class CPGObservationEvent(override val resource: Observation) :
-  CPGEventForOrderService<Observation>(resource) {
-
-  override fun setStatus(status: EventStatus) {
-    TODO("Not yet implemented")
-  }
-
-  override fun getStatus(): EventStatus {
-    TODO("Not yet implemented")
-  }
-
-  override fun setBasedOn(reference: Reference) {
-    resource.addExtension("http://hl7.org/fhir/StructureDefinition/event-basedOn", reference)
-  }
-
-  override fun getBasedOn() =
-    resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/event-basedOn")?.value
-      as Reference?
+  //
 }

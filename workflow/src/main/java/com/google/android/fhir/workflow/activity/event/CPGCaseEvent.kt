@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.request
+package com.google.android.fhir.workflow.activity.event
 
+import org.hl7.fhir.r4.model.EpisodeOfCare
 import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Task
 
-abstract class CPGTaskRequest internal constructor(override val resource: Task) :
-  CPGRequestResource<Task>(resource) {
-  override fun setIntent(intent: Intent) {
-    resource.intent = Task.TaskIntent.fromCode(intent.code)
+class CPGCaseEvent(override val resource: EpisodeOfCare) :
+  CPGEventResource<EpisodeOfCare>(resource) {
+  override fun setStatus(status: EventStatus) {
+    resource.status = EpisodeOfCare.EpisodeOfCareStatus.fromCode(status.code)
   }
 
-  override fun getIntent() = Intent.of(resource.intent.toCode())
-
-  override fun setStatus(status: Status) {
-    resource.status = Task.TaskStatus.fromCode(status.string)
-  }
-
-  override fun getStatus() = Status.of(resource.status.toCode())
+  override fun getStatus() = EventStatus.of(resource.status.toCode())
 
   override fun setBasedOn(reference: Reference) {
-    resource.addBasedOn(reference)
+    resource.addReferralRequest(reference)
   }
 
-  override fun getBasedOn() = resource.basedOn.lastOrNull()
+  override fun getBasedOn() = resource.referralRequest.lastOrNull()
 }
