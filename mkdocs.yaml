@@ -44,6 +44,7 @@ nav:
       - Use Snapshots: use/Snapshots.md
   - Contributors:
       - Contributing: contrib/index.md
+      - Git Guideline: contrib/git.md
       - Codespaces: contrib/codespaces.md
       - Documentation: contrib/docs.md
       - contrib/dependencies.md

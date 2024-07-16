@@ -17,6 +17,8 @@ To generate the website, for simplicity we recommend using [GitHub Codespaces](c
 
 1. `pipenv shell`: This enters a [Python "virtual environment" (`venv`)](https://docs.python.org/3/library/venv.html), using [`pipenv`](https://pipenv.pypa.io/)
 
+1. `pipenv install`: This install the required tools listed in the [`Pipfile`](https://github.com/google/android-fhir/blob/master/Pipfile)
+
 1. `mkdocs serve`
 
 1. Confirm Codespace's _"Port Forward"_ prompt to open `https://...app.github.dev`, et voilà!

@@ -107,6 +107,8 @@ dependencies {
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.xmlUnit)
+  testImplementation(libs.androidx.room.room)
+  testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
