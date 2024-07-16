@@ -58,7 +58,7 @@
     <string name="component_name_initial_value">Initial Value</string>
     <string
         name="behavior_name_calculated_expression_info"
-    >Input date of birth to automatically calculate age.</string>
+    >Input date of birth to automatically calculate age until age is updated manually.</string>
     <string
         name="behavior_name_calculated_expression"
     >Calculated Expression</string>
