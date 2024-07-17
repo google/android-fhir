@@ -16,222 +16,403 @@
 
 package com.google.android.fhir.workflow.activity
 
-import com.google.android.fhir.FhirEngine
-import com.google.android.fhir.search.search
+import ca.uhn.fhir.model.api.IQueryParameterType
+import ca.uhn.fhir.rest.param.ReferenceParam
+import com.google.android.fhir.getResourceClass
+import com.google.android.fhir.workflow.activity.event.CPGCommunicationEvent
+import com.google.android.fhir.workflow.activity.event.CPGEventForOrderService
+import com.google.android.fhir.workflow.activity.event.CPGEventResource
+import com.google.android.fhir.workflow.activity.event.CPGEventResourceForOrderMedication
+import com.google.android.fhir.workflow.activity.event.CPGImmunizationEvent
+import com.google.android.fhir.workflow.activity.event.EventStatus
+import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGImmunizationRequest
+import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
+import com.google.android.fhir.workflow.activity.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.request.CPGServiceRequest
+import com.google.android.fhir.workflow.activity.request.CPGTaskRequest
+import com.google.android.fhir.workflow.activity.request.Intent
+import com.google.android.fhir.workflow.activity.request.Status
 import java.util.UUID
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.CommunicationRequest
+import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
+import org.hl7.fhir.r4.model.ServiceRequest
+import org.hl7.fhir.r4.model.Task
+import org.opencds.cqf.fhir.api.Repository
 
-/** Defines various transitions for an activity in a computable Clinical Guideline. */
-class ActivityFlow private constructor(private val fhirEngine: FhirEngine) {
+private val Reference.idType
+  get() = IdType(reference)
 
-  private val Reference.searchByIdQuery
-    get() = reference.split("/").joinToString("?_id=")
+private val Reference.`class`
+  get() = getResourceClass<Resource>(reference.split("/")[0])
 
-  /**
-   * Given an active proposal, plan the proposal The proposal is accepted or rejected by the user,
-   * resulting in a plan to perform (or not perform) the activity.
-   *
-   * val plan = ActivityFlow.with(fhirEngine).plan("CommunicationRequest/12345")
-   */
-  suspend fun startPlan(proposalId: String): Resource {
-    val searchQuery = proposalId.split("/").joinToString("?_id=")
-    val request = fhirEngine.search(searchQuery).first().resource
-    return startPlan(request)
+class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>>
+internal constructor(
+  private val repository: Repository,
+  val requestResource: R,
+  private val eventResource: E? = null,
+) :
+  StartPlan<R, E>,
+  EndPlan<R, E>,
+  StartOrder<R, E>,
+  EndOrder<R, E>,
+  StartPerform<R, E>,
+  EndPerform<E> {
+
+  fun intent() = requestResource.getIntent()
+
+  fun status() = requestResource.getStatus()
+
+  override suspend fun startPlan(init: R.() -> Unit): EndPlan<R, E> {
+    requestResource.init()
+    return ActivityFlow(repository, startPlan(requestResource), null)
   }
 
-  suspend fun startPlan(proposal: Resource): Resource {
-    //    check inputProposal.intent = proposal
-    //      check inputProposal.status = active
-    //    var result = new Request(copy from inputProposal)
-    //    set result.id = null
-    //    set result.intent = plan
-    //      set result.status = draft
-    //      set result.basedOn = referenceTo(inputProposal)
+  override suspend fun endPlan(init: R.() -> Unit): StartOrder<R, E> {
+    requestResource.init()
+    endPlan(requestResource)
+    return this
+  }
 
-    val inputProposal = Request(proposal)
+  override suspend fun startOrder(init: R.() -> Unit): EndOrder<R, E> {
+    requestResource.init()
+    return ActivityFlow(repository, startOrder(requestResource), null)
+  }
 
-    check(inputProposal.intent == Request.Intent.PROPOSAL) {
-      "Proposal is still in ${inputProposal.intent} state."
+  override suspend fun endOrder(init: R.() -> Unit): StartPerform<R, E> {
+    requestResource.init()
+    endOrder(requestResource)
+    return this
+  }
+
+  //  The flow maybe such that the event type can only be confirmed after a certain stage, lets say
+  // at endPlan or endOrder.
+  override suspend fun <D : E> startPerform(klass: Class<D>, init: R.() -> Unit): EndPerform<D> {
+    // The caller could still call with any event resource, but we can fail fast by checking the
+    // compatibility of request and event types.
+    requestResource.init()
+    return ActivityFlow(repository, requestResource, startPerform(requestResource, klass) as D)
+  }
+
+  override suspend fun endPerform(init: E.() -> Unit) {
+    checkNotNull(eventResource) { "No event generated." }
+    eventResource.init()
+    endPerform(eventResource)
+  }
+
+  private fun startPlan(inputProposal: R): R {
+    check(inputProposal.getIntent() == Intent.PROPOSAL) {
+      "Proposal is still in ${inputProposal.getIntent()} state."
     }
 
-    check(inputProposal.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${inputProposal.status} status."
+    check(inputProposal.getStatus() == Status.ACTIVE) {
+      "Proposal is still in ${inputProposal.getStatus()} status."
     }
 
-    val plan =
+    try {
+      repository.create(inputProposal.resource)
+    } catch (e: Exception) {
+      repository.update(inputProposal.resource)
+    }
+
+    val planRequest: CPGRequestResource<*> =
       inputProposal.copy(
         id = UUID.randomUUID().toString(),
-        status = Request.Status.DRAFT,
-        intent = Request.Intent.PLAN,
+        status = Status.DRAFT,
+        intent = Intent.PLAN,
       )
-
-    return plan.resource
+    return planRequest as R
   }
 
-  suspend fun endPlan(plan: Resource) {
-    val inputPlan = Request(plan)
+  private fun endPlan(inputPlan: R) {
     val basedOn = inputPlan.getBasedOn()
-    check(basedOn != null) { "${plan.resourceType}.basedOn shouldn't be null" }
+    check(basedOn != null) { "${inputPlan.resource.resourceType}.basedOn shouldn't be null" }
 
     val basedOnProposal =
-      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
-    check(basedOnProposal != null) { "Couldn't find ${basedOn.searchByIdQuery} in the database." }
+      repository.read(inputPlan.resource.javaClass, basedOn.idType)?.let {
+        CPGRequestResource.of(inputPlan, it)
+      }
+    check(basedOnProposal != null) { "Couldn't find ${basedOn.reference} in the database." }
 
-    check(basedOnProposal.intent == Request.Intent.PROPOSAL) {
-      "Proposal is still in ${basedOnProposal.intent} state."
+    check(basedOnProposal.getIntent() == Intent.PROPOSAL) {
+      "Proposal is still in ${basedOnProposal.getIntent()} state."
     }
 
-    check(basedOnProposal.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${basedOnProposal.status} status."
+    check(basedOnProposal.getStatus() == Status.ACTIVE) {
+      "Proposal is still in ${basedOnProposal.getStatus()} status."
     }
 
-    check(inputPlan.intent == Request.Intent.PLAN) {
-      "Proposal is still in ${basedOnProposal.intent} state."
+    check(inputPlan.getIntent() == Intent.PLAN) {
+      "Proposal is still in ${basedOnProposal.getIntent()} state."
     }
 
-    check(inputPlan.status == Request.Status.DRAFT || inputPlan.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${basedOnProposal.status} status."
+    check(inputPlan.getStatus() == Status.DRAFT || inputPlan.getStatus() == Status.ACTIVE) {
+      "Proposal is still in ${basedOnProposal.getStatus()} status."
     }
 
-    basedOnProposal.setStatus(Request.Status.COMPLETED)
+    basedOnProposal.setStatus(Status.COMPLETED)
 
-    fhirEngine.create(inputPlan.resource)
-    fhirEngine.update(basedOnProposal.resource)
+    repository.create(inputPlan.resource)
+    repository.update(basedOnProposal.resource)
   }
 
-  /**
-   * Given an active proposal or plan, order the proposal The plan is authorized by an appropriately
-   * qualified user, resulting in an order to perform (or not perform) the activity.
-   *
-   * ```
-   * val order = ActivityFlow.with(fhirEngine).order("CommunicationRequest/6789")
-   * ```
-   */
-  suspend fun startOrder(planId: String): Resource {
-    val searchQuery = planId.split("/").joinToString("?_id=")
-    val request = fhirEngine.search(searchQuery).first().resource
-    return startOrder(request)
-  }
-
-  suspend fun startOrder(request: Resource): Resource {
-    val inputRequest = Request(request)
+  private fun startOrder(inputRequest: R): R {
     check(
-      inputRequest.intent == Request.Intent.PROPOSAL || inputRequest.intent == Request.Intent.PLAN,
+      inputRequest.getIntent() == Intent.PROPOSAL || inputRequest.getIntent() == Intent.PLAN,
     ) {
-      "Plan is still in ${inputRequest.intent} state."
+      "Plan is still in ${inputRequest.getIntent()} state."
     }
 
-    check(inputRequest.status == Request.Status.ACTIVE) {
-      "Plan is still in ${inputRequest.status} status."
+    check(inputRequest.getStatus() == Status.ACTIVE) {
+      "Plan is still in ${inputRequest.getStatus()} status."
     }
 
-    val order =
-      inputRequest.copy(
-        UUID.randomUUID().toString(),
-        Request.Status.DRAFT,
-        Request.Intent.ORDER,
-      )
-    return order.resource
+    repository.update(inputRequest.resource)
+
+    return inputRequest.copy(
+      UUID.randomUUID().toString(),
+      Status.DRAFT,
+      Intent.ORDER,
+    ) as R
   }
 
-  suspend fun endOrder(order: Resource) {
-    //    check inputOrder.basedOn is not null
-    //    var basedOn = engine.get(inputOrder.basedOn)
-    //    check basedOn.intent in { proposal | plan }
-    //    check basedOn.status = active
-    //      check inputOrder.status in { draft | active }
-    //    check inputOrder.intent = order
-    //      set basedOn.status = completed
-    //      try
-    //        engine.save(inputOrder)
-    //        engine.save(basedOn)
-    //        commit
-
-    val inputOrder = Request(order)
+  private fun endOrder(inputOrder: R) {
     val basedOn = inputOrder.getBasedOn()
-    check(basedOn != null) { "${order.resourceType}.basedOn shouldn't be null" }
+    check(basedOn != null) { "${inputOrder.resource.resourceType}.basedOn shouldn't be null" }
 
     val basedOnResource =
-      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+      repository.read(inputOrder.resource.javaClass, basedOn.idType)?.let {
+        CPGRequestResource.of(inputOrder, it)
+      }
+
     check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
     check(
-      basedOnResource.intent == Request.Intent.PROPOSAL ||
-        basedOnResource.intent == Request.Intent.PLAN,
+      basedOnResource.getIntent() == Intent.PROPOSAL || basedOnResource.getIntent() == Intent.PLAN,
     ) {
-      "Proposal is still in ${basedOnResource.intent} state."
+      "Proposal is still in ${basedOnResource.getIntent()} state."
     }
 
-    check(basedOnResource.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${basedOnResource.status} status."
+    check(basedOnResource.getStatus() == Status.ACTIVE) {
+      "Proposal is still in ${basedOnResource.getStatus()} status."
     }
 
-    check(inputOrder.intent == Request.Intent.ORDER) {
-      "Proposal is still in ${basedOnResource.intent} state."
+    check(inputOrder.getIntent() == Intent.ORDER) {
+      "Proposal is still in ${basedOnResource.getIntent()} state."
     }
 
-    check(inputOrder.status == Request.Status.DRAFT || inputOrder.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${basedOnResource.status} status."
+    check(
+      inputOrder.getStatus() == Status.DRAFT || inputOrder.getStatus() == Status.ACTIVE,
+    ) {
+      "Proposal is still in ${basedOnResource.getStatus()} status."
     }
 
-    basedOnResource.setStatus(Request.Status.COMPLETED)
+    basedOnResource.setStatus(Status.COMPLETED)
 
-    fhirEngine.create(inputOrder.resource)
-    fhirEngine.update(basedOnResource.resource)
+    repository.create(inputOrder.resource)
+    repository.update(basedOnResource.resource)
   }
 
-  /**
-   * Given an active order, perform the event. The order is fulfilled through actually performing
-   * the activity.
-   *
-   * val communicationEvent = ActivityFlow.with(fhirEngine).perform("CommunicationRequest/6789")
-   */
-  suspend fun startPerform(requestId: String): Resource {
-    // TODO : End the order by marking completed.
-    val searchQuery = requestId.split("/").joinToString("?_id=")
-    val request = fhirEngine.search(searchQuery).first().resource
-    val order = Request(request)
-    check(order.intent == Request.Intent.ORDER) { "Order is still in ${order.intent} state." }
+  private fun startPerform(inputOrder: R, eventClass: Class<*>): E {
+    check(inputOrder.getIntent() == Intent.ORDER) {
+      "Order is still in ${inputOrder.getIntent()} state."
+    }
 
-    check(order.status == Request.Status.ACTIVE) { "Order is still in ${order.status} status." }
-    val event = order.createEventResource(fhirEngine)
-    event.setStatus(Event.Status.PREPARATION)
-    event.setBasedOn(order)
-    return event.resource
+    check(inputOrder.getStatus() == Status.ACTIVE) {
+      "Order is still in ${inputOrder.getStatus()} status."
+    }
+
+    repository.update(inputOrder.resource)
+
+    val eventRequest = CPGEventResource.of(inputOrder, eventClass)
+    eventRequest.setStatus(EventStatus.PREPARATION)
+    eventRequest.setBasedOn(inputOrder.asReference())
+    return eventRequest as E
   }
 
-  suspend fun endPerform(event: Resource) {
-    val inputEvent = Event(event)
+  private fun endPerform(inputEvent: CPGEventResource<*>) {
     val basedOn = inputEvent.getBasedOn()
-    check(basedOn != null) { "${event.resourceType}.basedOn shouldn't be null" }
+    check(basedOn != null) { "${inputEvent.resourceType}.basedOn shouldn't be null" }
 
     val basedOnResource =
-      fhirEngine.search(basedOn.searchByIdQuery).firstOrNull()?.resource?.let { Request(it) }
+      repository.read(basedOn.`class`, basedOn.idType)?.let { CPGRequestResource.of(it) }
+
     check(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
-    check(basedOnResource.intent == Request.Intent.ORDER) {
-      "Proposal is still in ${basedOnResource.intent} state."
+    check(basedOnResource.getIntent() == Intent.ORDER) {
+      "Proposal is still in ${basedOnResource.getIntent()} state."
     }
 
-    check(basedOnResource.status == Request.Status.ACTIVE) {
-      "Proposal is still in ${basedOnResource.status} status."
+    check(basedOnResource.getStatus() == Status.ACTIVE) {
+      "Proposal is still in ${basedOnResource.getStatus()} status."
     }
 
     check(
-      inputEvent.getStatus() == Event.Status.PREPARATION ||
-        inputEvent.getStatus() == Event.Status.INPROGRESS,
+      inputEvent.getStatus() == EventStatus.PREPARATION ||
+        inputEvent.getStatus() == EventStatus.INPROGRESS,
     ) {
-      "Proposal is still in ${basedOnResource.status} status."
+      "Proposal is still in ${basedOnResource.getStatus()} status."
     }
 
-    basedOnResource.setStatus(Request.Status.COMPLETED)
+    basedOnResource.setStatus(Status.COMPLETED)
 
-    fhirEngine.create(inputEvent.resource)
-    fhirEngine.update(basedOnResource.resource)
+    repository.create(inputEvent.resource)
+    repository.update(basedOnResource.resource)
   }
 
   companion object {
-    fun with(fhirEngine: FhirEngine): ActivityFlow = ActivityFlow(fhirEngine)
+
+    // Send a message
+    fun of(
+      repository: Repository,
+      resource: CPGCommunicationRequest,
+    ): CPGCommunicationActivity = ActivityFlow(repository, resource)
+
+    // Collect information
+    fun of(repository: Repository, resource: CPGTaskRequest) =
+      ActivityFlow(repository, resource, null)
+
+    // order medication
+    fun of(
+      repository: Repository,
+      resource: CPGMedicationRequest,
+    ): CPGMedicationRequestActivity = ActivityFlow(repository, resource)
+
+    // Order a service
+    fun of(
+      repository: Repository,
+      resource: CPGServiceRequest,
+    ): ActivityFlow<CPGServiceRequest, CPGEventForOrderService<*>> =
+      ActivityFlow(repository, resource)
+
+    fun of(
+      repository: Repository,
+      resource: CPGImmunizationRequest,
+    ): CPGRecommendImmunizationActivity = ActivityFlow(repository, resource)
+
+    /**
+     * This returns a list of flows and because of type erasure, its not possible to do a
+     * filterInstance with specific CPG resource types. Instead, use list.filter and check the cpg
+     * type of the [ActivityFlow.requestResource] instead.
+     */
+    fun of(
+      repository: Repository,
+      patientId: String,
+    ): List<ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>> {
+      val tasks =
+        repository
+          .search(
+            Bundle::class.java,
+            Task::class.java,
+            mutableMapOf<String, MutableList<IQueryParameterType>>(
+              Task.SUBJECT.paramName to mutableListOf(ReferenceParam("Patient/$patientId")),
+            ),
+            null,
+          )
+          .entry
+          .map { it.resource }
+
+      val medicationRequests =
+        repository
+          .search(
+            Bundle::class.java,
+            MedicationRequest::class.java,
+            mutableMapOf<String, MutableList<IQueryParameterType>>(
+              MedicationRequest.SUBJECT.paramName to
+                mutableListOf(ReferenceParam("Patient/$patientId")),
+            ),
+            null,
+          )
+          .entry
+          .map { it.resource }
+
+      val communicationRequests =
+        repository
+          .search(
+            Bundle::class.java,
+            CommunicationRequest::class.java,
+            mutableMapOf<String, MutableList<IQueryParameterType>>(
+              CommunicationRequest.SUBJECT.paramName to
+                mutableListOf(ReferenceParam("Patient/$patientId")),
+            ),
+            null,
+          )
+          .entry
+          .map { it.resource }
+
+      val serviceRequests =
+        repository
+          .search(
+            Bundle::class.java,
+            ServiceRequest::class.java,
+            mutableMapOf<String, MutableList<IQueryParameterType>>(
+              ServiceRequest.SUBJECT.paramName to
+                mutableListOf(ReferenceParam("Patient/$patientId")),
+            ),
+            null,
+          )
+          .entry
+          .map { it.resource }
+
+      val cache: MutableMap<String, CPGRequestResource<*>> =
+        sequenceOf(tasks, communicationRequests, serviceRequests, medicationRequests)
+          .flatten()
+          .map { CPGRequestResource.of(it) }
+          .associateByTo(LinkedHashMap()) { "${it.resourceType}/${it.logicalId}" }
+
+      fun addBasedOn(
+        request: RequestChain<CPGRequestResource<*>>,
+      ): RequestChain<CPGRequestResource<*>>? {
+        request.request.getBasedOn()?.let { reference ->
+          cache[reference.reference]?.let {
+            cache.remove(reference.reference)
+            request.basedOn = RequestChain(it, addBasedOn(RequestChain(it, null)))
+            request.basedOn
+          }
+        }
+        return null
+      }
+
+      val requestChain =
+        cache.values
+          .filter {
+            it.getIntent() == Intent.ORDER ||
+              it.getIntent() == Intent.PLAN ||
+              it.getIntent() == Intent.PROPOSAL
+          }
+          .sortedByDescending { it.getIntent().ordinal }
+          .mapNotNull {
+            if (cache.containsKey("${it.resourceType}/${it.logicalId}")) {
+              RequestChain(it, addBasedOn(RequestChain(it, null)))
+            } else {
+              null
+            }
+          }
+
+      return requestChain.map { ActivityFlow(repository, it.request) }
+    }
   }
 }
+
+internal data class RequestChain<R : CPGRequestResource<*>>(
+  val request: CPGRequestResource<*>,
+  var basedOn: RequestChain<R>?,
+)
+
+// Send a message
+typealias CPGCommunicationActivity = ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+
+// Order a service
+typealias CPGServiceRequestActivity = ActivityFlow<CPGServiceRequest, CPGEventForOrderService<*>>
+
+// Order a medication
+typealias CPGMedicationRequestActivity =
+  ActivityFlow<CPGMedicationRequest, CPGEventResourceForOrderMedication<*>>
+
+// Recommend an immunization
+typealias CPGRecommendImmunizationActivity =
+  ActivityFlow<CPGImmunizationRequest, CPGImmunizationEvent>
