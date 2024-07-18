@@ -12,9 +12,10 @@ plugins {
 
 publishArtifact(Releases.Knowledge)
 
-ksp { arg("room.schemaLocation", "$projectDir/schemas") }
-
 createJacocoTestReportTask()
+
+// Generate database schema in the schemas folder
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
 
 android {
   namespace = "com.google.android.fhir.knowledge"
