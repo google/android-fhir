@@ -12,6 +12,8 @@ plugins {
 
 publishArtifact(Releases.Knowledge)
 
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 createJacocoTestReportTask()
 
 android {
@@ -22,14 +24,6 @@ android {
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.knowledge"
-
-    ksp { arg("room.schemaLocation", "$projectDir/schemas") }
-
-    javaCompileOptions {
-      annotationProcessorOptions {
-        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
-      }
-    }
   }
 
   sourceSets {
