@@ -51,7 +51,7 @@ internal constructor(
   knowledgeManager: KnowledgeManager,
 ) {
   init {
-    check(fhirContext.version.version == FhirVersionEnum.R4) {
+    require(fhirContext.version.version == FhirVersionEnum.R4) {
       "R4 is the only supported version by FhirOperator"
     }
   }
