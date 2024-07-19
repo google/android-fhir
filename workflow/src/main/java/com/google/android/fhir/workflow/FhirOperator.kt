@@ -51,25 +51,27 @@ internal constructor(
   knowledgeManager: KnowledgeManager,
 ) {
   init {
-    require(fhirContext.version.version == FhirVersionEnum.R4) {
+    check(fhirContext.version.version == FhirVersionEnum.R4) {
       "R4 is the only supported version by FhirOperator"
     }
   }
 
   private var dataRepo = FhirEngineRepository(fhirContext, fhirEngine)
-  private var contentRepo = KnowledgeRepository(fhirContext, knowledgeManager)
-  private var terminologyRepo = KnowledgeRepository(fhirContext, knowledgeManager)
+  private var knowledgeRepo = KnowledgeRepository(fhirContext, knowledgeManager)
+  // The knowledge manager is used for both content and terminology.
+  private val repository = ProxyRepository(
+    /* data = */ dataRepo,
+    /* content = */ knowledgeRepo,
+    /* terminology = */ knowledgeRepo
+  )
 
-  private val repository = ProxyRepository(dataRepo, contentRepo, terminologyRepo)
   private val evaluationSettings: EvaluationSettings = EvaluationSettings.getDefault()
-
   private val measureEvaluationOptions =
     MeasureEvaluationOptions().apply { evaluationSettings = this@FhirOperator.evaluationSettings }
 
   private val libraryProcessor = LibraryEngine(repository, evaluationSettings)
-
-  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
   private val planDefinitionProcessor = PlanDefinitionProcessor(repository, evaluationSettings)
+  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
 
   /**
    * The function evaluates a FHIR library against the database.
