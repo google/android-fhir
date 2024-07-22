@@ -14,6 +14,9 @@ publishArtifact(Releases.Engine)
 
 createJacocoTestReportTask()
 
+// Generate database schema in the schemas folder
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 val generateSearchParamsTask =
   project.tasks.register("generateSearchParamsTask", GenerateSearchParamsTask::class) {
     srcOutputDir.set(project.layout.buildDirectory.dir("gen/main"))
@@ -39,12 +42,6 @@ android {
     // need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir"
     consumerProguardFile("proguard-rules.pro")
-
-    javaCompileOptions {
-      annotationProcessorOptions {
-        compilerArgumentProviders(RoomSchemaArgProvider(File(projectDir, "schemas")))
-      }
-    }
   }
 
   sourceSets {
