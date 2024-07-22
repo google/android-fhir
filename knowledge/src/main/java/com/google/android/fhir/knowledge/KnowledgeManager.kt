@@ -21,8 +21,8 @@ import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.knowledge.db.KnowledgeDatabase
+import com.google.android.fhir.knowledge.db.entities.ImplementationGuideEntity
 import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
-import com.google.android.fhir.knowledge.db.entities.toEntity
 import com.google.android.fhir.knowledge.files.NpmFileManager
 import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
 import com.google.android.fhir.knowledge.npm.OkHttpNpmPackageDownloader
@@ -49,6 +49,9 @@ import timber.log.Timber
  * - database: indexing knowledge artifacts stored in the local file system,
  * - file manager: managing files containing the knowledge artifacts, and
  * - NPM downloader: downloading from an NPM package server the knowledge artifacts.
+ *
+ * Knowledge artifacts are scoped by the application. Multiple applications using the knowledge
+ * manager will not share the same sets of knowledge artifacts.
  */
 class KnowledgeManager
 internal constructor(
@@ -81,7 +84,7 @@ internal constructor(
         try {
           val localFhirNpmPackageMetadata =
             npmFileManager.getLocalFhirNpmPackageMetadata(it.name, it.version)
-          install(it, localFhirNpmPackageMetadata.rootDirectory)
+          import(it, localFhirNpmPackageMetadata.rootDirectory)
           install(*localFhirNpmPackageMetadata.dependencies.toTypedArray())
         } catch (e: Exception) {
           Timber.w("Unable to install package ${it.name} ${it.version}")
@@ -93,9 +96,18 @@ internal constructor(
    * Checks if the [fhirNpmPackage] is present in DB. If necessary, populates the database with the
    * metadata of FHIR Resource from the provided [rootDirectory].
    */
-  suspend fun install(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
+  suspend fun import(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId = knowledgeDao.insert(fhirNpmPackage.toEntity(rootDirectory))
+    val igId =
+      knowledgeDao.insert(
+        ImplementationGuideEntity(
+          0L,
+          fhirNpmPackage.canonical ?: "",
+          fhirNpmPackage.name,
+          fhirNpmPackage.version,
+          rootDirectory,
+        ),
+      )
     rootDirectory.listFiles()?.sorted()?.forEach { file ->
       try {
         val resource = jsonParser.parseResource(FileInputStream(file))
@@ -116,9 +128,43 @@ internal constructor(
     }
   }
 
-  /** Imports the Knowledge Artifact from the provided [file] to the default dependency. */
-  suspend fun install(file: File) {
-    importFile(null, file)
+  /**
+   * Indexes a knowledge artifact as a JSON object in the provided [file].
+   *
+   * This creates a record of the knowledge artifact's metadata and the file's location. When the
+   * knowledge artifact is requested, knowledge manager will load the content of the file,
+   * deserialize it and return the resulting FHIR resource.
+   *
+   * This operation does not make a copy of the knowledge artifact, nor does it checksum the content
+   * of the file. Therefore, it cannot be guaranteed that subsequent retrievals of the knowledge
+   * artifact will produce the same result. Applications using this function must be aware of the
+   * risk of the content of the file being modified or corrupt, potentially resulting in incorrect
+   * or inaccurate result of decision support or measure evaluation.
+   *
+   * Use this API for knowledge artifacts in immutable files (e.g. in the app's `assets` folder).
+   *
+   * resources already indexed and resources already imported by ig?
+   */
+  suspend fun index(file: File) {
+    val resource =
+      withContext(Dispatchers.IO) {
+        try {
+          FileInputStream(file).use(jsonParser::parseResource)
+        } catch (exception: Exception) {
+          Timber.d(exception, "Unable to import file: $file. Parsing to FhirResource failed.")
+        }
+      }
+    when (resource) {
+      is Resource -> {
+        val newId = indexResourceFile(null, resource, file)
+        resource.setId(IdType(resource.resourceType.name, newId))
+
+        // Overrides the Id in the file
+        FileOutputStream(file).use {
+          it.write(jsonParser.encodeResourceToString(resource).toByteArray())
+        }
+      }
+    }
   }
 
   /** Loads resources from IGs listed in dependencies. */
@@ -141,7 +187,7 @@ internal constructor(
         name != null -> knowledgeDao.getResourcesWithName(resType, name)
         else -> knowledgeDao.getResources(resType)
       }
-    return resourceEntities.map { loadResource(it) }
+    return resourceEntities.map { parseResourceFile(it.resourceFile) }
   }
 
   /** Deletes Implementation Guide, cleans up files. */
@@ -153,43 +199,6 @@ internal constructor(
         igEntity.rootDirectory.deleteRecursively()
       }
     }
-  }
-
-  private suspend fun importFile(igId: Long?, file: File) {
-    val resource =
-      withContext(Dispatchers.IO) {
-        try {
-          FileInputStream(file).use(jsonParser::parseResource)
-        } catch (exception: Exception) {
-          Timber.d(exception, "Unable to import file: $file. Parsing to FhirResource failed.")
-        }
-      }
-    when (resource) {
-      is Resource -> {
-        val newId = indexResourceFile(igId, resource, file)
-        resource.setId(IdType(resource.resourceType.name, newId))
-
-        // Overrides the Id in the file
-        FileOutputStream(file).use {
-          it.write(jsonParser.encodeResourceToString(resource).toByteArray())
-        }
-      }
-    }
-  }
-
-  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
-    val metadataResource = resource as? MetadataResource
-    val res =
-      ResourceMetadataEntity(
-        0L,
-        resource.resourceType,
-        metadataResource?.url,
-        metadataResource?.name,
-        metadataResource?.version,
-        file,
-      )
-
-    return knowledgeDao.insertResource(igId, res)
   }
 
   /**
@@ -220,8 +229,28 @@ internal constructor(
     }
   }
 
-  private fun loadResource(resourceEntity: ResourceMetadataEntity): IBaseResource {
-    return jsonParser.parseResource(FileInputStream(resourceEntity.resourceFile))
+  /**  */
+  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
+    val metadataResource = resource as? MetadataResource
+    val res =
+      ResourceMetadataEntity(
+        0L,
+        resource.resourceType,
+        metadataResource?.url,
+        metadataResource?.name,
+        metadataResource?.version,
+        file,
+      )
+
+    return knowledgeDao.insertResource(igId, res)
+  }
+
+  /**
+   * Parses the content of a file containing a FHIR resource in JSON and returns the parsed
+   * resource.
+   */
+  private fun parseResourceFile(file: File): IBaseResource {
+    return jsonParser.parseResource(FileInputStream(file))
   }
 
   companion object {

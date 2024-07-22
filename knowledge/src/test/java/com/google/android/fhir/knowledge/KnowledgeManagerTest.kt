@@ -65,7 +65,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `importing IG creates entries in DB`() = runTest {
-    knowledgeManager.install(fhirNpmPackage, dataFolder)
+    knowledgeManager.import(fhirNpmPackage, dataFolder)
     val implementationGuideId =
       knowledgeDb.knowledgeDao().getImplementationGuide("anc-cds", "0.3.0")!!.implementationGuideId
 
@@ -83,7 +83,7 @@ internal class KnowledgeManagerTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
-    knowledgeManager.install(fhirNpmPackage, igRoot)
+    knowledgeManager.import(fhirNpmPackage, igRoot)
 
     knowledgeManager.delete(fhirNpmPackage)
 
@@ -93,7 +93,7 @@ internal class KnowledgeManagerTest {
 
   @Test
   fun `imported entries are readable`() = runTest {
-    knowledgeManager.install(fhirNpmPackage, dataFolder)
+    knowledgeManager.import(fhirNpmPackage, dataFolder)
 
     assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
       .isNotNull()
@@ -128,8 +128,8 @@ internal class KnowledgeManagerTest {
         version = "A.1.0.1"
       }
 
-    knowledgeManager.install(writeToFile(libraryAOld))
-    knowledgeManager.install(writeToFile(libraryANew))
+    knowledgeManager.index(writeToFile(libraryAOld))
+    knowledgeManager.index(writeToFile(libraryANew))
 
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
@@ -182,8 +182,8 @@ internal class KnowledgeManagerTest {
         url = commonUrl
       }
 
-    knowledgeManager.install(writeToFile(libraryWithSameUrl))
-    knowledgeManager.install(writeToFile(planDefinitionWithSameUrl))
+    knowledgeManager.index(writeToFile(libraryWithSameUrl))
+    knowledgeManager.index(writeToFile(planDefinitionWithSameUrl))
 
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
@@ -215,8 +215,8 @@ internal class KnowledgeManagerTest {
         version = "0"
       }
 
-    knowledgeManager.install(writeToFile(libraryWithSameUrl))
-    knowledgeManager.install(writeToFile(planDefinitionWithSameUrl))
+    knowledgeManager.index(writeToFile(libraryWithSameUrl))
+    knowledgeManager.index(writeToFile(planDefinitionWithSameUrl))
 
     val resources = knowledgeDb.knowledgeDao().getResources()
     assertThat(resources).hasSize(2)
