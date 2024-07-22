@@ -58,12 +58,14 @@ internal constructor(
 
   private var dataRepo = FhirEngineRepository(fhirContext, fhirEngine)
   private var knowledgeRepo = KnowledgeRepository(fhirContext, knowledgeManager)
+
   // The knowledge manager is used for both content and terminology.
-  private val repository = ProxyRepository(
-    /* data = */ dataRepo,
-    /* content = */ knowledgeRepo,
-    /* terminology = */ knowledgeRepo
-  )
+  private val repository =
+    ProxyRepository(
+      /* data = */ dataRepo,
+      /* content = */ knowledgeRepo,
+      /* terminology = */ knowledgeRepo,
+    )
 
   private val evaluationSettings: EvaluationSettings = EvaluationSettings.getDefault()
   private val measureEvaluationOptions =
