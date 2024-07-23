@@ -43,7 +43,7 @@ object Plugins {
     "com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:${Versions.kspPlugin}"
 
   object Versions {
-    const val androidGradlePlugin = "8.0.2"
+    const val androidGradlePlugin = "8.5.0"
     const val benchmarkPlugin = "1.1.0"
     const val dokka = "1.9.20"
     const val kspPlugin = "1.9.22-1.0.18"

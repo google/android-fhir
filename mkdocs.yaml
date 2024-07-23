@@ -6,7 +6,6 @@ copyright: Copyright 2024 The Android FHIR SDK Authors
 
 nav:
   - Home: index.md
-  - faq.md
   - Users:
       - FHIR Engine Library:
           - Introduction: use/FEL/index.md
@@ -45,10 +44,13 @@ nav:
       - Use Snapshots: use/Snapshots.md
   - Contributors:
       - Contributing: contrib/index.md
+      - Git Guideline: contrib/git.md
       - Codespaces: contrib/codespaces.md
       - Documentation: contrib/docs.md
       - contrib/dependencies.md
-      - Roadmap: contrib/roadmap.md
+  - Roadmap: contrib/roadmap.md
+  - Community: community.md
+  - faq.md
 
 # The following settings were originally partially inspired by
 # https://github.com/enola-dev/enola/blob/main/mkdocs.yaml
