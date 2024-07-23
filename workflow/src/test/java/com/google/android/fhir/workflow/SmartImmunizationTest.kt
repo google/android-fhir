@@ -63,7 +63,7 @@ class SmartImmunizationTest {
     // Installing SmartImmunizations IG into the IGManager
     val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
 
-    knowledgeManager.import(
+    knowledgeManager.install(
       FhirNpmPackage(
         "who.fhir.immunization",
         "1.0.0",

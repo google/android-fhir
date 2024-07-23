@@ -110,8 +110,8 @@ class FhirOperatorLibraryEvaluateJavaTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.index(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
-    knowledgeManager.index(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
+    knowledgeManager.install(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
+    knowledgeManager.install(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
 
     // Evaluates a specific Patient
     val results =
@@ -137,7 +137,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
 
-    knowledgeManager.index(writeToFile(library))
+    knowledgeManager.install(writeToFile(library))
 
     // Evaluates expression without any extra data
     val results =
@@ -162,7 +162,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
 
-    knowledgeManager.index(writeToFile(library))
+    knowledgeManager.install(writeToFile(library))
 
     val params =
       Parameters().apply {
