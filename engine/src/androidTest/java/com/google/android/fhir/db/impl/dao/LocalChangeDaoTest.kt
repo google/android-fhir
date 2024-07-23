@@ -359,6 +359,7 @@ class LocalChangeDaoTest {
       .isEqualTo(practitionerReference)
   }
 
+  // https://github.com/google/android-fhir/issues/2559
   @Test
   fun updateResourceIdAndReferences_shouldSafelyUpdateLocalChangesReferencesAboveSQLiteInOpLimit() =
     runBlocking {

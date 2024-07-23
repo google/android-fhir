@@ -4088,6 +4088,7 @@ class DatabaseImplTest {
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
 
+  // https://github.com/google/android-fhir/issues/2559
   @Test
   fun getLocalChangeResourceReferences_shouldSafelyReturnReferencesAboveSQLiteInOpLimit() =
     runBlocking {
