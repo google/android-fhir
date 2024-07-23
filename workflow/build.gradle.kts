@@ -112,7 +112,6 @@ dependencies {
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
 
   constraints {
