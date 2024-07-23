@@ -52,8 +52,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.asStringValue
+import com.google.android.fhir.datacapture.extensions.createNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.entryMode
-import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -3174,7 +3174,7 @@ class QuestionnaireViewModelTest {
     }
   // ==================================================================== //
   //                                                                      //
-  //                       Navigation in Long  Scroll                     //
+  //                       Navigation in Long Scroll                      //
   //                                                                      //
   // ==================================================================== //
 
@@ -4332,7 +4332,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListA()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
         getQuestionnaireAdapterItemListB()
@@ -4343,7 +4343,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListB()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
       }
@@ -4560,6 +4560,93 @@ class QuestionnaireViewModelTest {
       assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
     }
   }
+
+  // ==================================================================== //
+  //                                                                      //
+  //                   Repeated Groups with Enable When                   //
+  //                                                                      //
+  // ==================================================================== //
+
+  // https://github.com/google/android-fhir/issues/2590
+  @Test
+  fun `should evaluate enable when with new questionnaire response items eg added repeated group`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "repeated-group"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              repeats = true
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "nested-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                },
+              )
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "nested-2"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  addEnableWhen().apply {
+                    answer = BooleanType(true)
+                    question = "nested-1"
+                    operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                  }
+                },
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+            ),
+            null,
+          )
+        }
+
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .filterIsInstance<QuestionnaireAdapterItem.Question>()
+              .map { it.asQuestion().questionnaireItem.linkId },
+          )
+          .containsExactly("repeated-group", "nested-1")
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "nested-1" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = valueBooleanType.setValue(true)
+                },
+              ),
+              null,
+            )
+          }
+
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .filterIsInstance<QuestionnaireAdapterItem.Question>()
+              .map { it.asQuestion().questionnaireItem.linkId },
+          )
+          .containsExactly("repeated-group", "nested-1", "nested-2")
+      }
+    }
 
   // ==================================================================== //
   //                                                                      //
@@ -5074,6 +5161,7 @@ class QuestionnaireViewModelTest {
   //                 Answer Options Toggle Expression                     //
   //                                                                      //
   // ==================================================================== //
+
   @Test
   fun `only answer options evaluating to true in answerOptionsToggleExpression occurrences should be enabled on initial load`() =
     runTest {
@@ -7313,12 +7401,6 @@ class QuestionnaireViewModelTest {
 
   private fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.value.items
-
-  private fun QuestionnaireViewItem.getQuestionnaireResponseItem() =
-    ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
-      this,
-      "questionnaireResponseItem",
-    )
 
   /**
    * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on
