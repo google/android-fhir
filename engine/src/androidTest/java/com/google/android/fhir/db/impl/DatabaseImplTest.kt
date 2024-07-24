@@ -4213,12 +4213,13 @@ class DatabaseImplTest {
      * This tests that the search query does not return duplicated resources as a result of sorting
      * by a field that has multiple index values. For example, searching a group of patients sorted
      * by Patient.GIVEN should return a single copy of each patient even if some of them might have
-     * mulitple given names indexed.
+     * multiple given names indexed.
      *
      * Whilst sorting, the resource table and the relevant index table are joined, which could
      * result in multiple rows for a single resource if there are multiple index values for the
-     * particular index used in the sorting criteria. This is prevented by adding the `DISTINCT`
-     * keyword in the generated SQL query.
+     * particular index used in the sorting criteria. This is prevented by adding the `GROUP BY`
+     * with `HAVING` clause in the generated SQL query. See `MoreSearch.generateGroupAndOrderQuery`
+     * for additional info.
      */
     val group =
       Group().apply {
@@ -4268,12 +4269,13 @@ class DatabaseImplTest {
      * This tests that the search query does not return duplicated resources as a result of sorting
      * by a field that has multiple index values. For example, searching a group of patients sorted
      * by Patient.GIVEN should return a single copy of each patient even if some of them might have
-     * mulitple given names indexed.
+     * multiple given names indexed.
      *
      * Whilst sorting, the resource table and the relevant index table are joined, which could
      * result in multiple rows for a single resource if there are multiple index values for the
-     * particular index used in the sorting criteria. This is prevented by adding the `DISTINCT`
-     * keyword in the generated SQL query.
+     * particular index used in the sorting criteria. This is prevented by adding the `GROUP BY`
+     * with `HAVING` clause in the generated SQL query. See `MoreSearch.generateGroupAndOrderQuery`
+     * for additional info.
      */
     val group =
       Group().apply {
