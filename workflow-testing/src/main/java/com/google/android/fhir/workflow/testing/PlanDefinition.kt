@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,8 +38,8 @@ import org.junit.Assert.fail
 import org.opencds.cqf.fhir.api.Repository
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
-import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
-import org.opencds.cqf.fhir.utility.repository.IGLayoutMode
+import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
+import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.InMemoryFhirRepository
 import org.opencds.cqf.fhir.utility.repository.Repositories
 import org.skyscreamer.jsonassert.JSONAssert
@@ -152,7 +152,6 @@ object PlanDefinition : Loadable() {
         IGInputStreamStructureRepository(
           fhirContext,
           repositoryPath ?: ".",
-          IGLayoutMode.TYPE_PREFIX,
           EncodingEnum.JSON,
         )
       if (dataRepository == null && contentRepository == null && terminologyRepository == null) {
@@ -200,14 +199,12 @@ object PlanDefinition : Loadable() {
 
       return GeneratedBundle(
         buildProcessor(repository)
-          .applyR5<IPrimitiveType<String>>(
-            /* id = */ IdType("PlanDefinition", planDefinitionID),
-            /* canonical = */ null,
-            /* planDefinition = */ null,
-            /* patientId = */ patientID,
-            /* encounterId = */ encounterID,
-            /* practitionerId = */ practitionerID,
-            /* organizationId = */ null,
+          .applyR5(
+            /* planDefinition = */ Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
+            /* subject = */ patientID,
+            /* encounter = */ encounterID,
+            /* practitioner = */ practitionerID,
+            /* organization = */ null,
             /* userType = */ null,
             /* userLanguage = */ null,
             /* userTaskContext = */ null,

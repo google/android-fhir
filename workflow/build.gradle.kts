@@ -92,8 +92,6 @@ dependencies {
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.guavaCaching)
 
-  implementation(Dependencies.Cql.evaluator)
-  implementation(Dependencies.Cql.evaluatorFhirJackson)
   implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
   implementation(Dependencies.androidFhirKnowledge)
@@ -103,6 +101,8 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.opencds.cqf.fhir.cr)
+  implementation(libs.opencds.cqf.fhir.jackson)
 
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.robolectric)

@@ -19,14 +19,6 @@ import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.kotlin.dsl.exclude
 
 object Dependencies {
-  object Cql {
-    const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirJackson =
-      "org.opencds.cqf.fhir:cqf-fhir-jackson:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirUtilities =
-      "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
-  }
-
   object HapiFhir {
     const val fhirBaseModule = "ca.uhn.hapi.fhir:hapi-fhir-base"
     const val fhirClientModule = "ca.uhn.hapi.fhir:hapi-fhir-client"
@@ -139,11 +131,6 @@ object Dependencies {
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-
-    object Cql {
-      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
-    }
-
     const val androidFhirCommon = "0.1.0-alpha05"
     const val androidFhirEngine = "0.1.0-beta05"
     const val androidFhirKnowledge = "0.1.0-alpha03"

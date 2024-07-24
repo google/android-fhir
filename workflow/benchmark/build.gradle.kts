@@ -55,9 +55,6 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.Cql.evaluator)
-  androidTestImplementation(Dependencies.Cql.evaluatorFhirJackson)
-  androidTestImplementation(Dependencies.Cql.evaluatorFhirUtilities)
   androidTestImplementation(libs.androidx.benchmark.junit4)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)
@@ -65,6 +62,9 @@ dependencies {
   androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.kotlinx.coroutines.android)
+  androidTestImplementation(libs.opencds.cqf.fhir.cr)
+  androidTestImplementation(libs.opencds.cqf.fhir.jackson)
+  androidTestImplementation(libs.opencds.cqf.fhir.utility)
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
