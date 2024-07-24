@@ -188,4 +188,10 @@
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
         <attr name="questionnaire_theme" format="reference" />
     </declare-styleable>
+
+    <declare-styleable name="QuestionnaireCustomStyle">
+        <attr name="android:textSize" />
+        <attr name="android:textColor" />
+        <attr name="android:background" />
+    </declare-styleable>
 </resources>

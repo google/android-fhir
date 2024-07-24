@@ -80,7 +80,7 @@
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item name="questionnaireQuestionTextStyle">
-            @style/TextAppearance.Material3.HeadlineMedium
+            @style/TextAppearance.Material3.HeadlineLarge
         </item>
     </style>
 
@@ -98,4 +98,14 @@
         <item name="android:minLines">2</item>
     </style>
 
+    <style name="CustomStyle_1">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:background">?attr/colorSecondary</item>
+    </style>
+
+    <style name="CustomStyle_2">
+        <item name="android:textSize">12sp</item>
+        <item name="android:textColor">@color/error_red_80</item>
+    </style>
 </resources>

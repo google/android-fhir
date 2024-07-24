@@ -56,6 +56,7 @@ data class DataCaptureConfig(
   var questionnaireItemViewHolderFactoryMatchersProviderFactory:
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
+  val questionnaireItemViewStyleResolver: QuestionnaireItemViewStyleResolver? = null,
 ) {
 
   /**
@@ -113,4 +114,8 @@ interface UrlResolver {
  */
 fun interface QuestionnaireItemViewHolderFactoryMatchersProviderFactory {
   fun get(provider: String): QuestionnaireItemViewHolderFactoryMatchersProvider
+}
+
+fun interface QuestionnaireItemViewStyleResolver {
+  fun getStyleResource(style: String): Int
 }
