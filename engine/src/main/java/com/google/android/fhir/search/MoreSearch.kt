@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import androidx.annotation.VisibleForTesting
 import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -48,6 +49,11 @@ import timber.log.Timber
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
+/**
+ * SQLite supports signed and unsigned integers with a maximum length of 8 bytes. The signed
+ * integers can range from `-9223372036854775808` to `+9223372036854775807`. See
+ * [Storage Classes and Datatypes](https://www.sqlite.org/datatype3.html)
+ */
 private const val MIN_VALUE = "-9223372036854775808"
 private const val MAX_VALUE = "9223372036854775808"
 
@@ -261,36 +267,81 @@ private fun Search.getSortOrder(
         .joinToString(separator = "\n")
     sortTableNames.forEach { _ -> args.add(sort.paramName) }
 
-    val havingColumn =
-      when (sort) {
-        is StringClientParam,
-        is NumberClientParam, -> "IFNULL(b.index_value,0)"
-        is DateClientParam -> "IFNULL(b.index_from,0) + IFNULL(c.index_from,0)"
-        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
-      }
-
     sortOrderStatement +=
-      """
-      GROUP BY $otherTable.resourceUuid ${if (groupByColumn.isNotEmpty()) ", $groupByColumn" else "" }
+      generateGroupAndOrderQuery(sort, order!!, otherTable, groupByColumn, sortTableNames)
+  }
+  return Pair(SearchQuery(sortJoinStatement, args), sortOrderStatement)
+}
+
+/**
+ * Sorting by a field that has multiple indexed values may result in duplicated resources. So, we
+ * use `GROUP BY` + `HAVING` clause to find distinct values in specified order.
+ *
+ * To make the sorting order a bit predictable, we use MIN and MAX functions with `HAVING` to use
+ * the corresponding values for GROUPING to find the distinct results.
+ *
+ * e.g. If there are Two Patients resources with multiple first names P1 ( first names =`3`, `1`)
+ * and P2 (first names = `2`, `4`), when sorting them in
+ *
+ * *ASCENDING order*: MIN function is used so that the smallest names of both the patients are
+ * considered for Grouping `[P1(`1`), P2(`2`)]`.
+ *
+ * *DESCENDING order*: MAX function is used so that the largest names of both the patients are
+ * considered for Grouping `[P2(`4`), P1(`3`)]`.
+ *
+ * For the special case where the index value is NULL, we use the default 0 value and to complete
+ * the expression, we check that the value is greater than [MIN_VALUE], the minimum value an INTEGER
+ * type can store in SQLITE. The reason to check against [MIN_VALUE] rather that 0, since string is
+ * always greater than integer (StringIndexEntity) and Date/DateTimeIndexEntity will always have
+ * positive integer values, is because the NumberIndexEntity table may contain negative values in
+ * it.
+ *
+ * Without the `>= MIN_VALUE` check, NULL values are not included in the results if the default
+ * is 0.
+ *
+ * The default values provided in GROUP BY stage are not carried forward during the ORDER BY, so we
+ * provide [MAX_VALUE] and [MIN_VALUE] as default in ORDER BY respectively for ASCENDING and
+ * DESCENDING to make sure that results with null index values are always at the bottom.
+ */
+private fun generateGroupAndOrderQuery(
+  sort: IParam,
+  order: Order,
+  otherTable: String,
+  groupByColumn: String,
+  sortTableNames: List<SortTableInfo>,
+): String {
+  var sortOrderStatement = ""
+  val havingColumn =
+    when (sort) {
+      is StringClientParam,
+      is NumberClientParam, -> "IFNULL(b.index_value,0)"
+      /*  The DateClientParam is used for both Date and DateTime values and the value is present exclusively in either one of the DateIndexEntity or DateTimeIndexEntity tables.
+      To find the MIN or MAX values, we add the values from both the tables. It results in the exact value as the other table would have null and hence default 0 would be added to actual date/datetime value.*/
+      is DateClientParam -> "IFNULL(b.index_from,0) + IFNULL(c.index_from,0)"
+      else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+    }
+
+  sortOrderStatement +=
+    """
+      GROUP BY $otherTable.resourceUuid ${if (groupByColumn.isNotEmpty()) ", $groupByColumn" else ""}
       HAVING ${if (order == Order.ASCENDING) "MIN($havingColumn) >= $MIN_VALUE" else "MAX($havingColumn) >= $MIN_VALUE"}
       
             """
-        .trimIndent()
-    val defaultValue = if (order == Order.ASCENDING) MAX_VALUE else MIN_VALUE
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-      sortOrderStatement +=
-        if (index == 0) {
-          """
+      .trimIndent()
+  val defaultValue = if (order == Order.ASCENDING) MAX_VALUE else MIN_VALUE
+  sortTableNames.forEachIndexed { index, sortTableName ->
+    val tableAlias = 'b' + index
+    sortOrderStatement +=
+      if (index == 0) {
+        """
             ORDER BY IFNULL($tableAlias.${sortTableName.columnName}, $defaultValue) ${order.sqlString}
           """
-            .trimIndent()
-        } else {
-          ", IFNULL($tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName}, $defaultValue) ${order.sqlString}"
-        }
-    }
+          .trimIndent()
+      } else {
+        ", IFNULL($tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName}, $defaultValue) ${order.sqlString}"
+      }
   }
-  return Pair(SearchQuery(sortJoinStatement, args), sortOrderStatement)
+  return sortOrderStatement
 }
 
 private fun Search.getFilterQueries() =
