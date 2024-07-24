@@ -57,7 +57,7 @@
         "reference": "Patient/IMMZ-Patient-NoVaxeninfant-f"
       },
       "instantiatesCanonical": [
-        "http://fhir.org/guides/who/smart-immunization/ActivityDefinition/IMMZD2DTMeaslesMR"
+        "http://fhir.org/guides/who/smart-immunization/ActivityDefinition/IMMZD2DTMeaslesMR|0.1.0"
       ],
       "dispenseRequest": {
         "validityPeriod": {
