@@ -66,7 +66,7 @@ fun Project.configureFirebaseTestLabForMicroBenchmark() {
     devices.set(
       listOf(
         mapOf(
-          "model" to "panther",
+          "model" to "husky",
           "version" to "${project.extensions.getByType(LibraryExtension::class.java).compileSdk}",
           "locale" to "en_US",
         ),
