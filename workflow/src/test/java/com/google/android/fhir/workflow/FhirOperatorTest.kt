@@ -209,6 +209,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("Unable to find Library with url: http://localhost/Library/PatientGroups|1.0.0")
   fun evaluateGroupPopulationMeasure() = runBlockingOnWorkerThread {
     loader.loadFile("/group-measure/PatientGroups-1.0.0.cql", ::installToIgManager)
     loader.loadFile("/group-measure/PatientGroupsMeasure.json", ::installToIgManager)

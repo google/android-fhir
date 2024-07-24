@@ -11,7 +11,7 @@
       "status": "draft",
       "intent": "proposal",
       "subject": {
-        "reference": "patient-CdsHooksMultipleActions"
+        "reference": "Patient/patient-CdsHooksMultipleActions"
       },
       "action": [
         {
@@ -51,7 +51,7 @@
   "status": "draft",
   "intent": "proposal",
   "subject": {
-    "reference": "patient-CdsHooksMultipleActions"
+    "reference": "Patient/patient-CdsHooksMultipleActions"
   },
   "activity": [
     {
