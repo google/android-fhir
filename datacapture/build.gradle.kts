@@ -52,7 +52,10 @@ android {
     getByName("test").apply { resources.setSrcDirs(listOf("sampledata")) }
   }
 
-  testOptions { animationsDisabled = true }
+  testOptions {
+    animationsDisabled = true
+    targetSdk = Sdk.TARGET_SDK
+  }
   kotlin { jvmToolchain(11) }
 }
 
