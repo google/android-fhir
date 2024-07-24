@@ -21,7 +21,6 @@ import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.rest.api.EncodingEnum
 import java.io.IOException
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.instance.model.api.IPrimitiveType
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CommunicationRequest
@@ -250,10 +249,8 @@ object PlanDefinition : Loadable() {
 
       return GeneratedCarePlan(
         (buildProcessor(repository)
-          .apply<IPrimitiveType<String>>(
-            IdType("PlanDefinition", planDefinitionID),
-            null,
-            null,
+          .apply(
+            /* planDefinition = */ Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
             patientID,
             encounterID,
             practitionerID,
@@ -277,10 +274,8 @@ object PlanDefinition : Loadable() {
       val repository = overrideRepository ?: buildRepository()
       return GeneratedPackage(
         (buildProcessor(repository)
-          .packagePlanDefinition<IPrimitiveType<String>>(
-            IdType("PlanDefinition", planDefinitionID),
-            null,
-            null,
+          .packagePlanDefinition(
+            Eithers.forMiddle3(IdType("PlanDefinition", planDefinitionID)),
             true,
           ) as Bundle),
         null,
