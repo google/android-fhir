@@ -204,10 +204,9 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao
-        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
-        .distinctBy { it.uuid }
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+        ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R)
+      }
     }
   }
 
