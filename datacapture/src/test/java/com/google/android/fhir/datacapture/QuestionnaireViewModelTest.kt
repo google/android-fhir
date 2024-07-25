@@ -7447,7 +7447,7 @@ class QuestionnaireViewModelTest {
             extension.add(
               actualResponse.extension.firstOrNull { extension ->
                 extension.url == "http://github.com/google-android/questionnaire-launch-timestamp"
-              }
+              },
             )
             authored = actualResponse.authored
           }
