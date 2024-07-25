@@ -80,7 +80,7 @@
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item name="questionnaireQuestionTextStyle">
-            @style/TextAppearance.Material3.HeadlineLarge
+            @style/TextAppearance.Material3.HeadlineMedium
         </item>
     </style>
 
