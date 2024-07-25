@@ -23,6 +23,7 @@ android {
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
         "META-INF/DEPENDENCIES",
+        "META-INF/INDEX.LIST",
         "META-INF/LGPL-3.0.txt",
         "META-INF/LICENSE",
         "META-INF/LICENSE.txt",
