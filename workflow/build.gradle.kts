@@ -103,9 +103,7 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.opencds.cqf.fhir.cr) {
-    exclude("ch.qos.logback", "logback-classic")
-  }
+  implementation(libs.opencds.cqf.fhir.cr) { exclude("ch.qos.logback", "logback-classic") }
   implementation(libs.opencds.cqf.fhir.jackson)
 
   testImplementation(Dependencies.jsonAssert)
