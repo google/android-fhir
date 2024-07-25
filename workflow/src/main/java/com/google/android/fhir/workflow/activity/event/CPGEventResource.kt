@@ -17,13 +17,29 @@
 package com.google.android.fhir.workflow.activity.event
 
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.workflow.activity.event.CPGEventResource.Companion.of
 import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
 import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.request.CPGRequestResource.Companion.of
+import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
+/**
+ * This abstracts the
+ * [CPG Event Resources](https://build.fhir.org/ig/HL7/cqf-recommendations/profiles.html#activity-profiles)
+ * used in various activities. The various subclasses of [CPGEventResource] act as a wrapper around
+ * the resource they are derived from and helps with the abstracted properties defined for each
+ * [CPGEventResource]. e.g. [CPGCommunicationEvent] is a wrapper around the [Communication] and
+ * helps with its [EventStatus] and basedOn [Reference]s.
+ *
+ * Any direct update to the [resource] can be done by using [update] api.
+ *
+ * The application users may use appropriate [of] static factories to create the required
+ * [CPGEventResource]s.
+ */
 sealed class CPGEventResource<out R>(internal open val resource: R) where R : Resource {
 
   val resourceType: ResourceType
@@ -44,9 +60,8 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
     resource.update()
   }
 
-  //  abstract fun from(request: CPGRequestResource<*>) : CPGEventResource<R>
-
   companion object {
+
     fun of(request: CPGRequestResource<*>, eventClass: Class<*>): CPGEventResource<*> {
       return when (request) {
         is CPGCommunicationRequest -> CPGCommunicationEvent.from(request)

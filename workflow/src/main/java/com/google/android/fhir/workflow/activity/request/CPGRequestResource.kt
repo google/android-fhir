@@ -26,6 +26,26 @@ import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.ServiceRequest
 import org.hl7.fhir.r4.model.Task
 
+/**
+ * This abstracts the
+ * [CPG Request Resources](https://build.fhir.org/ig/HL7/cqf-recommendations/profiles.html#activity-profiles)
+ * used in various activities. The various subclasses of [CPGRequestResource] act as a wrapper
+ * around the resource they are derived from and helps with the abstracted properties defined for
+ * each [CPGRequestResource]. e.g. [CPGCommunicationRequest] is a wrapper around the
+ * [CommunicationRequest] and helps with its [Intent], [Status] and basedOn [Reference]s.
+ *
+ * Any direct update to the [resource] can be done by using [update] api.
+ *
+ * The application users may use appropriate [of] static factories to create the required
+ * [CPGRequestResource]s.
+ *
+ * **NOTE**
+ *
+ * The [resource] must contain appropriate [Resource.meta.profile] for the [of] factories to create
+ * appropriate [CPGRequestResource]s. e.g. Both [CPGMedicationRequest] and [CPGImmunizationRequest]
+ * are derived from [MedicationRequest]. So the [MedicationRequest.meta.profile] is required to
+ * create the appropriate [CPGRequestResource].
+ */
 sealed class CPGRequestResource<R>(internal open val resource: R) where R : Resource {
 
   val resourceType: ResourceType

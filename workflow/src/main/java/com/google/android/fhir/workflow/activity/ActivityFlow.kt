@@ -50,6 +50,78 @@ private val Reference.idType
 private val Reference.`class`
   get() = getResourceClass<Resource>(reference.split("/")[0])
 
+/**
+ * This abstracts the flow of various
+ * [CPG activities](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order)
+ * throughout their various stages.
+ *
+ * The application developer may create the flow of a new proposal and move it through the various
+ * stages or they may resume the workflow of a request already in a later stage (plan,order).
+ *
+ * The application developers should use the appropriate static factory [ActivityFlow.of] apis
+ * provided by the library to create / resume an activity flow.
+ *
+ * An activity flow starts with the user creating the flow with an appropriate [CPGRequestResource].
+ * The user then may move the activity to the next phase by calling the appropriate start* and end*
+ * apis provided by the class.
+ *
+ * The start* and end* apis take a lambda receiver and the application developer may call the
+ * [CPGRequestResource.update] on the passed [CPGRequestResource] request object to put in any
+ * updates into the request.
+ *
+ * Since the perform creates a [CPGEventResource] and the same flow could create different event
+ * resources, application developer needs to provide the appropriate event type as a parameter to
+ * the [startPerform].
+ *
+ * Example of a `Send a Message` activity flow.
+ *
+ *  ```
+ *  // Create appropriate CPGRequestResource for the proposal resource.
+ *  val cpgCommunicationRequest =
+ *       CommunicationRequest().apply {
+ *         id = "com-req-01"
+ *         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+ *         subject = Reference("Patient/pat-01")
+ *         meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+ *         addPayload().apply { content = StringType("Message for patient") }
+ *       }.let {
+ *         CPGRequestResource.of(it)
+ *       }
+ *
+ *     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+ *     // Create ActivityFlow for the given CPGRequestResource.
+ *     val communicationFlow : ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
+ *       ActivityFlow.of(repository, cpgCommunicationRequest)
+ *
+ *     communicationFlow.
+ *     startPlan { // CPGCommunicationRequest
+ *       update { // CommunicationRequest
+ *         // Add updates the input proposal here.
+ *       }
+ *     }.endPlan { // CPGCommunicationRequest
+ *       update {  // CommunicationRequest
+ *         // Add updates the newly generated plan here.
+ *       }
+ *     }.startOrder { // CPGCommunicationRequest
+ *       update {  // CommunicationRequest
+ *         // Add updates the input plan here.
+ *       }
+ *     }.endOrder { // CPGCommunicationRequest
+ *       update {  // CommunicationRequest
+ *         // Add updates the newly generated order here.
+ *       }
+ *     }.startPerform(CPGCommunicationEvent::class.java) { // CPGCommunicationRequest
+ *       update {  // CommunicationRequest
+ *         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+ *         // Add updates the input order here.
+ *       }
+ *     }.endPerform { // CPGCommunicationEvent
+ *       update {  // Communication
+ *         // Add updates the newly generated event here.
+ *       }
+ *     }
+ *     ```
+ */
 class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>>
 internal constructor(
   private val repository: Repository,
