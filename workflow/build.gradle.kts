@@ -87,6 +87,7 @@ dependencies {
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":workflow-testing"))
 
@@ -102,7 +103,9 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
-  implementation(libs.opencds.cqf.fhir.cr)
+  implementation(libs.opencds.cqf.fhir.cr) {
+    exclude("ch.qos.logback", "logback-classic")
+  }
   implementation(libs.opencds.cqf.fhir.jackson)
 
   testImplementation(Dependencies.jsonAssert)

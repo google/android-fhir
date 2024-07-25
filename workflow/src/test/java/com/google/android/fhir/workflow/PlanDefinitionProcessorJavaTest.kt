@@ -57,7 +57,7 @@ class PlanDefinitionProcessorJavaTest {
       .isEqualsTo("/plan-definition/anc-visit/anc_visit_careplan.json")
 
   @Test
-  @Ignore("works when the full suite is run but not if this individual test is run")
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testANCDT17() {
     val repository =
       TestRepositoryFactory.createRepository(
@@ -78,7 +78,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  @Ignore
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testANCDT17WithElm() {
     PlanDefinition.Assert.that(
         "ANCDT17",
@@ -156,7 +156,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  @Ignore
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnairePrepopulate() {
     val planDefinitionID = "prepopulate"
     val patientID = "OPA-Patient1"
@@ -170,7 +170,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  @Ignore
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnairePrepopulate_NoLibrary() {
     val planDefinitionID = "prepopulate-noLibrary"
     val patientID = "OPA-Patient1"
@@ -183,7 +183,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  @Ignore("Questionnaire response changed")
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnaireResponse() {
     val planDefinitionID = "prepopulate"
     val patientID = "OPA-Patient1"
@@ -198,7 +198,7 @@ class PlanDefinitionProcessorJavaTest {
   }
 
   @Test
-  @Ignore("Questionnaire changed")
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testGenerateQuestionnaire() {
     val planDefinitionID = "generate-questionnaire"
     val patientID = "OPA-Patient1"

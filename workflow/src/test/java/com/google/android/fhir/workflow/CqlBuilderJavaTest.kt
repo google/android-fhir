@@ -23,7 +23,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-@Ignore
+@Ignore("https://github.com/google/android-fhir/issues/2638")
 class CqlBuilderJavaTest {
   /**
    * Tests the compilation of CQL expressions into ELM by verifying if the compiled JSONs match.
