@@ -14,6 +14,9 @@ publishArtifact(Releases.Knowledge)
 
 createJacocoTestReportTask()
 
+// Generate database schema in the schemas folder
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 android {
   namespace = "com.google.android.fhir.knowledge"
   compileSdk = Sdk.COMPILE_SDK
@@ -25,7 +28,10 @@ android {
   }
 
   sourceSets {
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
+    getByName("androidTest").apply {
+      resources.setSrcDirs(listOf("testdata"))
+      assets.srcDirs("$projectDir/schemas")
+    }
 
     getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
   }
