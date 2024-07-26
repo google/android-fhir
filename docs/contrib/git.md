@@ -23,7 +23,7 @@ We use the following workflow:
    typically with a generic message such as _"Incorporated review feedback."_
    Do NOT squash (or amend) these review updates into the original commit.
 
-1. Maintainers (AKA Committers) _squash_ all commits of PRs into a single commit when merging.
+1. Maintainers (with write acces) _squash_ all commits of PRs into a single commit when merging.
 
 ## Usage
 
