@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.google.android.fhir.workflow
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.android.fhir.workflow.testing.CqlBuilder
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -29,6 +30,7 @@ class CqlBuilderAndroidTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun shouldCompileAndAssembleImmunityCheck() {
     CqlBuilder.Assert.that("/cql-compiler/ImmunityCheck-1.0.0.cql")
       .compiles()
@@ -43,6 +45,7 @@ class CqlBuilderAndroidTest {
    * This is part of [#1365](https://github.com/google/android-fhir/issues/1365)
    */
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun shouldCompileAndAssembleFhirHelpers() {
     CqlBuilder.Assert.that("/cql-compiler/FHIRHelpers-4.0.1.cql")
       .compiles()

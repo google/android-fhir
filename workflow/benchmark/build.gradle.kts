@@ -23,6 +23,7 @@ android {
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
         "META-INF/DEPENDENCIES",
+        "META-INF/INDEX.LIST",
         "META-INF/LGPL-3.0.txt",
         "META-INF/LICENSE",
         "META-INF/LICENSE.txt",
@@ -55,16 +56,17 @@ afterEvaluate { configureFirebaseTestLabForMicroBenchmark() }
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.Cql.evaluator)
-  androidTestImplementation(Dependencies.Cql.evaluatorFhirJackson)
-  androidTestImplementation(Dependencies.Cql.evaluatorFhirUtilities)
   androidTestImplementation(libs.androidx.benchmark.junit4)
   androidTestImplementation(libs.androidx.test.ext.junit)
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.runtime)
   androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.kotlinx.coroutines.android)
+  androidTestImplementation(libs.opencds.cqf.fhir.cr)
+  androidTestImplementation(libs.opencds.cqf.fhir.jackson)
+  androidTestImplementation(libs.opencds.cqf.fhir.utility)
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
