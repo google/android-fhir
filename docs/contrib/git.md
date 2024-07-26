@@ -8,7 +8,7 @@ This project generally follows [these guidelines](https://github.com/google/fhir
 
 We use the following workflow:
 
-1. Contributors can open "draft" PRs for any Work In Progress (WIP) which does not require reviews yet.
+1. Contributors can open "draft" PRs for any Work In Progress (WIP) which does not require review yet.
    It's OK if these don't fully build, yet.
 
 1. When a PR is ready for code review, Contributors un-draft it. It must fully build green.
