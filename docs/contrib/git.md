@@ -9,7 +9,7 @@ This project generally follows [these guidelines](https://github.com/google/fhir
 We use the following workflow:
 
 1. Contributors can open "draft" PRs for any Work In Progress (WIP) which does not require review yet.
-   It's OK if these don't fully build, yet.
+   It's OK if the checks do not pass yet.
 
 1. When a PR is ready for code review, the contributor marks the PR as "Ready for review". For a smooth review, the PR must pass all the checks.
    At this point, the PR should only have 1 single commit; please "squash" (or use `--amend`) your "local history",
