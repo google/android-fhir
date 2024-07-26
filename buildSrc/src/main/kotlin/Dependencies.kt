@@ -182,16 +182,17 @@ object Dependencies {
   }
 
   fun Configuration.removeIncompatibleDependencies() {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    exclude(module = "xmlpull")
+    exclude(module = "hapi-fhir-caching-caffeine")
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
-    exclude(group = "org.apache.httpcomponents")
-    exclude(group = "org.antlr", module = "antlr4")
-    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
-    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(module = "xmlpull")
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(group = "ch.qos.logback", module = "logback-classic")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
+    exclude(group = "org.antlr", module = "antlr4")
+    exclude(group = "org.apache.httpcomponents")
   }
 
   fun hapiFhirConstraints(): Map<String, DependencyConstraint.() -> Unit> {

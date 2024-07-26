@@ -64,9 +64,7 @@ dependencies {
   androidTestImplementation(libs.junit)
   androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.kotlinx.coroutines.android)
-  androidTestImplementation(libs.opencds.cqf.fhir.cr) {
-    exclude("ch.qos.logback", "logback-classic")
-  }
+  androidTestImplementation(libs.opencds.cqf.fhir.cr)
   androidTestImplementation(libs.opencds.cqf.fhir.jackson)
   androidTestImplementation(libs.opencds.cqf.fhir.utility)
   androidTestImplementation(libs.truth)
