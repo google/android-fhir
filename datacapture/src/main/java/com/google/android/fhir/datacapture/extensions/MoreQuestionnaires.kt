@@ -229,7 +229,7 @@ private suspend fun forEachItemPair(
 
     // Questionnaire items nested under question are repeated for each answer.
     if (
-      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+      questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
         questionnaireItem.repeats &&
         questionnaireItem.item.isNotEmpty()
     ) {
