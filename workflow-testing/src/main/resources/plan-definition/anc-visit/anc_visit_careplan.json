@@ -79,8 +79,7 @@
       "instantiatesCanonical": "ActivityDefinition/careplan-activity",
       "basedOn": [
         {
-          "reference": "#RequestGroup/AncVisit-PlanDefinition",
-          "type": "RequestGroup"
+          "reference": "RequestGroup/AncVisit-PlanDefinition"
         }
       ],
       "status": "ready",
