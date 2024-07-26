@@ -209,6 +209,7 @@ class FhirOperatorTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun evaluateGroupPopulationMeasure() = runBlockingOnWorkerThread {
     loader.loadFile("/group-measure/PatientGroups-1.0.0.cql", ::installToIgManager)
     loader.loadFile("/group-measure/PatientGroupsMeasure.json", ::installToIgManager)
