@@ -39,21 +39,31 @@ nav:
               - use/WFL/Evaluate-a-Measure.md
               - use/WFL/Evaluate-a-Library.md
               - use/WFL/Compile-and-Execute-CQL.md
-      - use/Extensions.md
+      - use/extensions.md
       - API Doc: use/api.md
-      - Use Snapshots: use/Snapshots.md
+      - Use Snapshots: use/snapshots.md
   - Contributors:
-      - Contributing: contrib/index.md
+      - Prerequisites: contrib/prereqs.md
+      - Libraries: contrib/libs.md
+      - Database: contrib/db.md
+      - Testing: contrib/test.md
+      - Troubleshooting: contrib/troubleshoot.md
+      - Code Style: contrib/style.md
       - Git Guideline: contrib/git.md
       - Codespaces: contrib/codespaces.md
       - Documentation: contrib/docs.md
-      - contrib/dependencies.md
   - Roadmap: contrib/roadmap.md
   - Community: community.md
   - faq.md
 
 # The following settings were originally partially inspired by
 # https://github.com/enola-dev/enola/blob/main/mkdocs.yaml
+
+# https://squidfunk.github.io/mkdocs-material/reference/admonitions/
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
 
 theme:
   name: material
