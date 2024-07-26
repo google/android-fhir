@@ -12,7 +12,7 @@ We use the following workflow:
    It's OK if these don't fully build, yet.
 
 1. When a PR is ready for code review, the contributor marks the PR as "Ready for review". For a smooth review, the PR must pass all the checks.
-   At this point, PRs should only have 1 single commit; please "squash" (or use `--amend`) your "local history",
+   At this point, the PR should only have 1 single commit; please "squash" (or use `--amend`) your "local history",
    before pushing to a branch to open a PR (or when your WIP Draft PR is ready for review). The commit message
    of this initial commit should explain what this PR is all about.
 
