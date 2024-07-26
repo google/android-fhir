@@ -163,7 +163,7 @@ enum class EntryMode(val value: String) {
   ;
 
   companion object {
-    fun from(type: String?): EntryMode? = values().find { it.value == type }
+    fun from(type: String?): EntryMode? = entries.find { it.value == type }
   }
 }
 
@@ -175,6 +175,9 @@ enum class EntryMode(val value: String) {
  *
  * Items nested under repeated groups and repeated questions will be repeated for each repeated
  * group instance or answer provided by the user.
+ *
+ * Note: use this function only with a questionnaire response that has been packed using
+ * [QuestionnaireResponse.packRepeatedGroups].
  */
 internal suspend fun Questionnaire.forEachItemPair(
   questionnaireResponse: QuestionnaireResponse,
@@ -196,6 +199,7 @@ private suspend fun forEachItemPair(
       questionnaireResponseItem: QuestionnaireResponseItemComponent,
     ) -> Unit,
 ) {
+  require(questionnaireItems.size == questionnaireResponseItems.size)
   questionnaireItems.zip(questionnaireResponseItems).forEach {
     (questionnaireItem, questionnaireResponseItem) ->
     require(questionnaireItem.linkId == questionnaireResponseItem.linkId)
@@ -210,31 +214,15 @@ private suspend fun forEachItemPair(
         !questionnaireItem.repeats &&
         questionnaireItem.item.isNotEmpty()
     ) {
-      require(questionnaireItem.item.size == questionnaireResponseItem.item.size)
       forEachItemPair(questionnaireItem.item, questionnaireResponseItem.item, forEach)
     }
 
-    // Questionnaire items nested under repeated group are repeated for each instance of the
+    // The following block handles two separate cases:
+    // 1. questionnaire items nested under repeated group are repeated for each instance of the
     // repeated group, each represented as an answer components in the questionnaire response item.
-    if (
-      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-        questionnaireItem.repeats &&
-        questionnaireItem.item.isNotEmpty()
-    ) {
+    // 2. questionnaire items nested directly under question are repeated for each answer.
+    if (questionnaireItem.repeats && questionnaireItem.item.isNotEmpty()) {
       questionnaireResponseItem.answer.forEach {
-        require(questionnaireItem.item.size == it.item.size)
-        forEachItemPair(questionnaireItem.item, it.item, forEach)
-      }
-    }
-
-    // Questionnaire items nested under question are repeated for each answer.
-    if (
-      questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
-        questionnaireItem.repeats &&
-        questionnaireItem.item.isNotEmpty()
-    ) {
-      questionnaireResponseItem.answer.forEach {
-        require(questionnaireItem.item.size == it.item.size)
         forEachItemPair(questionnaireItem.item, it.item, forEach)
       }
     }
