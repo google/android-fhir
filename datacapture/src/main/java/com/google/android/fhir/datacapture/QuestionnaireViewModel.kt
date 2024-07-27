@@ -802,7 +802,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           when {
             questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText = (getApplication() as Context).getString(R.string.button_pagination_previous),
+                labelText =
+                  (getApplication() as Context).getString(R.string.button_pagination_previous),
                 onClickAction = { goToPreviousPage() },
               )
             }
@@ -814,7 +815,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           when {
             questionnairePagination.isPaginated && questionnairePagination.hasNextPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText = (getApplication() as Context).getString(R.string.button_pagination_next),
+                labelText =
+                  (getApplication() as Context).getString(R.string.button_pagination_next),
                 onClickAction = { goToNextPage() },
               )
             }
