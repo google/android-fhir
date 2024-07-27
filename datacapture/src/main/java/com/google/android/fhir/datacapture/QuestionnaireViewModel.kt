@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
+import android.content.Context
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
@@ -38,6 +39,8 @@ import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtensio
 import com.google.android.fhir.datacapture.extensions.flattened
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
+import com.google.android.fhir.datacapture.extensions.isEnableWhenReferencedBy
+import com.google.android.fhir.datacapture.extensions.isExpressionReferencedBy
 import com.google.android.fhir.datacapture.extensions.isHelpCode
 import com.google.android.fhir.datacapture.extensions.isHidden
 import com.google.android.fhir.datacapture.extensions.isPaginated
@@ -64,6 +67,7 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -324,6 +328,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private val draftAnswerMap = mutableMapOf<QuestionnaireResponseItemComponent, Any>()
 
+  private val isLoadingNextPage = MutableStateFlow(true)
+
   /**
    * Callback function to update the view model after the answer(s) to a question have been changed.
    * This is passed to the [QuestionnaireViewItem] in its constructor so that it can invoke this
@@ -378,10 +384,28 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
+      viewModelScope.launch(Dispatchers.IO) {
+        var isReferenced = false
+        kotlin.run {
+          isReferenced = questionnaireItem.isExpressionReferencedBy(questionnaire)
+          if (isReferenced) return@run
 
-      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
+          questionnaire.item.flattened().forEach { item ->
+            isReferenced = questionnaireItem.isEnableWhenReferencedBy(item)
+            if (isReferenced) return@run
 
-      modificationCount.update { it + 1 }
+            isReferenced = questionnaireItem.isExpressionReferencedBy(item)
+            if (isReferenced) return@run
+          }
+        }
+        if (isReferenced) isLoadingNextPage.value = true
+        modificationCount.update { it + 1 }
+
+        updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
+        pages = getQuestionnairePages()
+        isLoadingNextPage.value = false
+        modificationCount.update { it + 1 }
+      }
     }
 
   private val expressionEvaluator: ExpressionEvaluator =
@@ -582,6 +606,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .onEach {
         if (it.index == 0) {
           initializeCalculatedExpressions()
+          pages = getQuestionnairePages()
+          isLoadingNextPage.value = false
           modificationCount.update { count -> count + 1 }
         }
       }
@@ -711,7 +737,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     // display all items.
     val questionnaireItemViewItems =
       if (!isReadOnly && !isInReviewModeFlow.value && questionnaire.isPaginated) {
-        pages = getQuestionnairePages()
         if (currentPageIndexFlow.value == null) {
           currentPageIndexFlow.value = pages!!.first { it.enabled && !it.hidden }.index
         }
@@ -1112,7 +1137,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Gets a list of [QuestionnairePage]s for a paginated questionnaire, or `null` if the
    * questionnaire is not paginated.
    */
-  private suspend fun getQuestionnairePages(): List<QuestionnairePage>? =
+  internal suspend fun getQuestionnairePages(): List<QuestionnairePage>? =
     if (questionnaire.isPaginated) {
       questionnaire.item.zip(questionnaireResponse.item).mapIndexed {
         index,
