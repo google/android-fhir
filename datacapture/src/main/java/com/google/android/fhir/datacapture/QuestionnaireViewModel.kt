@@ -826,8 +826,9 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           when {
             questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText = (getApplication() as Context).getString(R.string.button_pagination_previous),
-                onClickAction = { goToPreviousPage() }
+                labelText =
+                  (getApplication() as Context).getString(R.string.button_pagination_previous),
+                onClickAction = { goToPreviousPage() },
               )
             }
             else -> {
@@ -836,15 +837,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           },
         navNext =
           when {
-            questionnairePagination.isPaginated && questionnairePagination.hasNextPage && isLoadingNextPage.value -> {
+            questionnairePagination.isPaginated &&
+              questionnairePagination.hasNextPage &&
+              isLoadingNextPage.value -> {
               QuestionnaireNavigationViewUIState.Enabled(
                 labelText = null,
               )
             }
             questionnairePagination.isPaginated && questionnairePagination.hasNextPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText = (getApplication() as Context).getString(R.string.button_pagination_next),
-                onClickAction = { goToNextPage() }
+                labelText =
+                  (getApplication() as Context).getString(R.string.button_pagination_next),
+                onClickAction = { goToNextPage() },
               )
             }
             else -> {
@@ -855,7 +859,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           if (showSubmitButton) {
             QuestionnaireNavigationViewUIState.Enabled(
               labelText = submitButtonText,
-              onClickAction = onSubmitButtonClickListener
+              onClickAction = onSubmitButtonClickListener,
             )
           } else {
             QuestionnaireNavigationViewUIState.Hidden
@@ -864,7 +868,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           if (showReviewButton) {
             QuestionnaireNavigationViewUIState.Enabled(
               labelText = (getApplication() as Context).getString(R.string.button_review),
-              onClickAction = { setReviewMode(true) }
+              onClickAction = { setReviewMode(true) },
             )
           } else {
             QuestionnaireNavigationViewUIState.Hidden
@@ -873,7 +877,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           if (showCancelButton) {
             QuestionnaireNavigationViewUIState.Enabled(
               labelText = (getApplication() as Context).getString(R.string.cancel_questionnaire),
-              onClickAction = onCancelButtonClickListener
+              onClickAction = onCancelButtonClickListener,
             )
           } else {
             QuestionnaireNavigationViewUIState.Hidden

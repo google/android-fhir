@@ -61,14 +61,17 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     }
   }
 
-  private fun CircularProgressIndicator.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
-    visibility = when (navigationViewState) {
-      is QuestionnaireNavigationViewUIState.Enabled -> {
-        View.VISIBLE
+  private fun CircularProgressIndicator.updateState(
+    navigationViewState: QuestionnaireNavigationViewUIState,
+  ) {
+    visibility =
+      when (navigationViewState) {
+        is QuestionnaireNavigationViewUIState.Enabled -> {
+          View.VISIBLE
+        }
+        QuestionnaireNavigationViewUIState.Hidden -> {
+          View.GONE
+        }
       }
-      QuestionnaireNavigationViewUIState.Hidden -> {
-        View.GONE
-      }
-    }
   }
 }

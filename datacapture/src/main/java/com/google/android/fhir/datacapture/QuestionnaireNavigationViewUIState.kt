@@ -29,5 +29,6 @@ data class QuestionnaireNavigationUIState(
   val navSubmit: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
   val navCancel: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
   val navReview: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
-  val navNextProgressBar: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
+  val navNextProgressBar: QuestionnaireNavigationViewUIState =
+    QuestionnaireNavigationViewUIState.Hidden,
 )
