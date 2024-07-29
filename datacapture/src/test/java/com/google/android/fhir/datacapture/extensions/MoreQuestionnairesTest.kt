@@ -247,7 +247,7 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `forEachPair should throw an exception if questionnaire and questionnaire response item numbers do not match`() =
+  fun `forEachItemPair should throw an exception if questionnaire and questionnaire response item numbers do not match`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -287,7 +287,7 @@ class MoreQuestionnairesTest {
     }
 
   @Test
-  fun `forEachPair should throw an exception if questionnaire and questionnaire response link ids do not match`() =
+  fun `forEachItemPair should throw an exception if questionnaire and questionnaire response link ids do not match`() =
     runTest {
       val questionnaire =
         Questionnaire().apply {
@@ -320,7 +320,7 @@ class MoreQuestionnairesTest {
     }
 
   @Test
-  fun `forEachPair should traverse group items in pre-order`() = runTest {
+  fun `forEachItemPair should traverse group items in pre-order`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         addItem(
@@ -399,7 +399,7 @@ class MoreQuestionnairesTest {
   }
 
   @Test
-  fun `forEachPair should traverse repeated group items in pre-order`() = runTest {
+  fun `forEachItemPair should traverse repeated group items in pre-order`() = runTest {
     val questionnaire =
       Questionnaire().apply {
         addItem(
