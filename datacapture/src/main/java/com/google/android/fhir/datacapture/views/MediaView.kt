@@ -91,12 +91,12 @@ class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, 
   }
 
   private fun loadImage(image: Bitmap) {
-    Glide.with(context).load(image).into(imageAttachment)
+    imageAttachment.setImageBitmap(image)
     imageAttachment.visibility = View.VISIBLE
   }
 
   private fun clearImage() {
-    Glide.with(context).clear(imageAttachment)
+    imageAttachment.setImageBitmap(null)
     imageAttachment.visibility = View.GONE
   }
 
