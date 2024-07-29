@@ -15,9 +15,9 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  compileOnly(Dependencies.Cql.evaluator)
-  compileOnly(Dependencies.Cql.evaluatorFhirJackson)
-  compileOnly(Dependencies.Cql.evaluatorFhirUtilities)
+  compileOnly(libs.opencds.cqf.fhir.cr)
+  compileOnly(libs.opencds.cqf.fhir.jackson)
+  compileOnly(libs.opencds.cqf.fhir.utility)
   compileOnly(project(":engine")) { exclude(module = "truth") }
 
   compileOnly(Dependencies.jsonAssert)

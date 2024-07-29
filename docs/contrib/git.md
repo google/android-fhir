@@ -4,6 +4,27 @@ This page documents [Git](https://git-scm.com) tips for contributors to this pro
 
 This project generally follows [these guidelines](https://github.com/google/fhir-data-pipes/blob/master/doc/review_process.md) from our `fhir-data-pipes` sister project.
 
+## Overview
+
+We use the following workflow:
+
+1. Contributors can open "draft" PRs for any Work In Progress (WIP) which does not require review yet.
+   It's OK if the checks do not pass yet.
+
+1. When a PR is ready for code review, the contributor marks the PR as "Ready for review". For a smooth review, the PR must pass all the checks.
+   At this point, the PR should only have 1 single commit; please "squash" (or use `--amend`) your "local history",
+   before pushing to a branch to open a PR (or when your WIP Draft PR is ready for review). The commit message
+   of this initial commit should explain what this PR is all about.
+
+1. Maintainers, or other Contributors, will now review the PR. They may add comments requesting changes.
+
+1. When contributors update PRs to make changes requested by reviewers, those should be added as
+   additional new single commits per round of review,
+   typically with a generic message such as _"Incorporated review feedback."_
+   Do NOT squash (or amend) these review updates into the original commit.
+
+1. Maintainers (with write acces) _squash_ all commits of PRs into a single commit when merging.
+
 ## Usage
 
 ### Edit on GitHub Web UI

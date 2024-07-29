@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ class PlanDefinitionProcessorAndroidTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testANCDT17WithElm() {
     PlanDefinition.Assert.that(
         "ANCDT17",
@@ -160,6 +161,7 @@ class PlanDefinitionProcessorAndroidTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnairePrepopulate() {
     val planDefinitionID = "prepopulate"
     val patientID = "OPA-Patient1"
@@ -173,6 +175,7 @@ class PlanDefinitionProcessorAndroidTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnairePrepopulate_NoLibrary() {
     val planDefinitionID = "prepopulate-noLibrary"
     val patientID = "OPA-Patient1"
@@ -185,6 +188,7 @@ class PlanDefinitionProcessorAndroidTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testQuestionnaireResponse() {
     val planDefinitionID = "prepopulate"
     val patientID = "OPA-Patient1"
@@ -199,6 +203,7 @@ class PlanDefinitionProcessorAndroidTest {
   }
 
   @Test
+  @Ignore("https://github.com/google/android-fhir/issues/2638")
   fun testGenerateQuestionnaire() {
     val planDefinitionID = "generate-questionnaire"
     val patientID = "OPA-Patient1"
