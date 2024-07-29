@@ -112,7 +112,7 @@ internal class OptionSelectDialogFragment(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
               it.setDecorFitsSystemWindows(false)
             } else {
-              it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+              it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
             }
           }
         }
