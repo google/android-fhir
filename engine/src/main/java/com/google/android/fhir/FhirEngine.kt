@@ -100,16 +100,6 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list of resources matching the [Search] specifications.
    *
-   * Example:
-   * ```
-   * fhirEngine.search<Patient> {
-   *  filter(Patient.GIVEN, {
-   *    value = "Kiran"
-   *    modifier = StringFilterModifier.MATCHES_EXACTLY
-   *  })
-   * }
-   * ```
-   *
    * @param search The search criteria to apply.
    * @return A list of [SearchResult] objects containing the matching resources and any included
    *   references.

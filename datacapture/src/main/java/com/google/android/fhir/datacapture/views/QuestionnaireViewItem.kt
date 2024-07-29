@@ -110,7 +110,7 @@ data class QuestionnaireViewItem(
    * carried out for the [RecyclerView.Adapter] to decide which items need to be updated.
    */
   val answers: List<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent> =
-    questionnaireResponseItem.answer.map { it.copy() }
+    questionnaireResponseItem.answer
 
   /** Updates the answers. This will override any existing answers and removes the draft answer. */
   suspend fun setAnswer(
@@ -163,6 +163,21 @@ data class QuestionnaireViewItem(
       answers.filterNot { ans ->
         questionnaireResponseItemAnswerComponent.any { ans.value.equalsDeep(it.value) }
       },
+      null,
+    )
+  }
+
+  internal suspend fun removeAnswerAt(index: Int) {
+    check(questionnaireItem.repeats) {
+      "Questionnaire item with linkId ${questionnaireItem.linkId} does not allow repeated answers"
+    }
+    require(index in answers.indices) {
+      "removeAnswerAt($index), but ${questionnaireItem.linkId} only has ${answers.size} answers"
+    }
+    answersChangedCallback(
+      questionnaireItem,
+      questionnaireResponseItem,
+      answers.filterIndexed { currentIndex, _ -> currentIndex != index },
       null,
     )
   }

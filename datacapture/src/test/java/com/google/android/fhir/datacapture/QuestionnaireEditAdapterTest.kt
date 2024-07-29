@@ -17,6 +17,8 @@
 package com.google.android.fhir.datacapture
 
 import android.os.Build
+import android.widget.FrameLayout
+import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
@@ -24,7 +26,9 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
 import com.google.android.fhir.datacapture.extensions.ItemControlTypes
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
+import com.google.android.fhir.datacapture.views.MediaView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderFactory
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.runTest
@@ -756,13 +760,10 @@ class QuestionnaireEditAdapterTest {
   fun onCreateViewHolder_customViewType_shouldReturnCorrectCustomViewHolder() {
     val viewFactoryMatchers = getQuestionnaireItemViewHolderFactoryMatchers()
     val questionnaireEditAdapter = QuestionnaireEditAdapter(viewFactoryMatchers)
-    assertThat(
-        questionnaireEditAdapter.onCreateViewHolder(
-          mock(),
-          QuestionnaireViewHolderType.values().size,
-        ),
-      )
-      .isEqualTo(viewFactoryMatchers[0].factory.create(mock()))
+    val holder =
+      questionnaireEditAdapter.onCreateViewHolder(mock(), QuestionnaireViewHolderType.values().size)
+    holder as QuestionnaireEditAdapter.ViewHolder.QuestionHolder
+    assertThat(holder.holder).isEqualTo(fakeHolder)
   }
 
   @Test
@@ -803,11 +804,20 @@ class QuestionnaireEditAdapterTest {
     return listOf(
       QuestionnaireFragment.QuestionnaireItemViewHolderFactoryMatcher(
         mock<QuestionnaireItemViewHolderFactory>().apply {
-          whenever(create(any())).thenReturn(mock())
+          whenever(create(any())).thenReturn(fakeHolder)
         },
       ) { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DATE
       },
     )
   }
+
+  private val fakeHolder =
+    QuestionnaireItemViewHolder(
+      itemView =
+        FrameLayout(ApplicationProvider.getApplicationContext()).apply {
+          addView(MediaView(context, null).apply { id = R.id.item_media })
+        },
+      delegate = mock(),
+    )
 }

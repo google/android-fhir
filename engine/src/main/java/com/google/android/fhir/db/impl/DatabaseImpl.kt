@@ -31,6 +31,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.LocalChangeDao.Companion.SQLITE_LIMIT_MAX_VARIABLE_NUMBER
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
@@ -174,12 +175,10 @@ internal class DatabaseImpl(
   }
 
   override suspend fun select(type: ResourceType, id: String): Resource {
-    return db.withTransaction {
-      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-        iParser.parseResource(it)
-      }
-        ?: throw ResourceNotFoundException(type.name, id)
-    } as Resource
+    return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+      iParser.parseResource(it) as Resource
+    }
+      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun insertSyncedResources(resources: List<Resource>) {
@@ -206,10 +205,9 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao
-        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
-        .distinctBy { it.uuid }
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+        ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R)
+      }
     }
   }
 
@@ -386,26 +384,22 @@ internal class DatabaseImpl(
   override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
     db.withTransaction {
       ids.forEach { id ->
-        // To check resource is present in DB else throw ResourceNotFoundException()
+        // 1. Verify resource presence:
         selectEntity(type, id)
-        val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
-        // If local change is not available simply delete resource
-        if (localChangeEntityList.isEmpty()) {
-          resourceDao.deleteResource(resourceId = id, resourceType = type)
-        } else {
-          // local change is available with FORCE_PURGE the delete resource and discard changes from
-          // localChangeEntity table
-          if (forcePurge) {
-            resourceDao.deleteResource(resourceId = id, resourceType = type)
-            localChangeDao.discardLocalChanges(
-              token = LocalChangeToken(localChangeEntityList.map { it.id }),
-            )
-          } else {
-            // local change is available but FORCE_PURGE = false then throw exception
-            throw IllegalStateException(
-              "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
-            )
-          }
+
+        // 2. Check for local changes (which can only be cleared without syncing in FORCE_PURGE
+        // mode):
+        val localChanges = localChangeDao.getLocalChanges(type, id)
+        if (localChanges.isNotEmpty() && !forcePurge) {
+          throw IllegalStateException(
+            "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
+          )
+        }
+
+        // 3. Delete resource and discard local changes (if applicable):
+        resourceDao.deleteResource(id, type)
+        if (localChanges.isNotEmpty()) {
+          localChangeDao.discardLocalChanges(id, type)
         }
       }
     }
@@ -414,12 +408,14 @@ internal class DatabaseImpl(
   override suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference> {
-    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
-      LocalChangeResourceReference(
-        it.localChangeId,
-        it.resourceReferenceValue,
-        it.resourceReferencePath,
-      )
+    return localChangeIds.chunked(SQLITE_LIMIT_MAX_VARIABLE_NUMBER).flatMap { chunk ->
+      localChangeDao.getReferencesForLocalChanges(chunk).map {
+        LocalChangeResourceReference(
+          it.localChangeId,
+          it.resourceReferenceValue,
+          it.resourceReferencePath,
+        )
+      }
     }
   }
 
@@ -444,7 +440,7 @@ internal class DatabaseImpl(
   }
 }
 
-data class DatabaseConfig(
+internal data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
   val databaseErrorStrategy: DatabaseErrorStrategy,

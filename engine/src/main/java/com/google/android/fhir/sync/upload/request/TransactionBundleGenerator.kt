@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload.request
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
 import org.hl7.fhir.r4.model.Bundle
 
 /** Generates list of [BundleUploadRequest] of type Transaction [Bundle] from the [Patch]es */
@@ -29,10 +30,38 @@ internal class TransactionBundleGenerator(
     (patch: Patch, useETagForUpload: Boolean) -> BundleEntryComponentGenerator,
 ) : UploadRequestGenerator {
 
+  /**
+   * In order to accommodate cyclic dependencies between [PatchMapping]s and maintain referential
+   * integrity on the server, the [PatchMapping]s in a [StronglyConnectedPatchMappings] are all put
+   * in a single [BundleUploadRequestMapping]. Based on the [generatedBundleSize], the remaining
+   * space of the [BundleUploadRequestMapping] maybe filled with other
+   * [StronglyConnectedPatchMappings] mappings.
+   *
+   * In case a single [StronglyConnectedPatchMappings] has more [PatchMapping]s than the
+   * [generatedBundleSize], [generatedBundleSize] will be ignored so that all of the dependent
+   * mappings in [StronglyConnectedPatchMappings] can be sent in a single [Bundle].
+   */
   override fun generateUploadRequests(
-    mappedPatches: List<PatchMapping>,
+    mappedPatches: List<StronglyConnectedPatchMappings>,
   ): List<BundleUploadRequestMapping> {
-    return mappedPatches.chunked(generatedBundleSize).map { patchList ->
+    val mappingsPerBundle = mutableListOf<List<PatchMapping>>()
+
+    var bundle = mutableListOf<PatchMapping>()
+    mappedPatches.forEach {
+      if ((bundle.size + it.patchMappings.size) <= generatedBundleSize) {
+        bundle.addAll(it.patchMappings)
+      } else {
+        if (bundle.isNotEmpty()) {
+          mappingsPerBundle.add(bundle)
+          bundle = mutableListOf()
+        }
+        bundle.addAll(it.patchMappings)
+      }
+    }
+
+    if (bundle.isNotEmpty()) mappingsPerBundle.add(bundle)
+
+    return mappingsPerBundle.map { patchList ->
       generateBundleRequest(patchList).let { mappedBundleRequest ->
         BundleUploadRequestMapping(
           splitLocalChanges = mappedBundleRequest.first,
