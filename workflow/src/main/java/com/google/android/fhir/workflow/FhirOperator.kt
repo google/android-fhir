@@ -40,7 +40,7 @@ import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
 import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
-import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
+import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.ProxyRepository
 
@@ -124,6 +124,7 @@ internal constructor(
     subjectId: String? = null,
     practitioner: String? = null,
     additionalData: IBaseBundle? = null,
+    parameters: Parameters? = null,
   ): MeasureReport {
     val subject =
       if (!practitioner.isNullOrBlank()) {
@@ -143,6 +144,7 @@ internal constructor(
         /* reportType = */ reportType,
         /* subjectIds = */ listOf(subject),
         /* additionalData = */ additionalData,
+        /* parameters = */ parameters,
       )
 
     // add subject reference for non-individual reportTypes
@@ -178,13 +180,15 @@ internal constructor(
     prefetchData: IBaseParameters? = null,
   ): IBaseResource {
     return planDefinitionProcessor.apply(
-      /* id = */ planDefinitionId?.let { IdType("PlanDefinition", it) },
-      /* canonical = */ planDefinitionCanonical,
-      /* planDefinition = */ planDefinition,
+      /* planDefinition = */ Eithers.for3(
+        planDefinitionCanonical,
+        IdType("PlanDefinition", planDefinitionId),
+        planDefinition,
+      ),
       /* subject = */ subject,
-      /* encounterId = */ encounterId,
-      /* practitionerId = */ practitionerId,
-      /* organizationId = */ organizationId,
+      /* encounter = */ encounterId,
+      /* practitioner = */ practitionerId,
+      /* organization = */ organizationId,
       /* userType = */ userType,
       /* userLanguage = */ userLanguage,
       /* userTaskContext = */ userTaskContext,
