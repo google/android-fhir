@@ -15,9 +15,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.workflow"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -49,6 +49,7 @@ android {
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
         "META-INF/DEPENDENCIES",
+        "META-INF/INDEX.LIST",
         "META-INF/LGPL-3.0.txt",
         "META-INF/LICENSE",
         "META-INF/LICENSE.txt",
@@ -86,14 +87,13 @@ dependencies {
   androidTestImplementation(libs.androidx.test.runner)
   androidTestImplementation(libs.androidx.work.testing)
   androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.logback.android)
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.guavaCaching)
 
-  implementation(Dependencies.Cql.evaluator)
-  implementation(Dependencies.Cql.evaluatorFhirJackson)
   implementation(Dependencies.HapiFhir.guavaCaching)
   implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
   implementation(Dependencies.androidFhirKnowledge)
@@ -103,10 +103,14 @@ dependencies {
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.opencds.cqf.fhir.cr)
+  implementation(libs.opencds.cqf.fhir.jackson)
 
   testImplementation(Dependencies.jsonAssert)
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.xmlUnit)
+  testImplementation(libs.androidx.room.room)
+  testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.truth)

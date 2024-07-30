@@ -72,14 +72,21 @@ fun Project.configureLicensee() {
     }
 
     // Jakarta XML Binding API
-    allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "2.3.3") {
+    allowDependency("jakarta.xml.bind", "jakarta.xml.bind-api", "4.0.1") {
       because("BSD 3-clause.")
     }
 
     // Jakarta Activation API 2.1 Specification
-    allowDependency("jakarta.activation", "jakarta.activation-api", "1.2.2") {
+    allowDependency("jakarta.activation", "jakarta.activation-api", "2.1.2") {
       because(
         "Licensed under Eclipse Distribution License 1.0. http://www.eclipse.org/org/documents/edl-v10.php",
+      )
+    }
+
+    // Jakarta Annotation API 2.1 Specification
+    allowDependency("jakarta.annotation", "jakarta.annotation-api", "2.1.1") {
+      because(
+        "Licensed under EPL 2.0",
       )
     }
 
@@ -108,7 +115,7 @@ fun Project.configureLicensee() {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
     // ANTLR 4
-    allowDependency("org.antlr", "antlr4-runtime", "4.10.1") {
+    allowDependency("org.antlr", "antlr4-runtime", "4.13.1") {
       because("BSD 3-clause. http://www.antlr.org/license.html")
     }
 
@@ -195,6 +202,12 @@ fun Project.configureLicensee() {
     allowDependency("com.ibm.icu", "icu4j", "72.1") {
       because("BSD, part MIT and Apache 2.0. https://github.com/unicode-org/icu/blob/main/LICENSE")
     }
+
+    // Logback
+    allowDependency("ch.qos.logback", "logback-classic", "1.4.14") { because("LGPL") }
+
+    // Logback
+    allowDependency("ch.qos.logback", "logback-core", "1.4.14") { because("LGPL") }
   }
 }
 

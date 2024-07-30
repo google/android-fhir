@@ -26,17 +26,9 @@
   }, {
     "resourceType": "Task",
     "id": "16",
-    "extension": [ {
-      "url": "http://hl7.org/fhir/aphl/StructureDefinition/condition",
-      "valueExpression": {
-        "language": "text/cql.identifier",
-        "expression": "Patient is Female"
-      }
-    } ],
     "instantiatesCanonical": "http://example.com/ActivityDefinition/Activity-Example",
     "basedOn": [ {
-      "reference": "#RequestGroup/17",
-      "type": "RequestGroup"
+      "reference": "RequestGroup/17"
     } ],
     "status": "draft",
     "intent": "proposal",

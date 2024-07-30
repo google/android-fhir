@@ -18,14 +18,14 @@
           "id": "medication-action-1",
           "title": "Administer Medication 1",
           "resource": {
-            "reference": "MedicationRequest/16"
+            "reference": "medication-action-1-16"
           }
         }
       ]
     },
     {
       "resourceType": "MedicationRequest",
-      "id": "16",
+      "id": "medication-action-1-16",
       "status": "draft",
       "intent": "order",
       "medicationCodeableConcept": {

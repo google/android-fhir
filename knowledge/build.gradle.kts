@@ -14,18 +14,24 @@ publishArtifact(Releases.Knowledge)
 
 createJacocoTestReportTask()
 
+// Generate database schema in the schemas folder
+ksp { arg("room.schemaLocation", "$projectDir/schemas") }
+
 android {
   namespace = "com.google.android.fhir.knowledge"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.knowledge"
   }
 
   sourceSets {
-    getByName("androidTest").apply { resources.setSrcDirs(listOf("testdata")) }
+    getByName("androidTest").apply {
+      resources.setSrcDirs(listOf("testdata"))
+      assets.srcDirs("$projectDir/schemas")
+    }
 
     getByName("test").apply { resources.setSrcDirs(listOf("testdata")) }
   }
