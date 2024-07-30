@@ -69,6 +69,10 @@ theme:
     - search.suggest
     - search.share
 
+markdown_extensions:
+  # https://facelessuser.github.io/pymdown-extensions/extensions/magiclink/
+  - pymdownx.magiclink
+
 plugins:
   - search
   - git-revision-date-localized
