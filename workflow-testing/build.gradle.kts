@@ -7,17 +7,17 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.workflow.testing"
-  compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+  compileSdk = Sdk.COMPILE_SDK
+  defaultConfig { minSdk = Sdk.MIN_SDK }
   kotlin { jvmToolchain(11) }
 }
 
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  compileOnly(Dependencies.Cql.evaluator)
-  compileOnly(Dependencies.Cql.evaluatorFhirJackson)
-  compileOnly(Dependencies.Cql.evaluatorFhirUtilities)
+  compileOnly(libs.opencds.cqf.fhir.cr)
+  compileOnly(libs.opencds.cqf.fhir.jackson)
+  compileOnly(libs.opencds.cqf.fhir.utility)
   compileOnly(project(":engine")) { exclude(module = "truth") }
 
   compileOnly(Dependencies.jsonAssert)

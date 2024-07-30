@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import ca.uhn.fhir.util.BundleBuilder
 import com.google.common.collect.ImmutableMap
 import java.io.File
 import java.io.FileNotFoundException
-import java.util.Locale
 import java.util.Objects
 import java.util.function.Consumer
 import org.hl7.fhir.instance.model.api.IBaseBundle
@@ -40,9 +39,7 @@ import org.opencds.cqf.fhir.api.Repository
 import org.opencds.cqf.fhir.utility.Ids
 import org.opencds.cqf.fhir.utility.dstu3.AttachmentUtil
 import org.opencds.cqf.fhir.utility.matcher.ResourceMatcher
-import org.opencds.cqf.fhir.utility.repository.IGLayoutMode
 import org.opencds.cqf.fhir.utility.repository.Repositories
-import org.opencds.cqf.fhir.utility.repository.ResourceCategory
 
 /**
  * This class implements the Repository interface on onto a directory structure that matches the
@@ -51,7 +48,6 @@ import org.opencds.cqf.fhir.utility.repository.ResourceCategory
 class IGInputStreamStructureRepository(
   private val fhirContext: FhirContext,
   private val root: String? = null,
-  private val layoutMode: IGLayoutMode = IGLayoutMode.DIRECTORY,
   private val encodingEnum: EncodingEnum = EncodingEnum.JSON,
 ) : Loadable(), Repository {
   private val resourceCache: MutableMap<String, IBaseResource> = HashMap()
@@ -62,7 +58,7 @@ class IGInputStreamStructureRepository(
     resourceCache.clear()
   }
 
-  protected fun <T : IBaseResource?, I : IIdType?> locationForResource(
+  private fun <T : IBaseResource?, I : IIdType?> locationForResource(
     resourceType: Class<T>,
     id: I,
   ): String {
@@ -70,17 +66,12 @@ class IGInputStreamStructureRepository(
     return directory + "/" + fileNameForLayoutAndEncoding(resourceType.simpleName, id!!.idPart)
   }
 
-  protected fun fileNameForLayoutAndEncoding(resourceType: String, resourceId: String): String {
+  private fun fileNameForLayoutAndEncoding(resourceType: String, resourceId: String): String {
     val name = resourceId + fileExtensions[encodingEnum]
-    return if (layoutMode === IGLayoutMode.DIRECTORY) {
-      // TODO: case sensitivity!!
-      resourceType.lowercase(Locale.getDefault()) + "/" + name
-    } else {
-      "$resourceType-$name"
-    }
+    return "$resourceType-$name"
   }
 
-  protected fun <T : IBaseResource?> directoryForType(resourceType: Class<T>): String {
+  private fun <T : IBaseResource?> directoryForType(resourceType: Class<T>): String {
     val category = ResourceCategory.forType(resourceType.simpleName)
     val directory = categoryDirectories[category]
 
@@ -88,16 +79,11 @@ class IGInputStreamStructureRepository(
     return (if (root!!.endsWith("/")) root else "$root/") + directory
   }
 
-  protected fun <T : IBaseResource?> directoryForResource(resourceType: Class<T>): String {
-    val directory = directoryForType(resourceType)
-    return if (layoutMode === IGLayoutMode.DIRECTORY) {
-      directory + "/" + resourceType.simpleName.lowercase(Locale.getDefault())
-    } else {
-      directory
-    }
+  private fun <T : IBaseResource?> directoryForResource(resourceType: Class<T>): String {
+    return directoryForType(resourceType)
   }
 
-  protected fun <T : IBaseResource, I : IIdType> readLocation(
+  private fun <T : IBaseResource, I : IIdType> readLocation(
     resourceClass: Class<T>?,
     location: String,
   ): T {
@@ -112,7 +98,7 @@ class IGInputStreamStructureRepository(
     } as T
   }
 
-  protected fun <T : IBaseResource> handleLibrary(resource: T, location: String?): T {
+  private fun <T : IBaseResource> handleLibrary(resource: T, location: String?): T {
     var resourceOutput = resource
     if (resourceOutput.fhirType() == "Library") {
       val cqlLocation: String?
@@ -161,7 +147,7 @@ class IGInputStreamStructureRepository(
     return resourceOutput
   }
 
-  protected fun getCqlContent(rootPath: String?, relativePath: String?): String {
+  private fun getCqlContent(rootPath: String?, relativePath: String?): String {
     val p = File(File(rootPath).parent, relativePath).normalize().toString()
     return try {
       load(p)
@@ -171,18 +157,14 @@ class IGInputStreamStructureRepository(
     }
   }
 
-  protected fun <T : IBaseResource> readLocation(resourceClass: Class<T>): Map<IIdType, T> {
+  private fun <T : IBaseResource> readLocation(resourceClass: Class<T>): Map<IIdType, T> {
     val location = directoryForResource(resourceClass)
     val resources = HashMap<IIdType, T>()
 
     val inputFiles = listFiles(location)
 
     for (file in inputFiles) {
-      if (
-        layoutMode.equals(IGLayoutMode.DIRECTORY) ||
-          (layoutMode.equals(IGLayoutMode.TYPE_PREFIX) &&
-            file.startsWith(resourceClass.simpleName + "-"))
-      ) {
+      if (file.startsWith(resourceClass.simpleName + "-")) {
         try {
           val r = this.readLocation<T, IIdType>(resourceClass, "$location/$file")
           if (r.fhirType() == resourceClass.simpleName) {
@@ -282,7 +264,7 @@ class IGInputStreamStructureRepository(
   ): B {
     val builder = BundleBuilder(fhirContext)
     val resourceIdMap = readLocation(resourceType)
-    if (searchParameters == null || searchParameters.isEmpty()) {
+    if (searchParameters.isEmpty()) {
       resourceIdMap.values.forEach(
         Consumer { theResource: T ->
           builder.addCollectionEntry(
@@ -442,6 +424,34 @@ class IGInputStreamStructureRepository(
   }
 
   companion object {
+    enum class ResourceCategory {
+      DATA,
+      TERMINOLOGY,
+      CONTENT,
+      ;
+
+      companion object {
+        private val TERMINOLOGY_RESOURCES: Set<String> = hashSetOf("ValueSet", "CodeSystem")
+        private val CONTENT_RESOURCES: Set<String> =
+          hashSetOf(
+            "Library",
+            "Questionnaire",
+            "Measure",
+            "PlanDefinition",
+            "StructureDefinition",
+            "ActivityDefinition",
+          )
+
+        fun forType(resourceType: String): ResourceCategory {
+          return if (TERMINOLOGY_RESOURCES.contains(resourceType)) {
+            TERMINOLOGY
+          } else {
+            if (CONTENT_RESOURCES.contains(resourceType)) CONTENT else DATA
+          }
+        }
+      }
+    }
+
     private val categoryDirectories: Map<ResourceCategory, String> =
       ImmutableMap.Builder<ResourceCategory, String>()
         .put(ResourceCategory.CONTENT, "resources")
