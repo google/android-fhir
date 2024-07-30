@@ -19,14 +19,6 @@ import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.kotlin.dsl.exclude
 
 object Dependencies {
-  object Cql {
-    const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirJackson =
-      "org.opencds.cqf.fhir:cqf-fhir-jackson:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirUtilities =
-      "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
-  }
-
   object HapiFhir {
     const val fhirBaseModule = "ca.uhn.hapi.fhir:hapi-fhir-base"
     const val fhirClientModule = "ca.uhn.hapi.fhir:hapi-fhir-client"
@@ -139,12 +131,8 @@ object Dependencies {
 
   object Versions {
 
-    object Cql {
-      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
-    }
-
     const val androidFhirCommon = "0.1.0-alpha05-preview3-SNAPSHOT"
-    const val androidFhirEngine = "1.0.0-preview11-SNAPSHOT"
+    const val androidFhirEngine = "1.0.0-preview11-SNAPSHOT"    
     const val androidFhirKnowledge = "0.1.0-alpha03-preview5-SNAPSHOT"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
@@ -194,16 +182,17 @@ object Dependencies {
   }
 
   fun Configuration.removeIncompatibleDependencies() {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    exclude(module = "xmlpull")
+    exclude(module = "hapi-fhir-caching-caffeine")
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
-    exclude(group = "org.apache.httpcomponents")
-    exclude(group = "org.antlr", module = "antlr4")
-    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
-    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(module = "xmlpull")
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(group = "ch.qos.logback", module = "logback-classic")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
+    exclude(group = "org.antlr", module = "antlr4")
+    exclude(group = "org.apache.httpcomponents")
   }
 
   fun hapiFhirConstraints(): Map<String, DependencyConstraint.() -> Unit> {
