@@ -28,15 +28,12 @@ import com.google.android.fhir.knowledge.npm.NpmPackageDownloader
 import com.google.android.fhir.knowledge.npm.OkHttpNpmPackageDownloader
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.context.SimpleWorkerContext
-import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MetadataResource
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
@@ -46,12 +43,20 @@ import timber.log.Timber
  * individually as JSON files or from FHIR NPM packages.
  *
  * Coordinates the management of knowledge artifacts by using the three following components:
- * - database: indexing knowledge artifacts stored in the local file system,
- * - file manager: managing files containing the knowledge artifacts, and
- * - NPM downloader: downloading from an NPM package server the knowledge artifacts.
+ * - knowledgeDatabase: indexing knowledge artifacts stored in the local file system,
+ * - npmFileManager: managing files containing the knowledge artifacts, and
+ * - npmPackageDownloader: downloading from an NPM package server the knowledge artifacts.
  *
  * Knowledge artifacts are scoped by the application. Multiple applications using the knowledge
  * manager will not share the same sets of knowledge artifacts.
+ *
+ * See [Clinical Reasoning](https://hl7.org/fhir/R4/clinicalreasoning-module.html) for the formal
+ * definition of knowledge artifacts. In this implementation, however, knowledge artifacts are
+ * represented as [MetadataResource]s.
+ *
+ * **Note** that the list of resources implementing the [MetadataResource] class differs from the
+ * list of resources implementing the
+ * [MetadataResource interface](https://www.hl7.org/fhir/R5/metadataresource.html) in FHIR R5.
  */
 class KnowledgeManager
 internal constructor(
@@ -63,9 +68,11 @@ internal constructor(
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
   /**
-   * Checks if the [fhirNpmPackages] are present in DB. If necessary, downloads the dependencies
-   * from NPM and imports data from the package manager (populates the metadata of the FHIR
-   * Resources).
+   * Downloads and installs the [fhirNpmPackages] from the NPM package server with transitive
+   * dependencies. The NPM packages will be unzipped to a directory managed by the knowledge
+   * manager. The resources will be indexed in the database for future retrieval.
+   *
+   * FHIR NPM packages already present in the database will be skipped.
    */
   suspend fun install(vararg fhirNpmPackages: FhirNpmPackage) {
     fhirNpmPackages
@@ -93,12 +100,14 @@ internal constructor(
   }
 
   /**
-   * Checks if the [fhirNpmPackage] is present in DB. If necessary, populates the database with the
-   * metadata of FHIR Resource from the provided [rootDirectory].
+   * Imports the content of the [fhirNpmPackage] from the provided [rootDirectory] by indexing the
+   * metadata of the FHIR resources for future retrieval.
+   *
+   * FHIR NPM packages already present in the database will be skipped.
    */
   suspend fun import(fhirNpmPackage: FhirNpmPackage, rootDirectory: File) {
     // TODO(ktarasenko) copy files to the safe space?
-    val igId =
+    val implementationGuideId =
       knowledgeDao.insert(
         ImplementationGuideEntity(
           0L,
@@ -108,23 +117,22 @@ internal constructor(
           rootDirectory,
         ),
       )
-    rootDirectory.listFiles()?.sorted()?.forEach { file ->
-      try {
-        val resource = jsonParser.parseResource(FileInputStream(file))
-        if (resource is Resource) {
-          val newId = indexResourceFile(igId, resource, file)
-          resource.setId(IdType(resource.resourceType.name, newId))
-
-          // Overrides the Id in the file
-          FileOutputStream(file).use {
-            it.write(jsonParser.encodeResourceToString(resource).toByteArray())
-          }
-        } else {
-          Timber.d("Unable to import file: %file")
-        }
-      } catch (exception: Exception) {
-        Timber.d(exception, "Unable to import file: %file")
-      }
+    val files = rootDirectory.listFiles() ?: return
+    files.sorted().forEach { file ->
+      // Ignore files that are not meta resources instead of throwing exceptions since unzipped
+      // NPM package might contain other types of files e.g. package.json.
+      val resource = readMetadataResourceOrNull(file) ?: return@forEach
+      knowledgeDao.insertResource(
+        implementationGuideId,
+        ResourceMetadataEntity(
+          0,
+          resource.resourceType,
+          resource.url,
+          resource.name,
+          resource.version,
+          file,
+        ),
+      )
     }
   }
 
@@ -146,25 +154,18 @@ internal constructor(
    * resources already indexed and resources already imported by ig?
    */
   suspend fun index(file: File) {
-    val resource =
-      withContext(Dispatchers.IO) {
-        try {
-          FileInputStream(file).use(jsonParser::parseResource)
-        } catch (exception: Exception) {
-          Timber.d(exception, "Unable to import file: $file. Parsing to FhirResource failed.")
-        }
-      }
-    when (resource) {
-      is Resource -> {
-        val newId = indexResourceFile(null, resource, file)
-        resource.setId(IdType(resource.resourceType.name, newId))
-
-        // Overrides the Id in the file
-        FileOutputStream(file).use {
-          it.write(jsonParser.encodeResourceToString(resource).toByteArray())
-        }
-      }
-    }
+    val resource = readMetadataResourceOrThrow(file)
+    knowledgeDao.insertResource(
+      null,
+      ResourceMetadataEntity(
+        0L,
+        resource.resourceType,
+        resource.url,
+        resource.name,
+        resource.version,
+        file,
+      ),
+    )
   }
 
   /** Loads resources from IGs listed in dependencies. */
@@ -187,7 +188,7 @@ internal constructor(
         name != null -> knowledgeDao.getResourcesWithName(resType, name)
         else -> knowledgeDao.getResources(resType)
       }
-    return resourceEntities.map { parseResourceFile(it.resourceFile) }
+    return resourceEntities.map { readMetadataResourceOrThrow(it.resourceFile)!! }
   }
 
   /** Deletes Implementation Guide, cleans up files. */
@@ -229,28 +230,37 @@ internal constructor(
     }
   }
 
-  /**  */
-  private suspend fun indexResourceFile(igId: Long?, resource: Resource, file: File): Long {
-    val metadataResource = resource as? MetadataResource
-    val res =
-      ResourceMetadataEntity(
-        0L,
-        resource.resourceType,
-        metadataResource?.url,
-        metadataResource?.name,
-        metadataResource?.version,
-        file,
-      )
-
-    return knowledgeDao.insertResource(igId, res)
-  }
+  /**
+   * Parses and returns the content of a file containing a FHIR resource in JSON, or null if the
+   * file does not contain a FHIR resource.
+   */
+  private suspend fun readResourceOrNull(file: File): IBaseResource? =
+    withContext(Dispatchers.IO) {
+      try {
+        FileInputStream(file).use(jsonParser::parseResource)
+      } catch (e: Exception) {
+        Timber.e(e, "Unable to load resource from $file")
+        null
+      }
+    }
 
   /**
-   * Parses the content of a file containing a FHIR resource in JSON and returns the parsed
-   * resource.
+   * Parses and returns the content of a file containing a FHIR metadata resource in JSON, or null
+   * if the file does not contain a FHIR metadata resource.
    */
-  private fun parseResourceFile(file: File): IBaseResource {
-    return jsonParser.parseResource(FileInputStream(file))
+  private suspend fun readMetadataResourceOrNull(file: File) =
+    readResourceOrNull(file) as? MetadataResource
+
+  /**
+   * Parses and returns the content of a file containing a FHIR metadata resource in JSON, or throws
+   * an exception if the file does not contain a FHIR metadata resource.
+   */
+  private suspend fun readMetadataResourceOrThrow(file: File): MetadataResource {
+    val resource = readResourceOrNull(file)!!
+    check(resource is MetadataResource) {
+      "Resource ${resource.idElement} is not a MetadataResource"
+    }
+    return resource
   }
 
   companion object {

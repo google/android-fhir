@@ -25,11 +25,14 @@ import com.google.android.fhir.knowledge.db.KnowledgeDatabase
 import com.google.android.fhir.knowledge.files.NpmFileManager
 import com.google.common.truth.Truth.assertThat
 import java.io.File
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.hl7.fhir.r4.model.BaseResource
 import org.hl7.fhir.r4.model.Library
-import org.hl7.fhir.r4.model.MetadataResource
+import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.PlanDefinition
 import org.junit.After
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -81,6 +84,7 @@ internal class KnowledgeManagerTest {
   @Test
   fun `deleting IG deletes files and DB entries`() = runTest {
     val igRoot = File(dataFolder.parentFile, "anc-cds.copy")
+    igRoot.deleteRecursively()
     igRoot.deleteOnExit()
     dataFolder.copyRecursively(igRoot)
     knowledgeManager.import(fhirNpmPackage, igRoot)
@@ -112,7 +116,16 @@ internal class KnowledgeManagerTest {
   }
 
   @Test
-  fun `inserting a library of a different version creates new entry`() = runTest {
+  fun `indexing non metadata resource should throw an exception`() {
+    val patient = Patient().apply { id = "Patient/defaultA-A.1.0.0" }
+
+    assertThrows(IllegalStateException::class.java) {
+      runBlocking { knowledgeManager.index(writeToFile(patient)) }
+    }
+  }
+
+  @Test
+  fun `should index a library of a different version`() = runTest {
     val libraryAOld =
       Library().apply {
         id = "Library/defaultA-A.1.0.0"
@@ -137,14 +150,14 @@ internal class KnowledgeManagerTest {
     val resourceA100 =
       knowledgeManager
         .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.0")
-        .single()
-    assertThat(resourceA100.idElement.toString()).isEqualTo("Library/1")
+        .single() as Library
+    assertThat(resourceA100.version).isEqualTo("A.1.0.0")
 
     val resourceA101 =
       knowledgeManager
         .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.1")
-        .single()
-    assertThat(resourceA101.idElement.toString()).isEqualTo("Library/2")
+        .single() as Library
+    assertThat(resourceA101.version.toString()).isEqualTo("A.1.0.1")
   }
 
   fun `installing from npmPackageManager`() = runTest {
@@ -189,12 +202,13 @@ internal class KnowledgeManagerTest {
     assertThat(resources).hasSize(2)
 
     val libraryLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single()
-    assertThat(libraryLoadedByUrl.idElement.toString()).isEqualTo("Library/1")
+      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single() as Library
+    assertThat(libraryLoadedByUrl.name.toString()).isEqualTo("LibraryName")
 
     val planDefinitionLoadedByUrl =
       knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
-    assertThat(planDefinitionLoadedByUrl.idElement.toString()).isEqualTo("PlanDefinition/2")
+        as PlanDefinition
+    assertThat(planDefinitionLoadedByUrl.name.toString()).isEqualTo("PlanDefinitionName")
   }
 
   @Test
@@ -222,18 +236,19 @@ internal class KnowledgeManagerTest {
     assertThat(resources).hasSize(2)
 
     val libraryLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single()
-    assertThat(libraryLoadedByUrl.idElement.toString()).isEqualTo("Library/1")
+      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single() as Library
+    assertThat(libraryLoadedByUrl.name.toString()).isEqualTo("LibraryName")
 
     val planDefinitionLoadedByUrl =
       knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
-    assertThat(planDefinitionLoadedByUrl.idElement.toString()).isEqualTo("PlanDefinition/2")
+        as PlanDefinition
+    assertThat(planDefinitionLoadedByUrl.name.toString()).isEqualTo("PlanDefinitionName")
   }
 
-  private fun writeToFile(metadataResource: MetadataResource): File {
-    return File(context.filesDir, metadataResource.id).apply {
+  private fun writeToFile(resource: BaseResource): File {
+    return File(context.filesDir, resource.id).apply {
       this.parentFile?.mkdirs()
-      writeText(jsonParser.encodeResourceToString(metadataResource))
+      writeText(jsonParser.encodeResourceToString(resource))
     }
   }
 }
