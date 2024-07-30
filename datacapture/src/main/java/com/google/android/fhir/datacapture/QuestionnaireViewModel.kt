@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
-import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.forEachItemPair
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -601,16 +601,13 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
   private suspend fun initializeCalculatedExpressions() {
     expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-    val itemsToBeCalculated =
-      questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
-    itemsToBeCalculated.forEach { qItem ->
-      // TODO: Traverse the two trees in parallel and match based on the pairs, the current
-      // implementation does not work well with nested items and repeated groups
-      // https://github.com/google/android-fhir/issues/2618
-      val qrItem =
-        questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
-          ?: return@forEach
-      updateAnswerWithCalculatedExpression(qItem, qrItem)
+    questionnaire.forEachItemPair(questionnaireResponse) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      if (questionnaireItem.calculatedExpression != null) {
+        updateAnswerWithCalculatedExpression(questionnaireItem, questionnaireResponseItem)
+      }
     }
   }
 
