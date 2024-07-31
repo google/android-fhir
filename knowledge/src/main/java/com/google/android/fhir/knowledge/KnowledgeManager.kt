@@ -150,7 +150,6 @@ internal constructor(
    * or inaccurate result of decision support or measure evaluation.
    *
    * Use this API for knowledge artifacts in immutable files (e.g. in the app's `assets` folder).
-   *
    */
   suspend fun index(file: File) {
     val resource = readMetadataResourceOrThrow(file)
