@@ -151,7 +151,6 @@ internal constructor(
    *
    * Use this API for knowledge artifacts in immutable files (e.g. in the app's `assets` folder).
    *
-   * resources already indexed and resources already imported by ig?
    */
   suspend fun index(file: File) {
     val resource = readMetadataResourceOrThrow(file)
