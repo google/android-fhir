@@ -45,7 +45,7 @@ import timber.log.Timber
  * Coordinates the management of knowledge artifacts by using the three following components:
  * - knowledgeDatabase: indexing knowledge artifacts stored in the local file system,
  * - npmFileManager: managing files containing the knowledge artifacts, and
- * - npmPackageDownloader: downloading from an NPM package server the knowledge artifacts.
+ * - npmPackageDownloader: downloading the knowledge artifacts from an NPM package server .
  *
  * Knowledge artifacts are scoped by the application. Multiple applications using the knowledge
  * manager will not share the same sets of knowledge artifacts.
