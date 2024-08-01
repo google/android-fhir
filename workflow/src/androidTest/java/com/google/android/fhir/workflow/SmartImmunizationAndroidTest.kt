@@ -116,7 +116,7 @@ class SmartImmunizationAndroidTest {
 
     moveAllIGResourcesIntoFilesDir("smart-imm")
 
-    knowledgeManager.install(
+    knowledgeManager.import(
       FhirNpmPackage(
         "who.fhir.immunization",
         "1.0.0",
