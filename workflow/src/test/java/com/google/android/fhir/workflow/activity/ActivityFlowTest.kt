@@ -22,7 +22,7 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.workflow.activity.event.CPGCommunicationEvent
-import com.google.android.fhir.workflow.activity.event.CPGMedicationAdministrationEvent
+import com.google.android.fhir.workflow.activity.event.CPGMedicationDispenseEvent
 import com.google.android.fhir.workflow.activity.event.CPGObservationEvent
 import com.google.android.fhir.workflow.activity.event.CPGProcedureEvent
 import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
@@ -38,7 +38,7 @@ import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MarkdownType
-import org.hl7.fhir.r4.model.MedicationAdministration
+import org.hl7.fhir.r4.model.MedicationDispense
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ServiceRequest
@@ -49,6 +49,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
+@Suppress(
+  "UnstableApiUsage", /*Repository is marked @Beta */
+  "UNCHECKED_CAST", /*Cast type erased ActivityFlow to a concrete type ActivityFlow*/
+)
 @RunWith(RobolectricTestRunner::class)
 class ActivityFlowTest {
 
@@ -64,18 +68,19 @@ class ActivityFlowTest {
   @Test
   fun `communication request flow`(): Unit = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
-      CommunicationRequest()
-        .apply {
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
           id = "com-req-01"
           status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
           subject = Reference("Patient/pat-01")
           meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
 
           addPayload().apply { content = StringType("Proposal") }
-        }
-        .let { CPGRequestResource.of(it) }
+        },
+      )
 
     val stageToRequestLogicalIdMap = mutableMapOf<String, String>()
+
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     val communicationFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
       ActivityFlow.of(repository, cpgCommunicationRequest)
@@ -109,7 +114,7 @@ class ActivityFlowTest {
 
     val resumedFlow =
       ActivityFlow.of(repository, "pat-01").first { it.requestResource is CPGCommunicationRequest }
-        as ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+        as CPGCommunicationActivity
 
     assertFailsWith(Exception::class) {
       resumedFlow.startPlan {
@@ -176,31 +181,41 @@ class ActivityFlowTest {
   }
 
   @Test
-  fun `test order service`() = runBlockingOnWorkerThread {
-    val serviceRequestFromCarePlan =
-      ServiceRequest().apply {
-        id = "service-request"
-        subject = Reference("Patient/patient-001")
-      }
+  fun `order service flow`(): Unit = runBlockingOnWorkerThread {
+    val cpgServiceRequest =
+      CPGRequestResource.of(
+        ServiceRequest().apply {
+          id = "service-request"
+          subject = Reference("Patient/patient-001")
+          intent = ServiceRequest.ServiceRequestIntent.PROPOSAL
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-servicerequest")
+        },
+      )
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
-
-    val flow = ActivityFlow.of(repository, CPGRequestResource.of(serviceRequestFromCarePlan))
+    val stageToRequestLogicalIdMap = mutableMapOf<String, String>()
+    val flow = ActivityFlow.of(repository, cpgServiceRequest)
 
     flow
       .startPlan {
+        stageToRequestLogicalIdMap["startPlan"] = this.logicalId
         update {
           status = ServiceRequest.ServiceRequestStatus.ACTIVE
           addNote().apply { text = "Start Plan annotation.." }
         }
       }
-      .endPlan { update { addNote().apply { text = "End Plan annotation.." } } }
+      .endPlan {
+        stageToRequestLogicalIdMap["endPlan"] = this.logicalId
+        update { addNote().apply { text = "End Plan annotation.." } }
+      }
       .startOrder {
+        stageToRequestLogicalIdMap["startOrder"] = this.logicalId
         update {
           status = ServiceRequest.ServiceRequestStatus.ACTIVE
           addNote().apply { text = "Start order annotation.." }
         }
       }
       .endOrder {
+        stageToRequestLogicalIdMap["endOrder"] = this.logicalId
         update {
           status = ServiceRequest.ServiceRequestStatus.ACTIVE
           addNote().apply { text = "End order annotation.." }
@@ -214,79 +229,158 @@ class ActivityFlowTest {
 
     performFlow
       .startPerform(klass = CPGProcedureEvent::class.java) {
+        stageToRequestLogicalIdMap["startPerform"] = this.logicalId
         update {
           status = ServiceRequest.ServiceRequestStatus.ACTIVE
           addNote().apply { text = "Start Perform procedure annotation.." }
         }
       }
-      .endPerform { update {} }
-
-    performFlow
-      .startPerform(klass = CPGObservationEvent::class.java) {
-        update {
-          status = ServiceRequest.ServiceRequestStatus.ACTIVE
-          addNote().apply { text = "Start Perform observation annotation.." }
-        }
+      .endPerform {
+        stageToRequestLogicalIdMap["endPerform"] = this.logicalId
+        update { addNote().apply { text = "End Perform observation annotation.." } }
       }
-      .endPerform { update {} }
+
+    assertFailsWith(Exception::class) {
+      performFlow
+        .startPerform(klass = CPGObservationEvent::class.java) {
+          update {
+            status = ServiceRequest.ServiceRequestStatus.ACTIVE
+            addNote().apply { text = "Start Perform observation annotation.." }
+          }
+        }
+        .endPerform { update { addNote().apply { text = "End Perform observation annotation.." } } }
+    }
+
+    // Assert that each phase creates a new resource.
+    assertThat(stageToRequestLogicalIdMap["startPlan"]).isEqualTo(cpgServiceRequest.logicalId)
+    assertThat(stageToRequestLogicalIdMap["endPlan"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startPlan"])
+
+    assertThat(stageToRequestLogicalIdMap["startOrder"])
+      .isEqualTo(stageToRequestLogicalIdMap["endPlan"])
+    assertThat(stageToRequestLogicalIdMap["endOrder"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startOrder"])
+
+    assertThat(stageToRequestLogicalIdMap["startPerform"])
+      .isEqualTo(stageToRequestLogicalIdMap["endOrder"])
+    assertThat(stageToRequestLogicalIdMap["endPerform"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startPerform"])
+
+    val plan =
+      repository
+        .read(MedicationRequest::class.java, IdType(stageToRequestLogicalIdMap["endPlan"]))
+        .let { CPGRequestResource.of(it) }
+
+    val order =
+      repository
+        .read(MedicationRequest::class.java, IdType(stageToRequestLogicalIdMap["endOrder"]))
+        .let { CPGRequestResource.of(it) }
+
+    val event =
+      repository
+        .read(MedicationDispense::class.java, IdType(stageToRequestLogicalIdMap["endPerform"]))
+        .let { CPGMedicationDispenseEvent(it) }
+
+    // check that current phase resource is based on the previous phase's resource
+    assertThat(plan.getBasedOn()!!.reference).isEqualTo(cpgServiceRequest.asReference().reference)
+    assertThat(order.getBasedOn()!!.reference).isEqualTo(plan.asReference().reference)
+    assertThat(event.getBasedOn()!!.reference).isEqualTo(order.asReference().reference)
   }
 
   @Test
-  fun `test order medication`() = runBlockingOnWorkerThread {
-    val medicationRequest =
-      MedicationRequest().apply {
-        id = "med-req-01"
-        subject = Reference("Patient/pat-01")
-        intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+  fun `order medication flow for medication dispense`(): Unit = runBlockingOnWorkerThread {
+    val cpgMedicationRequest =
+      CPGMedicationRequest(
+        MedicationRequest().apply {
+          id = "med-req-01"
+          subject = Reference("Patient/pat-01")
+          intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest")
 
-        addNote(Annotation(MarkdownType("Proposal")))
-      }
+          addNote(Annotation(MarkdownType("Proposal")))
+        },
+      )
+
+    val stageToRequestLogicalIdMap = mutableMapOf<String, String>()
 
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
-    val flow = ActivityFlow.of(repository, CPGMedicationRequest(medicationRequest))
+    val flow = ActivityFlow.of(repository, cpgMedicationRequest)
 
     flow
       .startPlan {
+        stageToRequestLogicalIdMap["startPlan"] = this.logicalId
         update {
           status = MedicationRequest.MedicationRequestStatus.ACTIVE
           addNote(Annotation(MarkdownType("Start Plan")))
         }
       }
-      .endPlan { update { addNote(Annotation(MarkdownType("End Plan"))) } }
+      .endPlan {
+        stageToRequestLogicalIdMap["endPlan"] = this.logicalId
+        update { addNote(Annotation(MarkdownType("End Plan"))) }
+      }
       .startOrder {
+        stageToRequestLogicalIdMap["startOrder"] = this.logicalId
         update {
           status = MedicationRequest.MedicationRequestStatus.ACTIVE
           addNote(Annotation(MarkdownType("Start Order")))
         }
       }
-      .endOrder { update { addNote(Annotation(MarkdownType("End Order"))) } }
+      .endOrder {
+        stageToRequestLogicalIdMap["endOrder"] = this.logicalId
+        update { addNote(Annotation(MarkdownType("End Order"))) }
+      }
 
     val performFlow =
-      ActivityFlow.of(repository, "pat-01").filterIsInstance<CPGMedicationRequestActivity>().first()
+      ActivityFlow.of(repository, "pat-01").first { it.requestResource is CPGMedicationRequest }
+        as CPGMedicationRequestActivity
 
-    //    performFlow
-    //       .startPerform(CPGMedicationDispenseEvent::class.java) {
-    //         update {
-    //           status = MedicationRequest.MedicationRequestStatus.ACTIVE
-    //           addNote(Annotation(MarkdownType("Perform Order for dispense")))
-    //         }
-    //       }
-    //       .endPerform {
-    //         update {
-    //           status = MedicationDispense.MedicationDispenseStatus.INPROGRESS
-    //         }
-    //       }
-
-    // ---- Alternate ----
     performFlow
-      .startPerform(CPGMedicationAdministrationEvent::class.java) {
+      .startPerform(CPGMedicationDispenseEvent::class.java) {
+        stageToRequestLogicalIdMap["startPerform"] = this.logicalId
         update {
           status = MedicationRequest.MedicationRequestStatus.ACTIVE
           addNote(Annotation(MarkdownType("Perform Order for administration")))
         }
       }
       .endPerform {
-        update { status = MedicationAdministration.MedicationAdministrationStatus.INPROGRESS }
+        stageToRequestLogicalIdMap["endPerform"] = this.logicalId
+        update { status = MedicationDispense.MedicationDispenseStatus.INPROGRESS }
       }
+
+    // Assert that each phase creates a new resource.
+    assertThat(stageToRequestLogicalIdMap["startPlan"]).isEqualTo(cpgMedicationRequest.logicalId)
+    assertThat(stageToRequestLogicalIdMap["endPlan"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startPlan"])
+
+    assertThat(stageToRequestLogicalIdMap["startOrder"])
+      .isEqualTo(stageToRequestLogicalIdMap["endPlan"])
+    assertThat(stageToRequestLogicalIdMap["endOrder"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startOrder"])
+
+    assertThat(stageToRequestLogicalIdMap["startPerform"])
+      .isEqualTo(stageToRequestLogicalIdMap["endOrder"])
+    assertThat(stageToRequestLogicalIdMap["endPerform"])
+      .isNotEqualTo(stageToRequestLogicalIdMap["startPerform"])
+
+    val plan =
+      repository
+        .read(MedicationRequest::class.java, IdType(stageToRequestLogicalIdMap["endPlan"]))
+        .let { CPGRequestResource.of(it) }
+
+    val order =
+      repository
+        .read(MedicationRequest::class.java, IdType(stageToRequestLogicalIdMap["endOrder"]))
+        .let { CPGRequestResource.of(it) }
+
+    val event =
+      repository
+        .read(MedicationDispense::class.java, IdType(stageToRequestLogicalIdMap["endPerform"]))
+        .let { CPGMedicationDispenseEvent(it) }
+
+    // check that current phase resource is based on the previous phase's resource
+    assertThat(plan.getBasedOn()!!.reference)
+      .isEqualTo(cpgMedicationRequest.asReference().reference)
+    assertThat(order.getBasedOn()!!.reference).isEqualTo(plan.asReference().reference)
+    assertThat(event.getBasedOn()!!.reference).isEqualTo(order.asReference().reference)
   }
 }

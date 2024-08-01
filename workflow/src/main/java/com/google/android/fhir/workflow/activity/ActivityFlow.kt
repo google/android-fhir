@@ -77,51 +77,76 @@ private val Reference.`class`
  *
  *  ```
  *  // Create appropriate CPGRequestResource for the proposal resource.
- *  val cpgCommunicationRequest =
- *       CommunicationRequest().apply {
- *         id = "com-req-01"
- *         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
- *         subject = Reference("Patient/pat-01")
- *         meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
- *         addPayload().apply { content = StringType("Message for patient") }
- *       }.let {
- *         CPGRequestResource.of(it)
- *       }
+ *
+ *      val cpgCommunicationRequest =
+ *       CPGRequestResource.of(
+ *         CommunicationRequest().apply {
+ *           id = "com-req-01"
+ *           status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+ *           subject = Reference("Patient/pat-01")
+ *           meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+ *           addPayload().apply { content = StringType("Hello message for patient") }
+ *         }
+ *       )
  *
  *     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
  *     // Create ActivityFlow for the given CPGRequestResource.
- *     val communicationFlow : ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
- *       ActivityFlow.of(repository, cpgCommunicationRequest)
- *
- *     communicationFlow.
- *     startPlan { // CPGCommunicationRequest
+ *     val communicationFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
+ *       ActivityFlow.of(repository, "pat-01")
+ *         .first() as ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+ *     late init var order: CommunicationRequest
+ *     communicationFlow.startPlan { // CPGCommunicationRequest
  *       update { // CommunicationRequest
- *         // Add updates the input proposal here.
+ *         addPayload().apply { content = StringType("Updated proposal with this message ") }
  *       }
  *     }.endPlan { // CPGCommunicationRequest
+ *       order = this.resource
  *       update {  // CommunicationRequest
- *         // Add updates the newly generated plan here.
+ *         addPayload().apply { content = StringType("Updated newly created plan with this message ") }
  *       }
- *     }.startOrder { // CPGCommunicationRequest
+ *     }
+ *
+ *     // Find all the flows associated with the patient and resume the particular one
+ *     val orderFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
+ *       ActivityFlow.of(repository, "pat-01")
+ *         .first() as ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+ *
+ *     // alternatively if you have access to the order request, create a flow directly.
+ *
+ *     val orderFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
+ *       ActivityFlow.of(repository, CPGCommunicationRequest(order))
+ *
+ *     orderFlow.startOrder { // CPGCommunicationRequest
  *       update {  // CommunicationRequest
- *         // Add updates the input plan here.
+ *         addPayload().apply { content = StringType("Updated plan with this message ") }
  *       }
  *     }.endOrder { // CPGCommunicationRequest
  *       update {  // CommunicationRequest
- *         // Add updates the newly generated order here.
+ *         addPayload().apply {
+ *           content = StringType("Updated newly created order with this message ")
+ *         }
  *       }
- *     }.startPerform(CPGCommunicationEvent::class.java) { // CPGCommunicationRequest
+ *     }
+ *     val performFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
+ *       ActivityFlow.of(repository, cpgCommunicationRequest)
+ *     performFlow.startPerform(CPGCommunicationEvent::class.java) { // CPGCommunicationRequest
  *       update {  // CommunicationRequest
  *         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
- *         // Add updates the input order here.
+ *         addPayload().apply { content = StringType("Updated order with this message ") }
  *       }
  *     }.endPerform { // CPGCommunicationEvent
  *       update {  // Communication
- *         // Add updates the newly generated event here.
+ *         addPayload().apply {
+ *           content = StringType("Updated newly created event with this message ")
+ *         }
  *       }
  *     }
  *     ```
  */
+@Suppress(
+  "UnstableApiUsage", /* Repository is marked @Beta */
+  "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
+)
 class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>>
 internal constructor(
   private val repository: Repository,

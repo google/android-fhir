@@ -84,6 +84,7 @@ enum class EventStatus(val code: String) {
   STOPPED("stopped"),
   DECLINED("decline"),
   UNKNOWN("unknown"),
+  NOTDONE("not-done"),
   NULL("null"),
   ;
 
