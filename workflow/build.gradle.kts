@@ -118,7 +118,7 @@ dependencies {
   testImplementation(project(":knowledge"))
 
   configurations.all {
-    if (gradle.startParameter.taskRequests[0].args[0].contains("test", ignoreCase = true)) {
+    if (name.contains("test", ignoreCase = true)) {
       resolutionStrategy.dependencySubstitution {
         // To test the workflow library against the latest Knowledge Manager APIs, substitute the
         // dependency on the released Knowledge Manager library with the current build.
