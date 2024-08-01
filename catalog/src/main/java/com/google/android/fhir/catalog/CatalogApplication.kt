@@ -41,10 +41,9 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
     val styleMap =
       mapOf(
-        "customStyle_1" to R.style.CustomStyle_1,
-        "customStyle_2" to R.style.CustomStyle_2,
+        "CustomStyle_1" to R.style.CustomStyle_1,
+        "CustomStyle_2" to R.style.CustomStyle_2,
       )
-
     dataCaptureConfig =
       DataCaptureConfig(
         xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } },

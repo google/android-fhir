@@ -190,8 +190,8 @@
     </declare-styleable>
 
     <declare-styleable name="QuestionnaireCustomStyle">
-        <attr name="android:textSize" />
-        <attr name="android:textColor" />
-        <attr name="android:background" />
+        <attr name="android:textSize" format="dimension" />
+        <attr name="android:textColor" format="reference|color" />
+        <attr name="android:background" format="reference|color" />
     </declare-styleable>
 </resources>

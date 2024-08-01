@@ -21,17 +21,19 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.google.android.fhir.datacapture.DataCapture
+import applyDefaultStyleToView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.StyleUrl
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
-import com.google.android.fhir.datacapture.extensions.applyStyle
+import com.google.android.fhir.datacapture.extensions.applyCustomStyleBasedOnViewType
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
+import com.google.android.fhir.datacapture.extensions.getStyleResIdByName
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.readCustomStyleExtension
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
+import getStyleResIdFromTheme
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -72,20 +74,30 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     questionnaireViewItem.questionnaireItem
       .readCustomStyleExtension(StyleUrl.QUESTION_TEXT_VIEW)
       ?.let {
-        DataCapture.getConfiguration(context)
-          .questionnaireItemViewStyleResolver
-          ?.getStyleResource(it)
-          ?.let { styleResId -> applyStyle(question.context, question, styleResId) }
+        getStyleResIdByName(question.context, it)?.let { styleResId ->
+          question.tag = styleResId
+          applyCustomStyleBasedOnViewType(question.context, question, styleResId)
+        }
       }
+      ?: applyDefaultStyleToView(
+        question.context,
+        question,
+        getStyleResIdFromTheme(question.context, R.attr.questionnaireQuestionTextStyle),
+      )
 
     questionnaireViewItem.questionnaireItem
       .readCustomStyleExtension(StyleUrl.SUBTITLE_TEXT_VIEW)
       ?.let {
-        DataCapture.getConfiguration(context)
-          .questionnaireItemViewStyleResolver
-          ?.getStyleResource(it)
-          ?.let { styleResId -> applyStyle(question.context, hint, styleResId) }
+        getStyleResIdByName(hint.context, it)?.let { styleResId ->
+          hint.tag = styleResId
+          applyCustomStyleBasedOnViewType(hint.context, hint, styleResId)
+        }
       }
+      ?: applyDefaultStyleToView(
+        hint.context,
+        hint,
+        getStyleResIdFromTheme(hint.context, R.attr.questionnaireSubtitleTextStyle),
+      )
   }
 
   /**

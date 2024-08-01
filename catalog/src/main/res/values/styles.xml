@@ -80,7 +80,10 @@
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item name="questionnaireQuestionTextStyle">
-            @style/TextAppearance.Material3.HeadlineMedium
+            @style/QuestionTextStyle
+        </item>
+        <item name="questionnaireSubtitleTextStyle">
+            @style/SubtitleTextStyle
         </item>
     </style>
 
@@ -98,6 +101,24 @@
         <item name="android:minLines">2</item>
     </style>
 
+    <style
+        name="QuestionTextStyle"
+        parent="TextAppearance.Material3.HeadlineMedium"
+    >
+<!--        <item name="android:textSize">28sp</item>-->
+<!--        <item name="android:textColor">?android:textColorPrimary</item>-->
+<!--        <item name="android:background">?attr/colorSurface</item>-->
+    </style>
+
+    <style
+        name="SubtitleTextStyle"
+        parent="TextAppearance.Material3.BodyMedium"
+    >
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
     <style name="CustomStyle_1">
         <item name="android:textSize">24sp</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
@@ -105,7 +126,8 @@
     </style>
 
     <style name="CustomStyle_2">
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">10sp</item>
         <item name="android:textColor">@color/error_red_80</item>
+        <item name="android:background">?attr/colorSurfaceVariant</item>
     </style>
 </resources>
