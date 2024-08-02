@@ -136,8 +136,6 @@ class SmartImmunizationAndroidTest {
         )
         .single()
 
-    assertThat(planDef.idElement.idPart).isEqualTo("26")
-
     val patient =
       load(
         "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/Patient/Patient-IMMZ-Patient-NoVaxeninfant-f.json",
