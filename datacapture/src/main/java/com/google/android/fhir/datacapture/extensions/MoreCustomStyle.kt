@@ -24,8 +24,8 @@ import androidx.core.content.ContextCompat
 import com.google.android.fhir.datacapture.R
 
 enum class CustomStyleViewAttributes(val attrId: Int) {
-  TEXT_APPEARANCE(R.styleable.QuestionnaireCustomStyle_android_textAppearance),
-  BACKGROUND(R.styleable.QuestionnaireCustomStyle_android_background),
+  TEXT_APPEARANCE(R.styleable.QuestionnaireCustomStyle_questionnaire_textAppearance),
+  BACKGROUND(R.styleable.QuestionnaireCustomStyle_questionnaire_background),
 }
 
 /**

@@ -116,8 +116,12 @@
     </style>
 
     <style name="CustomStyle_1">
-        <item name="android:textAppearance">@style/CustomTextAppearance_1</item>
-        <item name="android:background">?attr/colorTertiaryContainer</item>
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_1</item>
+        <item
+            name="questionnaire_background"
+        >?attr/colorTertiaryContainer</item>
     </style>
 
     <style
@@ -128,8 +132,10 @@
     </style>
 
     <style name="CustomStyle_2">
-        <item name="android:textAppearance">@style/CustomTextAppearance_2</item>
-        <item name="android:background">?attr/colorSurfaceVariant</item>
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_2</item>
+        <item name="questionnaire_background">?attr/colorSurfaceVariant</item>
     </style>
 
     <style
