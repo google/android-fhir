@@ -68,7 +68,7 @@ class F_CqlEvaluatorBenchmark {
           for (entry in patientImmunizationHistory.entry) {
             fhirEngine.create(entry.resource)
           }
-          knowledgeManager.install(
+          knowledgeManager.index(
             File(context.filesDir, lib.name).apply {
               writeText(jsonParser.encodeResourceToString(lib))
             },

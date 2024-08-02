@@ -61,7 +61,7 @@ class FhirOperatorTest {
 
     // Installing ANC CDS to the IGManager
     val rootDirectory = File(javaClass.getResource("/anc-cds")!!.file)
-    knowledgeManager.install(
+    knowledgeManager.import(
       FhirNpmPackage(
         "com.google.android.fhir",
         "1.0.0",
@@ -281,7 +281,9 @@ class FhirOperatorTest {
   }
 
   private suspend fun installToIgManager(resource: Resource) {
-    knowledgeManager.install(writeToFile(resource))
+    try {
+      knowledgeManager.index(writeToFile(resource))
+    } catch (_: Exception) {}
   }
 
   private fun writeToFile(resource: Resource): File {

@@ -121,7 +121,7 @@ class FhirOperatorLibraryEvaluateTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.index(copy("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =
@@ -142,8 +142,8 @@ class FhirOperatorLibraryEvaluateTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
-    knowledgeManager.install(copy("/immunity-check/FhirHelpers.json"))
+    knowledgeManager.index(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.index(copy("/immunity-check/FhirHelpers.json"))
 
     val location =
       """
@@ -185,7 +185,7 @@ class FhirOperatorLibraryEvaluateTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.install(copy("/immunity-check/ImmunityCheck.json"))
+    knowledgeManager.index(copy("/immunity-check/ImmunityCheck.json"))
 
     // Evaluates a specific Patient
     val results =
