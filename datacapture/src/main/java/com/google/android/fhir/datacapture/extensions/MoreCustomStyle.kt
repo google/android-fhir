@@ -18,16 +18,14 @@ package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.google.android.fhir.datacapture.R
 
 enum class CustomStyleViewAttributes(val attrId: Int) {
-  TEXT_COLOR(R.styleable.QuestionnaireCustomStyle_android_textColor),
+  TEXT_APPEARANCE(R.styleable.QuestionnaireCustomStyle_android_textAppearance),
   BACKGROUND(R.styleable.QuestionnaireCustomStyle_android_background),
-  TEXT_SIZE(R.styleable.QuestionnaireCustomStyle_android_textSize),
 }
 
 /**
@@ -91,13 +89,11 @@ private fun applyTextViewSpecificCustomStyle(
 ) {
   for (i in 0 until typedArray.indexCount) {
     when (typedArray.getIndex(i)) {
-      CustomStyleViewAttributes.TEXT_SIZE.attrId -> {
-        val textSize = typedArray.getDimension(i, textView.textSize)
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-      }
-      CustomStyleViewAttributes.TEXT_COLOR.attrId -> {
-        val textColor = typedArray.getColor(i, textView.currentTextColor)
-        textView.setTextColor(textColor)
+      CustomStyleViewAttributes.TEXT_APPEARANCE.attrId -> {
+        val textAppearance = typedArray.getResourceId(i, -1)
+        if (textAppearance != -1) {
+          textView.setTextAppearance(textAppearance)
+        }
       }
       else -> {
         // Ignore other attributes for TextView

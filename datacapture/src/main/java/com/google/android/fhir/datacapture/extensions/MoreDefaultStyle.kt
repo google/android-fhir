@@ -16,14 +16,12 @@
 
 import android.content.Context
 import android.content.res.TypedArray
-import android.util.TypedValue
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 
 enum class DefaultStyleViewAttributes(val attrId: Int) {
-  TEXT_SIZE(android.R.attr.textSize),
-  TEXT_COLOR(android.R.attr.textColor),
+  TEXT_APPEARANCE(android.R.attr.textAppearance),
   BACKGROUND(android.R.attr.background),
   // Add other attributes you want to apply
 }
@@ -87,14 +85,11 @@ private fun applyTextViewDefaultStyle(
 ) {
   for (i in 0 until typedArray.indexCount) {
     when (DefaultStyleViewAttributes.values()[i]) {
-      DefaultStyleViewAttributes.TEXT_SIZE -> {
-        val textSize = typedArray.getDimension(i, textView.textSize)
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-      }
-      DefaultStyleViewAttributes.TEXT_COLOR -> {
-        val textColor =
-          typedArray.getColor(i, ContextCompat.getColor(context, android.R.color.black))
-        textView.setTextColor(textColor)
+      DefaultStyleViewAttributes.TEXT_APPEARANCE -> {
+        val textAppearance = typedArray.getResourceId(i, -1)
+        if (textAppearance != -1) {
+          textView.setTextAppearance(textAppearance)
+        }
       }
       else -> {
         // Ignore other attributes for TextView

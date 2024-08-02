@@ -101,33 +101,41 @@
         <item name="android:minLines">2</item>
     </style>
 
-    <style
-        name="QuestionTextStyle"
-        parent="TextAppearance.Material3.HeadlineMedium"
-    >
-<!--        <item name="android:textSize">28sp</item>-->
-<!--        <item name="android:textColor">?android:textColorPrimary</item>-->
-<!--        <item name="android:background">?attr/colorSurface</item>-->
+    <style name="QuestionTextStyle">
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.Material3.HeadlineMedium</item>
+        <item name="android:background">?attr/colorSurface</item>
     </style>
 
-    <style
-        name="SubtitleTextStyle"
-        parent="TextAppearance.Material3.BodyMedium"
-    >
-        <item name="android:textSize">14sp</item>
-        <item name="android:textColor">?android:textColorPrimary</item>
+    <style name="SubtitleTextStyle">
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.Material3.BodyMedium</item>
         <item name="android:background">?attr/colorSurface</item>
     </style>
 
     <style name="CustomStyle_1">
-        <item name="android:textSize">24sp</item>
-        <item name="android:textColor">?attr/colorOnSecondary</item>
-        <item name="android:background">?attr/colorSecondary</item>
+        <item name="android:textAppearance">@style/CustomTextAppearance_1</item>
+        <item name="android:background">?attr/colorTertiaryContainer</item>
+    </style>
+
+    <style
+        name="CustomTextAppearance_1"
+        parent="TextAppearance.Material3.HeadlineLarge"
+    >
+        <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
     </style>
 
     <style name="CustomStyle_2">
-        <item name="android:textSize">10sp</item>
-        <item name="android:textColor">@color/error_red_80</item>
+        <item name="android:textAppearance">@style/CustomTextAppearance_2</item>
         <item name="android:background">?attr/colorSurfaceVariant</item>
+    </style>
+
+    <style
+        name="CustomTextAppearance_2"
+        parent="TextAppearance.Material3.BodyLarge"
+    >
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
 </resources>
