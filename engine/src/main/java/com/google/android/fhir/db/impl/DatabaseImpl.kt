@@ -174,6 +174,31 @@ internal class DatabaseImpl(
     }
   }
 
+  override suspend fun updateResourcesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    postSyncResourceVersionId: String,
+    postSyncResourceLastUpdated: Instant,
+    dependentResources: List<UUID>,
+  ) {
+    db.withTransaction {
+      resourceDao.updateResourceAndIndexPostSync(
+        preSyncResourceId,
+        postSyncResourceID,
+        resourceType,
+        postSyncResourceVersionId,
+        postSyncResourceLastUpdated,
+      )
+      updateResourceReferencesPostSync(
+        preSyncResourceId,
+        postSyncResourceID,
+        resourceType,
+        dependentResources,
+      )
+    }
+  }
+
   override suspend fun select(type: ResourceType, id: String): Resource {
     return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
       iParser.parseResource(it) as Resource
@@ -344,6 +369,14 @@ internal class DatabaseImpl(
   ) {
     val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
+    updateReferringResources(referringResourcesUuids, oldReferenceValue, updatedReferenceValue)
+  }
+
+  private suspend fun updateReferringResources(
+    referringResourcesUuids: List<UUID>,
+    preSyncReferenceValue: String,
+    postSyncReferenceValue: String,
+  ) {
     referringResourcesUuids.forEach { resourceUuid ->
       resourceDao.getResourceEntity(resourceUuid)?.let {
         val referringResource = iParser.parseResource(it.serializedResource) as Resource
@@ -351,8 +384,8 @@ internal class DatabaseImpl(
           addUpdatedReferenceToResource(
             iParser,
             referringResource,
-            oldReferenceValue,
-            updatedReferenceValue,
+            preSyncReferenceValue,
+            postSyncReferenceValue,
           )
         resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
       }
@@ -417,6 +450,59 @@ internal class DatabaseImpl(
         )
       }
     }
+  }
+
+  override suspend fun getResourceUuidsThatReferenceTheGivenResource(
+    preSyncResourceId: String,
+    resourceType: ResourceType,
+  ): List<UUID> {
+    return db.withTransaction {
+      val preSyncResource =
+        iParser.parseResource(
+          selectEntity(resourceType, preSyncResourceId).serializedResource,
+        ) as Resource
+      getResourceUuidsThatRefereceTheGivenResource(preSyncResource)
+    }
+  }
+
+  /**
+   * Retrieves a list of UUIDs for resources that reference [preSyncResource]. [preSyncResource] can
+   * be referenced as the reference value in other resources, returning those resource UUIDs.
+   * Essentially, [LocalChangeResourceReference] contains
+   * [LocalChangeResourceReference.resourceReferenceValue] and
+   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
+   *
+   * @param preSyncResource The resource that is being referenced.
+   * @return A list of UUIDs of resources that reference [preSyncResource].
+   */
+  private suspend fun getResourceUuidsThatRefereceTheGivenResource(
+    preSyncResource: Resource,
+  ): List<UUID> {
+    return db.withTransaction {
+      val preSyncReference = "${preSyncResource.resourceType.name}/${preSyncResource.logicalId}"
+      val localChangeIds =
+        localChangeDao
+          .getLocalChangeReferencesWithValue(preSyncReference)
+          .map { it.localChangeId }
+          .distinct()
+      val localChanges = localChangeDao.getLocalChanges(localChangeIds)
+      localChanges.map { it.resourceUuid }.distinct()
+    }
+  }
+
+  private suspend fun updateResourceReferencesPostSync(
+    preSyncResourceId: String,
+    postSyncResourceID: String,
+    resourceType: ResourceType,
+    referringResourcesUuids: List<UUID>,
+  ) {
+    val preSyncReferenceValue = "$resourceType/$preSyncResourceId"
+    val postSyncReferenceValue = "$resourceType/$postSyncResourceID"
+    updateReferringResources(
+      referringResourcesUuids = referringResourcesUuids,
+      preSyncReferenceValue = preSyncReferenceValue,
+      postSyncReferenceValue = postSyncReferenceValue,
+    )
   }
 
   companion object {

@@ -19,6 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
+import java.util.*
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.Resource
@@ -97,23 +98,36 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   override suspend fun consolidate(uploadRequestResult: UploadRequestResult) =
     when (uploadRequestResult) {
       is UploadRequestResult.Success -> {
-        database.deleteUpdates(
-          LocalChangeToken(
-            uploadRequestResult.successfulUploadResponseMappings.flatMap {
-              it.localChanges.flatMap { localChange -> localChange.token.ids }
-            },
-          ),
-        )
-        uploadRequestResult.successfulUploadResponseMappings.forEach {
-          when (it) {
+        uploadRequestResult.successfulUploadResponseMappings.forEach { responseMapping ->
+          when (responseMapping) {
             is BundleComponentUploadResponseMapping -> {
-              // TODO https://github.com/google/android-fhir/issues/2499
-              throw NotImplementedError()
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                val dependentResources =
+                  responseMapping.output.resourceIdAndType?.let {
+                    database.getResourceUuidsThatReferenceTheGivenResource(
+                      preSyncResourceId,
+                      it.second,
+                    )
+                  }
+                    ?: emptyList()
+                val tokenIds =
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids }
+                database.deleteUpdates(LocalChangeToken(tokenIds))
+                updateResourcePostSync(
+                  preSyncResourceId,
+                  responseMapping.output,
+                  dependentResources,
+                )
+              }
             }
             is ResourceUploadResponseMapping -> {
-              val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
-              preSyncResourceId?.let { preSyncResourceId ->
-                updateResourcePostSync(preSyncResourceId, it.output)
+              database.deleteUpdates(
+                LocalChangeToken(
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                ),
+              )
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                updateResourcePostSync(preSyncResourceId, responseMapping.output)
               }
             }
           }
@@ -141,6 +155,25 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
       )
     }
   }
+
+  private suspend fun updateResourcePostSync(
+    preSyncResourceId: String,
+    response: Bundle.BundleEntryResponseComponent,
+    dependentResources: List<UUID> = emptyList(),
+  ) {
+    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
+      response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
+        database.updateResourcesPostSync(
+          preSyncResourceId,
+          postSyncResourceID,
+          resourceType,
+          getVersionFromETag(response.etag),
+          response.lastModified.toInstant(),
+          dependentResources,
+        )
+      }
+    }
+  }
 }
 
 /**
@@ -165,7 +198,7 @@ private fun getVersionFromETag(eTag: String) =
  * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
  * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
  */
-private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+internal val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
   get() =
     location
       ?.split("/")
