@@ -48,9 +48,7 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
-        if (navigationViewState.labelText.isNullOrBlank().not() && this is Button) {
-          text = navigationViewState.labelText
-        }
+        text = navigationViewState.labelText
         setOnClickListener { navigationViewState.onClickAction() }
       }
       QuestionnaireNavigationViewUIState.Hidden -> {
