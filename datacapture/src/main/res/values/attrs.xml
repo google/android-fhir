@@ -118,6 +118,12 @@
     <!--   Style for previous and next buttons in paginated layout. -->
     <attr name="questionnaireButtonStyle" format="reference" />
 
+    <!--   Style for for circular progress indicator for next button in paginated layout. -->
+    <attr
+        name="questionnaireNextButtonCircularProgressIndicatorStyle"
+        format="reference"
+    />
+
     <!--   Style for submit button. -->
     <attr name="questionnaireSubmitButtonStyle" format="reference" />
 
