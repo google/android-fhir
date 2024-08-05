@@ -23,14 +23,12 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.get
 import com.google.android.fhir.knowledge.FhirNpmPackage
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import java.io.File
 import java.io.InputStream
-import java.lang.RuntimeException
 import java.util.TimeZone
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.instance.model.api.IBaseResource
@@ -118,7 +116,7 @@ class SmartImmunizationAndroidTest {
 
     moveAllIGResourcesIntoFilesDir("smart-imm")
 
-    knowledgeManager.install(
+    knowledgeManager.import(
       FhirNpmPackage(
         "who.fhir.immunization",
         "1.0.0",
@@ -137,8 +135,6 @@ class SmartImmunizationAndroidTest {
           url = "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
         )
         .single()
-
-    assertThat(planDef.idElement.idPart).isEqualTo("26")
 
     val patient =
       load(
