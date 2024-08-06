@@ -73,7 +73,7 @@ private fun applyGenericViewCustomStyle(context: Context, view: View, typedArray
     when (typedArray.getIndex(i)) {
       CustomStyleViewAttributes.BACKGROUND.attrId -> {
         val backgroundColor =
-          typedArray.getColor(i, ContextCompat.getColor(context, android.R.color.white))
+          typedArray.getColor(i, ContextCompat.getColor(context, android.R.color.transparent))
         view.setBackgroundColor(backgroundColor)
       }
     }
