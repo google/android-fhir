@@ -51,13 +51,13 @@ internal fun getStyleResIdFromTheme(context: Context, attr: Int): Int {
  * @param view The View to which the style should be applied.
  * @param styleResId The resource ID of the style to apply.
  */
-fun applyDefaultStyleToView(context: Context, view: View, styleResId: Int) {
+fun applyDefaultStyle(context: Context, view: View, styleResId: Int) {
   (view.tag as? Int)?.let {
     val attrs = DefaultStyleViewAttributes.values().map { it.attrId }.toIntArray()
     val typedArray: TypedArray = context.obtainStyledAttributes(styleResId, attrs)
     applyGenericViewDefaultStyle(context, view, typedArray)
     if (view is TextView) {
-      applyTextViewDefaultStyle(context, view, typedArray)
+      applyTextViewDefaultStyle(view, typedArray)
     }
     typedArray.recycle()
   }
@@ -79,7 +79,6 @@ private fun applyGenericViewDefaultStyle(context: Context, view: View, typedArra
 }
 
 private fun applyTextViewDefaultStyle(
-  context: Context,
   textView: TextView,
   typedArray: TypedArray,
 ) {
@@ -92,7 +91,7 @@ private fun applyTextViewDefaultStyle(
         }
       }
       else -> {
-        // Ignore other attributes for TextView
+        // applyGenericViewDefaultStyle for other attributes.
       }
     }
   }

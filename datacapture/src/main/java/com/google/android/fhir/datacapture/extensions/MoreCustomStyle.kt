@@ -59,15 +59,12 @@ internal fun getTypedArrayForQuestionnaireCustomStyle(
  * @param view The view to which the style should be applied.
  * @param styleResId The resource ID of the style to be applied.
  */
-internal fun applyCustomStyleBasedOnViewType(context: Context, view: View, styleResId: Int) {
+internal fun applyCustomStyle(context: Context, view: View, styleResId: Int) {
   val typedArray = getTypedArrayForQuestionnaireCustomStyle(context, styleResId)
-  // Apply common style attributes
   applyGenericViewCustomStyle(context, view, typedArray)
-  // Apply TextView-specific attributes if the view is a TextView
   if (view is TextView) {
     applyTextViewSpecificCustomStyle(view, typedArray)
   }
-
   typedArray.recycle()
 }
 
@@ -96,7 +93,7 @@ private fun applyTextViewSpecificCustomStyle(
         }
       }
       else -> {
-        // Ignore other attributes for TextView
+        // applyGenericViewCustomStyle for other attributes.
       }
     }
   }

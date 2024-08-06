@@ -19,13 +19,14 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import applyDefaultStyleToView
+import applyDefaultStyle
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.StyleUrl
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
-import com.google.android.fhir.datacapture.extensions.applyCustomStyleBasedOnViewType
+import com.google.android.fhir.datacapture.extensions.applyCustomStyle
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.getStyleResIdByName
@@ -70,34 +71,20 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)
-
-    questionnaireViewItem.questionnaireItem
-      .readCustomStyleExtension(StyleUrl.QUESTION_TEXT_VIEW)
-      ?.let {
-        getStyleResIdByName(question.context, it)?.let { styleResId ->
-          question.tag = styleResId
-          applyCustomStyleBasedOnViewType(question.context, question, styleResId)
-        }
-      }
-      ?: applyDefaultStyleToView(
-        question.context,
-        question,
-        getStyleResIdFromTheme(question.context, R.attr.questionnaireQuestionTextStyle),
-      )
-
-    questionnaireViewItem.questionnaireItem
-      .readCustomStyleExtension(StyleUrl.SUBTITLE_TEXT_VIEW)
-      ?.let {
-        getStyleResIdByName(hint.context, it)?.let { styleResId ->
-          hint.tag = styleResId
-          applyCustomStyleBasedOnViewType(hint.context, hint, styleResId)
-        }
-      }
-      ?: applyDefaultStyleToView(
-        hint.context,
-        hint,
-        getStyleResIdFromTheme(hint.context, R.attr.questionnaireSubtitleTextStyle),
-      )
+    applyCustomOrDefaultStyle(
+      context = question.context,
+      view = question,
+      styleUrlType = StyleUrl.QUESTION_TEXT_VIEW,
+      defaultAttr = R.attr.questionnaireQuestionTextStyle,
+      questionnaireItem = questionnaireViewItem.questionnaireItem,
+    )
+    applyCustomOrDefaultStyle(
+      context = hint.context,
+      view = hint,
+      styleUrlType = StyleUrl.SUBTITLE_TEXT_VIEW,
+      defaultAttr = R.attr.questionnaireSubtitleTextStyle,
+      questionnaireItem = questionnaireViewItem.questionnaireItem,
+    )
   }
 
   /**
@@ -141,5 +128,25 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
         }
       text = requireOptionalText
     }
+  }
+
+  private fun applyCustomOrDefaultStyle(
+    context: Context,
+    view: View,
+    styleUrlType: StyleUrl,
+    defaultAttr: Int,
+    questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  ) {
+    val customStyleUrl = questionnaireItem.readCustomStyleExtension(styleUrlType)
+    customStyleUrl?.let {
+      val styleResId = getStyleResIdByName(context, it)
+      if (styleResId != 0) {
+        view.tag = styleResId
+        applyCustomStyle(context, view, styleResId)
+      } else {
+        applyDefaultStyle(context, view, getStyleResIdFromTheme(context, defaultAttr))
+      }
+    }
+      ?: applyDefaultStyle(context, view, getStyleResIdFromTheme(context, defaultAttr))
   }
 }
