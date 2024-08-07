@@ -188,4 +188,24 @@
              extend Theme.Questionnaire. If unspecified, Theme.Questionnaire will be used. -->
         <attr name="questionnaire_theme" format="reference" />
     </declare-styleable>
+
+    <!--
+        Declare custom styleable attributes for QuestionnaireCustomStyle.
+        These attributes can be used to customize the appearance of views in the questionnaire.
+    -->
+    <declare-styleable name="QuestionnaireCustomStyle">
+        <!--
+            Specifies the text appearance for the questionnaire text.
+            This should be a reference to a text appearance style resource.
+            Example: @style/TextAppearance.AppCompat.Headline
+        -->
+        <attr name="questionnaire_textAppearance" format="reference" />
+
+        <!--
+            Specifies the background for the questionnaire item.
+            This can be a reference to a drawable resource or a color value.
+            Example: @color/background_color or #FFFFFF
+        -->
+        <attr name="questionnaire_background" format="reference|color" />
+    </declare-styleable>
 </resources>

@@ -1,0 +1,70 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Question text custom style",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_1"
+            },
+            {
+              "url": "subtitle_text_view",
+              "valueString": "CustomStyle_2"
+            }
+          ]
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.3",
+          "text": "Instructions custom style.",
+          "type": "display"
+        }
+      ]
+    },
+    {
+      "linkId": "2",
+      "text": "Question text default style",
+      "type": "display",
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.3",
+          "text": "Instructions default style.",
+          "type": "display"
+        }
+      ]
+    }
+  ]
+}

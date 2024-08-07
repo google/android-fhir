@@ -67,6 +67,131 @@ the new theme you just created:
 </style>
 ```
 
+## Custom Style per Question Item
+
+With this change, you can apply individual custom styles per question item. If a custom style is not mentioned in the question item, the default style will be applied, which is present in the DataCapture module or overridden in the application.
+
+### Add a Custom Style Extension to the Question Item
+
+```json
+{
+  "extension": [
+    {
+      "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+      "extension": [
+        {
+          "url": "question_text_view",
+          "valueString": "CustomStyle_1"
+        },
+        {
+          "url": "subtitle_text_view",
+          "valueString": "CustomStyle_2"
+        }
+      ]
+    }
+  ]
+}
+```
+### Custom Style Extension URL
+"https://github.com/google/android-fhir/tree/master/datacapture/android-style"
+
+It identifies extensions for applying the custom style to a given questionnaire item.
+
+### Question Item View
+* `question_text_view`: Used to show the text value of the question item.
+* `subtitle_text_view`: Used to show the instructions of the question item.
+  For more information about supported views, please see the [link](https://github.com/google/android-fhir/pull/2636/files#diff-5497e7116b552983c2c9c53cb4a1bab919ef972747ec326bc71bcec734a26ddaR64).
+
+### Custom Style Values
+In the above example:
+
+`CustomStyle_1` is the custom style for question_text_view.
+`CustomStyle_2` is the custom style for subtitle_text_view.
+Both styles are defined in the application.
+
+### Custom Style Attributes
+* `questionnaire_textAppearance`: Specifies the text appearance for the questionnaire text. Example: `@style/TextAppearance.AppCompat.Headline`
+* `questionnaire_background`: Specifies the background for the view. Example: `@color/background_color or #FFFFFF`
+
+For more information on custom style attributes, please see the [link](https://github.com/google/android-fhir/pull/2636/files#diff-60ddcdc840f0b488d17fb9bea36a1c6000376068203d120826887e59639e9424R196).
+
+### Example Custom Styles
+
+```
+<style name="CustomStyle_1">
+   <item name="questionnaire_textAppearance">@style/CustomTextAppearance_1</item>
+</style>
+
+<style name="CustomStyle_2">
+   <item name="questionnaire_textAppearance">@style/CustomTextAppearance_2</item>
+</style>
+
+<style
+        name="CustomTextAppearance_1"
+        parent="TextAppearance.Material3.HeadlineLarge"
+    >
+        <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
+    </style>
+
+    <style name="CustomStyle_2">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_2</item>
+        <item name="questionnaire_background">?attr/colorSurfaceVariant</item>
+    </style>
+
+```
+
+The above custom styles are defined in the `res/values/styles.xml` of the application.
+
+### questionnaire.json with custom style
+```
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "text": "Question text custom style",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_1"
+            },
+            {
+              "url": "subtitle_text_view",
+              "valueString": "CustomStyle_2"
+            }
+          ]
+        }
+      ],
+      "item": [
+        {
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
+              "valueCodeableConcept": {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/questionnaire-display-category",
+                    "code": "instructions"
+                  }
+                ]
+              }
+            }
+          ],
+          "linkId": "1.3",
+          "text": "Instructions custom style.",
+          "type": "display"
+        }
+      ]
+    }  ]
+}
+```
+
 ## Custom questionnaire components
 
 The Structured Data Capture Library uses

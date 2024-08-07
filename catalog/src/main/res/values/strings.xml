@@ -37,6 +37,9 @@
     <string name="component_name_repeated_group">Repeated Group</string>
     <string name="component_name_attachment">Attachment</string>
     <string name="component_name_location_widget">Location Widget</string>
+    <string
+        name="component_name_per_question_custom_style"
+    >Per question custom style</string>
     <string name="layout_name_default_text">Default</string>
     <string name="layout_name_paginated">Paginated</string>
     <string name="layout_name_review">Review</string>

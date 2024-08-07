@@ -80,7 +80,10 @@
 
     <style name="Theme.MyQuestionnaire.PaginatedLayout">
         <item name="questionnaireQuestionTextStyle">
-            @style/TextAppearance.Material3.HeadlineMedium
+            @style/QuestionTextStyle
+        </item>
+        <item name="questionnaireSubtitleTextStyle">
+            @style/SubtitleTextStyle
         </item>
     </style>
 
@@ -98,4 +101,47 @@
         <item name="android:minLines">2</item>
     </style>
 
+    <style name="QuestionTextStyle">
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.Material3.HeadlineMedium</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="SubtitleTextStyle">
+        <item
+            name="android:textAppearance"
+        >@style/TextAppearance.Material3.BodyMedium</item>
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
+
+    <style name="CustomStyle_1">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_1</item>
+        <item
+            name="questionnaire_background"
+        >?attr/colorTertiaryContainer</item>
+    </style>
+
+    <style
+        name="CustomTextAppearance_1"
+        parent="TextAppearance.Material3.HeadlineLarge"
+    >
+        <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
+    </style>
+
+    <style name="CustomStyle_2">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_2</item>
+        <item name="questionnaire_background">?attr/colorSurfaceVariant</item>
+    </style>
+
+    <style
+        name="CustomTextAppearance_2"
+        parent="TextAppearance.Material3.BodyLarge"
+    >
+        <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
+    </style>
 </resources>
