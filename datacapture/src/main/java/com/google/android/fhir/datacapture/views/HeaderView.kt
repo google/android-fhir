@@ -34,7 +34,7 @@ import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
 import com.google.android.fhir.datacapture.extensions.readCustomStyleExtension
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
-import getStyleResIdFromTheme
+import getStyleResIdFromAttribute
 import org.hl7.fhir.r4.model.Questionnaire
 
 /** View for the prefix, question, and hint of a questionnaire item. */
@@ -137,16 +137,22 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     defaultAttr: Int,
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
   ) {
-    val customStyleUrl = questionnaireItem.readCustomStyleExtension(styleUrlType)
-    customStyleUrl?.let {
-      val styleResId = getStyleResIdByName(context, it)
-      if (styleResId != 0) {
-        view.tag = styleResId
-        applyCustomStyle(context, view, styleResId)
-      } else {
-        applyDefaultStyle(context, view, getStyleResIdFromTheme(context, defaultAttr))
+    val customStyleName = questionnaireItem.readCustomStyleExtension(styleUrlType)
+    val defaultStyleResId = getStyleResIdFromAttribute(context, defaultAttr)
+
+    if (customStyleName != null) {
+      val customStyleResId = getStyleResIdByName(context, customStyleName)
+      when {
+        customStyleResId != 0 -> {
+          view.tag = customStyleResId
+          applyCustomStyle(context, view, customStyleResId)
+        }
+        defaultStyleResId != 0 -> {
+          applyDefaultStyle(context, view, defaultStyleResId)
+        }
       }
+    } else if (defaultStyleResId != 0) {
+      applyDefaultStyle(context, view, defaultStyleResId)
     }
-      ?: applyDefaultStyle(context, view, getStyleResIdFromTheme(context, defaultAttr))
   }
 }

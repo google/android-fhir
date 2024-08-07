@@ -93,7 +93,7 @@ private fun applyTextViewSpecificCustomStyle(
         }
       }
       else -> {
-        // applyGenericViewCustomStyle for other attributes.
+        // applyGenericViewCustomStyle for generic view attributes.
       }
     }
   }

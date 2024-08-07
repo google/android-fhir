@@ -37,7 +37,7 @@ enum class DefaultStyleViewAttributes(val attrId: Int) {
  * @param attr The attribute whose associated style resource ID is to be retrieved.
  * @return The resource ID of the style associated with the specified attribute, or 0 if not found.
  */
-internal fun getStyleResIdFromTheme(context: Context, attr: Int): Int {
+internal fun getStyleResIdFromAttribute(context: Context, attr: Int): Int {
   val typedArray = context.theme.obtainStyledAttributes(intArrayOf(attr))
   val styleResId = typedArray.getResourceId(0, 0)
   typedArray.recycle()
