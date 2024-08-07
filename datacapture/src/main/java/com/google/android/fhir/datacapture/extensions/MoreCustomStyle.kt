@@ -21,11 +21,53 @@ import android.content.res.TypedArray
 import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import applyDefaultStyle
 import com.google.android.fhir.datacapture.R
 
-enum class CustomStyleViewAttributes(val attrId: Int) {
+private enum class CustomStyleViewAttributes(val attrId: Int) {
   TEXT_APPEARANCE(R.styleable.QuestionnaireCustomStyle_questionnaire_textAppearance),
   BACKGROUND(R.styleable.QuestionnaireCustomStyle_questionnaire_background),
+}
+
+/**
+ * Applies either a custom style or a default style to the given view based on the provided custom
+ * style name and default style resource ID.
+ *
+ * If the custom style resource name is valid, it applies the custom style to the view. If the
+ * custom style resource name is not valid or not found, it falls back to applying the default style
+ * defined by the given style resource ID.
+ *
+ * @param context the context used to access resources.
+ * @param view the view to which the style should be applied.
+ * @param customStyleName the name of the custom style to apply.
+ * @param defaultStyleResId the default style resource ID to use if no custom style is found.
+ */
+internal fun applyCustomOrDefaultStyle(
+  context: Context,
+  view: View,
+  customStyleName: String?,
+  defaultStyleResId: Int,
+) {
+  if (customStyleName != null) {
+    val customStyleResId = getStyleResIdByName(context, customStyleName)
+    when {
+      customStyleResId != 0 -> {
+        view.tag = customStyleResId
+        applyCustomStyle(context, view, customStyleResId)
+      }
+      defaultStyleResId != 0 -> {
+        (view.tag as? Int)?.let {
+          applyDefaultStyle(context, view, defaultStyleResId)
+          view.tag = null
+        }
+      }
+    }
+  } else if (defaultStyleResId != 0) {
+    (view.tag as? Int)?.let {
+      applyDefaultStyle(context, view, defaultStyleResId)
+      view.tag = null
+    }
+  }
 }
 
 /**
@@ -38,11 +80,11 @@ enum class CustomStyleViewAttributes(val attrId: Int) {
  * @param styleName The name of the style whose resource ID is to be retrieved.
  * @return The resource ID of the style, or 0 if the style name is not found.
  */
-internal fun getStyleResIdByName(context: Context, styleName: String): Int {
+private fun getStyleResIdByName(context: Context, styleName: String): Int {
   return context.resources.getIdentifier(styleName, "style", context.packageName)
 }
 
-internal fun getTypedArrayForQuestionnaireCustomStyle(
+private fun getTypedArrayForQuestionnaireCustomStyle(
   context: Context,
   styleResId: Int,
 ): TypedArray {
@@ -59,7 +101,7 @@ internal fun getTypedArrayForQuestionnaireCustomStyle(
  * @param view The view to which the style should be applied.
  * @param styleResId The resource ID of the style to be applied.
  */
-internal fun applyCustomStyle(context: Context, view: View, styleResId: Int) {
+private fun applyCustomStyle(context: Context, view: View, styleResId: Int) {
   val typedArray = getTypedArrayForQuestionnaireCustomStyle(context, styleResId)
   applyGenericViewCustomStyle(context, view, typedArray)
   if (view is TextView) {
@@ -91,9 +133,6 @@ private fun applyTextViewSpecificCustomStyle(
         if (textAppearance != -1) {
           textView.setTextAppearance(textAppearance)
         }
-      }
-      else -> {
-        // applyGenericViewCustomStyle for generic view attributes.
       }
     }
   }

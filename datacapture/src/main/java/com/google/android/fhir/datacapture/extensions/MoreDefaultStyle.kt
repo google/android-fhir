@@ -20,7 +20,7 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 
-enum class DefaultStyleViewAttributes(val attrId: Int) {
+private enum class DefaultStyleViewAttributes(val attrId: Int) {
   TEXT_APPEARANCE(android.R.attr.textAppearance),
   BACKGROUND(android.R.attr.background),
   // Add other attributes you want to apply
@@ -51,16 +51,14 @@ internal fun getStyleResIdFromAttribute(context: Context, attr: Int): Int {
  * @param view The View to which the style should be applied.
  * @param styleResId The resource ID of the style to apply.
  */
-fun applyDefaultStyle(context: Context, view: View, styleResId: Int) {
-  (view.tag as? Int)?.let {
-    val attrs = DefaultStyleViewAttributes.values().map { it.attrId }.toIntArray()
-    val typedArray: TypedArray = context.obtainStyledAttributes(styleResId, attrs)
-    applyGenericViewDefaultStyle(context, view, typedArray)
-    if (view is TextView) {
-      applyTextViewDefaultStyle(view, typedArray)
-    }
-    typedArray.recycle()
+internal fun applyDefaultStyle(context: Context, view: View, styleResId: Int) {
+  val attrs = DefaultStyleViewAttributes.values().map { it.attrId }.toIntArray()
+  val typedArray: TypedArray = context.obtainStyledAttributes(styleResId, attrs)
+  applyGenericViewDefaultStyle(context, view, typedArray)
+  if (view is TextView) {
+    applyTextViewDefaultStyle(view, typedArray)
   }
+  typedArray.recycle()
 }
 
 private fun applyGenericViewDefaultStyle(context: Context, view: View, typedArray: TypedArray) {
@@ -72,7 +70,7 @@ private fun applyGenericViewDefaultStyle(context: Context, view: View, typedArra
         view.setBackgroundColor(backgroundColor)
       }
       else -> {
-        // Ignore other attributes for generic View
+        // Ignore view specific attributes.
       }
     }
   }
