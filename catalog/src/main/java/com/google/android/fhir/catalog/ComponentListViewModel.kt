@@ -153,7 +153,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_location_widget.json",
     ),
     QUESTION_ITEM_CUSTOM_STYLE(
-      R.drawable.style_48dp,
+      R.drawable.text_format_48dp,
       R.string.component_name_per_question_custom_style,
       "component_per_question_custom_style.json",
     ),
