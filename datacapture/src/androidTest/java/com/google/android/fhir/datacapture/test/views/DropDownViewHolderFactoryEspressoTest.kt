@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -347,6 +347,33 @@ class DropDownViewHolderFactoryEspressoTest {
       .isEqualTo("Reference")
     assertThat((answerHolder!!.single().value as Reference).display).isEqualTo("Reference")
     assertThat((answerHolder!!.single().value as Reference).id).isEqualTo("ref_2")
+  }
+
+  @Test
+  fun shouldSetDefaultValueFromInitialProperty() {
+    val questionnaireViewItem =
+      QuestionnaireViewItem(
+        answerOptions("Coding 1", "Coding 2", "Coding 3", "Coding 4", "Coding 5"),
+        responseOptions(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+      )
+    questionnaireViewItem.questionnaireItem.addInitial(
+      Questionnaire.QuestionnaireItemInitialComponent().apply {
+        this.value = StringType("Select Answer")
+      },
+    )
+    runOnUI {
+      viewHolder.bind(questionnaireViewItem)
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.auto_complete).showDropDown()
+    }
+    onView(withId(R.id.auto_complete)).perform(delayMainThread())
+    onView(withText("Select Answer"))
+      .inRoot(isPlatformPopup())
+      .check(matches(isDisplayed()))
+      .perform(click())
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.auto_complete).text.toString())
+      .isEqualTo("Select Answer")
   }
 
   /** Method to run code snippet on UI/main thread */
