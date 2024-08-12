@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,24 @@ private fun QuestionnaireResponse.QuestionnaireResponseItemComponent.appendDesce
 }
 
 /**
- * Add nested items under the provided `questionnaireItem` to each answer in the questionnaire
- * response item. The hierarchy and order of nested items will be retained as specified in the
- * standard.
+ * Copies nested items under `questionnaireItem` to each answer without children. The hierarchy and
+ * order of nested items will be retained as specified in the standard.
+ *
+ * Existing answers with nested items will not be modified because the nested items may contain
+ * answers already.
+ *
+ * This should be used when
+ * - a new answer is added to a question with nested questions, or
+ * - a new answer is added to a repeated group (in which case this indicates a new instance of the
+ *   repeated group will be added to the final questionnaire response).
  *
  * See https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-fun QuestionnaireResponse.QuestionnaireResponseItemComponent.addNestedItemsToAnswer(
+internal fun QuestionnaireResponse.QuestionnaireResponseItemComponent
+  .copyNestedItemsToChildlessAnswers(
   questionnaireItem: Questionnaire.QuestionnaireItemComponent,
 ) {
-  answer.forEach { it.item = questionnaireItem.getNestedQuestionnaireResponseItems() }
+  answer
+    .filter { it.item.isEmpty() }
+    .forEach { it.item = questionnaireItem.createNestedQuestionnaireResponseItems() }
 }

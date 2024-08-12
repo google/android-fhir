@@ -1,0 +1,24 @@
+{
+  "resourceType": "Questionnaire",
+  "item": [
+    {
+      "linkId": "1",
+      "type": "group",
+      "text": "Repeated Group",
+      "repeats": true,
+      "item": [
+        {
+          "linkId": "1-1",
+          "text": "Sample date question",
+          "type": "date",
+          "extension": [
+            {
+              "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+              "valueString": "yyyy-mm-dd"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ object CqlBuilder : Loadable() {
   /**
    * Compiles a CQL InputStream to ELM
    *
-   * @param cqlText the CQL Library
+   * @param cqlText the CQL Library's input stream
    * @return a [CqlTranslator] object that contains the elm representation of the library inside it.
    */
   fun compile(cqlText: InputStream): CqlTranslator {
@@ -120,7 +120,7 @@ object CqlBuilder : Loadable() {
       version = libVersion
       status = Enumerations.PublicationStatus.ACTIVE
       experimental = true
-      url = "http://localhost/Library/$libName|$libVersion"
+      url = "http://localhost/Library/$libName"
       attachmentCql?.let { addContent(it) }
       attachmentJson?.let { addContent(it) }
       attachmentXml?.let { addContent(it) }

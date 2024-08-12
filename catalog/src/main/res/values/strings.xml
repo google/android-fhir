@@ -36,6 +36,7 @@
     <string name="component_name_item_answer_media">Item Answer Media</string>
     <string name="component_name_repeated_group">Repeated Group</string>
     <string name="component_name_attachment">Attachment</string>
+    <string name="component_name_location_widget">Location Widget</string>
     <string name="layout_name_default_text">Default</string>
     <string name="layout_name_paginated">Paginated</string>
     <string name="layout_name_review">Review</string>
@@ -51,10 +52,13 @@
     <string
         name="behavior_name_dynamic_question_text"
     >Dynamic question text</string>
+    <string
+        name="behavior_name_questionnaire_constraint"
+    >Questionnaire constraint</string>
     <string name="component_name_initial_value">Initial Value</string>
     <string
         name="behavior_name_calculated_expression_info"
-    >Input age to automatically calculate birthdate until birthdate is updated manually.</string>
+    >Input date of birth to automatically calculate age until age is updated manually.</string>
     <string
         name="behavior_name_calculated_expression"
     >Calculated Expression</string>
@@ -70,7 +74,6 @@
     >Below is the JSON code</string>
     <string name="submit">Submit</string>
     <string name="show_error_state">Show error state</string>
-    <string name="hide_error_state">Hide error state</string>
     <string name="options">Options</string>
     <string name="error">Error</string>
     <string name="widgets">Widgets</string>

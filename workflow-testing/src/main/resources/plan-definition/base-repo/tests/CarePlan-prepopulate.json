@@ -11,7 +11,7 @@
       "status": "draft",
       "intent": "proposal",
       "subject": {
-        "reference": "OPA-Patient1"
+        "reference": "Patient/OPA-Patient1"
       },
       "action": [
         {
@@ -842,7 +842,7 @@
         "reference": "Questionnaire/OutpatientPriorAuthorizationRequest-OPA-Patient1"
       },
       "for": {
-        "reference": "OPA-Patient1"
+        "reference": "Patient/OPA-Patient1"
       }
     }
   ],
@@ -852,7 +852,7 @@
   "status": "draft",
   "intent": "proposal",
   "subject": {
-    "reference": "OPA-Patient1"
+    "reference": "Patient/OPA-Patient1"
   },
   "activity": [
     {

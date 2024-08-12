@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,15 +39,32 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-/** A WorkManager Worker that handles periodic sync. */
+/**
+ * Handles FHIR data synchronization between local database and remote server.
+ *
+ * Extend this abstract [CoroutineWorker][androidx.work.CoroutineWorker] and implement the abstract
+ * methods to define your specific synchronization behavior. The custom worker class can then be
+ * used to schedule periodic synchronization jobs using [Sync].
+ */
 abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   CoroutineWorker(appContext, workerParams) {
+
+  /** Returns the [FhirEngine] instance used for interacting with the local FHIR data store. */
   abstract fun getFhirEngine(): FhirEngine
 
+  /** Returns the [DownloadWorkManager] instance that manages the download process. */
   abstract fun getDownloadWorkManager(): DownloadWorkManager
 
+  /**
+   * Returns the [ConflictResolver] instance that defines how to handle conflicts between local and
+   * remote data during synchronization.
+   */
   abstract fun getConflictResolver(): ConflictResolver
 
+  /**
+   * Returns the [UploadStrategy] instance that defines how local changes are uploaded to the
+   * server.
+   */
   abstract fun getUploadStrategy(): UploadStrategy
 
   private val gson =
@@ -56,7 +73,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
       .setExclusionStrategies(StateExclusionStrategy())
       .create()
 
-  /** The purpose of this api makes it easy to stub [FhirSyncWorker] for testing. */
+  /** Convenience API to stub [FhirSyncWorker] for testing. */
   internal open fun getDataSource() = FhirEngineProvider.getDataSource(applicationContext)
 
   override suspend fun doWork(): Result {
@@ -72,30 +89,47 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
     val synchronizer =
       FhirSynchronizer(
-        applicationContext,
         getFhirEngine(),
         UploadConfiguration(
-          Uploader(
-            dataSource = dataSource,
-            patchGenerator = PatchGeneratorFactory.byMode(getUploadStrategy().patchGeneratorMode),
-            requestGenerator =
-              UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
-          ),
+          uploader =
+            Uploader(
+              dataSource = dataSource,
+              patchGenerator =
+                PatchGeneratorFactory.byMode(
+                  getUploadStrategy().patchGeneratorMode,
+                  FhirEngineProvider.getFhirDatabase(applicationContext),
+                ),
+              requestGenerator =
+                UploadRequestGeneratorFactory.byMode(getUploadStrategy().requestGeneratorMode),
+            ),
+          uploadStrategy = getUploadStrategy(),
         ),
         DownloadConfiguration(
           DownloaderImpl(dataSource, getDownloadWorkManager()),
           getConflictResolver(),
         ),
+        FhirEngineProvider.getFhirDataStore(applicationContext),
       )
 
     val job =
       CoroutineScope(Dispatchers.IO).launch {
-        synchronizer.syncState.collect {
-          // now send Progress to work manager so caller app can listen
-          setProgress(buildWorkData(it))
-
-          if (it is SyncJobStatus.Finished || it is SyncJobStatus.Failed) {
-            this@launch.cancel()
+        val fhirDataStore = FhirEngineProvider.getFhirDataStore(applicationContext)
+        synchronizer.syncState.collect { syncJobStatus ->
+          val uniqueWorkerName = inputData.getString(UNIQUE_WORK_NAME)
+          when (syncJobStatus) {
+            is SyncJobStatus.Succeeded,
+            is SyncJobStatus.Failed, -> {
+              // While creating periodicSync request if
+              // putString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY, uniqueWorkName) is not present,
+              // then inputData.getString(SYNC_STATUS_PREFERENCES_DATASTORE_KEY) can be null.
+              if (uniqueWorkerName != null) {
+                fhirDataStore.writeTerminalSyncJobStatus(uniqueWorkerName, syncJobStatus)
+              }
+              cancel()
+            }
+            else -> {
+              setProgress(buildWorkData(syncJobStatus))
+            }
           }
         }
       }
@@ -106,8 +140,6 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
     // await/join is needed to collect states completely
     kotlin.runCatching { job.join() }.onFailure(Timber::w)
 
-    setProgress(output)
-
     Timber.d("Received result from worker $result and sending output $output")
 
     /**
@@ -116,7 +148,7 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
      */
     val retries = inputData.getInt(MAX_RETRIES_ALLOWED, 0)
     return when (result) {
-      is SyncJobStatus.Finished -> Result.success(output)
+      is SyncJobStatus.Succeeded -> Result.success(output)
       else -> {
         if (retries > runAttemptCount) Result.retry() else Result.failure(output)
       }

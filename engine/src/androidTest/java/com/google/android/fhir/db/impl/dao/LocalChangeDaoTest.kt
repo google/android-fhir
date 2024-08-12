@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,8 +35,10 @@ import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Enumerations
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Task
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -355,5 +357,78 @@ class LocalChangeDaoTest {
       .isEqualTo("activity.detail.performer")
     assertThat(localChangeResourceReferences[2].resourceReferenceValue)
       .isEqualTo(practitionerReference)
+  }
+
+  // https://github.com/google/android-fhir/issues/2559
+  @Test
+  fun updateResourceIdAndReferences_shouldSafelyUpdateLocalChangesReferencesAboveSQLiteInOpLimit() =
+    runBlocking {
+      val localPatientId = "local-patient-id"
+      val patientResourceUuid = UUID.randomUUID()
+      val localPatient = Patient().apply { id = localPatientId }
+      val patientCreationTime = Instant.now()
+      localChangeDao.addInsert(localPatient, patientResourceUuid, patientCreationTime)
+
+      val countAboveLimit = LocalChangeDao.SQLITE_LIMIT_MAX_VARIABLE_NUMBER * 10
+      (1..countAboveLimit).forEach {
+        val taskResourceUuid = UUID.randomUUID()
+        val task =
+          Task().apply {
+            id = "local-task-$it"
+            `for` = Reference("Patient/$localPatientId")
+          }
+        val taskCreationTime = Instant.now()
+        localChangeDao.addInsert(task, taskResourceUuid, taskCreationTime)
+      }
+
+      val updatedPatientId = "synced-patient-id"
+      val updatedLocalPatient = localPatient.copy().apply { id = updatedPatientId }
+      val updatedReferences =
+        localChangeDao.updateResourceIdAndReferences(
+          patientResourceUuid,
+          oldResource = localPatient,
+          updatedResource = updatedLocalPatient,
+        )
+      assertThat(updatedReferences.size).isEqualTo(countAboveLimit)
+    }
+
+  @Test
+  fun getReferencesForLocalChanges_should_return_all_changes(): Unit = runBlocking {
+    listOf(
+        Observation().apply {
+          id = "1"
+          subject = Reference("Patient/1")
+          encounter = Reference("Encounter/1")
+        },
+        Observation().apply {
+          id = "2"
+          subject = Reference("Patient/2")
+          encounter = Reference("Encounter/2")
+        },
+      )
+      .forEach {
+        localChangeDao.addInsert(
+          it,
+          UUID.randomUUID(),
+          Instant.now(),
+        )
+      }
+
+    // we need LocalChangeEntity.id (auto generated) to call getReferencesForLocalChanges api
+    val localChangesMap = localChangeDao.getAllLocalChanges().associateBy { it.resourceId }
+
+    // Calling the api for single local change
+    var result = localChangeDao.getReferencesForLocalChanges(listOf(localChangesMap["1"]!!.id))
+    assertThat(result).hasSize(2)
+    assertThat(result.map { it.resourceReferenceValue }).containsExactly("Patient/1", "Encounter/1")
+
+    // Calling the api for multiple local changes
+    result =
+      localChangeDao.getReferencesForLocalChanges(
+        listOf(localChangesMap["1"]!!.id, localChangesMap["2"]!!.id),
+      )
+    assertThat(result).hasSize(4)
+    assertThat(result.map { it.resourceReferenceValue })
+      .containsExactly("Patient/1", "Encounter/1", "Patient/2", "Encounter/2")
   }
 }

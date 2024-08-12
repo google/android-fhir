@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.contrib.views
 import android.text.Editable
 import android.text.InputType
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemEditTextViewHolderDelegate
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
@@ -33,7 +34,10 @@ object PhoneNumberViewHolderFactory :
   override fun getQuestionnaireItemViewHolderDelegate(): QuestionnaireItemViewHolderDelegate =
     object : QuestionnaireItemEditTextViewHolderDelegate(InputType.TYPE_CLASS_PHONE) {
 
-      override fun handleInput(editable: Editable, questionnaireViewItem: QuestionnaireViewItem) {
+      override suspend fun handleInput(
+        editable: Editable,
+        questionnaireViewItem: QuestionnaireViewItem,
+      ) {
         val input = getValue(editable.toString())
         if (input != null) {
           questionnaireViewItem.setAnswer(input)
@@ -55,16 +59,27 @@ object PhoneNumberViewHolderFactory :
         }
       }
 
-      override fun updateUI(
+      override fun updateInputTextUI(
         questionnaireViewItem: QuestionnaireViewItem,
         textInputEditText: TextInputEditText,
-        textInputLayout: TextInputLayout,
       ) {
         val text =
           questionnaireViewItem.answers.singleOrNull()?.valueStringType?.value?.toString() ?: ""
         if (text != textInputEditText.text.toString()) {
           textInputEditText.setText(text)
         }
+      }
+
+      override fun updateValidationTextUI(
+        questionnaireViewItem: QuestionnaireViewItem,
+        textInputLayout: TextInputLayout,
+      ) {
+        textInputLayout.error =
+          getValidationErrorMessage(
+            textInputLayout.context,
+            questionnaireViewItem,
+            questionnaireViewItem.validationResult,
+          )
       }
     }
 }

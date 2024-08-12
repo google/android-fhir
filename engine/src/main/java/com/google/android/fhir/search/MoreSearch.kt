@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,11 @@
 
 package com.google.android.fhir.search
 
+import android.annotation.SuppressLint
+import androidx.annotation.VisibleForTesting
+import androidx.room.util.convertUUIDToByte
 import ca.uhn.fhir.rest.gclient.DateClientParam
+import ca.uhn.fhir.rest.gclient.IParam
 import ca.uhn.fhir.rest.gclient.NumberClientParam
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
@@ -31,11 +35,13 @@ import com.google.android.fhir.logicalId
 import com.google.android.fhir.ucumUrl
 import java.math.BigDecimal
 import java.util.Date
+import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.DateType
 import org.hl7.fhir.r4.model.Resource
+import timber.log.Timber
 
 /**
  * The multiplier used to determine the range for the `ap` search prefix. See
@@ -43,41 +49,50 @@ import org.hl7.fhir.r4.model.Resource
  */
 private const val APPROXIMATION_COEFFICIENT = 0.1
 
+/**
+ * SQLite supports signed and unsigned integers with a maximum length of 8 bytes. The signed
+ * integers can range from `-9223372036854775808` to `+9223372036854775807`. See
+ * [Storage Classes and Datatypes](https://www.sqlite.org/datatype3.html)
+ */
+private const val MIN_VALUE = "-9223372036854775808"
+private const val MAX_VALUE = "9223372036854775808"
+
 internal suspend fun <R : Resource> Search.execute(database: Database): List<SearchResult<R>> {
   val baseResources = database.search<R>(getQuery())
   val includedResources =
     if (forwardIncludes.isEmpty() || baseResources.isEmpty()) {
       null
     } else {
-      database.searchReferencedResources(
-        getIncludeQuery(includeIds = baseResources.map { it.logicalId }),
+      database.searchForwardReferencedResources(
+        getIncludeQuery(includeIds = baseResources.map { it.uuid }),
       )
     }
   val revIncludedResources =
     if (revIncludes.isEmpty() || baseResources.isEmpty()) {
       null
     } else {
-      database.searchReferencedResources(
-        getRevIncludeQuery(includeIds = baseResources.map { "${it.resourceType}/${it.logicalId}" }),
+      database.searchReverseReferencedResources(
+        getRevIncludeQuery(
+          includeIds = baseResources.map { "${it.resource.resourceType}/${it.resource.logicalId}" },
+        ),
       )
     }
 
-  return baseResources.map { baseResource ->
+  return baseResources.map { (uuid, baseResource) ->
     SearchResult(
       baseResource,
       included =
         includedResources
           ?.asSequence()
-          ?.filter { it.idOfBaseResourceOnWhichThisMatched == baseResource.logicalId }
-          ?.groupBy({ it.matchingIndex }, { it.resource }),
+          ?.filter { it.baseResourceUUID == uuid }
+          ?.groupBy({ it.searchIndex }, { it.resource }),
       revIncluded =
         revIncludedResources
           ?.asSequence()
           ?.filter {
-            it.idOfBaseResourceOnWhichThisMatched ==
-              "${baseResource.fhirType()}/${baseResource.logicalId}"
+            it.baseResourceTypeWithId == "${baseResource.fhirType()}/${baseResource.logicalId}"
           }
-          ?.groupBy({ it.resource.resourceType to it.matchingIndex }, { it.resource }),
+          ?.groupBy({ it.resource.resourceType to it.searchIndex }, { it.resource }),
     )
   }
 }
@@ -90,117 +105,243 @@ fun Search.getQuery(isCount: Boolean = false): SearchQuery {
   return getQuery(isCount, null)
 }
 
-private fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
-  var matchQuery = ""
+@VisibleForTesting
+internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
   val args = mutableListOf<Any>()
-  args.addAll(includeIds)
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
 
-  // creating the match and filter query
-  revIncludes.forEachIndexed { index, (param, search) ->
+  fun generateFilterQuery(nestedSearch: NestedSearch): String {
+    val (param, search) = nestedSearch
     val resourceToInclude = search.type
     args.add(resourceToInclude.name)
     args.add(param.paramName)
-    matchQuery += " ( a.resourceType = ? and a.index_name IN (?) "
+    args.addAll(includeIds)
+    args.add(resourceToInclude.name)
 
-    val allFilters = search.getFilterQueries()
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
 
-    if (allFilters.isNotEmpty()) {
-      val iterator = allFilters.listIterator()
-      matchQuery += "AND b.resourceUuid IN (\n"
-      do {
-        iterator.next().let {
-          matchQuery += it.query
-          args.addAll(it.args)
-        }
-
-        if (iterator.hasNext()) {
-          matchQuery +=
-            if (search.operation == Operation.OR) {
-              "\n UNION \n"
-            } else {
-              "\n INTERSECT \n"
-            }
-        }
-      } while (iterator.hasNext())
-      matchQuery += "\n)"
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\n UNION \n"
+          } else {
+            "\n INTERSECT \n"
+          }
+      }
     }
-
-    matchQuery += " \n)"
-
-    if (index != revIncludes.lastIndex) matchQuery += " OR "
+    return filterQuery
   }
 
-  return SearchQuery(
-    query =
+  return revIncludes
+    .map {
+      val (join, order) =
+        it.search.getSortOrder(otherTable = "re", groupByColumn = "rie.index_value")
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
       """
-    SELECT a.index_name, a.index_value, b.serializedResource 
-    FROM ReferenceIndexEntity a 
-    JOIN  ResourceEntity b
-    ON  a.resourceUuid = b.resourceUuid
-    AND  a.index_value IN( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
-    ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
-        """
-        .trimIndent(),
-    args = args,
-  )
+      SELECT rie.index_name, rie.index_value, re.serializedResource
+      FROM ResourceEntity re
+      JOIN ReferenceIndexEntity rie
+      ON re.resourceUuid = rie.resourceUuid
+      ${join.query}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString) AND re.resourceType = ?
+      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      $order
+            """
+        .trimIndent()
+    }
+    .joinToString("\nUNION ALL\n") {
+      StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
+    }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
+    .let { SearchQuery(it, args) }
 }
 
-private fun Search.getIncludeQuery(includeIds: List<String>): SearchQuery {
-  var matchQuery = ""
-  val args = mutableListOf<Any>(type.name)
-  args.addAll(includeIds)
+@SuppressLint("RestrictedApi")
+@VisibleForTesting
+internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
+  val args = mutableListOf<Any>()
+  val baseResourceType = type
+  val uuidsString = CharArray(includeIds.size) { '?' }.joinToString()
 
-  // creating the match and filter query
-  forwardIncludes.forEachIndexed { index, (param, search) ->
+  fun generateFilterQuery(nestedSearch: NestedSearch): String {
+    val (param, search) = nestedSearch
     val resourceToInclude = search.type
-    args.add(resourceToInclude.name)
+    args.add(baseResourceType.name)
     args.add(param.paramName)
-    matchQuery += " ( c.resourceType = ? and b.index_name IN (?) "
+    args.addAll(includeIds.map { convertUUIDToByte(it) })
+    args.add(resourceToInclude.name)
 
-    val allFilters = search.getFilterQueries()
+    var filterQuery = ""
+    val filters = search.getFilterQueries()
+    val iterator = filters.listIterator()
+    while (iterator.hasNext()) {
+      iterator.next().let {
+        filterQuery += it.query
+        args.addAll(it.args)
+      }
 
-    if (allFilters.isNotEmpty()) {
-      val iterator = allFilters.listIterator()
-      matchQuery += "AND c.resourceUuid IN (\n"
-      do {
-        iterator.next().let {
-          matchQuery += it.query
-          args.addAll(it.args)
-        }
-
-        if (iterator.hasNext()) {
-          matchQuery +=
-            if (search.operation == Operation.OR) {
-              "\n UNION \n"
-            } else {
-              "\n INTERSECT \n"
-            }
-        }
-      } while (iterator.hasNext())
-      matchQuery += "\n)"
+      if (iterator.hasNext()) {
+        filterQuery +=
+          if (search.operation == Operation.OR) {
+            "\nUNION\n"
+          } else {
+            "\nINTERSECT\n"
+          }
+      }
     }
-
-    matchQuery += " \n)"
-
-    if (index != forwardIncludes.lastIndex) matchQuery += " OR "
+    return filterQuery
   }
 
-  return SearchQuery(
-    query =
-      //  spotless:off
+  return forwardIncludes
+    .map {
+      val (join, order) =
+        it.search.getSortOrder(otherTable = "re", groupByColumn = "rie.resourceuuid")
+      args.addAll(join.args)
+      val filterQuery = generateFilterQuery(it)
+      """
+      SELECT rie.index_name, rie.resourceUuid, re.serializedResource
+      FROM ResourceEntity re
+      JOIN ReferenceIndexEntity rie
+      ON re.resourceType||"/"||re.resourceId = rie.index_value
+      ${join.query}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString) AND re.resourceType = ?
+      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      $order
+      """
+        .trimIndent()
+    }
+    .joinToString("\nUNION ALL\n") {
+      StringBuilder("SELECT * FROM (\n").append(it.trim()).append("\n)")
+    }
+    .split("\n")
+    .filter { it.isNotBlank() }
+    .joinToString("\n") { it.trim() }
+    .let { SearchQuery(it, args) }
+}
+
+private fun Search.getSortOrder(
+  otherTable: String,
+  isReferencedSearch: Boolean = false,
+  groupByColumn: String = "",
+): Pair<SearchQuery, String> {
+  var sortJoinStatement = ""
+  var sortOrderStatement = ""
+  val args = mutableListOf<Any>()
+  if (isReferencedSearch && count != null) {
+    Timber.e("count not supported for [rev]include search.")
+  }
+  sort?.let { sort ->
+    val sortTableNames =
+      when (sort) {
+        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
+        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
+        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
+        // with timezone info). Any data field in any resource will only have index records in one
+        // of the two tables. So we simply sort by both in the SQL query.
+        is DateClientParam ->
+          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
+        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+      }
+
+    sortJoinStatement =
+      sortTableNames
+        .mapIndexed { index, sortTableName ->
+          val tableAlias = 'b' + index
+          //  spotless:off
+      """
+      LEFT JOIN ${sortTableName.tableName} $tableAlias
+      ON $otherTable.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
+      """
+        //  spotless:on
+        }
+        .joinToString(separator = "\n")
+    sortTableNames.forEach { _ -> args.add(sort.paramName) }
+
+    sortOrderStatement +=
+      generateGroupAndOrderQuery(sort, order!!, otherTable, groupByColumn, sortTableNames)
+  }
+  return Pair(SearchQuery(sortJoinStatement, args), sortOrderStatement)
+}
+
+/**
+ * Sorting by a field that has multiple indexed values may result in duplicated resources. So, we
+ * use `GROUP BY` + `HAVING` clause to find distinct values in specified order.
+ *
+ * To make the sorting order a bit predictable, we use MIN and MAX functions with `HAVING` to use
+ * the corresponding values for GROUPING to find the distinct results.
+ *
+ * e.g. If there are Two Patients resources with multiple first names P1 ( first names =`3`, `1`)
+ * and P2 (first names = `2`, `4`), when sorting them in
+ *
+ * *ASCENDING order*: MIN function is used so that the smallest names of both the patients are
+ * considered for Grouping `[P1(`1`), P2(`2`)]`.
+ *
+ * *DESCENDING order*: MAX function is used so that the largest names of both the patients are
+ * considered for Grouping `[P2(`4`), P1(`3`)]`.
+ *
+ * For the special case where the index value is NULL, we use the default 0 value and to complete
+ * the expression, we check that the value is greater than [MIN_VALUE], the minimum value an INTEGER
+ * type can store in SQLITE. The reason to check against [MIN_VALUE] rather that 0, since string is
+ * always greater than integer (StringIndexEntity) and Date/DateTimeIndexEntity will always have
+ * positive integer values, is because the NumberIndexEntity table may contain negative values in
+ * it.
+ *
+ * Without the `>= MIN_VALUE` check, NULL values are not included in the results if the default
+ * is 0.
+ *
+ * The default values provided in GROUP BY stage are not carried forward during the ORDER BY, so we
+ * provide [MAX_VALUE] and [MIN_VALUE] as default in ORDER BY respectively for ASCENDING and
+ * DESCENDING to make sure that results with null index values are always at the bottom.
+ */
+private fun generateGroupAndOrderQuery(
+  sort: IParam,
+  order: Order,
+  otherTable: String,
+  groupByColumn: String,
+  sortTableNames: List<SortTableInfo>,
+): String {
+  var sortOrderStatement = ""
+  val havingColumn =
+    when (sort) {
+      is StringClientParam,
+      is NumberClientParam, -> "IFNULL(b.index_value,0)"
+      /*  The DateClientParam is used for both Date and DateTime values and the value is present exclusively in either one of the DateIndexEntity or DateTimeIndexEntity tables.
+      To find the MIN or MAX values, we add the values from both the tables. It results in the exact value as the other table would have null and hence default 0 would be added to actual date/datetime value.*/
+      is DateClientParam -> "IFNULL(b.index_from,0) + IFNULL(c.index_from,0)"
+      else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
+    }
+
+  sortOrderStatement +=
     """
-    SELECT b.index_name,  a.resourceId, c.serializedResource from ResourceEntity a 
-    JOIN ReferenceIndexEntity b 
-    On a.resourceUuid = b.resourceUuid
-    AND a.resourceType = ?
-    AND a.resourceId IN ( ${ CharArray(includeIds.size) { '?' }.joinToString()} ) 
-    JOIN ResourceEntity c
-    ON c.resourceType||"/"||c.resourceId = b.index_value
-    ${if (matchQuery.isEmpty()) "" else "AND ($matchQuery) " }
-    """.trimIndent(),
-    //  spotless:on
-    args = args,
-  )
+      GROUP BY $otherTable.resourceUuid ${if (groupByColumn.isNotEmpty()) ", $groupByColumn" else ""}
+      HAVING ${if (order == Order.ASCENDING) "MIN($havingColumn) >= $MIN_VALUE" else "MAX($havingColumn) >= $MIN_VALUE"}
+      
+            """
+      .trimIndent()
+  val defaultValue = if (order == Order.ASCENDING) MAX_VALUE else MIN_VALUE
+  sortTableNames.forEachIndexed { index, sortTableName ->
+    val tableAlias = 'b' + index
+    sortOrderStatement +=
+      if (index == 0) {
+        """
+            ORDER BY IFNULL($tableAlias.${sortTableName.columnName}, $defaultValue) ${order.sqlString}
+          """
+          .trimIndent()
+      } else {
+        ", IFNULL($tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName}, $defaultValue) ${order.sqlString}"
+      }
+  }
+  return sortOrderStatement
 }
 
 private fun Search.getFilterQueries() =
@@ -217,49 +358,10 @@ internal fun Search.getQuery(
   isCount: Boolean = false,
   nestedContext: NestedContext? = null,
 ): SearchQuery {
-  var sortJoinStatement = ""
-  var sortOrderStatement = ""
-  val sortArgs = mutableListOf<Any>()
-  sort?.let { sort ->
-    val sortTableNames =
-      when (sort) {
-        is StringClientParam -> listOf(SortTableInfo.STRING_SORT_TABLE_INFO)
-        is NumberClientParam -> listOf(SortTableInfo.NUMBER_SORT_TABLE_INFO)
-        // The DateClientParam maps to two index tables (Date without timezone info and DateTime
-        // with timezone info). Any data field in any resource will only have index records in one
-        // of the two tables. So we simply sort by both in the SQL query.
-        is DateClientParam ->
-          listOf(SortTableInfo.DATE_SORT_TABLE_INFO, SortTableInfo.DATE_TIME_SORT_TABLE_INFO)
-        else -> throw NotImplementedError("Unhandled sort parameter of type ${sort::class}: $sort")
-      }
-    sortJoinStatement = ""
-
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-
-      sortJoinStatement +=
-        //  spotless:off
-      """
-      LEFT JOIN ${sortTableName.tableName} $tableAlias
-      ON a.resourceType = $tableAlias.resourceType AND a.resourceUuid = $tableAlias.resourceUuid AND $tableAlias.index_name = ?
-      """
-      //  spotless:on
-      sortArgs += sort.paramName
-    }
-
-    sortTableNames.forEachIndexed { index, sortTableName ->
-      val tableAlias = 'b' + index
-      sortOrderStatement +=
-        if (index == 0) {
-          """
-            ORDER BY $tableAlias.${sortTableName.columnName} ${order.sqlString}
-                    """
-            .trimIndent()
-        } else {
-          ", $tableAlias.${SortTableInfo.DATE_TIME_SORT_TABLE_INFO.columnName} ${order.sqlString}"
-        }
-    }
-  }
+  val (join, order) = getSortOrder(otherTable = "a")
+  val sortJoinStatement = join.query
+  val sortOrderStatement = order
+  val sortArgs = join.args
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
@@ -331,7 +433,7 @@ internal fun Search.getQuery(
         else ->
           //  spotless:off
         """ 
-        SELECT a.serializedResource
+        SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
         WHERE a.resourceType = ?

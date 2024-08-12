@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,6 +348,17 @@ internal abstract class LocalChangeDao {
     localChangeId: Long,
   ): List<LocalChangeResourceReferenceEntity>
 
+  @Query(
+    """
+        SELECT *
+        FROM LocalChangeResourceReferenceEntity
+        WHERE localChangeId IN (:localChangeId)
+    """,
+  )
+  abstract suspend fun getReferencesForLocalChanges(
+    localChangeId: List<Long>,
+  ): List<LocalChangeResourceReferenceEntity>
+
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   abstract suspend fun insertLocalChangeResourceReferences(
     resourceReferences: List<LocalChangeResourceReferenceEntity>,
@@ -401,7 +412,10 @@ internal abstract class LocalChangeDao {
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
     val referringLocalChangeIds =
       getLocalChangeReferencesWithValue(oldReferenceValue).map { it.localChangeId }.distinct()
-    val referringLocalChanges = getLocalChanges(referringLocalChangeIds)
+    val referringLocalChanges =
+      referringLocalChangeIds.chunked(SQLITE_LIMIT_MAX_VARIABLE_NUMBER).flatMap {
+        getLocalChanges(it)
+      }
 
     referringLocalChanges.forEach { existingLocalChangeEntity ->
       val updatedLocalChangeEntity =
@@ -487,6 +501,13 @@ internal abstract class LocalChangeDao {
 
   companion object {
     const val DEFAULT_ID_VALUE = 0L
+
+    /**
+     * Represents SQLite limit on the size of parameters that can be passed in an IN(..) query See
+     * https://issuetracker.google.com/issues/192284727 See https://www.sqlite.org/limits.html See
+     * https://github.com/google/android-fhir/issues/2559
+     */
+    const val SQLITE_LIMIT_MAX_VARIABLE_NUMBER = 999
   }
 }
 

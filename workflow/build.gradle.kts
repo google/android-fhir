@@ -1,6 +1,3 @@
-import Dependencies.forceGuava
-import Dependencies.forceHapiVersion
-import Dependencies.forceJacksonVersion
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
 
@@ -18,9 +15,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.workflow"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.workflow"
@@ -52,6 +49,7 @@ android {
         "META-INF/ASL2.0",
         "META-INF/ASL-2.0.txt",
         "META-INF/DEPENDENCIES",
+        "META-INF/INDEX.LIST",
         "META-INF/LGPL-3.0.txt",
         "META-INF/LICENSE",
         "META-INF/LICENSE.txt",
@@ -76,62 +74,67 @@ android {
 
 afterEvaluate { configureFirebaseTestLabForLibraries() }
 
-configurations {
-  all {
-    removeIncompatibleDependencies()
-    forceGuava()
-    forceHapiVersion()
-    forceJacksonVersion()
-  }
-}
+configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.AndroidxTest.workTestingRuntimeKtx)
   androidTestImplementation(Dependencies.jsonAssert)
-  androidTestImplementation(Dependencies.junit)
-  androidTestImplementation(Dependencies.truth)
   androidTestImplementation(Dependencies.xmlUnit)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.androidx.work.testing)
+  androidTestImplementation(libs.junit)
+  androidTestImplementation(libs.logback.android)
+  androidTestImplementation(libs.truth)
   androidTestImplementation(project(":workflow-testing"))
 
   api(Dependencies.HapiFhir.structuresR4) { exclude(module = "junit") }
   api(Dependencies.HapiFhir.guavaCaching)
 
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Cql.evaluator)
-  implementation(Dependencies.Cql.evaluatorFhirJackson)
   implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesAndroid)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesCore)
-  implementation(Dependencies.Kotlin.stdlib)
   implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
   implementation(Dependencies.androidFhirKnowledge)
   implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
+  implementation(libs.androidx.core)
+  implementation(libs.kotlin.stdlib)
+  implementation(libs.kotlinx.coroutines.android)
+  implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.opencds.cqf.fhir.cr)
+  implementation(libs.opencds.cqf.fhir.jackson)
 
-  testImplementation(Dependencies.AndroidxTest.core)
   testImplementation(Dependencies.jsonAssert)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
   testImplementation(Dependencies.xmlUnit)
+  testImplementation(libs.androidx.room.room)
+  testImplementation(libs.androidx.room.runtime)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.truth)
   testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
+
+  constraints {
+    Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
+      api(libName, constraints)
+      implementation(libName, constraints)
+    }
+  }
 }
 
 tasks.dokkaHtml.configure {
-  outputDirectory.set(file("../docs/${Releases.Workflow.artifactId}/${Releases.Workflow.version}"))
+  outputDirectory.set(
+    file("../docs/use/api/${Releases.Workflow.artifactId}/${Releases.Workflow.version}"),
+  )
   suppressInheritedMembers.set(true)
   dokkaSourceSets {
     named("main") {
-      moduleName.set(Releases.Workflow.artifactId)
+      moduleName.set(Releases.Workflow.name)
       moduleVersion.set(Releases.Workflow.version)
-      noAndroidSdkLink.set(false)
+      includes.from("Module.md")
       sourceLink {
         localDirectory.set(file("src/main/java"))
         remoteUrl.set(
