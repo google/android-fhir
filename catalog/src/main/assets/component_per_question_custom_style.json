@@ -3,7 +3,7 @@
   "item": [
     {
       "linkId": "1",
-      "text": "Question text custom style",
+      "text": "Question text",
       "type": "display",
       "extension": [
         {
@@ -19,50 +19,137 @@
             }
           ]
         }
-      ],
-      "item": [
+      ]
+    },
+    {
+      "linkId": "3",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
         {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-display-category",
-                    "code": "instructions"
-                  }
-                ]
-              }
+              "url": "question_text_view",
+              "valueString": "CustomStyle_3"
             }
-          ],
-          "linkId": "1.3",
-          "text": "Instructions custom style.",
-          "type": "display"
+          ]
         }
       ]
     },
     {
-      "linkId": "2",
-      "text": "Question text default style",
+      "linkId": "4",
+      "text": "Question text",
       "type": "display",
-      "item": [
+      "extension": [
         {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
           "extension": [
             {
-              "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-displayCategory",
-              "valueCodeableConcept": {
-                "coding": [
-                  {
-                    "system": "http://hl7.org/fhir/questionnaire-display-category",
-                    "code": "instructions"
-                  }
-                ]
-              }
+              "url": "question_text_view",
+              "valueString": "CustomStyle_4"
             }
-          ],
-          "linkId": "1.3",
-          "text": "Instructions default style.",
-          "type": "display"
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "5",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_5"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "linkId": "6",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_6"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "linkId": "7",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_7"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "linkId": "8",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_8"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "linkId": "9",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_9"
+            }
+          ]
+        }
+      ]
+    },
+
+    {
+      "linkId": "10",
+      "text": "Question text",
+      "type": "display",
+      "extension": [
+        {
+          "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
+          "extension": [
+            {
+              "url": "question_text_view",
+              "valueString": "CustomStyle_10"
+            }
+          ]
         }
       ]
     }

@@ -119,16 +119,153 @@
         <item
             name="questionnaire_textAppearance"
         >@style/CustomTextAppearance_1</item>
-        <item
+                <item
             name="questionnaire_background"
-        >?attr/colorTertiaryContainer</item>
+        >@color/custom_style_primary_100</item>
+
     </style>
 
     <style
         name="CustomTextAppearance_1"
+        parent="TextAppearance.Material3.DisplayLarge"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_100</item>
+    </style>
+
+    <style name="CustomStyle_3">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_3</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_100</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_3"
+        parent="TextAppearance.Material3.DisplayMedium"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_100</item>
+    </style>
+
+    <style name="CustomStyle_4">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_4</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_200</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_4"
+        parent="TextAppearance.Material3.DisplaySmall"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_200</item>
+    </style>
+
+    <style name="CustomStyle_5">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_5</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_300</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_5"
         parent="TextAppearance.Material3.HeadlineLarge"
     >
-        <item name="android:textColor">?attr/colorOnTertiaryContainer</item>
+        <item name="android:textColor">@color/custom_style_on_primary_300</item>
+    </style>
+
+    <style name="CustomStyle_6">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_6</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_400</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_6"
+        parent="TextAppearance.Material3.HeadlineMedium"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_400</item>
+    </style>
+
+    <style name="CustomStyle_7">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_7</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_500</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_7"
+        parent="TextAppearance.Material3.HeadlineSmall"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_500</item>
+    </style>
+
+    <style name="CustomStyle_8">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_8</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_600</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_8"
+        parent="TextAppearance.Material3.LabelLarge"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_600</item>
+    </style>
+
+    <style name="CustomStyle_9">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_9</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_700</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_9"
+        parent="TextAppearance.Material3.LabelMedium"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_700</item>
+    </style>
+
+    <style name="CustomStyle_10">
+        <item
+            name="questionnaire_textAppearance"
+        >@style/CustomTextAppearance_10</item>
+        <item
+            name="questionnaire_background"
+        >@color/custom_style_primary_800</item>
+
+    </style>
+
+    <style
+        name="CustomTextAppearance_10"
+        parent="TextAppearance.Material3.LabelMedium"
+    >
+        <item name="android:textColor">@color/custom_style_on_primary_800</item>
     </style>
 
     <style name="CustomStyle_2">

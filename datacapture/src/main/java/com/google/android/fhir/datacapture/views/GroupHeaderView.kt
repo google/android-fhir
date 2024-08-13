@@ -72,7 +72,7 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
           StyleUrl.QUESTION_TEXT_VIEW,
         ),
       defaultStyleResId =
-        getStyleResIdFromAttribute(context, R.attr.questionnaireQuestionTextStyle),
+        getStyleResIdFromAttribute(context, R.attr.questionnaireGroupTypeQuestionTextStyle),
     )
     applyCustomOrDefaultStyle(
       context = hint.context,
