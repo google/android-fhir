@@ -23,15 +23,12 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.StyleUrl
 import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.readCustomStyleExtension
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
-import getStyleResIdFromAttribute
 
 /**
  * Generic view for the prefix, question, and hint as the header of a group using a view holder of
@@ -64,25 +61,6 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
     visibility = getHeaderViewVisibility(prefix, question, hint)
-    applyCustomOrDefaultStyle(
-      context = question.context,
-      view = question,
-      customStyleName =
-        questionnaireViewItem.questionnaireItem.readCustomStyleExtension(
-          StyleUrl.QUESTION_TEXT_VIEW,
-        ),
-      defaultStyleResId =
-        getStyleResIdFromAttribute(context, R.attr.questionnaireGroupTypeQuestionTextStyle),
-    )
-    applyCustomOrDefaultStyle(
-      context = hint.context,
-      view = hint,
-      customStyleName =
-        questionnaireViewItem.questionnaireItem.readCustomStyleExtension(
-          StyleUrl.SUBTITLE_TEXT_VIEW,
-        ),
-      defaultStyleResId =
-        getStyleResIdFromAttribute(context, R.attr.questionnaireSubtitleTextStyle),
-    )
+    applyCustomOrDefaultStyle(questionnaireViewItem.questionnaireItem, question, hint)
   }
 }

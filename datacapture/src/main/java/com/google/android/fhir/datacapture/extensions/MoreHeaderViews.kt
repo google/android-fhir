@@ -104,3 +104,30 @@ fun appendAsteriskToQuestionText(
     }
   }
 }
+
+internal fun applyCustomOrDefaultStyle(
+  questionnaireItem: Questionnaire.QuestionnaireItemComponent,
+  questionTextView: TextView,
+  instructionTextView: TextView,
+) {
+  applyCustomOrDefaultStyle(
+    context = questionTextView.context,
+    view = questionTextView,
+    customStyleName =
+      questionnaireItem.readCustomStyleExtension(
+        StyleUrl.QUESTION_TEXT_VIEW,
+      ),
+    defaultStyleResId =
+      getStyleResIdFromAttribute(questionTextView.context, R.attr.questionnaireQuestionTextStyle),
+  )
+  applyCustomOrDefaultStyle(
+    context = instructionTextView.context,
+    view = instructionTextView,
+    customStyleName =
+      questionnaireItem.readCustomStyleExtension(
+        StyleUrl.SUBTITLE_TEXT_VIEW,
+      ),
+    defaultStyleResId =
+      getStyleResIdFromAttribute(questionTextView.context, R.attr.questionnaireSubtitleTextStyle),
+  )
+}
