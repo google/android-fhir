@@ -56,7 +56,6 @@ data class DataCaptureConfig(
   var questionnaireItemViewHolderFactoryMatchersProviderFactory:
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
-  val questionnaireItemViewStyleResolver: QuestionnaireItemViewStyleResolver? = null,
 ) {
 
   /**
@@ -114,16 +113,4 @@ interface UrlResolver {
  */
 fun interface QuestionnaireItemViewHolderFactoryMatchersProviderFactory {
   fun get(provider: String): QuestionnaireItemViewHolderFactoryMatchersProvider
-}
-
-/** Functional interface for resolving the style resource associated with a given style name. */
-fun interface QuestionnaireItemViewStyleResolver {
-
-  /**
-   * Returns the style resource ID for the given style name.
-   *
-   * @param style The name of the style to resolve.
-   * @return The resource ID of the style.
-   */
-  fun getStyleResource(style: String): Int
 }

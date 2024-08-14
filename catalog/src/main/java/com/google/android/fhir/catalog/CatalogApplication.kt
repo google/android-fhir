@@ -39,17 +39,11 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
 
     FhirEngineProvider.init(FhirEngineConfiguration())
 
-    val styleMap =
-      mapOf(
-        "CustomStyle_1" to R.style.CustomStyle_1,
-        "CustomStyle_2" to R.style.CustomStyle_2,
-      )
     dataCaptureConfig =
       DataCaptureConfig(
         xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } },
         questionnaireItemViewHolderFactoryMatchersProviderFactory =
           ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory,
-        questionnaireItemViewStyleResolver = { styleMap[it]!! },
       )
 
     CoroutineScope(Dispatchers.IO).launch {
