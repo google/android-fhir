@@ -65,7 +65,12 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)
-    applyCustomOrDefaultStyle(questionnaireViewItem.questionnaireItem, question, hint)
+    applyCustomOrDefaultStyle(
+      questionnaireViewItem.questionnaireItem,
+      prefixTextView = prefix,
+      questionTextView = question,
+      instructionTextView = hint,
+    )
   }
 
   /**

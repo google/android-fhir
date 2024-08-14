@@ -61,6 +61,11 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
     visibility = getHeaderViewVisibility(prefix, question, hint)
-    applyCustomOrDefaultStyle(questionnaireViewItem.questionnaireItem, question, hint)
+    applyCustomOrDefaultStyle(
+      questionnaireViewItem.questionnaireItem,
+      prefixTextView = prefix,
+      questionTextView = question,
+      instructionTextView = hint,
+    )
   }
 }

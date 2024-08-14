@@ -79,6 +79,10 @@ With this change, you can apply individual custom styles per question item. If a
     {
       "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
       "extension": [
+         {
+            "url": "prefix_text_view",
+            "valueString": "CustomStyle_1"
+         },
         {
           "url": "question_text_view",
           "valueString": "CustomStyle_1"
@@ -98,6 +102,7 @@ With this change, you can apply individual custom styles per question item. If a
 It identifies extensions for applying the custom style to a given questionnaire item.
 
 ### Question Item View
+* `prefix_text_view`: Used to show the prefix value of the question item.
 * `question_text_view`: Used to show the text value of the question item.
 * `subtitle_text_view`: Used to show the instructions of the question item.
   For more information about supported views, please see the [link](https://github.com/google/android-fhir/pull/2636/files#diff-5497e7116b552983c2c9c53cb4a1bab919ef972747ec326bc71bcec734a26ddaR64).
@@ -105,7 +110,7 @@ It identifies extensions for applying the custom style to a given questionnaire 
 ### Custom Style Values
 In the above example:
 
-`CustomStyle_1` is the custom style for question_text_view.
+`CustomStyle_1` is the custom style for prefix_text_view and question_text_view.
 `CustomStyle_2` is the custom style for subtitle_text_view.
 Both styles are defined in the application.
 
@@ -157,6 +162,10 @@ The above custom styles are defined in the `res/values/styles.xml` of the applic
         {
           "url": "https://github.com/google/android-fhir/tree/master/datacapture/android-style",
           "extension": [
+            {
+              "url": "prefix_text_view",
+              "valueString": "CustomStyle_1"
+            },
             {
               "url": "question_text_view",
               "valueString": "CustomStyle_1"

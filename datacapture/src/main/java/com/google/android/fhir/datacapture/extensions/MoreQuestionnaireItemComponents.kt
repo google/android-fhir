@@ -63,6 +63,7 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
 
 internal enum class StyleUrl(val url: String) {
   BASE("https://github.com/google/android-fhir/tree/master/datacapture/android-style"),
+  PREFIX_TEXT_VIEW("prefix_text_view"),
   QUESTION_TEXT_VIEW("question_text_view"),
   SUBTITLE_TEXT_VIEW("subtitle_text_view"),
 }
