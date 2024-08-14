@@ -23,6 +23,9 @@ import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Expression
 import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
+import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
+import org.hl7.fhir.r4.model.QuestionnaireResponse
+import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -160,6 +163,68 @@ enum class EntryMode(val value: String) {
   ;
 
   companion object {
-    fun from(type: String?): EntryMode? = values().find { it.value == type }
+    fun from(type: String?): EntryMode? = entries.find { it.value == type }
+  }
+}
+
+/**
+ * Applies `forEach` on each questionnaire item and questionnaire response item pair in the
+ * questionnaire and the given `questionnaireResponse`.
+ *
+ * Questionnaire items and questionnaire response items are visited in pre-order.
+ *
+ * Items nested under repeated groups and repeated questions will be repeated for each repeated
+ * group instance or answer provided by the user.
+ *
+ * Note: use this function only with a questionnaire response that has been packed using
+ * [QuestionnaireResponse.packRepeatedGroups].
+ */
+internal suspend fun Questionnaire.forEachItemPair(
+  questionnaireResponse: QuestionnaireResponse,
+  forEach:
+    suspend (
+      questionnaireItem: QuestionnaireItemComponent,
+      questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    ) -> Unit,
+) {
+  forEachItemPair(item, questionnaireResponse.item, forEach)
+}
+
+private suspend fun forEachItemPair(
+  questionnaireItems: List<QuestionnaireItemComponent>,
+  questionnaireResponseItems: List<QuestionnaireResponseItemComponent>,
+  forEach:
+    suspend (
+      questionnaireItem: QuestionnaireItemComponent,
+      questionnaireResponseItem: QuestionnaireResponseItemComponent,
+    ) -> Unit,
+) {
+  require(questionnaireItems.size == questionnaireResponseItems.size)
+  questionnaireItems.zip(questionnaireResponseItems).forEach {
+    (questionnaireItem, questionnaireResponseItem) ->
+    require(questionnaireItem.linkId == questionnaireResponseItem.linkId)
+
+    // Apply forEach on the current questionnaire item and questionnaire response item
+    forEach(questionnaireItem, questionnaireResponseItem)
+
+    // For non-repeated groups, simply match the child questionnaire items with child questionnaire
+    // response items.
+    if (
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        !questionnaireItem.repeats &&
+        questionnaireItem.item.isNotEmpty()
+    ) {
+      forEachItemPair(questionnaireItem.item, questionnaireResponseItem.item, forEach)
+    }
+
+    // The following block handles two separate cases:
+    // 1. questionnaire items nested under repeated group are repeated for each instance of the
+    // repeated group, each represented as an answer components in the questionnaire response item.
+    // 2. questionnaire items nested directly under question are repeated for each answer.
+    if (questionnaireItem.repeats && questionnaireItem.item.isNotEmpty()) {
+      questionnaireResponseItem.answer.forEach {
+        forEachItemPair(questionnaireItem.item, it.item, forEach)
+      }
+    }
   }
 }
