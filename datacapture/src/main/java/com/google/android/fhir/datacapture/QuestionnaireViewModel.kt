@@ -422,7 +422,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * might not contain answers to unanswered or disabled questions. Note : this only applies to
    * [QuestionnaireItemComponent]s nested under a group.
    */
-  private fun addMissingResponseItems(
+  @VisibleForTesting
+  internal fun addMissingResponseItems(
     questionnaireItems: List<QuestionnaireItemComponent>,
     responseItems: MutableList<QuestionnaireResponseItemComponent>,
   ) {
@@ -445,6 +446,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItems = it.item,
             responseItems = responseItemMap[it.linkId]!!.single().item,
           )
+        }
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && it.repeats) {
+          responseItemMap[it.linkId]!!.forEach { rItem ->
+            addMissingResponseItems(
+              questionnaireItems = it.item,
+              responseItems = rItem.item,
+            )
+          }
         }
         responseItems.addAll(responseItemMap[it.linkId]!!)
       }
