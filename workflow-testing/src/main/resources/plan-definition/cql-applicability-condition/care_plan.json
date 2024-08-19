@@ -1,9 +1,9 @@
 {
   "resourceType": "CarePlan",
-  "id": "17",
+  "id": "Plan-Definition-Example",
   "contained": [ {
     "resourceType": "RequestGroup",
-    "id": "17",
+    "id": "Plan-Definition-Example",
     "instantiatesCanonical": [ "http://example.com/PlanDefinition/Plan-Definition-Example" ],
     "status": "draft",
     "intent": "proposal",
@@ -20,15 +20,15 @@
         }
       } ],
       "resource": {
-        "reference": "Task/16"
+        "reference": "Task/Activity-Example"
       }
     } ]
   }, {
     "resourceType": "Task",
-    "id": "16",
+    "id": "Activity-Example",
     "instantiatesCanonical": "http://example.com/ActivityDefinition/Activity-Example",
     "basedOn": [ {
-      "reference": "RequestGroup/17"
+      "reference": "RequestGroup/Plan-Definition-Example"
     } ],
     "status": "draft",
     "intent": "proposal",
@@ -45,7 +45,7 @@
   },
   "activity": [ {
     "reference": {
-      "reference": "#RequestGroup/17"
+      "reference": "#RequestGroup/Plan-Definition-Example"
     }
   } ]
 }

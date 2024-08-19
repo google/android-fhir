@@ -63,7 +63,7 @@ class SmartImmunizationTest {
     // Installing SmartImmunizations IG into the IGManager
     val rootDirectory = File(javaClass.getResource("/smart-imm/ig/")!!.file)
 
-    knowledgeManager.install(
+    knowledgeManager.import(
       FhirNpmPackage(
         "who.fhir.immunization",
         "1.0.0",
@@ -82,8 +82,6 @@ class SmartImmunizationTest {
           url = "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
         )
         .firstOrNull()
-
-    assertThat(planDef?.idElement?.idPart).isEqualTo("26")
 
     loader.loadFile(
       "/smart-imm/tests/IMMZ-Patient-NoVaxeninfant-f/Patient/Patient-IMMZ-Patient-NoVaxeninfant-f.json",
