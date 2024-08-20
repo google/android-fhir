@@ -1,11 +1,4 @@
 # This file lists people who get automatically added as Reviewers for Pull Requests.
-#
-# Note that we intentionally do NOT just include all committers here by using @google/android-fhir,
-# nor were we able to get it working using a group such as @google/android-fhir-reviewers;
-# details about why are described on https://github.com/google/android-fhir/issues/2320
-# and https://github.com/google/android-fhir/pull/2536.
-#
-# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 # These people for *ALL* Pull Requests:
 * @google/android-fhir-reviewers
