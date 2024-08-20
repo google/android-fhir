@@ -593,7 +593,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           QuestionnaireState(
             items = emptyList(),
             displayMode = DisplayMode.InitMode,
-            bottomNavItems = emptyList(),
+            bottomNavItem = null,
           ),
       )
 
@@ -743,8 +743,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               QuestionnaireNavigationViewUIState.Hidden
             },
         )
-      val bottomNavigationItems =
-        listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationViewState))
+      val bottomNavigationItems = QuestionnaireAdapterItem.Navigation(bottomNavigationViewState)
 
       return QuestionnaireState(
         items =
@@ -758,8 +757,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             showEditButton = !isReadOnly,
             showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
-        bottomNavItems =
-          if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
+        bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else null,
       )
     }
 
@@ -833,8 +831,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             QuestionnaireNavigationViewUIState.Hidden
           },
       )
-    val bottomNavigationItems =
-      listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState))
+    val bottomNavigationItems = QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState)
 
     return QuestionnaireState(
       items =
@@ -844,7 +841,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           questionnaireItemViewItems
         },
       displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
-      bottomNavItems = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
+      bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else null,
     )
   }
 
@@ -1136,7 +1133,7 @@ typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, Questionnaire
 internal data class QuestionnaireState(
   val items: List<QuestionnaireAdapterItem>,
   val displayMode: DisplayMode,
-  val bottomNavItems: List<QuestionnaireAdapterItem.Navigation>,
+  val bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 )
 
 internal sealed class DisplayMode {
