@@ -54,6 +54,18 @@ internal fun applyCustomOrDefaultStyle(
   }
 }
 
+/**
+ * Applies the default style to the given view if the default style has not already been applied.
+ *
+ * This function checks the `view`'s tag to determine if a style has been previously applied. If the
+ * tag is an integer, it will apply the default style specified by `defaultStyleResId`. After
+ * applying the style, it resets the view's tag to `null` to indicate that the default style has
+ * been applied.
+ *
+ * @param context The context used to access resources and themes.
+ * @param view The view to which the default style will be applied.
+ * @param defaultStyleResId The resource ID of the default style to apply.
+ */
 private fun applyDefaultStyleIfNotApplied(
   context: Context,
   view: View,
