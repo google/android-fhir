@@ -29,7 +29,8 @@ import com.google.android.fhir.datacapture.R
  *
  * If the custom style resource name is valid, it applies the custom style to the view. If the
  * custom style resource name is not valid or not found, it falls back to applying the default style
- * defined by the given style resource ID.
+ * defined by the given style resource ID. It sets the view's tag to resourceId to indicate that the
+ * custom style has been applied.
  *
  * @param context the context used to access resources.
  * @param view the view to which the style should be applied.
