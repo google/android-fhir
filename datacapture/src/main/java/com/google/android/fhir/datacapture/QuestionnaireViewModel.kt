@@ -743,12 +743,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               QuestionnaireNavigationViewUIState.Hidden
             },
         )
-      val bottomNavigationItems = QuestionnaireAdapterItem.Navigation(bottomNavigationViewState)
+      val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationViewState)
 
       return QuestionnaireState(
         items =
           if (shouldSetNavigationInLongScroll) {
-            questionnaireItemViewItems + bottomNavigationItems
+            questionnaireItemViewItems + bottomNavigation
           } else {
             questionnaireItemViewItems
           },
@@ -757,7 +757,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             showEditButton = !isReadOnly,
             showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
-        bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else null,
+        bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
       )
     }
 
@@ -831,17 +831,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             QuestionnaireNavigationViewUIState.Hidden
           },
       )
-    val bottomNavigationItems = QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState)
+    val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState)
 
     return QuestionnaireState(
       items =
         if (shouldSetNavigationInLongScroll) {
-          questionnaireItemViewItems + bottomNavigationItems
+          questionnaireItemViewItems + bottomNavigation
         } else {
           questionnaireItemViewItems
         },
       displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
-      bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else null,
+      bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
     )
   }
 
