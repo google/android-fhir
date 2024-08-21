@@ -290,11 +290,24 @@ internal class DatabaseImpl(
       val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
+      /**
+       * Update LocalChange records and identify referring resources.
+       *
+       * We need to update LocalChange records first because they might contain references to the
+       * old resource ID that are not readily searchable or present in the latest version of the
+       * [ResourceEntity] itself. The [LocalChangeResourceReferenceEntity] table helps us identify
+       * these [LocalChangeEntity] records accurately.
+       *
+       * Once LocalChange records are updated, we can then safely update the corresponding
+       * ResourceEntity records to ensure data consistency. Hence, we obtain the
+       * [ResourceEntity.resourceUuid]s of the resources from the updated LocalChangeEntity records
+       * and use them in the next step.
+       */
       val uuidsOfReferringResources =
-        updateLocalChangeResourceIdAndReferences(
+        localChangeDao.updateResourceIdAndReferences(
           resourceUuid = resourceUuid,
           oldResource = oldResource,
-          updatedResource = updatedResource,
+          updatedResourceId = updatedResource.logicalId,
         )
 
       updateReferringResources(
@@ -311,25 +324,6 @@ internal class DatabaseImpl(
    */
   private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
     resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
-
-  /**
-   * Update the [LocalChange]s to reflect the change in the resource ID. This primarily includes
-   * modifying the [LocalChange.resourceId] for the changes of the affected resource. Also, update
-   * any references in the [LocalChange] which refer to the affected resource.
-   *
-   * The function returns a [List<[UUID]>] which corresponds to the [ResourceEntity.resourceUuid]
-   * which contain references to the affected resource.
-   */
-  private suspend fun updateLocalChangeResourceIdAndReferences(
-    resourceUuid: UUID,
-    oldResource: Resource,
-    updatedResource: Resource,
-  ) =
-    localChangeDao.updateResourceIdAndReferences(
-      resourceUuid = resourceUuid,
-      oldResource = oldResource,
-      updatedResource = updatedResource,
-    )
 
   /**
    * Update all [Resource] and their corresponding [ResourceEntity] which refer to the affected
