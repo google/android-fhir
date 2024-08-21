@@ -838,7 +838,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         if (shouldSetNavigationInLongScroll) {
           questionnaireItemViewItems + bottomNavigation
         } else {
-          
           questionnaireItemViewItems
         },
       displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
