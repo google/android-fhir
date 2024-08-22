@@ -87,6 +87,9 @@ sealed class CurrentSyncJobStatus {
 
   /** State indicating that the synchronization operation is canceled. */
   object Cancelled : CurrentSyncJobStatus()
+
+  /** State indicating that the synchronization operation is blocked. */
+  data object Blocked : CurrentSyncJobStatus()
 }
 
 /**

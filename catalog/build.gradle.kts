@@ -8,11 +8,11 @@ configureRuler()
 
 android {
   namespace = "com.google.android.fhir.catalog"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
     applicationId = Releases.Catalog.applicationId
-    minSdk = Sdk.minSdk
-    targetSdk = Sdk.targetSdk
+    minSdk = Sdk.MIN_SDK
+    targetSdk = Sdk.TARGET_SDK
     versionCode = Releases.Catalog.versionCode
     versionName = Releases.Catalog.versionName
     testInstrumentationRunner = Dependencies.androidJunitRunner
@@ -41,24 +41,24 @@ android {
 }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.Espresso.espressoCore)
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.material)
-  implementation(Dependencies.Kotlin.stdlib)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.androidx.navigation.fragment)
   implementation(libs.androidx.navigation.ui)
+  implementation(libs.kotlin.stdlib)
 
   implementation(project(path = ":datacapture"))
   implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
   implementation(project(path = ":contrib:locationwidget"))
 
-  testImplementation(Dependencies.junit)
+  testImplementation(libs.junit)
 }

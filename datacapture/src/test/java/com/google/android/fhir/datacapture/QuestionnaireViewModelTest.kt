@@ -52,8 +52,8 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
 import com.google.android.fhir.datacapture.extensions.asStringValue
+import com.google.android.fhir.datacapture.extensions.createNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.entryMode
-import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.maxValue
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
@@ -997,8 +997,8 @@ class QuestionnaireViewModelTest {
             """
         .trimIndent()
 
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
-    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = questionnaireString
+    state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] = questionnaireResponseString
     val viewModel = QuestionnaireViewModel(context, state)
     runTest {
       val value = viewModel.getQuestionnaireResponse()
@@ -1125,8 +1125,8 @@ class QuestionnaireViewModelTest {
             """
         .trimIndent()
 
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
-    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = questionnaireString
+    state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] = questionnaireResponseString
     val viewModel = QuestionnaireViewModel(context, state)
     runTest {
       val value = viewModel.getQuestionnaireResponse()
@@ -1321,7 +1321,7 @@ class QuestionnaireViewModelTest {
       }
 
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = serializedQuestionnaire
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -1346,7 +1346,7 @@ class QuestionnaireViewModelTest {
         )
       }
     val serializedQuestionnaire = printer.encodeResourceToString(questionnaire)
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, serializedQuestionnaire)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = serializedQuestionnaire
 
     val viewModel = QuestionnaireViewModel(context, state)
     viewModel.runViewModelBlocking {
@@ -1987,11 +1987,8 @@ class QuestionnaireViewModelTest {
         )
 
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navReview
-            .isShown,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -2240,11 +2237,8 @@ class QuestionnaireViewModelTest {
           ),
         )
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navSubmit
-            .isShown,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navSubmit
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -2360,11 +2354,8 @@ class QuestionnaireViewModelTest {
           ),
         )
       assertThat(
-          questionnaireState1.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navSubmit
-            .isShown,
+          questionnaireState1.bottomNavItem!!.questionnaireNavigationUIState.navSubmit
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
 
@@ -2382,11 +2373,8 @@ class QuestionnaireViewModelTest {
           ),
         )
       assertThat(
-          questionnaireState2.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navSubmit
-            .isShown,
+          questionnaireState2.bottomNavItem!!.questionnaireNavigationUIState.navSubmit
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -2414,13 +2402,10 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
       val questionnaireState = viewModel.questionnaireStateFlow.first()
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navReview
-            .isShown,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
+            is QuestionnaireNavigationViewUIState.Hidden,
         )
-        .isFalse()
+        .isTrue()
     }
   }
 
@@ -2445,13 +2430,10 @@ class QuestionnaireViewModelTest {
         )
       val questionnaireState = viewModel.questionnaireStateFlow.first()
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navReview
-            .isShown,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
+            is QuestionnaireNavigationViewUIState.Hidden,
         )
-        .isFalse()
+        .isTrue()
     }
   }
 
@@ -2471,11 +2453,8 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       val questionnaireState = viewModel.questionnaireStateFlow.first()
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navReview
-            .isShown,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navReview
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -2580,13 +2559,11 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItems
-              .single()
+            viewModel.questionnaireStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
-              .navReview
-              .isShown,
+              .navReview is QuestionnaireNavigationViewUIState.Hidden,
           )
-          .isFalse()
+          .isTrue()
       }
     }
 
@@ -2629,13 +2606,11 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = false)
       viewModel.runViewModelBlocking {
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItems
-              .single()
+            viewModel.questionnaireStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
-              .navReview
-              .isShown,
+              .navReview is QuestionnaireNavigationViewUIState.Hidden,
           )
-          .isFalse()
+          .isTrue()
       }
     }
 
@@ -2678,11 +2653,9 @@ class QuestionnaireViewModelTest {
       viewModel.runViewModelBlocking {
         viewModel.goToNextPage()
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItems
-              .single()
+            viewModel.questionnaireStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
-              .navReview
-              .isShown,
+              .navReview is QuestionnaireNavigationViewUIState.Enabled,
           )
           .isTrue()
       }
@@ -2727,11 +2700,9 @@ class QuestionnaireViewModelTest {
       val viewModel = createQuestionnaireViewModel(questionnaire, enableReviewPage = true)
       viewModel.runViewModelBlocking {
         assertThat(
-            viewModel.questionnaireStateFlow.value.bottomNavItems
-              .single()
+            viewModel.questionnaireStateFlow.value.bottomNavItem!!
               .questionnaireNavigationUIState
-              .navReview
-              .isShown,
+              .navReview is QuestionnaireNavigationViewUIState.Enabled,
           )
           .isTrue()
       }
@@ -2755,11 +2726,9 @@ class QuestionnaireViewModelTest {
       assertThat(
           viewModel.questionnaireStateFlow
             .first()
-            .bottomNavItems
-            .single()
+            .bottomNavItem!!
             .questionnaireNavigationUIState
-            .navReview
-            .isShown,
+            .navReview is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -2795,7 +2764,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-linkId"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
@@ -2849,7 +2818,7 @@ class QuestionnaireViewModelTest {
       Questionnaire().apply {
         id = "a-questionnaire"
         addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
+          QuestionnaireItemComponent().apply {
             linkId = "a-linkId"
             type = Questionnaire.QuestionnaireItemType.BOOLEAN
           },
@@ -2889,13 +2858,11 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navSubmit
-          .isShown,
+          .navSubmit is QuestionnaireNavigationViewUIState.Hidden,
       )
-      .isFalse()
+      .isTrue()
   }
 
   @Test
@@ -2914,11 +2881,9 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navSubmit
-          .isShown,
+          .navSubmit is QuestionnaireNavigationViewUIState.Enabled,
       )
       .isTrue()
   }
@@ -2939,11 +2904,9 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navSubmit
-          .isShown,
+          .navSubmit is QuestionnaireNavigationViewUIState.Enabled,
       )
       .isTrue()
   }
@@ -2970,13 +2933,11 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navCancel
-          .isShown,
+          .navCancel is QuestionnaireNavigationViewUIState.Hidden,
       )
-      .isFalse()
+      .isTrue()
   }
 
   @Test
@@ -2995,11 +2956,9 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navCancel
-          .isShown,
+          .navCancel is QuestionnaireNavigationViewUIState.Enabled,
       )
       .isTrue()
   }
@@ -3020,13 +2979,11 @@ class QuestionnaireViewModelTest {
     assertThat(
         viewModel.questionnaireStateFlow
           .first()
-          .bottomNavItems
-          .single()
+          .bottomNavItem!!
           .questionnaireNavigationUIState
-          .navCancel
-          .isShown,
+          .navCancel is QuestionnaireNavigationViewUIState.Hidden,
       )
-      .isFalse()
+      .isTrue()
   }
 
   @Test
@@ -3068,13 +3025,11 @@ class QuestionnaireViewModelTest {
       assertThat(
           viewModel.questionnaireStateFlow
             .first()
-            .bottomNavItems
-            .single()
+            .bottomNavItem!!
             .questionnaireNavigationUIState
-            .navCancel
-            .isShown,
+            .navCancel is QuestionnaireNavigationViewUIState.Hidden,
         )
-        .isFalse()
+        .isTrue()
     }
 
   @Test
@@ -3116,11 +3071,9 @@ class QuestionnaireViewModelTest {
       assertThat(
           viewModel.questionnaireStateFlow
             .first()
-            .bottomNavItems
-            .single()
+            .bottomNavItem!!
             .questionnaireNavigationUIState
-            .navCancel
-            .isShown,
+            .navCancel is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -3164,17 +3117,15 @@ class QuestionnaireViewModelTest {
       assertThat(
           viewModel.questionnaireStateFlow
             .first()
-            .bottomNavItems
-            .single()
+            .bottomNavItem!!
             .questionnaireNavigationUIState
-            .navCancel
-            .isShown,
+            .navCancel is QuestionnaireNavigationViewUIState.Hidden,
         )
-        .isFalse()
+        .isTrue()
     }
   // ==================================================================== //
   //                                                                      //
-  //                       Navigation in Long  Scroll                     //
+  //                       Navigation in Long Scroll                      //
   //                                                                      //
   // ==================================================================== //
 
@@ -3185,7 +3136,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-linkId"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -3193,11 +3144,15 @@ class QuestionnaireViewModelTest {
         }
       val viewModel = createQuestionnaireViewModel(questionnaire, showNavigationInLongScroll = true)
       val questionnaireState = viewModel.questionnaireStateFlow.first()
-      assertThat(questionnaireState.bottomNavItems.isEmpty()).isTrue()
+      assertThat(questionnaireState.bottomNavItem).isNull()
       assertThat(questionnaireState.items.last())
         .isInstanceOf(QuestionnaireAdapterItem.Navigation::class.java)
       val navigationItem = questionnaireState.items.last() as QuestionnaireAdapterItem.Navigation
-      assertThat(navigationItem.questionnaireNavigationUIState.navSubmit.isEnabled).isTrue()
+      assertThat(
+          navigationItem.questionnaireNavigationUIState.navSubmit
+            is QuestionnaireNavigationViewUIState.Enabled,
+        )
+        .isTrue()
     }
 
   fun `EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL not setting should not add navigation item to questionnaireState items`() =
@@ -3206,7 +3161,7 @@ class QuestionnaireViewModelTest {
         Questionnaire().apply {
           id = "a-questionnaire"
           addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
+            QuestionnaireItemComponent().apply {
               linkId = "a-linkId"
               type = Questionnaire.QuestionnaireItemType.BOOLEAN
             },
@@ -3216,13 +3171,9 @@ class QuestionnaireViewModelTest {
       val questionnaireState = viewModel.questionnaireStateFlow.first()
       assertThat(questionnaireState.items.map { it::class.java })
         .doesNotContain(QuestionnaireAdapterItem.Navigation::class.java)
-      assertThat(questionnaireState.bottomNavItems.isNotEmpty()).isTrue()
       assertThat(
-          questionnaireState.bottomNavItems
-            .single()
-            .questionnaireNavigationUIState
-            .navSubmit
-            .isEnabled,
+          questionnaireState.bottomNavItem!!.questionnaireNavigationUIState.navSubmit
+            is QuestionnaireNavigationViewUIState.Enabled,
         )
         .isTrue()
     }
@@ -3399,7 +3350,7 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -3444,7 +3395,7 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -3504,7 +3455,7 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
     val questionnaireResponse =
       QuestionnaireResponse().apply {
@@ -3530,10 +3481,8 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(
-      EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-      printer.encodeResourceToString(questionnaireResponse),
-    )
+    state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] =
+      printer.encodeResourceToString(questionnaireResponse)
 
     val viewModel = QuestionnaireViewModel(context, state)
 
@@ -4087,8 +4036,8 @@ class QuestionnaireViewModelTest {
             """
         .trimIndent()
 
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
-    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = questionnaireString
+    state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] = questionnaireResponseString
     val viewModel = QuestionnaireViewModel(context, state)
     runTest {
       val value = viewModel.getQuestionnaireResponse()
@@ -4185,8 +4134,8 @@ class QuestionnaireViewModelTest {
       """
         .trimIndent()
 
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, questionnaireString)
-    state.set(EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING, questionnaireResponseString)
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = questionnaireString
+    state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] = questionnaireResponseString
     val viewModel = QuestionnaireViewModel(context, state)
     viewModel.clearAllAnswers()
     runTest {
@@ -4332,7 +4281,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListA()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
         getQuestionnaireAdapterItemListB()
@@ -4343,7 +4292,7 @@ class QuestionnaireViewModelTest {
                 getQuestionnaireAdapterItemListB()
                   .asQuestion()
                   .questionnaireItem
-                  .getNestedQuestionnaireResponseItems()
+                  .createNestedQuestionnaireResponseItems()
             },
           )
       }
@@ -4563,6 +4512,93 @@ class QuestionnaireViewModelTest {
 
   // ==================================================================== //
   //                                                                      //
+  //                   Repeated Groups with Enable When                   //
+  //                                                                      //
+  // ==================================================================== //
+
+  // https://github.com/google/android-fhir/issues/2590
+  @Test
+  fun `should evaluate enable when with new questionnaire response items eg added repeated group`() =
+    runTest {
+      val questionnaire =
+        Questionnaire().apply {
+          id = "a-questionnaire"
+          addItem(
+            QuestionnaireItemComponent().apply {
+              linkId = "repeated-group"
+              type = Questionnaire.QuestionnaireItemType.GROUP
+              repeats = true
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "nested-1"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                },
+              )
+              addItem(
+                QuestionnaireItemComponent().apply {
+                  linkId = "nested-2"
+                  type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  addEnableWhen().apply {
+                    answer = BooleanType(true)
+                    question = "nested-1"
+                    operator = Questionnaire.QuestionnaireItemOperator.EQUAL
+                  }
+                },
+              )
+            },
+          )
+        }
+
+      val viewModel = createQuestionnaireViewModel(questionnaire)
+      viewModel.runViewModelBlocking {
+        viewModel.getQuestionnaireItemViewItemList().single().asQuestion().apply {
+          this.answersChangedCallback(
+            this.questionnaireItem,
+            this.getQuestionnaireResponseItem(),
+            listOf(
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
+            ),
+            null,
+          )
+        }
+
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .filterIsInstance<QuestionnaireAdapterItem.Question>()
+              .map { it.asQuestion().questionnaireItem.linkId },
+          )
+          .containsExactly("repeated-group", "nested-1")
+
+        viewModel
+          .getQuestionnaireItemViewItemList()
+          .first { it.asQuestionOrNull()?.questionnaireItem?.linkId == "nested-1" }
+          .asQuestion()
+          .apply {
+            this.answersChangedCallback(
+              this.questionnaireItem,
+              this.getQuestionnaireResponseItem(),
+              listOf(
+                QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                  this.value = valueBooleanType.setValue(true)
+                },
+              ),
+              null,
+            )
+          }
+
+        assertThat(
+            viewModel
+              .getQuestionnaireItemViewItemList()
+              .filterIsInstance<QuestionnaireAdapterItem.Question>()
+              .map { it.asQuestion().questionnaireItem.linkId },
+          )
+          .containsExactly("repeated-group", "nested-1", "nested-2")
+      }
+    }
+
+  // ==================================================================== //
+  //                                                                      //
   //                          Answer Value Sets                           //
   //                                                                      //
   // ==================================================================== //
@@ -4741,11 +4777,9 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
-    state.set(
-      EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP,
-      mapOf("patient" to printer.encodeResourceToString(patient)),
-    )
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
+    state[EXTRA_QUESTIONNAIRE_LAUNCH_CONTEXT_MAP] =
+      mapOf("patient" to printer.encodeResourceToString(patient))
 
     val viewModel = QuestionnaireViewModel(context, state)
     viewModel.runViewModelBlocking {
@@ -4799,7 +4833,7 @@ class QuestionnaireViewModelTest {
             },
           )
         }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
       val viewModel = QuestionnaireViewModel(context, state)
       viewModel.runViewModelBlocking {
@@ -4843,7 +4877,7 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
     val viewModel = QuestionnaireViewModel(context, state)
     val exception =
       assertThrows(IllegalStateException::class.java) {
@@ -4900,7 +4934,7 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
       val viewModel = QuestionnaireViewModel(context, state)
 
       viewModel.runViewModelBlocking {
@@ -4952,7 +4986,7 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
       val viewModel = QuestionnaireViewModel(context, state)
 
       viewModel.runViewModelBlocking {
@@ -5004,7 +5038,7 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
       val viewModel = QuestionnaireViewModel(context, state)
 
       viewModel.runViewModelBlocking {
@@ -5055,7 +5089,7 @@ class QuestionnaireViewModelTest {
           )
         }
 
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
       val viewModel = QuestionnaireViewModel(context, state)
 
       viewModel.runViewModelBlocking {
@@ -5074,6 +5108,7 @@ class QuestionnaireViewModelTest {
   //                 Answer Options Toggle Expression                     //
   //                                                                      //
   // ==================================================================== //
+
   @Test
   fun `only answer options evaluating to true in answerOptionsToggleExpression occurrences should be enabled on initial load`() =
     runTest {
@@ -6795,7 +6830,7 @@ class QuestionnaireViewModelTest {
           },
         )
       }
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
     val viewModel = QuestionnaireViewModel(context, state)
     viewModel.runViewModelBlocking {
@@ -6845,7 +6880,7 @@ class QuestionnaireViewModelTest {
             },
           )
         }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
       val viewModel = QuestionnaireViewModel(context, state)
       viewModel.runViewModelBlocking {
@@ -6900,7 +6935,7 @@ class QuestionnaireViewModelTest {
             },
           )
         }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
       val viewModel = QuestionnaireViewModel(context, state)
       viewModel.runViewModelBlocking {
@@ -6955,7 +6990,7 @@ class QuestionnaireViewModelTest {
             },
           )
         }
-      state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+      state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
       val viewModel = QuestionnaireViewModel(context, state)
       viewModel.runViewModelBlocking {
@@ -7082,10 +7117,8 @@ class QuestionnaireViewModelTest {
       }
     }
 
-    state.set(
-      EXTRA_QUESTIONNAIRE_JSON_STRING,
-      printer.encodeResourceToString(questionnaire(emptyList())),
-    )
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] =
+      printer.encodeResourceToString(questionnaire(emptyList()))
 
     // empty initial value
     var viewModel = QuestionnaireViewModel(context, state)
@@ -7099,16 +7132,14 @@ class QuestionnaireViewModelTest {
     }
 
     // initial value is set to false
-    state.set(
-      EXTRA_QUESTIONNAIRE_JSON_STRING,
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] =
       printer.encodeResourceToString(
         questionnaire(
           listOf(
             Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(false) },
           ),
         ),
-      ),
-    )
+      )
 
     viewModel = QuestionnaireViewModel(context, state)
     var enabledDisplayItems: List<QuestionnaireItemComponent>
@@ -7123,16 +7154,14 @@ class QuestionnaireViewModelTest {
     }
 
     // initial value is set to true
-    state.set(
-      EXTRA_QUESTIONNAIRE_JSON_STRING,
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] =
       printer.encodeResourceToString(
         questionnaire(
           listOf(
             Questionnaire.QuestionnaireItemInitialComponent().apply { value = BooleanType(true) },
           ),
         ),
-      ),
-    )
+      )
 
     viewModel = QuestionnaireViewModel(context, state)
     viewModel.runViewModelBlocking {
@@ -7186,9 +7215,9 @@ class QuestionnaireViewModelTest {
 
       val job =
         this.launch {
-          viewModel.questionnaireStateFlow.collect {
+          viewModel.questionnaireStateFlow.collect { questionnaireState ->
             descriptionResponseItem =
-              it.items
+              questionnaireState.items
                 .find { it.asQuestion().questionnaireItem.linkId == "a-description" }!!
                 .asQuestion()
             this@launch.cancel()
@@ -7293,32 +7322,24 @@ class QuestionnaireViewModelTest {
     showCancelButton: Boolean? = null,
     showNavigationInLongScroll: Boolean = false,
   ): QuestionnaireViewModel {
-    state.set(EXTRA_QUESTIONNAIRE_JSON_STRING, printer.encodeResourceToString(questionnaire))
+    state[EXTRA_QUESTIONNAIRE_JSON_STRING] = printer.encodeResourceToString(questionnaire)
 
     questionnaireResponse?.let {
-      state.set(
-        EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING,
-        printer.encodeResourceToString(questionnaireResponse),
-      )
+      state[EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING] =
+        printer.encodeResourceToString(questionnaireResponse)
     }
-    enableReviewPage.let { state.set(EXTRA_ENABLE_REVIEW_PAGE, it) }
-    showReviewPageFirst.let { state.set(EXTRA_SHOW_REVIEW_PAGE_FIRST, it) }
-    readOnlyMode.let { state.set(EXTRA_READ_ONLY, it) }
-    showSubmitButton?.let { state.set(EXTRA_SHOW_SUBMIT_BUTTON, it) }
-    showCancelButton?.let { state.set(EXTRA_SHOW_CANCEL_BUTTON, it) }
-    showNavigationInLongScroll.let { state.set(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL, it) }
+    enableReviewPage.let { state[EXTRA_ENABLE_REVIEW_PAGE] = it }
+    showReviewPageFirst.let { state[EXTRA_SHOW_REVIEW_PAGE_FIRST] = it }
+    readOnlyMode.let { state[EXTRA_READ_ONLY] = it }
+    showSubmitButton?.let { state[EXTRA_SHOW_SUBMIT_BUTTON] = it }
+    showCancelButton?.let { state[EXTRA_SHOW_CANCEL_BUTTON] = it }
+    showNavigationInLongScroll.let { state[EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL] = it }
 
     return QuestionnaireViewModel(context, state)
   }
 
   private fun QuestionnaireViewModel.getQuestionnaireItemViewItemList() =
     questionnaireStateFlow.value.items
-
-  private fun QuestionnaireViewItem.getQuestionnaireResponseItem() =
-    ReflectionHelpers.getField<QuestionnaireResponse.QuestionnaireResponseItemComponent>(
-      this,
-      "questionnaireResponseItem",
-    )
 
   /**
    * Runs code that relies on the [QuestionnaireViewModel.viewModelScope]. Runs on
