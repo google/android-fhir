@@ -419,8 +419,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
    * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
    * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
-   * might not contain answers to unanswered or disabled questions. Note : this only applies to
-   * [QuestionnaireItemComponent]s nested under a group.
+   * might not contain answers to unanswered or disabled questions. This function should only be used for unpacked questionnaire.
    */
   @VisibleForTesting
   internal fun addMissingResponseItems(
