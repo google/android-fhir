@@ -419,10 +419,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
    * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
    * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
-   * might not contain answers to unanswered or disabled questions. Note : this only applies to
-   * [QuestionnaireItemComponent]s nested under a group.
+   * might not contain answers to unanswered or disabled questions. This function should only be
+   * used for unpacked questionnaire.
    */
-  private fun addMissingResponseItems(
+  @VisibleForTesting
+  internal fun addMissingResponseItems(
     questionnaireItems: List<QuestionnaireItemComponent>,
     responseItems: MutableList<QuestionnaireResponseItemComponent>,
   ) {
@@ -445,6 +446,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItems = it.item,
             responseItems = responseItemMap[it.linkId]!!.single().item,
           )
+        }
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && it.repeats) {
+          responseItemMap[it.linkId]!!.forEach { rItem ->
+            addMissingResponseItems(
+              questionnaireItems = it.item,
+              responseItems = rItem.item,
+            )
+          }
         }
         responseItems.addAll(responseItemMap[it.linkId]!!)
       }
