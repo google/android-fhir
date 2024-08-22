@@ -90,21 +90,28 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation): String {
-    if (this.size == 1) return first().condition
-    if (this.isEmpty()) return ""
+    if (this.size <= 1) {
+      return map {
+          if (it.params.size > 1) {
+            "(${it.condition})"
+          } else {
+            it.condition
+          }
+        }
+        .firstOrNull()
+        ?: ""
+    }
 
     val mid = this.size / 2
     val left = this.subList(0, mid).toQueryString(operation)
     val right = this.subList(mid, this.size).toQueryString(operation)
 
-    return when {
-        left.isNotBlank() && right.isNotBlank() -> "($left ${operation.logicalOperator} $right)"
-      left.isNotBlank() -> left
-      else -> right
-    }
-  }
-
-  companion object {
-    const val DEFAULT_CONDITION_PARAMS_CHUNK_SIZE = 50
+    return listOf(left, right)
+      .filter { it.isNotBlank() }
+      .joinToString(
+        separator = " ${operation.logicalOperator} ",
+        prefix = "(",
+        postfix = ")",
+      )
   }
 }
