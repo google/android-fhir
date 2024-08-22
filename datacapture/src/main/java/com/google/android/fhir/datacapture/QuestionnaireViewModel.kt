@@ -36,7 +36,7 @@ import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
-import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.forEachItemPair
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -594,23 +594,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           QuestionnaireState(
             items = emptyList(),
             displayMode = DisplayMode.InitMode,
-            bottomNavItems = emptyList(),
+            bottomNavItem = null,
           ),
       )
 
   /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
   private suspend fun initializeCalculatedExpressions() {
     expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-    val itemsToBeCalculated =
-      questionnaire.item.flattened().filter { qItem -> qItem.calculatedExpression != null }
-    itemsToBeCalculated.forEach { qItem ->
-      // TODO: Traverse the two trees in parallel and match based on the pairs, the current
-      // implementation does not work well with nested items and repeated groups
-      // https://github.com/google/android-fhir/issues/2618
-      val qrItem =
-        questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId }
-          ?: return@forEach
-      updateAnswerWithCalculatedExpression(qItem, qrItem)
+    questionnaire.forEachItemPair(questionnaireResponse) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      if (questionnaireItem.calculatedExpression != null) {
+        updateAnswerWithCalculatedExpression(questionnaireItem, questionnaireResponseItem)
+      }
     }
   }
 
@@ -748,13 +745,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               QuestionnaireNavigationViewUIState.Hidden
             },
         )
-      val bottomNavigationItems =
-        listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationViewState))
+      val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationViewState)
 
       return QuestionnaireState(
         items =
           if (shouldSetNavigationInLongScroll) {
-            questionnaireItemViewItems + bottomNavigationItems
+            questionnaireItemViewItems + bottomNavigation
           } else {
             questionnaireItemViewItems
           },
@@ -763,8 +759,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             showEditButton = !isReadOnly,
             showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
-        bottomNavItems =
-          if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
+        bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
       )
     }
 
@@ -852,18 +847,17 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             QuestionnaireNavigationViewUIState.Hidden
           },
       )
-    val bottomNavigationItems =
-      listOf(QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState))
+    val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState)
 
     return QuestionnaireState(
       items =
         if (shouldSetNavigationInLongScroll) {
-          questionnaireItemViewItems + bottomNavigationItems
+          questionnaireItemViewItems + bottomNavigation
         } else {
           questionnaireItemViewItems
         },
       displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
-      bottomNavItems = if (!shouldSetNavigationInLongScroll) bottomNavigationItems else emptyList(),
+      bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
     )
   }
 
@@ -1155,7 +1149,7 @@ typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, Questionnaire
 internal data class QuestionnaireState(
   val items: List<QuestionnaireAdapterItem>,
   val displayMode: DisplayMode,
-  val bottomNavItems: List<QuestionnaireAdapterItem.Navigation>,
+  val bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 )
 
 internal sealed class DisplayMode {
