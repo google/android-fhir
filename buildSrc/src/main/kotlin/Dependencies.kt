@@ -19,14 +19,6 @@ import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.kotlin.dsl.exclude
 
 object Dependencies {
-  object Cql {
-    const val evaluator = "org.opencds.cqf.fhir:cqf-fhir-cr:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirJackson =
-      "org.opencds.cqf.fhir:cqf-fhir-jackson:${Versions.Cql.clinicalReasoning}"
-    const val evaluatorFhirUtilities =
-      "org.opencds.cqf.fhir:cqf-fhir-utility:${Versions.Cql.clinicalReasoning}"
-  }
-
   object HapiFhir {
     const val fhirBaseModule = "ca.uhn.hapi.fhir:hapi-fhir-base"
     const val fhirClientModule = "ca.uhn.hapi.fhir:hapi-fhir-client"
@@ -78,19 +70,6 @@ object Dependencies {
     const val jsr310Base = "$datatypeGroup:jackson-datatype-jsr310:${Versions.jackson}"
   }
 
-  object Kotlin {
-    const val kotlinCoroutinesAndroid =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val kotlinCoroutinesCore =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val kotlinTestJunit = "org.jetbrains.kotlin:kotlin-test-junit:${Versions.Kotlin.stdlib}"
-    const val kotlinCoroutinesTest =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val kotlinCoroutinesPlay =
-      "org.jetbrains.kotlinx:kotlinx-coroutines-play-services:${Versions.Kotlin.kotlinCoroutinesCore}"
-    const val stdlib = "org.jetbrains.kotlin:kotlin-stdlib:${Versions.Kotlin.stdlib}"
-  }
-
   object Retrofit {
     const val coreRetrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val gsonConverter = "com.squareup.retrofit2:converter-gson:${Versions.retrofit}"
@@ -139,50 +118,19 @@ object Dependencies {
   const val zxing = "com.google.zxing:core:${Versions.zxing}"
   const val nimbus = "com.nimbusds:nimbus-jose-jwt:${Versions.nimbus}"
 
-  // Dependencies for testing go here
-  object AndroidxTest {
-    const val archCore = "androidx.arch.core:core-testing:${Versions.AndroidxTest.archCore}"
-    const val benchmarkJunit =
-      "androidx.benchmark:benchmark-junit4:${Versions.AndroidxTest.benchmarkJUnit}"
-    const val core = "androidx.test:core:${Versions.AndroidxTest.core}"
-    const val extJunit = "androidx.test.ext:junit:${Versions.AndroidxTest.extJunit}"
-    const val extJunitKtx = "androidx.test.ext:junit-ktx:${Versions.AndroidxTest.extJunit}"
-    const val fragmentTesting =
-      "androidx.fragment:fragment-testing:${Versions.AndroidxTest.fragmentVersion}"
-    const val rules = "androidx.test:rules:${Versions.AndroidxTest.rules}"
-    const val runner = "androidx.test:runner:${Versions.AndroidxTest.runner}"
-  }
-
-  object Espresso {
-    const val espressoCore = "androidx.test.espresso:espresso-core:${Versions.espresso}"
-    const val espressoContrib = "androidx.test.espresso:espresso-contrib:${Versions.espresso}"
-  }
-
   const val androidBenchmarkRunner = "androidx.benchmark.junit4.AndroidBenchmarkRunner"
   const val androidJunitRunner = "androidx.test.runner.AndroidJUnitRunner"
 
   // Makes Json assertions where the order of elements, tabs/whitespaces are not important.
   const val jsonAssert = "org.skyscreamer:jsonassert:${Versions.jsonAssert}"
-  const val junit = "junit:junit:${Versions.junit}"
   const val mockitoKotlin = "org.mockito.kotlin:mockito-kotlin:${Versions.mockitoKotlin}"
   const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockitoInline}"
   const val robolectric = "org.robolectric:robolectric:${Versions.robolectric}"
-  const val truth = "com.google.truth:truth:${Versions.truth}"
 
   // Makes XML assertions where the order of elements, tabs/whitespaces are not important.
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-
-    object Cql {
-      const val clinicalReasoning = "3.0.0-PRE9-SNAPSHOT"
-    }
-
-    object Kotlin {
-      const val kotlinCoroutinesCore = "1.7.2"
-      const val stdlib = "1.9.22"
-    }
-
     const val androidFhirCommon = "0.1.0-alpha05"
     const val androidFhirEngine = "0.1.0-beta05"
     const val androidFhirKnowledge = "0.1.0-alpha03"
@@ -211,7 +159,6 @@ object Dependencies {
     const val gsonConverter = "2.1.0"
     const val sqlcipher = "4.5.4"
     const val timber = "5.0.1"
-    const val truth = "1.1.5"
     const val woodstox = "6.5.1"
     const val xerces = "2.12.2"
     const val xmlUnit = "2.9.1"
@@ -220,19 +167,7 @@ object Dependencies {
     const val nimbus = "9.31"
 
     // Test dependencies
-    object AndroidxTest {
-      const val benchmarkJUnit = "1.1.1"
-      const val core = "1.5.0"
-      const val archCore = "2.2.0"
-      const val extJunit = "1.1.5"
-      const val rules = "1.5.0"
-      const val runner = "1.5.0"
-      const val fragmentVersion = "1.6.0"
-    }
-
-    const val espresso = "3.5.1"
     const val jacoco = "0.8.10"
-    const val junit = "4.13.2"
     const val mockitoKotlin = "3.2.0"
     const val mockitoInline = "4.0.0"
     const val robolectric = "4.10.3"
@@ -247,16 +182,17 @@ object Dependencies {
   }
 
   fun Configuration.removeIncompatibleDependencies() {
-    exclude(module = "xpp3")
-    exclude(module = "xpp3_min")
-    exclude(module = "xmlpull")
+    exclude(module = "hapi-fhir-caching-caffeine")
     exclude(module = "javax.json")
     exclude(module = "jcl-over-slf4j")
-    exclude(group = "org.apache.httpcomponents")
-    exclude(group = "org.antlr", module = "antlr4")
-    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
-    exclude(module = "hapi-fhir-caching-caffeine")
+    exclude(module = "xmlpull")
+    exclude(module = "xpp3")
+    exclude(module = "xpp3_min")
+    exclude(group = "ch.qos.logback", module = "logback-classic")
     exclude(group = "com.github.ben-manes.caffeine", module = "caffeine")
+    exclude(group = "org.eclipse.persistence", module = "org.eclipse.persistence.moxy")
+    exclude(group = "org.antlr", module = "antlr4")
+    exclude(group = "org.apache.httpcomponents")
   }
 
   fun hapiFhirConstraints(): Map<String, DependencyConstraint.() -> Unit> {

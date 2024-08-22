@@ -1,0 +1,17 @@
+{
+  "resourceType": "Patient",
+  "id": "IMMZ-Patient-NoVaxeninfant-f",
+  "meta": {
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/Patient-uv-ips"
+    ]
+  },
+  "name": [
+    {
+      "text": "NoVaxeninfant-f",
+      "use": "official"
+    }
+  ],
+  "birthDate": "2023-03-02",
+  "gender": "female"
+}
