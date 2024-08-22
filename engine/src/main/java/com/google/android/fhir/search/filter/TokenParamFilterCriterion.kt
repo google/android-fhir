@@ -112,5 +112,4 @@ internal data class TokenParamFilterCriteria(
   var parameter: TokenClientParam,
   override val filters: List<TokenParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "TokenIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "TokenIndexEntity")

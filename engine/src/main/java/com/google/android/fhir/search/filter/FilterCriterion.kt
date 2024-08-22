@@ -45,16 +45,12 @@ internal interface FilterCriterion {
  * @param operation [Operation]
  * @param param Search param
  * @param entityTableName Representative entity table used
- * @param chunkSize Number of filter [ConditionParam]s in a chunk to be grouped/wrapped in a
- *   bracket. Chunking can be used to prevent SQLite fail with error 'Expression tree exceeding max
- *   depth of 1000' (https://www.sqlite.org/limits.html).
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
   open val operation: Operation,
   val param: IParam,
   private val entityTableName: String,
-  open val chunkSize: Int,
 ) {
   /**
    * Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. In case a
@@ -93,21 +89,20 @@ internal sealed class FilterCriteria(
    * This function takes care of wrapping the conditions in brackets so that they are evaluated as
    * intended.
    */
-  private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.chunked(chunkSize) { conditionParams ->
-        conditionParams.joinToString(
-          separator = " ${operation.logicalOperator} ",
-          prefix = if (size > 1) "(" else "",
-          postfix = if (size > 1) ")" else "",
-        ) {
-          if (it.params.size > 1) {
-            "(${it.condition})"
-          } else {
-            it.condition
-          }
-        }
-      }
-      .joinToString(separator = " ${operation.logicalOperator} ")
+  private fun List<ConditionParam<*>>.toQueryString(operation: Operation): String {
+    if (this.size == 1) return first().condition
+    if (this.isEmpty()) return ""
+
+    val mid = this.size / 2
+    val left = this.subList(0, mid).toQueryString(operation)
+    val right = this.subList(mid, this.size).toQueryString(operation)
+
+    return when {
+        left.isNotBlank() && right.isNotBlank() -> "($left ${operation.logicalOperator} $right)"
+      left.isNotBlank() -> left
+      else -> right
+    }
+  }
 
   companion object {
     const val DEFAULT_CONDITION_PARAMS_CHUNK_SIZE = 50

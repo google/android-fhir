@@ -51,5 +51,4 @@ internal data class StringParamFilterCriteria(
   val parameter: StringClientParam,
   override val filters: List<StringParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "StringIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "StringIndexEntity")

@@ -38,5 +38,4 @@ internal data class ReferenceParamFilterCriteria(
   val parameter: ReferenceClientParam,
   override val filters: List<ReferenceParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "ReferenceIndexEntity")

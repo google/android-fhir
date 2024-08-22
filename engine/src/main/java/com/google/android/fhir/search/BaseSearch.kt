@@ -24,7 +24,6 @@ import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.gclient.UriClientParam
 import com.google.android.fhir.search.filter.DateParamFilterCriterion
-import com.google.android.fhir.search.filter.FilterCriteria
 import com.google.android.fhir.search.filter.NumberParamFilterCriterion
 import com.google.android.fhir.search.filter.QuantityParamFilterCriterion
 import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
@@ -55,49 +54,42 @@ interface BaseSearch {
     stringParameter: StringClientParam,
     vararg init: StringParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     referenceParameter: ReferenceClientParam,
     vararg init: ReferenceParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     dateParameter: DateClientParam,
     vararg init: DateParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     quantityParameter: QuantityClientParam,
     vararg init: QuantityParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     tokenParameter: TokenClientParam,
     vararg init: TokenParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     numberParameter: NumberClientParam,
     vararg init: NumberParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   fun filter(
     uriParam: UriClientParam,
     vararg init: UriParamFilterCriterion.() -> Unit,
     operation: Operation = Operation.OR,
-    chunkSize: Int = FilterCriteria.DEFAULT_CONDITION_PARAMS_CHUNK_SIZE,
   )
 
   /**

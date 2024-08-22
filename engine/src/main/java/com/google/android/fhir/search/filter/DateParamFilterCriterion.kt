@@ -72,8 +72,7 @@ internal data class DateClientParamFilterCriteria(
   val parameter: DateClientParam,
   override val filters: List<DateParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "", chunkSize) {
+) : FilterCriteria(filters, operation, parameter, "") {
 
   override fun query(type: ResourceType): SearchQuery {
     val filterCriteria =
@@ -82,13 +81,11 @@ internal data class DateClientParamFilterCriteria(
           parameter,
           filters.filter { it.value!!.date != null },
           operation,
-          chunkSize,
         ),
         DateTimeFilterCriteria(
           parameter,
           filters.filter { it.value!!.dateTime != null },
           operation,
-          chunkSize,
         ),
       )
 
@@ -113,14 +110,12 @@ internal data class DateClientParamFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
     override val operation: Operation,
-    override val chunkSize: Int,
-  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity", chunkSize)
+  ) : FilterCriteria(filters, operation, parameter, "DateIndexEntity")
 
   /** Internal class used to generate query for DateTime type Criterion */
   private data class DateTimeFilterCriteria(
     val parameter: DateClientParam,
     override val filters: List<DateParamFilterCriterion>,
     override val operation: Operation,
-    override val chunkSize: Int,
-  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity", chunkSize)
+  ) : FilterCriteria(filters, operation, parameter, "DateTimeIndexEntity")
 }

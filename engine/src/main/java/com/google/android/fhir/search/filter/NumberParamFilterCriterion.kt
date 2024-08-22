@@ -41,5 +41,4 @@ internal data class NumberParamFilterCriteria(
   val parameter: NumberClientParam,
   override val filters: List<NumberParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "NumberIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "NumberIndexEntity")

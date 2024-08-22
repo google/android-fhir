@@ -40,7 +40,6 @@ fun Search.applyFilterParam(
   name: String,
   param: IQueryParameterType,
   type: Operation,
-  chunkSize: Int = 50,
 ) =
   when (param) {
     is NumberParam -> {
@@ -48,7 +47,6 @@ fun Search.applyFilterParam(
         NumberClientParam(name),
         { value = param.value },
         operation = type,
-        chunkSize = chunkSize,
       )
     }
     is DateParam -> {
@@ -56,7 +54,6 @@ fun Search.applyFilterParam(
         DateClientParam(name),
         { value = of(DateTimeType(param.value)) },
         operation = type,
-        chunkSize = chunkSize,
       )
     }
     is QuantityParam -> {
@@ -68,7 +65,6 @@ fun Search.applyFilterParam(
           unit = param.units
         },
         operation = type,
-        chunkSize = chunkSize,
       )
     }
     is StringParam -> {
@@ -76,21 +72,19 @@ fun Search.applyFilterParam(
         StringClientParam(name),
         { value = param.value },
         operation = type,
-        chunkSize = chunkSize,
       )
     }
     is TokenParam -> {
       this.filter(
         TokenClientParam(name),
         { value = of(Coding(param.system, param.value, null)) },
-        chunkSize = chunkSize,
       )
     }
     is ReferenceParam -> {
-      this.filter(ReferenceClientParam(name), { value = param.value }, chunkSize = chunkSize)
+      this.filter(ReferenceClientParam(name), { value = param.value })
     }
     is UriParam -> {
-      this.filter(UriClientParam(name), { value = param.value }, chunkSize = chunkSize)
+      this.filter(UriClientParam(name), { value = param.value })
     }
     else -> {
       throw UnsupportedOperationException("$param type not supported in FhirEngineDal")

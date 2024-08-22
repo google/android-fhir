@@ -36,5 +36,4 @@ internal data class UriFilterCriteria(
   val parameter: UriClientParam,
   override val filters: List<UriParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "UriIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "UriIndexEntity")

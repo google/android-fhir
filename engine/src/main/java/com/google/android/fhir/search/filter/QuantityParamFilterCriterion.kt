@@ -43,5 +43,4 @@ internal data class QuantityParamFilterCriteria(
   val parameter: QuantityClientParam,
   override val filters: List<QuantityParamFilterCriterion>,
   override val operation: Operation,
-  override val chunkSize: Int,
-) : FilterCriteria(filters, operation, parameter, "QuantityIndexEntity", chunkSize)
+) : FilterCriteria(filters, operation, parameter, "QuantityIndexEntity")
