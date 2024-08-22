@@ -40,11 +40,6 @@ internal interface FilterCriterion {
  * An api call like filter(Patient.GIVEN,{value = "John"},{value = "Jane"}) will create a
  * [StringParamFilterCriteria] with two [StringParamFilterCriterion] one with
  * [StringParamFilterCriterion.value] as "John" and other as "Jane."
- *
- * @param filters list of [FilterCriterion]s
- * @param operation [Operation]
- * @param param Search param
- * @param entityTableName Representative entity table used
  */
 internal sealed class FilterCriteria(
   open val filters: List<FilterCriterion>,
@@ -52,6 +47,7 @@ internal sealed class FilterCriteria(
   val param: IParam,
   private val entityTableName: String,
 ) {
+
   /**
    * Returns a [SearchQuery] for the [FilterCriteria] based on all the [FilterCriterion]. In case a
    * particular FilterCriteria wants to return [SearchQuery] in custom manner, it should override

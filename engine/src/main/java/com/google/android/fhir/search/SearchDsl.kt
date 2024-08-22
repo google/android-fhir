@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2023 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,9 +71,7 @@ class Search(
   ) {
     val filters = mutableListOf<StringParamFilterCriterion>()
     init.forEach { StringParamFilterCriterion(stringParameter).apply(it).also(filters::add) }
-    stringFilterCriteria.add(
-      StringParamFilterCriteria(stringParameter, filters, operation),
-    )
+    stringFilterCriteria.add(StringParamFilterCriteria(stringParameter, filters, operation))
   }
 
   override fun filter(
@@ -95,9 +93,7 @@ class Search(
   ) {
     val filters = mutableListOf<DateParamFilterCriterion>()
     init.forEach { DateParamFilterCriterion(dateParameter).apply(it).also(filters::add) }
-    dateTimeFilterCriteria.add(
-      DateClientParamFilterCriteria(dateParameter, filters, operation),
-    )
+    dateTimeFilterCriteria.add(DateClientParamFilterCriteria(dateParameter, filters, operation))
   }
 
   override fun filter(
@@ -107,9 +103,7 @@ class Search(
   ) {
     val filters = mutableListOf<QuantityParamFilterCriterion>()
     init.forEach { QuantityParamFilterCriterion(quantityParameter).apply(it).also(filters::add) }
-    quantityFilterCriteria.add(
-      QuantityParamFilterCriteria(quantityParameter, filters, operation),
-    )
+    quantityFilterCriteria.add(QuantityParamFilterCriteria(quantityParameter, filters, operation))
   }
 
   override fun filter(
@@ -129,9 +123,7 @@ class Search(
   ) {
     val filters = mutableListOf<NumberParamFilterCriterion>()
     init.forEach { NumberParamFilterCriterion(numberParameter).apply(it).also(filters::add) }
-    numberFilterCriteria.add(
-      NumberParamFilterCriteria(numberParameter, filters, operation),
-    )
+    numberFilterCriteria.add(NumberParamFilterCriteria(numberParameter, filters, operation))
   }
 
   override fun filter(
