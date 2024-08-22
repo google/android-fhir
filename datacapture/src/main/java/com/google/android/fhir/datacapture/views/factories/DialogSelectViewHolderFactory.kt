@@ -92,6 +92,8 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
+                // We use the question text for the dialog title. If there is no question text, we
+                // use flyover text as it is sometimes used in text fields instead of question text.
                 title = questionnaireItem.localizedTextSpanned
                     ?: questionnaireItem.localizedFlyoverSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
