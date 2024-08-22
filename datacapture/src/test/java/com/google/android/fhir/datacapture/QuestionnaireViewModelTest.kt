@@ -1138,6 +1138,141 @@ class QuestionnaireViewModelTest {
     }
   }
 
+  @Test
+  fun `should add missing response item inside a repeated group`() {
+    val questionnaireString =
+      """
+          {
+            "resourceType": "Questionnaire",
+            "item": [
+              {
+                "linkId": "1",
+                "type": "group",
+                "text": "Repeated Group",
+                "repeats": true,
+                "item": [
+                  {
+                    "linkId": "1-1",
+                    "type": "date",
+                    "extension": [
+                      {
+                        "url": "http://hl7.org/fhir/StructureDefinition/entryFormat",
+                        "valueString": "yyyy-mm-dd"
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1-2",
+                    "type": "boolean"
+                  }
+                ]
+              }
+            ]
+          }
+            """
+        .trimIndent()
+
+    val questionnaireResponseString =
+      """
+              {
+                "resourceType": "QuestionnaireResponse",
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-14"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-13"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            """
+        .trimIndent()
+
+    val expectedQuestionnaireResponseString =
+      """
+              {
+                "resourceType": "QuestionnaireResponse",
+                "item": [
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-14"
+                          }
+                        ]
+                      },
+                      {
+                        "linkId": "1-2"
+                      }
+                    ]
+                  },
+                  {
+                    "linkId": "1",
+                    "text": "Repeated Group",
+                    "item": [
+                      {
+                        "linkId": "1-1",
+                        "answer": [
+                          {
+                            "valueDate": "2023-06-13"
+                          }
+                        ]
+                      },
+                      {
+                        "linkId": "1-2"
+                      }
+                    ]
+                  }
+                ]
+              }
+            """
+        .trimIndent()
+
+    val questionnaire =
+      printer.parseResource(Questionnaire::class.java, questionnaireString) as Questionnaire
+
+    val response =
+      printer.parseResource(QuestionnaireResponse::class.java, questionnaireResponseString)
+        as QuestionnaireResponse
+
+    val expectedResponse =
+      printer.parseResource(QuestionnaireResponse::class.java, expectedQuestionnaireResponseString)
+        as QuestionnaireResponse
+
+    val viewModel = createQuestionnaireViewModel(questionnaire, response)
+
+    runTest {
+      viewModel.addMissingResponseItems(questionnaire.item, response.item)
+      assertResourceEquals(response, expectedResponse)
+    }
+  }
+
   // ==================================================================== //
   //                                                                      //
   //                       Questionnaire State Flow                       //
