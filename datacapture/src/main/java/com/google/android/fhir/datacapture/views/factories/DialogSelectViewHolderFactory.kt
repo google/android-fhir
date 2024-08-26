@@ -94,7 +94,7 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
               OptionSelectDialogFragment(
                 // We use the question text for the dialog title. If there is no question text, we
                 // use flyover text as it is sometimes used in text fields instead of question text.
-                title = questionnaireItem.localizedTextSpanned
+                title = questionnaireViewItem.questionText
                     ?: questionnaireItem.localizedFlyoverSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
                 selectedOptions = selectedOptions,

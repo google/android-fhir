@@ -66,7 +66,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           questionnaireViewItem.questionnaireItem.localizedPrefixSpanned,
         )
         question.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedTextSpanned,
+          questionnaireViewItem.questionText,
         )
         hint.updateTextAndVisibility(
           questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),

@@ -95,7 +95,7 @@ object BarCodeReaderViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textQuestion.text = questionnaireViewItem.questionnaireItem.localizedTextSpanned
+        textQuestion.text = questionnaireViewItem.questionText
         setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
       }
 
