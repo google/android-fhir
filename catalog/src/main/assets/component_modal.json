@@ -2,6 +2,21 @@
   "resourceType": "Questionnaire",
   "item": [
     {
+      "extension": [
+        {
+          "url": "http://hl7.org/fhir/StructureDefinition/questionnaire-itemControl",
+          "valueCodeableConcept": {
+            "coding": [
+              {
+                "system": "http://hl7.org/fhir/questionnaire-item-control",
+                "code": "lookup",
+                "display": "Lookup"
+              }
+            ],
+            "text": "Lookup"
+          }
+        }
+      ],
       "linkId": "1.1",
       "type": "choice",
       "repeats": true,
@@ -43,48 +58,6 @@
           "valueCoding": {
             "code": "diarrhoea",
             "display": "Diarrhoea"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "fever",
-            "display": "Fever"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "injury",
-            "display": "Injury"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "jaundice",
-            "display": "Jaundice"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "mental-health",
-            "display": "Mental health"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "nausea",
-            "display": "Nausea"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "pain",
-            "display": "Pain"
-          }
-        },
-        {
-          "valueCoding": {
-            "code": "bleeding",
-            "display": "Bleeding"
           }
         }
       ]
