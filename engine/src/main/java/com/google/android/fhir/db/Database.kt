@@ -125,15 +125,13 @@ internal interface Database {
   suspend fun deleteUpdates(resources: List<Resource>)
 
   /**
-   * Updates a resource and its associated references in the database after a resource ID change.
+   * Updates the existing resource identified by [currentResourceId] with the [updatedResource],
+   * ensuring all associated references in the database are also updated accordingly.
    *
    * Implementations of this function should perform the following steps within a transaction:
    * 1. Update the corresponding [ResourceEntity].
    * 2. Update associated [LocalChangeEntity] records.
    * 3. Update the serialized representation of referring resources.
-   *
-   * @param currentResourceId The original ID of the resource.
-   * @param updatedResource The updated resource with the new ID.
    */
   suspend fun updateResourceAndReferences(
     currentResourceId: String,
