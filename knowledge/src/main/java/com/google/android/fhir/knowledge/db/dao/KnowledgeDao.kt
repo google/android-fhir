@@ -99,6 +99,15 @@ abstract class KnowledgeDao {
     url: String,
   ): ResourceMetadataEntity?
 
+  @Deprecated("Load resources using URLs")
+  @Query(
+    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name",
+  )
+  internal abstract suspend fun getResourcesWithName(
+    resourceType: ResourceType,
+    name: String?,
+  ): List<ResourceMetadataEntity>
+
   @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
   internal abstract suspend fun getResource(
     url: String,

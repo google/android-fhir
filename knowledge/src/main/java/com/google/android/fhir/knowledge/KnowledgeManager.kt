@@ -34,6 +34,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.context.IWorkerContext
 import org.hl7.fhir.r4.context.SimpleWorkerContext
 import org.hl7.fhir.r4.model.MetadataResource
+import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.utilities.npm.NpmPackage
 import timber.log.Timber
 
@@ -163,6 +164,31 @@ internal constructor(
         file,
       ),
     )
+  }
+
+  /** Loads resources from IGs listed in dependencies. */
+  @Deprecated("Load resources using URLs only")
+  suspend fun loadResources(
+    resourceType: String,
+    url: String? = null,
+    id: String? = null,
+    name: String? = null,
+    version: String? = null,
+  ): Iterable<IBaseResource> {
+    val resType = ResourceType.fromCode(resourceType)
+
+    val resourceEntities =
+      when {
+        url != null && version != null ->
+          listOfNotNull(knowledgeDao.getResourceWithUrlAndVersion(resType, url, version))
+        url != null -> listOfNotNull(knowledgeDao.getResourceWithUrl(resType, url))
+        id != null -> listOfNotNull(knowledgeDao.getResourcesWithId(id.toLong()))
+        name != null && version != null ->
+          listOfNotNull(knowledgeDao.getResourcesWithNameAndVersion(resType, name, version))
+        name != null -> knowledgeDao.getResourcesWithName(resType, name)
+        else -> knowledgeDao.getResources(resType)
+      }
+    return resourceEntities.map { readMetadataResourceOrThrow(it.resourceFile)!! }
   }
 
   /**
