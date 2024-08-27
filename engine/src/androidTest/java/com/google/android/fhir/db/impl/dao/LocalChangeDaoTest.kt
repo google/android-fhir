@@ -296,7 +296,7 @@ class LocalChangeDaoTest {
     localChangeDao.updateResourceIdAndReferences(
       resourceUuid = patientResourceUuid,
       oldResource = patient,
-      updatedResource = updatedPatient,
+      updatedResourceId = updatedPatient.logicalId,
     )
 
     // assert that Patient's new ID is reflected in the Patient Resource Change
@@ -387,7 +387,7 @@ class LocalChangeDaoTest {
         localChangeDao.updateResourceIdAndReferences(
           patientResourceUuid,
           oldResource = localPatient,
-          updatedResource = updatedLocalPatient,
+          updatedResourceId = updatedLocalPatient.logicalId,
         )
       assertThat(updatedReferences.size).isEqualTo(countAboveLimit)
     }
