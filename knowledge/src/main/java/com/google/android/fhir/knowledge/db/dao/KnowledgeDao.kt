@@ -99,13 +99,16 @@ abstract class KnowledgeDao {
     url: String,
   ): ResourceMetadataEntity?
 
-  @Query(
-    "SELECT * from ResourceMetadataEntity WHERE  resourceType = :resourceType AND name = :name",
-  )
-  internal abstract suspend fun getResourcesWithName(
-    resourceType: ResourceType,
-    name: String?,
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url")
+  internal abstract suspend fun getResource(
+    url: String,
   ): List<ResourceMetadataEntity>
+
+  @Query("SELECT * from ResourceMetadataEntity WHERE url = :url AND version = :version")
+  internal abstract suspend fun getResource(
+    url: String,
+    version: String,
+  ): ResourceMetadataEntity
 
   @Query(
     "SELECT * from ResourceMetadataEntity WHERE resourceMetadataId = :id",
