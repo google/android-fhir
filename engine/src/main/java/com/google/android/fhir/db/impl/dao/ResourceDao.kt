@@ -42,6 +42,7 @@ import com.google.android.fhir.index.ResourceIndexer.Companion.createLocalLastUp
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.updateMeta
 import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
@@ -186,8 +187,8 @@ internal abstract class ResourceDao {
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdatedRemote: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   )
 
   @Query(
@@ -319,21 +320,13 @@ internal abstract class ResourceDao {
   suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   ) {
-    updateRemoteVersionIdAndLastUpdate(resourceId, resourceType, versionId, lastUpdated)
-    // update the remote lastUpdated index
-    getResourceEntity(resourceId, resourceType)?.let {
-      val indicesToUpdate =
-        ResourceIndices.Builder(resourceType, resourceId)
-          .apply {
-            addDateTimeIndex(
-              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),
-            )
-          }
-          .build()
-      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    getResourceEntity(resourceId, resourceType)?.let { oldResource ->
+      val resource = iParser.parseResource(oldResource.serializedResource) as Resource
+      resource.updateMeta(versionId, lastUpdatedRemote)
+      updateResourceWithUuid(oldResource.resourceUuid, resource)
     }
   }
 
@@ -359,13 +352,7 @@ internal abstract class ResourceDao {
     getResourceEntity(oldResourceId, resourceType)?.let { oldResource ->
       val resource = iParser.parseResource(oldResource.serializedResource) as Resource
       resource.idElement = IdType(newResourceId)
-      resource.meta.apply {
-        versionIdElement = IdType(versionId ?: resource.versionId)
-        lastUpdatedRemote
-          ?: resource.lastUpdated?.let { lastUpdatedRemote ->
-            lastUpdatedElement = InstantType(Date.from(lastUpdatedRemote))
-          }
-      }
+      resource.updateMeta(versionId, lastUpdatedRemote)
       updateResourceWithUuid(oldResource.resourceUuid, resource)
     }
   }

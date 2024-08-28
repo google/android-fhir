@@ -18,7 +18,9 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
+import com.google.android.fhir.versionId
 import java.util.UUID
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
@@ -56,8 +58,12 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         )
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
-            is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
-            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is BundleComponentUploadResponseMapping -> {
+              updateVersionIdAndLastUpdated(it.output)
+            }
+            is ResourceUploadResponseMapping -> {
+              updateVersionIdAndLastUpdated(it.output)
+            }
           }
         }
       }
@@ -69,27 +75,23 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
 
   private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (id, type) ->
-        database.updateVersionIdAndLastUpdated(
-          id,
-          type,
-          getVersionFromETag(response.etag),
-          response.lastModified.toInstant(),
-        )
-      }
+    response.resourceIdAndType?.let { (id, type) ->
+      database.updateVersionIdAndLastUpdated(
+        id,
+        type,
+        response.etag?.let { getVersionFromETag(response.etag) },
+        response.lastModified?.let { it.toInstant() },
+      )
     }
   }
 
   private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant(),
-      )
-    }
+    database.updateVersionIdAndLastUpdated(
+      resource.id,
+      resource.resourceType,
+      resource.versionId,
+      resource.lastUpdated,
+    )
   }
 }
 
