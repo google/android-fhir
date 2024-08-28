@@ -69,7 +69,7 @@ internal interface Database {
    *
    * @param oldResourceId The [Resource.id] of the resource before synchronization.
    * @param newResourceId The [Resource.id] of the resource after synchronization.
-   * @param newVersionId The version id of the resource after synchronization.
+   * @param versionId The version id of the resource after synchronization.
    * @param lastUpdated The last modified time of the resource after synchronization.
    * @param referencingResourceUuids The dependent resources for which the reference value will be
    *   changed.
@@ -78,8 +78,8 @@ internal interface Database {
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
-    newVersionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdated: Instant?,
     referencingResourceUuids: List<UUID> = emptyList(),
   )
 

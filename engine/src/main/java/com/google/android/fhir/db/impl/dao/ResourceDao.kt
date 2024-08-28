@@ -88,7 +88,7 @@ internal abstract class ResourceDao {
           resourceId = updatedResource.logicalId,
           serializedResource = iParser.encodeResourceToString(updatedResource),
           lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
-          versionId = updatedResource.meta.versionId,
+          versionId = updatedResource.meta.versionId ?: it.versionId,
         )
       updateChanges(entity, updatedResource)
     }
@@ -196,8 +196,8 @@ internal abstract class ResourceDao {
         SET 
             resourceId = :newResourceId,
             serializedResource = :serializedResource,
-            versionId = :newVersionId,
-            lastUpdatedRemote = :lastUpdated
+            versionId = :versionId,
+            lastUpdatedRemote = :lastUpdatedRemote
         WHERE resourceId = :oldResourceId
         AND resourceType = :resourceType
     """,
@@ -206,8 +206,8 @@ internal abstract class ResourceDao {
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
-    newVersionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
     serializedResource: String,
   )
 
@@ -339,51 +339,34 @@ internal abstract class ResourceDao {
 
   /**
    * Updates a resource and its indices post-synchronization. This function updates a resource id
-   * [newResourceId], version [versionId], and last updated [lastUpdated] metadata to new values. It
-   * also updates the associated indices in the local database to reflect the latest synchronization
-   * state.
+   * [newResourceId], version [versionId], and last updated [lastUpdatedRemote] metadata to new
+   * values. It also updates the associated indices in the local database to reflect the latest
+   * synchronization state.
    *
    * @param oldResourceId The ID of the resource before synchronization.
    * @param newResourceId The new ID of the resource after synchronization.
    * @param resourceType The type of the resource being updated.
    * @param versionId The new version ID of the resource after synchronization.
-   * @param lastUpdated The timestamp indicating when the resource was last updated remotely.
+   * @param lastUpdatedRemote The timestamp indicating when the resource was last updated remotely.
    */
   internal suspend fun updateResourceAndIndices(
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   ) {
-    getResourceEntity(oldResourceId, resourceType)?.let {
-      val preSyncResource = iParser.parseResource(it.serializedResource) as Resource
-      preSyncResource.idElement = IdType(newResourceId)
-      preSyncResource.meta.apply {
-        versionIdElement = IdType(versionId)
-        lastUpdatedElement = InstantType(Date.from(lastUpdated))
-      }
-      updateResource(
-        oldResourceId = oldResourceId,
-        newResourceId = newResourceId,
-        resourceType = resourceType,
-        newVersionId = versionId,
-        lastUpdated = lastUpdated,
-        serializedResource = iParser.encodeResourceToString(preSyncResource),
-      )
-
-      val indicesToUpdate =
-        ResourceIndices.Builder(resourceType, newResourceId)
-          .apply {
-            addDateTimeIndex(
-              createLastUpdatedIndex(
-                resourceType,
-                InstantType(Date.from(lastUpdated)),
-              ),
-            )
+    getResourceEntity(oldResourceId, resourceType)?.let { oldResource ->
+      val resource = iParser.parseResource(oldResource.serializedResource) as Resource
+      resource.idElement = IdType(newResourceId)
+      resource.meta.apply {
+        versionIdElement = IdType(versionId ?: resource.versionId)
+        lastUpdatedRemote
+          ?: resource.lastUpdated?.let { lastUpdatedRemote ->
+            lastUpdatedElement = InstantType(Date.from(lastUpdatedRemote))
           }
-          .build()
-      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+      }
+      updateResourceWithUuid(oldResource.resourceUuid, resource)
     }
   }
 

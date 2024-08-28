@@ -178,8 +178,8 @@ internal class DatabaseImpl(
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdated: Instant?,
     referencingResourceUuids: List<UUID>,
   ) {
     db.withTransaction {

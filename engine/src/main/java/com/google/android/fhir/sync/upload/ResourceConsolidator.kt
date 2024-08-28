@@ -22,7 +22,6 @@ import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
 import java.util.UUID
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
@@ -129,7 +128,10 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
                 ),
               )
               responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
-                updateResourcePostSync(preSyncResourceId, responseMapping.output)
+                database.updateResourceAndReferences(
+                  preSyncResourceId,
+                  responseMapping.output,
+                )
               }
             }
           }
@@ -144,36 +146,18 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
 
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,
-    postSyncResource: Resource,
-  ) {
-    if (
-      postSyncResource.hasMeta() &&
-        postSyncResource.meta.hasVersionId() &&
-        postSyncResource.meta.hasLastUpdated()
-    ) {
-      database.updateResourceAndReferences(
-        preSyncResourceId,
-        postSyncResource,
-      )
-    }
-  }
-
-  private suspend fun updateResourcePostSync(
-    preSyncResourceId: String,
     response: Bundle.BundleEntryResponseComponent,
     dependentResources: List<UUID> = emptyList(),
   ) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
-        database.updateResource(
-          preSyncResourceId,
-          postSyncResourceID,
-          resourceType,
-          getVersionFromETag(response.etag),
-          response.lastModified.toInstant(),
-          dependentResources,
-        )
-      }
+    response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
+      database.updateResource(
+        preSyncResourceId,
+        postSyncResourceID,
+        resourceType,
+        response.etag?.let { getVersionFromETag(response.etag) },
+        response.lastModified?.let { response.lastModified.toInstant() },
+        dependentResources,
+      )
     }
   }
 }
