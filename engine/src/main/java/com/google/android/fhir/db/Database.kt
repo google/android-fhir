@@ -64,27 +64,23 @@ internal interface Database {
   )
 
   /**
-   * Updates existing [Resource] present in the [ResourceEntity]. It updates [Resource.id],
-   * metadata, and reference values of the dependent resources. This method is more suitable if
-   * [preSyncResourceId] and post-sync resourceId [postSyncResource] are different. However, even if
-   * [preSyncResourceId] and post-sync resourceId are the same, it still updates the reference value
-   * of referring resources, which is just redundant.
+   * Updates existing [oldResourceId] and [referencingResourceUuids] with the new [newResourceId].
+   * No-op on [referencingResourceUuids] if [oldResourceId] and [newResourceId] are the same.
    *
-   * @param preSyncResourceId The [Resource.id] of the resource before synchronization.
-   * @param postSyncResourceID The [Resource.id] of the resource after synchronization.
-   * @param postSyncResourceVersionId The version id of the resource after synchronization.
-   * @param postSyncResourceLastUpdated The last modified time of the resource after
-   *   synchronization.
-   * @param dependentResources The dependent resources for which the reference value will be
+   * @param oldResourceId The [Resource.id] of the resource before synchronization.
+   * @param newResourceId The [Resource.id] of the resource after synchronization.
+   * @param newVersionId The version id of the resource after synchronization.
+   * @param lastUpdated The last modified time of the resource after synchronization.
+   * @param referencingResourceUuids The dependent resources for which the reference value will be
    *   changed.
    */
-  suspend fun updateResourcesPostSync(
-    preSyncResourceId: String,
-    postSyncResourceID: String,
+  suspend fun updateResource(
+    oldResourceId: String,
+    newResourceId: String,
     resourceType: ResourceType,
-    postSyncResourceVersionId: String,
-    postSyncResourceLastUpdated: Instant,
-    dependentResources: List<UUID> = emptyList(),
+    newVersionId: String,
+    lastUpdated: Instant,
+    referencingResourceUuids: List<UUID> = emptyList(),
   )
 
   /**
@@ -220,18 +216,18 @@ internal interface Database {
   ): List<LocalChangeResourceReference>
 
   /**
-   * Retrieves a list of UUIDs for resources that reference [preSyncResourceId]. [preSyncResourceId]
-   * can be referenced as the reference value in other resources, returning those resource UUIDs.
-   * Essentially, [LocalChangeResourceReference] contains
-   * [LocalChangeResourceReference.resourceReferenceValue] and
-   * [LocalChangeResourceReference.localChangeId]. [LocalChange] contains UUIDs for every resource.
+   * Retrieves a list of UUIDs of referencing resources that reference the given
+   * [referencedResourceId]. This method maps the [referencedResourceId] to a
+   * [LocalChangeResourceReference.localChangeId] and then fetches the corresponding
+   * [LocalChangeEntity.resourceUuid].
    *
-   * @param preSyncResource The resource that is being referenced.
-   * @return A list of UUIDs of resources that reference [preSyncResource].
+   * @param referencedResourceId The resource that is being referenced.
+   * @param referencedResourceType The type of the [Resource].
+   * @return A list of UUIDs of referencing resources that reference the [referencedResourceId].
    */
-  suspend fun getResourceUuidsThatReferenceTheGivenResource(
-    preSyncResourceId: String,
-    resourceType: ResourceType,
+  suspend fun getReferencingResourceUuids(
+    referencedResourceId: String,
+    referencedResourceType: ResourceType,
   ): List<UUID>
 }
 

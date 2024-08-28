@@ -29,9 +29,11 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
-import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
+import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.After
 import org.junit.Assert.assertThrows
@@ -68,35 +70,21 @@ class HttpPostResourceConsolidatorTest {
   }
 
   @Test
-  fun consolidate_shouldUpdateResourceId() = runBlocking {
-    val patientJsonString =
-      """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
-        }
-            """
-        .trimIndent()
-    val patient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
-    database.insert(patient)
-    val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
-
-    val postSyncPatientJsonString =
-      """
-      {
-        "resourceType": "Patient",
-        "id": "patient2",
-        "meta": {
-          "versionId": "1"
-        }
-      }
-        """
-        .trimIndent()
+  fun resourceConsolidator_singleResourceUpload_shouldUpdateNewResourceId() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val localChanges =
+      database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
     val postSyncPatient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
-        as DomainResource
-    postSyncPatient.meta.lastUpdatedElement = InstantType.now()
+      Patient().apply {
+        id = "patient2"
+        meta =
+          Meta().apply {
+            versionId = "1"
+            lastUpdatedElement = InstantType.now()
+          }
+      }
+
     val uploadRequestResult =
       UploadRequestResult.Success(
         listOf(ResourceUploadResponseMapping(localChanges, postSyncPatient)),
@@ -105,147 +93,90 @@ class HttpPostResourceConsolidatorTest {
 
     assertThat(database.select(ResourceType.Patient, "patient2").logicalId)
       .isEqualTo(postSyncPatient.logicalId)
-
     val exception =
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { database.select(ResourceType.Patient, "patient1") }
       }
-
     assertThat(exception.message).isEqualTo("Resource not found with type Patient and id patient1!")
   }
 
   @Test
-  fun consolidate_dependentResources_shouldUpdateReferenceValue() = runBlocking {
-    val patientJsonString =
-      """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
+  fun resourceConsolidator_singleResourceUpload_shouldUpdateReferenceValueOfReferencingResources() =
+    runBlocking {
+      val preSyncPatient = Patient().apply { id = "patient1" }
+      val observation =
+        Observation().apply {
+          id = "observation1"
+          subject = Reference().apply { reference = "Patient/patient1" }
         }
-            """
-        .trimIndent()
-    val patient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
-    val observationJsonString =
-      """
-        {
-          "resourceType": "Observation",
-          "id": "observation1",
-          "subject": {
-            "reference": "Patient/patient1"
-          }
+      database.insert(preSyncPatient, observation)
+      val postSyncPatient =
+        Patient().apply {
+          id = "patient2"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdatedElement = InstantType.now()
+            }
         }
-            """
-        .trimIndent()
-    val observation =
-      FhirContext.forR4Cached().newJsonParser().parseResource(observationJsonString)
-        as DomainResource
-    database.insert(patient, observation)
-    val postSyncPatientJsonString =
-      """
-      {
-        "resourceType": "Patient",
-        "id": "patient2",
-        "meta": {
-          "versionId": "1"
-        }
-      }
-        """
-        .trimIndent()
-    val postSyncPatient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
-        as DomainResource
-    postSyncPatient.meta.lastUpdatedElement = InstantType.now()
-    val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
-    val uploadRequestResult =
-      UploadRequestResult.Success(
-        listOf(ResourceUploadResponseMapping(localChanges, postSyncPatient)),
-      )
+      val localChanges =
+        database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
+      val uploadRequestResult =
+        UploadRequestResult.Success(
+          listOf(ResourceUploadResponseMapping(localChanges, postSyncPatient)),
+        )
 
-    resourceConsolidator.consolidate(uploadRequestResult)
+      resourceConsolidator.consolidate(uploadRequestResult)
 
-    assertThat(
-        (database.select(ResourceType.Observation, "observation1") as Observation)
-          .subject
-          .reference,
-      )
-      .isEqualTo("Patient/patient2")
-  }
+      assertThat(
+          (database.select(ResourceType.Observation, "observation1") as Observation)
+            .subject
+            .reference,
+        )
+        .isEqualTo("Patient/patient2")
+    }
 
   @Test
-  fun consolidate_localChanges_shouldUpdateReferenceValue() = runBlocking {
-    val patientJsonString =
-      """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
+  fun resourceConsolidator_singleResourceUpload_shouldUpdateReferenceValueOfLocalReferencingResources() =
+    runBlocking {
+      val preSyncPatient = Patient().apply { id = "patient1" }
+      val observation =
+        Observation().apply {
+          id = "observation1"
+          subject = Reference().apply { reference = "Patient/patient1" }
         }
-            """
-        .trimIndent()
-    val patient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(patientJsonString) as DomainResource
-    val observationJsonString =
-      """
-        {
-          "resourceType": "Observation",
-          "id": "observation1",
-          "subject": {
-            "reference": "Patient/patient1"
-          }
+      database.insert(preSyncPatient, observation)
+      val postSyncPatient =
+        Patient().apply {
+          id = "patient2"
+          meta =
+            Meta().apply {
+              versionId = "1"
+              lastUpdatedElement = InstantType.now()
+            }
         }
-            """
-        .trimIndent()
-    val observation =
-      FhirContext.forR4Cached().newJsonParser().parseResource(observationJsonString)
-        as DomainResource
-    database.insert(patient, observation)
-    val postSyncPatientJsonString =
-      """
-      {
-        "resourceType": "Patient",
-        "id": "patient2",
-        "meta": {
-          "versionId": "1"
-        }
-      }
-        """
-        .trimIndent()
-    val postSyncPatient =
-      FhirContext.forR4Cached().newJsonParser().parseResource(postSyncPatientJsonString)
-        as DomainResource
-    postSyncPatient.meta.lastUpdatedElement = InstantType.now()
-    val localChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
-    val uploadRequestResult =
-      UploadRequestResult.Success(
-        listOf(ResourceUploadResponseMapping(localChanges, postSyncPatient)),
-      )
+      val localChanges =
+        database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
+      val uploadRequestResult =
+        UploadRequestResult.Success(
+          listOf(ResourceUploadResponseMapping(localChanges, postSyncPatient)),
+        )
 
-    resourceConsolidator.consolidate(uploadRequestResult)
+      resourceConsolidator.consolidate(uploadRequestResult)
 
-    val localChange = database.getLocalChanges(ResourceType.Observation, "observation1").last()
-    assertThat(
-        (FhirContext.forR4Cached().newJsonParser().parseResource(localChange.payload)
-            as Observation)
-          .subject
-          .reference,
-      )
-      .isEqualTo("Patient/patient2")
-  }
+      val localChange = database.getLocalChanges(ResourceType.Observation, "observation1").last()
+      assertThat(
+          (FhirContext.forR4Cached().newJsonParser().parseResource(localChange.payload)
+              as Observation)
+            .subject
+            .reference,
+        )
+        .isEqualTo("Patient/patient2")
+    }
 
   @Test
-  fun consolidate_allChangesBundleSquashedPost_shouldUpdateResourceId() = runBlocking {
-    val preSyncPatientJsonString =
-      """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
-        }
-            """
-        .trimIndent()
-    val preSyncPatient =
-      FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(preSyncPatientJsonString) as DomainResource
+  fun resourceConsolidator_bundleComponentUploadResponse_shouldUpdateNewResourceId() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
     database.insert(preSyncPatient)
     val localChanges =
       database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
@@ -287,11 +218,8 @@ class HttpPostResourceConsolidatorTest {
       FhirContext.forCached(FhirVersionEnum.R4)
         .newJsonParser()
         .parseResource(bundleEntryComponentJsonString) as Bundle
-
     val patientResponseEntry =
-      (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
-    val secondResponseEntry = postSyncResponseBundle.entry[1]
-
+      (postSyncResponseBundle.entry.first() as BundleEntryComponent).response
     val uploadRequestResult =
       UploadRequestResult.Success(
         listOf(BundleComponentUploadResponseMapping(localChanges, patientResponseEntry)),
@@ -311,35 +239,14 @@ class HttpPostResourceConsolidatorTest {
   }
 
   @Test
-  fun consolidate_allChangesBundleSquashedPost_dependentResources_shouldUpdateReferenceValue() =
+  fun resourceConsolidator_bundleComponentUploadResponse_shouldUpdateReferenceValueOfReferencingResources() =
     runBlocking {
-      val preSyncPatientJsonString =
-        """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
-        }
-            """
-          .trimIndent()
-      val preSyncPatient =
-        FhirContext.forCached(FhirVersionEnum.R4)
-          .newJsonParser()
-          .parseResource(preSyncPatientJsonString) as DomainResource
-      val preSyncObservationJsonString =
-        """
-        {
-          "resourceType": "Observation",
-          "id": "observation1",
-          "subject": {
-            "reference": "Patient/patient1"
-          }
-        }
-            """
-          .trimIndent()
+      val preSyncPatient = Patient().apply { id = "patient1" }
       val preSyncObservation =
-        FhirContext.forCached(FhirVersionEnum.R4)
-          .newJsonParser()
-          .parseResource(preSyncObservationJsonString) as DomainResource
+        Observation().apply {
+          id = "observation1"
+          subject = Reference("Patient/patient1")
+        }
       database.insert(preSyncPatient, preSyncObservation)
       val patientLocalChanges =
         database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
@@ -385,7 +292,7 @@ class HttpPostResourceConsolidatorTest {
           .parseResource(bundleEntryComponentJsonString) as Bundle
 
       val patientResponseEntry =
-        (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
+        (postSyncResponseBundle.entry.first() as BundleEntryComponent).response
       val observationResponseEntry =
         (postSyncResponseBundle.entry[1] as BundleEntryComponent).response
 
@@ -408,19 +315,8 @@ class HttpPostResourceConsolidatorTest {
     }
 
   @Test
-  fun consolidate_allChangesBundleSquashedPost_shouldDiscardLocalChanges() = runBlocking {
-    val preSyncPatientJsonString =
-      """
-        {
-          "resourceType": "Patient",
-          "id": "patient1"
-        }
-            """
-        .trimIndent()
-    val preSyncPatient =
-      FhirContext.forCached(FhirVersionEnum.R4)
-        .newJsonParser()
-        .parseResource(preSyncPatientJsonString) as DomainResource
+  fun resourceConsolidator_bundleComponentUploadResponse_shouldDiscardLocalChanges() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
     database.insert(preSyncPatient)
     val localChanges =
       database.getLocalChanges(preSyncPatient.resourceType, preSyncPatient.logicalId)
@@ -447,7 +343,7 @@ class HttpPostResourceConsolidatorTest {
         .newJsonParser()
         .parseResource(bundleEntryComponentJsonString) as Bundle
     val patientResponseEntry =
-      (postSyncResponseBundle.entry.firstOrNull() as BundleEntryComponent).response
+      (postSyncResponseBundle.entry.first() as BundleEntryComponent).response
     val uploadRequestResult =
       UploadRequestResult.Success(
         listOf(BundleComponentUploadResponseMapping(localChanges, patientResponseEntry)),

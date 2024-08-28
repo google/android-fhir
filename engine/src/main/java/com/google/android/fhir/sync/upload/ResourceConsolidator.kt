@@ -19,7 +19,7 @@ package com.google.android.fhir.sync.upload
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
-import java.util.*
+import java.util.UUID
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.Resource
@@ -104,15 +104,17 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
               responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
                 val dependentResources =
                   responseMapping.output.resourceIdAndType?.let {
-                    database.getResourceUuidsThatReferenceTheGivenResource(
+                    database.getReferencingResourceUuids(
                       preSyncResourceId,
                       it.second,
                     )
                   }
                     ?: emptyList()
-                val tokenIds =
-                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids }
-                database.deleteUpdates(LocalChangeToken(tokenIds))
+                database.deleteUpdates(
+                  LocalChangeToken(
+                    responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                  ),
+                )
                 updateResourcePostSync(
                   preSyncResourceId,
                   responseMapping.output,
@@ -163,7 +165,7 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   ) {
     if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
       response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
-        database.updateResourcesPostSync(
+        database.updateResource(
           preSyncResourceId,
           postSyncResourceID,
           resourceType,
