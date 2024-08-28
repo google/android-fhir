@@ -28,13 +28,14 @@ import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.enablement.EnablementEvaluator
 import com.google.android.fhir.datacapture.expressions.EnabledAnswerOptionsEvaluator
 import com.google.android.fhir.datacapture.extensions.EntryMode
-import com.google.android.fhir.datacapture.extensions.addNestedItemsToAnswer
 import com.google.android.fhir.datacapture.extensions.allItems
+import com.google.android.fhir.datacapture.extensions.calculatedExpression
+import com.google.android.fhir.datacapture.extensions.copyNestedItemsToChildlessAnswers
 import com.google.android.fhir.datacapture.extensions.cqfExpression
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
-import com.google.android.fhir.datacapture.extensions.flattened
+import com.google.android.fhir.datacapture.extensions.forEachItemPair
 import com.google.android.fhir.datacapture.extensions.hasDifferentAnswerSet
 import com.google.android.fhir.datacapture.extensions.isDisplayItem
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -228,6 +229,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /** Flag to show/hide submit button. Default is true. */
   private var shouldShowSubmitButton = state[QuestionnaireFragment.EXTRA_SHOW_SUBMIT_BUTTON] ?: true
 
+  /** Flag to show questionnaire page as default/long scroll. Default is false. */
+  private var shouldSetNavigationInLongScroll =
+    state[QuestionnaireFragment.EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL] ?: false
+
+  private var submitButtonText =
+    state[QuestionnaireFragment.EXTRA_SUBMIT_BUTTON_TEXT]
+      ?: application.getString(R.string.submit_questionnaire)
+
+  private var onSubmitButtonClickListener: () -> Unit = {}
+
+  private var onCancelButtonClickListener: () -> Unit = {}
+
   /** Flag to show/hide cancel button. Default is false */
   private var shouldShowCancelButton =
     state[QuestionnaireFragment.EXTRA_SHOW_CANCEL_BUTTON] ?: false
@@ -335,7 +348,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       Any?,
     ) -> Unit =
     { questionnaireItem, questionnaireResponseItem, answers, draftAnswer ->
-      // TODO(jingtang10): update the questionnaire response item pre-order list and the parent map
       questionnaireResponseItem.answer = answers.toList()
       when {
         (questionnaireResponseItem.answer.isNotEmpty()) -> {
@@ -350,11 +362,24 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
       if (questionnaireItem.shouldHaveNestedItemsUnderAnswers) {
-        questionnaireResponseItem.addNestedItemsToAnswer(questionnaireItem)
+        questionnaireResponseItem.copyNestedItemsToChildlessAnswers(questionnaireItem)
+
+        // If nested items are added to the answer, the enablement evaluator needs to be
+        // reinitialized in order for it to rebuild the pre-order map and parent map of
+        // questionnaire response items to reflect the new structure of the questionnaire response
+        // to correctly calculate calculate enable when statements.
+        enablementEvaluator =
+          EnablementEvaluator(
+            questionnaire,
+            questionnaireResponse,
+            questionnaireItemParentMap,
+            questionnaireLaunchContextMap,
+            xFhirQueryResolver,
+          )
       }
       modifiedQuestionnaireResponseItemSet.add(questionnaireResponseItem)
 
-      updateDependentQuestionnaireResponseItems(questionnaireItem, questionnaireResponseItem)
+      updateAnswerWithAffectedCalculatedExpression(questionnaireItem)
 
       modificationCount.update { it + 1 }
     }
@@ -368,7 +393,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       xFhirQueryResolver,
     )
 
-  private val enablementEvaluator: EnablementEvaluator =
+  private var enablementEvaluator: EnablementEvaluator =
     EnablementEvaluator(
       questionnaire,
       questionnaireResponse,
@@ -394,10 +419,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * Adds empty [QuestionnaireResponseItemComponent]s to `responseItems` so that each
    * [QuestionnaireItemComponent] in `questionnaireItems` has at least one corresponding
    * [QuestionnaireResponseItemComponent]. This is because user-provided [QuestionnaireResponse]
-   * might not contain answers to unanswered or disabled questions. Note : this only applies to
-   * [QuestionnaireItemComponent]s nested under a group.
+   * might not contain answers to unanswered or disabled questions. This function should only be
+   * used for unpacked questionnaire.
    */
-  private fun addMissingResponseItems(
+  @VisibleForTesting
+  internal fun addMissingResponseItems(
     questionnaireItems: List<QuestionnaireItemComponent>,
     responseItems: MutableList<QuestionnaireResponseItemComponent>,
   ) {
@@ -420,6 +446,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnaireItems = it.item,
             responseItems = responseItemMap[it.linkId]!!.single().item,
           )
+        }
+        if (it.type == Questionnaire.QuestionnaireItemType.GROUP && it.repeats) {
+          responseItemMap[it.linkId]!!.forEach { rItem ->
+            addMissingResponseItems(
+              questionnaireItems = it.item,
+              responseItems = rItem.item,
+            )
+          }
         }
         responseItems.addAll(responseItemMap[it.linkId]!!)
       }
@@ -532,6 +566,14 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
   }
 
+  internal fun setOnSubmitButtonClickListener(onClickAction: () -> Unit) {
+    onSubmitButtonClickListener = onClickAction
+  }
+
+  internal fun setOnCancelButtonClickListener(onClickAction: () -> Unit) {
+    onCancelButtonClickListener = onClickAction
+  }
+
   internal fun setShowSubmitButtonFlag(showSubmitButton: Boolean) {
     this.shouldShowSubmitButton = showSubmitButton
   }
@@ -548,13 +590,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .withIndex()
       .onEach {
         if (it.index == 0) {
-          expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
-          questionnaire.item.flattened().forEach { qItem ->
-            updateDependentQuestionnaireResponseItems(
-              qItem,
-              questionnaireResponse.allItems.find { qrItem -> qrItem.linkId == qItem.linkId },
-            )
-          }
+          initializeCalculatedExpressions()
           modificationCount.update { count -> count + 1 }
         }
       }
@@ -562,17 +598,45 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .stateIn(
         viewModelScope,
         SharingStarted.Lazily,
-        initialValue = QuestionnaireState(items = emptyList(), displayMode = DisplayMode.InitMode),
+        initialValue =
+          QuestionnaireState(
+            items = emptyList(),
+            displayMode = DisplayMode.InitMode,
+            bottomNavItem = null,
+          ),
       )
 
-  private suspend fun updateDependentQuestionnaireResponseItems(
+  /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
+  private suspend fun initializeCalculatedExpressions() {
+    expressionEvaluator.detectExpressionCyclicDependency(questionnaire.item)
+    questionnaire.forEachItemPair(questionnaireResponse) {
+      questionnaireItem,
+      questionnaireResponseItem,
+      ->
+      if (questionnaireItem.calculatedExpression != null) {
+        updateAnswerWithCalculatedExpression(questionnaireItem, questionnaireResponseItem)
+      }
+    }
+  }
+
+  /**
+   * Updates all items that has [calculatedExpression] that reference the given [questionnaireItem]
+   * within their calculations.
+   *
+   * If item X has a [calculatedExpression], but that item does not reference the given
+   * [questionnaireItem], then item X should not be calculated.
+   *
+   * Only items that have not been modified by the user will be updated to prevent any event loops.
+   *
+   * @param questionnaireItem The questionnaire item referenced by other items through
+   *   [calculatedExpression].
+   */
+  private suspend fun updateAnswerWithAffectedCalculatedExpression(
     questionnaireItem: QuestionnaireItemComponent,
-    updatedQuestionnaireResponseItem: QuestionnaireResponseItemComponent?,
   ) {
     expressionEvaluator
-      .evaluateCalculatedExpressions(
+      .evaluateAllAffectedCalculatedExpressions(
         questionnaireItem,
-        updatedQuestionnaireResponseItem,
       )
       .forEach { (questionnaireItem, calculatedAnswers) ->
         // update all response item with updated values
@@ -594,6 +658,33 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             }
           }
       }
+  }
+
+  /**
+   * Updates the answer(s) in the questionnaire response item with the evaluation result of the
+   * calculated expression if
+   * - there is a calculated expression in the questionnaire item, and
+   * - there is no user provided answer to the questionnaire response item (user input should always
+   *   take precedence over calculated answers).
+   *
+   * Do nothing, otherwise.
+   */
+  private suspend fun updateAnswerWithCalculatedExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent,
+  ) {
+    if (questionnaireItem.calculatedExpression == null) return
+    if (modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem)) return
+    val answers =
+      expressionEvaluator.evaluateCalculatedExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+      )
+    if (answers.isEmpty()) return
+    if (questionnaireResponseItem.answer.hasDifferentAnswerSet(answers)) {
+      questionnaireResponseItem.answer =
+        answers.map { QuestionnaireResponseItemAnswerComponent().apply { value = it } }
+    }
   }
 
   private fun removeDisabledAnswers(
@@ -640,51 +731,126 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
 
     // Reviewing the questionnaire or the questionnaire is read-only
     if (isReadOnly || isInReviewModeFlow.value) {
+      val showSubmitButton = !isReadOnly && shouldShowSubmitButton
+      val bottomNavigationViewState =
+        QuestionnaireNavigationUIState(
+          navSubmit =
+            if (showSubmitButton) {
+              QuestionnaireNavigationViewUIState.Enabled(
+                submitButtonText,
+                onSubmitButtonClickListener,
+              )
+            } else {
+              QuestionnaireNavigationViewUIState.Hidden
+            },
+          navCancel =
+            if (!isReadOnly && shouldShowCancelButton) {
+              QuestionnaireNavigationViewUIState.Enabled(
+                onClickAction = onCancelButtonClickListener,
+              )
+            } else {
+              QuestionnaireNavigationViewUIState.Hidden
+            },
+        )
+      val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationViewState)
+
       return QuestionnaireState(
-        items = questionnaireItemViewItems,
+        items =
+          if (shouldSetNavigationInLongScroll) {
+            questionnaireItemViewItems + bottomNavigation
+          } else {
+            questionnaireItemViewItems
+          },
         displayMode =
           DisplayMode.ReviewMode(
             showEditButton = !isReadOnly,
-            showSubmitButton = !isReadOnly && shouldShowSubmitButton,
-            showCancelButton = !isReadOnly && shouldShowCancelButton,
+            showNavAsScroll = shouldSetNavigationInLongScroll,
           ),
+        bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
       )
     }
 
+    val showReviewButton: Boolean
+    val showSubmitButton: Boolean
+    val showCancelButton: Boolean
     // Editing the questionnaire
     val questionnairePagination =
       if (!questionnaire.isPaginated) {
-        val showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
-        val showSubmitButton = shouldShowSubmitButton && !showReviewButton
-        val showCancelButton = shouldShowCancelButton && !showReviewButton
+        showReviewButton = shouldEnableReviewPage && !isInReviewModeFlow.value
+        showSubmitButton = shouldShowSubmitButton && !showReviewButton
+        showCancelButton = shouldShowCancelButton && !showReviewButton
         QuestionnairePagination(
           false,
           emptyList(),
           -1,
-          showSubmitButton,
-          showCancelButton,
-          showReviewButton,
         )
       } else {
         val hasNextPage =
           QuestionnairePagination(pages = pages!!, currentPageIndex = currentPageIndexFlow.value!!)
             .hasNextPage
-        val showReviewButton = shouldEnableReviewPage && !hasNextPage
-        val showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
-        val showCancelButton = shouldShowCancelButton
+        showReviewButton = shouldEnableReviewPage && !hasNextPage
+        showSubmitButton = shouldShowSubmitButton && !showReviewButton && !hasNextPage
+        showCancelButton = shouldShowCancelButton
         QuestionnairePagination(
           true,
           pages!!,
           currentPageIndexFlow.value!!,
-          showSubmitButton,
-          showCancelButton,
-          showReviewButton,
         )
       }
 
+    val bottomNavigationUiViewState =
+      QuestionnaireNavigationUIState(
+        navPrevious =
+          when {
+            questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage -> {
+              QuestionnaireNavigationViewUIState.Enabled { goToPreviousPage() }
+            }
+            else -> {
+              QuestionnaireNavigationViewUIState.Hidden
+            }
+          },
+        navNext =
+          when {
+            questionnairePagination.isPaginated && questionnairePagination.hasNextPage -> {
+              QuestionnaireNavigationViewUIState.Enabled { goToNextPage() }
+            }
+            else -> {
+              QuestionnaireNavigationViewUIState.Hidden
+            }
+          },
+        navSubmit =
+          if (showSubmitButton) {
+            QuestionnaireNavigationViewUIState.Enabled(
+              submitButtonText,
+              onSubmitButtonClickListener,
+            )
+          } else {
+            QuestionnaireNavigationViewUIState.Hidden
+          },
+        navReview =
+          if (showReviewButton) {
+            QuestionnaireNavigationViewUIState.Enabled { setReviewMode(true) }
+          } else {
+            QuestionnaireNavigationViewUIState.Hidden
+          },
+        navCancel =
+          if (showCancelButton) {
+            QuestionnaireNavigationViewUIState.Enabled(onClickAction = onCancelButtonClickListener)
+          } else {
+            QuestionnaireNavigationViewUIState.Hidden
+          },
+      )
+    val bottomNavigation = QuestionnaireAdapterItem.Navigation(bottomNavigationUiViewState)
+
     return QuestionnaireState(
-      items = questionnaireItemViewItems,
-      displayMode = DisplayMode.EditMode(questionnairePagination),
+      items =
+        if (shouldSetNavigationInLongScroll) {
+          questionnaireItemViewItems + bottomNavigation
+        } else {
+          questionnaireItemViewItems
+        },
+      displayMode = DisplayMode.EditMode(questionnairePagination, shouldSetNavigationInLongScroll),
+      bottomNavItem = if (!shouldSetNavigationInLongScroll) bottomNavigation else null,
     )
   }
 
@@ -845,6 +1011,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
                 index = index,
                 onDeleteClicked = { viewModelScope.launch { question.item.removeAnswerAt(index) } },
                 responses = nestedResponseItemList,
+                title = question.item.questionText?.toString() ?: "",
               ),
             )
           }
@@ -975,15 +1142,16 @@ typealias ItemToParentMap = MutableMap<QuestionnaireItemComponent, Questionnaire
 internal data class QuestionnaireState(
   val items: List<QuestionnaireAdapterItem>,
   val displayMode: DisplayMode,
+  val bottomNavItem: QuestionnaireAdapterItem.Navigation?,
 )
 
 internal sealed class DisplayMode {
-  class EditMode(val pagination: QuestionnairePagination) : DisplayMode()
+  class EditMode(val pagination: QuestionnairePagination, val showNavAsScroll: Boolean) :
+    DisplayMode()
 
   data class ReviewMode(
     val showEditButton: Boolean,
-    val showSubmitButton: Boolean,
-    val showCancelButton: Boolean,
+    val showNavAsScroll: Boolean,
   ) : DisplayMode()
 
   // Sentinel displayMode that's used in setting the initial default QuestionnaireState
@@ -998,9 +1166,6 @@ internal data class QuestionnairePagination(
   val isPaginated: Boolean = false,
   val pages: List<QuestionnairePage>,
   val currentPageIndex: Int,
-  val showSubmitButton: Boolean = false,
-  val showCancelButton: Boolean = false,
-  val showReviewButton: Boolean = false,
 )
 
 /** A single page in the questionnaire. This is used for the UI to render pagination controls. */

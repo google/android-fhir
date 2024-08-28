@@ -1,0 +1,234 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "41dc6411ce57c1eeba3300592f302b07",
+    "entities": [
+      {
+        "tableName": "ImplementationGuideEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`implementationGuideId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `packageId` TEXT NOT NULL, `version` TEXT, `rootDirectory` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "implementationGuideId",
+            "columnName": "implementationGuideId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "packageId",
+            "columnName": "packageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "rootDirectory",
+            "columnName": "rootDirectory",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "implementationGuideId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ImplementationGuideEntity_implementationGuideId",
+            "unique": false,
+            "columnNames": [
+              "implementationGuideId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ImplementationGuideEntity_implementationGuideId` ON `${TABLE_NAME}` (`implementationGuideId`)"
+          },
+          {
+            "name": "index_ImplementationGuideEntity_packageId_url_version",
+            "unique": true,
+            "columnNames": [
+              "packageId",
+              "url",
+              "version"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ImplementationGuideEntity_packageId_url_version` ON `${TABLE_NAME}` (`packageId`, `url`, `version`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ResourceMetadataEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`resourceMetadataId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `resourceType` TEXT NOT NULL, `url` TEXT, `name` TEXT, `version` TEXT, `resourceFile` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "resourceMetadataId",
+            "columnName": "resourceMetadataId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resourceType",
+            "columnName": "resourceType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "version",
+            "columnName": "version",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "resourceFile",
+            "columnName": "resourceFile",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "resourceMetadataId"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ResourceMetadataEntity_resourceMetadataId",
+            "unique": false,
+            "columnNames": [
+              "resourceMetadataId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ResourceMetadataEntity_resourceMetadataId` ON `${TABLE_NAME}` (`resourceMetadataId`)"
+          },
+          {
+            "name": "index_ResourceMetadataEntity_url_version_resourceFile",
+            "unique": true,
+            "columnNames": [
+              "url",
+              "version",
+              "resourceFile"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ResourceMetadataEntity_url_version_resourceFile` ON `${TABLE_NAME}` (`url`, `version`, `resourceFile`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "ImplementationGuideResourceMetadataEntity",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `implementationGuideId` INTEGER, `resourceMetadataId` INTEGER NOT NULL, FOREIGN KEY(`implementationGuideId`) REFERENCES `ImplementationGuideEntity`(`implementationGuideId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`resourceMetadataId`) REFERENCES `ResourceMetadataEntity`(`resourceMetadataId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "implementationGuideId",
+            "columnName": "implementationGuideId",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "resourceMetadataId",
+            "columnName": "resourceMetadataId",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_ImplementationGuideResourceMetadataEntity_implementationGuideId",
+            "unique": false,
+            "columnNames": [
+              "implementationGuideId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ImplementationGuideResourceMetadataEntity_implementationGuideId` ON `${TABLE_NAME}` (`implementationGuideId`)"
+          },
+          {
+            "name": "index_ImplementationGuideResourceMetadataEntity_resourceMetadataId",
+            "unique": false,
+            "columnNames": [
+              "resourceMetadataId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_ImplementationGuideResourceMetadataEntity_resourceMetadataId` ON `${TABLE_NAME}` (`resourceMetadataId`)"
+          },
+          {
+            "name": "index_ImplementationGuideResourceMetadataEntity_implementationGuideId_resourceMetadataId",
+            "unique": true,
+            "columnNames": [
+              "implementationGuideId",
+              "resourceMetadataId"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ImplementationGuideResourceMetadataEntity_implementationGuideId_resourceMetadataId` ON `${TABLE_NAME}` (`implementationGuideId`, `resourceMetadataId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "ImplementationGuideEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "implementationGuideId"
+            ],
+            "referencedColumns": [
+              "implementationGuideId"
+            ]
+          },
+          {
+            "table": "ResourceMetadataEntity",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "resourceMetadataId"
+            ],
+            "referencedColumns": [
+              "resourceMetadataId"
+            ]
+          }
+        ]
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '41dc6411ce57c1eeba3300592f302b07')"
+    ]
+  }
+}

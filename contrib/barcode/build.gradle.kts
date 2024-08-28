@@ -13,9 +13,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.datacapture.contrib.views.barcode"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -29,6 +29,12 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
   }
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https://developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
+  }
+
   packaging {
     resources.excludes.addAll(
       listOf(
@@ -49,31 +55,33 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  androidTestImplementation(Dependencies.AndroidxTest.rules)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
   androidTestImplementation(Dependencies.mockitoInline)
-  androidTestImplementation(Dependencies.truth)
+  androidTestImplementation(libs.androidx.fragment.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.truth)
+
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(project(":datacapture"))
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.Mlkit.barcodeScanning)
   implementation(Dependencies.Mlkit.objectDetection)
   implementation(Dependencies.Mlkit.objectDetectionCustom)
   implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Androidx.appCompat)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
 
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.fragment.testing)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
 }

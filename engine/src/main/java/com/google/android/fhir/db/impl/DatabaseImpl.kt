@@ -31,6 +31,7 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.LocalChangeDao.Companion.SQLITE_LIMIT_MAX_VARIABLE_NUMBER
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
@@ -234,10 +235,9 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao
-        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
-        .distinctBy { it.uuid }
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+        ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R)
+      }
     }
   }
 
@@ -320,11 +320,24 @@ internal class DatabaseImpl(
       val resourceUuid = oldResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
+      /**
+       * Update LocalChange records and identify referring resources.
+       *
+       * We need to update LocalChange records first because they might contain references to the
+       * old resource ID that are not readily searchable or present in the latest version of the
+       * [ResourceEntity] itself. The [LocalChangeResourceReferenceEntity] table helps us identify
+       * these [LocalChangeEntity] records accurately.
+       *
+       * Once LocalChange records are updated, we can then safely update the corresponding
+       * ResourceEntity records to ensure data consistency. Hence, we obtain the
+       * [ResourceEntity.resourceUuid]s of the resources from the updated LocalChangeEntity records
+       * and use them in the next step.
+       */
       val uuidsOfReferringResources =
-        updateLocalChangeResourceIdAndReferences(
+        localChangeDao.updateResourceIdAndReferences(
           resourceUuid = resourceUuid,
           oldResource = oldResource,
-          updatedResource = updatedResource,
+          updatedResourceId = updatedResource.logicalId,
         )
 
       updateReferringResources(
@@ -341,25 +354,6 @@ internal class DatabaseImpl(
    */
   private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
     resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
-
-  /**
-   * Update the [LocalChange]s to reflect the change in the resource ID. This primarily includes
-   * modifying the [LocalChange.resourceId] for the changes of the affected resource. Also, update
-   * any references in the [LocalChange] which refer to the affected resource.
-   *
-   * The function returns a [List<[UUID]>] which corresponds to the [ResourceEntity.resourceUuid]
-   * which contain references to the affected resource.
-   */
-  private suspend fun updateLocalChangeResourceIdAndReferences(
-    resourceUuid: UUID,
-    oldResource: Resource,
-    updatedResource: Resource,
-  ) =
-    localChangeDao.updateResourceIdAndReferences(
-      resourceUuid = resourceUuid,
-      oldResource = oldResource,
-      updatedResource = updatedResource,
-    )
 
   /**
    * Update all [Resource] and their corresponding [ResourceEntity] which refer to the affected
@@ -446,12 +440,14 @@ internal class DatabaseImpl(
   override suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference> {
-    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
-      LocalChangeResourceReference(
-        it.localChangeId,
-        it.resourceReferenceValue,
-        it.resourceReferencePath,
-      )
+    return localChangeIds.chunked(SQLITE_LIMIT_MAX_VARIABLE_NUMBER).flatMap { chunk ->
+      localChangeDao.getReferencesForLocalChanges(chunk).map {
+        LocalChangeResourceReference(
+          it.localChangeId,
+          it.resourceReferenceValue,
+          it.resourceReferencePath,
+        )
+      }
     }
   }
 

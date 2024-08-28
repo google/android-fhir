@@ -1,0 +1,74 @@
+{
+  "resourceType" : "ValueSet",
+  "id" : "inactive-condition",
+  "meta" : {
+    "profile" : ["http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-publishablevalueset"]
+  },
+  "text" : {
+    "status" : "extensions",
+    "div" : "<div xmlns=\"http://www.w3.org/1999/xhtml\"><ul><li>Include these codes as defined in <a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html\"><code>http://terminology.hl7.org/CodeSystem/condition-clinical</code></a><table class=\"none\"><tr><td style=\"white-space:nowrap\"><b>Code</b></td><td><b>Display</b></td><td><b>Definition</b></td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-inactive\">inactive</a></td><td>Inactive</td><td>The subject is no longer experiencing the condition or situation and there is no longer evidence or appreciable risk of the condition or situation.</td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-remission\">remission</a></td><td>Remission</td><td>The subject is not presently experiencing the condition or situation, but there is a risk of the condition or situation returning.</td></tr><tr><td><a href=\"http://terminology.hl7.org/2.1.0/CodeSystem-condition-clinical.html#condition-clinical-resolved\">resolved</a></td><td>Resolved</td><td>The subject is not presently experiencing the condition or situation and there is a negligible perceived risk of the condition or situation returning.</td></tr></table></li></ul></div>"
+  },
+  "extension" : [{
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueCode" : "shareable"
+  },
+  {
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueCode" : "computable"
+  },
+  {
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeCapability",
+    "valueCode" : "publishable"
+  },
+  {
+    "url" : "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-knowledgeRepresentationLevel",
+    "valueCode" : "structured"
+  },
+  {
+    "url" : "http://hl7.org/fhir/StructureDefinition/valueset-author",
+    "valueContactDetail" : {
+      "name" : "Bryn Rhodes"
+    }
+  }],
+  "url" : "http://fhir.org/guides/cqf/common/ValueSet/inactive-condition",
+  "version" : "0.1.0",
+  "name" : "CQFInactiveCondition",
+  "title" : "CQF Inactive Condition",
+  "status" : "active",
+  "experimental" : false,
+  "date" : "2019-07-21",
+  "publisher" : "World Health Organization (WHO)",
+  "contact" : [{
+    "name" : "World Health Organization (WHO)",
+    "telecom" : [{
+      "system" : "url",
+      "value" : "https://www.who.int"
+    }]
+  }],
+  "description" : "Inactive condition clinical status codes",
+  "jurisdiction" : [{
+    "coding" : [{
+      "system" : "http://unstats.un.org/unsd/methods/m49/m49.htm",
+      "code" : "001"
+    }]
+  }],
+  "purpose" : "Used to specify the set of clinical status codes that are considered inactive",
+  "copyright" : "© Alphora 2019+",
+  "compose" : {
+    "include" : [{
+      "system" : "http://terminology.hl7.org/CodeSystem/condition-clinical",
+      "concept" : [{
+        "code" : "inactive",
+        "display" : "Inactive"
+      },
+      {
+        "code" : "remission",
+        "display" : "Remission"
+      },
+      {
+        "code" : "resolved",
+        "display" : "Resolved"
+      }]
+    }]
+  }
+}

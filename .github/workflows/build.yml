@@ -49,6 +49,7 @@ jobs:
     permissions:
       actions: read
       contents: read
+      packages: write
 
     strategy:
       fail-fast: false
@@ -75,9 +76,21 @@ jobs:
       - name: Check with Gradle
         run: ./gradlew check --scan --full-stacktrace
 
+      - name: Publish Maven packages to GitHub Packages
+        if: ${{ github.event_name == 'push' }}
+        run: ./gradlew publish
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY_URL: 'https://maven.pkg.github.com/google/android-fhir'
+          # Use SNAPSHOT Prefix to follow Maven convention
+          ARTIFACT_VERSION_SUFFIX: SNAPSHOT
+
       - name: Release artifacts to local repo
         run: ./gradlew publishReleasePublicationToCIRepository --scan
-      - name: Upload maven repo
+        env:
+          ARTIFACT_VERSION_SUFFIX: build_${{ github.run_id }}
+
+      - name: Upload artifact maven-repository.zip
         uses: actions/upload-artifact@v4
         with:
           name: maven-repository

@@ -19,6 +19,7 @@ package com.google.android.fhir.sync
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
@@ -33,9 +34,11 @@ import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -105,11 +108,53 @@ class SyncInstrumentedTest {
   }
 
   @Test
+  fun oneTimeSync_currentSyncJobStatusSucceeded_nextCurrentSyncJobStatusShouldBeRunning() =
+    runBlocking {
+      WorkManagerTestInitHelper.initializeTestWorkManager(context)
+      val states = mutableListOf<CurrentSyncJobStatus>()
+      val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
+
+      launch {
+          Sync.oneTimeSync<TestSyncWorker>(context = context).collect {
+            states.add(it)
+            if (it is CurrentSyncJobStatus.Succeeded) {
+              cancel()
+            }
+          }
+        }
+        .join()
+
+      launch {
+          Sync.oneTimeSync<TestSyncWorker>(context = context).collect {
+            nextExecutionStates.add(it)
+            if (it is CurrentSyncJobStatus.Succeeded) {
+              cancel()
+            }
+          }
+        }
+        .join()
+
+      assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+      assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Succeeded::class.java)
+      assertThat(nextExecutionStates.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+    }
+
+  @Test
   fun oneTime_worker_failedSyncState() {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     runBlocking {
-      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(context = context)
+      Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+          context = context,
+          RetryConfiguration(
+            BackoffCriteria(
+              BackoffPolicy.LINEAR,
+              30,
+              TimeUnit.SECONDS,
+            ),
+            0,
+          ),
+        )
         .transformWhile {
           states.add(it)
           emit(it is CurrentSyncJobStatus.Failed)
@@ -120,6 +165,60 @@ class SyncInstrumentedTest {
     assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
   }
+
+  @Test
+  fun oneTimeSync_currentSyncJobStatusFailed_nextCurrentSyncJobStatusShouldBeRunning() =
+    runBlocking {
+      WorkManagerTestInitHelper.initializeTestWorkManager(context)
+      val states = mutableListOf<CurrentSyncJobStatus>()
+      val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
+
+      launch {
+          Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+              context = context,
+              RetryConfiguration(
+                BackoffCriteria(
+                  BackoffPolicy.LINEAR,
+                  30,
+                  TimeUnit.SECONDS,
+                ),
+                0,
+              ),
+            )
+            .collect {
+              states.add(it)
+              if (it is CurrentSyncJobStatus.Failed) {
+                cancel()
+              }
+            }
+        }
+        .join()
+
+      launch {
+          Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
+              context = context,
+              RetryConfiguration(
+                BackoffCriteria(
+                  BackoffPolicy.LINEAR,
+                  30,
+                  TimeUnit.SECONDS,
+                ),
+                0,
+              ),
+            )
+            .collect {
+              nextExecutionStates.add(it)
+              if (it is CurrentSyncJobStatus.Failed) {
+                cancel()
+              }
+            }
+        }
+        .join()
+
+      assertThat(states.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+      assertThat(states.last()).isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
+      assertThat(nextExecutionStates.first()).isInstanceOf(CurrentSyncJobStatus.Running::class.java)
+    }
 
   @Test
   fun periodic_worker_periodicSyncState() {

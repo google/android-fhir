@@ -18,13 +18,15 @@
     //   "platform": "33",
     //   "build_tools": "33.0.1"
     // }
-  }
+  },
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "java -version",
+  // See https://github.com/google/android-fhir/issues/2614, which is blocked by
+  // https://github.com/akhildevelops/devcontainer-features/issues/9.
+  "postCreateCommand": "sudo chown -R vscode:vscode /opt/android/"
 
   // Configure tool-specific properties.
   // "customizations": {},
