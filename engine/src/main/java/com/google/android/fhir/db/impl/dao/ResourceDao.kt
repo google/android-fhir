@@ -37,7 +37,6 @@ import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
-import com.google.android.fhir.index.ResourceIndexer.Companion.createLastUpdatedIndex
 import com.google.android.fhir.index.ResourceIndexer.Companion.createLocalLastUpdatedIndex
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
