@@ -478,11 +478,7 @@ internal class DatabaseImpl(
   ): List<UUID> {
     return db.withTransaction {
       val referenceValue = "${referencedResource.resourceType.name}/${referencedResource.logicalId}"
-      val localChangeIds =
-        localChangeDao
-          .getLocalChangeReferencesWithValue(referenceValue)
-          .map { it.localChangeId }
-          .distinct()
+      val localChangeIds = localChangeDao.getLocalChangeIdsWithReferenceValue(referenceValue)
       val localChanges = localChangeDao.getLocalChanges(localChangeIds)
       localChanges.map { it.resourceUuid }.distinct()
     }
