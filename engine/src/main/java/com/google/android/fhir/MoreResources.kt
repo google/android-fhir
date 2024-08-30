@@ -18,7 +18,7 @@ package com.google.android.fhir
 
 import java.lang.reflect.InvocationTargetException
 import java.time.Instant
-import java.util.*
+import java.util.Date
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Resource
@@ -67,6 +67,12 @@ internal val Resource.versionId: String?
 internal val Resource.lastUpdated
   get() = if (hasMeta()) meta.lastUpdated?.toInstant() else null
 
+/**
+ * Updates the meta information of a FHIR [Resource] with the provided version ID and last updated
+ * timestamp. This extension function sets the version ID and last updated time in the resource's
+ * metadata. If the provided values are null, the respective fields in the meta will remain
+ * unchanged.
+ */
 internal fun Resource.updateMeta(versionId: String?, lastUpdatedRemote: Instant?) {
   meta.apply {
     versionId?.let { versionIdElement = IdType(it) }

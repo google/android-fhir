@@ -39,8 +39,10 @@ import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
+import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -163,14 +165,14 @@ internal class DatabaseImpl(
     resourceId: String,
     resourceType: ResourceType,
     versionId: String?,
-    lastUpdated: Instant?,
+    lastUpdatedRemote: Instant?,
   ) {
     db.withTransaction {
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
-        lastUpdated,
+        lastUpdatedRemote,
       )
     }
   }
@@ -180,27 +182,17 @@ internal class DatabaseImpl(
     newResourceId: String,
     resourceType: ResourceType,
     versionId: String?,
-    lastUpdated: Instant?,
-    referencingResourceUuids: List<UUID>,
+    lastUpdatedRemote: Instant?,
   ) {
     db.withTransaction {
-      resourceDao.updateResourceAndIndices(
-        oldResourceId,
-        newResourceId,
-        resourceType,
-        versionId,
-        lastUpdated,
-      )
-      val oldReferenceValue = "$resourceType/$oldResourceId"
-      val newReferenceValue = "$resourceType/$newResourceId"
-      if (oldReferenceValue == newReferenceValue) {
-        return@withTransaction
+      resourceDao.getResourceEntity(oldResourceId, resourceType)?.let { oldResourceEntity ->
+        val updatedResource =
+          (iParser.parseResource(oldResourceEntity.serializedResource) as Resource).apply {
+            idElement = IdType(newResourceId)
+            updateMeta(versionId, lastUpdatedRemote)
+          }
+        updateResourceAndReferences(oldResourceId, updatedResource)
       }
-      updateReferringResources(
-        referringResourcesUuids = referencingResourceUuids,
-        oldReferenceValue = oldReferenceValue,
-        newReferenceValue = newReferenceValue,
-      )
     }
   }
 
@@ -311,13 +303,13 @@ internal class DatabaseImpl(
   }
 
   override suspend fun updateResourceAndReferences(
-    oldResourceId: String,
+    currentResourceId: String,
     updatedResource: Resource,
   ) {
     db.withTransaction {
-      val oldResourceEntity = selectEntity(updatedResource.resourceType, oldResourceId)
-      val oldResource = iParser.parseResource(oldResourceEntity.serializedResource) as Resource
-      val resourceUuid = oldResourceEntity.resourceUuid
+      val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
+      val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+      val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
       /**
@@ -368,14 +360,6 @@ internal class DatabaseImpl(
   ) {
     val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
-    updateReferringResources(referringResourcesUuids, oldReferenceValue, updatedReferenceValue)
-  }
-
-  private suspend fun updateReferringResources(
-    referringResourcesUuids: List<UUID>,
-    oldReferenceValue: String,
-    newReferenceValue: String,
-  ) {
     referringResourcesUuids.forEach { resourceUuid ->
       resourceDao.getResourceEntity(resourceUuid)?.let {
         val referringResource = iParser.parseResource(it.serializedResource) as Resource
@@ -384,7 +368,7 @@ internal class DatabaseImpl(
             iParser,
             referringResource,
             oldReferenceValue,
-            newReferenceValue,
+            updatedReferenceValue,
           )
         resourceDao.updateResourceWithUuid(resourceUuid, updatedReferringResource)
       }
@@ -448,39 +432,6 @@ internal class DatabaseImpl(
           it.resourceReferencePath,
         )
       }
-    }
-  }
-
-  override suspend fun getReferencingResourceUuids(
-    referencedResourceId: String,
-    referencedResourceType: ResourceType,
-  ): List<UUID> {
-    return db.withTransaction {
-      val referencedResource =
-        iParser.parseResource(
-          selectEntity(referencedResourceType, referencedResourceId).serializedResource,
-        ) as Resource
-      getReferencingResourceUuids(referencedResource)
-    }
-  }
-
-  /**
-   * Retrieves a list of UUIDs of referencing resources that reference the given
-   * [referencedResource]. This method maps the [referencedResource] to a
-   * [LocalChangeResourceReference.localChangeId] and then fetches the corresponding
-   * [LocalChangeEntity.resourceUuid].
-   *
-   * @param referencedResource The resource that is being referenced.
-   * @return A list of UUIDs of referencing resources that reference the [referencedResource].
-   */
-  private suspend fun getReferencingResourceUuids(
-    referencedResource: Resource,
-  ): List<UUID> {
-    return db.withTransaction {
-      val referenceValue = "${referencedResource.resourceType.name}/${referencedResource.logicalId}"
-      val localChangeIds = localChangeDao.getLocalChangeIdsWithReferenceValue(referenceValue)
-      val localChanges = localChangeDao.getLocalChanges(localChangeIds)
-      localChanges.map { it.resourceUuid }.distinct()
     }
   }
 

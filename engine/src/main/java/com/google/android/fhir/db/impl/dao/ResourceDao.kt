@@ -46,7 +46,6 @@ import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
 import java.util.UUID
-import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.InstantType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -88,8 +87,8 @@ internal abstract class ResourceDao {
         it.copy(
           resourceId = updatedResource.logicalId,
           serializedResource = iParser.encodeResourceToString(updatedResource),
-          lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
-          versionId = updatedResource.meta.versionId ?: it.versionId,
+          lastUpdatedRemote = updatedResource.lastUpdated ?: it.lastUpdatedRemote,
+          versionId = updatedResource.versionId ?: it.versionId,
         )
       updateChanges(entity, updatedResource)
     }
@@ -184,27 +183,6 @@ internal abstract class ResourceDao {
     resourceType: ResourceType,
     versionId: String?,
     lastUpdatedRemote: Instant?,
-  )
-
-  @Query(
-    """
-        UPDATE ResourceEntity
-        SET 
-            resourceId = :newResourceId,
-            serializedResource = :serializedResource,
-            versionId = :versionId,
-            lastUpdatedRemote = :lastUpdatedRemote
-        WHERE resourceId = :oldResourceId
-        AND resourceType = :resourceType
-    """,
-  )
-  abstract suspend fun updateResource(
-    oldResourceId: String,
-    newResourceId: String,
-    resourceType: ResourceType,
-    versionId: String?,
-    lastUpdatedRemote: Instant?,
-    serializedResource: String,
   )
 
   @Query(
@@ -318,37 +296,10 @@ internal abstract class ResourceDao {
     versionId: String?,
     lastUpdatedRemote: Instant?,
   ) {
-    getResourceEntity(resourceId, resourceType)?.let { oldResource ->
-      val resource = iParser.parseResource(oldResource.serializedResource) as Resource
+    getResourceEntity(resourceId, resourceType)?.let { oldResourceEntity ->
+      val resource = iParser.parseResource(oldResourceEntity.serializedResource) as Resource
       resource.updateMeta(versionId, lastUpdatedRemote)
-      updateResourceWithUuid(oldResource.resourceUuid, resource)
-    }
-  }
-
-  /**
-   * Updates a resource and its indices post-synchronization. This function updates a resource id
-   * [newResourceId], version [versionId], and last updated [lastUpdatedRemote] metadata to new
-   * values. It also updates the associated indices in the local database to reflect the latest
-   * synchronization state.
-   *
-   * @param oldResourceId The ID of the resource before synchronization.
-   * @param newResourceId The new ID of the resource after synchronization.
-   * @param resourceType The type of the resource being updated.
-   * @param versionId The new version ID of the resource after synchronization.
-   * @param lastUpdatedRemote The timestamp indicating when the resource was last updated remotely.
-   */
-  internal suspend fun updateResourceAndIndices(
-    oldResourceId: String,
-    newResourceId: String,
-    resourceType: ResourceType,
-    versionId: String?,
-    lastUpdatedRemote: Instant?,
-  ) {
-    getResourceEntity(oldResourceId, resourceType)?.let { oldResource ->
-      val resource = iParser.parseResource(oldResource.serializedResource) as Resource
-      resource.idElement = IdType(newResourceId)
-      resource.updateMeta(versionId, lastUpdatedRemote)
-      updateResourceWithUuid(oldResource.resourceUuid, resource)
+      updateResourceWithUuid(oldResourceEntity.resourceUuid, resource)
     }
   }
 

@@ -21,7 +21,6 @@ import com.google.android.fhir.db.Database
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
 import com.google.android.fhir.versionId
-import java.util.UUID
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
 import org.hl7.fhir.r4.model.ResourceType
@@ -59,10 +58,10 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
             is BundleComponentUploadResponseMapping -> {
-              updateVersionIdAndLastUpdated(it.output)
+              updateResourceMeta(it.output)
             }
             is ResourceUploadResponseMapping -> {
-              updateVersionIdAndLastUpdated(it.output)
+              updateResourceMeta(it.output)
             }
           }
         }
@@ -74,7 +73,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
       }
     }
 
-  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
+  private suspend fun updateResourceMeta(response: Bundle.BundleEntryResponseComponent) {
     response.resourceIdAndType?.let { (id, type) ->
       database.updateVersionIdAndLastUpdated(
         id,
@@ -85,7 +84,7 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
+  private suspend fun updateResourceMeta(resource: DomainResource) {
     database.updateVersionIdAndLastUpdated(
       resource.id,
       resource.resourceType,
@@ -103,14 +102,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
           when (responseMapping) {
             is BundleComponentUploadResponseMapping -> {
               responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
-                val dependentResources =
-                  responseMapping.output.resourceIdAndType?.let {
-                    database.getReferencingResourceUuids(
-                      preSyncResourceId,
-                      it.second,
-                    )
-                  }
-                    ?: emptyList()
                 database.deleteUpdates(
                   LocalChangeToken(
                     responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
@@ -119,7 +110,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
                 updateResourcePostSync(
                   preSyncResourceId,
                   responseMapping.output,
-                  dependentResources,
                 )
               }
             }
@@ -149,7 +139,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,
     response: Bundle.BundleEntryResponseComponent,
-    dependentResources: List<UUID> = emptyList(),
   ) {
     response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
       database.updateResource(
@@ -158,7 +147,6 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
         resourceType,
         response.etag?.let { getVersionFromETag(response.etag) },
         response.lastModified?.let { response.lastModified.toInstant() },
-        dependentResources,
       )
     }
   }

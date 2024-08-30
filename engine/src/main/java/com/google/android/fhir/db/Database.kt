@@ -80,7 +80,6 @@ internal interface Database {
     resourceType: ResourceType,
     versionId: String?,
     lastUpdated: Instant?,
-    referencingResourceUuids: List<UUID> = emptyList(),
   )
 
   /**
@@ -216,21 +215,6 @@ internal interface Database {
   suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference>
-
-  /**
-   * Retrieves a list of UUIDs of referencing resources that reference the given
-   * [referencedResourceId]. This method maps the [referencedResourceId] to a
-   * [LocalChangeResourceReference.localChangeId] and then fetches the corresponding
-   * [LocalChangeEntity.resourceUuid].
-   *
-   * @param referencedResourceId The resource that is being referenced.
-   * @param referencedResourceType The type of the [Resource].
-   * @return A list of UUIDs of referencing resources that reference the [referencedResourceId].
-   */
-  suspend fun getReferencingResourceUuids(
-    referencedResourceId: String,
-    referencedResourceType: ResourceType,
-  ): List<UUID>
 }
 
 internal data class ResourceWithUUID<R>(
