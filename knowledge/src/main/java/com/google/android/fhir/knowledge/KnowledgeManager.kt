@@ -167,6 +167,7 @@ internal constructor(
   }
 
   /** Loads resources from IGs listed in dependencies. */
+  @Deprecated("Load resources using URLs only")
   suspend fun loadResources(
     resourceType: String,
     url: String? = null,
@@ -175,6 +176,7 @@ internal constructor(
     version: String? = null,
   ): Iterable<IBaseResource> {
     val resType = ResourceType.fromCode(resourceType)
+
     val resourceEntities =
       when {
         url != null && version != null ->
@@ -187,6 +189,65 @@ internal constructor(
         else -> knowledgeDao.getResources(resType)
       }
     return resourceEntities.map { readMetadataResourceOrThrow(it.resourceFile)!! }
+  }
+
+  /**
+   * Loads knowledge artifact by its canonical URL and an optional version.
+   *
+   * The version can either be passed as a parameter or as part of the URL (using pipe `|` to
+   * separate the URL and the version). For example, passing the URL
+   * `http://abc.xyz/fhir/Library|1.0.0` with no version is the same as passing the URL
+   * `http://abc.xyz/fhir/Library` and version `1.0.0`.
+   *
+   * However, if a version is specified both as a parameter and as part of the URL, the two must
+   * match.
+   *
+   * @throws IllegalArgumentException if the url contains more than one pipe `|`
+   * @throws IllegalArgumentException if the version specified in the URL and the explicit version
+   *   do not match
+   */
+  suspend fun loadResources(
+    url: String,
+    version: String? = null,
+  ): Iterable<IBaseResource> {
+    val (canonicalUrl, canonicalVersion) = canonicalizeUrlAndVersion(url, version ?: "")
+
+    val resourceEntities =
+      if (canonicalVersion == "") {
+        knowledgeDao.getResource(canonicalUrl)
+      } else {
+        listOfNotNull(knowledgeDao.getResource(canonicalUrl, canonicalVersion))
+      }
+    return resourceEntities.map { readMetadataResourceOrThrow(it.resourceFile) }
+  }
+
+  /**
+   * Canonicalizes the URL and version. It will extract the version as part of the URL separated by
+   * pipe `|`.
+   *
+   * For example, URL `http://abc.xyz/fhir/Library|1.0.0` will be canonicalized as URL
+   * `http://abc.xyz/fhir/Library` and version `1.0.0`.
+   *
+   * @throws IllegalArgumentException if the URL contains more than one pipe
+   * @throws IllegalArgumentException if the version specified in the URL and the explicit version
+   *   do not match
+   */
+  private fun canonicalizeUrlAndVersion(
+    url: String,
+    version: String,
+  ): Pair<String, String> {
+    if (!url.contains('|')) {
+      return Pair(url, version)
+    }
+
+    val parts = url.split('|')
+    require(parts.size == 2) { "URL $url contains too many parts separated by \"|\"" }
+
+    // If an explicit version is specified, it must match the one in the URL
+    require(version == "" || version == parts[1]) {
+      "Version specified in the URL $parts[1] and explicit version $version do not match"
+    }
+    return Pair(parts[0], parts[1])
   }
 
   /** Deletes Implementation Guide, cleans up files. */

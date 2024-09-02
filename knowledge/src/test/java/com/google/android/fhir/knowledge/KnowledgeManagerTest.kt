@@ -99,20 +99,27 @@ internal class KnowledgeManagerTest {
   fun `imported entries are readable`() = runTest {
     knowledgeManager.import(fhirNpmPackage, dataFolder)
 
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
-      .isNotNull()
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon"))
-      .isNotNull()
-    assertThat(knowledgeManager.loadResources(resourceType = "Measure")).hasSize(1)
     assertThat(
         knowledgeManager.loadResources(
-          resourceType = "Measure",
-          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+          url = "http://fhir.org/guides/who/anc-cds/Library/WHOCommon",
+          version = "0.3.0",
         ),
       )
-      .isNotEmpty()
-    assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
-      .isNotNull()
+      .hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          url = "http://fhir.org/guides/who/anc-cds/Library/FHIRCommon",
+          version = "0.3.0",
+        ),
+      )
+      .hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+          version = "0.3.0",
+        ),
+      )
+      .hasSize(1)
   }
 
   @Test
@@ -130,14 +137,14 @@ internal class KnowledgeManagerTest {
       Library().apply {
         id = "Library/defaultA-A.1.0.0"
         name = "defaultA"
-        url = "www.exampleA.com"
+        url = "www.exampleA.com/Library/defaultA-A.1.0.0"
         version = "A.1.0.0"
       }
     val libraryANew =
       Library().apply {
         id = "Library/defaultA-A.1.0.1"
         name = "defaultA"
-        url = "www.exampleA.com"
+        url = "www.exampleA.com/Library/defaultA-A.1.0.1"
         version = "A.1.0.1"
       }
 
@@ -149,13 +156,13 @@ internal class KnowledgeManagerTest {
 
     val resourceA100 =
       knowledgeManager
-        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.0")
+        .loadResources(url = "www.exampleA.com/Library/defaultA-A.1.0.0", version = "A.1.0.0")
         .single() as Library
     assertThat(resourceA100.version).isEqualTo("A.1.0.0")
 
     val resourceA101 =
       knowledgeManager
-        .loadResources(resourceType = "Library", name = "defaultA", version = "A.1.0.1")
+        .loadResources(url = "www.exampleA.com/Library/defaultA-A.1.0.1", version = "A.1.0.1")
         .single() as Library
     assertThat(resourceA101.version.toString()).isEqualTo("A.1.0.1")
   }
@@ -163,36 +170,42 @@ internal class KnowledgeManagerTest {
   fun `installing from npmPackageManager`() = runTest {
     knowledgeManager.install(fhirNpmPackage)
 
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", name = "WHOCommon"))
-      .isNotNull()
-    assertThat(knowledgeManager.loadResources(resourceType = "Library", url = "FHIRCommon"))
-      .isNotNull()
-    assertThat(knowledgeManager.loadResources(resourceType = "Measure")).hasSize(1)
     assertThat(
         knowledgeManager.loadResources(
-          resourceType = "Measure",
-          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+          url = "http://fhir.org/guides/who/anc-cds/Library/WHOCommon",
+          version = "0.3.0",
         ),
       )
-      .isNotEmpty()
-    assertThat(knowledgeManager.loadResources(resourceType = "Measure", url = "Measure/ANCIND01"))
-      .isNotNull()
+      .hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          url = "http://fhir.org/guides/who/anc-cds/Library/FHIRCommon",
+          version = "0.3.0",
+        ),
+      )
+      .hasSize(1)
+    assertThat(
+        knowledgeManager.loadResources(
+          url = "http://fhir.org/guides/who/anc-cds/Measure/ANCIND01",
+          version = "0.3.0",
+        ),
+      )
+      .hasSize(1)
   }
 
   @Test
   fun `for different resources with URL loading by URL should be correct`() = runTest {
-    val commonUrl = "www.sample-url.com"
     val libraryWithSameUrl =
       Library().apply {
         id = "Library/lId"
         name = "LibraryName"
-        url = commonUrl
+        url = "www.sample-url.com/Library/lId"
       }
     val planDefinitionWithSameUrl =
       PlanDefinition().apply {
         id = "PlanDefinition/pdId"
         name = "PlanDefinitionName"
-        url = commonUrl
+        url = "www.sample-url.com/PlanDefinition/pdId"
       }
 
     knowledgeManager.index(writeToFile(libraryWithSameUrl))
@@ -202,30 +215,29 @@ internal class KnowledgeManagerTest {
     assertThat(resources).hasSize(2)
 
     val libraryLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single() as Library
+      knowledgeManager.loadResources(url = "www.sample-url.com/Library/lId").single() as Library
     assertThat(libraryLoadedByUrl.name.toString()).isEqualTo("LibraryName")
 
     val planDefinitionLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
+      knowledgeManager.loadResources(url = "www.sample-url.com/PlanDefinition/pdId").single()
         as PlanDefinition
     assertThat(planDefinitionLoadedByUrl.name.toString()).isEqualTo("PlanDefinitionName")
   }
 
   @Test
   fun `for different resources with URL and Version loading by URL should be correct`() = runTest {
-    val commonUrl = "www.sample-url.com"
     val libraryWithSameUrl =
       Library().apply {
         id = "Library/lId"
         name = "LibraryName"
-        url = commonUrl
+        url = "www.sample-url.com/Library/lId"
         version = "0"
       }
     val planDefinitionWithSameUrl =
       PlanDefinition().apply {
         id = "PlanDefinition/pdId"
         name = "PlanDefinitionName"
-        url = commonUrl
+        url = "www.sample-url.com/PlanDefinition/pdId"
         version = "0"
       }
 
@@ -236,11 +248,11 @@ internal class KnowledgeManagerTest {
     assertThat(resources).hasSize(2)
 
     val libraryLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "Library", url = commonUrl).single() as Library
+      knowledgeManager.loadResources(url = "www.sample-url.com/Library/lId").single() as Library
     assertThat(libraryLoadedByUrl.name.toString()).isEqualTo("LibraryName")
 
     val planDefinitionLoadedByUrl =
-      knowledgeManager.loadResources(resourceType = "PlanDefinition", url = commonUrl).single()
+      knowledgeManager.loadResources(url = "www.sample-url.com/PlanDefinition/pdId").single()
         as PlanDefinition
     assertThat(planDefinitionLoadedByUrl.name.toString()).isEqualTo("PlanDefinitionName")
   }
