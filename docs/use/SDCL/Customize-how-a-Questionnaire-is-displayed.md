@@ -118,7 +118,7 @@ Both styles are defined in the application.
 * `questionnaire_textAppearance`: Specifies the text appearance for the questionnaire text. Example: `@style/TextAppearance.AppCompat.Headline`
 * `questionnaire_background`: Specifies the background for the view. Example: `@color/background_color or #FFFFFF`
 
-For more information on custom style attributes, please see the [link](https://github.com/google/android-fhir/pull/2636/files#diff-60ddcdc840f0b488d17fb9bea36a1c6000376068203d120826887e59639e9424R196).
+For more information on custom style attributes, please see the [QuestionnaireCustomStyle](https://github.com/google/android-fhir/blob/master/datacapture/src/main/res/values/attrs.xml)
 
 ### Example Custom Styles
 
