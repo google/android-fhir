@@ -138,7 +138,10 @@ internal class OptionSelectDialogFragment(
           otherOptions =
             currentList
               .filterIsInstance<OptionSelectRow.OtherEditText>()
-              .filter { it.currentText.isNotEmpty() }
+              .filter {
+                it.currentText.isNotEmpty()
+              } // Filters out empty answers when the user inputs nothing into a new option choice
+              // edit text field.
               .map { it.currentText },
         ),
       )
