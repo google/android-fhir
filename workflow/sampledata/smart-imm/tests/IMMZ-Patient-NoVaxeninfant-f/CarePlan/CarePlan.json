@@ -1,10 +1,10 @@
 {
   "resourceType": "CarePlan",
-  "id": "26",
+  "id": "IMMZD2DTMeasles",
   "contained": [
     {
       "resourceType": "RequestGroup",
-      "id": "26",
+      "id": "IMMZD2DTMeasles",
       "instantiatesCanonical": [
         "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles|0.1.0"
       ],
@@ -28,14 +28,14 @@
             }
           ],
           "resource": {
-            "reference": "MedicationRequest/1"
+            "reference": "MedicationRequest/IMMZD2DTMeaslesMR"
           }
         }
       ]
     },
     {
       "resourceType": "MedicationRequest",
-      "id": "1",
+      "id": "IMMZD2DTMeaslesMR",
       "meta": {
         "profile": [
           "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationrequest"
@@ -77,7 +77,7 @@
   "activity": [
     {
       "reference": {
-        "reference": "#RequestGroup/26"
+        "reference": "#RequestGroup/IMMZD2DTMeasles"
       }
     }
   ]
