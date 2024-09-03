@@ -22,7 +22,6 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.contrib.views.barcode.mlkit.md.LiveBarcodeScanningFragment
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolderDelegate
@@ -95,7 +94,7 @@ object BarCodeReaderViewHolderFactory :
         } else {
           prefixTextView.visibility = View.GONE
         }
-        textQuestion.text = questionnaireViewItem.questionnaireItem.localizedTextSpanned
+        textQuestion.text = questionnaireViewItem.questionText
         setInitial(questionnaireViewItem.answers.singleOrNull(), reScanView)
       }
 

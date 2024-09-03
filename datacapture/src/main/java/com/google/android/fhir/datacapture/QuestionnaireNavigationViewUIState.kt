@@ -16,11 +16,11 @@
 
 package com.google.android.fhir.datacapture
 
-sealed class QuestionnaireNavigationViewUIState(val isShown: Boolean, val isEnabled: Boolean) {
-  data object Hidden : QuestionnaireNavigationViewUIState(isShown = false, isEnabled = false)
+sealed interface QuestionnaireNavigationViewUIState {
+  data object Hidden : QuestionnaireNavigationViewUIState
 
   data class Enabled(val labelText: String? = null, val onClickAction: () -> Unit) :
-    QuestionnaireNavigationViewUIState(isShown = true, isEnabled = true)
+    QuestionnaireNavigationViewUIState
 }
 
 data class QuestionnaireNavigationUIState(
