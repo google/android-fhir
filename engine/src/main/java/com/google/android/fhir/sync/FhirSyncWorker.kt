@@ -164,26 +164,26 @@ abstract class FhirSyncWorker(appContext: Context, workerParams: WorkerParameter
 
   open fun onFailedSyncJobResult(failedSyncJobStatus: SyncJobStatus.Failed) {
     try {
-      CoroutineScope(Dispatchers.IO).launch {
-        val jsonParser = FhirContext.forR4().newJsonParser()
 
-        (failedSyncJobStatus).exceptions.filterIsInstance<HttpException>().forEach {
-          resourceSyncHTTPException ->
-          val operationOutcome =
-            jsonParser.parseResource(
-              IOUtils.toString(
-                resourceSyncHTTPException.response()?.errorBody()?.byteStream(),
-                StandardCharsets.UTF_8,
-              ),
-            ) as OperationOutcome
+      val jsonParser = FhirContext.forR4().newJsonParser()
+      val exceptions = (failedSyncJobStatus).exceptions
 
-          operationOutcome.issue.forEach { operationOutcome ->
-            Timber.e(
-              "SERVER ${operationOutcome.severity} - HTTP ${resourceSyncHTTPException.code()} | Code - ${operationOutcome.code} | Diagnostics - ${operationOutcome.diagnostics}",
-            )
-          }
+      exceptions.forEach{ resourceSyncException ->
+        val operationOutcome =
+          jsonParser.parseResource(
+            IOUtils.toString(
+              (resourceSyncException.exception as HttpException).response()?.errorBody()?.byteStream(),
+              StandardCharsets.UTF_8,
+            ),
+          ) as OperationOutcome
+
+        operationOutcome.issue.forEach { operationOutcome ->
+          Timber.e(
+            "SERVER ${operationOutcome.severity} - HTTP ${resourceSyncException.exception.code()} | Code - ${operationOutcome.code} | Diagnostics - ${operationOutcome.diagnostics}",
+          )
         }
       }
+
     } catch (e: Exception) {
       Timber.e(e)
     }
