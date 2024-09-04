@@ -64,15 +64,8 @@ internal interface Database {
   )
 
   /**
-   * Updates existing [oldResourceId] and [referencingResourceUuids] with the new [newResourceId].
-   * No-op on [referencingResourceUuids] if [oldResourceId] and [newResourceId] are the same.
-   *
-   * @param oldResourceId The [Resource.id] of the resource before synchronization.
-   * @param newResourceId The [Resource.id] of the resource after synchronization.
-   * @param versionId The version id of the resource after synchronization.
-   * @param lastUpdated The last modified time of the resource after synchronization.
-   * @param referencingResourceUuids The dependent resources for which the reference value will be
-   *   changed.
+   * Updates the existing [oldResourceId] with the new [newResourceId]. Even if [oldResourceId] and
+   * [newResourceId] are the same, it is still necessary to update the resource meta.
    */
   suspend fun updateResourcePostSync(
     oldResourceId: String,
