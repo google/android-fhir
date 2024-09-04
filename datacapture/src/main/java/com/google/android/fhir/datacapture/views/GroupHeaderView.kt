@@ -23,6 +23,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.QuestionnaireViewHolderType
 import com.google.android.fhir.datacapture.R
+import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
@@ -60,5 +61,11 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
     visibility = getHeaderViewVisibility(prefix, question, hint)
+    applyCustomOrDefaultStyle(
+      questionnaireViewItem.questionnaireItem,
+      prefixTextView = prefix,
+      questionTextView = question,
+      instructionTextView = hint,
+    )
   }
 }

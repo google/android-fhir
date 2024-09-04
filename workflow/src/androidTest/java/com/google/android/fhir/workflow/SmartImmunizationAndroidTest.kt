@@ -116,7 +116,7 @@ class SmartImmunizationAndroidTest {
 
     moveAllIGResourcesIntoFilesDir("smart-imm")
 
-    knowledgeManager.install(
+    knowledgeManager.import(
       FhirNpmPackage(
         "who.fhir.immunization",
         "1.0.0",
@@ -135,8 +135,6 @@ class SmartImmunizationAndroidTest {
           url = "http://fhir.org/guides/who/smart-immunization/PlanDefinition/IMMZD2DTMeasles",
         )
         .single()
-
-    assertThat(planDef.idElement.idPart).isEqualTo("26")
 
     val patient =
       load(
