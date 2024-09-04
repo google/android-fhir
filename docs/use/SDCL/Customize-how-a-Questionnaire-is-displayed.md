@@ -105,7 +105,7 @@ It identifies extensions for applying the custom style to a given questionnaire 
 * `prefix_text_view`: Used to show the prefix value of the question item.
 * `question_text_view`: Used to show the text value of the question item.
 * `subtitle_text_view`: Used to show the instructions of the question item.
-  For more information about supported views, please see the [link](https://github.com/google/android-fhir/pull/2636/files#diff-5497e7116b552983c2c9c53cb4a1bab919ef972747ec326bc71bcec734a26ddaR64).
+  For more information about supported views, please see the [Question Item View](https://github.com/google/android-fhir/blob/master/datacapture/src/main/java/com/google/android/fhir/datacapture/extensions/MoreQuestionnaireItemComponents.kt).
 
 ### Custom Style Values
 In the above example:
