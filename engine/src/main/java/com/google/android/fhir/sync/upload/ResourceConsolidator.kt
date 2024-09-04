@@ -141,7 +141,7 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
     response: Bundle.BundleEntryResponseComponent,
   ) {
     response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
-      database.updateResource(
+      database.updateResourcePostSync(
         preSyncResourceId,
         postSyncResourceID,
         resourceType,

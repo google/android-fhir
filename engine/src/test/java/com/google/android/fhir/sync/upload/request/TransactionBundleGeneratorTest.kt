@@ -104,6 +104,23 @@ class TransactionBundleGeneratorTest {
     }
 
   @Test
+  fun `getGenerator() should not throw exception for create by POST`() = runBlocking {
+    val exception =
+      kotlin
+        .runCatching {
+          TransactionBundleGenerator.Factory.getGenerator(
+            Bundle.HTTPVerb.POST,
+            Bundle.HTTPVerb.PATCH,
+            generatedBundleSize = 500,
+            useETagForUpload = true,
+          )
+        }
+        .exceptionOrNull()
+
+    assert(exception !is IllegalArgumentException) { "IllegalArgumentException was thrown" }
+  }
+
+  @Test
   fun `generate() should return Bundle Entry without if-match when useETagForUpload is false`() =
     runBlocking {
       val localChange =

@@ -177,7 +177,7 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun updateResource(
+  override suspend fun updateResourcePostSync(
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
@@ -311,6 +311,10 @@ internal class DatabaseImpl(
       val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
+
+      if (currentResourceId == updatedResource.logicalId) {
+        return@withTransaction
+      }
 
       /**
        * Update LocalChange records and identify referring resources.

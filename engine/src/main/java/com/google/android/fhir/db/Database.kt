@@ -74,7 +74,7 @@ internal interface Database {
    * @param referencingResourceUuids The dependent resources for which the reference value will be
    *   changed.
    */
-  suspend fun updateResource(
+  suspend fun updateResourcePostSync(
     oldResourceId: String,
     newResourceId: String,
     resourceType: ResourceType,
