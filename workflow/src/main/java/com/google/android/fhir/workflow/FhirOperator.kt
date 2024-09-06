@@ -31,7 +31,6 @@ import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.PlanDefinition
@@ -39,9 +38,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
-import org.opencds.cqf.fhir.cr.measure.common.MeasureEvalType
 import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
-import org.opencds.cqf.fhir.cr.plandefinition.r4.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
@@ -75,8 +72,9 @@ internal constructor(
     MeasureEvaluationOptions().apply { evaluationSettings = this@FhirOperator.evaluationSettings }
 
   private val libraryProcessor = LibraryEngine(repository, evaluationSettings)
-  private val measureProcessor: FhirEngineR4MeasureProcessor =
-    FhirEngineR4MeasureProcessor(repository, measureEvaluationOptions)
+
+  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
+
   private val planDefinitionProcessor = PlanDefinitionProcessor(repository, evaluationSettings)
 
   /**
@@ -149,55 +147,6 @@ internal constructor(
         /* subjectIds = */ listOf(subject),
         /* additionalData = */ additionalData,
         /* parameters = */ parameters,
-      )
-
-    // add subject reference for non-individual reportTypes
-    if (report.type.name == MeasureReportType.SUMMARY.name && !subject.isNullOrBlank()) {
-      report.setSubject(Reference(subject))
-    }
-    return report
-  }
-
-  /**
-   * Generates a [MeasureReport] based on the provided inputs.
-   *
-   * NOTE: The API may internally result in a blocking IO operation. The user should call the API
-   * from a worker thread or it may throw [BlockingMainThreadException] exception.
-   */
-  @WorkerThread
-  fun evaluateMeasure(
-    measure: Measure,
-    start: String,
-    end: String,
-    reportType: String,
-    subjectId: String? = null,
-    practitioner: String? = null,
-    additionalData: IBaseBundle? = null,
-  ): MeasureReport {
-    val subject =
-      if (!practitioner.isNullOrBlank()) {
-        checkAndAddType(practitioner, "Practitioner")
-      } else if (!subjectId.isNullOrBlank()) {
-        checkAndAddType(subjectId, "Patient")
-      } else {
-        // List of null is required to run population-level measures
-        null
-      }
-    val evalType =
-      MeasureEvalType.fromCode(reportType)
-        .orElse(
-          if (!subjectId.isNullOrEmpty()) MeasureEvalType.SUBJECT else MeasureEvalType.POPULATION,
-        ) as MeasureEvalType
-
-    val report =
-      measureProcessor.evaluateMeasure(
-        /* measure = */ measure,
-        /* periodStart = */ start,
-        /* periodEnd = */ end,
-        /* reportType = */ reportType,
-        /* subjectIds = */ if (subject.isNullOrEmpty()) listOf() else listOf(subject),
-        /* additionalData = */ additionalData,
-        /* evalType = */ evalType,
       )
 
     // add subject reference for non-individual reportTypes
