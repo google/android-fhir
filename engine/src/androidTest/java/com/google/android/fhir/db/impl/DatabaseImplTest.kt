@@ -4212,7 +4212,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun updateResourcePostSync_shouldUpdateResourceIdAndResourceMeta() = runBlocking {
+  fun updateResourcePostSync_shouldUpdateResourceId() = runBlocking {
     val preSyncPatient = Patient().apply { id = "patient1" }
     database.insert(preSyncPatient)
     val postSyncResourceId = "patient2"
@@ -4230,9 +4230,45 @@ class DatabaseImplTest {
     val patientResourceEntityPostSync =
       database.selectEntity(preSyncPatient.resourceType, postSyncResourceId)
     assertThat(patientResourceEntityPostSync.resourceId).isEqualTo(postSyncResourceId)
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldUpdateResourceMeta() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val postSyncResourceId = "patient2"
+    val newVersionId = "1"
+    val lastUpdatedRemote = Instant.now()
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      newVersionId,
+      lastUpdatedRemote,
+    )
+
+    val patientResourceEntityPostSync =
+      database.selectEntity(preSyncPatient.resourceType, postSyncResourceId)
     assertThat(patientResourceEntityPostSync.versionId).isEqualTo(newVersionId)
     assertThat(patientResourceEntityPostSync.lastUpdatedRemote?.toEpochMilli())
       .isEqualTo(lastUpdatedRemote.toEpochMilli())
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldDeleteOldResourceId() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val postSyncResourceId = "patient2"
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      null,
+      null,
+    )
+
     val exception =
       assertThrows(ResourceNotFoundException::class.java) {
         runBlocking { database.select(ResourceType.Patient, "patient1") }
