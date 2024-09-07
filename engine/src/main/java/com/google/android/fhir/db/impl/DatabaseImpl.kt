@@ -36,6 +36,7 @@ import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.pmap
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
 import java.time.Instant
@@ -205,7 +206,7 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap {
         ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R)
       }
     }
@@ -217,7 +218,7 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
+        .pmap {
           ForwardIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceUUID,
@@ -233,7 +234,7 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
+        .pmap {
           ReverseIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceTypeAndId,
