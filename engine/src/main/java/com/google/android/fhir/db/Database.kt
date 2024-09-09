@@ -59,8 +59,20 @@ internal interface Database {
   suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdated: Instant?,
+  )
+
+  /**
+   * Updates the existing [oldResourceId] with the new [newResourceId]. Even if [oldResourceId] and
+   * [newResourceId] are the same, it is still necessary to update the resource meta.
+   */
+  suspend fun updateResourcePostSync(
+    oldResourceId: String,
+    newResourceId: String,
+    resourceType: ResourceType,
+    versionId: String?,
+    lastUpdated: Instant?,
   )
 
   /**

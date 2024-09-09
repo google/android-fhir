@@ -421,7 +421,7 @@ internal abstract class LocalChangeDao {
    * @return A list of distinct resource UUIDs for all `LocalChangeEntity` records that referenced
    *   the old resource.
    */
-  private suspend fun updateReferencesInLocalChange(
+  internal suspend fun updateReferencesInLocalChange(
     oldResource: Resource,
     updatedResourceId: String,
   ): List<UUID> {

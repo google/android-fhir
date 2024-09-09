@@ -37,11 +37,11 @@ import com.google.android.fhir.db.impl.entities.StringIndexEntity
 import com.google.android.fhir.db.impl.entities.TokenIndexEntity
 import com.google.android.fhir.db.impl.entities.UriIndexEntity
 import com.google.android.fhir.index.ResourceIndexer
-import com.google.android.fhir.index.ResourceIndexer.Companion.createLastUpdatedIndex
 import com.google.android.fhir.index.ResourceIndexer.Companion.createLocalLastUpdatedIndex
 import com.google.android.fhir.index.ResourceIndices
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.updateMeta
 import com.google.android.fhir.versionId
 import java.time.Instant
 import java.util.Date
@@ -87,8 +87,8 @@ internal abstract class ResourceDao {
         it.copy(
           resourceId = updatedResource.logicalId,
           serializedResource = iParser.encodeResourceToString(updatedResource),
-          lastUpdatedRemote = updatedResource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
-          versionId = updatedResource.meta.versionId,
+          lastUpdatedRemote = updatedResource.lastUpdated ?: it.lastUpdatedRemote,
+          versionId = updatedResource.versionId ?: it.versionId,
         )
       updateChanges(entity, updatedResource)
     }
@@ -181,8 +181,8 @@ internal abstract class ResourceDao {
   abstract suspend fun updateRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdatedRemote: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   )
 
   @Query(
@@ -293,21 +293,13 @@ internal abstract class ResourceDao {
   suspend fun updateAndIndexRemoteVersionIdAndLastUpdate(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   ) {
-    updateRemoteVersionIdAndLastUpdate(resourceId, resourceType, versionId, lastUpdated)
-    // update the remote lastUpdated index
-    getResourceEntity(resourceId, resourceType)?.let {
-      val indicesToUpdate =
-        ResourceIndices.Builder(resourceType, resourceId)
-          .apply {
-            addDateTimeIndex(
-              createLastUpdatedIndex(resourceType, InstantType(Date.from(lastUpdated))),
-            )
-          }
-          .build()
-      updateIndicesForResource(indicesToUpdate, resourceType, it.resourceUuid)
+    getResourceEntity(resourceId, resourceType)?.let { oldResourceEntity ->
+      val resource = iParser.parseResource(oldResourceEntity.serializedResource) as Resource
+      resource.updateMeta(versionId, lastUpdatedRemote)
+      updateResourceWithUuid(oldResourceEntity.resourceUuid, resource)
     }
   }
 
