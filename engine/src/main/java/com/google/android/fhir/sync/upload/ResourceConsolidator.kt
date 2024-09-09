@@ -18,10 +18,11 @@ package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.sync.upload.request.UploadRequestGeneratorMode
+import com.google.android.fhir.versionId
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DomainResource
-import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
 
@@ -56,8 +57,12 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
         )
         uploadRequestResult.successfulUploadResponseMappings.forEach {
           when (it) {
-            is BundleComponentUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
-            is ResourceUploadResponseMapping -> updateVersionIdAndLastUpdated(it.output)
+            is BundleComponentUploadResponseMapping -> {
+              updateResourceMeta(it.output)
+            }
+            is ResourceUploadResponseMapping -> {
+              updateResourceMeta(it.output)
+            }
           }
         }
       }
@@ -68,28 +73,24 @@ internal class DefaultResourceConsolidator(private val database: Database) : Res
       }
     }
 
-  private suspend fun updateVersionIdAndLastUpdated(response: Bundle.BundleEntryResponseComponent) {
-    if (response.hasEtag() && response.hasLastModified() && response.hasLocation()) {
-      response.resourceIdAndType?.let { (id, type) ->
-        database.updateVersionIdAndLastUpdated(
-          id,
-          type,
-          getVersionFromETag(response.etag),
-          response.lastModified.toInstant(),
-        )
-      }
+  private suspend fun updateResourceMeta(response: Bundle.BundleEntryResponseComponent) {
+    response.resourceIdAndType?.let { (id, type) ->
+      database.updateVersionIdAndLastUpdated(
+        id,
+        type,
+        response.etag?.let { getVersionFromETag(response.etag) },
+        response.lastModified?.let { it.toInstant() },
+      )
     }
   }
 
-  private suspend fun updateVersionIdAndLastUpdated(resource: DomainResource) {
-    if (resource.hasMeta() && resource.meta.hasVersionId() && resource.meta.hasLastUpdated()) {
-      database.updateVersionIdAndLastUpdated(
-        resource.id,
-        resource.resourceType,
-        resource.meta.versionId,
-        resource.meta.lastUpdated.toInstant(),
-      )
-    }
+  private suspend fun updateResourceMeta(resource: DomainResource) {
+    database.updateVersionIdAndLastUpdated(
+      resource.id,
+      resource.resourceType,
+      resource.versionId,
+      resource.lastUpdated,
+    )
   }
 }
 
@@ -97,23 +98,32 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
   override suspend fun consolidate(uploadRequestResult: UploadRequestResult) =
     when (uploadRequestResult) {
       is UploadRequestResult.Success -> {
-        database.deleteUpdates(
-          LocalChangeToken(
-            uploadRequestResult.successfulUploadResponseMappings.flatMap {
-              it.localChanges.flatMap { localChange -> localChange.token.ids }
-            },
-          ),
-        )
-        uploadRequestResult.successfulUploadResponseMappings.forEach {
-          when (it) {
+        uploadRequestResult.successfulUploadResponseMappings.forEach { responseMapping ->
+          when (responseMapping) {
             is BundleComponentUploadResponseMapping -> {
-              // TODO https://github.com/google/android-fhir/issues/2499
-              throw NotImplementedError()
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                database.deleteUpdates(
+                  LocalChangeToken(
+                    responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                  ),
+                )
+                updateResourcePostSync(
+                  preSyncResourceId,
+                  responseMapping.output,
+                )
+              }
             }
             is ResourceUploadResponseMapping -> {
-              val preSyncResourceId = it.localChanges.firstOrNull()?.resourceId
-              preSyncResourceId?.let { preSyncResourceId ->
-                updateResourcePostSync(preSyncResourceId, it.output)
+              database.deleteUpdates(
+                LocalChangeToken(
+                  responseMapping.localChanges.flatMap { localChange -> localChange.token.ids },
+                ),
+              )
+              responseMapping.localChanges.firstOrNull()?.resourceId?.let { preSyncResourceId ->
+                database.updateResourceAndReferences(
+                  preSyncResourceId,
+                  responseMapping.output,
+                )
               }
             }
           }
@@ -128,16 +138,15 @@ internal class HttpPostResourceConsolidator(private val database: Database) : Re
 
   private suspend fun updateResourcePostSync(
     preSyncResourceId: String,
-    postSyncResource: Resource,
+    response: Bundle.BundleEntryResponseComponent,
   ) {
-    if (
-      postSyncResource.hasMeta() &&
-        postSyncResource.meta.hasVersionId() &&
-        postSyncResource.meta.hasLastUpdated()
-    ) {
-      database.updateResourceAndReferences(
+    response.resourceIdAndType?.let { (postSyncResourceID, resourceType) ->
+      database.updateResourcePostSync(
         preSyncResourceId,
-        postSyncResource,
+        postSyncResourceID,
+        resourceType,
+        response.etag?.let { getVersionFromETag(response.etag) },
+        response.lastModified?.let { response.lastModified.toInstant() },
       )
     }
   }
@@ -165,7 +174,7 @@ private fun getVersionFromETag(eTag: String) =
  * 1. absolute path: `<server-path>/<resource-type>/<resource-id>/_history/<version>`
  * 2. relative path: `<resource-type>/<resource-id>/_history/<version>`
  */
-private val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
+internal val Bundle.BundleEntryResponseComponent.resourceIdAndType: Pair<String, ResourceType>?
   get() =
     location
       ?.split("/")
