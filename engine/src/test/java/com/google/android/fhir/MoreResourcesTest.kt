@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@ package com.google.android.fhir
 
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
+import java.time.Instant
+import java.util.*
+import org.hl7.fhir.r4.model.InstantType
+import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -42,5 +46,38 @@ class MoreResourcesTest {
   @Test
   fun `getResourceClass() by resource type should return resource class`() {
     assertThat(getResourceClass<Resource>(ResourceType.Patient)).isEqualTo(Patient::class.java)
+  }
+
+  @Test
+  fun `updateMeta should update resource meta with given versionId and lastUpdated`() {
+    val versionId = "1"
+    val instantValue = Instant.now()
+    val resource = Patient().apply { id = "patient" }
+
+    resource.updateMeta(versionId, instantValue)
+
+    assertThat(resource.meta.versionId).isEqualTo(versionId)
+    assertThat(resource.meta.lastUpdatedElement.value)
+      .isEqualTo(InstantType(Date.from(instantValue)).value)
+  }
+
+  @Test
+  fun `updateMeta should not change existing meta if new values are null`() {
+    val versionId = "1"
+    val instantValue = InstantType(Date.from(Instant.now()))
+    val resource =
+      Patient().apply {
+        id = "patient"
+        meta =
+          Meta().apply {
+            this.versionId = versionId
+            lastUpdatedElement = instantValue
+          }
+      }
+
+    resource.updateMeta(null, null)
+
+    assertThat(resource.meta.versionId).isEqualTo(versionId)
+    assertThat(resource.meta.lastUpdatedElement.value).isEqualTo(instantValue.value)
   }
 }
