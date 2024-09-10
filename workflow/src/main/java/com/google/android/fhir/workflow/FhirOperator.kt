@@ -31,6 +31,7 @@ import org.hl7.fhir.instance.model.api.IBaseParameters
 import org.hl7.fhir.instance.model.api.IBaseResource
 import org.hl7.fhir.r4.model.CanonicalType
 import org.hl7.fhir.r4.model.IdType
+import org.hl7.fhir.r4.model.Measure
 import org.hl7.fhir.r4.model.MeasureReport
 import org.hl7.fhir.r4.model.Parameters
 import org.hl7.fhir.r4.model.PlanDefinition
@@ -38,8 +39,8 @@ import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.cql.EvaluationSettings
 import org.opencds.cqf.fhir.cql.LibraryEngine
 import org.opencds.cqf.fhir.cr.measure.MeasureEvaluationOptions
+import org.opencds.cqf.fhir.cr.measure.common.MeasureEvalType
 import org.opencds.cqf.fhir.cr.measure.common.MeasureReportType
-import org.opencds.cqf.fhir.cr.measure.r4.R4MeasureProcessor
 import org.opencds.cqf.fhir.cr.plandefinition.PlanDefinitionProcessor
 import org.opencds.cqf.fhir.utility.monad.Eithers
 import org.opencds.cqf.fhir.utility.repository.ProxyRepository
@@ -72,8 +73,8 @@ internal constructor(
     MeasureEvaluationOptions().apply { evaluationSettings = this@FhirOperator.evaluationSettings }
 
   private val libraryProcessor = LibraryEngine(repository, evaluationSettings)
+  private val measureProcessor = FhirEngineR4MeasureProcessor(repository, measureEvaluationOptions)
   private val planDefinitionProcessor = PlanDefinitionProcessor(repository, evaluationSettings)
-  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
 
   /**
    * The function evaluates a FHIR library against the database.
@@ -145,6 +146,53 @@ internal constructor(
         /* subjectIds = */ listOf(subject),
         /* additionalData = */ additionalData,
         /* parameters = */ parameters,
+      )
+
+    // add subject reference for non-individual reportTypes
+    if (report.type.name == MeasureReportType.SUMMARY.name && !subject.isNullOrBlank()) {
+      report.setSubject(Reference(subject))
+    }
+    return report
+  }
+
+  @WorkerThread
+  fun evaluateMeasure(
+    measure: Measure,
+    start: String,
+    end: String,
+    reportType: String,
+    subjectId: String? = null,
+    practitioner: String? = null,
+    additionalData: IBaseBundle? = null,
+    parameters: Parameters? = null,
+  ): MeasureReport {
+    val subject =
+      if (!practitioner.isNullOrBlank()) {
+        checkAndAddType(practitioner, "Practitioner")
+      } else if (!subjectId.isNullOrBlank()) {
+        checkAndAddType(subjectId, "Patient")
+      } else {
+        // List of null is required to run population-level measures
+        null
+      }
+
+    val subjectIds = listOf(subject)
+
+    val evalType = MeasureEvalType.fromCode(reportType).orElse(
+      if (subjectIds.isNotEmpty() && subjectIds[0] != null
+      ) MeasureEvalType.SUBJECT else MeasureEvalType.POPULATION
+    ) as MeasureEvalType
+
+    val report =
+      measureProcessor.evaluateMeasure(
+        /* measure = */ measure,
+        /* periodStart = */ start,
+        /* periodEnd = */ end,
+        /* reportType = */ reportType,
+        /* subjectIds = */ subjectIds,
+        /* additionalData = */ additionalData,
+        /* parameters = */ parameters,
+        /* evalType = */ evalType
       )
 
     // add subject reference for non-individual reportTypes
