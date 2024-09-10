@@ -160,10 +160,10 @@ class QuestionnaireFragment : Fragment() {
               }
 
             // Set bottom navigation
-            if (state.bottomNavItems.isNotEmpty()) {
+            if (state.bottomNavItem != null) {
               bottomNavContainerFrame.visibility = View.VISIBLE
               NavigationViewHolder(bottomNavContainerFrame)
-                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+                .bind(state.bottomNavItem.questionnaireNavigationUIState)
             } else {
               bottomNavContainerFrame.visibility = View.GONE
             }
@@ -179,10 +179,10 @@ class QuestionnaireFragment : Fragment() {
             reviewModeEditButton.visibility = View.GONE
 
             // Set bottom navigation
-            if (state.bottomNavItems.isNotEmpty()) {
+            if (state.bottomNavItem != null) {
               bottomNavContainerFrame.visibility = View.VISIBLE
               NavigationViewHolder(bottomNavContainerFrame)
-                .bind(state.bottomNavItems.single().questionnaireNavigationUIState)
+                .bind(state.bottomNavItem.questionnaireNavigationUIState)
             } else {
               bottomNavContainerFrame.visibility = View.GONE
             }
