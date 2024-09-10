@@ -33,16 +33,19 @@ import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABA
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
 import com.google.android.fhir.db.impl.dao.LocalChangeDao.Companion.SQLITE_LIMIT_MAX_VARIABLE_NUMBER
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
+import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -164,16 +167,35 @@ internal class DatabaseImpl(
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   ) {
     db.withTransaction {
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
-        lastUpdated,
+        lastUpdatedRemote,
       )
+    }
+  }
+
+  override suspend fun updateResourcePostSync(
+    oldResourceId: String,
+    newResourceId: String,
+    resourceType: ResourceType,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
+  ) {
+    db.withTransaction {
+      resourceDao.getResourceEntity(oldResourceId, resourceType)?.let { oldResourceEntity ->
+        val updatedResource =
+          (iParser.parseResource(oldResourceEntity.serializedResource) as Resource).apply {
+            idElement = IdType(newResourceId)
+            updateMeta(versionId, lastUpdatedRemote)
+          }
+        updateResourceAndReferences(oldResourceId, updatedResource)
+      }
     }
   }
 
@@ -291,7 +313,11 @@ internal class DatabaseImpl(
       val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
       val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
-      updateResourceEntity(resourceUuid, updatedResource)
+      updateResourceEntity(resourceUuid, updatedResource) 
+      
+      if (currentResourceId == updatedResource.logicalId) {
+        return@withTransaction
+      }
 
       /**
        * Update LocalChange records and identify referring resources.
