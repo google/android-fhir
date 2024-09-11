@@ -152,6 +152,11 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       R.string.component_name_location_widget,
       "component_location_widget.json",
     ),
+    QUESTION_ITEM_CUSTOM_STYLE(
+      R.drawable.text_format_48dp,
+      R.string.component_name_per_question_custom_style,
+      "component_per_question_custom_style.json",
+    ),
   }
 
   val viewItemList =
@@ -177,6 +182,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.ITEM_ANSWER_MEDIA),
       ViewItem.ComponentItem(Component.INITIAL_VALUE),
       ViewItem.ComponentItem(Component.LOCATION_WIDGET),
+      ViewItem.ComponentItem(Component.QUESTION_ITEM_CUSTOM_STYLE),
     )
 
   fun isComponent(context: Context, title: String) =
