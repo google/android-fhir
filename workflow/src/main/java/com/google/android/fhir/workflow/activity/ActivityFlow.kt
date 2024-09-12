@@ -24,7 +24,7 @@ import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
 import com.google.android.fhir.workflow.activity.phase.request.ProposalPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGCommunicationEvent
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
-import com.google.android.fhir.workflow.activity.resource.event.CPGEventResourceForOrderMedication
+import com.google.android.fhir.workflow.activity.resource.event.CPGOrderMedicationEvent
 import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
@@ -255,7 +255,7 @@ private constructor(
    *
    * @return [D] if the action is successful, error otherwise.
    */
-  fun <D : E> draftPerform(klass: Class<D>): Result<D> {
+  fun <D : E> draftPerform(klass: Class<in D>): Result<D> {
     return PerformPhase.draft<R, D>(klass, currentPhase)
   }
 
@@ -270,29 +270,57 @@ private constructor(
     }
 
   companion object {
+
+    /**
+     * Create flow for the
+     * [Send Message](https://build.fhir.org/ig/HL7/cqf-recommendations/examples-activities.html#send-a-message)
+     * activity with the [CPGCommunicationRequest].
+     *
+     * @return ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+     */
     fun of(
       repository: Repository,
       resource: CPGCommunicationRequest,
     ): ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
       ActivityFlow(repository, resource)
 
+    /**
+     * Create flow for the
+     * [Send Message](https://build.fhir.org/ig/HL7/cqf-recommendations/examples-activities.html#send-a-message)
+     * activity with the [CPGCommunicationEvent].
+     *
+     * @return ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+     */
     fun of(
       repository: Repository,
       resource: CPGCommunicationEvent,
     ): ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
       ActivityFlow(repository, null, resource)
 
-    // order medication
+    /**
+     * Create flow for the
+     * [Order a medication](https://build.fhir.org/ig/HL7/cqf-recommendations/examples-activities.html#order-a-medication)
+     * activity with the [CPGMedicationRequest].
+     *
+     * @return ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>>
+     */
     fun of(
       repository: Repository,
       resource: CPGMedicationRequest,
-    ): ActivityFlow<CPGMedicationRequest, CPGEventResourceForOrderMedication<*>> =
+    ): ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>> =
       ActivityFlow(repository, resource)
 
+    /**
+     * Create flow for the
+     * [Order a medication](https://build.fhir.org/ig/HL7/cqf-recommendations/examples-activities.html#order-a-medication)
+     * activity with the [CPGOrderMedicationEvent].
+     *
+     * @return ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>>
+     */
     fun of(
       repository: Repository,
-      resource: CPGEventResourceForOrderMedication<*>,
-    ): ActivityFlow<CPGMedicationRequest, CPGEventResourceForOrderMedication<*>> =
+      resource: CPGOrderMedicationEvent<*>,
+    ): ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>> =
       ActivityFlow(repository, null, resource)
 
     // Collect information

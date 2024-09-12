@@ -27,7 +27,7 @@ import org.hl7.fhir.r4.model.MedicationStatement
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 
-abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val resource: R) :
+abstract class CPGOrderMedicationEvent<out R : Resource>(override val resource: R) :
   CPGEventResource<R>(resource) {
 
   companion object {
@@ -44,7 +44,7 @@ abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val
 }
 
 class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
-  CPGEventResourceForOrderMedication<MedicationDispense>(resource) {
+  CPGOrderMedicationEvent<MedicationDispense>(resource) {
 
   override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationDispense.MedicationDispenseStatus.fromCode(status.code)
@@ -103,7 +103,7 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
 }
 
 class CPGMedicationAdministrationEvent(override val resource: MedicationAdministration) :
-  CPGEventResourceForOrderMedication<MedicationAdministration>(resource) {
+  CPGOrderMedicationEvent<MedicationAdministration>(resource) {
   override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationAdministration.MedicationAdministrationStatus.fromCode(status.code)
     resource.statusReason = reason?.let { listOf(CodeableConcept(Coding().setCode(it))) }
@@ -136,7 +136,7 @@ class CPGMedicationAdministrationEvent(override val resource: MedicationAdminist
 }
 
 class CPGMedicationStatementEvent(override val resource: MedicationStatement) :
-  CPGEventResourceForOrderMedication<MedicationStatement>(resource) {
+  CPGOrderMedicationEvent<MedicationStatement>(resource) {
   override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationStatement.MedicationStatementStatus.fromCode(status.code)
   }
