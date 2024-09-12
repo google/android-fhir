@@ -16,3 +16,5 @@ Your contributions to make this better are very welcome.
 If you are missing your fancy custom Shell configuration that you have built over the last 100 years,
 you should [set up your dotfiles for Codespaces](https://docs.github.com/en/codespaces/setting-your-user-preferences/personalizing-github-codespaces-for-your-account#dotfiles)
 such as [e.g. this dude did in his dotfiles](https://github.com/vorburger/vorburger-dotfiles-bin-etc#github-codespaces).
+
+Gradle may fail with an _out-of-memory_ related error on its very first run; just re-run it once, and it should work in the Codespace.

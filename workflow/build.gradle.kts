@@ -114,9 +114,19 @@ dependencies {
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
   testImplementation(libs.truth)
-  testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
   testImplementation(libs.kotlin.test.junit)
+  testImplementation(project(":knowledge"))
+
+  configurations.all {
+    if (name.contains("test", ignoreCase = true)) {
+      resolutionStrategy.dependencySubstitution {
+        // To test the workflow library against the latest Knowledge Manager APIs, substitute the
+        // dependency on the released Knowledge Manager library with the current build.
+        substitute(module(Dependencies.androidFhirKnowledge)).using(project(":knowledge"))
+      }
+    }
+  }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
