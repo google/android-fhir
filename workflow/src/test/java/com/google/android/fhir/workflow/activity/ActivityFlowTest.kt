@@ -22,6 +22,8 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.workflow.activity.phase.Phase
+import com.google.android.fhir.workflow.activity.phase.request.OrderPhase
+import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGCommunicationEvent
 import com.google.android.fhir.workflow.activity.resource.event.CPGMedicationDispenseEvent
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
@@ -83,7 +85,7 @@ class ActivityFlowTest {
 
     val flow = ActivityFlow.of(repository, cpgMedicationRequest)
 
-    var cachedPlanId = ""
+    var cachedResourceId = ""
 
     flow
       .draftPlan()
@@ -101,7 +103,7 @@ class ActivityFlowTest {
             .update(updatedPlan)
             .onSuccess {
               println("planPhase.update(updatedPlan).onSuccess")
-              cachedPlanId = updatedPlan.logicalId
+              cachedResourceId = updatedPlan.logicalId
             }
             .onFailure {
               println("onFailure")
@@ -113,7 +115,7 @@ class ActivityFlowTest {
 
     val planToResume =
       repository
-        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedPlanId))
+        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedResourceId))
         .let { CPGMedicationRequest(it) }
     val resumedPlanFlow = ActivityFlow.of(repository, planToResume)
 
@@ -135,7 +137,7 @@ class ActivityFlowTest {
 
           orderPhase
             .update(updatedOrder)
-            .onSuccess { cachedPlanId = updatedOrder.logicalId }
+            .onSuccess { cachedResourceId = updatedOrder.logicalId }
             .onFailure { fail("Should have succeeded", it) }
         }
       }
@@ -143,7 +145,7 @@ class ActivityFlowTest {
 
     val orderToResume =
       repository
-        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedPlanId))
+        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedResourceId))
         .let { CPGMedicationRequest(it) }
     val resumedOrderFlow = ActivityFlow.of(repository, orderToResume)
 
@@ -167,7 +169,7 @@ class ActivityFlowTest {
 
           performPhase
             .update(updatedEvent)
-            .onSuccess { cachedPlanId = updatedEvent.logicalId }
+            .onSuccess { cachedResourceId = updatedEvent.logicalId }
             .onFailure { fail("Should have succeeded", it) }
         }
       }
@@ -175,7 +177,7 @@ class ActivityFlowTest {
 
     val eventToResume =
       repository
-        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedPlanId))
+        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedResourceId))
         .let { CPGMedicationDispenseEvent(it) }
 
     val resumedPerformFlow = ActivityFlow.of(repository, eventToResume)
@@ -191,7 +193,7 @@ class ActivityFlowTest {
 
     val completedEvent =
       repository
-        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedPlanId))
+        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedResourceId))
         .let { CPGMedicationDispenseEvent(it) }
 
     assertThat(completedEvent.getStatus()).isEqualTo(EventStatus.COMPLETED)
@@ -296,5 +298,120 @@ class ActivityFlowTest {
         }
       }
     }
+  }
+
+  @Test
+  fun `order medication flow for medication dispense no test `(): Unit = runBlockingOnWorkerThread {
+    val cpgMedicationRequest =
+      CPGMedicationRequest(
+        MedicationRequest().apply {
+          id = "med-req-01"
+          subject = Reference("Patient/pat-01")
+          intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest")
+          status = MedicationRequest.MedicationRequestStatus.ACTIVE
+          addNote(Annotation(MarkdownType("Proposal looks OK.")))
+        },
+      )
+
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgMedicationRequest.resource)
+
+    val flow = ActivityFlow.of(repository, cpgMedicationRequest)
+
+    var cachedRequestId = ""
+
+    flow
+      .draftPlan()
+      .onSuccess { draftPlan ->
+        draftPlan.update { addNote(Annotation(MarkdownType("Draft plan looks OK."))) }
+
+        flow.startPlan(draftPlan).onSuccess { planPhase ->
+          val updatedPlan =
+            planPhase.getRequest().copy().apply {
+              setStatus(Status.ACTIVE)
+              update { addNote(Annotation(MarkdownType("Plan looks OK."))) }
+            }
+
+          planPhase
+            .update(updatedPlan)
+            .onSuccess { cachedRequestId = updatedPlan.logicalId }
+            .onFailure { fail("Should have succeeded", it) }
+        }
+      }
+      .onFailure { fail("Unexpected", it) }
+
+    val planToResume =
+      repository
+        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
+        .let { CPGMedicationRequest(it) }
+    val resumedPlanFlow = ActivityFlow.of(repository, planToResume)
+
+    check(resumedPlanFlow.getCurrentPhase() is PlanPhase<*>) {
+      "Flow is in ${resumedPlanFlow.getCurrentPhase().getPhaseName()} "
+    }
+    resumedPlanFlow
+      .draftOrder()
+      .onSuccess { draftOrder ->
+        draftOrder.update { addNote(Annotation(MarkdownType("Draft order looks OK."))) }
+
+        resumedPlanFlow.startOrder(draftOrder).onSuccess { orderPhase ->
+          val updatedOrder =
+            orderPhase.getRequest().copy().apply {
+              setStatus(Status.ACTIVE)
+              update { addNote(Annotation(MarkdownType("Order looks OK."))) }
+            }
+
+          orderPhase
+            .update(updatedOrder)
+            .onSuccess { cachedRequestId = updatedOrder.logicalId }
+            .onFailure { fail("Should have succeeded", it) }
+        }
+      }
+      .onFailure { fail("Unexpected", it) }
+
+    val orderToResume =
+      repository
+        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
+        .let { CPGMedicationRequest(it) }
+
+    val resumedOrderFlow = ActivityFlow.of(repository, orderToResume)
+
+    check(resumedOrderFlow.getCurrentPhase() is OrderPhase<*>) {
+      "Flow is in ${resumedOrderFlow.getCurrentPhase().getPhaseName()} "
+    }
+
+    resumedOrderFlow
+      .draftPerform(CPGMedicationDispenseEvent::class.java)
+      .onSuccess { draftEvent ->
+        draftEvent.update { addNote(Annotation(MarkdownType("Draft event looks OK."))) }
+
+        resumedOrderFlow.startPerform(draftEvent).onSuccess { performPhase ->
+          val updatedEvent =
+            performPhase.getEvent().copy().apply {
+              setStatus(EventStatus.INPROGRESS)
+              update { addNote(Annotation(MarkdownType("Event looks OK."))) }
+            }
+
+          performPhase
+            .update(updatedEvent)
+            .onSuccess { cachedRequestId = updatedEvent.logicalId }
+            .onFailure { fail("Should have succeeded", it) }
+        }
+      }
+      .onFailure { fail("Unexpected", it) }
+
+    val eventToResume =
+      repository
+        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedRequestId))
+        .let { CPGMedicationDispenseEvent(it) }
+
+    val resumedPerformFlow = ActivityFlow.of(repository, eventToResume)
+
+    check(resumedPerformFlow.getCurrentPhase() is Phase.EventPhase<*>) {
+      "Flow is in ${resumedPerformFlow.getCurrentPhase().getPhaseName()} "
+    }
+
+    (resumedPerformFlow.getCurrentPhase() as Phase.EventPhase<*>).complete()
   }
 }

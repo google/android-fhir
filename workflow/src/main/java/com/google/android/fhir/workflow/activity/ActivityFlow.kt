@@ -34,10 +34,10 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.fhir.api.Repository
 
-val Reference.idType
+internal val Reference.idType
   get() = IdType(reference)
 
-val Reference.`class`
+internal val Reference.`class`
   get() = getResourceClass<Resource>(reference.split("/")[0])
 
 /**
@@ -49,93 +49,141 @@ val Reference.`class`
  * stages or they may resume the workflow of a request already in a later stage (plan,order).
  *
  * The application developers should use the appropriate static factory [ActivityFlow.of] apis
- * provided by the library to create / resume an activity flow.
+ * provided by the library to create or resume an activity flow.
  *
  * An activity flow starts with the user creating the flow with an appropriate [CPGRequestResource].
- * The user then may move the activity to the next phase by calling the appropriate start* and end*
- * apis provided by the class.
+ * The user may do valid state transitions on the current phase by calling appropriate apis on
+ * current phase. The user may call [getCurrentPhase] as appropriately cast it to [PlanPhase],
+ * [OrderPhase] or [PerformPhase] by either checking type or value of [Phase.getPhaseName].
  *
- * The start* and end* apis take a lambda receiver and the application developer may call the
- * [CPGRequestResource.update] on the passed [CPGRequestResource] request object to put in any
- * updates into the request.
+ * The user may then move the activity to the next phase by creating a draft resource by calling
+ * appropriate draft api([draftPlan], [draftOrder] or [draftPerform]). The user may review and
+ * update the draft resource and then call appropriate start api([startPlan], [startOrder] or
+ * [startPerform]) to create a new activity phase.
  *
  * Since the perform creates a [CPGEventResource] and the same flow could create different event
  * resources, application developer needs to provide the appropriate event type as a parameter to
- * the [startPerform].
+ * the [draftPerform].
  *
- * Example of a `Send a Message` activity flow.
+ * Example of a `Order a Medication to dispense` where user completes only one [Phase] at a time and
+ * has to reload / resume the [ActivityFlow] to move to the next [Phase].
  *
- *  ```
- *  // Create appropriate CPGRequestResource for the proposal resource.
+ * ```
+ *   val cpgMedicationRequest =
+ *     CPGMedicationRequest(
+ *       MedicationRequest().apply {
+ *         id = "med-req-01"
+ *         subject = Reference("Patient/pat-01")
+ *         intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
+ *         meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest")
+ *         status = MedicationRequest.MedicationRequestStatus.ACTIVE
+ *         addNote(Annotation(MarkdownType("Proposal looks OK.")))
+ *       },
+ *     )
  *
- *      val cpgCommunicationRequest =
- *       CPGRequestResource.of(
- *         CommunicationRequest().apply {
- *           id = "com-req-01"
- *           status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
- *           subject = Reference("Patient/pat-01")
- *           meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
- *           addPayload().apply { content = StringType("Hello message for patient") }
+ *   val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+ *   repository.create(cpgMedicationRequest.resource)
+ *
+ *   val flow = ActivityFlow.of(repository, cpgMedicationRequest)
+ *
+ *   var cachedRequestId = ""
+ *
+ *   flow
+ *   .draftPlan()
+ *   .onSuccess { draftPlan ->
+ *     draftPlan.update { addNote(Annotation(MarkdownType("Draft plan looks OK."))) }
+ *
+ *     flow.startPlan(draftPlan).onSuccess { planPhase ->
+ *       val updatedPlan =
+ *         planPhase.getRequest().copy().apply {
+ *           setStatus(Status.ACTIVE)
+ *           update { addNote(Annotation(MarkdownType("Plan looks OK."))) }
  *         }
- *       )
  *
- *     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
- *     // Create ActivityFlow for the given CPGRequestResource.
- *     val communicationFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
- *       ActivityFlow.of(repository, "pat-01")
- *         .first() as ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
- *     late init var order: CommunicationRequest
- *     communicationFlow.startPlan { // CPGCommunicationRequest
- *       update { // CommunicationRequest
- *         addPayload().apply { content = StringType("Updated proposal with this message ") }
- *       }
- *     }.endPlan { // CPGCommunicationRequest
- *       order = this.resource
- *       update {  // CommunicationRequest
- *         addPayload().apply { content = StringType("Updated newly created plan with this message ") }
- *       }
+ *       planPhase
+ *         .update(updatedPlan)
+ *         .onSuccess { cachedRequestId = updatedPlan.logicalId }
+ *         .onFailure { fail("Should have succeeded", it) }
  *     }
+ *   }
+ *   .onFailure { fail("Unexpected", it) }
  *
- *     // Find all the flows associated with the patient and resume the particular one
- *     val orderFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
- *       ActivityFlow.of(repository, "pat-01")
- *         .first() as ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent>
+ *   val planToResume =
+ *     repository
+ *       .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
+ *       .let { CPGMedicationRequest(it) }
+ *   val resumedPlanFlow = ActivityFlow.of(repository, planToResume)
  *
- *     // alternatively if you have access to the order request, create a flow directly.
+ *   check(resumedPlanFlow.getCurrentPhase() is PlanPhase<*>) {
+ *     "Flow is in ${resumedPlanFlow.getCurrentPhase().getPhaseName()} "
+ *   }
+ *   resumedPlanFlow
+ *   .draftOrder()
+ *   .onSuccess { draftOrder ->
+ *     draftOrder.update { addNote(Annotation(MarkdownType("Draft order looks OK."))) }
  *
- *     val orderFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
- *       ActivityFlow.of(repository, CPGCommunicationRequest(order))
- *
- *     orderFlow.startOrder { // CPGCommunicationRequest
- *       update {  // CommunicationRequest
- *         addPayload().apply { content = StringType("Updated plan with this message ") }
- *       }
- *     }.endOrder { // CPGCommunicationRequest
- *       update {  // CommunicationRequest
- *         addPayload().apply {
- *           content = StringType("Updated newly created order with this message ")
+ *     resumedPlanFlow.startOrder(draftOrder).onSuccess { orderPhase ->
+ *       val updatedOrder =
+ *         orderPhase.getRequest().copy().apply {
+ *           setStatus(Status.ACTIVE)
+ *           update { addNote(Annotation(MarkdownType("Order looks OK."))) }
  *         }
- *       }
+ *
+ *       orderPhase
+ *         .update(updatedOrder)
+ *         .onSuccess { cachedRequestId = updatedOrder.logicalId }
+ *         .onFailure { fail("Should have succeeded", it) }
  *     }
- *     val performFlow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
- *       ActivityFlow.of(repository, cpgCommunicationRequest)
- *     performFlow.startPerform(CPGCommunicationEvent::class.java) { // CPGCommunicationRequest
- *       update {  // CommunicationRequest
- *         status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
- *         addPayload().apply { content = StringType("Updated order with this message ") }
- *       }
- *     }.endPerform { // CPGCommunicationEvent
- *       update {  // Communication
- *         addPayload().apply {
- *           content = StringType("Updated newly created event with this message ")
+ *   }
+ *   .onFailure { fail("Unexpected", it) }
+ *
+ *   val orderToResume =
+ *     repository
+ *       .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
+ *       .let { CPGMedicationRequest(it) }
+ *
+ *   val resumedOrderFlow = ActivityFlow.of(repository, orderToResume)
+ *
+ *   check(resumedOrderFlow.getCurrentPhase() is OrderPhase<*>) {
+ *     "Flow is in ${resumedOrderFlow.getCurrentPhase().getPhaseName()} "
+ *   }
+ *
+ *   resumedOrderFlow
+ *   .draftPerform(CPGMedicationDispenseEvent::class.java)
+ *   .onSuccess { draftEvent ->
+ *     draftEvent.update { addNote(Annotation(MarkdownType("Draft event looks OK."))) }
+ *
+ *     resumedOrderFlow.startPerform(draftEvent).onSuccess { performPhase ->
+ *       val updatedEvent =
+ *         performPhase.getEvent().copy().apply {
+ *           setStatus(EventStatus.INPROGRESS)
+ *           update { addNote(Annotation(MarkdownType("Event looks OK."))) }
  *         }
- *       }
+ *
+ *       performPhase
+ *         .update(updatedEvent)
+ *         .onSuccess { cachedRequestId = updatedEvent.logicalId }
+ *         .onFailure { fail("Should have succeeded", it) }
  *     }
- *     ```
+ *   }
+ *   .onFailure { fail("Unexpected", it) }
+ *
+ *   val eventToResume =
+ *     repository
+ *       .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedRequestId))
+ *       .let { CPGMedicationDispenseEvent(it) }
+ *
+ *   val resumedPerformFlow = ActivityFlow.of(repository, eventToResume)
+ *
+ *   check(resumedPerformFlow.getCurrentPhase() is Phase.EventPhase<*>) {
+ *     "Flow is in ${resumedPerformFlow.getCurrentPhase().getPhaseName()} "
+ *   }
+ *
+ *   (resumedPerformFlow.getCurrentPhase() as Phase.EventPhase<*>).complete()
+ * ```
  */
 @Suppress(
   "UnstableApiUsage", /* Repository is marked @Beta */
-  "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
 )
 class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>>
 private constructor(
@@ -166,26 +214,56 @@ private constructor(
     return currentPhase
   }
 
+  /**
+   * Creates a draft plan resource based on the state of the [currentPhase].
+   *
+   * @return [R] if the action is successful, error otherwise.
+   */
   fun draftPlan(): Result<R> {
     return PlanPhase.draft(currentPhase)
   }
 
-  fun startPlan(inputPlan: R) =
-    PlanPhase.start(repository, currentPhase, inputPlan).also { it.onSuccess { currentPhase = it } }
+  /**
+   * Starts a plan phase based on the state of the [currentPhase] and [draftPlan].
+   *
+   * @return [PlanPhase] if the action is successful, error otherwise.
+   */
+  fun startPlan(draftPlan: R) =
+    PlanPhase.start(repository, currentPhase, draftPlan).also { it.onSuccess { currentPhase = it } }
 
+  /**
+   * Creates a draft order resource based on the state of the [currentPhase].
+   *
+   * @return [R] if the action is successful, error otherwise.
+   */
   fun draftOrder(): Result<R> {
     return OrderPhase.draft(currentPhase)
   }
 
+  /**
+   * Starts an order phase based on the state of the [currentPhase] and [draftPlan].
+   *
+   * @return [OrderPhase] if the action is successful, error otherwise.
+   */
   fun startOrder(updatedDraftOrder: R) =
     OrderPhase.start(repository, currentPhase, updatedDraftOrder).also {
       it.onSuccess { currentPhase = it }
     }
 
+  /**
+   * Creates a draft event resource based on the state of the [currentPhase].
+   *
+   * @return [D] if the action is successful, error otherwise.
+   */
   fun <D : E> draftPerform(klass: Class<D>): Result<D> {
     return PerformPhase.draft<R, D>(klass, currentPhase)
   }
 
+  /**
+   * Starts a perform phase based on the state of the [currentPhase] and [draftPlan].
+   *
+   * @return [PerformPhase] if the action is successful, error otherwise.
+   */
   fun <D : E> startPerform(updatedDraftPerform: D) =
     PerformPhase.start<R, D>(repository, currentPhase, updatedDraftPerform).also {
       it.onSuccess { currentPhase = it }

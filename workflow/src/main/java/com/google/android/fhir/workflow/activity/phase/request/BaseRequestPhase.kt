@@ -21,6 +21,10 @@ import com.google.android.fhir.workflow.activity.resource.request.CPGRequestReso
 import com.google.android.fhir.workflow.activity.resource.request.Status
 import org.opencds.cqf.fhir.api.Repository
 
+/** Encapsulates the state transitions of a [Phase.RequestPhase]. */
+@Suppress(
+  "UnstableApiUsage", /* Repository is marked @Beta */
+)
 abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repository, r: R) :
   Phase.RequestPhase<R> {
   private var request: R = r
@@ -73,4 +77,8 @@ abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repos
       request.setStatus(Status.REVOKED, reason)
       repository.update(request.resource)
     }
+
+  companion object {
+    val AllowedStatusForPhaseStart = listOf(Status.DRAFT, Status.ACTIVE)
+  }
 }

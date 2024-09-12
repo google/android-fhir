@@ -20,6 +20,14 @@ import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import org.opencds.cqf.fhir.api.Repository
 
+/**
+ * Provides implementation of the proposal phase of the activity flow. See
+ * [general-activity-flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#general-activity-flow)
+ * for more info.
+ */
+@Suppress(
+  "UnstableApiUsage", /* Repository is marked @Beta */
+)
 class ProposalPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
   BaseRequestPhase<R>(repository, r) {
   override fun getPhaseName() = Phase.PhaseName.PROPOSAL

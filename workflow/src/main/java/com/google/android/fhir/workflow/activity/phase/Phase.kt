@@ -20,6 +20,7 @@ import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import org.hl7.fhir.r4.model.Reference
 
+/** Defines the various phases of a CPG Request. */
 sealed interface Phase {
 
   enum class PhaseName {
@@ -31,6 +32,7 @@ sealed interface Phase {
 
   fun getPhaseName(): PhaseName
 
+  /** Activity Phases for a CPG Request. */
   interface RequestPhase<R : CPGRequestResource<*>> : Phase {
     fun getRequest(): R
 
@@ -45,6 +47,7 @@ sealed interface Phase {
     fun reject(reason: String?): Result<Unit>
   }
 
+  /** Activity phases for a CPG Event. */
   interface EventPhase<E : CPGEventResource<*>> : Phase {
     fun getEvent(): E
 
@@ -66,4 +69,4 @@ sealed interface Phase {
   }
 }
 
-fun equals(a: Reference, b: Reference) = a.reference == b.reference
+fun checkEquals(a: Reference, b: Reference) = a.reference == b.reference

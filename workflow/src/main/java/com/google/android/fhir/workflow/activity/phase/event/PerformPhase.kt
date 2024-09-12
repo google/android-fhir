@@ -19,13 +19,24 @@ package com.google.android.fhir.workflow.activity.phase.event
 import com.google.android.fhir.workflow.activity.`class`
 import com.google.android.fhir.workflow.activity.idType
 import com.google.android.fhir.workflow.activity.phase.Phase
+import com.google.android.fhir.workflow.activity.phase.checkEquals
 import com.google.android.fhir.workflow.activity.phase.request.BaseRequestPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
 import org.opencds.cqf.fhir.api.Repository
 
+/**
+ * Provides implementation of the perform phase of the activity flow. See
+ * [general-activity-flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#general-activity-flow)
+ * for more info.
+ */
+@Suppress(
+  "UnstableApiUsage", /* Repository is marked @Beta */
+  "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
+)
 class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   Phase.EventPhase<E> {
   private var event: E = e
@@ -113,39 +124,37 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
 
   companion object {
 
+    private val AllowedIntents = listOf(Intent.PROPOSAL, Intent.PLAN, Intent.ORDER)
+    private val AllowedPhases =
+      listOf(Phase.PhaseName.PROPOSAL, Phase.PhaseName.PLAN, Phase.PhaseName.ORDER)
+    val AllowedStatusForPhaseStart = listOf(EventStatus.INPROGRESS, EventStatus.PREPARATION)
+
+    /**
+     * Creates a draft event of type [E] based on the state of the provided [inputPhase]. See
+     * [beginPerform](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#perform)
+     * for more details.
+     */
     fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> draft(
       eventClass: Class<*>,
       inputPhase: Phase,
     ): Result<E> = runCatching {
-      check(inputPhase is Phase.RequestPhase<*>) {
-        "The api can't be called from ${inputPhase.getPhaseName().name}."
+      check(inputPhase.getPhaseName() in AllowedPhases) {
+        "Event can't be created for a flow in ${inputPhase.getPhaseName().name} phase. "
       }
 
-      val currentPhase: Phase.RequestPhase<R> = inputPhase as Phase.RequestPhase<R>
+      val inputRequest = (inputPhase as BaseRequestPhase<*>).getRequest()
 
-      val acceptPhases =
-        listOf(
-          Phase.PhaseName.PROPOSAL,
-          Phase.PhaseName.PLAN,
-          Phase.PhaseName.ORDER,
-        )
-      check(acceptPhases.contains(currentPhase.getPhaseName())) {
-        "Order can't be created from ${currentPhase.getPhaseName().name}"
+      check(inputRequest.getIntent() in AllowedIntents) {
+        "Event can't be created for a request with ${inputRequest.getIntent().name} intent."
       }
 
-      val inputOrder = (currentPhase as BaseRequestPhase<*>).getRequest()
-
-      //      check(inputOrder.getIntent() == Intent.ORDER) {
-      //        "Order is still in ${inputOrder.getIntent()} state."
-      //      }
-
-      check(inputOrder.getStatus() == Status.ACTIVE) {
-        "Order is still in ${inputOrder.getStatus()} status."
+      check(inputRequest.getStatus() == Status.ACTIVE) {
+        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatus()} status."
       }
 
-      val eventRequest = CPGEventResource.of(inputOrder, eventClass)
+      val eventRequest = CPGEventResource.of(inputRequest, eventClass)
       eventRequest.setStatus(EventStatus.PREPARATION)
-      eventRequest.setBasedOn(inputOrder.asReference())
+      eventRequest.setBasedOn(inputRequest.asReference())
       eventRequest as E
     }
 
@@ -154,48 +163,40 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
       inputPhase: Phase,
       inputEvent: E,
     ): Result<PerformPhase<E>> = runCatching {
-      check(inputPhase is Phase.RequestPhase<*>) {
-        "The api can't be called from ${inputPhase.getPhaseName().name}."
+      check(inputPhase.getPhaseName() in AllowedPhases) {
+        "A Perform can't be started for a flow in ${inputPhase.getPhaseName().name} phase."
       }
 
-      val currentPhase: Phase.RequestPhase<R> = inputPhase as Phase.RequestPhase<R>
+      val currentPhase = inputPhase as Phase.RequestPhase<*>
 
       val basedOn = inputEvent.getBasedOn()
-      require(basedOn != null) { "${inputEvent.resourceType}.basedOn shouldn't be null" }
+      require(basedOn != null) { "${inputEvent.resource.resourceType}.basedOn can't be null." }
 
-      require(
-        com.google.android.fhir.workflow.activity.phase.equals(
-          basedOn,
-          currentPhase.getRequest().asReference(),
-        ),
-      ) {
-        "Provided draft is not based on current ${currentPhase.getPhaseName().name}."
+      require(checkEquals(basedOn, currentPhase.getRequest().asReference())) {
+        "Provided draft is not based on the request in current phase."
       }
 
-      val basedOnResource =
+      val basedOnRequest =
         repository.read(basedOn.`class`, basedOn.idType)?.let { CPGRequestResource.of(it) }
 
-      require(basedOnResource != null) { "Couldn't find $basedOn in the database." }
+      require(basedOnRequest != null) { "Couldn't find ${basedOn.reference} in the database." }
 
-      //      require(basedOnResource.getIntent() == Intent.ORDER) {
-      //        "Proposal is still in ${basedOnResource.getIntent()} state."
-      //      }
-
-      require(basedOnResource.getStatus() == Status.ACTIVE) {
-        "Proposal is still in ${basedOnResource.getStatus()} status."
+      require(basedOnRequest.getIntent() in AllowedIntents) {
+        "Order can't be based on a request with ${basedOnRequest.getIntent()} intent."
       }
 
-      require(
-        inputEvent.getStatus() == EventStatus.PREPARATION ||
-          inputEvent.getStatus() == EventStatus.INPROGRESS,
-      ) {
-        "Proposal is still in ${inputEvent.getStatus()} status."
+      require(basedOnRequest.getStatus() == Status.ACTIVE) {
+        "Plan can't be based on a request with ${basedOnRequest.getStatus()} status."
       }
 
-      basedOnResource.setStatus(Status.COMPLETED)
+      require(inputEvent.getStatus() in AllowedStatusForPhaseStart) {
+        "Input event is in ${inputEvent.getStatus().name} status."
+      }
+
+      basedOnRequest.setStatus(Status.COMPLETED)
 
       repository.create(inputEvent.resource)
-      repository.update(basedOnResource.resource)
+      repository.update(basedOnRequest.resource)
       PerformPhase(repository, inputEvent)
     }
   }
