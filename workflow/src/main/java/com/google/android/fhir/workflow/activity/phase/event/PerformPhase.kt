@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.workflow.activity.phase.event
 
 import com.google.android.fhir.workflow.activity.`class`
@@ -7,7 +23,6 @@ import com.google.android.fhir.workflow.activity.phase.request.BaseRequestPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
-import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
 import org.opencds.cqf.fhir.api.Repository
 
@@ -19,104 +34,110 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
 
   override fun getEvent() = event
 
-
-  override fun update(e: E) = runCatching<Unit> {
-    //TODO Add some basic checks to make sure e is update event and not a completely different resource.
-    require(e.getStatus() in listOf(EventStatus.PREPARATION, EventStatus.INPROGRESS)) {
-      "Status is ${e.getStatus()}"
-    }
-    repository.update(e.resource)
-    event = e
-  }
-
-  override fun suspend(reason: String?) = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.INPROGRESS) {
-      " Can't suspend an event with status ${event.getStatus()} "
+  override fun update(e: E) =
+    runCatching<Unit> {
+      // TODO Add some basic checks to make sure e is update event and not a completely different
+      // resource.
+      require(e.getStatus() in listOf(EventStatus.PREPARATION, EventStatus.INPROGRESS)) {
+        "Status is ${e.getStatus()}"
+      }
+      repository.update(e.resource)
+      event = e
     }
 
-    event.setStatus(EventStatus.ONHOLD, reason)
-    repository.update(event.resource)
-  }
+  override fun suspend(reason: String?) =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.INPROGRESS) {
+        " Can't suspend an event with status ${event.getStatus()} "
+      }
 
-  override fun resume() = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.ONHOLD) {
-      " Can't resume an event with status ${event.getStatus()} "
+      event.setStatus(EventStatus.ONHOLD, reason)
+      repository.update(event.resource)
     }
 
-    event.setStatus(EventStatus.INPROGRESS)
-    repository.update(event.resource)
-  }
+  override fun resume() =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.ONHOLD) {
+        " Can't resume an event with status ${event.getStatus()} "
+      }
 
-  override fun enteredInError(reason: String?) = runCatching<Unit> {
-
-    event.setStatus(EventStatus.ENTEREDINERROR, reason)
-    repository.update(event.resource)
-  }
-
-  override fun start() = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.PREPARATION) {
-      " Can't start an event with status ${event.getStatus()} "
+      event.setStatus(EventStatus.INPROGRESS)
+      repository.update(event.resource)
     }
 
-    event.setStatus(EventStatus.INPROGRESS)
-    repository.update(event.resource)
-  }
-
-  override fun notDone(reason: String?) = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.PREPARATION) {
-      " Can't not-done an event with status ${event.getStatus()} "
+  override fun enteredInError(reason: String?) =
+    runCatching<Unit> {
+      event.setStatus(EventStatus.ENTEREDINERROR, reason)
+      repository.update(event.resource)
     }
 
-    event.setStatus(EventStatus.NOTDONE, reason)
-    repository.update(event.resource)
-  }
+  override fun start() =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.PREPARATION) {
+        " Can't start an event with status ${event.getStatus()} "
+      }
 
-  override fun stop(reason: String?) = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.INPROGRESS) {
-      " Can't stop an event with status ${event.getStatus()} "
+      event.setStatus(EventStatus.INPROGRESS)
+      repository.update(event.resource)
     }
 
-    event.setStatus(EventStatus.STOPPED, reason)
-    repository.update(event.resource)
-  }
+  override fun notDone(reason: String?) =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.PREPARATION) {
+        " Can't not-done an event with status ${event.getStatus()} "
+      }
 
-  override fun complete() = runCatching<Unit> {
-    check(event.getStatus() == EventStatus.INPROGRESS) {
-      " Can't complete an event with status ${event.getStatus()} "
+      event.setStatus(EventStatus.NOTDONE, reason)
+      repository.update(event.resource)
     }
 
-    event.setStatus(EventStatus.COMPLETED)
-    repository.update(event.resource)
-  }
+  override fun stop(reason: String?) =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.INPROGRESS) {
+        " Can't stop an event with status ${event.getStatus()} "
+      }
+
+      event.setStatus(EventStatus.STOPPED, reason)
+      repository.update(event.resource)
+    }
+
+  override fun complete() =
+    runCatching<Unit> {
+      check(event.getStatus() == EventStatus.INPROGRESS) {
+        " Can't complete an event with status ${event.getStatus()} "
+      }
+
+      event.setStatus(EventStatus.COMPLETED)
+      repository.update(event.resource)
+    }
 
   companion object {
 
     fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> draft(
       eventClass: Class<*>,
-      inputPhase: Phase
+      inputPhase: Phase,
     ): Result<E> = runCatching {
-
       check(inputPhase is Phase.RequestPhase<*>) {
         "The api can't be called from ${inputPhase.getPhaseName().name}."
       }
 
       val currentPhase: Phase.RequestPhase<R> = inputPhase as Phase.RequestPhase<R>
 
-
-      val acceptPhases = listOf(
-        Phase.PhaseName.PROPOSAL,
-        Phase.PhaseName.PLAN,
-        Phase.PhaseName.ORDER
-      )
+      val acceptPhases =
+        listOf(
+          Phase.PhaseName.PROPOSAL,
+          Phase.PhaseName.PLAN,
+          Phase.PhaseName.ORDER,
+        )
       check(acceptPhases.contains(currentPhase.getPhaseName())) {
         "Order can't be created from ${currentPhase.getPhaseName().name}"
       }
 
       val inputOrder = (currentPhase as BaseRequestPhase<*>).getRequest()
 
-//      check(inputOrder.getIntent() == Intent.ORDER) {
-//        "Order is still in ${inputOrder.getIntent()} state."
-//      }
+      //      check(inputOrder.getIntent() == Intent.ORDER) {
+      //        "Order is still in ${inputOrder.getIntent()} state."
+      //      }
 
       check(inputOrder.getStatus() == Status.ACTIVE) {
         "Order is still in ${inputOrder.getStatus()} status."
@@ -131,15 +152,13 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
     fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> start(
       repository: Repository,
       inputPhase: Phase,
-      inputEvent: E
+      inputEvent: E,
     ): Result<PerformPhase<E>> = runCatching {
-
       check(inputPhase is Phase.RequestPhase<*>) {
         "The api can't be called from ${inputPhase.getPhaseName().name}."
       }
 
       val currentPhase: Phase.RequestPhase<R> = inputPhase as Phase.RequestPhase<R>
-
 
       val basedOn = inputEvent.getBasedOn()
       require(basedOn != null) { "${inputEvent.resourceType}.basedOn shouldn't be null" }
@@ -147,8 +166,8 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
       require(
         com.google.android.fhir.workflow.activity.phase.equals(
           basedOn,
-          currentPhase.getRequest().asReference()
-        )
+          currentPhase.getRequest().asReference(),
+        ),
       ) {
         "Provided draft is not based on current ${currentPhase.getPhaseName().name}."
       }
@@ -158,9 +177,9 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
 
       require(basedOnResource != null) { "Couldn't find $basedOn in the database." }
 
-//      require(basedOnResource.getIntent() == Intent.ORDER) {
-//        "Proposal is still in ${basedOnResource.getIntent()} state."
-//      }
+      //      require(basedOnResource.getIntent() == Intent.ORDER) {
+      //        "Proposal is still in ${basedOnResource.getIntent()} state."
+      //      }
 
       require(basedOnResource.getStatus() == Status.ACTIVE) {
         "Proposal is still in ${basedOnResource.getStatus()} status."

@@ -29,7 +29,7 @@ class CPGServiceRequest(override val resource: ServiceRequest) :
 
   override fun setStatus(status: Status, reason: String?) {
     resource.status = ServiceRequest.ServiceRequestStatus.fromCode(status.string)
-//    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
+    //    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus() = Status.of(resource.status.toCode())

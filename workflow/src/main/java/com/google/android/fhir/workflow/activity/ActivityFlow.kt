@@ -137,7 +137,8 @@ val Reference.`class`
   "UnstableApiUsage", /* Repository is marked @Beta */
   "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
 )
-class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private constructor(
+class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>>
+private constructor(
   private val repository: Repository,
   requestResource: R? = null,
   eventResource: E? = null,
@@ -146,16 +147,19 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
   private var currentPhase: Phase
 
   init {
-    currentPhase = if (eventResource != null) {
-      PerformPhase<E>(repository, eventResource)
-    } else if (requestResource != null) {
-      when (requestResource.getIntent()) {
-        Intent.PROPOSAL -> ProposalPhase(repository, requestResource)
-        Intent.PLAN -> PlanPhase(repository, requestResource)
-        Intent.ORDER -> OrderPhase(repository, requestResource)
-        else -> throw IllegalArgumentException("Unknown")
+    currentPhase =
+      if (eventResource != null) {
+        PerformPhase(repository, eventResource)
+      } else if (requestResource != null) {
+        when (requestResource.getIntent()) {
+          Intent.PROPOSAL -> ProposalPhase(repository, requestResource)
+          Intent.PLAN -> PlanPhase(repository, requestResource)
+          Intent.ORDER -> OrderPhase(repository, requestResource)
+          else -> throw IllegalArgumentException("Unknown")
+        }
+      } else {
+        throw IllegalArgumentException("Unknown")
       }
-    } else throw IllegalArgumentException("Unknown")
   }
 
   fun getCurrentPhase(): Phase {
@@ -167,11 +171,7 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
   }
 
   fun startPlan(inputPlan: R) =
-    PlanPhase.start(repository, currentPhase, inputPlan).also {
-      it.onSuccess {
-        currentPhase = it
-      }
-    }
+    PlanPhase.start(repository, currentPhase, inputPlan).also { it.onSuccess { currentPhase = it } }
 
   fun draftOrder(): Result<R> {
     return OrderPhase.draft(currentPhase)
@@ -179,11 +179,8 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
 
   fun startOrder(updatedDraftOrder: R) =
     OrderPhase.start(repository, currentPhase, updatedDraftOrder).also {
-      it.onSuccess {
-        currentPhase = it
-      }
+      it.onSuccess { currentPhase = it }
     }
-
 
   fun <D : E> draftPerform(klass: Class<D>): Result<D> {
     return PerformPhase.draft<R, D>(klass, currentPhase)
@@ -191,9 +188,7 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
 
   fun <D : E> startPerform(updatedDraftPerform: D) =
     PerformPhase.start<R, D>(repository, currentPhase, updatedDraftPerform).also {
-      it.onSuccess {
-        currentPhase = it
-      }
+      it.onSuccess { currentPhase = it }
     }
 
   companion object {
@@ -209,7 +204,6 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
     ): ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
       ActivityFlow(repository, null, resource)
 
-
     // order medication
     fun of(
       repository: Repository,
@@ -223,21 +217,21 @@ class ActivityFlow<R : CPGRequestResource<*>, E : CPGEventResource<*>> private c
     ): ActivityFlow<CPGMedicationRequest, CPGEventResourceForOrderMedication<*>> =
       ActivityFlow(repository, null, resource)
 
-
     // Collect information
-//    fun of(repository: Repository, resource: CPGTaskRequest) =
-//      ActivityFlow(repository, resource, null)
+    //    fun of(repository: Repository, resource: CPGTaskRequest) =
+    //      ActivityFlow(repository, resource, null)
 
-//    // Order a service
-//    fun of(
-//      repository: Repository,
-//      resource: CPGServiceRequest,
-//    ): ActivityFlow<CPGServiceRequest, CPGEventForOrderService<*>> =
-//      ActivityFlow(repository, resource)
-//
-//    fun of(
-//      repository: Repository,
-//      resource: CPGImmunizationRequest,
-//    ): ActivityFlow<CPGImmunizationRequest, CPGImmunizationEvent> = ActivityFlow(repository, resource)
+    //    // Order a service
+    //    fun of(
+    //      repository: Repository,
+    //      resource: CPGServiceRequest,
+    //    ): ActivityFlow<CPGServiceRequest, CPGEventForOrderService<*>> =
+    //      ActivityFlow(repository, resource)
+    //
+    //    fun of(
+    //      repository: Repository,
+    //      resource: CPGImmunizationRequest,
+    //    ): ActivityFlow<CPGImmunizationRequest, CPGImmunizationEvent> = ActivityFlow(repository,
+    // resource)
   }
 }

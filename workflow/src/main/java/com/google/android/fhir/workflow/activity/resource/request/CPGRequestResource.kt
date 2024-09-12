@@ -91,7 +91,6 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
       return when (klass::class.java) {
         CPGCommunicationRequest::class.java ->
           CPGCommunicationRequest(resource as CommunicationRequest)
-
         CPGMedicationRequest::class.java -> CPGMedicationRequest(resource as MedicationRequest)
         CPGImmunizationRequest::class.java -> CPGImmunizationRequest(resource as MedicationRequest)
         CPGServiceRequest::class.java -> CPGServiceRequest(resource as ServiceRequest)

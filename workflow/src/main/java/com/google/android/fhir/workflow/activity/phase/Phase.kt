@@ -1,3 +1,19 @@
+/*
+ * Copyright 2024 Google LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.google.android.fhir.workflow.activity.phase
 
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
@@ -19,10 +35,13 @@ sealed interface Phase {
     fun getRequest(): R
 
     fun update(r: R): Result<Unit>
+
     fun suspend(reason: String?): Result<Unit>
+
     fun resume(): Result<Unit>
 
     fun enteredInError(reason: String?): Result<Unit>
+
     fun reject(reason: String?): Result<Unit>
   }
 
@@ -30,13 +49,19 @@ sealed interface Phase {
     fun getEvent(): E
 
     fun update(r: E): Result<Unit>
+
     fun suspend(reason: String?): Result<Unit>
+
     fun resume(): Result<Unit>
 
     fun enteredInError(reason: String?): Result<Unit>
+
     fun start(): Result<Unit>
+
     fun notDone(reason: String?): Result<Unit>
+
     fun stop(reason: String?): Result<Unit>
+
     fun complete(): Result<Unit>
   }
 }

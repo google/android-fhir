@@ -37,7 +37,6 @@ abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val
         CPGMedicationDispenseEvent::class.java -> CPGMedicationDispenseEvent.from(request)
         CPGMedicationAdministrationEvent::class.java ->
           CPGMedicationAdministrationEvent.from(request)
-
         CPGMedicationStatementEvent::class.java -> CPGMedicationStatementEvent.from(request)
         else -> throw IllegalArgumentException(" Unknown Event type $eventClass")
       }
@@ -89,7 +88,8 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
       )
     }
 
-    private fun MedicationRequest.MedicationRequestSubstitutionComponent.toMedicationDispenseSubstitutionComponent() =
+    private fun MedicationRequest.MedicationRequestSubstitutionComponent
+      .toMedicationDispenseSubstitutionComponent() =
       MedicationDispense.MedicationDispenseSubstitutionComponent().apply {
         id = this@toMedicationDispenseSubstitutionComponent.id
         extension = this@toMedicationDispenseSubstitutionComponent.extension

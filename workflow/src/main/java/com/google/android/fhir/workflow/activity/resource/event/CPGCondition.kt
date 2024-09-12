@@ -24,7 +24,7 @@ class CPGCondition(override val resource: Condition) : CPGEventResource<Conditio
   // clinical status http://hl7.org/fhir/ValueSet/condition-clinical
   override fun setStatus(status: EventStatus, reason: String?) {
     resource.clinicalStatus = CodeableConcept()
-//    resource.ras = reason?.let { CodeableConcept(Coding().setCode(it)) }
+    //    resource.ras = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus(): EventStatus {
