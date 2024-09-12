@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.event
+package com.google.android.fhir.workflow.activity.resource.event
 
-import org.hl7.fhir.r4.model.CodeableConcept
-import org.hl7.fhir.r4.model.Condition
+import org.hl7.fhir.r4.model.EpisodeOfCare
 import org.hl7.fhir.r4.model.Reference
 
-class CPGCondition(override val resource: Condition) : CPGEventResource<Condition>(resource) {
-  // clinical status http://hl7.org/fhir/ValueSet/condition-clinical
-  override fun setStatus(status: EventStatus) {
-    resource.clinicalStatus = CodeableConcept()
+class CPGCaseEvent(override val resource: EpisodeOfCare) :
+  CPGEventResource<EpisodeOfCare>(resource) {
+  override fun setStatus(status: EventStatus, reason: String?) {
+    resource.status = EpisodeOfCare.EpisodeOfCareStatus.fromCode(status.code)
   }
 
-  override fun getStatus(): EventStatus {
-    TODO("Not yet implemented")
-  }
+  override fun getStatus() = EventStatus.of(resource.status.toCode())
 
   override fun setBasedOn(reference: Reference) {
-    TODO("Not yet implemented")
+    resource.addReferralRequest(reference)
   }
 
-  override fun getBasedOn(): Reference? {
-    TODO("Not yet implemented")
-  }
+  override fun getBasedOn() = resource.referralRequest.lastOrNull()
 
-  //
+  override fun copy() = CPGCaseEvent(resource.copy())
 }

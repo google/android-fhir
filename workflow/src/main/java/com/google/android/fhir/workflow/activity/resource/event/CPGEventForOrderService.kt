@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.event
+package com.google.android.fhir.workflow.activity.resource.event
 
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Procedure
@@ -26,7 +26,7 @@ abstract class CPGEventForOrderService<out R : Resource>(override val resource: 
 
 class CPGProcedureEvent(override val resource: Procedure) :
   CPGEventForOrderService<Procedure>(resource) {
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     TODO("Not yet implemented")
   }
 
@@ -41,12 +41,14 @@ class CPGProcedureEvent(override val resource: Procedure) :
   override fun getBasedOn(): Reference? {
     TODO("Not yet implemented")
   }
+
+  override fun copy() = CPGProcedureEvent(resource.copy())
 }
 
 class CPGObservationEvent(override val resource: Observation) :
   CPGEventForOrderService<Observation>(resource) {
 
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     TODO("Not yet implemented")
   }
 
@@ -61,4 +63,6 @@ class CPGObservationEvent(override val resource: Observation) :
   override fun getBasedOn() =
     resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/event-basedOn")?.value
       as Reference?
+
+  override fun copy() = CPGObservationEvent(resource.copy())
 }

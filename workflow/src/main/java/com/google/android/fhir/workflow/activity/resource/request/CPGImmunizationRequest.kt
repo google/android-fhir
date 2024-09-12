@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.request
+package com.google.android.fhir.workflow.activity.resource.request
 
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 
@@ -27,8 +29,9 @@ class CPGImmunizationRequest(override val resource: MedicationRequest) :
 
   override fun getIntent() = Intent.of(resource.intent.toCode())
 
-  override fun setStatus(status: Status) {
+  override fun setStatus(status: Status, reason: String?) {
     resource.status = MedicationRequest.MedicationRequestStatus.fromCode(status.string)
+    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus() = Status.of(resource.status.toCode())
@@ -39,5 +42,5 @@ class CPGImmunizationRequest(override val resource: MedicationRequest) :
 
   override fun getBasedOn() = resource.basedOn.lastOrNull()
 
-  override fun copy(r: MedicationRequest) = CPGImmunizationRequest(r)
+  override fun copy() = CPGImmunizationRequest(resource.copy())
 }

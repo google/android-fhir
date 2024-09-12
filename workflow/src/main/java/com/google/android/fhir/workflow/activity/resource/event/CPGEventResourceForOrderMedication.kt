@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.event
+package com.google.android.fhir.workflow.activity.resource.event
 
-import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
+import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import java.util.UUID
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MedicationAdministration
 import org.hl7.fhir.r4.model.MedicationDispense
 import org.hl7.fhir.r4.model.MedicationRequest
@@ -35,6 +37,7 @@ abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val
         CPGMedicationDispenseEvent::class.java -> CPGMedicationDispenseEvent.from(request)
         CPGMedicationAdministrationEvent::class.java ->
           CPGMedicationAdministrationEvent.from(request)
+
         CPGMedicationStatementEvent::class.java -> CPGMedicationStatementEvent.from(request)
         else -> throw IllegalArgumentException(" Unknown Event type $eventClass")
       }
@@ -44,8 +47,9 @@ abstract class CPGEventResourceForOrderMedication<out R : Resource>(override val
 class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
   CPGEventResourceForOrderMedication<MedicationDispense>(resource) {
 
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationDispense.MedicationDispenseStatus.fromCode(status.code)
+    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus() = EventStatus.of(resource.status.toCode())
@@ -55,6 +59,8 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
   }
 
   override fun getBasedOn(): Reference? = resource.authorizingPrescription.lastOrNull()
+
+  override fun copy() = CPGMedicationDispenseEvent(resource.copy())
 
   companion object {
 
@@ -83,8 +89,7 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
       )
     }
 
-    private fun MedicationRequest.MedicationRequestSubstitutionComponent
-      .toMedicationDispenseSubstitutionComponent() =
+    private fun MedicationRequest.MedicationRequestSubstitutionComponent.toMedicationDispenseSubstitutionComponent() =
       MedicationDispense.MedicationDispenseSubstitutionComponent().apply {
         id = this@toMedicationDispenseSubstitutionComponent.id
         extension = this@toMedicationDispenseSubstitutionComponent.extension
@@ -99,8 +104,9 @@ class CPGMedicationDispenseEvent(override val resource: MedicationDispense) :
 
 class CPGMedicationAdministrationEvent(override val resource: MedicationAdministration) :
   CPGEventResourceForOrderMedication<MedicationAdministration>(resource) {
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationAdministration.MedicationAdministrationStatus.fromCode(status.code)
+    resource.statusReason = reason?.let { listOf(CodeableConcept(Coding().setCode(it))) }
   }
 
   override fun getStatus() = EventStatus.of(resource.status.toCode())
@@ -110,6 +116,8 @@ class CPGMedicationAdministrationEvent(override val resource: MedicationAdminist
   }
 
   override fun getBasedOn(): Reference = resource.request
+
+  override fun copy() = CPGMedicationAdministrationEvent(resource.copy())
 
   companion object {
     fun from(request: CPGMedicationRequest): CPGMedicationAdministrationEvent {
@@ -129,7 +137,7 @@ class CPGMedicationAdministrationEvent(override val resource: MedicationAdminist
 
 class CPGMedicationStatementEvent(override val resource: MedicationStatement) :
   CPGEventResourceForOrderMedication<MedicationStatement>(resource) {
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = MedicationStatement.MedicationStatementStatus.fromCode(status.code)
   }
 
@@ -140,6 +148,8 @@ class CPGMedicationStatementEvent(override val resource: MedicationStatement) :
   }
 
   override fun getBasedOn(): Reference? = resource.basedOn.firstOrNull()
+
+  override fun copy() = CPGMedicationStatementEvent(resource.copy())
 
   companion object {
     fun from(request: CPGMedicationRequest): CPGMedicationStatementEvent {

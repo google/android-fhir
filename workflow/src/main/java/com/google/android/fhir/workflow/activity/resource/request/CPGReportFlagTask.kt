@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.request
+package com.google.android.fhir.workflow.activity.resource.request
 
 import org.hl7.fhir.r4.model.Task
 
-class CPGProposeDiagnosisTask(override val resource: Task) : CPGTaskRequest(resource) {
-  override fun copy(r: Task) = CPGProposeDiagnosisTask(r)
+class CPGReportFlagTask(override val resource: Task) : CPGTaskRequest(resource) {
+  override fun copy() = CPGReportFlagTask(resource.copy())
 }

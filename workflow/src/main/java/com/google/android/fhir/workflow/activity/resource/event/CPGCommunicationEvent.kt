@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.event
+package com.google.android.fhir.workflow.activity.resource.event
 
-import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
 import java.util.UUID
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.Reference
 
 class CPGCommunicationEvent(override val resource: Communication) :
   CPGEventResource<Communication>(resource) {
 
-  override fun setStatus(status: EventStatus) {
+  override fun setStatus(status: EventStatus, reason: String?) {
     resource.status = Communication.CommunicationStatus.fromCode(status.code)
+    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus() = EventStatus.of(resource.status.toCode())
@@ -35,6 +38,8 @@ class CPGCommunicationEvent(override val resource: Communication) :
   }
 
   override fun getBasedOn(): Reference? = resource.basedOn.lastOrNull()
+
+  override fun copy() = CPGCommunicationEvent(resource.copy())
 
   companion object {
     fun from(request: CPGCommunicationRequest): CPGCommunicationEvent {

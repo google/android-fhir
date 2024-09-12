@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.request
+package com.google.android.fhir.workflow.activity.resource.request
 
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource.Companion.of
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MedicationRequest
@@ -58,7 +59,7 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
 
   abstract fun getIntent(): Intent
 
-  abstract fun setStatus(status: Status)
+  abstract fun setStatus(status: Status, reason: String? = null)
 
   abstract fun getStatus(): Status
 
@@ -70,11 +71,11 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
     resource.update()
   }
 
-  internal abstract fun copy(r: R): CPGRequestResource<R>
+  internal abstract fun copy(): CPGRequestResource<R>
 
   fun copy(id: String, status: Status, intent: Intent): CPGRequestResource<R> {
     val parent: CPGRequestResource<R> = this
-    return copy(parent.resource.copy() as R).apply {
+    return copy().apply {
       resource.idElement = IdType.of(resource).setValue(id)
       setStatus(status)
       setIntent(intent)
@@ -90,6 +91,7 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
       return when (klass::class.java) {
         CPGCommunicationRequest::class.java ->
           CPGCommunicationRequest(resource as CommunicationRequest)
+
         CPGMedicationRequest::class.java -> CPGMedicationRequest(resource as MedicationRequest)
         CPGImmunizationRequest::class.java -> CPGImmunizationRequest(resource as MedicationRequest)
         CPGServiceRequest::class.java -> CPGServiceRequest(resource as ServiceRequest)

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.event
+package com.google.android.fhir.workflow.activity.resource.event
 
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.workflow.activity.event.CPGEventResource.Companion.of
-import com.google.android.fhir.workflow.activity.request.CPGCommunicationRequest
-import com.google.android.fhir.workflow.activity.request.CPGMedicationRequest
-import com.google.android.fhir.workflow.activity.request.CPGRequestResource
-import com.google.android.fhir.workflow.activity.request.CPGRequestResource.Companion.of
+import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource.Companion.of
+import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
+import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
+import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource.Companion.of
 import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
@@ -48,7 +48,7 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
   val logicalId: String
     get() = resource.logicalId
 
-  abstract fun setStatus(status: EventStatus)
+  abstract fun setStatus(status: EventStatus, reason: String? = null)
 
   abstract fun getStatus(): EventStatus
 
@@ -59,6 +59,8 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
   fun update(update: R.() -> Unit) {
     resource.update()
   }
+
+  abstract fun copy(): CPGEventResource<R>
 
   companion object {
 

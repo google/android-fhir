@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package com.google.android.fhir.workflow.activity.request
+package com.google.android.fhir.workflow.activity.resource.request
 
+import org.hl7.fhir.r4.model.CodeableConcept
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Task
 
@@ -27,8 +29,9 @@ abstract class CPGTaskRequest internal constructor(override val resource: Task) 
 
   override fun getIntent() = Intent.of(resource.intent.toCode())
 
-  override fun setStatus(status: Status) {
+  override fun setStatus(status: Status, reason: String?) {
     resource.status = Task.TaskStatus.fromCode(status.string)
+    resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
   override fun getStatus() = Status.of(resource.status.toCode())
