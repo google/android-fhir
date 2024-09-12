@@ -22,14 +22,17 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.workflow.activity.phase.Phase
+import com.google.android.fhir.workflow.activity.phase.event.PerformPhase
 import com.google.android.fhir.workflow.activity.phase.request.OrderPhase
 import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
+import com.google.android.fhir.workflow.activity.phase.request.ProposalPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGCommunicationEvent
 import com.google.android.fhir.workflow.activity.resource.event.CPGMedicationDispenseEvent
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
 import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import com.google.android.fhir.workflow.runBlockingOnWorkerThread
@@ -413,5 +416,349 @@ class ActivityFlowTest {
     }
 
     (resumedPerformFlow.getCurrentPhase() as Phase.EventPhase<*>).complete()
+  }
+
+  @Test
+  fun `draftPlan is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+
+    val proposalPhase = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+    assertThat(proposalPhase.getCurrentPhase()).isInstanceOf(ProposalPhase::class.java)
+    assertThat(proposalPhase.draftPlan().isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftPlan is failure when flow is in plan phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationPlanRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.PLAN,
+      ) as CPGCommunicationRequest
+
+    val planPhase = ActivityFlow.of(repository, cpgCommunicationPlanRequest)
+
+    assertThat(planPhase.getCurrentPhase()).isInstanceOf(PlanPhase::class.java)
+    assertThat(planPhase.draftPlan().isFailure).isTrue()
+  }
+
+  @Test
+  fun `draftPlan is failure when flow is in order phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationOrderRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.ORDER,
+      ) as CPGCommunicationRequest
+
+    val orderPhase = ActivityFlow.of(repository, cpgCommunicationOrderRequest)
+
+    assertThat(orderPhase.getCurrentPhase()).isInstanceOf(OrderPhase::class.java)
+    assertThat(orderPhase.draftPlan().isFailure).isTrue()
+  }
+
+  @Test
+  fun `draftPlan is failure when flow is in perform phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationEvent = CPGCommunicationEvent.from(cpgCommunicationRequest)
+
+    val performPhase = ActivityFlow.of(repository, cpgCommunicationEvent)
+
+    assertThat(performPhase.getCurrentPhase()).isInstanceOf(PerformPhase::class.java)
+    assertThat(performPhase.draftPlan().isFailure).isTrue()
+  }
+
+  @Test
+  fun `draftOrder is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+
+    val proposalPhase = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+    assertThat(proposalPhase.getCurrentPhase()).isInstanceOf(ProposalPhase::class.java)
+    assertThat(proposalPhase.draftOrder().isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftOrder is success when flow is in plan phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationPlanRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.PLAN,
+      ) as CPGCommunicationRequest
+
+    val planPhase = ActivityFlow.of(repository, cpgCommunicationPlanRequest)
+
+    assertThat(planPhase.getCurrentPhase()).isInstanceOf(PlanPhase::class.java)
+    assertThat(planPhase.draftOrder().isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftOrder is failure when flow is in order phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationOrderRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.ORDER,
+      ) as CPGCommunicationRequest
+
+    val orderPhase = ActivityFlow.of(repository, cpgCommunicationOrderRequest)
+
+    assertThat(orderPhase.getCurrentPhase()).isInstanceOf(OrderPhase::class.java)
+    assertThat(orderPhase.draftOrder().isFailure).isTrue()
+  }
+
+  @Test
+  fun `draftOrder is failure when flow is in perform phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationEvent = CPGCommunicationEvent.from(cpgCommunicationRequest)
+
+    val performPhase = ActivityFlow.of(repository, cpgCommunicationEvent)
+
+    assertThat(performPhase.getCurrentPhase()).isInstanceOf(PerformPhase::class.java)
+    assertThat(performPhase.draftOrder().isFailure).isTrue()
+  }
+
+  @Test
+  fun `draftPerform is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+
+    val proposalPhase = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+    assertThat(proposalPhase.getCurrentPhase()).isInstanceOf(ProposalPhase::class.java)
+    assertThat(proposalPhase.draftPerform(CPGCommunicationEvent::class.java).isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftPerform is success when flow is in plan phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationPlanRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.PLAN,
+      ) as CPGCommunicationRequest
+
+    val planPhase = ActivityFlow.of(repository, cpgCommunicationPlanRequest)
+
+    assertThat(planPhase.getCurrentPhase()).isInstanceOf(PlanPhase::class.java)
+    assertThat(planPhase.draftPerform(CPGCommunicationEvent::class.java).isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftPerform is success when flow is in order phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationOrderRequest =
+      cpgCommunicationRequest.copy(
+        id = "com-req-01=plan",
+        status = Status.ACTIVE,
+        intent = Intent.ORDER,
+      ) as CPGCommunicationRequest
+
+    val orderPhase = ActivityFlow.of(repository, cpgCommunicationOrderRequest)
+
+    assertThat(orderPhase.getCurrentPhase()).isInstanceOf(OrderPhase::class.java)
+    assertThat(orderPhase.draftPerform(CPGCommunicationEvent::class.java).isSuccess).isTrue()
+  }
+
+  @Test
+  fun `draftPerform is failure when flow is in perform phase`(): Unit = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+    val cpgCommunicationEvent = CPGCommunicationEvent.from(cpgCommunicationRequest)
+
+    val performPhase = ActivityFlow.of(repository, cpgCommunicationEvent)
+
+    assertThat(performPhase.getCurrentPhase()).isInstanceOf(PerformPhase::class.java)
+    assertThat(performPhase.draftPerform(CPGCommunicationEvent::class.java).isFailure).isTrue()
+  }
+
+  @Test
+  fun `getCurrentPhase should return the current phase of the flow`() = runBlockingOnWorkerThread {
+    val cpgCommunicationRequest =
+      CPGRequestResource.of(
+        CommunicationRequest().apply {
+          id = "com-req-01"
+          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+          subject = Reference("Patient/pat-01")
+          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+
+          addPayload().apply { content = StringType("Proposal") }
+        },
+      )
+    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+    repository.create(cpgCommunicationRequest.resource)
+
+    val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+    assertThat(flow.getCurrentPhase()).isInstanceOf(ProposalPhase::class.java)
+
+    flow
+      .draftPlan()
+      .onSuccess {
+        it.setStatus(Status.ACTIVE)
+        flow.startPlan(it)
+      }
+      .onFailure { fail("Unexpected", it) }
+
+    assertThat(flow.getCurrentPhase()).isInstanceOf(PlanPhase::class.java)
+
+    flow
+      .draftOrder()
+      .onSuccess {
+        it.setStatus(Status.ACTIVE)
+        flow.startOrder(it)
+      }
+      .onFailure { fail("Unexpected", it) }
+
+    assertThat(flow.getCurrentPhase()).isInstanceOf(OrderPhase::class.java)
   }
 }
