@@ -72,10 +72,8 @@ internal constructor(
     MeasureEvaluationOptions().apply { evaluationSettings = this@FhirOperator.evaluationSettings }
 
   private val libraryProcessor = LibraryEngine(repository, evaluationSettings)
-
-  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
-
   private val planDefinitionProcessor = PlanDefinitionProcessor(repository, evaluationSettings)
+  private val measureProcessor = R4MeasureProcessor(repository, measureEvaluationOptions)
 
   /**
    * The function evaluates a FHIR library against the database.
