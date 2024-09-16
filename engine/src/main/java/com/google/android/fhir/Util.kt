@@ -26,9 +26,6 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -85,8 +82,3 @@ internal const val ucumUrl = "http://unitsofmeasure.org"
 
 internal fun percentOf(value: Number, total: Number) =
   if (total == 0) 0.0 else value.toDouble() / total.toDouble()
-
-/** Implementation of a parallelized map */
-suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-  map { async { f(it) } }.awaitAll()
-}
