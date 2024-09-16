@@ -18,6 +18,11 @@ package com.google.android.fhir.workflow.activity
 
 import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.workflow.activity.phase.Phase
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.ORDER
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PERFORM
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PLAN
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PROPOSAL
 import com.google.android.fhir.workflow.activity.phase.event.PerformPhase
 import com.google.android.fhir.workflow.activity.phase.request.OrderPhase
 import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
@@ -203,13 +208,31 @@ private constructor(
           Intent.PROPOSAL -> ProposalPhase(repository, requestResource)
           Intent.PLAN -> PlanPhase(repository, requestResource)
           Intent.ORDER -> OrderPhase(repository, requestResource)
-          else -> throw IllegalArgumentException("Unknown")
+          else ->
+            throw IllegalArgumentException(
+              "Couldn't create the flow for ${requestResource.getIntent().name} intent. Supported intents are 'proposal', 'plan', 'order'",
+            )
         }
       } else {
-        throw IllegalArgumentException("Unknown")
+        throw IllegalArgumentException(
+          "Either Request or Event is required to create a flow. Both can't be null.",
+        )
       }
   }
 
+  /**
+   * Returns the current phase of the flow. The users may check the type of flow by calling
+   * [Phase.getPhaseName] on the [getCurrentPhase] and then cast it to appropriate classes.
+   *
+   * The table below shows the mapping between the [PhaseName] and [Phase] implementations.
+   *
+   * | [PhaseName] | [Class]         |
+   * |-------------|-----------------|
+   * | [PROPOSAL]  | [ProposalPhase] |
+   * | [PLAN]      | [PlanPhase]     |
+   * | [ORDER]     | [OrderPhase]    |
+   * | [PERFORM]   | [PerformPhase]  |
+   */
   fun getCurrentPhase(): Phase {
     return currentPhase
   }

@@ -27,7 +27,7 @@ class CPGMedicationRequest(override val resource: MedicationRequest) :
     resource.intent = MedicationRequest.MedicationRequestIntent.fromCode(intent.code)
   }
 
-  override fun getIntent() = Intent.of(resource.intent.toCode())
+  override fun getIntent() = Intent.of(resource.intent?.toCode())
 
   override fun setStatus(status: Status, reason: String?) {
     resource.status = MedicationRequest.MedicationRequestStatus.fromCode(status.string)

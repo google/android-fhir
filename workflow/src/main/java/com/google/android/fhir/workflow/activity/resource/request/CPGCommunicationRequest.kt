@@ -39,9 +39,9 @@ class CPGCommunicationRequest(override val resource: CommunicationRequest) :
 
   override fun getIntent() =
     resource.getExtensionByUrl("http://hl7.org/fhir/StructureDefinition/request-intent")?.let {
-      Intent.of((it.value.primitiveValue()))
+      Intent.of(it.value?.primitiveValue())
     }
-      ?: Intent.PROPOSAL
+      ?: Intent.NULL
 
   override fun setStatus(status: Status, reason: String?) {
     resource.status = CommunicationRequest.CommunicationRequestStatus.fromCode(status.string)

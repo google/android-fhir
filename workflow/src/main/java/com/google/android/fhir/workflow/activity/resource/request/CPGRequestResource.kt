@@ -143,7 +143,7 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
   }
 }
 
-enum class Intent(val code: String) {
+enum class Intent(val code: String?) {
   PROPOSAL("proposal"),
   PLAN("plan"),
   DIRECTIVE("directive"),
@@ -153,11 +153,11 @@ enum class Intent(val code: String) {
   FILLERORDER("filler-order"),
   INSTANCEORDER("instance-order"),
   OPTION("option"),
-  NULL("null"),
+  NULL(null),
   ;
 
   companion object {
-    fun of(code: String): Intent {
+    fun of(code: String?): Intent {
       return when (code) {
         "proposal" -> PROPOSAL
         "plan" -> PLAN

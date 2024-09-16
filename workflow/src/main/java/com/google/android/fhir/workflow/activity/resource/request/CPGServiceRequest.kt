@@ -25,7 +25,7 @@ class CPGServiceRequest(override val resource: ServiceRequest) :
     resource.intent = ServiceRequest.ServiceRequestIntent.fromCode(intent.code)
   }
 
-  override fun getIntent() = Intent.of(resource.intent.toCode())
+  override fun getIntent() = Intent.of(resource.intent?.toCode())
 
   override fun setStatus(status: Status, reason: String?) {
     resource.status = ServiceRequest.ServiceRequestStatus.fromCode(status.string)

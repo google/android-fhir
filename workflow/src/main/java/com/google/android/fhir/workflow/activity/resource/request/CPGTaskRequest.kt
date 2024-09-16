@@ -27,7 +27,7 @@ abstract class CPGTaskRequest internal constructor(override val resource: Task) 
     resource.intent = Task.TaskIntent.fromCode(intent.code)
   }
 
-  override fun getIntent() = Intent.of(resource.intent.toCode())
+  override fun getIntent() = Intent.of(resource.intent?.toCode())
 
   override fun setStatus(status: Status, reason: String?) {
     resource.status = Task.TaskStatus.fromCode(status.string)
