@@ -52,7 +52,7 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
 
       val inputRequest = (inputPhase as Phase.RequestPhase<*>).getRequest()
       check(inputRequest.getIntent() == Intent.PROPOSAL) {
-        "Plan can't be created for a request with ${inputRequest.getIntent().name} intent."
+        "Plan can't be created for a request with ${inputRequest.getIntent().code} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {
@@ -107,7 +107,7 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
       }
 
       require(draftPlan.getIntent() == Intent.PLAN) {
-        "Input request has '${draftPlan.getIntent().name}' intent."
+        "Input request has '${draftPlan.getIntent().code}' intent."
       }
 
       require(draftPlan.getStatus() in AllowedStatusForPhaseStart) {

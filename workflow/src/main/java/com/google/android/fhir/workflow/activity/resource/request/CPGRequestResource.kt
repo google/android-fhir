@@ -55,9 +55,9 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
   val logicalId: String
     get() = resource.logicalId
 
-  abstract fun setIntent(intent: Intent)
+  internal abstract fun setIntent(intent: Intent)
 
-  abstract fun getIntent(): Intent
+  internal abstract fun getIntent(): Intent
 
   abstract fun setStatus(status: Status, reason: String? = null)
 
@@ -73,7 +73,7 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
 
   internal abstract fun copy(): CPGRequestResource<R>
 
-  fun copy(id: String, status: Status, intent: Intent): CPGRequestResource<R> {
+  internal fun copy(id: String, status: Status, intent: Intent): CPGRequestResource<R> {
     val parent: CPGRequestResource<R> = this
     return copy().apply {
       resource.idElement = IdType.of(resource).setValue(id)
@@ -143,32 +143,28 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
   }
 }
 
-enum class Intent(val code: String?) {
-  PROPOSAL("proposal"),
-  PLAN("plan"),
-  DIRECTIVE("directive"),
-  ORDER("order"),
-  ORIGINALORDER("original-order"),
-  REFLEXORDER("reflex-order"),
-  FILLERORDER("filler-order"),
-  INSTANCEORDER("instance-order"),
-  OPTION("option"),
-  NULL(null),
-  ;
+/**
+ * PROPOSAL, PLAN and ORDER are the only intents we are interested in. All the other Request Intent
+ * values are represented by OTHER. See
+ * [codesystem-request-intent](https://www.hl7.org/FHIR/codesystem-request-intent.html) for the list
+ * of intents.
+ */
+internal sealed class Intent(val code: String?) {
+  data object PROPOSAL : Intent("proposal")
+
+  data object PLAN : Intent("plan")
+
+  data object ORDER : Intent("order")
+
+  class OTHER(code: String?) : Intent(code)
 
   companion object {
     fun of(code: String?): Intent {
       return when (code) {
         "proposal" -> PROPOSAL
         "plan" -> PLAN
-        "directive" -> DIRECTIVE
         "order" -> ORDER
-        "original-order" -> ORIGINALORDER
-        "reflex-order" -> REFLEXORDER
-        "filler-order" -> FILLERORDER
-        "instance-order" -> INSTANCEORDER
-        "option" -> OPTION
-        else -> NULL
+        else -> OTHER(code)
       }
     }
   }

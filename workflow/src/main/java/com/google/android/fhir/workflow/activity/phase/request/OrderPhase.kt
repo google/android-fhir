@@ -57,7 +57,7 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
       val inputRequest = (inputPhase as Phase.RequestPhase<*>).getRequest()
 
       check(inputRequest.getIntent() in AllowedIntents) {
-        "Order can't be created for a request with ${inputRequest.getIntent().name} intent."
+        "Order can't be created for a request with ${inputRequest.getIntent().code} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {
@@ -110,7 +110,7 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
       }
 
       require(inputOrder.getIntent() == Intent.ORDER) {
-        "Input request has '${inputOrder.getIntent().name}' intent."
+        "Input request has '${inputOrder.getIntent().code}' intent."
       }
 
       require(inputOrder.getStatus() in AllowedStatusForPhaseStart) {

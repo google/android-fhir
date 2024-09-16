@@ -206,16 +206,18 @@ class ActivityFlowTest {
   fun `communication request flow new api`(): Unit = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
       CPGRequestResource.of(
-        CommunicationRequest().apply {
-          id = "com-req-01"
-          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-          subject = Reference("Patient/pat-01")
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+          CommunicationRequest().apply {
+            id = "com-req-01"
+            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+            subject = Reference("Patient/pat-01")
+            meta.addProfile(
+              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+            )
 
-          addPayload().apply { content = StringType("Proposal") }
-        },
-      )
-
+            addPayload().apply { content = StringType("Proposal") }
+          },
+        )
+        .apply { setIntent(Intent.PROPOSAL) }
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     repository.create(cpgCommunicationRequest.resource)
 
@@ -422,15 +424,18 @@ class ActivityFlowTest {
   fun `draftPlan is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
       CPGRequestResource.of(
-        CommunicationRequest().apply {
-          id = "com-req-01"
-          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-          subject = Reference("Patient/pat-01")
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+          CommunicationRequest().apply {
+            id = "com-req-01"
+            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+            subject = Reference("Patient/pat-01")
+            meta.addProfile(
+              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+            )
 
-          addPayload().apply { content = StringType("Proposal") }
-        },
-      )
+            addPayload().apply { content = StringType("Proposal") }
+          },
+        )
+        .apply { setIntent(Intent.PROPOSAL) }
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     repository.create(cpgCommunicationRequest.resource)
 
@@ -523,15 +528,18 @@ class ActivityFlowTest {
   fun `draftOrder is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
       CPGRequestResource.of(
-        CommunicationRequest().apply {
-          id = "com-req-01"
-          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-          subject = Reference("Patient/pat-01")
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+          CommunicationRequest().apply {
+            id = "com-req-01"
+            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+            subject = Reference("Patient/pat-01")
+            meta.addProfile(
+              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+            )
 
-          addPayload().apply { content = StringType("Proposal") }
-        },
-      )
+            addPayload().apply { content = StringType("Proposal") }
+          },
+        )
+        .apply { setIntent(Intent.PROPOSAL) }
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     repository.create(cpgCommunicationRequest.resource)
 
@@ -624,15 +632,18 @@ class ActivityFlowTest {
   fun `draftPerform is success when flow is in proposal phase`(): Unit = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
       CPGRequestResource.of(
-        CommunicationRequest().apply {
-          id = "com-req-01"
-          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-          subject = Reference("Patient/pat-01")
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+          CommunicationRequest().apply {
+            id = "com-req-01"
+            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+            subject = Reference("Patient/pat-01")
+            meta.addProfile(
+              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+            )
 
-          addPayload().apply { content = StringType("Proposal") }
-        },
-      )
+            addPayload().apply { content = StringType("Proposal") }
+          },
+        )
+        .apply { setIntent(Intent.PROPOSAL) }
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     repository.create(cpgCommunicationRequest.resource)
 
@@ -725,15 +736,18 @@ class ActivityFlowTest {
   fun `getCurrentPhase should return the current phase of the flow`() = runBlockingOnWorkerThread {
     val cpgCommunicationRequest =
       CPGRequestResource.of(
-        CommunicationRequest().apply {
-          id = "com-req-01"
-          status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-          subject = Reference("Patient/pat-01")
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest")
+          CommunicationRequest().apply {
+            id = "com-req-01"
+            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+            subject = Reference("Patient/pat-01")
+            meta.addProfile(
+              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+            )
 
-          addPayload().apply { content = StringType("Proposal") }
-        },
-      )
+            addPayload().apply { content = StringType("Proposal") }
+          },
+        )
+        .apply { setIntent(Intent.PROPOSAL) }
     val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
     repository.create(cpgCommunicationRequest.resource)
 

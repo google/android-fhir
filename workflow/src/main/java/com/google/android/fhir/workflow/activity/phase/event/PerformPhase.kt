@@ -145,7 +145,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
       val inputRequest = (inputPhase as BaseRequestPhase<*>).getRequest()
 
       check(inputRequest.getIntent() in AllowedIntents) {
-        "Event can't be created for a request with ${inputRequest.getIntent().name} intent."
+        "Event can't be created for a request with ${inputRequest.getIntent().code} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {

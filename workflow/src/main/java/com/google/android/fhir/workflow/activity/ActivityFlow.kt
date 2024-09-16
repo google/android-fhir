@@ -210,7 +210,7 @@ private constructor(
           Intent.ORDER -> OrderPhase(repository, requestResource)
           else ->
             throw IllegalArgumentException(
-              "Couldn't create the flow for ${requestResource.getIntent().name} intent. Supported intents are 'proposal', 'plan', 'order'",
+              "Couldn't create the flow for ${requestResource.getIntent().code} intent. Supported intents are 'proposal', 'plan' and 'order'.",
             )
         }
       } else {
