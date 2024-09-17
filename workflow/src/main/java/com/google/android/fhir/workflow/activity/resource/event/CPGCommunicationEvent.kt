@@ -16,6 +16,7 @@
 
 package com.google.android.fhir.workflow.activity.resource.event
 
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.PREPARATION
 import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
 import java.util.UUID
 import org.hl7.fhir.r4.model.CodeableConcept
@@ -24,14 +25,14 @@ import org.hl7.fhir.r4.model.Communication
 import org.hl7.fhir.r4.model.Reference
 
 class CPGCommunicationEvent(override val resource: Communication) :
-  CPGEventResource<Communication>(resource) {
+  CPGEventResource<Communication>(resource, CommunicationEventMapper) {
 
   override fun setStatus(status: EventStatus, reason: String?) {
-    resource.status = Communication.CommunicationStatus.fromCode(status.code)
+    resource.status = Communication.CommunicationStatus.fromCode(mapper.mapStatusToCode(status))
     resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
-  override fun getStatus() = EventStatus.of(resource.status.toCode())
+  override fun getStatusCode() = resource.status?.toCode()
 
   override fun setBasedOn(reference: Reference) {
     resource.addBasedOn(reference)
@@ -65,4 +66,6 @@ class CPGCommunicationEvent(override val resource: Communication) :
       )
     }
   }
+
+  private object CommunicationEventMapper : EventStatusCodeMapperImpl()
 }

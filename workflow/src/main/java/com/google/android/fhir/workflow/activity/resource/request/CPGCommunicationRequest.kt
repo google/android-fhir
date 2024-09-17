@@ -23,7 +23,7 @@ import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 
 class CPGCommunicationRequest(override val resource: CommunicationRequest) :
-  CPGRequestResource<CommunicationRequest>(resource) {
+  CPGRequestResource<CommunicationRequest>(resource, StatusCodeMapperImpl()) {
   override fun setIntent(intent: Intent) {
     if (resource.hasExtension("http://hl7.org/fhir/StructureDefinition/request-intent")) {
       resource
@@ -44,11 +44,12 @@ class CPGCommunicationRequest(override val resource: CommunicationRequest) :
       ?: Intent.of(null)
 
   override fun setStatus(status: Status, reason: String?) {
-    resource.status = CommunicationRequest.CommunicationRequestStatus.fromCode(status.string)
+    resource.status =
+      CommunicationRequest.CommunicationRequestStatus.fromCode(mapper.mapStatusToCode(status))
     resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
-  override fun getStatus() = Status.of(resource.status.toCode())
+  override fun getStatusCode() = resource.status?.toCode()
 
   override fun setBasedOn(reference: Reference) {
     resource.addBasedOn(reference)

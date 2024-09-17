@@ -40,7 +40,10 @@ import org.hl7.fhir.r4.model.ResourceType
  * The application users may use appropriate [of] static factories to create the required
  * [CPGEventResource]s.
  */
-sealed class CPGEventResource<out R>(internal open val resource: R) where R : Resource {
+sealed class CPGEventResource<out R>(
+  internal open val resource: R,
+  internal val mapper: EventStatusCodeMapper,
+) where R : Resource {
 
   val resourceType: ResourceType
     get() = resource.resourceType
@@ -50,15 +53,13 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
 
   abstract fun setStatus(status: EventStatus, reason: String? = null)
 
-  abstract fun getStatus(): EventStatus
+  fun getStatus(): EventStatus = mapper.mapCodeToStatus(getStatusCode())
+
+  abstract fun getStatusCode(): String?
 
   abstract fun setBasedOn(reference: Reference)
 
   abstract fun getBasedOn(): Reference?
-
-  fun update(update: R.() -> Unit) {
-    resource.update()
-  }
 
   abstract fun copy(): CPGEventResource<R>
 
@@ -76,19 +77,24 @@ sealed class CPGEventResource<out R>(internal open val resource: R) where R : Re
   }
 }
 
-enum class EventStatus(val code: String) {
-  PREPARATION("preparation"),
-  INPROGRESS("in-progress"),
-  CANCELLED("not-done"),
-  ONHOLD("on-hold"),
-  COMPLETED("completed"),
-  ENTEREDINERROR("entered-in-error"),
-  STOPPED("stopped"),
-  DECLINED("decline"),
-  UNKNOWN("unknown"),
-  NOTDONE("not-done"),
-  NULL("null"),
-  ;
+sealed interface EventStatus {
+  data object PREPARATION : EventStatus
+
+  data object INPROGRESS : EventStatus
+
+  data object NOTDONE : EventStatus
+
+  data object ONHOLD : EventStatus
+
+  data object COMPLETED : EventStatus
+
+  data object ENTEREDINERROR : EventStatus
+
+  data object STOPPED : EventStatus
+
+  data object UNKNOWN : EventStatus
+
+  class OTHER(val code: String?) : EventStatus
 
   companion object {
 
@@ -96,15 +102,12 @@ enum class EventStatus(val code: String) {
       when (code) {
         "preparation" -> PREPARATION
         "in-progress" -> INPROGRESS
-        "not-done" -> CANCELLED
+        "not-done" -> NOTDONE
         "on-hold" -> ONHOLD
         "completed" -> COMPLETED
         "entered-in-error" -> ENTEREDINERROR
         "stopped" -> STOPPED
-        "decline" -> DECLINED
-        "unknown" -> UNKNOWN
-        "null" -> NULL
-        else -> UNKNOWN
+        else -> OTHER(code)
       }
   }
 }

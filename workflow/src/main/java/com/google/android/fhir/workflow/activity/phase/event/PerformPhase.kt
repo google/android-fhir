@@ -16,16 +16,18 @@
 
 package com.google.android.fhir.workflow.activity.phase.event
 
-import com.google.android.fhir.workflow.activity.`class`
-import com.google.android.fhir.workflow.activity.idType
+import com.google.android.fhir.getResourceClass
 import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.phase.checkEquals
+import com.google.android.fhir.workflow.activity.phase.idType
 import com.google.android.fhir.workflow.activity.phase.request.BaseRequestPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
+import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.fhir.api.Repository
 
 /**
@@ -37,20 +39,24 @@ import org.opencds.cqf.fhir.api.Repository
   "UnstableApiUsage", /* Repository is marked @Beta */
   "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
 )
-class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
-  Phase.EventPhase<E> {
-  private var event: E = e
+class PerformPhase<E : CPGEventResource<*>>(
+  /** Implementation of [Repository] to store / retrieve FHIR resources. */
+  private val repository: Repository,
+  /** Concrete implementation of sealed [CPGEventResource] class. e.g. `CPGCommunicationEvent`. */
+  e: E,
+) : Phase.EventPhase<E> {
+  private var event: E = e.copy() as E
 
   override fun getPhaseName() = Phase.PhaseName.PERFORM
 
-  override fun getEvent() = event
+  override fun getEventResource() = event.copy() as E
 
   override fun update(e: E) =
     runCatching<Unit> {
       // TODO Add some basic checks to make sure e is update event and not a completely different
       // resource.
       require(e.getStatus() in listOf(EventStatus.PREPARATION, EventStatus.INPROGRESS)) {
-        "Status is ${e.getStatus()}"
+        "Status is ${e.getStatusCode()}"
       }
       repository.update(e.resource)
       event = e
@@ -59,7 +65,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun suspend(reason: String?) =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.INPROGRESS) {
-        " Can't suspend an event with status ${event.getStatus()} "
+        " Can't suspend an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.ONHOLD, reason)
@@ -69,7 +75,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun resume() =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.ONHOLD) {
-        " Can't resume an event with status ${event.getStatus()} "
+        " Can't resume an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.INPROGRESS)
@@ -85,7 +91,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun start() =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.PREPARATION) {
-        " Can't start an event with status ${event.getStatus()} "
+        " Can't start an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.INPROGRESS)
@@ -95,7 +101,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun notDone(reason: String?) =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.PREPARATION) {
-        " Can't not-done an event with status ${event.getStatus()} "
+        " Can't not-done an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.NOTDONE, reason)
@@ -105,7 +111,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun stop(reason: String?) =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.INPROGRESS) {
-        " Can't stop an event with status ${event.getStatus()} "
+        " Can't stop an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.STOPPED, reason)
@@ -115,7 +121,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
   override fun complete() =
     runCatching<Unit> {
       check(event.getStatus() == EventStatus.INPROGRESS) {
-        " Can't complete an event with status ${event.getStatus()} "
+        " Can't complete an event with status ${event.getStatusCode()} "
       }
 
       event.setStatus(EventStatus.COMPLETED)
@@ -127,14 +133,21 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
     private val AllowedIntents = listOf(Intent.PROPOSAL, Intent.PLAN, Intent.ORDER)
     private val AllowedPhases =
       listOf(Phase.PhaseName.PROPOSAL, Phase.PhaseName.PLAN, Phase.PhaseName.ORDER)
-    val AllowedStatusForPhaseStart = listOf(EventStatus.INPROGRESS, EventStatus.PREPARATION)
+    private val AllowedStatusForPhaseStart = listOf(EventStatus.INPROGRESS, EventStatus.PREPARATION)
+
+    /**
+     * Returns the [Resource] class for the resource. e.g. If the Reference is `Patient/1234`, then
+     * this would return the `Class` for `org.hl7.fhir.r4.model.Patient`.
+     */
+    private val Reference.`class`
+      get() = getResourceClass<Resource>(reference.split("/")[0])
 
     /**
      * Creates a draft event of type [E] based on the state of the provided [inputPhase]. See
      * [beginPerform](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#perform)
      * for more details.
      */
-    fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> draft(
+    fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> prepare(
       eventClass: Class<*>,
       inputPhase: Phase,
     ): Result<E> = runCatching {
@@ -142,14 +155,14 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
         "Event can't be created for a flow in ${inputPhase.getPhaseName().name} phase. "
       }
 
-      val inputRequest = (inputPhase as BaseRequestPhase<*>).getRequest()
+      val inputRequest = (inputPhase as BaseRequestPhase<*>).request
 
       check(inputRequest.getIntent() in AllowedIntents) {
-        "Event can't be created for a request with ${inputRequest.getIntent().code} intent."
+        "Event can't be created for a request with ${inputRequest.getIntent()} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {
-        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatus()} status."
+        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatusCode()} status."
       }
 
       val eventRequest = CPGEventResource.of(inputRequest, eventClass)
@@ -158,7 +171,7 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
       eventRequest as E
     }
 
-    fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> start(
+    fun <R : CPGRequestResource<*>, E : CPGEventResource<*>> initiate(
       repository: Repository,
       inputPhase: Phase,
       inputEvent: E,
@@ -167,12 +180,12 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
         "A Perform can't be started for a flow in ${inputPhase.getPhaseName().name} phase."
       }
 
-      val currentPhase = inputPhase as Phase.RequestPhase<*>
+      val currentPhase = inputPhase as BaseRequestPhase<*>
 
       val basedOn = inputEvent.getBasedOn()
       require(basedOn != null) { "${inputEvent.resource.resourceType}.basedOn can't be null." }
 
-      require(checkEquals(basedOn, currentPhase.getRequest().asReference())) {
+      require(checkEquals(basedOn, currentPhase.request.asReference())) {
         "Provided draft is not based on the request in current phase."
       }
 
@@ -186,11 +199,11 @@ class PerformPhase<E : CPGEventResource<*>>(val repository: Repository, e: E) :
       }
 
       require(basedOnRequest.getStatus() == Status.ACTIVE) {
-        "Plan can't be based on a request with ${basedOnRequest.getStatus()} status."
+        "Plan can't be based on a request with ${basedOnRequest.getStatusCode()} status."
       }
 
       require(inputEvent.getStatus() in AllowedStatusForPhaseStart) {
-        "Input event is in ${inputEvent.getStatus().name} status."
+        "Input event is in ${inputEvent.getStatusCode()} status."
       }
 
       basedOnRequest.setStatus(Status.COMPLETED)

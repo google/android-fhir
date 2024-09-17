@@ -16,13 +16,14 @@
 
 package com.google.android.fhir.workflow.activity.resource.request
 
+import com.google.android.fhir.workflow.activity.resource.request.Status.REVOKED
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 
 class CPGMedicationRequest(override val resource: MedicationRequest) :
-  CPGRequestResource<MedicationRequest>(resource) {
+  CPGRequestResource<MedicationRequest>(resource, MedicationRequestStatusMapper) {
   override fun setIntent(intent: Intent) {
     resource.intent = MedicationRequest.MedicationRequestIntent.fromCode(intent.code)
   }
@@ -30,11 +31,12 @@ class CPGMedicationRequest(override val resource: MedicationRequest) :
   override fun getIntent() = Intent.of(resource.intent?.toCode())
 
   override fun setStatus(status: Status, reason: String?) {
-    resource.status = MedicationRequest.MedicationRequestStatus.fromCode(status.string)
+    resource.status =
+      MedicationRequest.MedicationRequestStatus.fromCode(mapper.mapStatusToCode(status))
     resource.statusReason = reason?.let { CodeableConcept(Coding().setCode(it)) }
   }
 
-  override fun getStatus() = Status.of(resource.status.toCode())
+  override fun getStatusCode() = resource.status?.toCode()
 
   override fun setBasedOn(reference: Reference) {
     resource.addBasedOn(reference)
@@ -43,4 +45,20 @@ class CPGMedicationRequest(override val resource: MedicationRequest) :
   override fun getBasedOn() = resource.basedOn.lastOrNull()
 
   override fun copy() = CPGMedicationRequest(resource.copy())
+
+  private object MedicationRequestStatusMapper : StatusCodeMapperImpl() {
+    override fun mapCodeToStatus(code: String?): Status {
+      return when (code) {
+        "stopped" -> REVOKED
+        else -> super.mapCodeToStatus(code)
+      }
+    }
+
+    override fun mapStatusToCode(status: Status): String? {
+      return when (status) {
+        REVOKED -> "stopped"
+        else -> super.mapStatusToCode(status)
+      }
+    }
+  }
 }

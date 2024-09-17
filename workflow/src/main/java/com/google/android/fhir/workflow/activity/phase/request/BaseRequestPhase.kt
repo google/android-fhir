@@ -25,18 +25,28 @@ import org.opencds.cqf.fhir.api.Repository
 @Suppress(
   "UnstableApiUsage", /* Repository is marked @Beta */
 )
-abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repository, r: R) :
-  Phase.RequestPhase<R> {
-  private var request: R = r
+abstract class BaseRequestPhase<R : CPGRequestResource<*>>(
+  /** Implementation of [Repository] to store / retrieve FHIR resources. */
+  private val repository: Repository,
+  /**
+   * Concrete implementation of sealed [CPGRequestResource] class. e.g. `CPGCommunicationRequest`.
+   */
+  r: R,
+  /** PhaseName of the concrete implementation. */
+  private val phaseName: Phase.PhaseName,
+) : Phase.RequestPhase<R> {
+  internal var request: R = r.copy() as R
 
   // TODO : Maybe this should return a copy of the resource so that if the user does any changes to
   // this resource, it doesn't affect the state of the flow.
-  override fun getRequest() = request
+  override fun getRequestResource() = request.copy() as R
+
+  override fun getPhaseName() = phaseName
 
   override fun suspend(reason: String?) =
     runCatching<Unit> {
       check(request.getStatus() == Status.ACTIVE) {
-        " Can't suspend an event with status ${request.getStatus()} "
+        " Can't suspend an event with status ${request.getStatusCode()} "
       }
 
       request.setStatus(Status.ONHOLD, reason)
@@ -46,7 +56,7 @@ abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repos
   override fun resume() =
     runCatching<Unit> {
       check(request.getStatus() == Status.ONHOLD) {
-        " Can't resume an event with status ${request.getStatus()} "
+        " Can't resume an event with status ${request.getStatusCode()} "
       }
 
       request.setStatus(Status.ACTIVE)
@@ -57,7 +67,9 @@ abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repos
     runCatching<Unit> {
       // TODO Add some basic checks to make sure e is update event and not a completely different
       // resource.
-      require(r.getStatus() in listOf(Status.DRAFT, Status.ACTIVE)) { "Status is ${r.getStatus()}" }
+      require(r.getStatus() in listOf(Status.DRAFT, Status.ACTIVE)) {
+        "Status is ${r.getStatusCode()}"
+      }
       repository.update(r.resource)
       request = r
     }
@@ -71,7 +83,7 @@ abstract class BaseRequestPhase<R : CPGRequestResource<*>>(val repository: Repos
   override fun reject(reason: String?) =
     runCatching<Unit> {
       check(request.getStatus() == Status.ACTIVE) {
-        " Can't reject an event with status ${request.getStatus()} "
+        " Can't reject an event with status ${request.getStatusCode()} "
       }
 
       request.setStatus(Status.REVOKED, reason)

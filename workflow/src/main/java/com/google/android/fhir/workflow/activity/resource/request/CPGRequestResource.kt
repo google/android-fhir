@@ -18,6 +18,10 @@ package com.google.android.fhir.workflow.activity.resource.request
 
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource.Companion.of
+import com.google.android.fhir.workflow.activity.resource.request.Intent.ORDER
+import com.google.android.fhir.workflow.activity.resource.request.Intent.OTHER
+import com.google.android.fhir.workflow.activity.resource.request.Intent.PLAN
+import com.google.android.fhir.workflow.activity.resource.request.Intent.PROPOSAL
 import org.hl7.fhir.r4.model.CommunicationRequest
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.MedicationRequest
@@ -47,7 +51,10 @@ import org.hl7.fhir.r4.model.Task
  * are derived from [MedicationRequest]. So the [MedicationRequest.meta.profile] is required to
  * create the appropriate [CPGRequestResource].
  */
-sealed class CPGRequestResource<R>(internal open val resource: R) where R : Resource {
+sealed class CPGRequestResource<R>(
+  internal open val resource: R,
+  internal val mapper: StatusCodeMapper,
+) where R : Resource {
 
   val resourceType: ResourceType
     get() = resource.resourceType
@@ -61,15 +68,13 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
 
   abstract fun setStatus(status: Status, reason: String? = null)
 
-  abstract fun getStatus(): Status
+  fun getStatus(): Status = mapper.mapCodeToStatus(getStatusCode())
+
+  abstract fun getStatusCode(): String?
 
   abstract fun setBasedOn(reference: Reference)
 
   abstract fun getBasedOn(): Reference?
-
-  fun update(update: R.() -> Unit) {
-    resource.update()
-  }
 
   internal abstract fun copy(): CPGRequestResource<R>
 
@@ -92,8 +97,6 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
         CPGCommunicationRequest::class.java ->
           CPGCommunicationRequest(resource as CommunicationRequest)
         CPGMedicationRequest::class.java -> CPGMedicationRequest(resource as MedicationRequest)
-        CPGImmunizationRequest::class.java -> CPGImmunizationRequest(resource as MedicationRequest)
-        CPGServiceRequest::class.java -> CPGServiceRequest(resource as ServiceRequest)
         else -> {
           throw IllegalArgumentException("Unknown CPG Request type ${resource::class}.")
         }
@@ -110,17 +113,9 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
         )
       ) {
         CPGMedicationRequest(resource)
-      } else if (
-        resource.meta.hasProfile(
-          "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-immunizationrequest",
-        )
-      ) {
-        CPGImmunizationRequest(resource)
       } else {
         throw IllegalArgumentException("Unknown cpg profile")
       }
-
-    fun of(resource: ServiceRequest) = CPGServiceRequest(resource)
 
     fun of(resource: CommunicationRequest) = CPGCommunicationRequest(resource)
 
@@ -144,10 +139,11 @@ sealed class CPGRequestResource<R>(internal open val resource: R) where R : Reso
 }
 
 /**
- * PROPOSAL, PLAN and ORDER are the only intents we are interested in. All the other Request Intent
- * values are represented by OTHER. See
- * [codesystem-request-intent](https://www.hl7.org/FHIR/codesystem-request-intent.html) for the list
- * of intents.
+ * [PROPOSAL], [PLAN] and [ORDER] are the only intents we are interested in. All the other Request
+ * Intent values are represented by [OTHER].
+ *
+ * See [codesystem-request-intent](https://www.hl7.org/FHIR/codesystem-request-intent.html) for the
+ * list of intents.
  */
 internal sealed class Intent(val code: String?) {
   data object PROPOSAL : Intent("proposal")
@@ -157,6 +153,10 @@ internal sealed class Intent(val code: String?) {
   data object ORDER : Intent("order")
 
   class OTHER(code: String?) : Intent(code)
+
+  override fun toString(): String {
+    return code ?: "null"
+  }
 
   companion object {
     fun of(code: String?): Intent {
@@ -171,33 +171,24 @@ internal sealed class Intent(val code: String?) {
 }
 
 /**
- * This may not represent all the Request Resource status. For the activity flow, we may ony be
- * interested in a few values and they should be represented here.
+ * For the activity flow, we are interested in a few status and they are be represented as
+ * individual values here. Everything else is represented by [OTHER].
+ *
+ * See [codesystem-resource-status](https://build.fhir.org/codesystem-resource-status.html) for list
+ * of the status.
  */
-enum class Status(val string: String) {
-  DRAFT("draft"),
-  ACTIVE("active"),
-  ONHOLD("on-hold"),
-  REVOKED("revoked"),
-  COMPLETED("completed"),
-  ENTEREDINERROR("entered-in-error"),
-  UNKNOWN("unknown"),
-  NULL("null"),
-  ;
+sealed interface Status {
+  data object DRAFT : Status
 
-  companion object {
-    fun of(code: String): Status {
-      return when (code) {
-        "draft" -> DRAFT
-        "active" -> ACTIVE
-        "on-hold" -> ONHOLD
-        "revoked" -> REVOKED
-        "completed" -> COMPLETED
-        "entered-in-error" -> ENTEREDINERROR
-        "unknown" -> UNKNOWN
-        "null" -> NULL
-        else -> NULL
-      }
-    }
-  }
+  data object ACTIVE : Status
+
+  data object ONHOLD : Status
+
+  data object REVOKED : Status
+
+  data object COMPLETED : Status
+
+  data object ENTEREDINERROR : Status
+
+  class OTHER(val code: String?) : Status
 }

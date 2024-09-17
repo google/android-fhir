@@ -16,9 +16,9 @@
 
 package com.google.android.fhir.workflow.activity.phase.request
 
-import com.google.android.fhir.workflow.activity.idType
 import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.phase.checkEquals
+import com.google.android.fhir.workflow.activity.phase.idType
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
@@ -34,9 +34,14 @@ import org.opencds.cqf.fhir.api.Repository
   "UnstableApiUsage", /* Repository is marked @Beta */
   "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
 )
-class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
-  BaseRequestPhase<R>(repository, r) {
-  override fun getPhaseName() = Phase.PhaseName.PLAN
+class PlanPhase<R : CPGRequestResource<*>>(
+  /** Implementation of [Repository] to store / retrieve FHIR resources. */
+  repository: Repository,
+  /**
+   * Concrete implementation of sealed [CPGRequestResource] class. e.g. `CPGCommunicationRequest`.
+   */
+  r: R,
+) : BaseRequestPhase<R>(repository, r, Phase.PhaseName.PLAN) {
 
   companion object {
 
@@ -45,18 +50,18 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
      * [beginPlan](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#plan) for
      * more details.
      */
-    internal fun <R : CPGRequestResource<*>> draft(inputPhase: Phase): Result<R> = runCatching {
+    internal fun <R : CPGRequestResource<*>> prepare(inputPhase: Phase): Result<R> = runCatching {
       check(inputPhase.getPhaseName() == Phase.PhaseName.PROPOSAL) {
         "A Plan can't be created for a flow in ${inputPhase.getPhaseName().name} phase."
       }
 
-      val inputRequest = (inputPhase as Phase.RequestPhase<*>).getRequest()
+      val inputRequest = (inputPhase as BaseRequestPhase<*>).request
       check(inputRequest.getIntent() == Intent.PROPOSAL) {
-        "Plan can't be created for a request with ${inputRequest.getIntent().code} intent."
+        "Plan can't be created for a request with ${inputRequest.getIntent()} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {
-        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatus()} status."
+        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatusCode()} status."
       }
 
       val planRequest: CPGRequestResource<*> =
@@ -74,7 +79,7 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
      * [endPlan](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#plan) for more
      * details.
      */
-    internal fun <R : CPGRequestResource<*>> start(
+    internal fun <R : CPGRequestResource<*>> initiate(
       repository: Repository,
       inputPhase: Phase,
       draftPlan: R,
@@ -83,12 +88,12 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
         "A Plan can't be started for a flow in ${inputPhase.getPhaseName().name} phase."
       }
 
-      val currentPhase = inputPhase as Phase.RequestPhase<*>
+      val currentPhase = inputPhase as BaseRequestPhase<*>
 
       val basedOn = draftPlan.getBasedOn()
       require(basedOn != null) { "${draftPlan.resource.resourceType}.basedOn can't be null." }
 
-      require(checkEquals(basedOn, currentPhase.getRequest().asReference())) {
+      require(checkEquals(basedOn, currentPhase.request.asReference())) {
         "Provided draft is not based on the request in current phase."
       }
 
@@ -103,15 +108,15 @@ class PlanPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
       }
 
       require(basedOnRequest.getStatus() == Status.ACTIVE) {
-        "Plan can't be based on a request with ${basedOnRequest.getStatus()} status."
+        "Plan can't be based on a request with ${basedOnRequest.getStatusCode()} status."
       }
 
       require(draftPlan.getIntent() == Intent.PLAN) {
-        "Input request has '${draftPlan.getIntent().code}' intent."
+        "Input request has '${draftPlan.getIntent()}' intent."
       }
 
       require(draftPlan.getStatus() in AllowedStatusForPhaseStart) {
-        "Input request is in ${draftPlan.getStatus().name} status."
+        "Input request is in ${draftPlan.getStatusCode()} status."
       }
 
       basedOnRequest.setStatus(Status.COMPLETED)

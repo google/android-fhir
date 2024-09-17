@@ -28,7 +28,11 @@ import org.opencds.cqf.fhir.api.Repository
 @Suppress(
   "UnstableApiUsage", /* Repository is marked @Beta */
 )
-class ProposalPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
-  BaseRequestPhase<R>(repository, r) {
-  override fun getPhaseName() = Phase.PhaseName.PROPOSAL
-}
+class ProposalPhase<R : CPGRequestResource<*>>(
+  /** Implementation of [Repository] to store / retrieve FHIR resources. */
+  repository: Repository,
+  /**
+   * Concrete implementation of sealed [CPGRequestResource] class. e.g. `CPGCommunicationRequest`.
+   */
+  r: R,
+) : BaseRequestPhase<R>(repository, r, Phase.PhaseName.PROPOSAL)

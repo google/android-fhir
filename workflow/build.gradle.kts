@@ -113,9 +113,9 @@ dependencies {
   testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.truth)
   testImplementation(project(":workflow-testing"))
-  testImplementation(libs.kotlin.test.junit)
   testImplementation(project(":knowledge"))
 
   configurations.all {

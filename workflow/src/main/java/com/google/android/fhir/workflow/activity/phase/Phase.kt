@@ -16,8 +16,10 @@
 
 package com.google.android.fhir.workflow.activity.phase
 
+import androidx.annotation.WorkerThread
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Reference
 
 /** Defines the various phases of a CPG Request. */
@@ -34,39 +36,44 @@ sealed interface Phase {
 
   /** Activity Phases for a CPG Request. */
   interface RequestPhase<R : CPGRequestResource<*>> : Phase {
-    fun getRequest(): R
+    fun getRequestResource(): R
 
-    fun update(r: R): Result<Unit>
+    @WorkerThread fun update(r: R): Result<Unit>
 
-    fun suspend(reason: String?): Result<Unit>
+    @WorkerThread fun suspend(reason: String?): Result<Unit>
 
-    fun resume(): Result<Unit>
+    @WorkerThread fun resume(): Result<Unit>
 
-    fun enteredInError(reason: String?): Result<Unit>
+    @WorkerThread fun enteredInError(reason: String?): Result<Unit>
 
-    fun reject(reason: String?): Result<Unit>
+    @WorkerThread fun reject(reason: String?): Result<Unit>
   }
 
   /** Activity phases for a CPG Event. */
   interface EventPhase<E : CPGEventResource<*>> : Phase {
-    fun getEvent(): E
+    fun getEventResource(): E
 
-    fun update(r: E): Result<Unit>
+    @WorkerThread fun update(e: E): Result<Unit>
 
-    fun suspend(reason: String?): Result<Unit>
+    @WorkerThread fun suspend(reason: String?): Result<Unit>
 
-    fun resume(): Result<Unit>
+    @WorkerThread fun resume(): Result<Unit>
 
-    fun enteredInError(reason: String?): Result<Unit>
+    @WorkerThread fun enteredInError(reason: String?): Result<Unit>
 
-    fun start(): Result<Unit>
+    @WorkerThread fun start(): Result<Unit>
 
-    fun notDone(reason: String?): Result<Unit>
+    @WorkerThread fun notDone(reason: String?): Result<Unit>
 
-    fun stop(reason: String?): Result<Unit>
+    @WorkerThread fun stop(reason: String?): Result<Unit>
 
-    fun complete(): Result<Unit>
+    @WorkerThread fun complete(): Result<Unit>
   }
 }
 
-fun checkEquals(a: Reference, b: Reference) = a.reference == b.reference
+/** Checks if two references are equal by equating their value. */
+internal fun checkEquals(a: Reference, b: Reference) = a.reference == b.reference
+
+/** Returns an [IdType] of a [Reference]. This is required for [Repository.read] api. */
+internal val Reference.idType
+  get() = IdType(reference)

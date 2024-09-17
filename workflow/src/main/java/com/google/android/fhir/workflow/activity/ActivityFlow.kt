@@ -16,7 +16,7 @@
 
 package com.google.android.fhir.workflow.activity
 
-import com.google.android.fhir.getResourceClass
+import androidx.annotation.WorkerThread
 import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.ORDER
@@ -34,157 +34,101 @@ import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicati
 import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
-import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.Reference
-import org.hl7.fhir.r4.model.Resource
 import org.opencds.cqf.fhir.api.Repository
 
-internal val Reference.idType
-  get() = IdType(reference)
-
-internal val Reference.`class`
-  get() = getResourceClass<Resource>(reference.split("/")[0])
-
 /**
- * This abstracts the flow of various
- * [CPG activities](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order)
- * throughout their various stages.
+ * Manages the workflow of clinical recommendations according to the FHIR Clinical Practice
+ * Guidelines (CPG) specification. This class implements an
+ * [activity flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order),
+ * allowing you to take proposals and guide them through various phases (proposal, plan, order,
+ * perform) of a clinical recommendation. You can also resume existing workflows from any phase.
  *
- * The application developer may create the flow of a new proposal and move it through the various
- * stages or they may resume the workflow of a request already in a later stage (plan,order).
+ * **NOTE**
+ * * The `prepare` and `initiate` apis of `ActivityFlow` and all apis of `Phase` interface may block
+ *   the caller thread and should only be called from a worker thread.
+ * * The `ActivityFlow` is not thread safe and concurrent changes to the flow/phase with multiple
+ *   threads may produce undesired results.
  *
- * The application developers should use the appropriate static factory [ActivityFlow.of] apis
- * provided by the library to create or resume an activity flow.
+ * **Creating an ActivityFlow:**
  *
- * An activity flow starts with the user creating the flow with an appropriate [CPGRequestResource].
- * The user may do valid state transitions on the current phase by calling appropriate apis on
- * current phase. The user may call [getCurrentPhase] as appropriately cast it to [PlanPhase],
- * [OrderPhase] or [PerformPhase] by either checking type or value of [Phase.getPhaseName].
+ * Use appropriate `ActivityFlow.of()` factory function to create an instance. You can start a new
+ * flow with a `CPGRequestResource` or resume an existing flow from a `CPGRequestResource` or
+ * `CPGEventResource` based on the last state of the flow.
  *
- * The user may then move the activity to the next phase by creating a draft resource by calling
- * appropriate draft api([draftPlan], [draftOrder] or [draftPerform]). The user may review and
- * update the draft resource and then call appropriate start api([startPlan], [startOrder] or
- * [startPerform]) to create a new activity phase.
+ * ``` kotlin
+ * val request = CPGMedicationRequest(medicationRequestGeneratedByCarePlan)
+ * val flow = ActivityFlow.of(repository,  request)
+ * ```
+ *
+ * **Navigating Phases:**
+ *
+ * An `ActivityFlow` progresses through a series of phases, represented by the `Phase` class. You
+ * can access the current phase using `getCurrentPhase()`.
+ *
+ * ``` kotlin
+ * when (val phase = flow.getCurrentPhase( ) )  {
+ * 	is Phase.ProposalPhase -> // Handle proposal phase
+ * 	is Phase.PlanPhase -> // Handle plan phase
+ * 	is Phase.OrderPhase -> // Handle order phase
+ * 	is Phase.PerformPhase -> // Handle perform phase
+ * }
+ * ```
+ *
+ * **Transitioning Between Phases:**
+ *
+ * [ActivityFlow] provides functions to prepare and initiate the next phase.
+ * * The prepare api creates a new request or event based on the phase and returns it back to you.
+ *   It doesn't make any changes to the current phase request and also doesn't persist anything to
+ *   the [repository].
+ * * The initiate api creates a new phase based on the current phase and provided request/event. It
+ *   does make changes to the current phase request and the provided request and persists them to
+ *   the [repository]. For example, to move from the proposal phase to the plan phase:
+ * ``` kotlin
+ * val preparePlanResult = flow.getCurrentPhase( ).preparePlan()
+ * if (preparePlanResult.isFailure) {
+ * 	// Handle failure
+ * }
+ *
+ * val preparedPlan = preparePlanResult.getOrThrow()
+ * // ... modify preparedPlan
+ * val planPhase = flow.getCurrentPhase().initiatePlan(preparedPlan)
+ * ```
+ *
+ * **Note:** The specific `prepare` and `initiate` functions available depend on the current phase.
+ *
+ * **Transitioning to Perform Phase:**
  *
  * Since the perform creates a [CPGEventResource] and the same flow could create different event
- * resources, application developer needs to provide the appropriate event type as a parameter to
- * the [draftPerform].
+ * resources, you need to provide the appropriate event type as a parameter to the [preparePerform].
  *
- * Example of a `Order a Medication to dispense` where user completes only one [Phase] at a time and
- * has to reload / resume the [ActivityFlow] to move to the next [Phase].
- *
+ * Example:
+ * ``` kotlin
+ * // Prepare and initiate the perform phase
+ * val preparedPerformEvent = flow.getCurrentPhase().preparePerform(CPGMedicationDispenseEvent::class.java) . getOrThrow( )
+ * // update preparedPerformEvent
+ * val performPhase = flow.getCurrentPhase( ) . initiatePerform(preparedPerformEvent) . getOrThrow( )
  * ```
- *   val cpgMedicationRequest =
- *     CPGMedicationRequest(
- *       MedicationRequest().apply {
- *         id = "med-req-01"
- *         subject = Reference("Patient/pat-01")
- *         intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
- *         meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest")
- *         status = MedicationRequest.MedicationRequestStatus.ACTIVE
- *         addNote(Annotation(MarkdownType("Proposal looks OK.")))
- *       },
- *     )
  *
- *   val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
- *   repository.create(cpgMedicationRequest.resource)
+ * **Updating states in a phase:**
  *
- *   val flow = ActivityFlow.of(repository, cpgMedicationRequest)
+ * `ProposalPhase`, `PlanPhase` and `OrderPhase` are all a type of `Phase.RequestPhase` and allows
+ * you to update state of the request.
  *
- *   var cachedRequestId = ""
+ * ``` kotlin
+ * val planPhase = flow.getCurrentPhase().initiatePlan(preparedPlan)
+ * val medicationRequest = planPhase.getRequestResource()
+ * // update medicationRequest
+ * planPhase.update(updated medicationRequest)
+ * ```
  *
- *   flow
- *   .draftPlan()
- *   .onSuccess { draftPlan ->
- *     draftPlan.update { addNote(Annotation(MarkdownType("Draft plan looks OK."))) }
+ * `PerformPhase` is a type of `Phase.EventPhase` and allows you to update the state of the event.
  *
- *     flow.startPlan(draftPlan).onSuccess { planPhase ->
- *       val updatedPlan =
- *         planPhase.getRequest().copy().apply {
- *           setStatus(Status.ACTIVE)
- *           update { addNote(Annotation(MarkdownType("Plan looks OK."))) }
- *         }
- *
- *       planPhase
- *         .update(updatedPlan)
- *         .onSuccess { cachedRequestId = updatedPlan.logicalId }
- *         .onFailure { fail("Should have succeeded", it) }
- *     }
- *   }
- *   .onFailure { fail("Unexpected", it) }
- *
- *   val planToResume =
- *     repository
- *       .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
- *       .let { CPGMedicationRequest(it) }
- *   val resumedPlanFlow = ActivityFlow.of(repository, planToResume)
- *
- *   check(resumedPlanFlow.getCurrentPhase() is PlanPhase<*>) {
- *     "Flow is in ${resumedPlanFlow.getCurrentPhase().getPhaseName()} "
- *   }
- *   resumedPlanFlow
- *   .draftOrder()
- *   .onSuccess { draftOrder ->
- *     draftOrder.update { addNote(Annotation(MarkdownType("Draft order looks OK."))) }
- *
- *     resumedPlanFlow.startOrder(draftOrder).onSuccess { orderPhase ->
- *       val updatedOrder =
- *         orderPhase.getRequest().copy().apply {
- *           setStatus(Status.ACTIVE)
- *           update { addNote(Annotation(MarkdownType("Order looks OK."))) }
- *         }
- *
- *       orderPhase
- *         .update(updatedOrder)
- *         .onSuccess { cachedRequestId = updatedOrder.logicalId }
- *         .onFailure { fail("Should have succeeded", it) }
- *     }
- *   }
- *   .onFailure { fail("Unexpected", it) }
- *
- *   val orderToResume =
- *     repository
- *       .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedRequestId))
- *       .let { CPGMedicationRequest(it) }
- *
- *   val resumedOrderFlow = ActivityFlow.of(repository, orderToResume)
- *
- *   check(resumedOrderFlow.getCurrentPhase() is OrderPhase<*>) {
- *     "Flow is in ${resumedOrderFlow.getCurrentPhase().getPhaseName()} "
- *   }
- *
- *   resumedOrderFlow
- *   .draftPerform(CPGMedicationDispenseEvent::class.java)
- *   .onSuccess { draftEvent ->
- *     draftEvent.update { addNote(Annotation(MarkdownType("Draft event looks OK."))) }
- *
- *     resumedOrderFlow.startPerform(draftEvent).onSuccess { performPhase ->
- *       val updatedEvent =
- *         performPhase.getEvent().copy().apply {
- *           setStatus(EventStatus.INPROGRESS)
- *           update { addNote(Annotation(MarkdownType("Event looks OK."))) }
- *         }
- *
- *       performPhase
- *         .update(updatedEvent)
- *         .onSuccess { cachedRequestId = updatedEvent.logicalId }
- *         .onFailure { fail("Should have succeeded", it) }
- *     }
- *   }
- *   .onFailure { fail("Unexpected", it) }
- *
- *   val eventToResume =
- *     repository
- *       .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedRequestId))
- *       .let { CPGMedicationDispenseEvent(it) }
- *
- *   val resumedPerformFlow = ActivityFlow.of(repository, eventToResume)
- *
- *   check(resumedPerformFlow.getCurrentPhase() is Phase.EventPhase<*>) {
- *     "Flow is in ${resumedPerformFlow.getCurrentPhase().getPhaseName()} "
- *   }
- *
- *   (resumedPerformFlow.getCurrentPhase() as Phase.EventPhase<*>).complete()
+ * ``` kotlin
+ * val performPhase = ...
+ * val medicationDispense = performPhase.getEventResource()
+ * // update medicationDispense
+ * performPhase.update(updated medicationDispense)
+ * performPhase.complete()
  * ```
  */
 @Suppress(
@@ -210,7 +154,7 @@ private constructor(
           Intent.ORDER -> OrderPhase(repository, requestResource)
           else ->
             throw IllegalArgumentException(
-              "Couldn't create the flow for ${requestResource.getIntent().code} intent. Supported intents are 'proposal', 'plan' and 'order'.",
+              "Couldn't create the flow for ${requestResource.getIntent()} intent. Supported intents are 'proposal', 'plan' and 'order'.",
             )
         }
       } else {
@@ -238,57 +182,71 @@ private constructor(
   }
 
   /**
-   * Creates a draft plan resource based on the state of the [currentPhase].
+   * Prepares a plan resource based on the state of the [currentPhase] and returns it to the caller
+   * without persisting any changes into [repository].
    *
-   * @return [R] if the action is successful, error otherwise.
+   * @return [Result]<[R]> containing plan if the action is successful, error otherwise.
    */
-  fun draftPlan(): Result<R> {
-    return PlanPhase.draft(currentPhase)
+  @WorkerThread
+  fun preparePlan(): Result<R> {
+    return PlanPhase.prepare(currentPhase)
   }
 
   /**
-   * Starts a plan phase based on the state of the [currentPhase] and [draftPlan].
+   * Initiates a plan phase based on the state of the [currentPhase] and [preparedPlan]. This api
+   * will persist the [preparedPlan] into [repository].
    *
    * @return [PlanPhase] if the action is successful, error otherwise.
    */
-  fun startPlan(draftPlan: R) =
-    PlanPhase.start(repository, currentPhase, draftPlan).also { it.onSuccess { currentPhase = it } }
-
-  /**
-   * Creates a draft order resource based on the state of the [currentPhase].
-   *
-   * @return [R] if the action is successful, error otherwise.
-   */
-  fun draftOrder(): Result<R> {
-    return OrderPhase.draft(currentPhase)
-  }
-
-  /**
-   * Starts an order phase based on the state of the [currentPhase] and [draftPlan].
-   *
-   * @return [OrderPhase] if the action is successful, error otherwise.
-   */
-  fun startOrder(updatedDraftOrder: R) =
-    OrderPhase.start(repository, currentPhase, updatedDraftOrder).also {
+  @WorkerThread
+  fun initiatePlan(preparedPlan: R) =
+    PlanPhase.initiate(repository, currentPhase, preparedPlan).also {
       it.onSuccess { currentPhase = it }
     }
 
   /**
-   * Creates a draft event resource based on the state of the [currentPhase].
+   * Prepares an order resource based on the state of the [currentPhase] and returns it to the
+   * caller without persisting any changes into [repository].
    *
-   * @return [D] if the action is successful, error otherwise.
+   * @return [Result]<[R]> containing order if the action is successful, error otherwise.
    */
-  fun <D : E> draftPerform(klass: Class<in D>): Result<D> {
-    return PerformPhase.draft<R, D>(klass, currentPhase)
+  @WorkerThread
+  fun prepareOrder(): Result<R> {
+    return OrderPhase.prepare(currentPhase)
   }
 
   /**
-   * Starts a perform phase based on the state of the [currentPhase] and [draftPlan].
+   * Initiates an order phase based on the state of the [currentPhase] and [preparePlan]. This api
+   * will persist the [preparedOrder] into [repository].
+   *
+   * @return [OrderPhase] if the action is successful, error otherwise.
+   */
+  @WorkerThread
+  fun initiateOrder(preparedOrder: R) =
+    OrderPhase.initiate(repository, currentPhase, preparedOrder).also {
+      it.onSuccess { currentPhase = it }
+    }
+
+  /**
+   * Prepares an event resource based on the state of the [currentPhase] and returns it to the
+   * caller without persisting any changes into [repository].
+   *
+   * @return [Result]<[D]> containing event if the action is successful, error otherwise.
+   */
+  @WorkerThread
+  fun <D : E> preparePerform(klass: Class<in D>): Result<D> {
+    return PerformPhase.prepare<R, D>(klass, currentPhase)
+  }
+
+  /**
+   * Initiate a perform phase based on the state of the [currentPhase] and [preparePlan]. This api
+   * will persist the [preparedEvent] into [repository].
    *
    * @return [PerformPhase] if the action is successful, error otherwise.
    */
-  fun <D : E> startPerform(updatedDraftPerform: D) =
-    PerformPhase.start<R, D>(repository, currentPhase, updatedDraftPerform).also {
+  @WorkerThread
+  fun <D : E> initiatePerform(preparedEvent: D) =
+    PerformPhase.initiate<R, D>(repository, currentPhase, preparedEvent).also {
       it.onSuccess { currentPhase = it }
     }
 
@@ -345,22 +303,5 @@ private constructor(
       resource: CPGOrderMedicationEvent<*>,
     ): ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>> =
       ActivityFlow(repository, null, resource)
-
-    // Collect information
-    //    fun of(repository: Repository, resource: CPGTaskRequest) =
-    //      ActivityFlow(repository, resource, null)
-
-    //    // Order a service
-    //    fun of(
-    //      repository: Repository,
-    //      resource: CPGServiceRequest,
-    //    ): ActivityFlow<CPGServiceRequest, CPGEventForOrderService<*>> =
-    //      ActivityFlow(repository, resource)
-    //
-    //    fun of(
-    //      repository: Repository,
-    //      resource: CPGImmunizationRequest,
-    //    ): ActivityFlow<CPGImmunizationRequest, CPGImmunizationEvent> = ActivityFlow(repository,
-    // resource)
   }
 }

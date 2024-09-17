@@ -16,9 +16,9 @@
 
 package com.google.android.fhir.workflow.activity.phase.request
 
-import com.google.android.fhir.workflow.activity.idType
 import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.phase.checkEquals
+import com.google.android.fhir.workflow.activity.phase.idType
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
@@ -34,10 +34,14 @@ import org.opencds.cqf.fhir.api.Repository
   "UnstableApiUsage", /* Repository is marked @Beta */
   "UNCHECKED_CAST", /* Cast type erased CPGRequestResource<*> & CPGEventResource<*> to a concrete type classes */
 )
-class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
-  BaseRequestPhase<R>(repository, r) {
-
-  override fun getPhaseName() = Phase.PhaseName.ORDER
+class OrderPhase<R : CPGRequestResource<*>>(
+  /** Implementation of [Repository] to store / retrieve FHIR resources. */
+  repository: Repository,
+  /**
+   * Concrete implementation of sealed [CPGRequestResource] class. e.g. `CPGCommunicationRequest`.
+   */
+  r: R,
+) : BaseRequestPhase<R>(repository, r, Phase.PhaseName.ORDER) {
 
   companion object {
 
@@ -49,19 +53,19 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
      * [beginOrder](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#order) for
      * more details.
      */
-    internal fun <R : CPGRequestResource<*>> draft(inputPhase: Phase): Result<R> = runCatching {
+    internal fun <R : CPGRequestResource<*>> prepare(inputPhase: Phase): Result<R> = runCatching {
       check(inputPhase.getPhaseName() in AllowedPhases) {
         "An Order can't be created for a flow in ${inputPhase.getPhaseName().name} phase. "
       }
 
-      val inputRequest = (inputPhase as Phase.RequestPhase<*>).getRequest()
+      val inputRequest = (inputPhase as BaseRequestPhase<*>).request
 
       check(inputRequest.getIntent() in AllowedIntents) {
-        "Order can't be created for a request with ${inputRequest.getIntent().code} intent."
+        "Order can't be created for a request with ${inputRequest.getIntent()} intent."
       }
 
       check(inputRequest.getStatus() == Status.ACTIVE) {
-        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatus()} status."
+        "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatusCode()} status."
       }
 
       inputRequest.copy(
@@ -76,7 +80,7 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
      * [endPlan](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#plan) for more
      * details.
      */
-    fun <R : CPGRequestResource<*>> start(
+    fun <R : CPGRequestResource<*>> initiate(
       repository: Repository,
       inputPhase: Phase,
       inputOrder: R,
@@ -85,12 +89,12 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
         "An Order can't be started for a flow in ${inputPhase.getPhaseName().name} phase."
       }
 
-      val currentPhase = inputPhase as Phase.RequestPhase<*>
+      val currentPhase = inputPhase as BaseRequestPhase<*>
 
       val basedOn = inputOrder.getBasedOn()
       require(basedOn != null) { "${inputOrder.resource.resourceType}.basedOn can't be null." }
 
-      require(checkEquals(basedOn, currentPhase.getRequest().asReference())) {
+      require(checkEquals(basedOn, currentPhase.request.asReference())) {
         "Provided draft is not based on the request in current phase."
       }
 
@@ -106,15 +110,15 @@ class OrderPhase<R : CPGRequestResource<*>>(repository: Repository, r: R) :
       }
 
       require(basedOnRequest.getStatus() == Status.ACTIVE) {
-        "Plan can't be based on a request with ${basedOnRequest.getStatus()} status."
+        "Plan can't be based on a request with ${basedOnRequest.getStatusCode()} status."
       }
 
       require(inputOrder.getIntent() == Intent.ORDER) {
-        "Input request has '${inputOrder.getIntent().code}' intent."
+        "Input request has '${inputOrder.getIntent()}' intent."
       }
 
       require(inputOrder.getStatus() in AllowedStatusForPhaseStart) {
-        "Input request is in ${inputOrder.getStatus().name} status."
+        "Input request is in ${inputOrder.getStatusCode()} status."
       }
 
       basedOnRequest.setStatus(Status.COMPLETED)
