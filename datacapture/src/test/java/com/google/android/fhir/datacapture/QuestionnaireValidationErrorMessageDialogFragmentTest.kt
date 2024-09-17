@@ -85,7 +85,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
    * fragment arguments
    */
   @Test
-  fun checkAlertDialog_submitAnywayButtonIsTrue_shouldShowSubmitAnywayButton() {
+  fun `check alertDialog when submit anyway button argument is true should show Submit anyway button`() {
     runTest {
       val questionnaireValidationErrorMessageDialogArguments = Bundle()
       questionnaireValidationErrorMessageDialogArguments.putBoolean(
@@ -121,7 +121,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
    * passed
    */
   @Test
-  fun checkAlertDialog_noArgsPassed_shouldShowSubmitAnywayButton() {
+  fun `check alertDialog when no arguments are passed should show Submit anyway button`() {
     runTest {
       with(
         launchFragment<QuestionnaireValidationErrorMessageDialogFragment>(
@@ -151,7 +151,7 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
    * in the fragment arguments
    */
   @Test
-  fun checkAlertDialog_submitAnywayButtonIsFalse_shouldHideSubmitAnywayButton() {
+  fun `check alertDialog when submit anyway button argument is false should hide Submit anyway button`() {
     runTest {
       val validationErrorBundle = Bundle()
       validationErrorBundle.putBoolean(

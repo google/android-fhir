@@ -114,15 +114,16 @@ class QuestionnaireFragment : Fragment() {
             errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
             val validationErrorMessageDialog = QuestionnaireValidationErrorMessageDialogFragment()
             if (requireArguments().containsKey(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON)) {
-              val validationErrorBundle = Bundle()
-              validationErrorBundle.putBoolean(
-                EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
-                requireArguments()
-                  .getBoolean(
+              validationErrorMessageDialog.arguments =
+                Bundle().apply {
+                  putBoolean(
                     EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
-                  ),
-              )
-              validationErrorMessageDialog.arguments = validationErrorBundle
+                    requireArguments()
+                      .getBoolean(
+                        EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+                      ),
+                  )
+                }
             }
             validationErrorMessageDialog.show(
               requireActivity().supportFragmentManager,
