@@ -84,9 +84,10 @@ object Dependencies {
       "com.google.mlkit:object-detection-custom:${Versions.Mlkit.objectDetectionCustom}"
   }
 
-  const val androidFhirGroup = "org.smartregister"
   const val playServicesLocation =
     "com.google.android.gms:play-services-location:${Versions.playServicesLocation}"
+
+  const val androidFhirGroup = "org.smartregister"
   const val androidFhirEngineModule = "engine"
   const val androidFhirKnowledgeModule = "knowledge"
   const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
@@ -130,7 +131,6 @@ object Dependencies {
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-
     const val androidFhirCommon = "0.1.0-alpha05-preview3-SNAPSHOT"
     const val androidFhirEngine = "1.0.0-preview13-SNAPSHOT"
     const val androidFhirKnowledge = "0.1.0-beta01-preview-SNAPSHOT"
