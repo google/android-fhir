@@ -56,9 +56,6 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.time.Instant
 import java.util.Date
-import junit.framework.TestCase.assertTrue
-import kotlin.system.measureTimeMillis
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -5171,24 +5168,6 @@ class DatabaseImplTest {
       val localChangeResourceReferences = database.getLocalChangeResourceReferences(localChangeIds)
       assertThat(localChangeResourceReferences.size).isEqualTo(locallyCreatedPatients.size)
     }
-
-  @Test
-  fun `pmap_shouldExecuteMappingTasksInParallel`() = runBlocking {
-    val numberList = listOf(2, 3)
-    var squaredNumberList: List<Int>
-
-    val timeTaken = measureTimeMillis {
-      squaredNumberList =
-        numberList.pmap {
-          delay(1000L)
-          it * 2
-        }
-    }
-    assertTrue(squaredNumberList.isNotEmpty())
-    assertThat(squaredNumberList.first()).isEqualTo(4)
-    assertThat(squaredNumberList.last()).isEqualTo(6)
-    assertTrue(timeTaken < 2000)
-  }
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000

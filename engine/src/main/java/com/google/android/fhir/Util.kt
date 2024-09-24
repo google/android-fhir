@@ -26,6 +26,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -67,6 +71,11 @@ internal fun Resource.isUploadSuccess(): Boolean {
   val outcome: OperationOutcome = this as OperationOutcome
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
+}
+
+/** Implementation of a parallelized map for CPU intensive tasks */
+suspend fun <A, B> Iterable<A>.pmapCPU(f: suspend (A) -> B): List<B> = coroutineScope {
+  map { async(Dispatchers.Default) { f(it) } }.awaitAll()
 }
 
 internal class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {

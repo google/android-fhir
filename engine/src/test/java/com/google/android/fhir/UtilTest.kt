@@ -19,6 +19,9 @@ package com.google.android.fhir
 import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase
+import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Patient
@@ -109,6 +112,24 @@ class UtilTest : TestCase() {
   @Test
   fun `percentOf() should return percentage`() {
     assertThat(percentOf(25, 50)).isEqualTo(0.5)
+  }
+
+  @Test
+  fun `pmap() should execute mapping tasks in parallel`() = runBlocking {
+    val numberList = listOf(2, 3)
+    var squaredNumberList: List<Int>
+
+    val timeTaken = measureTimeMillis {
+      squaredNumberList =
+        numberList.pmapCPU {
+          delay(1000L)
+          it * 2
+        }
+    }
+    assertTrue(squaredNumberList.isNotEmpty())
+    assertThat(squaredNumberList.first()).isEqualTo(4)
+    assertThat(squaredNumberList.last()).isEqualTo(6)
+    assertTrue(timeTaken < 2000)
   }
 
   companion object {
