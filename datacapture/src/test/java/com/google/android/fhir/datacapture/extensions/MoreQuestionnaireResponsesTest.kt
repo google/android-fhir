@@ -703,29 +703,22 @@ class MoreQuestionnaireResponsesTest {
     val dateTimeType = DateTimeType("2024-07-05T00:00:00Z")
     questionnaireResponse.launchTimestamp = dateTimeType
 
-    val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertThat(launchTimestamp).isNotNull()
-    assertThat(dateTimeType).isEqualTo(launchTimestamp)
+    assertThat(dateTimeType).isEqualTo(questionnaireResponse.launchTimestamp)
   }
 
   @Test
   fun `launchTimestamp should be null when not added`() {
-    val questionnaireResponse = QuestionnaireResponse()
-
-    val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertThat(launchTimestamp).isNull()
+    assertThat(QuestionnaireResponse().launchTimestamp).isNull()
   }
 
   @Test
-  fun `launchTimestamp should not update if already exists`() {
+  fun `launchTimestamp should update if already exists`() {
     val questionnaireResponse = QuestionnaireResponse()
     val oldDateTimeType = DateTimeType("2024-07-01T00:00:00Z")
     val newDateTimeType = DateTimeType("2024-07-05T00:00:00Z")
     questionnaireResponse.launchTimestamp = oldDateTimeType
     questionnaireResponse.launchTimestamp = newDateTimeType
 
-    val launchTimestamp = questionnaireResponse.launchTimestamp
-    assertThat(launchTimestamp).isNotNull()
-    assertThat(oldDateTimeType).isEqualTo(launchTimestamp)
+    assertThat(newDateTimeType).isEqualTo(questionnaireResponse.launchTimestamp)
   }
 }

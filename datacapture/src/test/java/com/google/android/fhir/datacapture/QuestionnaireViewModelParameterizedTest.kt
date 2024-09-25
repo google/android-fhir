@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -189,7 +190,7 @@ class QuestionnaireViewModelParameterizedTest(
           (expected as QuestionnaireResponse).apply {
             extension.add(
               actualResponse.extension.firstOrNull { extension ->
-                extension.url == "http://github.com/google-android/questionnaire-launch-timestamp"
+                extension.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP
               },
             )
             authored = actualResponse.authored

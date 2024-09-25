@@ -48,6 +48,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
@@ -7520,7 +7521,7 @@ class QuestionnaireViewModelTest {
           (expected as QuestionnaireResponse).apply {
             extension.add(
               actualResponse.extension.firstOrNull { extension ->
-                extension.url == "http://github.com/google-android/questionnaire-launch-timestamp"
+                extension.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP
               },
             )
             authored = actualResponse.authored
