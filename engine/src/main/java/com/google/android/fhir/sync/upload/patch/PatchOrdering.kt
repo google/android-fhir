@@ -126,21 +126,12 @@ internal object PatchOrdering {
   private fun PatchMapping.findOutgoingReferences(
     localChangeIdToReferenceMap: Map<Long, List<LocalChangeResourceReference>>,
   ): Set<Node> {
+    if (generatedPatch.type == Patch.Type.DELETE) return emptySet()
     val references = mutableSetOf<Node>()
-    when (generatedPatch.type) {
-      Patch.Type.INSERT,
-      Patch.Type.UPDATE, -> {
-        localChanges.forEach { localChange ->
-          localChange.token.ids.forEach { id ->
-            localChangeIdToReferenceMap[id]?.let {
-              references.addAll(it.map { it.resourceReferenceValue })
-            }
-          }
-        }
-      }
-      Patch.Type.DELETE -> {
-        // do nothing
-      }
+    localChanges.forEach { localChange ->
+        localChange.token.ids.flatMap { id ->
+            localChangeIdToReferenceMap[id]?.map { it.resourceReferenceValue } ?: emptyList()
+        }.let { references.addAll(it) }
     }
     return references
   }
