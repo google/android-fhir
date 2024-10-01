@@ -38,12 +38,13 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
-import com.google.android.fhir.pmapCPU
+import com.google.android.fhir.pmap
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
 import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -229,7 +230,9 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmapCPU {
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
+        Dispatchers.Default,
+      ) {
         ResourceWithUUID(
           it.uuid,
           FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
@@ -244,7 +247,7 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmapCPU {
+        .pmap(Dispatchers.Default) {
           ForwardIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceUUID,
@@ -261,7 +264,7 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmapCPU {
+        .pmap(Dispatchers.Default) {
           ReverseIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceTypeAndId,

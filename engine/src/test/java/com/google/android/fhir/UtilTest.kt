@@ -20,6 +20,7 @@ import android.os.Build
 import com.google.common.truth.Truth.assertThat
 import junit.framework.TestCase
 import kotlin.system.measureTimeMillis
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.IdType
@@ -121,7 +122,7 @@ class UtilTest : TestCase() {
 
     val timeTaken = measureTimeMillis {
       squaredNumberList =
-        numberList.pmapCPU {
+        numberList.pmap(Dispatchers.Default) {
           delay(1000L)
           it * 2
         }
