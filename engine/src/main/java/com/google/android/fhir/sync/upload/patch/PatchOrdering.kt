@@ -129,9 +129,11 @@ internal object PatchOrdering {
     if (generatedPatch.type == Patch.Type.DELETE) return emptySet()
     val references = mutableSetOf<Node>()
     localChanges.forEach { localChange ->
-        localChange.token.ids.flatMap { id ->
+        references.addAll(
+          localChange.token.ids.flatMap { id ->
             localChangeIdToReferenceMap[id]?.map { it.resourceReferenceValue } ?: emptyList()
-        }.let { references.addAll(it) }
+          }
+        )
     }
     return references
   }
