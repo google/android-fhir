@@ -80,10 +80,6 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     }
   }
 
-  /**
-   * Test method to ensure that Submit anyway button is visible when its value is set as true in the
-   * fragment arguments
-   */
   @Test
   fun `check alertDialog when submit anyway button argument is true should show Submit anyway button`() {
     runTest {
@@ -116,10 +112,6 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     }
   }
 
-  /**
-   * Test method to ensure that Submit anyway button is visible when no fragment arguments are
-   * passed
-   */
   @Test
   fun `check alertDialog when no arguments are passed should show Submit anyway button`() {
     runTest {
@@ -146,10 +138,6 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
     }
   }
 
-  /**
-   * Test method to ensure that Submit anyway button is not visible when it's value is set as false
-   * in the fragment arguments
-   */
   @Test
   fun `check alertDialog when submit anyway button argument is false should hide Submit anyway button`() {
     runTest {
