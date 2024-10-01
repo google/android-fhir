@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload.patch
 
 import androidx.annotation.VisibleForTesting
-import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 
 /** Represents a resource e.g. 'Patient/123' , 'Encounter/123'. */
@@ -78,17 +77,12 @@ internal object PatchOrdering {
    * - [StronglyConnectedPatchMappings] with multiple values for [PatchMapping]s based on the
    *   references to other [PatchMapping]s if the mappings are cyclic.
    */
-  suspend fun List<PatchMapping>.sccOrderByReferences(
-    database: Database,
+  fun List<PatchMapping>.sccOrderByReferences(
+    localChangeResourceReferences: List<LocalChangeResourceReference>,
   ): List<StronglyConnectedPatchMappings> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
-    /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
-    multiple LocalChangeResourceReference, one for each resource reference in the
-    LocalChange.payload.*/
-    val localChangeIdToResourceReferenceMap: Map<Long, List<LocalChangeResourceReference>> =
-      database
-        .getLocalChangeResourceReferences(flatMap { it.localChanges.flatMap { it.token.ids } })
-        .groupBy { it.localChangeId }
+    val localChangeIdToResourceReferenceMap =
+      localChangeResourceReferences.groupBy { it.localChangeId }
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
 
