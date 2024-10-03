@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@
 package com.google.codelab.sdclibrary
 
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
@@ -32,24 +30,12 @@ class MainActivity : AppCompatActivity() {
     // 4.2 Replace with code from the codelab to add a questionnaire fragment.
   }
 
-  private fun submitQuestionnaire() {
-    // 5 Replace with code from the codelab to get a questionnaire response.
+  private fun submitQuestionnaire() =
+    lifecycleScope.launch {
+      // 5 Replace with code from the codelab to get a questionnaire response.
 
-    // 6 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
-  }
-
-  override fun onCreateOptionsMenu(menu: Menu): Boolean {
-    menuInflater.inflate(R.menu.submit_menu, menu)
-    return super.onCreateOptionsMenu(menu)
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    if (item.itemId == R.id.submit) {
-      submitQuestionnaire()
-      return true
+      // 6 Replace with code from the codelab to extract FHIR resources from QuestionnaireResponse.
     }
-    return super.onOptionsItemSelected(item)
-  }
 
   private fun getStringFromAssets(fileName: String): String {
     return assets.open(fileName).bufferedReader().use { it.readText() }
