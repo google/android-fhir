@@ -16,10 +16,15 @@
 
 package com.google.android.fhir.workflow.activity.resource.event
 
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.COMPLETED
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.ENTEREDINERROR
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus.INPROGRESS
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus.NOTDONE
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.ONHOLD
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.OTHER
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus.PREPARATION
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus.STOPPED
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus.UNKNOWN
 
 /**
  * Since event resources may have different code for same status, each [CPGEventResource] should
@@ -39,12 +44,12 @@ internal open class EventStatusCodeMapperImpl : EventStatusCodeMapper {
       "preparation" -> PREPARATION
       "in-progress" -> INPROGRESS
       "not-done" -> NOTDONE
-      "on-hold" -> EventStatus.ONHOLD
-      "completed" -> EventStatus.COMPLETED
-      "entered-in-error" -> EventStatus.ENTEREDINERROR
+      "on-hold" -> ONHOLD
+      "completed" -> COMPLETED
+      "entered-in-error" -> ENTEREDINERROR
       "stopped" -> STOPPED
-      "unknown" -> EventStatus.UNKNOWN
-      else -> EventStatus.OTHER(code)
+      "unknown" -> UNKNOWN
+      else -> OTHER(code)
     }
   }
 
@@ -53,12 +58,12 @@ internal open class EventStatusCodeMapperImpl : EventStatusCodeMapper {
       PREPARATION -> "preparation"
       INPROGRESS -> "in-progress"
       NOTDONE -> "not-done"
-      EventStatus.ONHOLD -> "on-hold"
-      EventStatus.COMPLETED -> "completed"
-      EventStatus.ENTEREDINERROR -> "entered-in-error"
+      ONHOLD -> "on-hold"
+      COMPLETED -> "completed"
+      ENTEREDINERROR -> "entered-in-error"
       STOPPED -> "stopped"
-      EventStatus.UNKNOWN -> "unknown"
-      is EventStatus.OTHER -> status.code
+      UNKNOWN -> "unknown"
+      is OTHER -> status.code
     }
   }
 }

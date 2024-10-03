@@ -27,10 +27,8 @@ import com.google.android.fhir.workflow.activity.phase.request.OrderPhase
 import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
 import com.google.android.fhir.workflow.activity.phase.request.ProposalPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGCommunicationEvent
-import com.google.android.fhir.workflow.activity.resource.event.CPGMedicationDispenseEvent
 import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
-import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
 import com.google.android.fhir.workflow.activity.resource.request.Status
@@ -39,12 +37,7 @@ import com.google.android.fhir.workflow.runBlockingOnWorkerThread
 import com.google.android.fhir.workflow.testing.FhirEngineProviderTestRule
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.fail
-import org.hl7.fhir.r4.model.Annotation
 import org.hl7.fhir.r4.model.CommunicationRequest
-import org.hl7.fhir.r4.model.IdType
-import org.hl7.fhir.r4.model.MarkdownType
-import org.hl7.fhir.r4.model.MedicationDispense
-import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.StringType
 import org.junit.Before
@@ -67,244 +60,6 @@ class ActivityFlowTest {
   fun setupTest() {
     val context: Context = ApplicationProvider.getApplicationContext()
     fhirEngine = FhirEngineProvider.getInstance(context)
-  }
-
-  @Test
-  fun `order medication flow for medication dispense`(): Unit = runBlockingOnWorkerThread {
-    val cpgMedicationRequest =
-      CPGMedicationRequest(
-        MedicationRequest().apply {
-          id = "med-req-01"
-          subject = Reference("Patient/pat-01")
-          intent = MedicationRequest.MedicationRequestIntent.PROPOSAL
-          meta.addProfile("http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest")
-          status = MedicationRequest.MedicationRequestStatus.ACTIVE
-          addNote(Annotation(MarkdownType("Proposal looks OK.")))
-        },
-      )
-
-    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
-    repository.create(cpgMedicationRequest.resource)
-
-    val flow = ActivityFlow.of(repository, cpgMedicationRequest)
-
-    var cachedResourceId = ""
-
-    flow
-      .preparePlan()
-      .onSuccess { preparePlan ->
-        preparePlan.resource.addNote(Annotation(MarkdownType("prepare plan looks OK.")))
-
-        flow.initiatePlan(preparePlan).onSuccess { planPhase ->
-          val updatedPlan =
-            planPhase.getRequestResource().copy().apply {
-              setStatus(Status.ACTIVE)
-              resource.addNote(Annotation(MarkdownType("Plan looks OK.")))
-            }
-
-          planPhase
-            .update(updatedPlan)
-            .onSuccess { cachedResourceId = updatedPlan.logicalId }
-            .onFailure { fail("Should have succeeded", it) }
-        }
-      }
-      .onFailure { fail("Unexpected", it) }
-
-    val planToResume =
-      repository
-        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedResourceId))
-        .let { CPGMedicationRequest(it) }
-    val resumedPlanFlow = ActivityFlow.of(repository, planToResume)
-    (resumedPlanFlow.getCurrentPhase() as Phase.RequestPhase<CPGMedicationRequest>)
-      .getRequestResource()
-    assertThat(resumedPlanFlow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PLAN)
-
-    assertThat(resumedPlanFlow.preparePlan().isFailure).isTrue()
-
-    resumedPlanFlow
-      .prepareOrder()
-      .onSuccess { prepareOrder ->
-        prepareOrder.resource.addNote(Annotation(MarkdownType("prepare order looks OK.")))
-
-        resumedPlanFlow.initiateOrder(prepareOrder).onSuccess { orderPhase ->
-          val updatedOrder =
-            orderPhase.getRequestResource().copy().apply {
-              setStatus(Status.ACTIVE)
-              resource.addNote(Annotation(MarkdownType("Order looks OK.")))
-            }
-
-          orderPhase
-            .update(updatedOrder)
-            .onSuccess { cachedResourceId = updatedOrder.logicalId }
-            .onFailure { fail("Should have succeeded", it) }
-        }
-      }
-      .onFailure { fail("Unexpected", it) }
-
-    val orderToResume =
-      repository
-        .read(MedicationRequest::class.java, IdType("MedicationRequest", cachedResourceId))
-        .let { CPGMedicationRequest(it) }
-    val resumedOrderFlow = ActivityFlow.of(repository, orderToResume)
-
-    assertThat(resumedOrderFlow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.ORDER)
-
-    assertThat(resumedOrderFlow.preparePlan().isFailure).isTrue()
-    assertThat(resumedOrderFlow.prepareOrder().isFailure).isTrue()
-
-    resumedOrderFlow
-      .preparePerform(CPGMedicationDispenseEvent::class.java)
-      .onSuccess { prepareEvent ->
-        prepareEvent.resource.let {
-          it.addNote(Annotation(MarkdownType("prepare event looks OK.")))
-        }
-
-        resumedOrderFlow.initiatePerform(prepareEvent).onSuccess { performPhase ->
-          val updatedEvent =
-            performPhase.getEventResource().copy().apply {
-              setStatus(EventStatus.INPROGRESS)
-
-              resource.let { it.addNote(Annotation(MarkdownType("Event looks OK."))) }
-            }
-
-          performPhase
-            .update(updatedEvent)
-            .onSuccess { cachedResourceId = updatedEvent.logicalId }
-            .onFailure { fail("Should have succeeded", it) }
-        }
-      }
-      .onFailure { fail("Unexpected", it) }
-
-    val eventToResume =
-      repository
-        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedResourceId))
-        .let { CPGMedicationDispenseEvent(it) }
-
-    val resumedPerformFlow = ActivityFlow.of(repository, eventToResume)
-    assertThat(resumedPerformFlow.getCurrentPhase().getPhaseName())
-      .isEqualTo(Phase.PhaseName.PERFORM)
-
-    assertThat(resumedPerformFlow.preparePlan().isFailure).isTrue()
-    assertThat(resumedPerformFlow.prepareOrder().isFailure).isTrue()
-    assertThat(resumedPerformFlow.preparePerform(CPGMedicationDispenseEvent::class.java).isFailure)
-      .isTrue()
-
-    (resumedPerformFlow.getCurrentPhase() as Phase.EventPhase<*>).complete()
-
-    val completedEvent =
-      repository
-        .read(MedicationDispense::class.java, IdType("MedicationDispense", cachedResourceId))
-        .let { CPGMedicationDispenseEvent(it) }
-
-    assertThat(completedEvent.getStatus()).isEqualTo(EventStatus.COMPLETED)
-  }
-
-  @Test
-  fun `communication request flow`(): Unit = runBlockingOnWorkerThread {
-    val cpgCommunicationRequest =
-      CPGRequestResource.of(
-          CommunicationRequest().apply {
-            id = "com-req-01"
-            status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
-            subject = Reference("Patient/pat-01")
-            meta.addProfile(
-              "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
-            )
-
-            addPayload().apply { content = StringType("Proposal") }
-          },
-        )
-        .apply { setIntent(Intent.PROPOSAL) }
-    val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
-    repository.create(cpgCommunicationRequest.resource)
-
-    val flow: ActivityFlow<CPGCommunicationRequest, CPGCommunicationEvent> =
-      ActivityFlow.of(repository, cpgCommunicationRequest)
-
-    val preparePlanResult =
-      flow
-        .preparePlan()
-        .onSuccess { planCPGRequest ->
-          planCPGRequest.resource.let {
-            it.addNote().apply { text = "This prepare Plan looks OK, so approving it." }
-          }
-        }
-        .onFailure { throw it }
-
-    val preparePlan = preparePlanResult.getOrNull()!!
-
-    val newPhase = flow.initiatePlan(preparePlan)
-    assertThat(newPhase.isSuccess).isTrue()
-    assertThat(newPhase.getOrNull()!!.getPhaseName()).isEqualTo(Phase.PhaseName.PLAN)
-
-    newPhase.onSuccess { planPhase ->
-      val request = planPhase.getRequestResource()
-      request.resource.let {
-        it.addNote().apply { text = "This Plan looks OK, so marking it active." }
-      }
-      request.setStatus(Status.ACTIVE)
-
-      planPhase.update(request).onSuccess {
-        assertThat(planPhase.resume().isFailure).isTrue()
-
-        // Get latest request from the phase.
-        val request = planPhase.getRequestResource()
-
-        request.resource.let {
-          it.addNote().apply { text = "This Plan looks OK, so marking it active." }
-        }
-
-        val prepareOrder =
-          flow.prepareOrder().onSuccess {
-            request.resource.let {
-              it.addNote().apply { text = "This prepare Order looks OK, so approving it." }
-            }
-          }
-
-        val newPhase = flow.initiateOrder(prepareOrder.getOrThrow())
-        assertThat(newPhase.isSuccess).isTrue()
-
-        newPhase.onSuccess { orderPhase ->
-          val order = orderPhase.getRequestResource()
-
-          request.resource.let {
-            it.addNote().apply { text = "This Order looks OK, so marking it active." }
-          }
-          order.setStatus(Status.ACTIVE)
-
-          orderPhase.update(order)
-
-          assertThat(orderPhase.resume().isFailure).isTrue()
-
-          val prepareEvent =
-            flow.preparePerform(CPGCommunicationEvent::class.java).onSuccess {
-              it.resource.let {
-                it.addNote().apply { text = "This Event looks OK, so approving it." }
-              }
-            }
-
-          assertThat(prepareEvent.isSuccess).isTrue()
-
-          val newPhase = flow.initiatePerform(prepareEvent.getOrThrow())
-
-          assertThat(newPhase.isSuccess).isTrue()
-
-          newPhase.onSuccess { performPhase ->
-            val event = performPhase.getEventResource()
-            event.resource.let {
-              it.addNote().apply { text = "This Event looks OK, so marking it active." }
-            }
-            event.setStatus(EventStatus.INPROGRESS)
-
-            performPhase.update(event)
-            performPhase.complete()
-
-            val phase = flow.getCurrentPhase() as Phase.EventPhase<CPGCommunicationEvent>
-            assertThat(phase.getEventResource().getStatus()).isEqualTo(EventStatus.COMPLETED)
-          }
-        }
-      }
-    }
   }
 
   @Test
@@ -662,4 +417,229 @@ class ActivityFlowTest {
 
     assertThat(flow.getCurrentPhase()).isInstanceOf(OrderPhase::class.java)
   }
+
+  @Test
+  fun `initiatePlan should move the flow to plan phase when correct prepared plan is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val preparePlan = flow.preparePlan()
+      assertThat(preparePlan.isSuccess).isTrue()
+
+      val initiatedPlan =
+        preparePlan.getOrThrow().let {
+          it.setStatus(Status.ACTIVE)
+          flow.initiatePlan(it)
+        }
+
+      assertThat(initiatedPlan.isSuccess).isTrue()
+      assertThat(initiatedPlan.getOrThrow().getPhaseName()).isEqualTo(Phase.PhaseName.PLAN)
+    }
+
+  @Test
+  fun `initiatePlan should fail when provided plan when corrupted prepared plan is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val preparePlan = flow.preparePlan()
+      assertThat(preparePlan.isSuccess).isTrue()
+
+      val preparedPlanResource = preparePlan.getOrThrow()
+      preparedPlanResource.let {
+        it.setStatus(Status.ACTIVE)
+        it.resource.basedOn.last().apply { this.reference = "" }
+      }
+      val initiatedPlan = preparePlan.getOrThrow().let { flow.initiatePlan(it) }
+
+      assertThat(initiatedPlan.isFailure).isTrue()
+      // check that the flow is still in old phase (proposal).
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+    }
+
+  @Test
+  fun `initiateOrder should move the flow to order phase when correct prepared order is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val prepareOrder = flow.prepareOrder()
+      assertThat(prepareOrder.isSuccess).isTrue()
+
+      val initiatedOrder =
+        prepareOrder.getOrThrow().let {
+          it.setStatus(Status.ACTIVE)
+          flow.initiateOrder(it)
+        }
+
+      assertThat(initiatedOrder.isSuccess).isTrue()
+      assertThat(initiatedOrder.getOrThrow().getPhaseName()).isEqualTo(Phase.PhaseName.ORDER)
+    }
+
+  @Test
+  fun `initiateOrder should fail when provided order when corrupted prepared order is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val prepareOrder = flow.prepareOrder()
+      assertThat(prepareOrder.isSuccess).isTrue()
+
+      val preparedPlanResource = prepareOrder.getOrThrow()
+      preparedPlanResource.let {
+        it.setStatus(Status.ACTIVE)
+        it.resource.basedOn.last().apply { this.reference = "" }
+      }
+      val initiatedOrder = prepareOrder.getOrThrow().let { flow.initiateOrder(it) }
+
+      assertThat(initiatedOrder.isFailure).isTrue()
+      // check that the flow is still in old phase (proposal).
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+    }
+
+  @Test
+  fun `initiatePerform should move the flow to perform phase when correct prepared event is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val preparePerform = flow.preparePerform(CPGCommunicationEvent::class.java)
+      assertThat(preparePerform.isSuccess).isTrue()
+
+      val preparedEvent = preparePerform.getOrThrow()
+      preparedEvent.let { it.setStatus(EventStatus.INPROGRESS) }
+      val initiatedPerform = preparePerform.getOrThrow().let { flow.initiatePerform(it) }
+      assertThat(initiatedPerform.isSuccess).isTrue()
+      assertThat(initiatedPerform.getOrThrow().getPhaseName()).isEqualTo(Phase.PhaseName.PERFORM)
+    }
+
+  @Test
+  fun `initiatePerform should fail when corrupted prepared event is provided`() =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+
+      val preparePerform = flow.preparePerform(CPGCommunicationEvent::class.java)
+      assertThat(preparePerform.isSuccess).isTrue()
+
+      val preparedEvent = preparePerform.getOrThrow()
+      preparedEvent.let {
+        it.setStatus(EventStatus.INPROGRESS)
+        it.resource.basedOn.last().apply { this.reference = "" }
+      }
+      val initiatedPerform = preparePerform.getOrThrow().let { flow.initiatePerform(it) }
+
+      assertThat(initiatedPerform.isFailure).isTrue()
+      // check that the flow is still in old phase (proposal).
+      assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
+    }
 }
