@@ -65,7 +65,7 @@ interface FhirEngine : CrudFhirEngine {
    * This function initiates multiple server calls to upload local changes. The results of each call
    * are emitted as [UploadRequestResult] objects, which can be collected using a [Flow].
    *
-   * @param localChangesFetchMode Specifies how to fetch local changes for upload.
+   * @param uploadStrategy Defines strategies for uploading FHIR resource.
    * @param upload A suspending function that takes a list of [LocalChange] objects and returns a
    *   [Flow] of [UploadRequestResult] objects.
    * @return A [Flow] that emits the progress of the synchronization process as [SyncUploadProgress]

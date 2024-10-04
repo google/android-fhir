@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
 import com.google.android.fhir.datacapture.extensions.localizedPrefixSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
 import com.google.android.fhir.datacapture.extensions.updateTextAndVisibility
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
@@ -66,7 +65,7 @@ internal object ReviewViewHolderFactory : QuestionnaireItemViewHolderFactory(R.l
           questionnaireViewItem.questionnaireItem.localizedPrefixSpanned,
         )
         question.updateTextAndVisibility(
-          questionnaireViewItem.questionnaireItem.localizedTextSpanned,
+          questionnaireViewItem.questionText,
         )
         hint.updateTextAndVisibility(
           questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),

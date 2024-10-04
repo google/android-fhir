@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,16 +23,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.search
-import com.google.android.fhir.sync.SyncJobStatus
+import com.google.android.fhir.sync.CurrentSyncJobStatus
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 
 class PatientListViewModel(application: Application) : AndroidViewModel(application) {
-  private val _pollState = MutableSharedFlow<SyncJobStatus>()
+  private val _pollState = MutableSharedFlow<CurrentSyncJobStatus>()
 
-  val pollState: Flow<SyncJobStatus>
+  val pollState: Flow<CurrentSyncJobStatus>
     get() = _pollState
 
   val liveSearchedPatients = MutableLiveData<List<Patient>>()
