@@ -58,7 +58,54 @@ import org.hl7.fhir.r4.model.ResourceType
  * val fhirEngine = FhirEngineProvider.getInstance(this)
  * ```
  */
-interface FhirEngine : CrudFhirEngine {
+interface FhirEngine {
+  /**
+   * Creates one or more FHIR [Resource]s in the local storage. FHIR Engine requires all stored
+   * resources to have a logical [Resource.id]. If the `id` is specified in the resource passed to
+   * [create], the resource created in `FhirEngine` will have the same `id`. If no `id` is
+   * specified, `FhirEngine` will generate a UUID as that resource's `id` and include it in the
+   * returned list of IDs.
+   *
+   * @param resource The FHIR resources to create.
+   * @return A list of logical IDs of the newly created resources.
+   */
+  suspend fun create(vararg resource: Resource): List<String>
+
+  /**
+   * Loads a FHIR resource given its [ResourceType] and logical ID.
+   *
+   * @param type The type of the resource to load.
+   * @param id The logical ID of the resource.
+   * @return The requested FHIR resource.
+   * @throws ResourceNotFoundException if the resource is not found.
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun get(type: ResourceType, id: String): Resource
+
+  /**
+   * Updates one or more FHIR [Resource]s in the local storage.
+   *
+   * @param resource The FHIR resources to update.
+   */
+  suspend fun update(vararg resource: Resource)
+
+  /**
+   * Removes a FHIR resource given its [ResourceType] and logical ID.
+   *
+   * @param type The type of the resource to delete.
+   * @param id The logical ID of the resource.
+   */
+  suspend fun delete(type: ResourceType, id: String)
+
+  /**
+   * Searches the database and returns a list of resources matching the [Search] specifications.
+   *
+   * @param search The search criteria to apply.
+   * @return A list of [SearchResult] objects containing the matching resources and any included
+   *   references.
+   */
+  suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
+
   /**
    * Synchronizes upload results with the database.
    *
@@ -155,71 +202,12 @@ interface FhirEngine : CrudFhirEngine {
    *   back and no record is purged.
    */
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
-}
-
-interface CrudFhirEngine {
-  /**
-   * Creates one or more FHIR [Resource]s in the local storage. FHIR Engine requires all stored
-   * resources to have a logical [Resource.id]. If the `id` is specified in the resource passed to
-   * [create], the resource created in `FhirEngine` will have the same `id`. If no `id` is
-   * specified, `FhirEngine` will generate a UUID as that resource's `id` and include it in the
-   * returned list of IDs.
-   *
-   * @param resource The FHIR resources to create.
-   * @return A list of logical IDs of the newly created resources.
-   */
-  suspend fun create(vararg resource: Resource): List<String>
-
-  /**
-   * Loads a FHIR resource given its [ResourceType] and logical ID.
-   *
-   * @param type The type of the resource to load.
-   * @param id The logical ID of the resource.
-   * @return The requested FHIR resource.
-   * @throws ResourceNotFoundException if the resource is not found.
-   */
-  @Throws(ResourceNotFoundException::class)
-  suspend fun get(type: ResourceType, id: String): Resource
-
-  /**
-   * Updates one or more FHIR [Resource]s in the local storage.
-   *
-   * @param resource The FHIR resources to update.
-   */
-  suspend fun update(vararg resource: Resource)
-
-  /**
-   * Removes a FHIR resource given its [ResourceType] and logical ID.
-   *
-   * @param type The type of the resource to delete.
-   * @param id The logical ID of the resource.
-   */
-  suspend fun delete(type: ResourceType, id: String)
-
-  /**
-   * Searches the database and returns a list of resources matching the [Search] specifications.
-   *
-   * Example:
-   * ```
-   * fhirEngine.search<Patient> {
-   *  filter(Patient.GIVEN, {
-   *    value = "Kiran"
-   *    modifier = StringFilterModifier.MATCHES_EXACTLY
-   *  })
-   * }
-   * ```
-   *
-   * @param search The search criteria to apply.
-   * @return A list of [SearchResult] objects containing the matching resources and any included
-   *   references.
-   */
-  suspend fun <R : Resource> search(search: Search): List<SearchResult<R>>
 
   /**
    * Adds support for performing actions on `FhirEngine` as a single atomic transaction where the
    * entire set of changes succeed or fail as a single entity
    */
-  suspend fun withTransaction(block: suspend CrudFhirEngine.() -> Unit)
+  suspend fun withTransaction(block: suspend FhirEngine.() -> Unit)
 }
 
 /**
