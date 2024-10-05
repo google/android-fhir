@@ -112,11 +112,23 @@ class QuestionnaireFragment : Fragment() {
           } else {
             val errorViewModel: QuestionnaireValidationErrorViewModel by activityViewModels()
             errorViewModel.setQuestionnaireAndValidation(viewModel.questionnaire, validationMap)
-            QuestionnaireValidationErrorMessageDialogFragment()
-              .show(
-                requireActivity().supportFragmentManager,
-                QuestionnaireValidationErrorMessageDialogFragment.TAG,
-              )
+            val validationErrorMessageDialog = QuestionnaireValidationErrorMessageDialogFragment()
+            if (requireArguments().containsKey(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON)) {
+              validationErrorMessageDialog.arguments =
+                Bundle().apply {
+                  putBoolean(
+                    EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+                    requireArguments()
+                      .getBoolean(
+                        EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+                      ),
+                  )
+                }
+            }
+            validationErrorMessageDialog.show(
+              requireActivity().supportFragmentManager,
+              QuestionnaireValidationErrorMessageDialogFragment.TAG,
+            )
           }
         }
       }
@@ -407,6 +419,11 @@ class QuestionnaireFragment : Fragment() {
       args.add(EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL to value)
     }
 
+    /** Setter to show/hide the Submit anyway button. This button is visible by default. */
+    fun setShowSubmitAnywayButton(value: Boolean) = apply {
+      args.add(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON to value)
+    }
+
     @VisibleForTesting fun buildArgs() = bundleOf(*args.toTypedArray())
 
     /** @return A [QuestionnaireFragment] with provided [Bundle] arguments. */
@@ -508,6 +525,12 @@ class QuestionnaireFragment : Fragment() {
 
     internal const val EXTRA_SHOW_NAVIGATION_IN_DEFAULT_LONG_SCROLL =
       "show-navigation-in-default-long-scroll"
+
+    /**
+     * A [Boolean] extra to show or hide the Submit anyway button in the questionnaire. Default is
+     * true.
+     */
+    internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
 
     fun builder() = Builder()
   }
