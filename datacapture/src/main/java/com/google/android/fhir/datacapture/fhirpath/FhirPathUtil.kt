@@ -18,6 +18,9 @@ package com.google.android.fhir.datacapture.fhirpath
 
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.hapi.ctx.HapiWorkerContext
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.ExpressionNode
@@ -26,32 +29,52 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComp
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.utils.FHIRPathEngine
 
-private val fhirPathEngine: FHIRPathEngine =
+private val fhirPathEngine: FHIRPathEngine by lazy {
   with(FhirContext.forCached(FhirVersionEnum.R4)) {
     FHIRPathEngine(HapiWorkerContext(this, this.validationSupport)).apply {
       hostServices = FHIRPathEngineHostServices
     }
   }
+}
+
+internal var fhirPathEngineDefaultDispatcher: CoroutineContext = Dispatchers.Default
 
 /**
  * Evaluates the expressions over list of resources [Resource] and joins to space separated string
  */
-internal fun evaluateToDisplay(expressions: List<String>, data: Resource) =
-  expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
+internal suspend fun evaluateToDisplay(expressions: List<String>, data: Resource) =
+  withContext(fhirPathEngineDefaultDispatcher) {
+    expressions.joinToString(" ") { fhirPathEngine.evaluateToString(data, it) }
+  }
 
 /** Evaluates the expression over resource [Resource] and returns string value */
-internal fun evaluateToString(
+internal suspend fun evaluateToString(
   expression: ExpressionNode,
   data: Resource?,
   contextMap: Map<String, Base?>,
 ) =
-  fhirPathEngine.evaluateToString(
-    /* appInfo = */ contextMap,
-    /* focusResource = */ null,
-    /* rootResource = */ null,
-    /* base = */ data,
-    /* node = */ expression,
+  withContext(fhirPathEngineDefaultDispatcher) {
+    fhirPathEngine.evaluateToString(
+      /* appInfo = */ contextMap,
+      /* focusResource = */ null,
+      /* rootResource = */ null,
+      /* base = */ data,
+      /* node = */ expression,
+    )
+  }
+
+/** Evaluates FhirPath expression string over a contextMap and returns string value */
+internal suspend fun evaluateToString(
+  contextMap: Map<String, Resource>,
+  fhirPathString: String,
+): String {
+  val expressionNode = extractExpressionNode(fhirPathString)
+  return evaluateToString(
+    expression = expressionNode,
+    data = contextMap[extractResourceType(expressionNode)],
+    contextMap = contextMap,
   )
+}
 
 /**
  * Evaluates the expression and returns the boolean result. The resources [QuestionnaireResponse]
@@ -60,20 +83,22 @@ internal fun evaluateToString(
  *
  * %resource = [QuestionnaireResponse], %context = [QuestionnaireResponseItemComponent]
  */
-internal fun evaluateToBoolean(
+internal suspend fun evaluateToBoolean(
   questionnaireResponse: QuestionnaireResponse,
   questionnaireResponseItemComponent: QuestionnaireResponseItemComponent,
   expression: String,
   contextMap: Map<String, Base?> = mapOf(),
 ): Boolean {
-  val expressionNode = fhirPathEngine.parse(expression)
-  return fhirPathEngine.evaluateToBoolean(
-    contextMap,
-    questionnaireResponse,
-    null,
-    questionnaireResponseItemComponent,
-    expressionNode,
-  )
+  return withContext(fhirPathEngineDefaultDispatcher) {
+    val expressionNode = fhirPathEngine.parse(expression)
+    fhirPathEngine.evaluateToBoolean(
+      contextMap,
+      questionnaireResponse,
+      null,
+      questionnaireResponseItemComponent,
+      expressionNode,
+    )
+  }
 }
 
 /**
@@ -84,31 +109,47 @@ internal fun evaluateToBoolean(
  *
  * %resource = [QuestionnaireResponse], %context = [QuestionnaireResponseItemComponent]
  */
-internal fun evaluateToBase(
+internal suspend fun evaluateToBase(
   questionnaireResponse: QuestionnaireResponse?,
   questionnaireResponseItem: QuestionnaireResponseItemComponent?,
   expression: String,
   contextMap: Map<String, Base?> = mapOf(),
 ): List<Base> {
-  return fhirPathEngine.evaluate(
-    /* appContext = */ contextMap,
-    /* focusResource = */ questionnaireResponse,
-    /* rootResource = */ null,
-    /* base = */ questionnaireResponseItem,
-    /* path = */ expression,
-  )
+  return withContext(fhirPathEngineDefaultDispatcher) {
+    fhirPathEngine.evaluate(
+      /* appContext = */ contextMap,
+      /* focusResource = */ questionnaireResponse,
+      /* rootResource = */ null,
+      /* base = */ questionnaireResponseItem,
+      /* path = */ expression,
+    )
+  }
 }
 
 /** Evaluates the given expression and returns list of [Base] */
-internal fun evaluateToBase(base: Base, expression: String): List<Base> {
-  return fhirPathEngine.evaluate(
-    /* base = */ base,
-    /* path = */ expression,
-  )
+internal suspend fun evaluateToBase(base: Base, expression: String): List<Base> {
+  return withContext(fhirPathEngineDefaultDispatcher) {
+    fhirPathEngine.evaluate(
+      /* base = */ base,
+      /* path = */ expression,
+    )
+  }
 }
 
 /** Evaluates the given list of [Base] elements and returns boolean result */
-internal fun convertToBoolean(items: List<Base>) = fhirPathEngine.convertToBoolean(items)
+internal suspend fun convertToBoolean(items: List<Base>) =
+  withContext(fhirPathEngineDefaultDispatcher) { fhirPathEngine.convertToBoolean(items) }
 
 /** Parse the given expression into [ExpressionNode] */
-internal fun extractExpressionNode(fhirPath: String) = fhirPathEngine.parse(fhirPath)
+internal suspend fun extractExpressionNode(fhirPath: String) =
+  withContext(fhirPathEngineDefaultDispatcher) { fhirPathEngine.parse(fhirPath) }
+
+/**
+ * Extract [ResourceType] string representation from constant or name property of given
+ * [ExpressionNode].
+ */
+private fun extractResourceType(expressionNode: ExpressionNode): String? {
+  // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
+  // expression vs an expression that is valid, but does not return one resource only.
+  return expressionNode.constant?.primitiveValue()?.substring(1) ?: expressionNode.name?.lowercase()
+}
