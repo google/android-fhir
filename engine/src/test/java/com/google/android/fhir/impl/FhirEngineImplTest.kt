@@ -32,6 +32,7 @@ import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
+import com.google.android.fhir.sync.upload.UpdatePayloadType
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertResourceEquals
@@ -323,7 +324,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)) {
         localChanges.addAll(it)
         flowOf(
           UploadRequestResult.Success(
@@ -356,7 +357,7 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)) {
         flowOf(
           UploadRequestResult.Failure(
             it,
@@ -767,7 +768,7 @@ class FhirEngineImplTest {
   fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
-      .syncUpload(UploadStrategy.SingleResourcePost) {
+      .syncUpload(UploadStrategy.SingleResourcePost(UpdatePayloadType.PATCH)) {
         flowOf(
           UploadRequestResult.Success(
             listOf(

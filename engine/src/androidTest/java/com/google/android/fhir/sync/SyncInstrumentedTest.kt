@@ -26,6 +26,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.UpdatePayloadType
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -65,7 +66,11 @@ class SyncInstrumentedTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.AllChangesSquashedBundlePut(
+        UpdatePayloadType.PATCH,
+        500,
+      )
   }
 
   class TestSyncWorkerForDownloadFailing(appContext: Context, workerParams: WorkerParameters) :

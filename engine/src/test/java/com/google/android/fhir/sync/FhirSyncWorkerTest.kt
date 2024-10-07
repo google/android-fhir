@@ -25,6 +25,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.sync.upload.UpdatePayloadType
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -56,7 +57,8 @@ internal class FhirSyncWorkerTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -70,7 +72,11 @@ internal class FhirSyncWorkerTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.AllChangesSquashedBundlePut(
+        UpdatePayloadType.PATCH,
+        500,
+      )
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -86,7 +92,8 @@ internal class FhirSyncWorkerTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)
   }
 
   companion object {

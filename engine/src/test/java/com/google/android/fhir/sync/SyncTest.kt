@@ -20,6 +20,7 @@ import android.content.Context
 import androidx.work.BackoffPolicy
 import androidx.work.WorkerParameters
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.UpdatePayloadType
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -45,7 +46,11 @@ class SyncTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.AllChangesSquashedBundlePut(
+        UpdatePayloadType.PATCH,
+        500,
+      )
   }
 
   @Test

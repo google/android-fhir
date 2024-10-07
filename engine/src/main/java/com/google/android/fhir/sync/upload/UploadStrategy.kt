@@ -31,7 +31,7 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * [getUploadStrategy][com.google.android.fhir.sync.FhirSyncWorker.getUploadStrategy] in your app's
  * [FhirSyncWorker][com.google.android.fhir.sync.FhirSyncWorker], for example:
  * ```
- * override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+ * override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)
  * ```
  *
  * The strategy you select depends on the server's capabilities (for example, support for `PUT` vs
@@ -62,22 +62,32 @@ private constructor(
    * bundled PUT request. This strategy is efficient and minimizes the number of requests sent to
    * the server, but does not maintain individual change history.
    */
-  data object AllChangesSquashedBundlePut :
+  data class AllChangesSquashedBundlePut(
+    val updatePayloadType: UpdatePayloadType,
+    val bundleSize: Int,
+  ) :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.PUT, Bundle.HTTPVerb.PATCH),
+      UploadRequestGeneratorMode.BundleRequest(
+        httpVerbToUseForCreate = Bundle.HTTPVerb.PUT,
+        httpVerbToUseForUpdate = updatePayloadType.toBundleHttpVerb(),
+        bundleSize = bundleSize,
+      ),
     )
 
   /**
    * Fetches all changes for a single resource, generates a patch for that resource, and creates a
    * single POST request with the patch.
    */
-  data object SingleResourcePost :
+  data class SingleResourcePost(val updatePayloadType: UpdatePayloadType) :
     UploadStrategy(
       LocalChangesFetchMode.PerResource,
       PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+      UploadRequestGeneratorMode.BundleRequest(
+        httpVerbToUseForCreate = Bundle.HTTPVerb.POST,
+        httpVerbToUseForUpdate = updatePayloadType.toBundleHttpVerb(),
+      ),
     )
 
   /*
@@ -90,54 +100,101 @@ private constructor(
    * Not yet implemented - Fetches all local changes, generates one patch per resource, and uploads
    * them in a single bundled POST request.
    */
-  object AllChangesSquashedBundlePost :
+  private data class AllChangesSquashedBundlePost(
+    val updatePayloadType: UpdatePayloadType,
+    val bundleSize: Int,
+  ) :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
+      UploadRequestGeneratorMode.BundleRequest(
+        Bundle.HTTPVerb.POST,
+        updatePayloadType.toBundleHttpVerb(),
+      ),
     )
 
   /**
    * Not yet implemented - Fetches the earliest local change, generates a patch for that change, and
    * creates a single PUT request with the patch.
    */
-  private object SingleChangePut :
+  private data class SingleChangePut(val updatePayloadType: UpdatePayloadType) :
     UploadStrategy(
       LocalChangesFetchMode.EarliestChange,
       PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, updatePayloadType.toHttpVerb()),
     )
 
   /**
    * Not yet implemented - Fetches the earliest local change, generates a patch for that change, and
    * creates a single POST request with the patch.
    */
-  private object SingleChangePost :
+  private data class SingleChangePost(val updatePayloadType: UpdatePayloadType) :
     UploadStrategy(
       LocalChangesFetchMode.EarliestChange,
       PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.POST, HttpVerb.PATCH),
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, updatePayloadType.toHttpVerb()),
     )
 
   /**
    * Not yet implemented - Fetches all changes for a single resource, generates a patch for that
    * resource, and creates a single PUT request with the patch.
    */
-  private object SingleResourcePut :
+  private data class SingleResourcePut(val updatePayloadType: UpdatePayloadType) :
     UploadStrategy(
       LocalChangesFetchMode.PerResource,
       PatchGeneratorMode.PerResource,
-      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, HttpVerb.PATCH),
+      UploadRequestGeneratorMode.UrlRequest(HttpVerb.PUT, updatePayloadType.toHttpVerb()),
     )
 
   /**
    * Not yet implemented - Fetches all local changes, generates a patch for each individual change,
    * and creates a single bundle POST request containing all the patches.
    */
-  private object AllChangesBundlePost :
+  private data class AllChangesBundlePut(
+    val updatePayloadType: UpdatePayloadType,
+    val bundleSize: Int,
+  ) :
     UploadStrategy(
       LocalChangesFetchMode.AllChanges,
       PatchGeneratorMode.PerChange,
-      UploadRequestGeneratorMode.BundleRequest(Bundle.HTTPVerb.POST, Bundle.HTTPVerb.PATCH),
+      UploadRequestGeneratorMode.BundleRequest(
+        Bundle.HTTPVerb.PUT,
+        updatePayloadType.toBundleHttpVerb(),
+      ),
     )
+
+  /**
+   * Not yet implemented - Fetches all local changes, generates a patch for each individual change,
+   * and creates a single bundle POST request containing all the patches.
+   */
+  private data class AllChangesBundlePost(
+    val updatePayloadType: UpdatePayloadType,
+    val bundleSize: Int,
+  ) :
+    UploadStrategy(
+      LocalChangesFetchMode.AllChanges,
+      PatchGeneratorMode.PerChange,
+      UploadRequestGeneratorMode.BundleRequest(
+        Bundle.HTTPVerb.POST,
+        updatePayloadType.toBundleHttpVerb(),
+      ),
+    )
+}
+
+enum class UpdatePayloadType {
+  PATCH,
+  FULL,
+  ;
+
+  fun toBundleHttpVerb() =
+    when (this) {
+      PATCH -> Bundle.HTTPVerb.PATCH
+      FULL -> Bundle.HTTPVerb.PUT
+    }
+
+  fun toHttpVerb() =
+    when (this) {
+      PATCH -> HttpVerb.PATCH
+      FULL -> HttpVerb.PUT
+    }
 }
