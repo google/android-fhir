@@ -86,22 +86,19 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation): String {
-    if (this.size <= 1) {
-      val queryString =
-        firstOrNull()?.let {
-          if (it.params.size > 1) {
-            "(${it.condition})"
-          } else {
-            it.condition
-          }
-        }
-      return queryString ?: ""
+    when {
+      this.isEmpty() ->
+        return "true" // In case empty, return true to match other conditions in the where clause
+      this.size == 1 -> {
+        return first().queryString
+      }
+      else -> {
+        val mid = this.size / 2
+        val left = this.subList(0, mid).toQueryString(operation)
+        val right = this.subList(mid, this.size).toQueryString(operation)
+
+        return "($left ${operation.logicalOperator} $right)"
+      }
     }
-
-    val mid = this.size / 2
-    val left = this.subList(0, mid).toQueryString(operation)
-    val right = this.subList(mid, this.size).toQueryString(operation)
-
-    return "($left ${operation.logicalOperator} $right)"
   }
 }
