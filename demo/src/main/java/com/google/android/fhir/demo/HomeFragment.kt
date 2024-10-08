@@ -47,6 +47,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     requireView().findViewById<CardView>(R.id.item_search).setOnClickListener {
       findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToPatientList())
     }
+    requireView().findViewById<CardView>(R.id.item_sync).setOnClickListener {
+      findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSyncFragment())
+    }
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
