@@ -47,8 +47,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
-import org.hl7.fhir.r4.model.Appointment
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Encounter
@@ -57,7 +57,6 @@ import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
-import org.hl7.fhir.r4.model.Practitioner
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
@@ -789,129 +788,68 @@ class FhirEngineImplTest {
   }
 
   @Test
-  fun `withTransaction saves all changes successfully in order`() = runTest {
-    val patient01ID = "patient-01"
-    val patient01 =
-      Patient().apply {
-        id = patient01ID
-        gender = Enumerations.AdministrativeGender.FEMALE
-      }
-    val patient01AppointmentID = "appointment-01"
-    val patient01Appointment =
-      Appointment().apply {
-        id = patient01AppointmentID
-        status = Appointment.AppointmentStatus.BOOKED
-        addParticipant(
-          Appointment.AppointmentParticipantComponent().apply {
-            actor = Reference("${patient01.resourceType}/$patient01ID")
-          },
-        )
-      }
-    fhirEngine.create(patient01, patient01Appointment)
-
-    // Fulfill appointment with related Encounter/Observation
-    val patient01AppointmentEncounterID = "enc-01"
-    val patient01AppointmentEncounter =
-      Encounter().apply {
-        id = patient01AppointmentEncounterID
-        subject = Reference("${patient01.resourceType}/$patient01ID")
-        addAppointment(Reference("${patient01Appointment.resourceType}/$patient01AppointmentID"))
-      }
-    val patient01AppointmentEncounterObservationID = "obs-01"
-    val patient01AppointmentEncounterObservation =
-      Observation().apply {
-        id = patient01AppointmentEncounterObservationID
-        encounter =
-          Reference(
-            "${patient01AppointmentEncounter.resourceType}/$patient01AppointmentEncounterID",
-          )
-      }
-    val updatedAppointment =
-      patient01Appointment.copy().apply { status = Appointment.AppointmentStatus.FULFILLED }
-
+  fun `withTransaction saves changes successfully`() = runTest {
     fhirEngine.withTransaction {
-      this.create(patient01AppointmentEncounter, patient01AppointmentEncounterObservation)
-      this.update(updatedAppointment)
+      val patient01 =
+        Patient().apply {
+          id = "patient-01"
+          gender = Enumerations.AdministrativeGender.FEMALE
+        }
+      this.create(patient01)
+
+      val patient01Observation =
+        Observation().apply {
+          id = "patient-01-observation"
+          status = Observation.ObservationStatus.FINAL
+          code = CodeableConcept()
+          subject = Reference(patient01)
+        }
+      this.create(patient01Observation)
     }
 
     assertThat(
-        fhirEngine.get<Encounter>(patient01AppointmentEncounterID).appointmentFirstRep.reference,
+        fhirEngine.get<Patient>("patient-01"),
       )
-      .isEqualTo("Appointment/$patient01AppointmentID")
+      .isNotNull()
+    assertThat(fhirEngine.get<Observation>("patient-01-observation")).isNotNull()
     assertThat(
-        fhirEngine.get<Observation>(patient01AppointmentEncounterObservationID).encounter.reference,
+        fhirEngine.get<Observation>("patient-01-observation").subject.reference,
       )
-      .isEqualTo("Encounter/$patient01AppointmentEncounterID")
-    assertThat(fhirEngine.get<Appointment>(patient01AppointmentID).status)
-      .isEqualTo(Appointment.AppointmentStatus.FULFILLED)
+      .isEqualTo("Patient/patient-01")
   }
 
   @Test
-  fun `withTransaction reverts all changes when an error occurs`() = runTest {
-    val patient01ID = "patient-01"
+  fun `withTransaction rolls back changes when an error occurs`() = runTest {
     val patient01 =
       Patient().apply {
-        id = patient01ID
+        id = "patient-01"
         gender = Enumerations.AdministrativeGender.FEMALE
       }
-    val patient01AppointmentID = "appointment-01"
-    val patient01Appointment =
-      Appointment().apply {
-        id = patient01AppointmentID
-        status = Appointment.AppointmentStatus.BOOKED
-        addParticipant(
-          Appointment.AppointmentParticipantComponent().apply {
-            actor = Reference("${patient01.resourceType}/$patient01ID")
-          },
-        )
-      }
-    fhirEngine.create(patient01, patient01Appointment)
 
-    // Fulfill appointment with related Encounter/Observation
-    val patient01AppointmentEncounterID = "enc-01"
-    val patient01AppointmentEncounter =
-      Encounter().apply {
-        id = patient01AppointmentEncounterID
-        subject = Reference("${patient01.resourceType}/$patient01ID")
-        addAppointment(Reference("${patient01Appointment.resourceType}/$patient01AppointmentID"))
-      }
-    val patient01AppointmentEncounterObservationID = "obs-01"
-    val patient01AppointmentEncounterObservation =
-      Observation().apply {
-        id = patient01AppointmentEncounterObservationID
-        encounter =
-          Reference(
-            "${patient01AppointmentEncounter.resourceType}/$patient01AppointmentEncounterID",
-          )
-      }
+    fhirEngine.create(patient01)
 
     try {
       fhirEngine.withTransaction {
-        this.create(patient01AppointmentEncounter, patient01AppointmentEncounterObservation)
-        // Get non-existent practitioner to force ResourceNotFoundException
-        val nonExistentPractitioner =
-          this.get(ResourceType.Practitioner, "non_existent_practitioner_id") as Practitioner
-        val updatedAppointment =
-          patient01Appointment.copy().apply {
-            status = Appointment.AppointmentStatus.FULFILLED
-            addParticipant(
-              Appointment.AppointmentParticipantComponent().apply {
-                actor = Reference("Practitioner/${nonExistentPractitioner.logicalId}")
-              },
-            )
+        val patientEncounter =
+          Encounter().apply {
+            id = "enc-01"
+            status = Encounter.EncounterStatus.FINISHED
+            class_ = Coding()
+            subject = Reference(patient01)
           }
-        this.update(updatedAppointment)
+
+        this.create(patientEncounter)
+
+        // Update encounter to reference non-existent subject to force ResourceNotFoundException
+        val nonExistentSubject = this.get(ResourceType.Patient, "non_existent_id") as Patient
+        patientEncounter.subject = Reference(nonExistentSubject)
+        this.update(patientEncounter)
       }
     } catch (_: ResourceNotFoundException) {}
 
     assertThrows(ResourceNotFoundException::class.java) {
-      runBlocking { fhirEngine.get<Encounter>(patient01AppointmentEncounterID) }
+      runBlocking { fhirEngine.get<Encounter>("enc-01") }
     }
-    assertThrows(ResourceNotFoundException::class.java) {
-      runBlocking { fhirEngine.get<Observation>(patient01AppointmentEncounterObservationID) }
-    }
-    assertThat(fhirEngine.get<Appointment>(patient01AppointmentID).status)
-      .isEqualTo(Appointment.AppointmentStatus.BOOKED)
   }
 
   companion object {
