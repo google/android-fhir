@@ -17,7 +17,6 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.cardview.widget.CardView
@@ -30,10 +29,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     super.onViewCreated(view, savedInstanceState)
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
       title = resources.getString(R.string.app_name)
-      setDisplayHomeAsUpEnabled(true)
+      setDisplayHomeAsUpEnabled(false)
     }
-    setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(true)
     setOnClicks()
   }
 
@@ -49,16 +46,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
     requireView().findViewById<CardView>(R.id.item_sync).setOnClickListener {
       findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSyncFragment())
-    }
-  }
-
-  override fun onOptionsItemSelected(item: MenuItem): Boolean {
-    return when (item.itemId) {
-      android.R.id.home -> {
-        (requireActivity() as MainActivity).openNavigationDrawer()
-        true
-      }
-      else -> false
     }
   }
 }

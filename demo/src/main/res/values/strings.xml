@@ -69,4 +69,5 @@
   <string name="syncing">Syncing</string>
   <string name="sync">Sync</string>
   <string name="current_status">Current Status: %1$s</string>
+  <string name="manual_sync">Manual Sync</string>
 </resources>

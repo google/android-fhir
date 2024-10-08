@@ -18,13 +18,16 @@ package com.google.android.fhir.demo
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
 import com.google.android.fhir.sync.CurrentSyncJobStatus
 
@@ -41,6 +44,8 @@ class ManualSyncFragment : Fragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    setUpActionBar()
+    setHasOptionsMenu(true)
     view.findViewById<Button>(R.id.sync_now_button).setOnClickListener {
       mainActivityViewModel.triggerOneTimeSync()
     }
@@ -48,6 +53,23 @@ class ManualSyncFragment : Fragment() {
     launchAndRepeatStarted(
       { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
     )
+  }
+
+  override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    return when (item.itemId) {
+      android.R.id.home -> {
+        NavHostFragment.findNavController(this).navigateUp()
+        true
+      }
+      else -> false
+    }
+  }
+
+  private fun setUpActionBar() {
+    (requireActivity() as AppCompatActivity).supportActionBar?.apply {
+      title = requireContext().getString(R.string.manual_sync)
+      setDisplayHomeAsUpEnabled(true)
+    }
   }
 
   private fun currentSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
