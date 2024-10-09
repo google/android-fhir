@@ -28,7 +28,6 @@ import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
 import com.google.android.fhir.search.filter.TokenParamFilterCriterion
-import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
@@ -318,6 +317,36 @@ class FhirEngineImplTest {
         },
       )
       .isTrue()
+  }
+
+  @Test
+  fun `search() should return patients filtered by param _id`() = runTest {
+    val patient1 = Patient().apply { id = "patient-1" }
+    val patient2 = Patient().apply { id = "patient-2" }
+    val patient3 = Patient().apply { id = "patient-45" }
+    val patient4 = Patient().apply { id = "patient-4355" }
+    val patient5 = Patient().apply { id = "patient-899" }
+    val patient6 = Patient().apply { id = "patient-883376" }
+    fhirEngine.create(patient1, patient2, patient3, patient4, patient5, patient6)
+
+    val filterValues =
+      listOf(patient2, patient3, patient1, patient5, patient4, patient6).map<
+        Patient,
+        TokenParamFilterCriterion.() -> Unit,
+      > {
+        { value = of(it.logicalId) }
+      }
+    val patientSearchResult =
+      fhirEngine.search<Patient> { filter(TokenClientParam("_id"), *filterValues.toTypedArray()) }
+    assertThat(patientSearchResult.map { it.resource.logicalId })
+      .containsExactly(
+        "patient-2",
+        "patient-45",
+        "patient-1",
+        "patient-4355",
+        "patient-899",
+        "patient-883376",
+      )
   }
 
   @Test
@@ -724,47 +753,6 @@ class FhirEngineImplTest {
 
     assertThat(result).isNotEmpty()
     assertThat(result.map { it.resource.logicalId }).containsExactly("patient-id-create").inOrder()
-  }
-
-  @Test
-  fun `testing search many`() = runTest {
-    val patient1 = Patient().apply { id = "patient-1" }
-    val patient2 = Patient().apply { id = "patient-2" }
-    val patient3 = Patient().apply { id = "patient-45" }
-    val patient4 = Patient().apply { id = "patient-4355" }
-    val patient5 = Patient().apply { id = "patient-899" }
-    val patient6 = Patient().apply { id = "patient-883376" }
-    fhirEngine.create(patient1, patient2, patient3, patient4, patient5, patient6)
-
-    val result1 =
-      fhirEngine.search<Patient> {
-        filter(TokenClientParam("_id"), { value = of(patient3.logicalId) })
-      }
-    assertThat(result1).isNotEmpty()
-    assertThat(result1.size).isEqualTo(1)
-
-    val filterValues =
-      listOf(patient2, patient3, patient1, patient5, patient4, patient6).map<
-        Patient,
-        TokenParamFilterCriterion.() -> Unit,
-      > {
-        { value = of(it.logicalId) }
-      }
-    val result2 =
-      fhirEngine.search<Patient> {
-        filter(TokenClientParam("_id"), *filterValues.toTypedArray())
-        println(getQuery().query)
-        println(getQuery().args)
-      }
-    assertThat(result2.map { it.resource.logicalId })
-      .containsExactly(
-        "patient-2",
-        "patient-45",
-        "patient-1",
-        "patient-4355",
-        "patient-899",
-        "patient-883376",
-      )
   }
 
   @Test

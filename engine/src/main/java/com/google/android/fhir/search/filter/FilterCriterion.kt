@@ -58,7 +58,7 @@ internal sealed class FilterCriteria(
     return SearchQuery(
       """
       SELECT resourceUuid FROM $entityTableName
-      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
+      WHERE resourceType = ? AND index_name = ?${if (conditionParams.isNotEmpty()) " AND ${conditionParams.toQueryString(operation)}" else ""}
       """,
       listOf(type.name, param.paramName) + conditionParams.flatMap { it.params },
     )
@@ -86,19 +86,14 @@ internal sealed class FilterCriteria(
    * intended.
    */
   private fun List<ConditionParam<*>>.toQueryString(operation: Operation): String {
-    when {
-      this.isEmpty() ->
-        return "true" // In case empty, return true to match other conditions in the where clause
-      this.size == 1 -> {
-        return first().queryString
-      }
-      else -> {
-        val mid = this.size / 2
-        val left = this.subList(0, mid).toQueryString(operation)
-        val right = this.subList(mid, this.size).toQueryString(operation)
-
-        return "($left ${operation.logicalOperator} $right)"
-      }
+    if (this.size == 1) {
+      return first().queryString
     }
+
+    val mid = this.size / 2
+    val left = this.subList(0, mid).toQueryString(operation)
+    val right = this.subList(mid, this.size).toQueryString(operation)
+
+    return "($left ${operation.logicalOperator} $right)"
   }
 }
