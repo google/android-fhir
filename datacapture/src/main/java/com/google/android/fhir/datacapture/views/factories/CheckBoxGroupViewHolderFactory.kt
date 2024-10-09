@@ -27,7 +27,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
-import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.displayStringSpanned
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
@@ -104,7 +104,7 @@ internal object CheckBoxGroupViewHolderFactory :
         val checkbox =
           checkboxLayout.findViewById<CheckBox>(R.id.check_box).apply {
             id = viewId
-            text = answerOption.value.displayString(header.context)
+            text = answerOption.value.displayStringSpanned(header.context)
             setCompoundDrawablesRelative(
               answerOption.itemAnswerOptionImage(checkboxGroup.context),
               null,
