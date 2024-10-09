@@ -685,6 +685,8 @@ internal val DateTimeType.rangeEpochMillis
 
 data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
+
+  val queryString = if (params.size > 1) "($condition)" else condition
 }
 
 private enum class SortTableInfo(val tableName: String, val columnName: String) {

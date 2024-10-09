@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,7 +58,7 @@ internal sealed class FilterCriteria(
     return SearchQuery(
       """
       SELECT resourceUuid FROM $entityTableName
-      WHERE resourceType = ? AND index_name = ? AND ${conditionParams.toQueryString(operation)} 
+      WHERE resourceType = ? AND index_name = ?${if (conditionParams.isNotEmpty()) " AND ${conditionParams.toQueryString(operation)}" else ""}
       """,
       listOf(type.name, param.paramName) + conditionParams.flatMap { it.params },
     )
@@ -85,16 +85,15 @@ internal sealed class FilterCriteria(
    * This function takes care of wrapping the conditions in brackets so that they are evaluated as
    * intended.
    */
-  private fun List<ConditionParam<*>>.toQueryString(operation: Operation) =
-    this.joinToString(
-      separator = " ${operation.logicalOperator} ",
-      prefix = if (size > 1) "(" else "",
-      postfix = if (size > 1) ")" else "",
-    ) {
-      if (it.params.size > 1) {
-        "(${it.condition})"
-      } else {
-        it.condition
-      }
+  private fun List<ConditionParam<*>>.toQueryString(operation: Operation): String {
+    if (this.size == 1) {
+      return first().queryString
     }
+
+    val mid = this.size / 2
+    val left = this.subList(0, mid).toQueryString(operation)
+    val right = this.subList(mid, this.size).toQueryString(operation)
+
+    return "($left ${operation.logicalOperator} $right)"
+  }
 }
