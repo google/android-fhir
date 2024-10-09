@@ -26,6 +26,10 @@ import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import org.hl7.fhir.r4.model.OperationOutcome
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -68,6 +72,12 @@ internal fun Resource.isUploadSuccess(): Boolean {
   return outcome.issue.isNotEmpty() &&
     outcome.issue.all { it.severity.equals(OperationOutcome.IssueSeverity.INFORMATION) }
 }
+
+/** Implementation of a parallelized map */
+suspend fun <A, B> Iterable<A>.pmap(dispatcher: CoroutineDispatcher, f: suspend (A) -> B): List<B> =
+  coroutineScope {
+    map { async(dispatcher) { f(it) } }.awaitAll()
+  }
 
 internal class OffsetDateTimeTypeAdapter : TypeAdapter<OffsetDateTime>() {
   override fun write(out: JsonWriter, value: OffsetDateTime) {

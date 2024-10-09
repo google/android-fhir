@@ -16,15 +16,20 @@
 
 package com.google.android.fhir.datacapture
 
+import android.os.Bundle
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.testing.launchFragment
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.fragment.app.testing.withFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.test.platform.app.InstrumentationRegistry
 import com.google.android.fhir.datacapture.validation.QuestionnaireResponseValidator
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertEquals
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -72,6 +77,93 @@ class QuestionnaireValidationErrorMessageDialogFragmentTest {
       assertThat(result.findViewById<TextView>(R.id.dialog_subtitle).text)
         .isEqualTo("Fix the following questions:")
       assertThat(result.findViewById<TextView>(R.id.body).text).isEqualTo("• First Name")
+    }
+  }
+
+  @Test
+  fun `check alertDialog when submit anyway button argument is true should show Submit anyway button`() {
+    runTest {
+      val questionnaireValidationErrorMessageDialogArguments = Bundle()
+      questionnaireValidationErrorMessageDialogArguments.putBoolean(
+        QuestionnaireValidationErrorMessageDialogFragment.EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+        true,
+      )
+      with(
+        launchFragment<QuestionnaireValidationErrorMessageDialogFragment>(
+          themeResId = R.style.Theme_Questionnaire,
+          fragmentArgs = questionnaireValidationErrorMessageDialogArguments,
+        ),
+      ) {
+        onFragment { fragment ->
+          assertThat(fragment.dialog).isNotNull()
+          assertThat(fragment.requireDialog().isShowing).isTrue()
+          val alertDialog = fragment.dialog as? AlertDialog
+          val context = InstrumentationRegistry.getInstrumentation().targetContext
+          val positiveButtonText =
+            context.getString(R.string.questionnaire_validation_error_fix_button_text)
+          val negativeButtonText =
+            context.getString(R.string.questionnaire_validation_error_submit_button_text)
+          assertThat(alertDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.text)
+            .isEqualTo(positiveButtonText)
+          assertThat(alertDialog?.getButton(AlertDialog.BUTTON_NEGATIVE)?.text)
+            .isEqualTo(negativeButtonText)
+        }
+      }
+    }
+  }
+
+  @Test
+  fun `check alertDialog when no arguments are passed should show Submit anyway button`() {
+    runTest {
+      with(
+        launchFragment<QuestionnaireValidationErrorMessageDialogFragment>(
+          themeResId = R.style.Theme_Questionnaire,
+        ),
+      ) {
+        onFragment { fragment ->
+          assertThat(fragment.dialog).isNotNull()
+          assertThat(fragment.requireDialog().isShowing).isTrue()
+          val alertDialog = fragment.dialog as? AlertDialog
+          val context = InstrumentationRegistry.getInstrumentation().targetContext
+          val positiveButtonText =
+            context.getString(R.string.questionnaire_validation_error_fix_button_text)
+          val negativeButtonText =
+            context.getString(R.string.questionnaire_validation_error_submit_button_text)
+          assertThat(alertDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.text)
+            .isEqualTo(positiveButtonText)
+          assertThat(alertDialog?.getButton(AlertDialog.BUTTON_NEGATIVE)?.text)
+            .isEqualTo(negativeButtonText)
+        }
+      }
+    }
+  }
+
+  @Test
+  fun `check alertDialog when submit anyway button argument is false should hide Submit anyway button`() {
+    runTest {
+      val validationErrorBundle = Bundle()
+      validationErrorBundle.putBoolean(
+        QuestionnaireValidationErrorMessageDialogFragment.EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON,
+        false,
+      )
+      with(
+        launchFragment<QuestionnaireValidationErrorMessageDialogFragment>(
+          themeResId = R.style.Theme_Questionnaire,
+          fragmentArgs = validationErrorBundle,
+        ),
+      ) {
+        onFragment { fragment ->
+          assertThat(fragment.dialog).isNotNull()
+          assertThat(fragment.requireDialog().isShowing).isTrue()
+          val alertDialog = fragment.dialog as? AlertDialog
+          val context = InstrumentationRegistry.getInstrumentation().targetContext
+          val positiveButtonText =
+            context.getString(R.string.questionnaire_validation_error_fix_button_text)
+          assertThat(alertDialog?.getButton(AlertDialog.BUTTON_POSITIVE)?.text)
+            .isEqualTo(positiveButtonText)
+          assertEquals(alertDialog?.getButton(AlertDialog.BUTTON_NEGATIVE)?.text, "")
+        }
+      }
     }
   }
 
