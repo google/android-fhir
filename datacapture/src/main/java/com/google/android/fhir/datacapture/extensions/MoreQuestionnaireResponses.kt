@@ -16,8 +16,13 @@
 
 package com.google.android.fhir.datacapture.extensions
 
+import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Extension
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
+
+internal const val EXTENSION_LAST_LAUNCHED_TIMESTAMP: String =
+  "http://github.com/google-android/questionnaire-lastLaunched-timestamp"
 
 /** Pre-order list of all questionnaire response items in the questionnaire. */
 val QuestionnaireResponse.allItems: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>
@@ -154,3 +159,26 @@ private fun unpackRepeatedGroups(
     listOf(questionnaireResponseItem)
   }
 }
+
+/**
+ * Adds a launch timestamp extension to the Questionnaire Response. If the extension @see
+ * EXTENSION_LAUNCH_TIMESTAMP already exists, it updates its value; otherwise, it adds a new one.
+ */
+internal var QuestionnaireResponse.launchTimestamp: DateTimeType?
+  get() {
+    val extension = this.extension.firstOrNull { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+    return extension?.value as? DateTimeType
+  }
+  set(value) {
+    this.extension
+      .find { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+      ?.let {
+        // Replace the existing extension with a new one having the updated value
+        this.extension[this.extension.indexOf(it)] =
+          Extension(EXTENSION_LAST_LAUNCHED_TIMESTAMP, value)
+      }
+      ?: run {
+        // Add a new extension if none exists
+        this.extension.add(Extension(EXTENSION_LAST_LAUNCHED_TIMESTAMP, value))
+      }
+  }
