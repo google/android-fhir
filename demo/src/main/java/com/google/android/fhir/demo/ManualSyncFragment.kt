@@ -97,7 +97,8 @@ class ManualSyncFragment : Fragment() {
 
   private fun observeLastSyncTime() {
     mainActivityViewModel.lastSyncTimestampLiveData.observe(viewLifecycleOwner) {
-      requireView().findViewById<TextView>(R.id.lastSyncTime).text = getString(R.string.last_sync_timestamp,it)
+      requireView().findViewById<TextView>(R.id.lastSyncTime).text =
+        getString(R.string.last_sync_timestamp, it)
     }
   }
 }
