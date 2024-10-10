@@ -18,7 +18,7 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
-import com.google.android.fhir.sync.upload.UpdatePayloadType
+import com.google.android.fhir.sync.upload.HttpUploadMethod
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.sync.upload.Uploader
@@ -63,7 +63,7 @@ class FhirSynchronizerTest {
         TestFhirEngineImpl,
         UploadConfiguration(
           uploader,
-          UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500),
+          UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),
         ),
         DownloadConfiguration(downloader, conflictResolver),
         fhirDataStore,
@@ -165,7 +165,12 @@ class FhirSynchronizerTest {
           TestFhirEngineImpl,
           UploadConfiguration(
             uploader,
-            UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500),
+            UploadStrategy.forBundleRequest(
+              HttpUploadMethod.PUT,
+              HttpUploadMethod.PATCH,
+              true,
+              500,
+            ),
           ),
           DownloadConfiguration(
             object : Downloader {

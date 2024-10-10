@@ -22,7 +22,7 @@ import com.google.android.fhir.demo.FhirApplication
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
-import com.google.android.fhir.sync.upload.UpdatePayloadType
+import com.google.android.fhir.sync.upload.HttpUploadMethod
 import com.google.android.fhir.sync.upload.UploadStrategy
 
 class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -35,7 +35,7 @@ class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
   override fun getConflictResolver() = AcceptLocalConflictResolver
 
   override fun getUploadStrategy(): UploadStrategy =
-    UploadStrategy.AllChangesSquashedBundlePut(UpdatePayloadType.PATCH, 500)
+    UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500)
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 }
