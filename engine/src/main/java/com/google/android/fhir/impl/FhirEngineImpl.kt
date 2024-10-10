@@ -22,6 +22,7 @@ import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.SearchResult
 import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.count
@@ -124,7 +125,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
   override suspend fun syncUpload(
     uploadStrategy: UploadStrategy,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
+    upload:
+      (suspend (List<LocalChange>, List<LocalChangeResourceReference>) -> Flow<
+          UploadRequestResult,
+        >),
   ): Flow<SyncUploadProgress> = flow {
     val resourceConsolidator =
       ResourceConsolidatorFactory.byHttpVerb(uploadStrategy.requestGeneratorMode, database)
@@ -140,8 +144,10 @@ internal class FhirEngineImpl(private val database: Database, private val contex
 
     while (localChangeFetcher.hasNext()) {
       val localChanges = localChangeFetcher.next()
+      val localChangeReferences =
+        database.getLocalChangeResourceReferences(localChanges.flatMap { it.token.ids })
       val uploadRequestResult =
-        upload(localChanges)
+        upload(localChanges, localChangeReferences)
           .onEach { result ->
             resourceConsolidator.consolidate(result)
             val newProgress =

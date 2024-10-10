@@ -215,7 +215,7 @@ internal data class ResourceWithUUID<R>(
   val resource: R,
 )
 
-internal data class LocalChangeResourceReference(
+data class LocalChangeResourceReference(
   val localChangeId: Long,
   val resourceReferenceValue: String,
   val resourceReferencePath: String?,

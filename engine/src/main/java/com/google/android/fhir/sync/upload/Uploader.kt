@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.upload
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.sync.DataSource
 import com.google.android.fhir.sync.ResourceSyncException
 import com.google.android.fhir.sync.upload.patch.PatchGenerator
@@ -49,9 +50,12 @@ internal class Uploader(
   private val patchGenerator: PatchGenerator,
   private val requestGenerator: UploadRequestGenerator,
 ) {
-  suspend fun upload(localChanges: List<LocalChange>) =
+  suspend fun upload(
+    localChanges: List<LocalChange>,
+    localChangesReferences: List<LocalChangeResourceReference>,
+  ) =
     localChanges
-      .let { patchGenerator.generate(it) }
+      .let { patchGenerator.generate(it, localChangesReferences) }
       .let { requestGenerator.generateUploadRequests(it) }
       .asFlow()
       .transformWhile {
