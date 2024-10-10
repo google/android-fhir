@@ -44,7 +44,6 @@ class AddPatientFragment : Fragment(R.layout.add_patient_fragment) {
       addQuestionnaireFragment()
     }
     observePatientSaveAction()
-    (activity as MainActivity).setDrawerEnabled(false)
 
     /** Use the provided cancel|submit buttons from the sdc library */
     childFragmentManager.setFragmentResultListener(

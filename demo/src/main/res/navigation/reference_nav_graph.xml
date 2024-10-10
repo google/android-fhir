@@ -21,6 +21,10 @@
             android:id="@+id/action_home_fragment_to_patient_list"
             app:destination="@id/patient_list"
         />
+    <action
+            android:id="@+id/action_home_fragment_to_sync_fragment"
+            app:destination="@id/manualSyncFragment"
+        />
   </fragment>
 
   <fragment
@@ -79,5 +83,12 @@
     >
         <argument android:name="patient_id" app:argType="string" />
     </fragment>
+
+  <fragment
+        android:id="@+id/manualSyncFragment"
+        android:name="com.google.android.fhir.demo.SyncFragment"
+        android:label="fragment_manual_sync"
+        tools:layout="@layout/sync"
+    />
 
 </navigation>
