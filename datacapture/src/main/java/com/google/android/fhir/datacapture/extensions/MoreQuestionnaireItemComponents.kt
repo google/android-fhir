@@ -941,13 +941,10 @@ internal fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
     ) {
       this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
     } else if (
-      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
-        !repeats
+      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
-        if (!it.isRepeatedGroup) {
           this.addItem(it.createQuestionnaireResponseItem())
-        }
       }
     }
   }
