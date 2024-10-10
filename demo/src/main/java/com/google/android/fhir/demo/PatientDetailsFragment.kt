@@ -82,7 +82,6 @@ class PatientDetailsFragment : Fragment() {
       }
     }
     patientDetailsViewModel.getPatientDetailData()
-    //    (activity as MainActivity).setDrawerEnabled(false)
   }
 
   private fun onAddScreenerClick() {

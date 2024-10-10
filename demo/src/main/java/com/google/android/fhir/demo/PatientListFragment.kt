@@ -153,7 +153,6 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    //    (activity as MainActivity).setDrawerEnabled(false)
     launchAndRepeatStarted(
       { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
       { mainActivityViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
