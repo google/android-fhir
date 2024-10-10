@@ -86,9 +86,9 @@
 
   <fragment
         android:id="@+id/manualSyncFragment"
-        android:name="com.google.android.fhir.demo.ManualSyncFragment"
+        android:name="com.google.android.fhir.demo.SyncFragment"
         android:label="fragment_manual_sync"
-        tools:layout="@layout/manual_sync"
+        tools:layout="@layout/sync"
     />
 
 </navigation>

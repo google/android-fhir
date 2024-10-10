@@ -64,7 +64,7 @@ class PatientListFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+  private val mainActivityViewModel: SyncFragmentViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,

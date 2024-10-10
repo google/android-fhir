@@ -159,7 +159,7 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/sync_24dp"
+                android:src="@drawable/ic_home_sync"
                 android:contentDescription="Task Image"
             />
             <TextView
@@ -172,7 +172,7 @@
                 android:maxLines="1"
                 android:layout_marginHorizontal="@dimen/new_patient_horizontal_margin"
                 android:layout_gravity="center"
-                android:text="Manual Sync"
+                android:text="@string/sync"
             />
         </LinearLayout>
 

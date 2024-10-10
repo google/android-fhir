@@ -26,20 +26,20 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
 import com.google.android.fhir.sync.CurrentSyncJobStatus
 
-class ManualSyncFragment : Fragment() {
-  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+class SyncFragment : Fragment() {
+  private val syncFragmentViewModel: SyncFragmentViewModel by viewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
     container: ViewGroup?,
     savedInstanceState: Bundle?,
   ): View {
-    return inflater.inflate(R.layout.manual_sync, container, false)
+    return inflater.inflate(R.layout.sync, container, false)
   }
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -47,11 +47,11 @@ class ManualSyncFragment : Fragment() {
     setUpActionBar()
     setHasOptionsMenu(true)
     view.findViewById<Button>(R.id.sync_now_button).setOnClickListener {
-      mainActivityViewModel.triggerOneTimeSync()
+      syncFragmentViewModel.triggerOneTimeSync()
     }
     observeLastSyncTime()
     launchAndRepeatStarted(
-      { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
+      { syncFragmentViewModel.pollState.collect(::currentSyncJobStatus) },
     )
   }
 
@@ -67,7 +67,7 @@ class ManualSyncFragment : Fragment() {
 
   private fun setUpActionBar() {
     (requireActivity() as AppCompatActivity).supportActionBar?.apply {
-      title = requireContext().getString(R.string.manual_sync)
+      title = requireContext().getString(R.string.sync)
       setDisplayHomeAsUpEnabled(true)
     }
   }
@@ -84,7 +84,7 @@ class ManualSyncFragment : Fragment() {
       }
       is CurrentSyncJobStatus.Succeeded -> {
         syncIndicator.visibility = View.GONE
-        mainActivityViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+        syncFragmentViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
       }
       is CurrentSyncJobStatus.Failed,
       is CurrentSyncJobStatus.Enqueued,
@@ -96,7 +96,7 @@ class ManualSyncFragment : Fragment() {
   }
 
   private fun observeLastSyncTime() {
-    mainActivityViewModel.lastSyncTimestampLiveData.observe(viewLifecycleOwner) {
+    syncFragmentViewModel.lastSyncTimestampLiveData.observe(viewLifecycleOwner) {
       requireView().findViewById<TextView>(R.id.lastSyncTime).text =
         getString(R.string.last_sync_timestamp, it)
     }
