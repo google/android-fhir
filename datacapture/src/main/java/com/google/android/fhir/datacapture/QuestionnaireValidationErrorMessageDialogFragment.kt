@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,17 +51,23 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
 
   override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
     isCancelable = false
-    return MaterialAlertDialogBuilder(requireContext())
-      .setView(onCreateCustomView())
-      .setPositiveButton(R.string.questionnaire_validation_error_fix_button_text) { dialog, _ ->
+    val currentDialog =
+      MaterialAlertDialogBuilder(requireContext()).setView(onCreateCustomView()).setPositiveButton(
+        R.string.questionnaire_validation_error_fix_button_text,
+      ) { dialog, _ ->
         setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_FIX))
         dialog?.dismiss()
       }
-      .setNegativeButton(R.string.questionnaire_validation_error_submit_button_text) { dialog, _ ->
+    if (arguments == null || requireArguments().getBoolean(EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON, true)) {
+      currentDialog.setNegativeButton(R.string.questionnaire_validation_error_submit_button_text) {
+        dialog,
+        _,
+        ->
         setFragmentResult(RESULT_CALLBACK, bundleOf(RESULT_KEY to RESULT_VALUE_SUBMIT))
         dialog?.dismiss()
       }
-      .create()
+    }
+    return currentDialog.create()
   }
 
   @VisibleForTesting
@@ -97,6 +103,12 @@ internal class QuestionnaireValidationErrorMessageDialogFragment(
     const val RESULT_KEY = "result"
     const val RESULT_VALUE_FIX = "result_fix"
     const val RESULT_VALUE_SUBMIT = "result_submit"
+
+    /**
+     * A [Boolean] extra to show or hide the Submit anyway button in the questionnaire. Default is
+     * true.
+     */
+    internal const val EXTRA_SHOW_SUBMIT_ANYWAY_BUTTON = "show-submit-anyway-button"
   }
 }
 
