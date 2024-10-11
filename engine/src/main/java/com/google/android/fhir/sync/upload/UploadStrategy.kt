@@ -69,7 +69,7 @@ private constructor(
      * bundle request would need to support chunking to accommodate multiple changes for the same
      * resource. This functionality is not yet implemented.
      *
-     * @param methodForCreate The HTTP method to use for creating new resources (PUT).
+     * @param methodForCreate The HTTP method to use for creating new resources (PUT or POST).
      * @param methodForUpdate The HTTP method to use for updating existing resources (PUT or PATCH).
      * @param squash Whether to combine multiple changes to the same resource into a single update.
      *   Only `true` is supported currently.
@@ -116,9 +116,8 @@ private constructor(
      * Note: PUT for update with squash set as false is not supported as that would require storing
      * full resource for each change.
      *
-     * @param methodForCreate The HTTP method to use for creating new resources. Must be PUT.
-     * @param methodForUpdate The HTTP method to use for updating existing resources. Must be PUT or
-     *   PATCH.
+     * @param methodForCreate The HTTP method to use for creating new resources. [PUT or POST]
+     * @param methodForUpdate The HTTP method to use for updating existing resources. [PUT or PATCH]
      * @param squash Whether to squash multiple changes to the same resource into a single update.
      *   If `true`, all changes for a resource are fetched and patches are generated per resource.
      *   If `false`, only the earliest change is fetched and patches are generated per change.
