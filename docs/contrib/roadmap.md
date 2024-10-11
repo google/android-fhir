@@ -36,7 +36,7 @@ The SDK is designed in a modular fashion to enable developers to layer in a rich
 
 ## Feedback and getting help
 
-Bugs and feature requests can be filed with [Github issues](https://github.com/google/android-fhir/issues). See the section on [How to Contribute](https://github.com/google/android-fhir/blob/master/docs/contributing.md) first
+Bugs and feature requests can be filed with [Github issues](https://github.com/google/android-fhir/issues). See the section on [How to Contribute](https://github.com/google/android-fhir/blob/master/Contributing.md) first
 
 If you want to provide any feedback or discuss use cases you can:
 
