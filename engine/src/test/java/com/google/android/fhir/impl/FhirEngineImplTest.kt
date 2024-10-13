@@ -323,13 +323,13 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
-        localChanges.addAll(it)
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) { lcs, _ ->
+        localChanges.addAll(lcs)
         flowOf(
           UploadRequestResult.Success(
             listOf(
               ResourceUploadResponseMapping(
-                it,
+                lcs,
                 TEST_PATIENT_1,
               ),
             ),
@@ -356,10 +356,10 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
+      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) { lcs, _ ->
         flowOf(
           UploadRequestResult.Failure(
-            it,
+            lcs,
             uploadError,
           ),
         )
@@ -767,12 +767,12 @@ class FhirEngineImplTest {
   fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
-      .syncUpload(UploadStrategy.SingleResourcePost) {
+      .syncUpload(UploadStrategy.SingleResourcePost) { lcs, _ ->
         flowOf(
           UploadRequestResult.Success(
             listOf(
               ResourceUploadResponseMapping(
-                it,
+                lcs,
                 TEST_PATIENT_1,
               ),
             ),

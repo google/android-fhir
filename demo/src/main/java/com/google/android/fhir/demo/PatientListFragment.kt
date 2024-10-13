@@ -64,7 +64,7 @@ class PatientListFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+  private val mainActivityViewModel: SyncFragmentViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -153,7 +153,6 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(false)
     launchAndRepeatStarted(
       { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
       { mainActivityViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
