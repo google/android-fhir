@@ -34,12 +34,3 @@ The SDK is designed in a modular fashion to enable developers to layer in a rich
 * **Data Capture Library:** Implementation of the FHIR SDC specification for interacting with Questionnaires includes population and extraction
 * **Workflow Library:** Provides specific operations for generating CarePlans and indicators relevant to implementers working with [WHO SMART Guidelines content](https://www.who.int/news/item/18-02-2021-from-paper-to-digital-pathway-who-launches-first-smart-guidelines)
 
-## Feedback and getting help
-
-Bugs and feature requests can be filed with [Github issues](https://github.com/google/android-fhir/issues). See the section on [How to Contribute](https://github.com/google/android-fhir/blob/master/Contributing.md) first
-
-If you want to provide any feedback or discuss use cases you can:
-
-* Email us at <android-fhir-sdk-feedback@google.com>
-* For general Android FHIR SDK discussion, join the FHIR Zulip chat for [Android](https://chat.fhir.org/#narrow/stream/276344-android)
-* For WHO SMART Guidelines topics, see the FHIR Zulip chat for [WHO SMART Guidelines](https://chat.fhir.org/#narrow/stream/310477-who-smart-guidelines)
