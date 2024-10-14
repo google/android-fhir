@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.fhir.codelabs.engine.databinding.FragmentPatientListViewBinding
-import com.google.android.fhir.sync.SyncJobStatus
+import com.google.android.fhir.sync.CurrentSyncJobStatus
 import kotlinx.coroutines.launch
 
 class PatientListFragment : Fragment() {
@@ -75,7 +75,7 @@ class PatientListFragment : Fragment() {
     }
   }
 
-  private fun handleSyncJobStatus(syncJobStatus: SyncJobStatus) {
+  private fun handleSyncJobStatus(syncJobStatus: CurrentSyncJobStatus) {
     // Add code to display Toast when sync job  is complete
   }
 

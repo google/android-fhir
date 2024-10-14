@@ -76,8 +76,8 @@ of the `app/build.gradle.kts` file of your project:
 dependencies {
     // ...
 
-    implementation("com.google.android.fhir:data-capture:0.1.0-beta03")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
+    implementation("com.google.android.fhir:data-capture:1.0.0")
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
 }
 ```
 
@@ -173,6 +173,13 @@ if (savedInstanceState == null) {
         add<QuestionnaireFragment>(R.id.fragment_container_view, args = questionnaireParams)
     }
 }
+// Submit button callback
+supportFragmentManager.setFragmentResultListener(
+  QuestionnaireFragment.SUBMIT_REQUEST_KEY,
+  this,
+) { _, _ ->
+  submitQuestionnaire()
+}
 ```
 
 Learn more about
@@ -244,12 +251,9 @@ questionnaire is already set up for
 Find the `submitQuestionnaire()` method and add the following code:
 
 ```kotlin
-lifecycleScope.launch {
-  val questionnaire =
-    jsonParser.parseResource(questionnaireJsonString) as Questionnaire
-  val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
-  Log.d("extraction result", jsonParser.encodeResourceToString(bundle))
-}
+val questionnaire = jsonParser.parseResource(questionnaireJsonString) as Questionnaire
+val bundle = ResourceMapper.extract(questionnaire, questionnaireResponse)
+Log.d("extraction result", jsonParser.encodeResourceToString(bundle))
 ```
 
 `ResourceMapper.extract()` requires a HAPI FHIR Questionnaire, which you can

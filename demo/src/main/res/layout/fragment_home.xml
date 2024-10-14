@@ -134,4 +134,47 @@
         </LinearLayout>
 
     </androidx.cardview.widget.CardView>
+    <androidx.cardview.widget.CardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/item_sync"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/search_patient_cardview_horizontal_margin"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginTop="@dimen/search_patient_cardview_margin_top"
+        android:layout_marginVertical="@dimen/search_patient_cardview_vertical_margin"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="@dimen/cardView_radius_corner"
+    >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/new_patient_padding"
+            android:orientation="horizontal"
+        >
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_home_sync"
+                android:contentDescription="Task Image"
+            />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="?textAppearanceTitleLarge"
+                android:textSize="@dimen/dashboard_text_fontSize"
+                android:textColor="@color/dashboard_cardview_textcolor"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:layout_marginHorizontal="@dimen/new_patient_horizontal_margin"
+                android:layout_gravity="center"
+                android:text="@string/sync"
+            />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

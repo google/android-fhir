@@ -19,6 +19,8 @@ package com.google.android.fhir.db.impl
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.filters.MediumTest
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.rest.gclient.StringClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
@@ -557,8 +559,8 @@ class DatabaseImplTest {
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
-      .syncUpload(AllChangesSquashedBundlePut) {
-        it
+      .syncUpload(AllChangesSquashedBundlePut) { lcs, _ ->
+        lcs
           .first { it.resourceId == "remote-patient-3" }
           .let {
             flowOf(
@@ -4208,6 +4210,142 @@ class DatabaseImplTest {
     assertThat(searchedObservations.size).isEqualTo(1)
     assertThat(searchedObservations[0].logicalId).isEqualTo(locallyCreatedObservationResourceId)
   }
+
+  @Test
+  fun updateResourcePostSync_shouldUpdateResourceId() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val postSyncResourceId = "patient2"
+    val newVersionId = "1"
+    val lastUpdatedRemote = Instant.now()
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      newVersionId,
+      lastUpdatedRemote,
+    )
+
+    val patientResourceEntityPostSync =
+      database.selectEntity(preSyncPatient.resourceType, postSyncResourceId)
+    assertThat(patientResourceEntityPostSync.resourceId).isEqualTo(postSyncResourceId)
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldUpdateResourceMeta() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val postSyncResourceId = "patient2"
+    val newVersionId = "1"
+    val lastUpdatedRemote = Instant.now()
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      newVersionId,
+      lastUpdatedRemote,
+    )
+
+    val patientResourceEntityPostSync =
+      database.selectEntity(preSyncPatient.resourceType, postSyncResourceId)
+    assertThat(patientResourceEntityPostSync.versionId).isEqualTo(newVersionId)
+    assertThat(patientResourceEntityPostSync.lastUpdatedRemote?.toEpochMilli())
+      .isEqualTo(lastUpdatedRemote.toEpochMilli())
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldDeleteOldResourceId() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    database.insert(preSyncPatient)
+    val postSyncResourceId = "patient2"
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      null,
+      null,
+    )
+
+    val exception =
+      assertThrows(ResourceNotFoundException::class.java) {
+        runBlocking { database.select(ResourceType.Patient, "patient1") }
+      }
+    assertThat(exception.message).isEqualTo("Resource not found with type Patient and id patient1!")
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldUpdateReferringResourceReferenceValue() = runBlocking {
+    val preSyncPatient = Patient().apply { id = "patient1" }
+    val observation =
+      Observation().apply {
+        id = "observation1"
+        subject = Reference().apply { reference = "Patient/patient1" }
+      }
+    database.insert(preSyncPatient, observation)
+    val postSyncResourceId = "patient2"
+    val newVersionId = "1"
+    val lastUpdatedRemote = Instant.now()
+
+    database.updateResourcePostSync(
+      preSyncPatient.logicalId,
+      postSyncResourceId,
+      preSyncPatient.resourceType,
+      newVersionId,
+      lastUpdatedRemote,
+    )
+
+    assertThat(
+        (database.select(ResourceType.Observation, "observation1") as Observation)
+          .subject
+          .reference,
+      )
+      .isEqualTo("Patient/patient2")
+  }
+
+  @Test
+  fun updateResourcePostSync_shouldUpdateReferringResourceReferenceValueInLocalChange() =
+    runBlocking {
+      val preSyncPatient = Patient().apply { id = "patient1" }
+      val observation =
+        Observation().apply {
+          id = "observation1"
+          subject = Reference().apply { reference = "Patient/patient1" }
+        }
+      database.insert(preSyncPatient, observation)
+      val postSyncResourceId = "patient2"
+      val newVersionId = "1"
+      val lastUpdatedRemote = Instant.now()
+
+      database.updateResourcePostSync(
+        preSyncPatient.logicalId,
+        postSyncResourceId,
+        preSyncPatient.resourceType,
+        newVersionId,
+        lastUpdatedRemote,
+      )
+
+      assertThat(
+          (database.select(ResourceType.Observation, "observation1") as Observation)
+            .subject
+            .reference,
+        )
+        .isEqualTo("Patient/patient2")
+      val observationLocalChanges =
+        database.getLocalChanges(
+          observation.resourceType,
+          observation.logicalId,
+        )
+      val observationReferenceValue =
+        (FhirContext.forCached(FhirVersionEnum.R4)
+            .newJsonParser()
+            .parseResource(observationLocalChanges.first().payload) as Observation)
+          .subject
+          .reference
+      assertThat(observationReferenceValue).isEqualTo("Patient/$postSyncResourceId")
+    }
 
   @Test // https://github.com/google/android-fhir/issues/2512
   fun included_results_sort_ascending_should_have_distinct_resources() = runBlocking {
