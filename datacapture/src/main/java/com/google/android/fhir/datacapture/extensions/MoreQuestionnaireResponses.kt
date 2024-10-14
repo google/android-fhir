@@ -170,15 +170,9 @@ internal var QuestionnaireResponse.launchTimestamp: DateTimeType?
     return extension?.value as? DateTimeType
   }
   set(value) {
-    this.extension
-      .find { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
-      ?.let {
-        // Replace the existing extension with a new one having the updated value
-        this.extension[this.extension.indexOf(it)] =
-          Extension(EXTENSION_LAST_LAUNCHED_TIMESTAMP, value)
-      }
+    extension.find { it.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }?.setValue(value)
       ?: run {
         // Add a new extension if none exists
-        this.extension.add(Extension(EXTENSION_LAST_LAUNCHED_TIMESTAMP, value))
+        extension.add(Extension(EXTENSION_LAST_LAUNCHED_TIMESTAMP, value))
       }
   }
