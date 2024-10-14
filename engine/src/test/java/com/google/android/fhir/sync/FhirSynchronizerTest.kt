@@ -70,7 +70,7 @@ class FhirSynchronizerTest {
   fun `synchronize should return Success on successful download and upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(UploadRequestResult.Success(listOf())),
         )
@@ -97,7 +97,7 @@ class FhirSynchronizerTest {
     runTest(UnconfinedTestDispatcher()) {
       val error = ResourceSyncException(ResourceType.Patient, Exception("Download error"))
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(UploadRequestResult.Success(listOf())),
         )
@@ -122,7 +122,7 @@ class FhirSynchronizerTest {
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(flowOf(UploadRequestResult.Failure(listOf(), error)))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -148,7 +148,7 @@ class FhirSynchronizerTest {
   fun `synchronize multiple invocations should execute in order`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 0, 0)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(
             UploadRequestResult.Success(
