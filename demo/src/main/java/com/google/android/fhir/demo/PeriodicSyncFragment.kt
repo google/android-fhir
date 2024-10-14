@@ -75,41 +75,48 @@ class PeriodicSyncFragment : Fragment() {
   private fun periodicSyncJobStatus(periodicSyncJobStatus: PeriodicSyncJobStatus) {
     // Handle last sync job status and update UI
     periodicSyncJobStatus.lastSyncJobStatus?.let { lastStatus ->
-      val lastSyncStatusValue = when (lastStatus) {
-        is LastSyncJobStatus.Succeeded -> getString(R.string.last_sync_status, LastSyncJobStatus.Succeeded::class.java.simpleName)
-        is LastSyncJobStatus.Failed -> getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
-        else -> null
-      }
+      val lastSyncStatusValue =
+        when (lastStatus) {
+          is LastSyncJobStatus.Succeeded ->
+            getString(R.string.last_sync_status, LastSyncJobStatus.Succeeded::class.java.simpleName)
+          is LastSyncJobStatus.Failed ->
+            getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
+          else -> null
+        }
 
       lastSyncStatusValue?.let { statusText ->
         requireView().findViewById<TextView>(R.id.last_sync_status).text = statusText
-        requireView().findViewById<TextView>(R.id.last_sync_time).text = getString(
-          R.string.last_sync_timestamp,
-          syncFragmentViewModel.formatSyncTimestamp(lastStatus.timestamp)
-        )
+        requireView().findViewById<TextView>(R.id.last_sync_time).text =
+          getString(
+            R.string.last_sync_timestamp,
+            syncFragmentViewModel.formatSyncTimestamp(lastStatus.timestamp),
+          )
       }
     }
 
     // Set current sync status
     val currentSyncStatusTextView = requireView().findViewById<TextView>(R.id.current_sync_status)
-    currentSyncStatusTextView.text = getString(
-      R.string.current_status,
-      periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName
-    )
+    currentSyncStatusTextView.text =
+      getString(
+        R.string.current_status,
+        periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName,
+      )
 
     // Update progress indicator visibility based on current sync status
     val syncIndicator = requireView().findViewById<ProgressBar>(R.id.sync_indicator)
-    syncIndicator.visibility = if (periodicSyncJobStatus.currentSyncJobStatus is CurrentSyncJobStatus.Running) {
-      View.VISIBLE
-    } else {
-      View.GONE
-    }
+    syncIndicator.visibility =
+      if (periodicSyncJobStatus.currentSyncJobStatus is CurrentSyncJobStatus.Running) {
+        View.VISIBLE
+      } else {
+        View.GONE
+      }
 
     // Control the visibility of the current sync status text view
-    currentSyncStatusTextView.visibility = when (periodicSyncJobStatus.currentSyncJobStatus) {
-      is CurrentSyncJobStatus.Failed, is CurrentSyncJobStatus.Succeeded -> View.GONE
-      else -> View.VISIBLE
-    }
+    currentSyncStatusTextView.visibility =
+      when (periodicSyncJobStatus.currentSyncJobStatus) {
+        is CurrentSyncJobStatus.Failed,
+        is CurrentSyncJobStatus.Succeeded, -> View.GONE
+        else -> View.VISIBLE
+      }
   }
-
 }

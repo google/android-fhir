@@ -22,8 +22,8 @@
             app:destination="@id/patient_list"
         />
     <action
-            android:id="@+id/action_home_fragment_to_manual_sync_fragment"
-            app:destination="@id/manualSyncFragment"
+            android:id="@+id/action_home_fragment_to_sync_fragment"
+            app:destination="@id/syncFragment"
         />
     <action
             android:id="@+id/action_home_fragment_to_periodic_sync_fragment"
@@ -89,7 +89,7 @@
     </fragment>
 
   <fragment
-        android:id="@+id/manualSyncFragment"
+        android:id="@+id/syncFragment"
         android:name="com.google.android.fhir.demo.SyncFragment"
         android:label="fragment_manual_sync"
         tools:layout="@layout/sync"
@@ -101,5 +101,4 @@
         android:label="fragment_periodic_sync"
         tools:layout="@layout/periodic_sync"
     />
-
 </navigation>

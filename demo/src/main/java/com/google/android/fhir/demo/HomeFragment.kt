@@ -45,7 +45,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
       findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToPatientList())
     }
     requireView().findViewById<CardView>(R.id.item_sync).setOnClickListener {
-      findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToManualSyncFragment())
+      findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSyncFragment())
     }
     requireView().findViewById<CardView>(R.id.item_periodic_sync).setOnClickListener {
       findNavController()

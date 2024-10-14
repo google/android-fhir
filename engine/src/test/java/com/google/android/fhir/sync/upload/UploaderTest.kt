@@ -65,9 +65,8 @@ class UploaderTest {
     MockitoAnnotations.openMocks(this)
     runTest { whenever(database.getLocalChangeResourceReferences(any())).thenReturn(emptyList()) }
 
-    perResourcePatchGenerator =
-      PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource, database)
-    perChangePatchGenerator = PatchGeneratorFactory.byMode(PatchGeneratorMode.PerChange, database)
+    perResourcePatchGenerator = PatchGeneratorFactory.byMode(PatchGeneratorMode.PerResource)
+    perChangePatchGenerator = PatchGeneratorFactory.byMode(PatchGeneratorMode.PerChange)
   }
 
   @Test
@@ -98,7 +97,7 @@ class UploaderTest {
             perResourcePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(localChangesToTestSuccess)
+          .upload(localChangesToTestSuccess, emptyList())
           .toList()
 
       // With BundleUploadRequestGenerator, all patches will be squashed into 1 request (default
@@ -156,7 +155,7 @@ class UploaderTest {
             perChangePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(localChangesToTestSuccess)
+          .upload(localChangesToTestSuccess, emptyList())
           .toList()
 
       // With BundleUploadRequestGenerator, all patches will be squashed into 1 request (default
@@ -196,7 +195,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -221,7 +220,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -236,7 +235,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -252,7 +251,7 @@ class UploaderTest {
             perResourcePatchGenerator,
             bundleUploadRequestGenerator,
           )
-          .upload(localChangesToTestFail)
+          .upload(localChangesToTestFail, emptyList())
           .toList()
 
       assertThat(result).hasSize(1)
@@ -267,7 +266,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           bundleUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -299,7 +298,7 @@ class UploaderTest {
             perResourcePatchGenerator,
             urlUploadRequestGenerator,
           )
-          .upload(localChangesToTestSuccess)
+          .upload(localChangesToTestSuccess, emptyList())
           .toList()
 
       // With UrlUploadRequestGenerator, patch-per-resource is mapped to one url request. So total
@@ -359,7 +358,7 @@ class UploaderTest {
             perChangePatchGenerator,
             urlUploadRequestGenerator,
           )
-          .upload(localChangesToTestSuccess)
+          .upload(localChangesToTestSuccess, emptyList())
           .toList()
 
       // With UrlUploadRequestGenerator, patch-per-resource is mapped to one url request. So total
@@ -405,7 +404,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -430,7 +429,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -445,7 +444,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -460,7 +459,7 @@ class UploaderTest {
           perResourcePatchGenerator,
           urlUploadRequestGenerator,
         )
-        .upload(localChangesToTestFail)
+        .upload(localChangesToTestFail, emptyList())
         .toList()
 
     assertThat(result).hasSize(1)
@@ -504,7 +503,7 @@ class UploaderTest {
             perResourcePatchGenerator,
             bundleUploadRequestGeneratorWithUnityBundleSize,
           )
-          .upload(localChangesToTestSuccess)
+          .upload(localChangesToTestSuccess, emptyList())
           .toList()
 
       // With BundleUploadRequestGenerator and bundleSize=1, each patch is mapped to a bundle
