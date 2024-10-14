@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -180,7 +180,7 @@ class ReviewViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text.toString())
       .isEqualTo(
         ApplicationProvider.getApplicationContext<Application>().getString(R.string.not_answered),
       )
@@ -206,7 +206,7 @@ class ReviewViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text.toString())
       .isEqualTo(ApplicationProvider.getApplicationContext<Application>().getString(R.string.yes))
   }
 
@@ -321,7 +321,7 @@ class ReviewViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text.toString())
       .isEqualTo("Yes")
   }
 
@@ -340,7 +340,7 @@ class ReviewViewHolderFactoryTest {
       ),
     )
 
-    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text)
+    assertThat(viewHolder.itemView.findViewById<TextView>(R.id.answer_text_view).text.toString())
       .isEqualTo("Not Answered")
   }
 
