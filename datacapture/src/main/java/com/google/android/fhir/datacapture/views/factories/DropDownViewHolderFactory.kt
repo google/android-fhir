@@ -186,9 +186,6 @@ internal data class DropDownAnswerOption(
   val answerOptionString: String,
   val answerOptionImage: Drawable? = null,
 ) {
-  override fun toString(): String {
-    return this.answerOptionString
-  }
 
   fun answerOptionStringSpanned(): Spanned = answerOptionString.toSpanned()
 }

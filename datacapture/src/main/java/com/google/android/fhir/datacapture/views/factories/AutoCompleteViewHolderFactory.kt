@@ -242,8 +242,4 @@ internal object AutoCompleteViewHolderFactory :
  * An answer option that would show up as a dropdown item in an [AutoCompleteViewHolderFactory]
  * textview
  */
-internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
-  override fun toString(): String {
-    return this.answerDisplay
-  }
-}
+internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String)
