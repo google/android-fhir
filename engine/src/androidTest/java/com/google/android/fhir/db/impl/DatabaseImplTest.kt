@@ -559,11 +559,8 @@ class DatabaseImplTest {
     database.insert(patient)
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
-    services.fhirEngine
-      .syncUpload(
-        UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),
-      ) {
-        it
+    services.fhirEngine.syncUpload(UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),) { lcs, _ ->
+        lcs
           .first { it.resourceId == "remote-patient-3" }
           .let {
             flowOf(
