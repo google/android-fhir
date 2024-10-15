@@ -24,6 +24,7 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
 import com.google.android.fhir.SearchResult
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
 import com.google.android.fhir.sync.DataSource
@@ -158,10 +159,11 @@ internal object TestFhirEngineImpl : FhirEngine {
 
   override suspend fun syncUpload(
     uploadStrategy: UploadStrategy,
-    upload: suspend (List<LocalChange>) -> Flow<UploadRequestResult>,
+    upload:
+      suspend (List<LocalChange>, List<LocalChangeResourceReference>) -> Flow<UploadRequestResult>,
   ): Flow<SyncUploadProgress> = flow {
     emit(SyncUploadProgress(1, 1))
-    upload(getLocalChanges(ResourceType.Patient, "123")).collect {
+    upload(getLocalChanges(ResourceType.Patient, "123"), emptyList()).collect {
       when (it) {
         is UploadRequestResult.Success -> emit(SyncUploadProgress(0, 1))
         is UploadRequestResult.Failure -> emit(SyncUploadProgress(1, 1, it.uploadError))

@@ -16,6 +16,7 @@
 
 package com.google.android.fhir
 
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
@@ -121,7 +122,10 @@ interface FhirEngine {
   @Deprecated("To be deprecated.")
   suspend fun syncUpload(
     uploadStrategy: UploadStrategy,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
+    upload:
+      (suspend (List<LocalChange>, List<LocalChangeResourceReference>) -> Flow<
+          UploadRequestResult,
+        >),
   ): Flow<SyncUploadProgress>
 
   /**

@@ -44,7 +44,7 @@ import kotlinx.coroutines.launch
 
 /** View model for [MainActivity]. */
 @OptIn(ExperimentalCoroutinesApi::class)
-class MainActivityViewModel(application: Application) : AndroidViewModel(application) {
+class SyncFragmentViewModel(application: Application) : AndroidViewModel(application) {
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
