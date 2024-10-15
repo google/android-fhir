@@ -43,7 +43,8 @@ import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
-import com.google.android.fhir.sync.upload.HttpUploadMethod
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.UploadStrategy
@@ -561,7 +562,7 @@ class DatabaseImplTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
       ) { lcs, _ ->
         lcs
           .first { it.resourceId == "remote-patient-3" }

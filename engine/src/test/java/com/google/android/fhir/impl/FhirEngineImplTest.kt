@@ -30,7 +30,8 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
-import com.google.android.fhir.sync.upload.HttpUploadMethod
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
@@ -325,7 +326,7 @@ class FhirEngineImplTest {
 
     fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
       ) { lcs, _ ->
         localChanges.addAll(lcs)
         flowOf(
@@ -360,7 +361,7 @@ class FhirEngineImplTest {
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
       ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Failure(
@@ -773,7 +774,7 @@ class FhirEngineImplTest {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
       .syncUpload(
-        UploadStrategy.forIndividualRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true),
+        UploadStrategy.forIndividualRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true),
       ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Success(

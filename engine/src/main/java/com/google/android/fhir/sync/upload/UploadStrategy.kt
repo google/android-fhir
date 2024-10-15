@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * [FhirSyncWorker][com.google.android.fhir.sync.FhirSyncWorker], for example:
  * ```kotlin
  * override fun getUploadStrategy(): UploadStrategy =
- *   UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500)
+ *   UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
  * ```
  *
  * The strategy you select depends on the server's capabilities (for example, support for `PUT` vs
@@ -51,7 +51,7 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * fetching, patch generation, and upload request creation. Not all possible combinations of these
  * modes are valid or supported.
  */
-open class UploadStrategy
+class UploadStrategy
 private constructor(
   internal val localChangesFetchMode: LocalChangesFetchMode,
   internal val patchGeneratorMode: PatchGeneratorMode,
@@ -77,21 +77,15 @@ private constructor(
      * @return An [UploadStrategy] configured for bundle requests.
      */
     fun forBundleRequest(
-      methodForCreate: HttpUploadMethod,
-      methodForUpdate: HttpUploadMethod,
+      methodForCreate: HttpCreateMethod,
+      methodForUpdate: HttpUpdateMethod,
       squash: Boolean,
       bundleSize: Int,
     ): UploadStrategy {
-      require(methodForCreate != HttpUploadMethod.PATCH) {
-        "Http method PATCH not recommended for CREATE."
-      }
-      require(methodForUpdate != HttpUploadMethod.POST) {
-        "Http method POST not recommended for UPDATE."
-      }
       if (!squash) {
         throw NotImplementedError("No squashing with bundle uploading not supported yet.")
       }
-      if (methodForUpdate == HttpUploadMethod.PUT) {
+      if (methodForUpdate == HttpUpdateMethod.PUT) {
         throw NotImplementedError("PUT for UPDATE not supported yet.")
       }
       return UploadStrategy(
@@ -124,20 +118,14 @@ private constructor(
      * @return An [UploadStrategy] configured for individual requests.
      */
     fun forIndividualRequest(
-      methodForCreate: HttpUploadMethod,
-      methodForUpdate: HttpUploadMethod,
+      methodForCreate: HttpCreateMethod,
+      methodForUpdate: HttpUpdateMethod,
       squash: Boolean,
     ): UploadStrategy {
-      require(methodForCreate != HttpUploadMethod.PATCH) {
-        "Http method PATCH not recommended for CREATE."
-      }
-      require(methodForUpdate != HttpUploadMethod.POST) {
-        "Http method POST not recommended for UPDATE."
-      }
-      require(methodForUpdate != HttpUploadMethod.PUT || squash) {
+      require(methodForUpdate != HttpUpdateMethod.PUT || squash) {
         "Http method PUT not supported for UPDATE with squash set as false."
       }
-      if (methodForUpdate == HttpUploadMethod.PUT) {
+      if (methodForUpdate == HttpUpdateMethod.PUT) {
         throw NotImplementedError("PUT for UPDATE not supported yet.")
       }
       return UploadStrategy(
@@ -155,23 +143,38 @@ private constructor(
   }
 }
 
-enum class HttpUploadMethod {
+enum class HttpCreateMethod {
   PUT,
   POST,
-  PATCH,
   ;
 
   fun toBundleHttpVerb() =
     when (this) {
       PUT -> Bundle.HTTPVerb.PUT
       POST -> Bundle.HTTPVerb.POST
-      PATCH -> Bundle.HTTPVerb.PATCH
     }
 
   fun toHttpVerb() =
     when (this) {
       PUT -> HttpVerb.PUT
       POST -> HttpVerb.POST
+    }
+}
+
+enum class HttpUpdateMethod {
+  PUT,
+  PATCH,
+  ;
+
+  fun toBundleHttpVerb() =
+    when (this) {
+      PUT -> Bundle.HTTPVerb.PUT
+      PATCH -> Bundle.HTTPVerb.PATCH
+    }
+
+  fun toHttpVerb() =
+    when (this) {
+      PUT -> HttpVerb.PUT
       PATCH -> HttpVerb.PATCH
     }
 }

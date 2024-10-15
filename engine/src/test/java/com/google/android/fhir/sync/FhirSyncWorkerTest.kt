@@ -25,7 +25,8 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.sync.upload.HttpUploadMethod
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -58,7 +59,7 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -73,7 +74,7 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -90,7 +91,7 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpUploadMethod.PUT, HttpUploadMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
   }
 
   companion object {
