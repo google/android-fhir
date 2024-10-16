@@ -83,7 +83,6 @@ class PeriodicSyncFragment : Fragment() {
             getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
           else -> null
         }
-
       lastSyncStatusValue?.let { statusText ->
         requireView().findViewById<TextView>(R.id.last_sync_status).text = statusText
         requireView().findViewById<TextView>(R.id.last_sync_time).text =
