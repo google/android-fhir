@@ -40,7 +40,7 @@ class DemoFhirSyncWorker(appContext: Context, workerParams: WorkerParameters) :
       methodForCreate = HttpCreateMethod.PUT,
       methodForUpdate = HttpUpdateMethod.PATCH,
       squash = true,
-      bundleSize = 500
+      bundleSize = 500,
     )
 
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
