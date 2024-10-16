@@ -5172,19 +5172,19 @@ class DatabaseImplTest {
 
   @Test
   fun searchTasksForManyPatientsReturnCorrectly() = runBlocking {
-    val patients = (0..990).map { Patient().apply { id = "task-patient-index-$it" } }
+    val patients = (0 until 990).map { Patient().apply { id = "task-patient-index-$it" } }
     database.insert(*patients.toTypedArray())
     val tasks =
-      (0..989).map {
+      patients.mapIndexed { index, patient ->
         Task().apply {
-          id = "patient-$it-task"
-          `for` = Reference().apply { reference = "Patient/${patients[it].logicalId}" }
+          id = "patient-$index-task"
+          `for` = Reference().apply { reference = "Patient/${patient.logicalId}" }
         }
       }
     database.insert(*tasks.toTypedArray())
 
     val patientsSearchIdList =
-      patients.map<Patient, ReferenceParamFilterCriterion.() -> Unit> {
+      patients.take(980).map<Patient, ReferenceParamFilterCriterion.() -> Unit> {
         { value = "Patient/${it.logicalId}" }
       }
     val searchQuery =
@@ -5193,7 +5193,7 @@ class DatabaseImplTest {
         .getQuery()
 
     val searchResults = database.search<Task>(searchQuery)
-    assertThat(searchResults.size).isEqualTo(990)
+    assertThat(searchResults.size).isEqualTo(980)
   }
 
   private companion object {
