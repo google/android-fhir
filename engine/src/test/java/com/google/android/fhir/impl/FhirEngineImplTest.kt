@@ -820,14 +820,6 @@ class FhirEngineImplTest {
 
   @Test
   fun `withTransaction rolls back changes when an error occurs`() = runTest {
-    val patient01 =
-      Patient().apply {
-        id = "patient-01"
-        gender = Enumerations.AdministrativeGender.FEMALE
-      }
-
-    fhirEngine.create(patient01)
-
     try {
       fhirEngine.withTransaction {
         val patientEncounter =
@@ -835,15 +827,12 @@ class FhirEngineImplTest {
             id = "enc-01"
             status = Encounter.EncounterStatus.FINISHED
             class_ = Coding()
-            subject = Reference(patient01)
           }
 
         this.create(patientEncounter)
 
-        // Update encounter to reference non-existent subject to force ResourceNotFoundException
-        val nonExistentSubject = this.get(ResourceType.Patient, "non_existent_id") as Patient
-        patientEncounter.subject = Reference(nonExistentSubject)
-        this.update(patientEncounter)
+        // An exception will rollback the entire block
+        this.get(ResourceType.Patient, "non_existent_id") as Patient
       }
     } catch (_: ResourceNotFoundException) {}
 
