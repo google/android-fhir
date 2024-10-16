@@ -32,7 +32,7 @@ import org.hl7.fhir.r4.model.codesystems.HttpVerb
  * [FhirSyncWorker][com.google.android.fhir.sync.FhirSyncWorker], for example:
  * ```kotlin
  * override fun getUploadStrategy(): UploadStrategy =
- *   UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
+ *   UploadStrategy.forBundleRequest(methodForCreate = HttpCreateMethod.PUT, methodForUpdate = HttpUpdateMethod.PATCH, squash = true, bundleSize = 500)
  * ```
  *
  * The strategy you select depends on the server's capabilities (for example, support for `PUT` vs

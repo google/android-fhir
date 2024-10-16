@@ -326,7 +326,12 @@ class FhirEngineImplTest {
 
     fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
       ) { lcs, _ ->
         localChanges.addAll(lcs)
         flowOf(
@@ -361,7 +366,12 @@ class FhirEngineImplTest {
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
       ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Failure(
@@ -774,7 +784,11 @@ class FhirEngineImplTest {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
       .syncUpload(
-        UploadStrategy.forIndividualRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true),
+        UploadStrategy.forIndividualRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+        ),
       ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Success(

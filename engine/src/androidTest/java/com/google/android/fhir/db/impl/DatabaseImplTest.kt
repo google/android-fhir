@@ -562,7 +562,12 @@ class DatabaseImplTest {
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
       .syncUpload(
-        UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
       ) { lcs, _ ->
         lcs
           .first { it.resourceId == "remote-patient-3" }

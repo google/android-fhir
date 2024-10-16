@@ -68,7 +68,12 @@ class SyncInstrumentedTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   class TestSyncWorkerForDownloadFailing(appContext: Context, workerParams: WorkerParameters) :

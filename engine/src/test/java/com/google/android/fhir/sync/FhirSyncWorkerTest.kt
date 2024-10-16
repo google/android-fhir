@@ -59,7 +59,12 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   class FailingPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters) :
@@ -74,7 +79,12 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   class FailingPeriodicSyncWorkerWithoutDataSource(
@@ -91,7 +101,12 @@ internal class FhirSyncWorkerTest {
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
     override fun getUploadStrategy(): UploadStrategy =
-      UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500)
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   companion object {

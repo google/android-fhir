@@ -64,7 +64,12 @@ class FhirSynchronizerTest {
         TestFhirEngineImpl,
         UploadConfiguration(
           uploader,
-          UploadStrategy.forBundleRequest(HttpCreateMethod.PUT, HttpUpdateMethod.PATCH, true, 500),
+          UploadStrategy.forBundleRequest(
+            methodForCreate = HttpCreateMethod.PUT,
+            methodForUpdate = HttpUpdateMethod.PATCH,
+            squash = true,
+            bundleSize = 500,
+          ),
         ),
         DownloadConfiguration(downloader, conflictResolver),
         fhirDataStore,
@@ -167,10 +172,10 @@ class FhirSynchronizerTest {
           UploadConfiguration(
             uploader,
             UploadStrategy.forBundleRequest(
-              HttpCreateMethod.PUT,
-              HttpUpdateMethod.PATCH,
-              true,
-              500,
+              methodForCreate = HttpCreateMethod.PUT,
+              methodForUpdate = HttpUpdateMethod.PATCH,
+              squash = true,
+              bundleSize = 500,
             ),
           ),
           DownloadConfiguration(
