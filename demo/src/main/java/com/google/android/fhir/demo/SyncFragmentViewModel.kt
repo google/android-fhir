@@ -80,13 +80,17 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
 
   /** Emits last sync time. */
   fun updateLastSyncTimestamp(lastSync: OffsetDateTime? = null) {
+    _lastSyncTimestampLiveData.value = formatSyncTimestamp(lastSync)
+  }
+
+  fun formatSyncTimestamp(lastSync: OffsetDateTime? = null): String {
     val formatter =
       DateTimeFormatter.ofPattern(
         if (DateFormat.is24HourFormat(getApplication())) formatString24 else formatString12,
       )
-    _lastSyncTimestampLiveData.value =
-      lastSync?.let { it.toLocalDateTime()?.format(formatter) ?: "" }
-        ?: Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
+
+    return lastSync?.let { it.toLocalDateTime()?.format(formatter) ?: "" }
+      ?: Sync.getLastSyncTimestamp(getApplication())?.toLocalDateTime()?.format(formatter) ?: ""
   }
 
   companion object {
