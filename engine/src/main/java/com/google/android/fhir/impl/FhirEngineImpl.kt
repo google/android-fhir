@@ -46,8 +46,9 @@ import org.hl7.fhir.r4.model.ResourceType
 /** Implementation of [FhirEngine]. */
 internal class FhirEngineImpl(private val database: Database, private val context: Context) :
   FhirEngine {
-  override suspend fun create(vararg resource: Resource) =
-    withContext(Dispatchers.IO) { database.insert(*resource) }
+  override suspend fun create(vararg resource: Resource, isLocalOnly: Boolean): List<String> {
+    return withContext(Dispatchers.IO) { if (isLocalOnly) database.insertLocalOnly(*resource) else database.insert(*resource) }
+  }
 
   override suspend fun get(type: ResourceType, id: String) =
     withContext(Dispatchers.IO) { database.select(type, id) }
