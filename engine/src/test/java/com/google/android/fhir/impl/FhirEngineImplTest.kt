@@ -50,12 +50,16 @@ import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -803,6 +807,60 @@ class FhirEngineImplTest {
       }
       .collect {}
     assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun `withTransaction saves changes successfully`() = runTest {
+    fhirEngine.withTransaction {
+      val patient01 =
+        Patient().apply {
+          id = "patient-01"
+          gender = Enumerations.AdministrativeGender.FEMALE
+        }
+      this.create(patient01)
+
+      val patient01Observation =
+        Observation().apply {
+          id = "patient-01-observation"
+          status = Observation.ObservationStatus.FINAL
+          code = CodeableConcept()
+          subject = Reference(patient01)
+        }
+      this.create(patient01Observation)
+    }
+
+    assertThat(
+        fhirEngine.get<Patient>("patient-01"),
+      )
+      .isNotNull()
+    assertThat(fhirEngine.get<Observation>("patient-01-observation")).isNotNull()
+    assertThat(
+        fhirEngine.get<Observation>("patient-01-observation").subject.reference,
+      )
+      .isEqualTo("Patient/patient-01")
+  }
+
+  @Test
+  fun `withTransaction rolls back changes when an error occurs`() = runTest {
+    try {
+      fhirEngine.withTransaction {
+        val patientEncounter =
+          Encounter().apply {
+            id = "enc-01"
+            status = Encounter.EncounterStatus.FINISHED
+            class_ = Coding()
+          }
+
+        this.create(patientEncounter)
+
+        // An exception will rollback the entire block
+        this.get(ResourceType.Patient, "non_existent_id") as Patient
+      }
+    } catch (_: ResourceNotFoundException) {}
+
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Encounter>("enc-01") }
+    }
   }
 
   companion object {

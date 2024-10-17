@@ -178,6 +178,8 @@ internal object TestFhirEngineImpl : FhirEngine {
     download().collect()
   }
 
+  override suspend fun withTransaction(block: suspend FhirEngine.() -> Unit) {}
+
   override suspend fun count(search: Search): Long {
     return 0
   }
