@@ -90,7 +90,7 @@ Finally, provide an implementation of `FhirSyncWorker`. This class is responsibl
 * **`getDownloadWorkManager()`**: This should return the implementation of `DownloadWorkManager` you created earlier.
 * **`getConflictResolver()`**: This controls how conflicts between the local and remote versions of resources are resolved. You can set it to `AcceptLocalConflictResolver` if the local version should take precedence, or `AcceptRemoteConflictResolver` if the remote version should.
 * **`getFhirEngine()`**: This should return your application's `FhirEngine` instance.
-* **`getUploadStrategy()`**: This defines how local changes are uploaded to the FHIR server. Currently, the only supported strategy is `UploadStrategy.AllChangesSquashedBundlePut`, which squashes all local changes into a single bundle and uses the `PUT` method to upload it.
+* **`getUploadStrategy()`**: This defines how local changes are uploaded to the FHIR server. You can provide either `UploadStrategy.forBundleRequest` or `UploadStrategy.forIndividualRequest`. 
 
 Here's an example implementation:
 
@@ -107,7 +107,12 @@ class FhirPeriodicSyncWorker(appContext: Context, workerParams: WorkerParameters
   override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
 
   override fun getUploadStrategy(): UploadStrategy {
-    return UploadStrategy.AllChangesSquashedBundlePut
+    return UploadStrategy.forBundleRequest(
+      methodForCreate = HttpCreateMethod.PUT,
+      methodForUpdate = HttpUpdateMethod.PATCH,
+      squash = true,
+      bundleSize = 500,
+    )
   }
 }
 ```

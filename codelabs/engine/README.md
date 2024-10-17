@@ -257,7 +257,13 @@ outlined below will guide you through the process.
 
       override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
     
-      override fun getUploadStrategy() = UploadStrategy.AllChangesSquashedBundlePut
+      override fun getUploadStrategy() = 
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        )
     }
     ```
 
