@@ -82,11 +82,11 @@ private constructor(
       squash: Boolean,
       bundleSize: Int,
     ): UploadStrategy {
-      if (!squash) {
-        throw NotImplementedError("No squashing with bundle uploading not supported yet.")
-      }
       if (methodForUpdate == HttpUpdateMethod.PUT) {
         throw NotImplementedError("PUT for UPDATE not supported yet.")
+      }
+      if (!squash) {
+        throw NotImplementedError("No squashing with bundle uploading not supported yet.")
       }
       return UploadStrategy(
         localChangesFetchMode = LocalChangesFetchMode.AllChanges,
@@ -122,11 +122,11 @@ private constructor(
       methodForUpdate: HttpUpdateMethod,
       squash: Boolean,
     ): UploadStrategy {
-      require(methodForUpdate != HttpUpdateMethod.PUT || squash) {
-        "Http method PUT not supported for UPDATE with squash set as false."
-      }
       if (methodForUpdate == HttpUpdateMethod.PUT) {
         throw NotImplementedError("PUT for UPDATE not supported yet.")
+      }
+      require(methodForUpdate != HttpUpdateMethod.PUT || squash) {
+        "Http method PUT not supported for UPDATE with squash set as false."
       }
       return UploadStrategy(
         localChangesFetchMode =
