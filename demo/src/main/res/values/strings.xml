@@ -67,9 +67,9 @@
   <string name="sync_menu">Sync</string>
   <string name="last_sync">Last sync</string>
   <string name="syncing">Syncing</string>
-  <string name="sync">Sync</string>
+  <string name="sync">One-time sync</string>
   <string name="last_sync_timestamp">Last sync: %1$s</string>
   <string name="current_status">Sync status: %1$s</string>
   <string name="last_sync_status">Last sync status: %1$s</string>
-  <string name="periodic_sync">Periodic Sync</string>
+  <string name="periodic_sync">Periodic sync</string>
 </resources>
