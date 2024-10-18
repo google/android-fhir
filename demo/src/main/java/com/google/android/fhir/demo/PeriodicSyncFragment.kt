@@ -21,20 +21,19 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
-import com.google.android.fhir.sync.CurrentSyncJobStatus
-import com.google.android.fhir.sync.LastSyncJobStatus
-import com.google.android.fhir.sync.PeriodicSyncJobStatus
+import kotlinx.coroutines.launch
 
 class PeriodicSyncFragment : Fragment() {
-  private val syncFragmentViewModel: SyncFragmentViewModel by viewModels()
+  private val periodicSyncViewModel: PeriodicSyncViewModel by viewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -48,11 +47,12 @@ class PeriodicSyncFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-    view.findViewById<Button>(R.id.sync_now_button).setOnClickListener {
-      launchAndRepeatStarted(
-        { syncFragmentViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
-      )
-    }
+
+    // update periodic sync ui data
+    updateLastSyncStatusUi()
+    updateLastSyncTimeUi()
+    updateCurrentSyncStatusUi()
+    updateSyncProgressUi()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -72,50 +72,57 @@ class PeriodicSyncFragment : Fragment() {
     }
   }
 
-  private fun periodicSyncJobStatus(periodicSyncJobStatus: PeriodicSyncJobStatus) {
-    // Handle last sync job status and update UI
-    periodicSyncJobStatus.lastSyncJobStatus?.let { lastStatus ->
-      val lastSyncStatusValue =
-        when (lastStatus) {
-          is LastSyncJobStatus.Succeeded ->
-            getString(R.string.last_sync_status, LastSyncJobStatus.Succeeded::class.java.simpleName)
-          is LastSyncJobStatus.Failed ->
-            getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
-          else -> null
+  private fun updateLastSyncStatusUi() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        periodicSyncViewModel.lastSyncStatusFlow.collect { lastSyncStatus ->
+          lastSyncStatus?.let {
+            requireView().findViewById<TextView>(R.id.last_sync_status).text = it
+          }
         }
-      lastSyncStatusValue?.let { statusText ->
-        requireView().findViewById<TextView>(R.id.last_sync_status).text = statusText
-        requireView().findViewById<TextView>(R.id.last_sync_time).text =
-          getString(
-            R.string.last_sync_timestamp,
-            syncFragmentViewModel.formatSyncTimestamp(lastStatus.timestamp),
-          )
       }
     }
+  }
 
-    // Set current sync status
-    val currentSyncStatusTextView = requireView().findViewById<TextView>(R.id.current_sync_status)
-    currentSyncStatusTextView.text =
-      getString(
-        R.string.current_status,
-        periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName,
-      )
-
-    // Update progress indicator visibility based on current sync status
-    val syncIndicator = requireView().findViewById<ProgressBar>(R.id.sync_indicator)
-    syncIndicator.visibility =
-      if (periodicSyncJobStatus.currentSyncJobStatus is CurrentSyncJobStatus.Running) {
-        View.VISIBLE
-      } else {
-        View.GONE
+  private fun updateLastSyncTimeUi() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        periodicSyncViewModel.lastSyncTimeFlow.collect { lastSyncTime ->
+          lastSyncTime?.let { requireView().findViewById<TextView>(R.id.last_sync_time).text = it }
+        }
       }
+    }
+  }
 
-    // Control the visibility of the current sync status text view
-    currentSyncStatusTextView.visibility =
-      when (periodicSyncJobStatus.currentSyncJobStatus) {
-        is CurrentSyncJobStatus.Failed,
-        is CurrentSyncJobStatus.Succeeded, -> View.GONE
-        else -> View.VISIBLE
+  private fun updateCurrentSyncStatusUi() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        periodicSyncViewModel.currentSyncStatusFlow.collect { currentSyncStatus ->
+          currentSyncStatus?.let {
+            val currentSyncStatusTextView =
+              requireView().findViewById<TextView>(R.id.current_sync_status)
+            currentSyncStatusTextView.text = it
+          }
+        }
       }
+    }
+  }
+
+  private fun updateSyncProgressUi() {
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+        periodicSyncViewModel.progressFlow.collect { progress ->
+          val syncIndicator = requireView().findViewById<ProgressBar>(R.id.sync_indicator)
+          if (progress != null) {
+            syncIndicator.isIndeterminate = false
+            syncIndicator.progress = progress
+            syncIndicator.visibility = View.VISIBLE
+          } else {
+            syncIndicator.isIndeterminate = true
+            // syncIndicator.visibility = View.GONE
+          }
+        }
+      }
+    }
   }
 }
