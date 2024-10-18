@@ -34,4 +34,6 @@
     <dimen name="search_patient_cardview_vertical_margin">6dp</dimen>
     <dimen name="search_patient_cardview_margin_top">10dp</dimen>
     <dimen name="dashboard_text_fontSize">20sp</dimen>
+    <dimen name="home_icon_width">36dp</dimen>
+    <dimen name="home_icon_height">36dp</dimen>
 </resources>

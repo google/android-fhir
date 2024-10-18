@@ -14,11 +14,6 @@
         android:orientation="vertical"
     >
 
-        <include
-            android:id="@+id/sync_status_container"
-            layout="@layout/sync_status_layout"
-        />
-
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
             android:layout_width="match_parent"

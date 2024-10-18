@@ -22,16 +22,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.work.Constraints
 import com.google.android.fhir.demo.data.DemoFhirSyncWorker
 import com.google.android.fhir.sync.CurrentSyncJobStatus
-import com.google.android.fhir.sync.PeriodicSyncConfiguration
-import com.google.android.fhir.sync.PeriodicSyncJobStatus
-import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -54,17 +49,6 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
       extraBufferCapacity = 1,
       onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-
-  val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
-    Sync.periodicSync<DemoFhirSyncWorker>(
-        application.applicationContext,
-        periodicSyncConfiguration =
-          PeriodicSyncConfiguration(
-            syncConstraints = Constraints.Builder().build(),
-            repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
-          ),
-      )
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
 
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
