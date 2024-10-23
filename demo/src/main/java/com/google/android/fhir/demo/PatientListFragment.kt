@@ -64,7 +64,7 @@ class PatientListFragment : Fragment() {
   private val binding
     get() = _binding!!
 
-  private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+  private val mainActivityViewModel: SyncFragmentViewModel by activityViewModels()
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -153,7 +153,6 @@ class PatientListFragment : Fragment() {
       addPatient.setColorFilter(Color.WHITE)
     }
     setHasOptionsMenu(true)
-    (activity as MainActivity).setDrawerEnabled(false)
     launchAndRepeatStarted(
       { mainActivityViewModel.pollState.collect(::currentSyncJobStatus) },
       { mainActivityViewModel.pollPeriodicSyncJobStatus.collect(::periodicSyncJobStatus) },
@@ -189,7 +188,14 @@ class PatientListFragment : Fragment() {
         patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
         fadeOutTopBanner(currentSyncJobStatus)
       }
-      CurrentSyncJobStatus.Cancelled -> TODO()
+      is CurrentSyncJobStatus.Cancelled -> {
+        Timber.i("Sync: Cancelled")
+        fadeOutTopBanner(currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Blocked -> {
+        Timber.i("Sync: Blocked")
+        fadeOutTopBanner(currentSyncJobStatus)
+      }
     }
   }
 
@@ -220,7 +226,14 @@ class PatientListFragment : Fragment() {
         patientListViewModel.searchPatientsByName(searchView.query.toString().trim())
         fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
       }
-      CurrentSyncJobStatus.Cancelled -> TODO()
+      is CurrentSyncJobStatus.Cancelled -> {
+        Timber.i("Sync: Cancelled")
+        fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
+      }
+      is CurrentSyncJobStatus.Blocked -> {
+        Timber.i("Sync: Blocked")
+        fadeOutTopBanner(periodicSyncJobStatus.currentSyncJobStatus)
+      }
     }
   }
 

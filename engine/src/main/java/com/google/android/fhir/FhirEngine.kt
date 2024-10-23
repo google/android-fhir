@@ -16,12 +16,13 @@
 
 package com.google.android.fhir
 
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
-import com.google.android.fhir.sync.upload.LocalChangesFetchMode
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
@@ -100,16 +101,6 @@ interface FhirEngine {
   /**
    * Searches the database and returns a list of resources matching the [Search] specifications.
    *
-   * Example:
-   * ```
-   * fhirEngine.search<Patient> {
-   *  filter(Patient.GIVEN, {
-   *    value = "Kiran"
-   *    modifier = StringFilterModifier.MATCHES_EXACTLY
-   *  })
-   * }
-   * ```
-   *
    * @param search The search criteria to apply.
    * @return A list of [SearchResult] objects containing the matching resources and any included
    *   references.
@@ -122,7 +113,7 @@ interface FhirEngine {
    * This function initiates multiple server calls to upload local changes. The results of each call
    * are emitted as [UploadRequestResult] objects, which can be collected using a [Flow].
    *
-   * @param localChangesFetchMode Specifies how to fetch local changes for upload.
+   * @param uploadStrategy Defines strategies for uploading FHIR resource.
    * @param upload A suspending function that takes a list of [LocalChange] objects and returns a
    *   [Flow] of [UploadRequestResult] objects.
    * @return A [Flow] that emits the progress of the synchronization process as [SyncUploadProgress]
@@ -130,8 +121,11 @@ interface FhirEngine {
    */
   @Deprecated("To be deprecated.")
   suspend fun syncUpload(
-    localChangesFetchMode: LocalChangesFetchMode,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
+    uploadStrategy: UploadStrategy,
+    upload:
+      (suspend (List<LocalChange>, List<LocalChangeResourceReference>) -> Flow<
+          UploadRequestResult,
+        >),
   ): Flow<SyncUploadProgress>
 
   /**
@@ -192,8 +186,26 @@ interface FhirEngine {
    * @param forcePurge If `true`, the resource will be purged even if it has local changes.
    *   Otherwise, an [IllegalStateException] will be thrown if local changes exist. Defaults to
    *   `false`.
+   *
+   *   If you need to purge resources in bulk use the method
+   *   [FhirEngine.purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)]
    */
   suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+
+  /**
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
+   *
+   * @param type The [ResourceType]
+   * @param ids The resource ids [Set]<[Resource.id]>
+   * @param forcePurge If `true`, the resource will be purged even if it has local changes.
+   *   Otherwise, an [IllegalStateException] will be thrown if local changes exist. Defaults to
+   *   `false`.
+   *
+   *   In the case an exception is thrown by any entry in the list the whole transaction is rolled
+   *   back and no record is purged.
+   */
+  suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
 }
 
 /**

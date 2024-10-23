@@ -18,7 +18,6 @@ package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.logicalId
@@ -28,8 +27,6 @@ import com.google.android.fhir.versionId
 import com.google.common.truth.Truth.assertThat
 import java.time.Instant
 import java.util.LinkedList
-import kotlin.random.Random
-import kotlin.test.assertFailsWith
 import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Group
@@ -38,26 +35,14 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.Resource
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class PatchOrderingTest {
 
-  @Mock private lateinit var database: Database
-  private lateinit var patchGenerator: PerResourcePatchGenerator
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.openMocks(this)
-    patchGenerator = PerResourcePatchGenerator.with(database)
-  }
+  private val patchGenerator = PerResourcePatchGenerator
 
   @Test
   fun `createReferenceAdjacencyList with local changes for only new resources should only have edges to inserted resources`() =
@@ -79,8 +64,6 @@ class PatchOrderingTest {
       helper.createEncounter("encounter-3", 11, "Patient/patient-3")
       helper.createObservation("observation-3", 12, "Patient/patient-3", "Encounter/encounter-3")
       group = helper.updateGroup(group, 13, "Patient/patient-3")
-      whenever(database.getLocalChangeResourceReferences(any()))
-        .thenReturn(helper.localChangeResourceReferences)
 
       val result =
         patchGenerator
@@ -177,15 +160,12 @@ class PatchOrderingTest {
     helper.createEncounter("encounter-3", 12, "Patient/patient-3")
     helper.createPatient("patient-3", 13)
 
-    whenever(database.getLocalChangeResourceReferences(any()))
-      .thenReturn(helper.localChangeResourceReferences)
-
-    val result = patchGenerator.generate(helper.localChanges)
+    val result = patchGenerator.generate(helper.localChanges, helper.localChangeResourceReferences)
 
     // This order is based on the current implementation of the topological sort in [PatchOrdering],
     // it's entirely possible to generate different order here which is acceptable/correct, should
     // we have a different implementation of the topological sort.
-    assertThat(result.map { it.generatedPatch.resourceId })
+    assertThat(result.map { it.patchMappings.single().generatedPatch.resourceId })
       .containsExactly(
         "patient-1",
         "patient-2",
@@ -202,53 +182,44 @@ class PatchOrderingTest {
   }
 
   @Test
-  fun `generate with cyclic references should throw exception`() = runTest {
-    val localChanges = LinkedList<LocalChange>()
-    val localChangeResourceReferences = mutableListOf<LocalChangeResourceReference>()
+  fun `generate with cyclic and acyclic references should generate both Individual and Combined mappings`() =
+    runTest {
+      val helper = LocalChangeHelper()
 
-    Patient()
-      .apply {
-        id = "patient-1"
-        addLink(
-          Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/related-1") },
+      // Patient and RelatedPerson have cyclic dependency
+      helper.createPatient("patient-1", 1, "related-1")
+      helper.createRelatedPerson("related-1", 2, "Patient/patient-1")
+
+      // Patient, RelatedPerson have cyclic dependency. Observation, Encounter and Patient have
+      // acyclic dependency and order doesn't matter since they all go in same bundle.
+      helper.createPatient("patient-2", 3, "related-2")
+      helper.createRelatedPerson("related-2", 4, "Patient/patient-2")
+      helper.createObservation("observation-1", 5, "Patient/patient-2", "Encounter/encounter-1")
+      helper.createEncounter("encounter-1", 6, "Patient/patient-2")
+
+      // observation , encounter and Patient have acyclic dependency with each other, hence order is
+      // important here.
+      helper.createObservation("observation-2", 7, "Patient/patient-3", "Encounter/encounter-2")
+      helper.createEncounter("encounter-2", 8, "Patient/patient-3")
+      helper.createPatient("patient-3", 9)
+
+      val result =
+        patchGenerator.generate(helper.localChanges, helper.localChangeResourceReferences)
+
+      assertThat(
+          result.map { it.patchMappings.map { it.generatedPatch.resourceId } },
         )
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it, Random.nextLong()))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "RelatedPerson/related-1",
-            "Patient.other",
-          ),
+        .containsExactly(
+          listOf("patient-1", "related-1"),
+          listOf("patient-2", "related-2"),
+          listOf("encounter-1"),
+          listOf("observation-1"),
+          listOf("patient-3"),
+          listOf("encounter-2"),
+          listOf("observation-2"),
         )
-      }
-
-    RelatedPerson()
-      .apply {
-        id = "related-1"
-        patient = Reference("Patient/patient-1")
-      }
-      .also {
-        localChanges.add(createInsertLocalChange(it))
-        localChangeResourceReferences.add(
-          LocalChangeResourceReference(
-            localChanges.last().token.ids.first(),
-            "Patient/patient-1",
-            "RelatedPerson.patient",
-          ),
-        )
-      }
-
-    whenever(database.getLocalChangeResourceReferences(any()))
-      .thenReturn(localChangeResourceReferences)
-
-    val errorMessage =
-      assertFailsWith<IllegalStateException> { patchGenerator.generate(localChanges) }
-        .localizedMessage
-
-    assertThat(errorMessage).isEqualTo("Detected a cycle.")
-  }
+        .inOrder()
+    }
 
   companion object {
 
@@ -319,10 +290,29 @@ class PatchOrderingTest {
     fun createPatient(
       id: String,
       changeId: Long,
+      relatedPersonId: String? = null,
     ) =
       Patient()
-        .apply { this.id = id }
-        .also { localChanges.add(createInsertLocalChange(it, changeId)) }
+        .apply {
+          this.id = id
+          relatedPersonId?.let {
+            addLink(
+              Patient.PatientLinkComponent().apply { other = Reference("RelatedPerson/$it") },
+            )
+          }
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          relatedPersonId?.let {
+            localChangeResourceReferences.add(
+              LocalChangeResourceReference(
+                localChanges.last().token.ids.first(),
+                "RelatedPerson/$relatedPersonId",
+                "Patient.other",
+              ),
+            )
+          }
+        }
 
     fun updatePatient(
       patient: Patient,
@@ -380,6 +370,27 @@ class PatchOrderingTest {
               changeId,
               encounter,
               "Observation.encounter",
+            ),
+          )
+        }
+
+    fun createRelatedPerson(
+      id: String,
+      changeId: Long,
+      patient: String,
+    ) =
+      RelatedPerson()
+        .apply {
+          this.id = id
+          this.patient = Reference(patient)
+        }
+        .also {
+          localChanges.add(createInsertLocalChange(it, changeId))
+          localChangeResourceReferences.add(
+            LocalChangeResourceReference(
+              localChanges.last().token.ids.first(),
+              patient,
+              "RelatedPerson.patient",
             ),
           )
         }

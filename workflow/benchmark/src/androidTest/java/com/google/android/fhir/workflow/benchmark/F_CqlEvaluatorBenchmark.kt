@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ class F_CqlEvaluatorBenchmark {
           for (entry in patientImmunizationHistory.entry) {
             fhirEngine.create(entry.resource)
           }
-          knowledgeManager.install(
+          knowledgeManager.index(
             File(context.filesDir, lib.name).apply {
               writeText(jsonParser.encodeResourceToString(lib))
             },
@@ -84,9 +84,9 @@ class F_CqlEvaluatorBenchmark {
 
       val results =
         fhirOperator.evaluateLibrary(
-          "http://localhost/Library/ImmunityCheck|1.0.0",
-          "d4d35004-24f8-40e4-8084-1ad75924514f",
-          setOf("CompletedImmunization"),
+          libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+          patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+          expressions = setOf("CompletedImmunization"),
         ) as Parameters
 
       assertThat(results.getParameterBool("CompletedImmunization")).isTrue()

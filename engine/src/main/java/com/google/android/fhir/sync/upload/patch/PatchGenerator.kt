@@ -17,11 +17,11 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 
 /**
- * Generates [Patch]es from [LocalChange]s and output [List<[PatchMapping]>] to keep a mapping of
- * the [LocalChange]s to their corresponding generated [Patch]
+ * Generates [Patch]es from [LocalChange]s and output [List<[StronglyConnectedPatchMappings]>] to
+ * keep a mapping of the [LocalChange]s to their corresponding generated [Patch]
  *
  * INTERNAL ONLY. This interface should NEVER been exposed as an external API because it works
  * together with other components in the upload package to fulfill a specific upload strategy.
@@ -35,17 +35,17 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  suspend fun generate(localChanges: List<LocalChange>): List<PatchMapping>
+  suspend fun generate(
+    localChanges: List<LocalChange>,
+    localChangesReferences: List<LocalChangeResourceReference>,
+  ): List<StronglyConnectedPatchMappings>
 }
 
 internal object PatchGeneratorFactory {
-  fun byMode(
-    mode: PatchGeneratorMode,
-    database: Database,
-  ): PatchGenerator =
+  fun byMode(mode: PatchGeneratorMode): PatchGenerator =
     when (mode) {
       is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
-      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator.with(database)
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
     }
 }
 
@@ -67,3 +67,14 @@ internal data class PatchMapping(
   val localChanges: List<LocalChange>,
   val generatedPatch: Patch,
 )
+
+/**
+ * Structure to describe the cyclic nature of [PatchMapping].
+ * - A single value in [patchMappings] signifies the acyclic nature of the node.
+ * - Multiple values in [patchMappings] signifies the cyclic nature of the nodes among themselves.
+ *
+ * [StronglyConnectedPatchMappings] is used by the engine to make sure that related resources get
+ * uploaded to the server in the same request to maintain the referential integrity of resources
+ * during creation.
+ */
+internal data class StronglyConnectedPatchMappings(val patchMappings: List<PatchMapping>)

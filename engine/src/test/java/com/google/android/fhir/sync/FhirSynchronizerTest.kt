@@ -18,7 +18,10 @@ package com.google.android.fhir.sync
 
 import com.google.android.fhir.sync.download.DownloadState
 import com.google.android.fhir.sync.download.Downloader
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.UploadRequestResult
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.sync.upload.Uploader
 import com.google.android.fhir.testing.TestFhirEngineImpl
 import com.google.common.truth.Truth.assertThat
@@ -59,7 +62,15 @@ class FhirSynchronizerTest {
     fhirSynchronizer =
       FhirSynchronizer(
         TestFhirEngineImpl,
-        UploadConfiguration(uploader),
+        UploadConfiguration(
+          uploader,
+          UploadStrategy.forBundleRequest(
+            methodForCreate = HttpCreateMethod.PUT,
+            methodForUpdate = HttpUpdateMethod.PATCH,
+            squash = true,
+            bundleSize = 500,
+          ),
+        ),
         DownloadConfiguration(downloader, conflictResolver),
         fhirDataStore,
       )
@@ -69,7 +80,7 @@ class FhirSynchronizerTest {
   fun `synchronize should return Success on successful download and upload`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(UploadRequestResult.Success(listOf())),
         )
@@ -96,7 +107,7 @@ class FhirSynchronizerTest {
     runTest(UnconfinedTestDispatcher()) {
       val error = ResourceSyncException(ResourceType.Patient, Exception("Download error"))
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Failure(error)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(UploadRequestResult.Success(listOf())),
         )
@@ -121,7 +132,7 @@ class FhirSynchronizerTest {
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 10, 10)))
       val error = ResourceSyncException(ResourceType.Patient, Exception("Upload error"))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(flowOf(UploadRequestResult.Failure(listOf(), error)))
 
       val emittedValues = mutableListOf<SyncJobStatus>()
@@ -147,7 +158,7 @@ class FhirSynchronizerTest {
   fun `synchronize multiple invocations should execute in order`() =
     runTest(UnconfinedTestDispatcher()) {
       `when`(downloader.download()).thenReturn(flowOf(DownloadState.Success(listOf(), 0, 0)))
-      `when`(uploader.upload(any()))
+      `when`(uploader.upload(any(), any()))
         .thenReturn(
           flowOf(
             UploadRequestResult.Success(
@@ -158,7 +169,15 @@ class FhirSynchronizerTest {
       val fhirSynchronizerWithDelayInDownload =
         FhirSynchronizer(
           TestFhirEngineImpl,
-          UploadConfiguration(uploader),
+          UploadConfiguration(
+            uploader,
+            UploadStrategy.forBundleRequest(
+              methodForCreate = HttpCreateMethod.PUT,
+              methodForUpdate = HttpUpdateMethod.PATCH,
+              squash = true,
+              bundleSize = 500,
+            ),
+          ),
           DownloadConfiguration(
             object : Downloader {
               override suspend fun download(): Flow<DownloadState> {

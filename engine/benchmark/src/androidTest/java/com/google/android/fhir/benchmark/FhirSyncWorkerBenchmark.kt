@@ -37,6 +37,8 @@ import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.DownloadWorkManager
 import com.google.android.fhir.sync.FhirSyncWorker
 import com.google.android.fhir.sync.download.DownloadRequest
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -91,7 +93,13 @@ class FhirSyncWorkerBenchmark {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   open class BenchmarkTestDownloadManagerImpl(queries: List<String> = listOf("List/sync-list")) :

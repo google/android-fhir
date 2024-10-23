@@ -59,8 +59,20 @@ internal interface Database {
   suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdated: Instant?,
+  )
+
+  /**
+   * Updates the existing [oldResourceId] with the new [newResourceId]. Even if [oldResourceId] and
+   * [newResourceId] are the same, it is still necessary to update the resource meta.
+   */
+  suspend fun updateResourcePostSync(
+    oldResourceId: String,
+    newResourceId: String,
+    resourceType: ResourceType,
+    versionId: String?,
+    lastUpdated: Instant?,
   )
 
   /**
@@ -125,11 +137,13 @@ internal interface Database {
   suspend fun deleteUpdates(resources: List<Resource>)
 
   /**
-   * Updates the [ResourceEntity.serializedResource] and [ResourceEntity.resourceId] corresponding
-   * to the updatedResource. Updates all the [LocalChangeEntity] for this updated resource as well
-   * as all the [LocalChangeEntity] referring to this resource in their [LocalChangeEntity.payload]
-   * Updates the [ResourceEntity.serializedResource] for all the resources which refer to this
-   * updated resource.
+   * Updates the existing resource identified by [currentResourceId] with the [updatedResource],
+   * ensuring all associated references in the database are also updated accordingly.
+   *
+   * Implementations of this function should perform the following steps within a transaction:
+   * 1. Update the corresponding [ResourceEntity].
+   * 2. Update associated [LocalChangeEntity] records.
+   * 3. Update the serialized representation of referring resources.
    */
   suspend fun updateResourceAndReferences(
     currentResourceId: String,
@@ -174,17 +188,17 @@ internal interface Database {
   suspend fun getLocalChanges(resourceUuid: UUID): List<LocalChange>
 
   /**
-   * Purge resource from database based on resource type and id without any deletion of data from
-   * the server.
+   * Purges resources of the specified type from the database identified by their IDs without any
+   * deletion of data from the server.
    *
    * @param type The [ResourceType]
-   * @param id The resource id [Resource.id]
-   * @param isLocalPurge default value is false here resource will not be deleted from
+   * @param ids The resource ids [Set]<[Resource.id]>
+   * @param forcePurge default value is false, here resources will not be deleted from
    *   LocalChangeEntity table but it will throw IllegalStateException("Resource has local changes
-   *   either sync with server or FORCE_PURGE required") if local change exists. If true this API
-   *   will delete resource entry from LocalChangeEntity table.
+   *   either sync with server or FORCE_PURGE required") if local changes exists. If true this API
+   *   will delete resource entries from LocalChangeEntity table.
    */
-  suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean = false)
+  suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
 
   /**
    * @return List of [LocalChangeResourceReference] associated with the [LocalChangeEntity.id]s. A
@@ -196,7 +210,7 @@ internal interface Database {
   ): List<LocalChangeResourceReference>
 }
 
-data class ResourceWithUUID<R>(
+internal data class ResourceWithUUID<R>(
   val uuid: UUID,
   val resource: R,
 )

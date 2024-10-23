@@ -328,14 +328,14 @@ internal abstract class LocalChangeDao {
 
   @Query(
     """
-        SELECT *
+        SELECT DISTINCT localChangeId
         FROM LocalChangeResourceReferenceEntity
         WHERE resourceReferenceValue = :resourceReferenceValue
     """,
   )
-  abstract suspend fun getLocalChangeReferencesWithValue(
+  abstract suspend fun getLocalChangeIdsWithReferenceValue(
     resourceReferenceValue: String,
-  ): List<LocalChangeResourceReferenceEntity>
+  ): List<Long>
 
   @Query(
     """
@@ -352,7 +352,7 @@ internal abstract class LocalChangeDao {
     """
         SELECT *
         FROM LocalChangeResourceReferenceEntity
-        WHERE localChangeId = (:localChangeId)
+        WHERE localChangeId IN (:localChangeId)
     """,
   )
   abstract suspend fun getReferencesForLocalChanges(
@@ -365,21 +365,29 @@ internal abstract class LocalChangeDao {
   )
 
   /**
-   * Updates the resource IDs of the [LocalChange] of the updated resource. Updates [LocalChange]
-   * with references to the updated resource.
+   * Updates the [LocalChangeEntity]s to reflect the change in the resource ID.
+   *
+   * This function performs the following steps:
+   * 1. Updates the `resourceId` in `LocalChange` entities directly related to the updated resource
+   * 2. Updates references within `LocalChange` payloads that point to the updated resource
+   *
+   * @param resourceUuid The UUID of the resource whose ID has changed
+   * @param oldResource The original resource with the old ID
+   * @param updatedResourceId The updated resource ID
+   * @return A list of UUIDs representing resources that reference the affected resource
    */
   suspend fun updateResourceIdAndReferences(
     resourceUuid: UUID,
     oldResource: Resource,
-    updatedResource: Resource,
+    updatedResourceId: String,
   ): List<UUID> {
     updateResourceIdInResourceLocalChanges(
       resourceUuid = resourceUuid,
-      updatedResourceId = updatedResource.logicalId,
+      updatedResourceId = updatedResourceId,
     )
     return updateReferencesInLocalChange(
       oldResource = oldResource,
-      updatedResource = updatedResource,
+      updatedResourceId = updatedResourceId,
     )
   }
 
@@ -396,34 +404,51 @@ internal abstract class LocalChangeDao {
     }
 
   /**
-   * Looks for [LocalChangeEntity] which refer to the updated resource through
-   * [LocalChangeResourceReferenceEntity]. For each [LocalChangeEntity] which contains reference to
-   * the updated resource in its payload, we update the payload with the reference and also update
-   * the corresponding [LocalChangeResourceReferenceEntity]. We delete the original
-   * [LocalChangeEntity] and create a new one with new [LocalChangeResourceReferenceEntity]s in its
-   * place. This method returns a list of the [ResourceEntity.resourceUuid] for all the resources
-   * whose [LocalChange] contained references to the oldResource
+   * Updates references within [LocalChangeEntity] payloads to reflect a resource ID change.
+   *
+   * This function performs the following steps:
+   * 1. Retrieves [LocalChangeEntity] records that reference the old resource.
+   * 2. For each [LocalChangeEntity]:
+   *     - Replaces the old resource reference with the new one in its payload.
+   *     - Creates updated [LocalChangeResourceReferenceEntity] objects.
+   *     - Deletes the original [LocalChangeEntity] record, which triggers a cascading delete in
+   *       [LocalChangeResourceReferenceEntity].
+   *     - Creates a new [LocalChangeEntity] record along with new
+   *       [LocalChangeResourceReferenceEntity] records.
+   *
+   * @param oldResource The original resource whose ID has been updated.
+   * @param updatedResource The updated resource with the new ID.
+   * @return A list of distinct resource UUIDs for all `LocalChangeEntity` records that referenced
+   *   the old resource.
    */
-  private suspend fun updateReferencesInLocalChange(
+  internal suspend fun updateReferencesInLocalChange(
     oldResource: Resource,
-    updatedResource: Resource,
+    updatedResourceId: String,
   ): List<UUID> {
     val oldReferenceValue = "${oldResource.resourceType.name}/${oldResource.logicalId}"
-    val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
-    val referringLocalChangeIds =
-      getLocalChangeReferencesWithValue(oldReferenceValue).map { it.localChangeId }.distinct()
-    val referringLocalChanges = getLocalChanges(referringLocalChangeIds)
+    val updatedReferenceValue = "${oldResource.resourceType.name}/$updatedResourceId"
 
-    referringLocalChanges.forEach { existingLocalChangeEntity ->
+    /**
+     * [getLocalChangeIdsWithReferenceValue] and [getLocalChanges] cannot be combined due to a
+     * limitation in Room. Fetching [LocalChangeEntity] in chunks is required to avoid the error
+     * documented in https://github.com/google/android-fhir/issues/2559.
+     */
+    val referringLocalChangeIds = getLocalChangeIdsWithReferenceValue(oldReferenceValue)
+    val localChangeEntitiesWithOldReferences =
+      referringLocalChangeIds.chunked(SQLITE_LIMIT_MAX_VARIABLE_NUMBER).flatMap {
+        getLocalChanges(it)
+      }
+
+    localChangeEntitiesWithOldReferences.forEach { localChangeEntityWithOldReferences ->
       val updatedLocalChangeEntity =
         replaceReferencesInLocalChangePayload(
-            localChange = existingLocalChangeEntity,
+            localChange = localChangeEntityWithOldReferences,
             oldReference = oldReferenceValue,
             updatedReference = updatedReferenceValue,
           )
           .copy(id = DEFAULT_ID_VALUE)
       val updatedLocalChangeReferences =
-        getReferencesForLocalChange(existingLocalChangeEntity.id).map {
+        getReferencesForLocalChange(localChangeEntityWithOldReferences.id).map {
           localChangeResourceReferenceEntity ->
           if (localChangeResourceReferenceEntity.resourceReferenceValue == oldReferenceValue) {
             LocalChangeResourceReferenceEntity(
@@ -439,10 +464,10 @@ internal abstract class LocalChangeDao {
             )
           }
         }
-      discardLocalChanges(existingLocalChangeEntity.id)
+      discardLocalChanges(localChangeEntityWithOldReferences.id)
       createLocalChange(updatedLocalChangeEntity, updatedLocalChangeReferences)
     }
-    return referringLocalChanges.map { it.resourceUuid }.distinct()
+    return localChangeEntitiesWithOldReferences.map { it.resourceUuid }.distinct()
   }
 
   private fun replaceReferencesInLocalChangePayload(
@@ -498,6 +523,13 @@ internal abstract class LocalChangeDao {
 
   companion object {
     const val DEFAULT_ID_VALUE = 0L
+
+    /**
+     * Represents SQLite limit on the size of parameters that can be passed in an IN(..) query See
+     * https://issuetracker.google.com/issues/192284727 See https://www.sqlite.org/limits.html See
+     * https://github.com/google/android-fhir/issues/2559
+     */
+    const val SQLITE_LIMIT_MAX_VARIABLE_NUMBER = 999
   }
 }
 

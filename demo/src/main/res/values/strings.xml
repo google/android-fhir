@@ -68,4 +68,7 @@
   <string name="last_sync">Last sync</string>
   <string name="syncing">Syncing</string>
   <string name="sync">Sync</string>
+  <string name="last_sync_timestamp">Last sync: %1$s</string>
+  <string name="current_status">Sync status: %1$s</string>
+  <string name="manual_sync">Sync</string>
 </resources>

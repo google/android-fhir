@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
+import android.widget.CheckBox
 import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 
@@ -40,25 +39,16 @@ class ModalBottomSheetFragment : BottomSheetDialogFragment() {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
-    val showHideErrorButton = view.findViewById<Button>(R.id.errorToggleButton)
-    showHideErrorButton.text =
-      requireContext()
-        .getString(
-          if (args.errorState) {
-            R.string.hide_error_state
-          } else {
-            R.string.show_error_state
-          },
-        )
-    showHideErrorButton.setOnClickListener {
+
+    val showHideErrorCheckBox = view.findViewById<CheckBox>(R.id.errorToggleCheckBox)
+    showHideErrorCheckBox.isChecked = args.errorState
+    showHideErrorCheckBox.setOnCheckedChangeListener { _, isChecked ->
       setFragmentResult(
         REQUEST_ERROR_KEY,
         bundleOf(
-          BUNDLE_ERROR_KEY to
-            (showHideErrorButton.text == requireContext().getString(R.string.show_error_state)),
+          BUNDLE_ERROR_KEY to isChecked,
         ),
       )
-      NavHostFragment.findNavController(this).navigateUp()
     }
     (activity as? MainActivity)?.showOpenQuestionnaireMenu(false)
   }

@@ -21,6 +21,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
+import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
@@ -31,14 +32,20 @@ import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.ResourceWithUUID
 import com.google.android.fhir.db.impl.DatabaseImpl.Companion.UNENCRYPTED_DATABASE_NAME
 import com.google.android.fhir.db.impl.dao.ForwardIncludeSearchResult
+import com.google.android.fhir.db.impl.dao.LocalChangeDao.Companion.SQLITE_LIMIT_MAX_VARIABLE_NUMBER
 import com.google.android.fhir.db.impl.dao.ReverseIncludeSearchResult
+import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.pmap
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
+import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 
@@ -160,26 +167,43 @@ internal class DatabaseImpl(
   override suspend fun updateVersionIdAndLastUpdated(
     resourceId: String,
     resourceType: ResourceType,
-    versionId: String,
-    lastUpdated: Instant,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
   ) {
     db.withTransaction {
       resourceDao.updateAndIndexRemoteVersionIdAndLastUpdate(
         resourceId,
         resourceType,
         versionId,
-        lastUpdated,
+        lastUpdatedRemote,
       )
     }
   }
 
-  override suspend fun select(type: ResourceType, id: String): Resource {
-    return db.withTransaction {
-      resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-        iParser.parseResource(it)
+  override suspend fun updateResourcePostSync(
+    oldResourceId: String,
+    newResourceId: String,
+    resourceType: ResourceType,
+    versionId: String?,
+    lastUpdatedRemote: Instant?,
+  ) {
+    db.withTransaction {
+      resourceDao.getResourceEntity(oldResourceId, resourceType)?.let { oldResourceEntity ->
+        val updatedResource =
+          (iParser.parseResource(oldResourceEntity.serializedResource) as Resource).apply {
+            idElement = IdType(newResourceId)
+            updateMeta(versionId, lastUpdatedRemote)
+          }
+        updateResourceAndReferences(oldResourceId, updatedResource)
       }
-        ?: throw ResourceNotFoundException(type.name, id)
-    } as Resource
+    }
+  }
+
+  override suspend fun select(type: ResourceType, id: String): Resource {
+    return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
+      iParser.parseResource(it) as Resource
+    }
+      ?: throw ResourceNotFoundException(type.name, id)
   }
 
   override suspend fun insertSyncedResources(resources: List<Resource>) {
@@ -206,10 +230,14 @@ internal class DatabaseImpl(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
     return db.withTransaction {
-      resourceDao
-        .getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map { ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R) }
-        .distinctBy { it.uuid }
+      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
+        Dispatchers.Default,
+      ) {
+        ResourceWithUUID(
+          it.uuid,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
+        )
+      }
     }
   }
 
@@ -219,11 +247,12 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
+        .pmap(Dispatchers.Default) {
           ForwardIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceUUID,
-            iParser.parseResource(it.serializedResource) as Resource,
+            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+              as Resource,
           )
         }
     }
@@ -235,11 +264,12 @@ internal class DatabaseImpl(
     return db.withTransaction {
       resourceDao
         .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
+        .pmap(Dispatchers.Default) {
           ReverseIncludeSearchResult(
             it.matchingIndex,
             it.baseResourceTypeAndId,
-            iParser.parseResource(it.serializedResource) as Resource,
+            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+              as Resource,
           )
         }
     }
@@ -292,11 +322,28 @@ internal class DatabaseImpl(
       val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
+      if (currentResourceId == updatedResource.logicalId) {
+        return@withTransaction
+      }
+
+      /**
+       * Update LocalChange records and identify referring resources.
+       *
+       * We need to update LocalChange records first because they might contain references to the
+       * old resource ID that are not readily searchable or present in the latest version of the
+       * [ResourceEntity] itself. The [LocalChangeResourceReferenceEntity] table helps us identify
+       * these [LocalChangeEntity] records accurately.
+       *
+       * Once LocalChange records are updated, we can then safely update the corresponding
+       * ResourceEntity records to ensure data consistency. Hence, we obtain the
+       * [ResourceEntity.resourceUuid]s of the resources from the updated LocalChangeEntity records
+       * and use them in the next step.
+       */
       val uuidsOfReferringResources =
-        updateLocalChangeResourceIdAndReferences(
+        localChangeDao.updateResourceIdAndReferences(
           resourceUuid = resourceUuid,
           oldResource = oldResource,
-          updatedResource = updatedResource,
+          updatedResourceId = updatedResource.logicalId,
         )
 
       updateReferringResources(
@@ -313,25 +360,6 @@ internal class DatabaseImpl(
    */
   private suspend fun updateResourceEntity(resourceUuid: UUID, updatedResource: Resource) =
     resourceDao.updateResourceWithUuid(resourceUuid, updatedResource)
-
-  /**
-   * Update the [LocalChange]s to reflect the change in the resource ID. This primarily includes
-   * modifying the [LocalChange.resourceId] for the changes of the affected resource. Also, update
-   * any references in the [LocalChange] which refer to the affected resource.
-   *
-   * The function returns a [List<[UUID]>] which corresponds to the [ResourceEntity.resourceUuid]
-   * which contain references to the affected resource.
-   */
-  private suspend fun updateLocalChangeResourceIdAndReferences(
-    resourceUuid: UUID,
-    oldResource: Resource,
-    updatedResource: Resource,
-  ) =
-    localChangeDao.updateResourceIdAndReferences(
-      resourceUuid = resourceUuid,
-      oldResource = oldResource,
-      updatedResource = updatedResource,
-    )
 
   /**
    * Update all [Resource] and their corresponding [ResourceEntity] which refer to the affected
@@ -383,27 +411,25 @@ internal class DatabaseImpl(
     }
   }
 
-  override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {
+  override suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean) {
     db.withTransaction {
-      // To check resource is present in DB else throw ResourceNotFoundException()
-      selectEntity(type, id)
-      val localChangeEntityList = localChangeDao.getLocalChanges(type, id)
-      // If local change is not available simply delete resource
-      if (localChangeEntityList.isEmpty()) {
-        resourceDao.deleteResource(resourceId = id, resourceType = type)
-      } else {
-        // local change is available with FORCE_PURGE the delete resource and discard changes from
-        // localChangeEntity table
-        if (forcePurge) {
-          resourceDao.deleteResource(resourceId = id, resourceType = type)
-          localChangeDao.discardLocalChanges(
-            token = LocalChangeToken(localChangeEntityList.map { it.id }),
-          )
-        } else {
-          // local change is available but FORCE_PURGE = false then throw exception
+      ids.forEach { id ->
+        // 1. Verify resource presence:
+        selectEntity(type, id)
+
+        // 2. Check for local changes (which can only be cleared without syncing in FORCE_PURGE
+        // mode):
+        val localChanges = localChangeDao.getLocalChanges(type, id)
+        if (localChanges.isNotEmpty() && !forcePurge) {
           throw IllegalStateException(
             "Resource with type $type and id $id has local changes, either sync with server or FORCE_PURGE required",
           )
+        }
+
+        // 3. Delete resource and discard local changes (if applicable):
+        resourceDao.deleteResource(id, type)
+        if (localChanges.isNotEmpty()) {
+          localChangeDao.discardLocalChanges(id, type)
         }
       }
     }
@@ -412,12 +438,14 @@ internal class DatabaseImpl(
   override suspend fun getLocalChangeResourceReferences(
     localChangeIds: List<Long>,
   ): List<LocalChangeResourceReference> {
-    return localChangeDao.getReferencesForLocalChanges(localChangeIds).map {
-      LocalChangeResourceReference(
-        it.localChangeId,
-        it.resourceReferenceValue,
-        it.resourceReferencePath,
-      )
+    return localChangeIds.chunked(SQLITE_LIMIT_MAX_VARIABLE_NUMBER).flatMap { chunk ->
+      localChangeDao.getReferencesForLocalChanges(chunk).map {
+        LocalChangeResourceReference(
+          it.localChangeId,
+          it.resourceReferenceValue,
+          it.resourceReferencePath,
+        )
+      }
     }
   }
 
@@ -442,7 +470,7 @@ internal class DatabaseImpl(
   }
 }
 
-data class DatabaseConfig(
+internal data class DatabaseConfig(
   val inMemory: Boolean,
   val enableEncryption: Boolean,
   val databaseErrorStrategy: DatabaseErrorStrategy,

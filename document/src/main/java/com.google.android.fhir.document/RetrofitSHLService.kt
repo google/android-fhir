@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@ package com.google.android.fhir.document
 
 import com.google.android.fhir.NetworkConfiguration
 import com.google.android.fhir.sync.remote.GzipUploadInterceptor
-import com.google.android.fhir.sync.remote.HttpLogger
 import java.util.concurrent.TimeUnit
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Headers
 import retrofit2.http.POST
@@ -53,15 +54,25 @@ interface RetrofitSHLService {
     @Header("Authorization") authorization: String,
   ): Response<ResponseBody>
 
+  /* POST request to the SHL's manifest url to get the list of files associated with the link */
+  @POST
+  @Headers("Content-Type: application/json")
+  suspend fun getFilesFromManifest(
+    @Url path: String,
+    @Body jsonData: JSONObject,
+  ): Response<ResponseBody>
+
+  /* GET request if files are stored in an external "location" */
+  @GET
+  suspend fun getFromLocation(
+    @Url path: String,
+  ): Response<ResponseBody>
+
   class Builder(
     private val baseUrl: String,
     private val networkConfiguration: NetworkConfiguration,
   ) {
     private var httpLoggingInterceptor: HttpLoggingInterceptor? = null
-
-    fun setHttpLogger(httpLogger: HttpLogger) = apply {
-      httpLoggingInterceptor = httpLogger.toOkHttpLoggingInterceptor()
-    }
 
     fun build(): RetrofitSHLService {
       val client =
@@ -83,25 +94,5 @@ interface RetrofitSHLService {
         .build()
         .create(RetrofitSHLService::class.java)
     }
-
-    /* Maybe move these to different class */
-    private fun HttpLogger.toOkHttpLoggingInterceptor() =
-      HttpLoggingInterceptor(log).apply {
-        level = configuration.level.toOkhttpLogLevel()
-        configuration.headersToIgnore?.forEach { this.redactHeader(it) }
-      }
-
-    private fun HttpLogger.Level.toOkhttpLogLevel() =
-      when (this) {
-        HttpLogger.Level.NONE -> HttpLoggingInterceptor.Level.NONE
-        HttpLogger.Level.BASIC -> HttpLoggingInterceptor.Level.BASIC
-        HttpLogger.Level.HEADERS -> HttpLoggingInterceptor.Level.HEADERS
-        HttpLogger.Level.BODY -> HttpLoggingInterceptor.Level.BODY
-      }
-  }
-
-  companion object {
-    fun builder(baseUrl: String, networkConfiguration: NetworkConfiguration) =
-      Builder(baseUrl, networkConfiguration)
   }
 }

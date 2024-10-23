@@ -71,25 +71,31 @@ object QuestionnaireResponseValidator {
       "Mismatching Questionnaire ${questionnaire.url} and QuestionnaireResponse (for Questionnaire ${questionnaireResponse.questionnaire})"
     }
 
-    val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
-
-    validateQuestionnaireResponseItems(
-      questionnaire.item,
-      questionnaireResponse.item,
-      context,
+    val enablementEvaluator =
       EnablementEvaluator(
         questionnaire,
         questionnaireResponse,
         questionnaireItemParentMap,
         launchContextMap,
         xFhirQueryResolver,
-      ),
-      ExpressionEvaluator(
-        questionnaire,
-        questionnaireResponse,
-        questionnaireItemParentMap,
-        launchContextMap,
-      ),
+      )
+    val questionnaireResponseItemValidator =
+      QuestionnaireResponseItemValidator(
+        ExpressionEvaluator(
+          questionnaire,
+          questionnaireResponse,
+          questionnaireItemParentMap,
+          launchContextMap,
+        ),
+      )
+    val linkIdToValidationResultMap = mutableMapOf<String, MutableList<ValidationResult>>()
+
+    validateQuestionnaireResponseItems(
+      questionnaire.item,
+      questionnaireResponse.item,
+      context,
+      enablementEvaluator,
+      questionnaireResponseItemValidator,
       linkIdToValidationResultMap,
     )
 
@@ -101,7 +107,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
-    expressionEvaluator: ExpressionEvaluator,
+    questionnaireResponseItemValidator: QuestionnaireResponseItemValidator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     val questionnaireItemListIterator = questionnaireItemList.iterator()
@@ -129,7 +135,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem,
           context,
           enablementEvaluator,
-          expressionEvaluator,
+          questionnaireResponseItemValidator,
           linkIdToValidationResultMap,
         )
       }
@@ -142,7 +148,7 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
     context: Context,
     enablementEvaluator: EnablementEvaluator,
-    expressionEvaluator: ExpressionEvaluator,
+    questionnaireResponseItemValidator: QuestionnaireResponseItemValidator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
     when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
@@ -156,7 +162,7 @@ object QuestionnaireResponseValidator {
           questionnaireResponseItem.item,
           context,
           enablementEvaluator,
-          expressionEvaluator,
+          questionnaireResponseItemValidator,
           linkIdToValidationResultMap,
         )
       else -> {
@@ -170,24 +176,18 @@ object QuestionnaireResponseValidator {
             it.item,
             context,
             enablementEvaluator,
-            expressionEvaluator,
+            questionnaireResponseItemValidator,
             linkIdToValidationResultMap,
           )
         }
 
         linkIdToValidationResultMap[questionnaireItem.linkId] = mutableListOf()
         linkIdToValidationResultMap[questionnaireItem.linkId]?.add(
-          QuestionnaireResponseItemValidator.validate(
+          questionnaireResponseItemValidator.validate(
             questionnaireItem,
-            questionnaireResponseItem.answer,
+            questionnaireResponseItem,
             context,
-          ) {
-            expressionEvaluator.evaluateExpressionValue(
-              questionnaireItem,
-              questionnaireResponseItem,
-              it,
-            )
-          },
+          ),
         )
       }
     }
@@ -233,7 +233,7 @@ object QuestionnaireResponseValidator {
     }
     checkQuestionnaireResponseItems(
       questionnaire.item,
-      questionnaireResponse.copy().apply { packRepeatedGroups() }.item,
+      questionnaireResponse.copy().apply { packRepeatedGroups(questionnaire) }.item,
     )
   }
 

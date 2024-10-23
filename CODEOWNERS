@@ -1,2 +1,7 @@
-# Owners of the repository
-* @google/android-fhir @santosh-pingle
+# This file lists people who get automatically added as Reviewers for Pull Requests.
+
+# These people for *ALL* Pull Requests:
+* @google/android-fhir-reviewers
+
+# These for anything documentation related:
+docs/* @vorburger

@@ -17,10 +17,28 @@
 package com.google.android.fhir.sync.upload.patch
 
 import androidx.annotation.VisibleForTesting
-import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 
-private typealias Node = String
+/** Represents a resource e.g. 'Patient/123' , 'Encounter/123'. */
+internal typealias Node = String
+
+/**
+ * Represents a collection of resources with reference to other resource represented as an edge.
+ * e.g. Two Patient resources p1 and p2, each with an encounter and subsequent observation will be
+ * represented as follows
+ *
+ * ```
+ * [
+ *   'Patient/p1' : [],
+ *   'Patient/p2' : [],
+ *   'Encounter/e1' : ['Patient/p1'],  // Encounter.subject
+ *   'Encounter/e2' : ['Patient/p2'],  // Encounter.subject
+ *   'Observation/o1' : ['Patient/p1', 'Encounter/e1'], // Observation.subject, Observation.encounter
+ *   'Observation/o2' : ['Patient/p2', 'Encounter/e2'], // Observation.subject, Observation.encounter
+ *  ]
+ *  ```
+ */
+internal typealias Graph = Map<Node, List<Node>>
 
 /**
  * Orders the [PatchMapping]s to maintain referential integrity during upload.
@@ -49,29 +67,33 @@ internal object PatchOrdering {
     get() = "${generatedPatch.resourceType}/${generatedPatch.resourceId}"
 
   /**
-   * Order the [PatchMapping] so that if the resource A has outgoing references {B,C} (CREATE) and
-   * {D} (UPDATE), then B,C needs to go before the resource A so that referential integrity is
-   * retained. Order of D shouldn't matter for the purpose of referential integrity.
+   * Orders the list of [PatchMapping]s to maintain referential integrity.
    *
-   * @return - A ordered list of the [PatchMapping]s based on the references to other [PatchMapping]
-   *   if the mappings are acyclic
-   * - throws [IllegalStateException] otherwise
+   * This function ensures that if resource A has a CREATE reference to resources B and C, then B
+   * and C appear before A in the ordered list. UPDATE references are not considered as they do not
+   * impact referential integrity.
+   *
+   * The function uses Strongly Connected Components (SCC) to handle cyclic dependencies.
+   *
+   * @return A list of [StronglyConnectedPatchMappings]:
+   *     - Each [StronglyConnectedPatchMappings] object represents an SCC.
+   *     - If the graph of references is acyclic, each [StronglyConnectedPatchMappings] will contain
+   *       a single [PatchMapping].
+   *     - If the graph has cycles, a [StronglyConnectedPatchMappings] object will contain multiple
+   *       [PatchMapping]s involved in the cycle.
    */
-  suspend fun List<PatchMapping>.orderByReferences(
-    database: Database,
-  ): List<PatchMapping> {
+  fun List<PatchMapping>.sccOrderByReferences(
+    localChangeResourceReferences: List<LocalChangeResourceReference>,
+  ): List<StronglyConnectedPatchMappings> {
     val resourceIdToPatchMapping = associateBy { patchMapping -> patchMapping.resourceTypeAndId }
-
-    /* Get LocalChangeResourceReferences for all the local changes. A single LocalChange may have
-    multiple LocalChangeResourceReference, one for each resource reference in the
-    LocalChange.payload.*/
-    val localChangeIdToResourceReferenceMap: Map<Long, List<LocalChangeResourceReference>> =
-      database
-        .getLocalChangeResourceReferences(flatMap { it.localChanges.flatMap { it.token.ids } })
-        .groupBy { it.localChangeId }
+    val localChangeIdToResourceReferenceMap =
+      localChangeResourceReferences.groupBy { it.localChangeId }
 
     val adjacencyList = createAdjacencyListForCreateReferences(localChangeIdToResourceReferenceMap)
-    return createTopologicalOrderedList(adjacencyList).mapNotNull { resourceIdToPatchMapping[it] }
+
+    return StronglyConnectedPatches.scc(adjacencyList).map {
+      StronglyConnectedPatchMappings(it.mapNotNull { resourceIdToPatchMapping[it] })
+    }
   }
 
   /**
@@ -120,23 +142,5 @@ internal object PatchOrdering {
       }
     }
     return references
-  }
-
-  private fun createTopologicalOrderedList(adjacencyList: Map<Node, List<Node>>): List<Node> {
-    val stack = ArrayDeque<String>()
-    val visited = mutableSetOf<String>()
-    val currentPath = mutableSetOf<String>()
-
-    fun dfs(key: String) {
-      check(currentPath.add(key)) { "Detected a cycle." }
-      if (visited.add(key)) {
-        adjacencyList[key]?.forEach { dfs(it) }
-        stack.addFirst(key)
-      }
-      currentPath.remove(key)
-    }
-
-    adjacencyList.keys.forEach { dfs(it) }
-    return stack.reversed()
   }
 }

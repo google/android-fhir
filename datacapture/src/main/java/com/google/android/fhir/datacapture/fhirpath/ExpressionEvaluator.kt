@@ -66,8 +66,30 @@ internal class ExpressionEvaluator(
   private val xFhirQueryResolver: XFhirQueryResolver? = null,
 ) {
 
-  private val reservedVariables =
-    listOf("sct", "loinc", "ucum", "resource", "rootResource", "context", "map-codes")
+  private val reservedItemVariables =
+    listOf(
+      "sct",
+      "loinc",
+      "ucum",
+      "resource",
+      "rootResource",
+      "context",
+      "map-codes",
+      "questionnaire",
+      "qItem",
+    )
+
+  private val reservedRootVariables =
+    listOf(
+      "sct",
+      "loinc",
+      "ucum",
+      "resource",
+      "rootResource",
+      "context",
+      "map-codes",
+      "questionnaire",
+    )
 
   /**
    * Finds all the matching occurrences of variables. For example, when we apply regex to the
@@ -132,7 +154,7 @@ internal class ExpressionEvaluator(
     questionnaireResponseItem: QuestionnaireResponseItemComponent?,
     expression: Expression,
   ): List<Base> {
-    val appContext = extractDependentVariables(expression, questionnaireItem)
+    val appContext = extractItemDependentVariables(expression, questionnaireItem)
     return evaluateToBase(
       questionnaireResponse,
       questionnaireResponseItem,
@@ -166,9 +188,8 @@ internal class ExpressionEvaluator(
    * Returns a list of pair of item and the calculated and evaluated value for all items with
    * calculated expression extension, which is dependent on value of updated response
    */
-  suspend fun evaluateCalculatedExpressions(
+  suspend fun evaluateAllAffectedCalculatedExpressions(
     questionnaireItem: QuestionnaireItemComponent,
-    updatedQuestionnaireResponseItemComponent: QuestionnaireResponseItemComponent?,
   ): List<ItemToAnswersPair> {
     return questionnaire.item
       .flattened()
@@ -180,15 +201,34 @@ internal class ExpressionEvaluator(
             findDependentVariables(item.calculatedExpression!!).isNotEmpty())
       }
       .map { item ->
+        // TODO: Pass the questionnaire response item corresponding to the
+        //  questionnaire item with the calculated expression for the FHIRPath supplement
+        //  `%context`.
         val updatedAnswer =
           evaluateExpression(
               item,
-              updatedQuestionnaireResponseItemComponent,
+              null,
               item.calculatedExpression!!,
             )
             .map { it.castToType(it) }
         item to updatedAnswer
       }
+  }
+
+  /**
+   * Returns the evaluated value of [calculatedExpression] from the given [questionnaireItem]. A
+   * [NullPointerException] will be thrown if [calculatedExpression] is not present.
+   */
+  suspend fun evaluateCalculatedExpression(
+    questionnaireItem: QuestionnaireItemComponent,
+    questionnaireResponseItem: QuestionnaireResponseItemComponent?,
+  ): List<Type> {
+    return evaluateExpression(
+        questionnaireItem,
+        questionnaireResponseItem,
+        questionnaireItem.calculatedExpression!!,
+      )
+      .map { it.castToType(it) }
   }
 
   /**
@@ -222,7 +262,7 @@ internal class ExpressionEvaluator(
     ) {
       "The expression should come from the same questionnaire item"
     }
-    extractDependentVariables(
+    extractItemDependentVariables(
       expression,
       questionnaireItem,
       variablesMap,
@@ -243,21 +283,23 @@ internal class ExpressionEvaluator(
    * @param variablesMap the [Map<String, Base>] of variables, the default value is empty map is
    *   defined
    */
-  internal suspend fun extractDependentVariables(
+  internal suspend fun extractItemDependentVariables(
     expression: Expression,
     questionnaireItem: QuestionnaireItemComponent,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
   ): MutableMap<String, Base?> {
     questionnaireLaunchContextMap?.let { variablesMap.putAll(it) }
-    findDependentVariables(expression).forEach { variableName ->
-      if (variablesMap[variableName] == null) {
-        findAndEvaluateVariable(
-          variableName,
-          questionnaireItem,
-          variablesMap,
-        )
+    findDependentVariables(expression)
+      .filterNot { variable -> reservedItemVariables.contains(variable) }
+      .forEach { variableName ->
+        if (variablesMap[variableName] == null) {
+          findAndEvaluateVariable(
+            variableName,
+            questionnaireItem,
+            variablesMap,
+          )
+        }
       }
-    }
     return variablesMap.apply {
       put(questionnaireFhirPathSupplement, questionnaire)
       put(questionnaireItemFhirPathSupplement, questionnaireItem)
@@ -282,17 +324,19 @@ internal class ExpressionEvaluator(
     expression: Expression,
     variablesMap: MutableMap<String, Base?> = mutableMapOf(),
   ): Base? {
-    findDependentVariables(expression).forEach { variableName ->
-      questionnaire.findVariableExpression(variableName)?.let { expression ->
-        if (variablesMap[expression.name] == null) {
-          variablesMap[expression.name] =
-            evaluateQuestionnaireVariableExpression(
-              expression,
-              variablesMap,
-            )
+    findDependentVariables(expression)
+      .filterNot { variable -> reservedRootVariables.contains(variable) }
+      .forEach { variableName ->
+        questionnaire.findVariableExpression(variableName)?.let { expression ->
+          if (variablesMap[expression.name] == null) {
+            variablesMap[expression.name] =
+              evaluateQuestionnaireVariableExpression(
+                expression,
+                variablesMap,
+              )
+          }
         }
       }
-    }
 
     return evaluateVariable(
       expression,
@@ -371,11 +415,7 @@ internal class ExpressionEvaluator(
       }
 
   private fun findDependentVariables(expression: Expression) =
-    variableRegex
-      .findAll(expression.expression)
-      .map { it.groupValues[1] }
-      .toList()
-      .filterNot { variable -> reservedVariables.contains(variable) }
+    variableRegex.findAll(expression.expression).map { it.groupValues[1] }.toList()
 
   /**
    * Finds the dependent variables at questionnaire item level first, then in ancestors and then at

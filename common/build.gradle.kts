@@ -13,8 +13,8 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.common"
-  compileSdk = Sdk.compileSdk
-  defaultConfig { minSdk = Sdk.minSdk }
+  compileSdk = Sdk.COMPILE_SDK
+  defaultConfig { minSdk = Sdk.MIN_SDK }
   configureJacocoTestOptions()
   kotlin { jvmToolchain(11) }
 }
@@ -26,11 +26,11 @@ dependencies {
 
   implementation(Dependencies.fhirUcum)
 
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.AndroidxTest.core)
-  testImplementation(Dependencies.junit)
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.test.core)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Google LLC
+ * Copyright 2022-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,15 +110,15 @@ class FhirOperatorLibraryEvaluateJavaTest {
     }
 
     // Load Library that checks if Patient has taken a vaccine
-    knowledgeManager.install(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
-    knowledgeManager.install(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
+    knowledgeManager.index(writeToFile(load("/immunity-check/ImmunityCheck.json") as Library))
+    knowledgeManager.index(writeToFile(load("/immunity-check/FhirHelpers.json") as Library))
 
     // Evaluates a specific Patient
     val results =
       fhirOperator.evaluateLibrary(
-        "http://localhost/Library/ImmunityCheck|1.0.0",
-        "d4d35004-24f8-40e4-8084-1ad75924514f",
-        setOf("CompletedImmunization"),
+        libraryUrl = "http://localhost/Library/ImmunityCheck|1.0.0",
+        patientId = "d4d35004-24f8-40e4-8084-1ad75924514f",
+        expressions = setOf("CompletedImmunization"),
       ) as Parameters
 
     assertThat(results.getParameterBool("CompletedImmunization")).isTrue()
@@ -137,10 +137,12 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestGetName", "1.0.0")
 
-    knowledgeManager.install(writeToFile(library))
+    knowledgeManager.index(writeToFile(library))
 
     // Evaluates expression without any extra data
-    val results = fhirOperator.evaluateLibrary(library.url, setOf("GetName")) as Parameters
+    val results =
+      fhirOperator.evaluateLibrary(libraryUrl = library.url, expressions = setOf("GetName"))
+        as Parameters
 
     assertThat((results.parameterFirstRep.value as StringType).value).isEqualTo("MyName")
   }
@@ -160,7 +162,7 @@ class FhirOperatorLibraryEvaluateJavaTest {
 
     val library = CqlBuilder.assembleFhirLib(cql, null, null, "TestSumWithParams", "1.0.0")
 
-    knowledgeManager.install(writeToFile(library))
+    knowledgeManager.index(writeToFile(library))
 
     val params =
       Parameters().apply {
@@ -171,7 +173,12 @@ class FhirOperatorLibraryEvaluateJavaTest {
       }
 
     // Evaluates the library with a parameter
-    val results = fhirOperator.evaluateLibrary(library.url, params, setOf("SumOne")) as Parameters
+    val results =
+      fhirOperator.evaluateLibrary(
+        libraryUrl = library.url,
+        parameters = params,
+        expressions = setOf("SumOne"),
+      ) as Parameters
 
     assertThat((results.parameterFirstRep.value as DecimalType).value).isEqualTo(BigDecimal(2))
   }
