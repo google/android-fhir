@@ -87,14 +87,13 @@ class PeriodicSyncFragment : Fragment() {
           val progressLabel = requireView().findViewById<TextView>(R.id.progress_percentage_label)
 
           if (uiState.progress != null) {
-            syncIndicator.isIndeterminate = false
             syncIndicator.progress = uiState.progress
             syncIndicator.visibility = View.VISIBLE
 
             progressLabel.text = "${uiState.progress}%"
             progressLabel.visibility = View.VISIBLE
           } else {
-            syncIndicator.isIndeterminate = true
+            syncIndicator.progress = 0
             progressLabel.visibility = View.GONE
           }
         }
