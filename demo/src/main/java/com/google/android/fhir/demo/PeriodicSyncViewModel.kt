@@ -51,84 +51,76 @@ class PeriodicSyncViewModel(application: Application) : AndroidViewModel(applica
       )
       .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
 
-  private val _lastSyncStatusFlow = MutableStateFlow<String?>(null)
-  val lastSyncStatusFlow: StateFlow<String?> = _lastSyncStatusFlow
-
-  private val _lastSyncTimeFlow = MutableStateFlow<String?>(null)
-  val lastSyncTimeFlow: StateFlow<String?> = _lastSyncTimeFlow
-
-  private val _currentSyncStatusFlow = MutableStateFlow<String?>(null)
-  val currentSyncStatusFlow: StateFlow<String?> = _currentSyncStatusFlow
-
-  private val _progressFlow = MutableStateFlow<Int?>(null)
-  val progressFlow: StateFlow<Int?> = _progressFlow
+  private val _uiStateFlow = MutableStateFlow(PeriodicSyncUiState())
+  val uiStateFlow: StateFlow<PeriodicSyncUiState> = _uiStateFlow
 
   init {
-    observePeriodicSyncJobStatus()
+    collectPeriodicSyncJobStatus()
   }
 
-  private fun observePeriodicSyncJobStatus() {
+  private fun collectPeriodicSyncJobStatus() {
     viewModelScope.launch {
       pollPeriodicSyncJobStatus.collect { periodicSyncJobStatus ->
-        updateLastSyncJobStatusUi(periodicSyncJobStatus.lastSyncJobStatus)
-
-        // refresh current sync status ui
-        _currentSyncStatusFlow.value =
+        val lastSyncStatus = getLastSyncStatus(periodicSyncJobStatus.lastSyncJobStatus)
+        val lastSyncTime = getLastSyncTime(periodicSyncJobStatus.lastSyncJobStatus)
+        val currentSyncStatus =
           getApplication<FhirApplication>()
             .getString(
               R.string.current_status,
               periodicSyncJobStatus.currentSyncJobStatus::class.java.simpleName,
             )
+        val progress = getProgress(periodicSyncJobStatus.currentSyncJobStatus)
 
-        // refresh progress ui based on the current sync job status
-        if (periodicSyncJobStatus.currentSyncJobStatus is CurrentSyncJobStatus.Running) {
-          updateProgressUiForRunningSync(
-            (periodicSyncJobStatus.currentSyncJobStatus as CurrentSyncJobStatus.Running)
-              .inProgressSyncJob,
+        // Update the UI state
+        _uiStateFlow.value =
+          _uiStateFlow.value.copy(
+            lastSyncStatus = lastSyncStatus,
+            lastSyncTime = lastSyncTime,
+            currentSyncStatus = currentSyncStatus,
+            progress = progress,
           )
-        } else {
-          _progressFlow.value = null
-        }
       }
     }
   }
 
-  private fun updateLastSyncJobStatusUi(lastSyncJobStatus: LastSyncJobStatus?) {
-    lastSyncJobStatus?.let {
-      // refresh last sync status ui
-      _lastSyncStatusFlow.value =
-        when (it) {
-          is LastSyncJobStatus.Succeeded ->
-            getApplication<FhirApplication>()
-              .getString(
-                R.string.last_sync_status,
-                LastSyncJobStatus.Succeeded::class.java.simpleName,
-              )
-          is LastSyncJobStatus.Failed ->
-            getApplication<FhirApplication>()
-              .getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
-          else -> null
-        }
-      // refresh last sync time ui
-      _lastSyncTimeFlow.value =
+  private fun getLastSyncStatus(lastSyncJobStatus: LastSyncJobStatus?): String? {
+    return when (lastSyncJobStatus) {
+      is LastSyncJobStatus.Succeeded ->
         getApplication<FhirApplication>()
           .getString(
-            R.string.last_sync_timestamp,
-            it.timestamp.formatSyncTimestamp(getApplication()),
+            R.string.last_sync_status,
+            LastSyncJobStatus.Succeeded::class.java.simpleName,
           )
+      is LastSyncJobStatus.Failed ->
+        getApplication<FhirApplication>()
+          .getString(R.string.last_sync_status, LastSyncJobStatus.Failed::class.java.simpleName)
+      else -> getApplication<FhirApplication>().getString(R.string.last_sync_status_na)
     }
   }
 
-  private fun updateProgressUiForRunningSync(inProgressSyncJob: SyncJobStatus) {
-    if (inProgressSyncJob is SyncJobStatus.InProgress) {
-      val progressPercentage =
-        ProgressHelper.calculateProgressPercentage(
-          inProgressSyncJob.total,
-          inProgressSyncJob.completed,
-        )
-      _progressFlow.value = progressPercentage
-    } else {
-      _progressFlow.value = null
+  private fun getLastSyncTime(lastSyncJobStatus: LastSyncJobStatus?): String {
+    val applicationContext = getApplication<FhirApplication>()
+    return lastSyncJobStatus?.let { status ->
+      applicationContext.getString(
+        R.string.last_sync_timestamp,
+        status.timestamp.formatSyncTimestamp(applicationContext),
+      )
+    }
+      ?: applicationContext.getString(R.string.last_sync_status_na)
+  }
+
+  private fun getProgress(currentSyncJobStatus: CurrentSyncJobStatus): Int? {
+    val inProgressSyncJob =
+      (currentSyncJobStatus as? CurrentSyncJobStatus.Running)?.inProgressSyncJob
+    return (inProgressSyncJob as? SyncJobStatus.InProgress)?.let {
+      ProgressHelper.calculateProgressPercentage(it.total, it.completed)
     }
   }
 }
+
+data class PeriodicSyncUiState(
+  val lastSyncStatus: String? = null,
+  val lastSyncTime: String? = null,
+  val currentSyncStatus: String? = null,
+  val progress: Int? = null,
+)

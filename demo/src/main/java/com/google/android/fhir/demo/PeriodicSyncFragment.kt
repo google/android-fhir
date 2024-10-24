@@ -47,12 +47,7 @@ class PeriodicSyncFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-
-    // update periodic sync ui data
-    updateLastSyncStatusUi()
-    updateLastSyncTimeUi()
-    updateCurrentSyncStatusUi()
-    updateSyncProgressUi()
+    refreshPeriodicSynUi()
   }
 
   override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -72,54 +67,35 @@ class PeriodicSyncFragment : Fragment() {
     }
   }
 
-  private fun updateLastSyncStatusUi() {
+  private fun refreshPeriodicSynUi() {
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        periodicSyncViewModel.lastSyncStatusFlow.collect { lastSyncStatus ->
-          lastSyncStatus?.let {
+        periodicSyncViewModel.uiStateFlow.collect { uiState ->
+          uiState.lastSyncStatus?.let {
             requireView().findViewById<TextView>(R.id.last_sync_status).text = it
           }
-        }
-      }
-    }
-  }
 
-  private fun updateLastSyncTimeUi() {
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        periodicSyncViewModel.lastSyncTimeFlow.collect { lastSyncTime ->
-          lastSyncTime?.let { requireView().findViewById<TextView>(R.id.last_sync_time).text = it }
-        }
-      }
-    }
-  }
-
-  private fun updateCurrentSyncStatusUi() {
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        periodicSyncViewModel.currentSyncStatusFlow.collect { currentSyncStatus ->
-          currentSyncStatus?.let {
-            val currentSyncStatusTextView =
-              requireView().findViewById<TextView>(R.id.current_sync_status)
-            currentSyncStatusTextView.text = it
+          uiState.lastSyncTime?.let {
+            requireView().findViewById<TextView>(R.id.last_sync_time).text = it
           }
-        }
-      }
-    }
-  }
 
-  private fun updateSyncProgressUi() {
-    viewLifecycleOwner.lifecycleScope.launch {
-      viewLifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-        periodicSyncViewModel.progressFlow.collect { progress ->
+          uiState.currentSyncStatus?.let {
+            requireView().findViewById<TextView>(R.id.current_sync_status).text = it
+          }
+
           val syncIndicator = requireView().findViewById<ProgressBar>(R.id.sync_indicator)
-          if (progress != null) {
+          val progressLabel = requireView().findViewById<TextView>(R.id.progress_percentage_label)
+
+          if (uiState.progress != null) {
             syncIndicator.isIndeterminate = false
-            syncIndicator.progress = progress
+            syncIndicator.progress = uiState.progress
             syncIndicator.visibility = View.VISIBLE
+
+            progressLabel.text = "${uiState.progress}%"
+            progressLabel.visibility = View.VISIBLE
           } else {
             syncIndicator.isIndeterminate = true
-            // syncIndicator.visibility = View.GONE
+            progressLabel.visibility = View.GONE
           }
         }
       }
