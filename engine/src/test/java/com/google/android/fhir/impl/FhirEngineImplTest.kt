@@ -32,6 +32,8 @@ import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
@@ -355,7 +357,14 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) { lcs, _ ->
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
         localChanges.addAll(lcs)
         flowOf(
           UploadRequestResult.Success(
@@ -388,7 +397,14 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) { lcs, _ ->
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Failure(
             lcs,
@@ -799,7 +815,13 @@ class FhirEngineImplTest {
   fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
-      .syncUpload(UploadStrategy.SingleResourcePost) { lcs, _ ->
+      .syncUpload(
+        UploadStrategy.forIndividualRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+        ),
+      ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Success(
             listOf(
