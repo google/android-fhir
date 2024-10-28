@@ -272,8 +272,7 @@ object Sync {
         when (workRequest) {
           WorkRequest.ONE_TIME ->
             handleNullWorkManagerStatusForOneTimeSync(workInfoState, syncJobStatusFromDataStore)
-          WorkRequest.PERIODIC ->
-            handleNullWorkManagerStatusForPeriodicSync(workInfoState, syncJobStatusFromDataStore)
+          WorkRequest.PERIODIC -> handleNullWorkManagerStatusForPeriodicSync(workInfoState)
         }
       }
       else -> error("Inconsistent syncJobStatus: $syncJobStatusFromWorkManager.")
@@ -320,14 +319,10 @@ object Sync {
    */
   private fun handleNullWorkManagerStatusForPeriodicSync(
     workInfoState: WorkInfo.State,
-    syncJobStatusFromDataStore: SyncJobStatus?,
   ): CurrentSyncJobStatus =
     when (workInfoState) {
       RUNNING -> Running(SyncJobStatus.Started())
-      ENQUEUED -> {
-        syncJobStatusFromDataStore?.let { mapDataStoreSyncJobStatusToCurrentSyncJobStatus(it) }
-          ?: Enqueued
-      }
+      ENQUEUED -> Enqueued
       CANCELLED -> Cancelled
       BLOCKED -> CurrentSyncJobStatus.Blocked
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
