@@ -33,15 +33,4 @@
         />
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/add_patient"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="12dp"
-        android:clickable="true"
-        app:srcCompat="@drawable/ic_baseline_add_24"
-    />
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
