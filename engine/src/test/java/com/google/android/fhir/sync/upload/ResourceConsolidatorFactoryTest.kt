@@ -32,7 +32,12 @@ class ResourceConsolidatorFactoryTest {
   fun `return HttpPostResourceConsolidator instance `() {
     val httpPostResourceConsolidator =
       ResourceConsolidatorFactory.byHttpVerb(
-        UploadStrategy.SingleResourcePost.requestGeneratorMode,
+        UploadStrategy.forIndividualRequest(
+            methodForCreate = HttpCreateMethod.POST,
+            methodForUpdate = HttpUpdateMethod.PATCH,
+            squash = true,
+          )
+          .requestGeneratorMode,
         services.database,
       )
     assertTrue(httpPostResourceConsolidator is HttpPostResourceConsolidator)
@@ -42,7 +47,13 @@ class ResourceConsolidatorFactoryTest {
   fun `return DefaultResourceConsolidator instance `() {
     val httpPostResourceConsolidator =
       ResourceConsolidatorFactory.byHttpVerb(
-        UploadStrategy.AllChangesSquashedBundlePut.requestGeneratorMode,
+        UploadStrategy.forBundleRequest(
+            methodForCreate = HttpCreateMethod.PUT,
+            methodForUpdate = HttpUpdateMethod.PATCH,
+            squash = true,
+            bundleSize = 500,
+          )
+          .requestGeneratorMode,
         services.database,
       )
     assertTrue(httpPostResourceConsolidator is DefaultResourceConsolidator)
