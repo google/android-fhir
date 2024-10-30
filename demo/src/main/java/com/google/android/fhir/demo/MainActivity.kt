@@ -17,6 +17,7 @@
 package com.google.android.fhir.demo
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.fhir.demo.databinding.ActivityMainBinding
 
@@ -24,12 +25,14 @@ const val MAX_RESOURCE_COUNT = 20
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
+  private val activityViewModel: ActivityViewModel by viewModels()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
     initActionBar()
+    activityViewModel.createPatientsOnAppFirstLaunch()
   }
 
   private fun initActionBar() {

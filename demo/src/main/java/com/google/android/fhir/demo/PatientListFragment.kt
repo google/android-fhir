@@ -124,10 +124,6 @@ class PatientListFragment : Fragment() {
         },
       )
 
-    binding.apply {
-      addPatient.setOnClickListener { onAddPatientClick() }
-      addPatient.setColorFilter(Color.WHITE)
-    }
     setHasOptionsMenu(true)
   }
 
@@ -149,10 +145,5 @@ class PatientListFragment : Fragment() {
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
-  }
-
-  private fun onAddPatientClick() {
-    findNavController()
-      .navigate(PatientListFragmentDirections.actionPatientListToAddPatientFragment())
   }
 }
