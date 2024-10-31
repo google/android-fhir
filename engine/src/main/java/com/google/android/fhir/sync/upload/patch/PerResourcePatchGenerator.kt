@@ -22,7 +22,7 @@ import com.github.fge.jackson.JsonLoader
 import com.github.fge.jsonpatch.JsonPatch
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChange.Type
-import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.sync.upload.patch.PatchOrdering.sccOrderByReferences
 
 /**
@@ -32,13 +32,13 @@ import com.google.android.fhir.sync.upload.patch.PatchOrdering.sccOrderByReferen
  * maintain an audit trail, but instead, multiple changes made to the same FHIR resource on the
  * client can be recorded as a single change on the server.
  */
-internal class PerResourcePatchGenerator private constructor(val database: Database) :
-  PatchGenerator {
+internal object PerResourcePatchGenerator : PatchGenerator {
 
   override suspend fun generate(
     localChanges: List<LocalChange>,
+    localChangesReferences: List<LocalChangeResourceReference>,
   ): List<StronglyConnectedPatchMappings> {
-    return generateSquashedChangesMapping(localChanges).sccOrderByReferences(database)
+    return generateSquashedChangesMapping(localChanges).sccOrderByReferences(localChangesReferences)
   }
 
   @androidx.annotation.VisibleForTesting
@@ -146,21 +146,5 @@ internal class PerResourcePatchGenerator private constructor(val database: Datab
     val mergedNode = objectMapper.createArrayNode()
     mergedOperations.values.flatten().forEach(mergedNode::add)
     return objectMapper.writeValueAsString(mergedNode)
-  }
-
-  companion object {
-
-    @Volatile private lateinit var _instance: PerResourcePatchGenerator
-
-    @Synchronized
-    fun with(database: Database): PerResourcePatchGenerator {
-      if (!::_instance.isInitialized) {
-        _instance = PerResourcePatchGenerator(database)
-      } else if (_instance.database != database) {
-        _instance = PerResourcePatchGenerator(database)
-      }
-
-      return _instance
-    }
   }
 }

@@ -22,6 +22,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.DateProvider
 import com.google.android.fhir.epochDay
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.common.truth.Correspondence
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
@@ -31,6 +32,7 @@ import java.util.UUID
 import kotlin.math.absoluteValue
 import kotlin.math.roundToLong
 import kotlinx.coroutines.runBlocking
+import org.hl7.fhir.r4.model.CarePlan
 import org.hl7.fhir.r4.model.CodeType
 import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
@@ -2748,6 +2750,258 @@ class SearchTest {
         "code",
         "44054006",
         "http://snomed.info/sct",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with large list of patient reference`() {
+    val patientIdReferenceList = (1..990).map { "Patient/patient-$it" }
+    val patientIdList =
+      patientIdReferenceList.map<String, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = it }
+      }
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply { filter(CarePlan.SUBJECT, *patientIdList.toTypedArray()) }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+          SELECT a.resourceUuid, a.serializedResource
+          FROM ResourceEntity a
+          WHERE a.resourceType = ?
+          AND a.resourceUuid IN (
+          SELECT resourceUuid FROM ReferenceIndexEntity
+          WHERE resourceType = ? AND index_name = ? AND (((((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR (((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))))) OR (((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))))) OR ((((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR (((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))))) OR (((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))))))
+          )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        *patientIdReferenceList.toTypedArray(),
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with no reference`() {
+    val query = Search(ResourceType.CarePlan).apply { filter(CarePlan.SUBJECT) }.getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+              SELECT a.resourceUuid, a.serializedResource
+              FROM ResourceEntity a
+              WHERE a.resourceType = ?
+              AND a.resourceUuid IN (
+              SELECT resourceUuid FROM ReferenceIndexEntity
+              WHERE resourceType = ? AND index_name = ?
+              )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with one patient reference`() {
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply { filter(CarePlan.SUBJECT, { value = "Patient/patient-0" }) }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+              SELECT a.resourceUuid, a.serializedResource
+              FROM ResourceEntity a
+              WHERE a.resourceType = ?
+              AND a.resourceUuid IN (
+              SELECT resourceUuid FROM ReferenceIndexEntity
+              WHERE resourceType = ? AND index_name = ? AND index_value = ?
+              )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        "Patient/patient-0",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with two patient references`() {
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply {
+          filter(CarePlan.SUBJECT, { value = "Patient/patient-0" }, { value = "Patient/patient-1" })
+        }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+              SELECT a.resourceUuid, a.serializedResource
+              FROM ResourceEntity a
+              WHERE a.resourceType = ?
+              AND a.resourceUuid IN (
+              SELECT resourceUuid FROM ReferenceIndexEntity
+              WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
+              )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        "Patient/patient-0",
+        "Patient/patient-1",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with three patient references`() {
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply {
+          filter(
+            CarePlan.SUBJECT,
+            { value = "Patient/patient-0" },
+            { value = "Patient/patient-1" },
+            { value = "Patient/patient-4" },
+          )
+        }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+              SELECT a.resourceUuid, a.serializedResource
+              FROM ResourceEntity a
+              WHERE a.resourceType = ?
+              AND a.resourceUuid IN (
+              SELECT resourceUuid FROM ReferenceIndexEntity
+              WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR (index_value = ? OR index_value = ?))
+              )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        "Patient/patient-0",
+        "Patient/patient-1",
+        "Patient/patient-4",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with four patient references`() {
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply {
+          filter(
+            CarePlan.SUBJECT,
+            { value = "Patient/patient-0" },
+            { value = "Patient/patient-1" },
+            { value = "Patient/patient-4" },
+            { value = "Patient/patient-7" },
+          )
+        }
+        .getQuery()
+
+    val queryString = query.query
+    assertThat(queryString)
+      .isEqualTo(
+        """
+              SELECT a.resourceUuid, a.serializedResource
+              FROM ResourceEntity a
+              WHERE a.resourceType = ?
+              AND a.resourceUuid IN (
+              SELECT resourceUuid FROM ReferenceIndexEntity
+              WHERE resourceType = ? AND index_name = ? AND ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))
+              )
+        """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        "Patient/patient-0",
+        "Patient/patient-1",
+        "Patient/patient-4",
+        "Patient/patient-7",
+      )
+      .inOrder()
+  }
+
+  @Test
+  fun `search CarePlan filter with 8 patient references`() {
+    val patientIdReferenceList = (0..7).map { "Patient/patient-$it" }
+    val patientIdList =
+      patientIdReferenceList.map<String, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = it }
+      }
+    val query =
+      Search(ResourceType.CarePlan)
+        .apply { filter(CarePlan.SUBJECT, *patientIdList.toTypedArray()) }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+                SELECT a.resourceUuid, a.serializedResource
+                FROM ResourceEntity a
+                WHERE a.resourceType = ?
+                AND a.resourceUuid IN (
+                SELECT resourceUuid FROM ReferenceIndexEntity
+                WHERE resourceType = ? AND index_name = ? AND (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))
+                )
+          """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .containsExactly(
+        "CarePlan",
+        "CarePlan",
+        "subject",
+        *patientIdReferenceList.toTypedArray(),
       )
       .inOrder()
   }

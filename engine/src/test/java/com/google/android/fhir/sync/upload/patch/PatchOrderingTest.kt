@@ -18,7 +18,6 @@ package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.logicalId
@@ -36,26 +35,14 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.RelatedPerson
 import org.hl7.fhir.r4.model.Resource
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class PatchOrderingTest {
 
-  @Mock private lateinit var database: Database
-  private lateinit var patchGenerator: PerResourcePatchGenerator
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.openMocks(this)
-    patchGenerator = PerResourcePatchGenerator.with(database)
-  }
+  private val patchGenerator = PerResourcePatchGenerator
 
   @Test
   fun `createReferenceAdjacencyList with local changes for only new resources should only have edges to inserted resources`() =
@@ -77,8 +64,6 @@ class PatchOrderingTest {
       helper.createEncounter("encounter-3", 11, "Patient/patient-3")
       helper.createObservation("observation-3", 12, "Patient/patient-3", "Encounter/encounter-3")
       group = helper.updateGroup(group, 13, "Patient/patient-3")
-      whenever(database.getLocalChangeResourceReferences(any()))
-        .thenReturn(helper.localChangeResourceReferences)
 
       val result =
         patchGenerator
@@ -175,10 +160,7 @@ class PatchOrderingTest {
     helper.createEncounter("encounter-3", 12, "Patient/patient-3")
     helper.createPatient("patient-3", 13)
 
-    whenever(database.getLocalChangeResourceReferences(any()))
-      .thenReturn(helper.localChangeResourceReferences)
-
-    val result = patchGenerator.generate(helper.localChanges)
+    val result = patchGenerator.generate(helper.localChanges, helper.localChangeResourceReferences)
 
     // This order is based on the current implementation of the topological sort in [PatchOrdering],
     // it's entirely possible to generate different order here which is acceptable/correct, should
@@ -221,10 +203,8 @@ class PatchOrderingTest {
       helper.createEncounter("encounter-2", 8, "Patient/patient-3")
       helper.createPatient("patient-3", 9)
 
-      whenever(database.getLocalChangeResourceReferences(any()))
-        .thenReturn(helper.localChangeResourceReferences)
-
-      val result = patchGenerator.generate(helper.localChanges)
+      val result =
+        patchGenerator.generate(helper.localChanges, helper.localChangeResourceReferences)
 
       assertThat(
           result.map { it.patchMappings.map { it.generatedPatch.resourceId } },

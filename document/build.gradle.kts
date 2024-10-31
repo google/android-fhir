@@ -39,13 +39,13 @@ dependencies {
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
   implementation(Dependencies.material)
-  implementation(Dependencies.androidFhirEngine)
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.zxing)
   implementation(Dependencies.nimbus)
   implementation(Dependencies.timber)
+  implementation(libs.android.fhir.engine)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
 

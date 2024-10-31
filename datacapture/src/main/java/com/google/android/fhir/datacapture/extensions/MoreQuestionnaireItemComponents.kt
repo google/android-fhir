@@ -64,6 +64,13 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
 internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR =
   "https://github.com/google/android-fhir/dialog"
 
+internal enum class StyleUrl(val url: String) {
+  BASE("https://github.com/google/android-fhir/tree/master/datacapture/android-style"),
+  PREFIX_TEXT_VIEW("prefix_text_view"),
+  QUESTION_TEXT_VIEW("question_text_view"),
+  SUBTITLE_TEXT_VIEW("subtitle_text_view"),
+}
+
 // Below URLs exist and are supported by HL7
 
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
@@ -1029,3 +1036,17 @@ val Resource.logicalId: String
   get() {
     return this.idElement?.idPart.orEmpty()
   }
+
+internal fun QuestionnaireItemComponent.readCustomStyleExtension(styleUrl: StyleUrl): String? {
+  // Find the base extension
+  val baseExtension = extension.find { it.url == StyleUrl.BASE.url }
+  baseExtension?.let { ext ->
+    // Extract nested extension based on the given StyleUrl
+    ext.extension.forEach { nestedExt ->
+      if (nestedExt.url == styleUrl.url) {
+        return nestedExt.value.asStringValue()
+      }
+    }
+  }
+  return null
+}

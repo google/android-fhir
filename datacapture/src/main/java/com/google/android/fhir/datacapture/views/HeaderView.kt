@@ -23,6 +23,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
+import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
@@ -64,6 +65,12 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)
+    applyCustomOrDefaultStyle(
+      questionnaireViewItem.questionnaireItem,
+      prefixTextView = prefix,
+      questionTextView = question,
+      instructionTextView = hint,
+    )
   }
 
   /**
