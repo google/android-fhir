@@ -242,7 +242,7 @@ internal class QuestionnaireEditAdapter(
   ): QuestionnaireViewHolderType {
     val questionnaireItem = questionnaireViewItem.questionnaireItem
 
-    // Use the view type that the client wants if they specified an itemControl
+    // Use the view type that the client wants if they specified an itemControl or dialog extension
     return when {
       questionnaireItem.shouldUseDialog -> QuestionnaireViewHolderType.DIALOG_SELECT
       else -> questionnaireItem.itemControl?.viewHolderType
