@@ -61,7 +61,8 @@ internal const val EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
   "https://github.com/google/android-fhir/questionnaire-item-control"
 
-internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR = "https://github.com/google/android-fhir/dialog"
+internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR =
+  "https://github.com/google/android-fhir/dialog"
 
 // Below URLs exist and are supported by HL7
 
