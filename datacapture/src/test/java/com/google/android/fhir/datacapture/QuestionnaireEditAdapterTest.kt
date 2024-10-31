@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
+import com.google.android.fhir.datacapture.extensions.EXTENSION_DIALOG_URL_ANDROID_FHIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
@@ -494,6 +495,84 @@ class QuestionnaireEditAdapterTest {
 
     assertThat(questionnaireEditAdapter.getItemViewType(0))
       .isEqualTo(QuestionnaireViewHolderType.DROP_DOWN.value)
+  }
+
+  @Suppress("ktlint:standard:max-line-length")
+  @Test
+  fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_andDialogExtension_shouldReturnDialogSelectViewHolderType() {
+    val questionnaireEditAdapter = QuestionnaireEditAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.apply {
+      addExtension(
+        Extension()
+          .setUrl(EXTENSION_ITEM_CONTROL_URL)
+          .setValue(
+            CodeableConcept()
+              .addCoding(
+                Coding()
+                  .setCode(ItemControlTypes.RADIO_BUTTON.extensionCode)
+                  .setDisplay("Radio Button")
+                  .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+              ),
+          ),
+      )
+      addExtension(Extension().setUrl(EXTENSION_DIALOG_URL_ANDROID_FHIR))
+    }
+    questionnaireEditAdapter.submitList(
+      listOf(
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          ),
+        ),
+      ),
+    )
+
+    assertThat(questionnaireEditAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireViewHolderType.DIALOG_SELECT.value)
+  }
+
+  @Suppress("ktlint:standard:max-line-length")
+  @Test
+  fun getItemViewType_choiceItemType_itemControlExtensionWithCheckBox_andDialogExtension_shouldReturnDialogSelectViewHolderType() {
+    val questionnaireEditAdapter = QuestionnaireEditAdapter()
+    val questionnaireItem =
+      Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
+    questionnaireItem.apply {
+      addExtension(
+        Extension()
+          .setUrl(EXTENSION_ITEM_CONTROL_URL)
+          .setValue(
+            CodeableConcept()
+              .addCoding(
+                Coding()
+                  .setCode(ItemControlTypes.CHECK_BOX.extensionCode)
+                  .setDisplay("Check Box")
+                  .setSystem(EXTENSION_ITEM_CONTROL_SYSTEM),
+              ),
+          ),
+      )
+      addExtension(Extension().setUrl(EXTENSION_DIALOG_URL_ANDROID_FHIR))
+    }
+    questionnaireEditAdapter.submitList(
+      listOf(
+        QuestionnaireAdapterItem.Question(
+          QuestionnaireViewItem(
+            questionnaireItem,
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+            validationResult = NotValidated,
+            answersChangedCallback = { _, _, _, _ -> },
+          ),
+        ),
+      ),
+    )
+
+    assertThat(questionnaireEditAdapter.getItemViewType(0))
+      .isEqualTo(QuestionnaireViewHolderType.DIALOG_SELECT.value)
   }
 
   // TODO: test errors thrown for unsupported types

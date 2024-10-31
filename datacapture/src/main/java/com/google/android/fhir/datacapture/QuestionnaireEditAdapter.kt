@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
@@ -242,7 +243,10 @@ internal class QuestionnaireEditAdapter(
     val questionnaireItem = questionnaireViewItem.questionnaireItem
 
     // Use the view type that the client wants if they specified an itemControl
-    return questionnaireItem.itemControl?.viewHolderType
+    return when {
+      questionnaireItem.shouldUseDialog -> QuestionnaireViewHolderType.DIALOG_SELECT
+      else -> questionnaireItem.itemControl?.viewHolderType
+    }
     // Otherwise, choose a sensible UI element automatically
     ?: run {
         val numOptions = questionnaireViewItem.enabledAnswerOptions.size

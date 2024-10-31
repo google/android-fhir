@@ -9,12 +9,15 @@
             "coding": [
               {
                 "system": "http://hl7.org/fhir/questionnaire-item-control",
-                "code": "lookup",
-                "display": "Lookup"
+                "code": "check-box",
+                "display": "Check Box"
               }
             ],
-            "text": "Lookup"
+            "text": "Check box"
           }
+        },
+        {
+          "url": "https://github.com/google/android-fhir/dialog"
         }
       ],
       "linkId": "1.1",

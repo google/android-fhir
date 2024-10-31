@@ -61,6 +61,8 @@ internal const val EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
   "https://github.com/google/android-fhir/questionnaire-item-control"
 
+internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR = "https://github.com/google/android-fhir/dialog"
+
 // Below URLs exist and are supported by HL7
 
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
@@ -230,6 +232,15 @@ val QuestionnaireItemComponent.itemControlCode: String?
  */
 val QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
+
+private val QuestionnaireItemComponent.hasDialogExtension: Boolean
+  get() = this.extension.any { it.url == EXTENSION_DIALOG_URL_ANDROID_FHIR }
+
+val QuestionnaireItemComponent.shouldUseDialog: Boolean
+  get() =
+    this.hasDialogExtension &&
+      (this.itemControl?.viewHolderType == QuestionnaireViewHolderType.CHECK_BOX_GROUP ||
+        this.itemControl?.viewHolderType == QuestionnaireViewHolderType.RADIO_GROUP)
 
 /**
  * The desired orientation for the list of choices.
