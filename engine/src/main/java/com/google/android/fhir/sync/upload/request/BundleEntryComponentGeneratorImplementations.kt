@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,13 @@ import org.hl7.fhir.r4.model.Bundle
 
 internal class HttpPutForCreateEntryComponentGenerator(useETagForUpload: Boolean) :
   BundleEntryComponentGenerator(Bundle.HTTPVerb.PUT, useETagForUpload) {
+  override fun getEntryResource(patch: Patch): IBaseResource {
+    return FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patch.payload)
+  }
+}
+
+internal class HttpPostForCreateEntryComponentGenerator(useETagForUpload: Boolean) :
+  BundleEntryComponentGenerator(Bundle.HTTPVerb.POST, useETagForUpload) {
   override fun getEntryResource(patch: Patch): IBaseResource {
     return FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(patch.payload)
   }
