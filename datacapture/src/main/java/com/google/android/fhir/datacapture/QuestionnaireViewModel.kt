@@ -1123,7 +1123,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
-      forceValidation = false
+      //forceValidation = false
     }
 
     if (
