@@ -16,6 +16,7 @@
 
 package com.google.android.fhir
 
+import com.google.android.fhir.db.LocalChangeResourceReference
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.sync.ConflictResolver
@@ -121,7 +122,10 @@ interface FhirEngine {
   @Deprecated("To be deprecated.")
   suspend fun syncUpload(
     uploadStrategy: UploadStrategy,
-    upload: (suspend (List<LocalChange>) -> Flow<UploadRequestResult>),
+    upload:
+      (suspend (List<LocalChange>, List<LocalChangeResourceReference>) -> Flow<
+          UploadRequestResult,
+        >),
   ): Flow<SyncUploadProgress>
 
   /**
@@ -204,6 +208,12 @@ interface FhirEngine {
    *   back and no record is purged.
    */
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
+
+  /**
+   * Adds support for performing actions on `FhirEngine` as a single atomic transaction where the
+   * entire set of changes succeed or fail as a single entity
+   */
+  suspend fun withTransaction(block: suspend FhirEngine.() -> Unit)
 }
 
 /**
