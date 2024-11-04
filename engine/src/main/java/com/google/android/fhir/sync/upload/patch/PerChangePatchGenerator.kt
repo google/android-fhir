@@ -17,6 +17,7 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
+import com.google.android.fhir.db.LocalChangeResourceReference
 
 /**
  * Generates a [Patch] for each [LocalChange].
@@ -27,6 +28,7 @@ import com.google.android.fhir.LocalChange
 internal object PerChangePatchGenerator : PatchGenerator {
   override suspend fun generate(
     localChanges: List<LocalChange>,
+    localChangesReferences: List<LocalChangeResourceReference>,
   ): List<StronglyConnectedPatchMappings> =
     localChanges
       .map {

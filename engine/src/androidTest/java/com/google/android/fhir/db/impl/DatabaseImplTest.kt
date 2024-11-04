@@ -39,13 +39,16 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.UploadRequestResult
-import com.google.android.fhir.sync.upload.UploadStrategy.AllChangesSquashedBundlePut
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -559,8 +562,15 @@ class DatabaseImplTest {
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
-      .syncUpload(AllChangesSquashedBundlePut) {
-        it
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
+        lcs
           .first { it.resourceId == "remote-patient-3" }
           .let {
             flowOf(
@@ -5168,6 +5178,32 @@ class DatabaseImplTest {
       val localChangeResourceReferences = database.getLocalChangeResourceReferences(localChangeIds)
       assertThat(localChangeResourceReferences.size).isEqualTo(locallyCreatedPatients.size)
     }
+
+  @Test
+  fun searchTasksForManyPatientsReturnCorrectly() = runBlocking {
+    val patients = (0 until 990).map { Patient().apply { id = "task-patient-index-$it" } }
+    database.insert(*patients.toTypedArray())
+    val tasks =
+      patients.mapIndexed { index, patient ->
+        Task().apply {
+          id = "patient-$index-task"
+          `for` = Reference().apply { reference = "Patient/${patient.logicalId}" }
+        }
+      }
+    database.insert(*tasks.toTypedArray())
+
+    val patientsSearchIdList =
+      patients.take(980).map<Patient, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = "Patient/${it.logicalId}" }
+      }
+    val searchQuery =
+      Search(ResourceType.Task)
+        .apply { filter(Task.SUBJECT, *patientsSearchIdList.toTypedArray()) }
+        .getQuery()
+
+    val searchResults = database.search<Task>(searchQuery)
+    assertThat(searchResults.size).isEqualTo(980)
+  }
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
