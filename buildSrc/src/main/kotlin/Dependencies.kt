@@ -87,14 +87,6 @@ object Dependencies {
   const val playServicesLocation =
     "com.google.android.gms:play-services-location:${Versions.playServicesLocation}"
 
-  const val androidFhirGroup = "org.smartregister"
-  const val androidFhirEngineModule = "engine"
-  const val androidFhirKnowledgeModule = "knowledge"
-  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
-  const val androidFhirEngine =
-    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
-  const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
-
   const val apacheCommonsCompress =
     "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
 
@@ -131,9 +123,6 @@ object Dependencies {
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-    const val androidFhirCommon = "0.1.0-alpha05-preview3-SNAPSHOT"
-    const val androidFhirEngine = "1.0.0-preview13-SNAPSHOT"
-    const val androidFhirKnowledge = "0.1.0-beta01-preview-SNAPSHOT"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
