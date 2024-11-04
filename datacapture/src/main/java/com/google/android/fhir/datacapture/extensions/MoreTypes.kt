@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.extensions
 
 import android.content.Context
+import android.text.Spanned
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.views.factories.localDate
 import com.google.android.fhir.datacapture.views.factories.localTime
@@ -56,6 +57,8 @@ fun Type.asStringValue(): String {
  */
 fun Type.displayString(context: Context): String =
   getDisplayString(this, context) ?: context.getString(R.string.not_answered)
+
+fun Type.displayStringSpanned(context: Context): Spanned = displayString(context).toSpanned()
 
 /** Returns value as string depending on the [Type] of element. */
 fun Type.getValueAsString(context: Context): String =
