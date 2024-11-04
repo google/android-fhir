@@ -17,7 +17,7 @@
 package com.google.android.fhir.sync.upload.patch
 
 import com.google.android.fhir.LocalChange
-import com.google.android.fhir.db.Database
+import com.google.android.fhir.db.LocalChangeResourceReference
 
 /**
  * Generates [Patch]es from [LocalChange]s and output [List<[StronglyConnectedPatchMappings]>] to
@@ -35,17 +35,17 @@ internal interface PatchGenerator {
    * NOTE: different implementations may have requirements on the size of [localChanges] and output
    * certain numbers of [Patch]es.
    */
-  suspend fun generate(localChanges: List<LocalChange>): List<StronglyConnectedPatchMappings>
+  suspend fun generate(
+    localChanges: List<LocalChange>,
+    localChangesReferences: List<LocalChangeResourceReference>,
+  ): List<StronglyConnectedPatchMappings>
 }
 
 internal object PatchGeneratorFactory {
-  fun byMode(
-    mode: PatchGeneratorMode,
-    database: Database,
-  ): PatchGenerator =
+  fun byMode(mode: PatchGeneratorMode): PatchGenerator =
     when (mode) {
       is PatchGeneratorMode.PerChange -> PerChangePatchGenerator
-      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator.with(database)
+      is PatchGeneratorMode.PerResource -> PerResourcePatchGenerator
     }
 }
 
