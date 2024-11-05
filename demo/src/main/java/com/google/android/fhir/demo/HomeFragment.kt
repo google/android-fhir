@@ -35,17 +35,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
   }
 
   private fun setOnClicks() {
-    requireView().findViewById<CardView>(R.id.item_new_patient).setOnClickListener {
-      findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToAddPatientFragment())
-    }
-    requireView().findViewById<CardView>(R.id.item_patient_list).setOnClickListener {
-      findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToPatientList())
-    }
     requireView().findViewById<CardView>(R.id.item_search).setOnClickListener {
       findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToPatientList())
     }
     requireView().findViewById<CardView>(R.id.item_sync).setOnClickListener {
       findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToSyncFragment())
+    }
+    requireView().findViewById<CardView>(R.id.item_periodic_sync).setOnClickListener {
+      findNavController()
+        .navigate(HomeFragmentDirections.actionHomeFragmentToPeriodicSyncFragment())
     }
   }
 }

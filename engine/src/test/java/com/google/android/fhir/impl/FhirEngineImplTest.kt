@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
@@ -26,6 +27,7 @@ import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
+import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
@@ -50,12 +52,16 @@ import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -317,6 +323,36 @@ class FhirEngineImplTest {
         },
       )
       .isTrue()
+  }
+
+  @Test
+  fun `search() should return patients filtered by param _id`() = runTest {
+    val patient1 = Patient().apply { id = "patient-1" }
+    val patient2 = Patient().apply { id = "patient-2" }
+    val patient3 = Patient().apply { id = "patient-45" }
+    val patient4 = Patient().apply { id = "patient-4355" }
+    val patient5 = Patient().apply { id = "patient-899" }
+    val patient6 = Patient().apply { id = "patient-883376" }
+    fhirEngine.create(patient1, patient2, patient3, patient4, patient5, patient6)
+
+    val filterValues =
+      listOf(patient2, patient3, patient1, patient5, patient4, patient6).map<
+        Patient,
+        TokenParamFilterCriterion.() -> Unit,
+      > {
+        { value = of(it.logicalId) }
+      }
+    val patientSearchResult =
+      fhirEngine.search<Patient> { filter(TokenClientParam("_id"), *filterValues.toTypedArray()) }
+    assertThat(patientSearchResult.map { it.resource.logicalId })
+      .containsExactly(
+        "patient-2",
+        "patient-45",
+        "patient-1",
+        "patient-4355",
+        "patient-899",
+        "patient-883376",
+      )
   }
 
   @Test
@@ -803,6 +839,60 @@ class FhirEngineImplTest {
       }
       .collect {}
     assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun `withTransaction saves changes successfully`() = runTest {
+    fhirEngine.withTransaction {
+      val patient01 =
+        Patient().apply {
+          id = "patient-01"
+          gender = Enumerations.AdministrativeGender.FEMALE
+        }
+      this.create(patient01)
+
+      val patient01Observation =
+        Observation().apply {
+          id = "patient-01-observation"
+          status = Observation.ObservationStatus.FINAL
+          code = CodeableConcept()
+          subject = Reference(patient01)
+        }
+      this.create(patient01Observation)
+    }
+
+    assertThat(
+        fhirEngine.get<Patient>("patient-01"),
+      )
+      .isNotNull()
+    assertThat(fhirEngine.get<Observation>("patient-01-observation")).isNotNull()
+    assertThat(
+        fhirEngine.get<Observation>("patient-01-observation").subject.reference,
+      )
+      .isEqualTo("Patient/patient-01")
+  }
+
+  @Test
+  fun `withTransaction rolls back changes when an error occurs`() = runTest {
+    try {
+      fhirEngine.withTransaction {
+        val patientEncounter =
+          Encounter().apply {
+            id = "enc-01"
+            status = Encounter.EncounterStatus.FINISHED
+            class_ = Coding()
+          }
+
+        this.create(patientEncounter)
+
+        // An exception will rollback the entire block
+        this.get(ResourceType.Patient, "non_existent_id") as Patient
+      }
+    } catch (_: ResourceNotFoundException) {}
+
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Encounter>("enc-01") }
+    }
   }
 
   companion object {

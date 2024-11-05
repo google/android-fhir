@@ -124,7 +124,8 @@ class CheckBoxGroupViewHolderFactoryTest {
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
     children.forEachIndexed { index, view ->
-      assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
+      assertThat(view.text.toString())
+        .isEqualTo(questionnaire.answerOption[index].valueCoding.display)
       assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.MATCH_PARENT)
     }
   }
@@ -161,7 +162,8 @@ class CheckBoxGroupViewHolderFactoryTest {
     val checkBoxGroup = viewHolder.itemView.findViewById<ConstraintLayout>(R.id.checkbox_group)
     val children = checkBoxGroup.children.asIterable().filterIsInstance<CheckBox>()
     children.forEachIndexed { index, view ->
-      assertThat(view.text).isEqualTo(questionnaire.answerOption[index].valueCoding.display)
+      assertThat(view.text.toString())
+        .isEqualTo(questionnaire.answerOption[index].valueCoding.display)
       assertThat(view.layoutParams.width).isEqualTo(ViewGroup.LayoutParams.WRAP_CONTENT)
     }
   }
