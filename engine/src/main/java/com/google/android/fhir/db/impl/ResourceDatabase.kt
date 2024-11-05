@@ -208,3 +208,10 @@ internal val MIGRATION_7_8 =
       }
     }
   }
+
+internal val MIGRATION_8_9 =
+  object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      TODO("Not yet implemented")
+    }
+  }

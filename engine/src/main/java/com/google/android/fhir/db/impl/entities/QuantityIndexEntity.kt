@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 Google LLC
+ * Copyright 2021-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,20 @@ import org.hl7.fhir.r4.model.ResourceType
 @Entity(
   indices =
     [
-      Index(value = ["resourceType", "index_name", "index_value", "index_code"]),
+      Index(value = ["index_name", "resourceType", "index_value", "resourceUuid"]),
+      Index(
+        value =
+          [
+            "index_name",
+            "resourceType",
+            "index_code",
+            "index_system",
+            "index_value",
+            "resourceUuid",
+          ],
+      ),
+      Index(value = ["index_name", "resourceType", "index_code", "index_value", "resourceUuid"]),
+      Index(value = ["index_name", "resourceType", "index_system", "index_value", "resourceUuid"]),
       // keep this index for faster foreign lookup
       Index(value = ["resourceUuid"]),
     ],
