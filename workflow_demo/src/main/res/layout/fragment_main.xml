@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ui.main.MainFragment"
+>
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:cardCornerRadius="5dp"
+        app:cardElevation="5dp"
+        app:contentPadding="5dp"
+        app:strokeWidth="2dp"
+    >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="150dp"
+        >
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/patient_name"
+                style="@style/TextAppearance.AppCompat.Headline"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mr. John Doe Sr."
+            />
+
+        </RelativeLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <Button
+        android:layout_marginRight="10dp"
+        android:id="@+id/restart_flow"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:text="Restart Flow"
+    />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+    >
+
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/phase_view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+        />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/into_tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:background="@color/white"
+            android:backgroundTint="@android:color/transparent"
+            app:tabBackground="@drawable/pager_move_drawable"
+            app:tabGravity="center"
+            app:tabIndicatorHeight="0dp"
+            app:tabPaddingEnd="10dp"
+            app:tabPaddingStart="10dp"
+        />
+
+        <ProgressBar
+            android:layout_gravity="center"
+            android:id="@+id/progress_circular"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+        />
+    </FrameLayout>
+
+</LinearLayout>

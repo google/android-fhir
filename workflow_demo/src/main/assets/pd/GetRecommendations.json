@@ -1,0 +1,99 @@
+{
+    "resourceType": "PlanDefinition",
+    "id": "GetRecommendations",
+    "url": "http://fhir.org/guides/cqf/cpg/example/PlanDefinition/GetRecommendations",
+    "type": {
+        "coding": [
+            {
+                "system": "http://terminology.hl7.org/CodeSystem/plan-definition-type",
+                "code": "eca-rule"
+            }
+        ]
+    },
+    "action": [
+        {
+            "title": "Determine potential treatments given relevant patient information",
+            "description": "Given input data, including age, gender, symptoms, diagnoses, and possible orders, determine potential treatments",
+            "code": [
+                {
+                    "system": "http://hl7.org/fhir/uv/cpg/CodeSystem/cpg-common-process-cs",
+                    "code": "guideline-based-care"
+                }
+            ],
+            "input": [
+                {
+                    "type": "Patient",
+                    "mustSupport": [
+                        "birthDate",
+                        "gender"
+                    ]
+                },
+                {
+                    "type": "Observation",
+                    "mustSupport": [
+                        "category",
+                        "code",
+                        "value"
+                    ],
+                    "codeFilter": [
+                        {
+                            "path": "category",
+                            "code": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/observation-category",
+                                    "code": "vital-signs"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "Condition",
+                    "mustSupport": [
+                        "category",
+                        "code",
+                        "clinicalStatus",
+                        "verificationStatus",
+                        "onset"
+                    ],
+                    "codeFilter": [
+                        {
+                            "path": "category",
+                            "code": [
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                                    "code": "encounter-diagnosis"
+                                },
+                                {
+                                    "system": "http://terminology.hl7.org/CodeSystem/condition-category",
+                                    "code": "problem-list-item"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "ServiceRequest",
+                    "mustSupport": [
+                        "category",
+                        "code"
+                    ]
+                }
+            ],
+            "output": [
+                {
+                    "type": "ServiceRequest",
+                    "profile": [
+                        "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-servicerequest"
+                    ]
+                },
+                {
+                    "type": "MedicationRequest",
+                    "profile": [
+                        "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest"
+                    ]
+                }
+            ]
+        }
+    ]
+}
