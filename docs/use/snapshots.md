@@ -1,14 +1,14 @@
 # Snapshots
 
-You can test the latest Android FHIR SDK libraries using the snapshot versions published on GitHub Packages. 
+You can test the latest Android FHIR SDK libraries using the snapshot versions published on GitHub Packages.
 
 They are unreleased versions of the library built from the `HEAD` of the main branch and have the `-SNAPSHOT` suffix in their version numbers.
 
 They can be found [here](https://github.com/orgs/google/packages?repo_name=android-fhir).
 
-> :warning: The snapshots are for testing and development purposes only. They are not QA tested and not production ready. Do **NOT** use them in production.
+!!! warning
 
-# How to use SNAPSHOT artifacts
+    The snapshots are for testing and development purposes only. They are not QA tested and not production ready. Do **NOT** use them in production.
 
 ## Configure GitHub maven repositories in `build.gradle.kts`
 
@@ -62,7 +62,7 @@ dependencies {
 }
 ```
 
-The versions `<...-version>` can be found in https://github.com/google?tab=packages&repo_name=android-fhir
+The versions `<...-version>` can be found in <https://github.com/google?tab=packages&repo_name=android-fhir>
 
 ## How SNAPSHOT versions are managed by Gradle
 
@@ -73,5 +73,3 @@ To summarize:
 * By default, Gradle caches changing versions of dependencies for **24 hours**
 * Dependency caching can be [controlled programmatically](https://docs.gradle.org/current/userguide/dynamic_versions.html#sec:controlling_dependency_caching_programmatically)
 * The `--refresh-dependencies` option in command line tells Gradle to ignore all cached versions
-
-

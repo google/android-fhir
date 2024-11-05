@@ -1,5 +1,6 @@
 import Dependencies.removeIncompatibleDependencies
 import java.net.URL
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 plugins {
   id(Plugins.BuildPlugins.androidLib)
@@ -95,10 +96,10 @@ dependencies {
   api(Dependencies.HapiFhir.guavaCaching)
 
   implementation(Dependencies.HapiFhir.guavaCaching)
-  implementation(Dependencies.androidFhirEngine) { exclude(module = "truth") }
-  implementation(Dependencies.androidFhirKnowledge)
   implementation(Dependencies.timber)
   implementation(Dependencies.xerces)
+  implementation(libs.android.fhir.engine) { exclude(module = "truth") }
+  implementation(libs.android.fhir.knowledge)
   implementation(libs.androidx.core)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.android)
@@ -113,9 +114,21 @@ dependencies {
   testImplementation(libs.androidx.room.runtime)
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
   testImplementation(libs.truth)
-  testImplementation(project(mapOf("path" to ":knowledge")))
   testImplementation(project(":workflow-testing"))
+  testImplementation(project(":knowledge"))
+
+  configurations.all {
+    if (name.contains("test", ignoreCase = true)) {
+      resolutionStrategy.dependencySubstitution {
+        // To test the workflow library against the latest Knowledge Manager APIs, substitute the
+        // dependency on the released Knowledge Manager library with the current build.
+        substitute(module("com.google.android.fhir:knowledge:0.1.0-beta01"))
+          .using(project(":knowledge"))
+      }
+    }
+  }
 
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->

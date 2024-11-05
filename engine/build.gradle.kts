@@ -113,7 +113,6 @@ dependencies {
     exclude(module = "httpclient")
   }
   implementation(Dependencies.Retrofit.coreRetrofit)
-  implementation(Dependencies.androidFhirCommon)
   implementation(Dependencies.guava)
   implementation(Dependencies.httpInterceptor)
   implementation(Dependencies.jsonToolsPatch)
@@ -121,6 +120,7 @@ dependencies {
   implementation(Dependencies.timber)
   implementation(Dependencies.woodstox)
   implementation(Dependencies.xerces)
+  implementation(libs.android.fhir.common)
   implementation(libs.androidx.datastore.preferences)
   implementation(libs.androidx.lifecycle.livedata)
   implementation(libs.androidx.room.room)
