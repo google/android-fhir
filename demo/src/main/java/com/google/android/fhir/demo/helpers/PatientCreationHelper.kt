@@ -17,6 +17,7 @@
 package com.google.android.fhir.demo.helpers
 
 import android.icu.text.SimpleDateFormat
+import com.google.android.fhir.datacapture.extensions.logicalId
 import java.util.*
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
@@ -26,20 +27,20 @@ import org.hl7.fhir.r4.model.Patient
 
 object PatientCreationHelper {
 
-  private fun createPatient(
+  fun createPatient(
+    patientId: String,
     firstName: String,
     lastName: String,
     birthDate: String,
     gender: Enumerations.AdministrativeGender,
-    phoneNumber: String,
-    city: String,
-    country: String,
+    phoneNumber: String? = null,
+    city: String? = null,
+    country: String? = null,
     isActive: Boolean,
   ): Patient {
     val patient = Patient()
 
     // Set UUID as patient ID
-    val patientId = UUID.randomUUID().toString()
     patient.id = patientId
 
     // Set patient name
@@ -77,6 +78,7 @@ object PatientCreationHelper {
     // Patient 1
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "John",
         lastName = "Doe",
         birthDate = "1990-01-01",
@@ -91,6 +93,7 @@ object PatientCreationHelper {
     // Patient 2
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Jane",
         lastName = "Smith",
         birthDate = "1985-05-15",
@@ -105,6 +108,7 @@ object PatientCreationHelper {
     // Patient 3
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Emily",
         lastName = "Johnson",
         birthDate = "1978-11-12",
@@ -119,6 +123,7 @@ object PatientCreationHelper {
     // Patient 4
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Michael",
         lastName = "Brown",
         birthDate = "1982-04-07",
@@ -133,6 +138,7 @@ object PatientCreationHelper {
     // Patient 5
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Sophia",
         lastName = "Davis",
         birthDate = "1995-08-22",
@@ -147,6 +153,7 @@ object PatientCreationHelper {
     // Patient 6
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Liam",
         lastName = "Wilson",
         birthDate = "2001-12-30",
@@ -161,6 +168,7 @@ object PatientCreationHelper {
     // Patient 7
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Olivia",
         lastName = "Martinez",
         birthDate = "1989-03-17",
@@ -175,6 +183,7 @@ object PatientCreationHelper {
     // Patient 8
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Noah",
         lastName = "Garcia",
         birthDate = "1975-07-05",
@@ -189,6 +198,7 @@ object PatientCreationHelper {
     // Patient 9
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Ava",
         lastName = "Anderson",
         birthDate = "1998-02-27",
@@ -203,6 +213,7 @@ object PatientCreationHelper {
     // Patient 10
     patients.add(
       createPatient(
+        patientId = UUID.randomUUID().toString(),
         firstName = "Ethan",
         lastName = "Harris",
         birthDate = "1993-09-10",
@@ -215,7 +226,32 @@ object PatientCreationHelper {
     )
 
     // Add more patients as needed
-
     return patients
   }
+}
+
+data class PatientUiState(
+  val patientId: String,
+  val firstName: String,
+  val lastName: String = "Unknown",
+  val birthDate: String = "1980-01-01",
+  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.UNKNOWN,
+  val isActive: Boolean = true,
+  val isReadOperation: Boolean = false,
+)
+
+fun Patient.toPatientUiState(isReadOperation: Boolean = false): PatientUiState {
+  val patientId = this.logicalId ?: ""
+  val firstName = this.name?.firstOrNull()?.given?.firstOrNull()?.value ?: ""
+  val lastName = this.name?.firstOrNull()?.family ?: "Unknown"
+  val gender = this.gender ?: Enumerations.AdministrativeGender.OTHER
+  val isActive = this.active ?: true
+  return PatientUiState(
+    patientId,
+    firstName,
+    lastName,
+    gender = gender,
+    isActive = isActive,
+    isReadOperation = isReadOperation,
+  )
 }
