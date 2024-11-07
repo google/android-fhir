@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+>
+
+  <!-- Title or Header -->
+  <TextView
+        android:id="@+id/title_sync"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"
+        android:text="Sync Data"
+        android:textStyle="bold"
+        android:textAppearance="?attr/textAppearanceHeadlineSmall"
+    />
+
+  <!-- Last Sync Time -->
+  <TextView
+        android:id="@+id/lastSyncTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/title_sync"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingTop="8dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+    />
+
+  <!-- Current Operation Status -->
+  <TextView
+        android:id="@+id/current_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/lastSyncTime"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+    />
+
+  <!-- Sync Operation Indicator -->
+  <ProgressBar
+        android:id="@+id/sync_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/current_status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp"
+        style="?android:attr/progressBarStyle"
+        android:indeterminate="true"
+        android:visibility="gone"
+    />
+
+  <!-- Sync Now Button -->
+  <Button
+        android:id="@+id/sync_now_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sync_indicator"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="64dp"
+        android:paddingLeft="24dp"
+        android:paddingRight="24dp"
+        android:text="Sync Now"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="?attr/colorOnPrimary"
+    />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

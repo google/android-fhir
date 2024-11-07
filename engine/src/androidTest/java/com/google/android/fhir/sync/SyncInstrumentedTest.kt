@@ -26,6 +26,8 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.testing.WorkManagerTestInitHelper
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.TestDataSourceImpl
 import com.google.android.fhir.testing.TestDownloadManagerImpl
@@ -65,7 +67,13 @@ class SyncInstrumentedTest {
 
     override fun getConflictResolver() = AcceptRemoteConflictResolver
 
-    override fun getUploadStrategy(): UploadStrategy = UploadStrategy.AllChangesSquashedBundlePut
+    override fun getUploadStrategy(): UploadStrategy =
+      UploadStrategy.forBundleRequest(
+        methodForCreate = HttpCreateMethod.PUT,
+        methodForUpdate = HttpUpdateMethod.PATCH,
+        squash = true,
+        bundleSize = 500,
+      )
   }
 
   class TestSyncWorkerForDownloadFailing(appContext: Context, workerParams: WorkerParameters) :
@@ -237,7 +245,7 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Succeeded
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -246,7 +254,7 @@ class SyncInstrumentedTest {
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.first().lastSyncJobStatus).isNull()
     assertThat(states.last().currentSyncJobStatus)
-      .isInstanceOf(CurrentSyncJobStatus.Succeeded::class.java)
+      .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
     assertThat(states.last().lastSyncJobStatus)
       .isInstanceOf(LastSyncJobStatus.Succeeded::class.java)
   }
@@ -268,7 +276,7 @@ class SyncInstrumentedTest {
         .transformWhile {
           states.add(it)
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Failed
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
@@ -277,7 +285,7 @@ class SyncInstrumentedTest {
       .isInstanceOf(CurrentSyncJobStatus.Running::class.java)
     assertThat(states.first().lastSyncJobStatus).isNull()
     assertThat(states.last().currentSyncJobStatus)
-      .isInstanceOf(CurrentSyncJobStatus.Failed::class.java)
+      .isInstanceOf(CurrentSyncJobStatus.Enqueued::class.java)
     assertThat(states.last().lastSyncJobStatus).isInstanceOf(LastSyncJobStatus.Failed::class.java)
   }
 
@@ -297,7 +305,7 @@ class SyncInstrumentedTest {
         )
         .transformWhile {
           emit(it)
-          it.currentSyncJobStatus !is CurrentSyncJobStatus.Succeeded
+          it.currentSyncJobStatus !is CurrentSyncJobStatus.Enqueued
         }
         .shareIn(this, SharingStarted.Eagerly, 5)
     }
