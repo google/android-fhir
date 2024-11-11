@@ -29,13 +29,11 @@ class ActivityHandler(
   suspend fun prepareAndInitiatePlan(): Result<Boolean> {
     // Get the current phase.
     val currentPhase = activityFlow.getCurrentPhase() as Phase.RequestPhase<CPGRequestResource<*>>
-    // Get the request resource and update the status.
-    val currentRequest = currentPhase.getRequestResource()
-    currentRequest.setStatus(Status.ACTIVE)
-
     // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
-    currentPhase.update(currentRequest)
+    currentPhase.update(
+      currentPhase.getRequestResource().apply { setStatus(Status.ACTIVE) },
+    )
 
     val preparedPlan = activityFlow.preparePlan()
     if (preparedPlan.isFailure) return Result.failure(preparedPlan.exceptionOrNull()!!)
@@ -52,13 +50,11 @@ class ActivityHandler(
   suspend fun prepareAndInitiateOrder(): Result<Boolean> {
     // Get the current phase.
     val currentPhase = activityFlow.getCurrentPhase() as Phase.RequestPhase<CPGRequestResource<*>>
-    // Get the request resource and update the status.
-    val currentRequest = currentPhase.getRequestResource()
-    currentRequest.setStatus(Status.ACTIVE)
-
     // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
-    currentPhase.update(currentRequest)
+    currentPhase.update(
+      currentPhase.getRequestResource().apply { setStatus(Status.ACTIVE) },
+    )
 
     val preparedOrder = activityFlow.prepareOrder()
     if (preparedOrder.isFailure) return Result.failure(preparedOrder.exceptionOrNull()!!)
@@ -74,13 +70,11 @@ class ActivityHandler(
 
   suspend fun prepareAndInitiatePerform(clazz: Class<CPGEventResource<*>>): Result<Boolean> {
     val currentPhase = activityFlow.getCurrentPhase() as Phase.RequestPhase<CPGRequestResource<*>>
-    // Get the request resource and update the status.
-    val currentRequest = currentPhase.getRequestResource()
-    currentRequest.setStatus(Status.ACTIVE)
-
     // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
-    currentPhase.update(currentRequest)
+    currentPhase.update(
+      currentPhase.getRequestResource().apply { setStatus(Status.ACTIVE) },
+    )
 
     val preparedEvent = activityFlow.preparePerform(clazz)
     if (preparedEvent.isFailure) return Result.failure(preparedEvent.exceptionOrNull()!!)

@@ -88,7 +88,6 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
       Log.d("TAG", "phaseFlow.map: $it")
       val nextPhase = loadChainAndReturnNextPhase()
       enabledPhaseFlow.value = nextPhase
-      //    generateData(it, ::handleOnClick)
 
       // Initialize the activity flow
       if (activityHandler == null) {
@@ -126,22 +125,22 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
       when (phase) {
         FlowPhase.PROPOSAL -> {
           _progressFlow.value = true
-          createProposalPhase2()
+          createProposalPhase()
           _progressFlow.value = false
         }
         FlowPhase.PLAN -> {
           _progressFlow.value = true
-          createPlanPhase2()
+          createPlanPhase()
           _progressFlow.value = false
         }
         FlowPhase.ORDER -> {
           _progressFlow.value = true
-          createOrderPhase2()
+          createOrderPhase()
           _progressFlow.value = false
         }
         FlowPhase.PERFORM -> {
           _progressFlow.value = true
-          createPerformPhase2()
+          createPerformPhase()
           _progressFlow.value = false
         }
         FlowPhase.NONE -> TODO()
@@ -159,7 +158,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     }
   }
 
-  private suspend fun createProposalPhase2() {
+  private suspend fun createProposalPhase() {
     proposalHandler
       .prepareAndInitiateProposal(activityOptionFlow.value)
       .onSuccess {
@@ -185,21 +184,21 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     if (nextPhase != null) enabledPhaseFlow.value = nextPhase
   }
 
-  private suspend fun createPlanPhase2() {
+  private suspend fun createPlanPhase() {
     activityHandler!!
       .prepareAndInitiatePlan()
       .onSuccess { onPhaseCreatedSuccess(FlowPhase.PLAN) }
       .onFailure { it.printStackTrace() }
   }
 
-  private suspend fun createOrderPhase2() {
+  private suspend fun createOrderPhase() {
     activityHandler!!
       .prepareAndInitiateOrder()
       .onSuccess { onPhaseCreatedSuccess(FlowPhase.ORDER) }
       .onFailure { it.printStackTrace() }
   }
 
-  private suspend fun createPerformPhase2() {
+  private suspend fun createPerformPhase() {
     activityHandler!!
       .prepareAndInitiatePerform(
         CPGMedicationDispenseEvent::class.java as Class<CPGEventResource<*>>,
