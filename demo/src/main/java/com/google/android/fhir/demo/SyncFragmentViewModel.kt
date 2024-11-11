@@ -52,14 +52,6 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
       onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
-  //  val pollState: SharedFlow<CurrentSyncJobStatus> =
-  //    _oneTimeSyncTrigger
-  //      .flatMapLatest {
-  //        Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
-  //      }
-  //      .map { it }
-  //      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
-
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .flatMapLatest {
@@ -72,21 +64,6 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
       }
       .map { it }
       .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
-
-  //  val pollState: SharedFlow<Pair<UUID, CurrentSyncJobStatus>> =
-  //    _oneTimeSyncTrigger
-  //      .flatMapLatest {
-  //        // Destructure the Pair to get both the Flow and UUID
-  //        val (statusFlow, uuid) = Sync.oneTimeSync<DemoFhirSyncWorker>(
-  //          context = application.applicationContext
-  //        )
-  //
-  //        // Map each status emission to include the UUID as a Pair
-  //        statusFlow.map { status ->
-  //          Pair(uuid, status) // Create Pair with UUID and status
-  //        }
-  //      }
-  //      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
 
   fun triggerOneTimeSync() {
     viewModelScope.launch { _oneTimeSyncTrigger.emit(true) }
