@@ -30,6 +30,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.demo.extensions.launchAndRepeatStarted
 import com.google.android.fhir.sync.CurrentSyncJobStatus
+import timber.log.Timber
 
 class SyncFragment : Fragment() {
   private val syncFragmentViewModel: SyncFragmentViewModel by viewModels()
@@ -49,9 +50,12 @@ class SyncFragment : Fragment() {
     view.findViewById<Button>(R.id.sync_now_button).setOnClickListener {
       syncFragmentViewModel.triggerOneTimeSync()
     }
+    view.findViewById<Button>(R.id.cancel_sync_button).setOnClickListener {
+      syncFragmentViewModel.cancelOneTimeSyncWork()
+    }
     observeLastSyncTime()
     launchAndRepeatStarted(
-      { syncFragmentViewModel.pollState.collect(::currentSyncJobStatus) },
+      { syncFragmentViewModel.pollState.collect(::updateSyncJobStatus) },
     )
   }
 
@@ -72,25 +76,42 @@ class SyncFragment : Fragment() {
     }
   }
 
-  private fun currentSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
-    requireView().findViewById<TextView>(R.id.current_status).text =
+  private fun updateSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
+    Timber.d("currentSyncJobStatus: $currentSyncJobStatus")
+    // Update status text
+    val statusTextView = requireView().findViewById<TextView>(R.id.current_status)
+    statusTextView.text =
       getString(R.string.current_status, currentSyncJobStatus::class.java.simpleName)
 
-    // Update progress indicator visibility and handle status-specific actions
+    // Get views once to avoid repeated lookups
     val syncIndicator = requireView().findViewById<ProgressBar>(R.id.sync_indicator)
+    val syncNowButton = requireView().findViewById<Button>(R.id.sync_now_button)
+    val cancelSyncButton = requireView().findViewById<Button>(R.id.cancel_sync_button)
+
+    // Update view states based on sync status
     when (currentSyncJobStatus) {
       is CurrentSyncJobStatus.Running -> {
         syncIndicator.visibility = View.VISIBLE
+        syncNowButton.visibility = View.GONE
+        cancelSyncButton.visibility = View.VISIBLE
       }
       is CurrentSyncJobStatus.Succeeded -> {
         syncIndicator.visibility = View.GONE
         syncFragmentViewModel.updateLastSyncTimestamp(currentSyncJobStatus.timestamp)
+        syncNowButton.visibility = View.VISIBLE
+        cancelSyncButton.visibility = View.GONE
       }
       is CurrentSyncJobStatus.Failed,
+      is CurrentSyncJobStatus.Cancelled, -> {
+        syncIndicator.visibility = View.GONE
+        syncNowButton.visibility = View.VISIBLE
+        cancelSyncButton.visibility = View.GONE
+      }
       is CurrentSyncJobStatus.Enqueued,
-      is CurrentSyncJobStatus.Cancelled,
       is CurrentSyncJobStatus.Blocked, -> {
         syncIndicator.visibility = View.GONE
+        syncNowButton.visibility = View.GONE
+        cancelSyncButton.visibility = View.VISIBLE
       }
     }
   }

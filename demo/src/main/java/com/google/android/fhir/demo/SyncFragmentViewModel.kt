@@ -27,6 +27,7 @@ import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.Sync
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -40,6 +41,7 @@ import kotlinx.coroutines.launch
 /** View model for [MainActivity]. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SyncFragmentViewModel(application: Application) : AndroidViewModel(application) {
+  private var oneTimeSyncUuid: UUID? = null
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData
@@ -50,16 +52,48 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
       onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
+  //  val pollState: SharedFlow<CurrentSyncJobStatus> =
+  //    _oneTimeSyncTrigger
+  //      .flatMapLatest {
+  //        Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
+  //      }
+  //      .map { it }
+  //      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
+
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .flatMapLatest {
-        Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
+        val (statusFlow, uuid) =
+          Sync.oneTimeSync<DemoFhirSyncWorker>(
+            context = application.applicationContext,
+          )
+        oneTimeSyncUuid = uuid
+        statusFlow
       }
       .map { it }
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
+      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
+
+  //  val pollState: SharedFlow<Pair<UUID, CurrentSyncJobStatus>> =
+  //    _oneTimeSyncTrigger
+  //      .flatMapLatest {
+  //        // Destructure the Pair to get both the Flow and UUID
+  //        val (statusFlow, uuid) = Sync.oneTimeSync<DemoFhirSyncWorker>(
+  //          context = application.applicationContext
+  //        )
+  //
+  //        // Map each status emission to include the UUID as a Pair
+  //        statusFlow.map { status ->
+  //          Pair(uuid, status) // Create Pair with UUID and status
+  //        }
+  //      }
+  //      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
 
   fun triggerOneTimeSync() {
     viewModelScope.launch { _oneTimeSyncTrigger.emit(true) }
+  }
+
+  fun cancelOneTimeSyncWork() {
+    oneTimeSyncUuid?.let { Sync.cancelWorkById(getApplication(), it) }
   }
 
   /** Emits last sync time. */

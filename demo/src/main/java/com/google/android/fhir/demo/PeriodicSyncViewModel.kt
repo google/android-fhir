@@ -30,37 +30,46 @@ import com.google.android.fhir.sync.PeriodicSyncJobStatus
 import com.google.android.fhir.sync.RepeatInterval
 import com.google.android.fhir.sync.Sync
 import com.google.android.fhir.sync.SyncJobStatus
+import java.util.*
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class PeriodicSyncViewModel(application: Application) : AndroidViewModel(application) {
 
-  val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> =
+  private val _uiStateFlow = MutableStateFlow(PeriodicSyncUiState())
+  val uiStateFlow: StateFlow<PeriodicSyncUiState> = _uiStateFlow
+  private var periodicSyncJobId: UUID? = null
+  private val pollPeriodicSyncJobStatus: SharedFlow<PeriodicSyncJobStatus> by lazy {
     Sync.periodicSync<DemoFhirSyncWorker>(
-        application.applicationContext,
+        context = application.applicationContext,
         periodicSyncConfiguration =
           PeriodicSyncConfiguration(
             syncConstraints = Constraints.Builder().build(),
             repeat = RepeatInterval(interval = 15, timeUnit = TimeUnit.MINUTES),
           ),
       )
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 10)
-
-  private val _uiStateFlow = MutableStateFlow(PeriodicSyncUiState())
-  val uiStateFlow: StateFlow<PeriodicSyncUiState> = _uiStateFlow
-
-  init {
-    collectPeriodicSyncJobStatus()
+      .let { (statusFlow, uuid) ->
+        periodicSyncJobId = uuid
+        statusFlow.map { status ->
+          status // Return status directly, preserving the original signature
+        }
+      }
+      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 10)
   }
 
-  private fun collectPeriodicSyncJobStatus() {
+  fun collectPeriodicSyncJobStatus() {
     viewModelScope.launch {
       pollPeriodicSyncJobStatus.collect { periodicSyncJobStatus ->
+        Timber.d(
+          "currentSyncJobStatus: ${periodicSyncJobStatus.currentSyncJobStatus}  lastSyncJobStatus ${periodicSyncJobStatus.lastSyncJobStatus}",
+        )
         val lastSyncStatus = getLastSyncStatus(periodicSyncJobStatus.lastSyncJobStatus)
         val lastSyncTime = getLastSyncTime(periodicSyncJobStatus.lastSyncJobStatus)
         val currentSyncStatus =
@@ -80,6 +89,12 @@ class PeriodicSyncViewModel(application: Application) : AndroidViewModel(applica
             progress = progress,
           )
       }
+    }
+  }
+
+  fun cancelPeriodicSyncJob() {
+    periodicSyncJobId?.let {
+      Sync.cancelWorkById(getApplication<FhirApplication>().applicationContext, it)
     }
   }
 
