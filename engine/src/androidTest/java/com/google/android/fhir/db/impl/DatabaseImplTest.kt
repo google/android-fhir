@@ -39,6 +39,7 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
@@ -5177,6 +5178,32 @@ class DatabaseImplTest {
       val localChangeResourceReferences = database.getLocalChangeResourceReferences(localChangeIds)
       assertThat(localChangeResourceReferences.size).isEqualTo(locallyCreatedPatients.size)
     }
+
+  @Test
+  fun searchTasksForManyPatientsReturnCorrectly() = runBlocking {
+    val patients = (0 until 990).map { Patient().apply { id = "task-patient-index-$it" } }
+    database.insert(*patients.toTypedArray())
+    val tasks =
+      patients.mapIndexed { index, patient ->
+        Task().apply {
+          id = "patient-$index-task"
+          `for` = Reference().apply { reference = "Patient/${patient.logicalId}" }
+        }
+      }
+    database.insert(*tasks.toTypedArray())
+
+    val patientsSearchIdList =
+      patients.take(980).map<Patient, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = "Patient/${it.logicalId}" }
+      }
+    val searchQuery =
+      Search(ResourceType.Task)
+        .apply { filter(Task.SUBJECT, *patientsSearchIdList.toTypedArray()) }
+        .getQuery()
+
+    val searchResults = database.search<Task>(searchQuery)
+    assertThat(searchResults.size).isEqualTo(980)
+  }
 
   private companion object {
     const val mockEpochTimeStamp = 1628516301000

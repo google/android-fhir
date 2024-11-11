@@ -18,6 +18,7 @@ package com.google.android.fhir.datacapture.views.factories
 
 import android.content.Context
 import android.graphics.drawable.Drawable
+import android.text.Spanned
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,7 @@ import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.identifierString
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
@@ -92,8 +94,8 @@ internal object DropDownViewHolderFactory :
         answerOptionList
           .firstOrNull { it.answerId == selectedAnswerIdentifier }
           ?.let {
-            autoCompleteTextView.setText(it.answerOptionString)
-            autoCompleteTextView.setSelection(it.answerOptionString.length)
+            autoCompleteTextView.setText(it.answerOptionStringSpanned())
+            autoCompleteTextView.setSelection(it.answerOptionStringSpanned().length)
             autoCompleteTextView.setCompoundDrawablesRelative(
               it.answerOptionImage,
               null,
@@ -105,7 +107,7 @@ internal object DropDownViewHolderFactory :
         autoCompleteTextView.onItemClickListener =
           AdapterView.OnItemClickListener { _, _, position, _ ->
             val selectedItem = adapter.getItem(position)
-            autoCompleteTextView.setText(selectedItem?.answerOptionString, false)
+            autoCompleteTextView.setText(selectedItem?.answerOptionStringSpanned(), false)
             autoCompleteTextView.setCompoundDrawablesRelative(
               adapter.getItem(position)?.answerOptionImage,
               null,
@@ -165,7 +167,7 @@ internal class AnswerOptionDropDownArrayAdapter(
       val answerOption: DropDownAnswerOption? = getItem(position)
       val answerOptionTextView =
         listItemView?.findViewById<View>(R.id.answer_option_textview) as TextView
-      answerOptionTextView.text = answerOption?.answerOptionString
+      answerOptionTextView.text = answerOption?.answerOptionStringSpanned()
       answerOptionTextView.setCompoundDrawablesRelative(
         answerOption?.answerOptionImage,
         null,
@@ -187,4 +189,6 @@ internal data class DropDownAnswerOption(
   override fun toString(): String {
     return this.answerOptionString
   }
+
+  fun answerOptionStringSpanned(): Spanned = answerOptionString.toSpanned()
 }
