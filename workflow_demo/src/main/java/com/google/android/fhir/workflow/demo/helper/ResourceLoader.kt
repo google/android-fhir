@@ -71,8 +71,5 @@ class ResourceLoader(
     return CqlBuilder.compileAndBuild(cql)
   }
 
-  //  private fun open(path: String) = javaClass.getResourceAsStream(path)!!
   private fun open(path: String) = androidContext.assets.open(path)
-
-  fun readResourceAsString(path: String) = open(path).readBytes().decodeToString()
 }

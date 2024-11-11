@@ -5,16 +5,15 @@ plugins {
 
 android {
   namespace = "com.google.android.fhir.workflow.demo"
-  compileSdk = 34
+  compileSdk = Sdk.COMPILE_SDK
 
   defaultConfig {
-    applicationId = "com.google.android.fhir.workflow.demo"
-    minSdk = 26
-    targetSdk = 34
-    versionCode = 1
-    versionName = "1.0"
-
-    testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    applicationId = Releases.WorkflowDemo.applicationId
+    minSdk = Sdk.MIN_SDK
+    targetSdk = Sdk.TARGET_SDK
+    versionCode = Releases.WorkflowDemo.versionCode
+    versionName = Releases.WorkflowDemo.versionName
+    testInstrumentationRunner = Dependencies.androidJunitRunner
   }
 
   buildTypes {
@@ -48,20 +47,23 @@ android {
 }
 
 dependencies {
+  androidTestImplementation(libs.androidx.test.espresso.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+
+  compileOnly(libs.opencds.cqf.fhir.cr)
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(libs.androidx.core)
   implementation(libs.androidx.appcompat)
-  implementation(libs.material)
   implementation(libs.androidx.constraintlayout)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
   implementation(libs.androidx.lifecycle.livedata)
   implementation(libs.androidx.lifecycle.viewmodel)
-  implementation(libs.androidx.fragment)
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.androidx.test.ext.junit)
-  androidTestImplementation(libs.androidx.test.espresso.core)
+  implementation(libs.material)
   implementation(project(":engine"))
-
+  implementation(project(":knowledge")) {
+    exclude(group = "com.google.android.fhir", module = "engine")
+  }
   implementation(project(":workflow")) {
     exclude(group = "com.google.android.fhir", module = "engine")
   }
@@ -69,10 +71,7 @@ dependencies {
     exclude(group = "com.google.android.fhir", module = "engine")
   }
 
-  implementation(project(":knowledge")) {
-    exclude(group = "com.google.android.fhir", module = "engine")
-  }
-  compileOnly(libs.opencds.cqf.fhir.cr)
+  testImplementation(libs.junit)
   constraints {
     Dependencies.hapiFhirConstraints().forEach { (libName, constraints) ->
       api(libName, constraints)

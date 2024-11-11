@@ -33,7 +33,7 @@ class ActivityHandler(
     val currentRequest = currentPhase.getRequestResource()
     currentRequest.setStatus(Status.ACTIVE)
 
-    //    ActivityFlow returns a copy of the resource it has, so after updating the returned
+    // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
     currentPhase.update(currentRequest)
 
@@ -56,7 +56,7 @@ class ActivityHandler(
     val currentRequest = currentPhase.getRequestResource()
     currentRequest.setStatus(Status.ACTIVE)
 
-    //    ActivityFlow returns a copy of the resource it has, so after updating the returned
+    // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
     currentPhase.update(currentRequest)
 
@@ -78,7 +78,7 @@ class ActivityHandler(
     val currentRequest = currentPhase.getRequestResource()
     currentRequest.setStatus(Status.ACTIVE)
 
-    //    ActivityFlow returns a copy of the resource it has, so after updating the returned
+    // ActivityFlow returns a copy of the resource it has, so after updating the returned
     // resource, give it back to the ActivityFlow by calling update api on the phase.
     currentPhase.update(currentRequest)
 
