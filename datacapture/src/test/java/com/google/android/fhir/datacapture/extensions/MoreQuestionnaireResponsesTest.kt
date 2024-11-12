@@ -262,6 +262,121 @@ class MoreQuestionnaireResponsesTest {
   }
 
   @Test
+  fun `should pack repeated groups recursively`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-repeated-group"
+                type = Questionnaire.QuestionnaireItemType.GROUP
+                repeats = true
+                addItem(
+                  QuestionnaireItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-repeated-group"
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
+                    )
+                  },
+                )
+              },
+            )
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-repeated-group"
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(false)
+                      },
+                    )
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    val packedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-repeated-group"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        addItem(
+                          QuestionnaireResponseItemComponent().apply {
+                            linkId = "nested-nested-question"
+                            addAnswer(
+                              QuestionnaireResponseItemAnswerComponent().apply {
+                                value = BooleanType(true)
+                              },
+                            )
+                          },
+                        )
+                      },
+                    )
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        addItem(
+                          QuestionnaireResponseItemComponent().apply {
+                            linkId = "nested-nested-question"
+                            addAnswer(
+                              QuestionnaireResponseItemAnswerComponent().apply {
+                                value = BooleanType(false)
+                              },
+                            )
+                          },
+                        )
+                      },
+                    )
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    questionnaireResponse.packRepeatedGroups(questionnaire)
+    assertResourceEquals(questionnaireResponse, packedQuestionnaireResponse)
+  }
+
+  @Test
   fun `should not modify non-repeated groups while packing repeated groups`() {
     val questionnaire =
       Questionnaire().apply {
