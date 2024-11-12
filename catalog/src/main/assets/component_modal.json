@@ -17,7 +17,7 @@
           }
         },
         {
-          "url": "https://github.com/google/android-fhir/dialog"
+          "url": "https://github.com/google/android-fhir/StructureDefinition/dialog"
         }
       ],
       "linkId": "1.1",
