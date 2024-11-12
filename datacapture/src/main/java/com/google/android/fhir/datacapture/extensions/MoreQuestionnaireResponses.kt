@@ -67,16 +67,8 @@ private fun List<QuestionnaireResponse.QuestionnaireResponseItemComponent>.packR
 
       val questionnaireItem = questionnaireItems.single()
 
-      questionnaireResponseItems.forEach { it ->
-        if (questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP) {
-          if (questionnaireItem.repeats) {
-            it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
-          } else {
-            it.item = it.item.packRepeatedGroups(questionnaireItem.item)
-          }
-        } else {
-          it.answer.forEach { it.item = it.item.packRepeatedGroups(questionnaireItem.item) }
-        }
+      questionnaireResponseItems.forEach {
+        it.item = it.item.packRepeatedGroups(questionnaireItem.item)
       }
 
       if (
