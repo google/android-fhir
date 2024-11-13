@@ -27,6 +27,7 @@ import androidx.core.view.isVisible
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.hl7.fhir.r4.model.Questionnaire
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,5 +55,31 @@ class LocationGpsCoordinateViewHolderFactoryInstrumentedTest {
         viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView).inputType,
       )
       .isEqualTo(InputType.TYPE_NULL)
+  }
+
+  @Test
+  fun matcherShouldReturnTrueForOriginalGpsCoordinateUrl() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    questionnaireItem.addExtension(
+      LocationGpsCoordinateViewHolderFactory.GPS_COORDINATE_EXTENSION_URL,
+      null,
+    )
+    assertThat(LocationGpsCoordinateViewHolderFactory.matcher(questionnaireItem)).isTrue()
+  }
+
+  @Test
+  fun matcherShouldReturnTrueForAlternativeGpsCoordinateUrl() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    questionnaireItem.addExtension(
+      LocationGpsCoordinateViewHolderFactory.ALTERNATIVE_GPS_COORDINATE_EXTENSION_URL,
+      null,
+    )
+    assertThat(LocationGpsCoordinateViewHolderFactory.matcher(questionnaireItem)).isTrue()
+  }
+
+  @Test
+  fun matcherShouldReturnFalseForNoGpsCoordinateUrl() {
+    val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
+    assertThat(LocationGpsCoordinateViewHolderFactory.matcher(questionnaireItem)).isFalse()
   }
 }

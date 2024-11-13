@@ -60,7 +60,10 @@ object LocationGpsCoordinateViewHolderFactory :
           val gpsCoordinateExtensionValue =
             questionnaireViewItem.questionnaireItem
               .getExtensionByUrl(GPS_COORDINATE_EXTENSION_URL)
-              .value as StringType
+              ?.value as? StringType
+              ?: questionnaireViewItem.questionnaireItem
+                .getExtensionByUrl(ALTERNATIVE_GPS_COORDINATE_EXTENSION_URL)
+                .value as StringType
           when (gpsCoordinateExtensionValue.valueAsString) {
             GPS_COORDINATE_EXTENSION_VALUE_LATITUDE -> {
               supportFragmentManager.setFragmentResultListener(
@@ -148,10 +151,13 @@ object LocationGpsCoordinateViewHolderFactory :
     }
 
   fun matcher(questionnaireItem: Questionnaire.QuestionnaireItemComponent): Boolean {
-    return questionnaireItem.hasExtension(GPS_COORDINATE_EXTENSION_URL)
+    return questionnaireItem.hasExtension(GPS_COORDINATE_EXTENSION_URL) ||
+      questionnaireItem.hasExtension(ALTERNATIVE_GPS_COORDINATE_EXTENSION_URL)
   }
 
   const val GPS_COORDINATE_EXTENSION_URL = "gps-coordinate"
+  const val ALTERNATIVE_GPS_COORDINATE_EXTENSION_URL =
+    "https://github.com/google/android-fhir/gps-coordinate"
   const val GPS_COORDINATE_EXTENSION_VALUE_LATITUDE = "latitude"
   const val GPS_COORDINATE_EXTENSION_VALUE_LONGITUDE = "longitude"
   const val GPS_COORDINATE_EXTENSION_VALUE_ALTITUDE = "altitude"
