@@ -42,15 +42,12 @@ class ProposalCreationHandler(
   private val knowledgeManager: KnowledgeManager,
 ) {
 
-  suspend fun prepareAndInitiateProposal(configuration: Configuration): Result<Resource> {
-    val proposal = generateProposal(configuration)
-    Log.d("TAG", "createProposalPhase: $proposal")
-    proposal?.let { fhirEngine.create(proposal) }
-      ?: return Result.failure(Exception("MedicationRequest not created."))
-    return Result.success(proposal)
+  suspend fun checkInstalledDependencies(configuration: Configuration): Boolean {
+    return configuration.planDefinitionCanonical?.let { knowledgeManager.loadResources(it).any() }
+      ?: false
   }
 
-  private suspend fun generateProposal(configuration: Configuration): Resource? =
+  suspend fun installDependencies(configuration: Configuration) {
     withContext(Dispatchers.IO) {
       val patient =
         Patient().apply {
@@ -83,14 +80,55 @@ class ProposalCreationHandler(
       configuration.cqlLibraryPath?.let { loader.loadFile(it, ::installToIgManager) }
 
       configuration.inputBundlePath?.let { loader.loadFile(it, ::importToFhirEngine) }
+    }
+  }
+
+  suspend fun prepareAndInitiateProposal(configuration: Configuration): Result<Resource> {
+    val proposal = generateProposal(configuration)
+    Log.d("TAG", "createProposalPhase: $proposal")
+    proposal?.let { fhirEngine.create(proposal) }
+      ?: return Result.failure(Exception("MedicationRequest not created."))
+    return Result.success(proposal)
+  }
+
+  private suspend fun generateProposal(configuration: Configuration): Resource? =
+    withContext(Dispatchers.IO) {
+      //      val patient =
+      //        Patient().apply {
+      //          id = "active_apple_guy"
+      //          addName(
+      //            HumanName().apply {
+      //              addGiven("First")
+      //              family = "Last"
+      //            },
+      //          )
+      //
+      //          active = true
+      //
+      //          birthDate = Date(1990, 2, 4)
+      //        }
+      //
+      //      importToFhirEngine(patient)
+      //
+      //      val loader = ResourceLoader(androidContext = applicationContext)
+      //
+      //      // load plan definition
+      //      configuration.planDefinitionPath?.let { loader.loadFile(it, ::installToIgManager) }
+      //
+      //      // load activity definition
+      //      configuration.activityDefinitionPath?.let {
+      //        // load plan definition
+      //        loader.loadFile(it, ::installToIgManager)
+      //      }
+      //      // load library
+      //      configuration.cqlLibraryPath?.let { loader.loadFile(it, ::installToIgManager) }
+      //
+      //      configuration.inputBundlePath?.let { loader.loadFile(it, ::importToFhirEngine) }
 
       val carePlan =
         fhirOperator.generateCarePlan(
-          planDefinitionCanonical =
-            CanonicalType(
-              "http://fhir.org/guides/cqf/cpg/example/PlanDefinition/DailyAppleRecommendation",
-            ),
-          subject = "Patient/active_apple_guy",
+          planDefinitionCanonical = CanonicalType(configuration.planDefinitionCanonical),
+          subject = "Patient/${configuration.patientId}",
         )
 
       if (carePlan !is CarePlan) return@withContext null

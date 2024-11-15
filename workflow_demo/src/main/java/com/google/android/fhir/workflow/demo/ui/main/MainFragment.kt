@@ -78,6 +78,10 @@ class MainFragment : Fragment() {
     TabLayoutMediator(tabLayout, pager) { tab, position -> }.attach()
 
     view.findViewById<Button>(R.id.restart_flow).setOnClickListener { viewModel.restartFlow() }
+    view.findViewById<Button>(R.id.install_dependencies).setOnClickListener {
+      viewModel.installDependencies()
+    }
+
     setHasOptionsMenu(true)
   }
 

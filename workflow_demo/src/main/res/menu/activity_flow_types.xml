@@ -10,11 +10,4 @@
         android:title="Order Medication"
         app:showAsAction="never"
     />
-
-    <item
-        android:id="@+id/menu_get_recommendation"
-        android:enabled="true"
-        android:title="Get Recommendation"
-        app:showAsAction="never"
-    />
 </menu>

@@ -22,6 +22,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
+import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
 import com.google.android.fhir.search.search
@@ -35,7 +36,7 @@ import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.MedicationDispense
@@ -46,13 +47,18 @@ import org.opencds.cqf.fhir.api.Repository
 class MainViewModel(private val application: Application) : AndroidViewModel(application) {
 
   private val fhirEngine: FhirEngine by lazy {
+    FhirEngineProvider.init(
+      FhirEngineConfiguration(
+        enableEncryptionIfSupported = false,
+      ),
+    )
     FhirEngineProvider.getInstance(application.applicationContext)
   }
 
   private val repository: Repository by lazy {
     FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
   }
-  private val enabledPhaseFlow = MutableStateFlow(FlowPhase.PROPOSAL)
+  private val enabledPhaseFlow = MutableStateFlow(FlowPhase.INITIALIZE)
   private val activityOptionFlow = MutableStateFlow(MEDICATION_DISPENSE)
   private val _progressFlow = MutableStateFlow(false)
   val progressFlow: Flow<Boolean> = _progressFlow
@@ -66,26 +72,24 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     val knowledgeManager =
       KnowledgeManager.create(context = application.applicationContext, inMemory = false)
 
-    val fhirOperator =
-      FhirOperator.Builder(application.applicationContext)
-        .fhirEngine(fhirEngine)
-        .fhirContext(
-          FhirContext.forR4Cached(),
-        )
-        .knowledgeManager(knowledgeManager)
-        .build()
-
     ProposalCreationHandler(
       fhirEngine,
-      fhirOperator,
+      fhirOperator =
+        FhirOperator.Builder(application.applicationContext)
+          .fhirEngine(fhirEngine)
+          .fhirContext(
+            FhirContext.forR4Cached(),
+          )
+          .knowledgeManager(knowledgeManager)
+          .build(),
       application.applicationContext,
       knowledgeManager,
     )
   }
 
   val adapterData =
-    enabledPhaseFlow.map {
-      Log.d("TAG", "phaseFlow.map: $it")
+    combine(activityOptionFlow, enabledPhaseFlow) { configuration, phase ->
+      Log.d("TAG", "phaseFlow configuration: $configuration phase: $phase")
       val nextPhase = loadChainAndReturnNextPhase()
       enabledPhaseFlow.value = nextPhase
 
@@ -143,17 +147,10 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
           createPerformPhase()
           _progressFlow.value = false
         }
-        FlowPhase.NONE -> TODO()
-      }
-    }
-  }
-
-  init {
-
-    viewModelScope.launch {
-      activityOptionFlow.collect {
-        activityHandler = null
-        enabledPhaseFlow.value = FlowPhase.PROPOSAL
+        FlowPhase.NONE,
+        FlowPhase.INITIALIZE, -> {
+          /* No op */
+        }
       }
     }
   }
@@ -175,6 +172,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
   private fun onPhaseCreatedSuccess(phase: FlowPhase) {
     val nextPhase =
       when (phase) {
+        FlowPhase.INITIALIZE -> FlowPhase.PROPOSAL
         FlowPhase.PROPOSAL -> FlowPhase.PLAN
         FlowPhase.PLAN -> FlowPhase.ORDER
         FlowPhase.ORDER -> FlowPhase.PERFORM
@@ -208,6 +206,7 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
   }
 
   private suspend fun loadChainAndReturnNextPhase(): FlowPhase {
+    // TODO : Add logic to load resources as per the selected configuration.
     val request =
       fhirEngine.search<MedicationRequest> {
         filter(MedicationRequest.SUBJECT, { value = "Patient/active_apple_guy" })
@@ -238,7 +237,9 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
 
     perform = request2.firstOrNull()?.resource
 
-    return if (proposal == null) {
+    return if (!proposalHandler.checkInstalledDependencies(activityOptionFlow.value)) {
+      FlowPhase.INITIALIZE
+    } else if (proposal == null) {
       FlowPhase.PROPOSAL
     } else if (plan == null) {
       FlowPhase.PLAN
@@ -380,6 +381,22 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     }
   }
 
+  fun installDependencies() {
+    viewModelScope.launch {
+      _progressFlow.value = true
+      _installDependencies()
+      enabledPhaseFlow.value = FlowPhase.PROPOSAL
+      _progressFlow.value = false
+    }
+  }
+
+  /**
+   * Install the dependencies required to generate a CarePlan based on the selected [Configuration].
+   */
+  private suspend fun _installDependencies() {
+    proposalHandler.installDependencies(configuration = activityOptionFlow.value)
+  }
+
   private suspend fun cleanUp() =
     withContext(Dispatchers.IO) {
       proposal?.let { fhirEngine.delete(it.resourceType, it.logicalId) }
@@ -390,6 +407,10 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
 
       perform?.let { fhirEngine.delete(it.resourceType, it.logicalId) }
 
+      proposal = null
+      plan = null
+      order = null
+      perform = null
       activityHandler = null
     }
 }
@@ -397,7 +418,9 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
 data class Configuration(
   val id: String,
   val description: String,
+  val patientId: String,
   val planDefinitionPath: String?,
+  val planDefinitionCanonical: String?,
   val activityDefinitionPath: String?,
   val cqlLibraryPath: String?,
   val inputBundlePath: String?,
@@ -407,7 +430,10 @@ val MEDICATION_DISPENSE =
   Configuration(
     id = "id_medication_dispense",
     description = "Apple a day",
+    patientId = "active_apple_guy",
     planDefinitionPath = "pd/DailyAppleRecommendation.json",
+    planDefinitionCanonical =
+      "http://fhir.org/guides/cqf/cpg/example/PlanDefinition/DailyAppleRecommendation",
     activityDefinitionPath = "ad/DailyAppleActivity.json",
     cqlLibraryPath = "cql/DailyAppleLogic.cql",
     inputBundlePath = null,
@@ -419,6 +445,7 @@ val Resource.logicalId: String
   }
 
 enum class FlowPhase {
+  INITIALIZE,
   PROPOSAL,
   PLAN,
   ORDER,
