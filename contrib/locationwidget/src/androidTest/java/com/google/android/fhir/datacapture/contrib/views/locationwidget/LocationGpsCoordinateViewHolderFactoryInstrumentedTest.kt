@@ -61,17 +61,17 @@ class LocationGpsCoordinateViewHolderFactoryInstrumentedTest {
   fun matcherShouldReturnTrueForOriginalGpsCoordinateUrl() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     questionnaireItem.addExtension(
-      LocationGpsCoordinateViewHolderFactory.GPS_COORDINATE_EXTENSION_URL,
+      LocationGpsCoordinateViewHolderFactory.PRIMARY_GPS_COORDINATE_EXTENSION_URL,
       null,
     )
     assertThat(LocationGpsCoordinateViewHolderFactory.matcher(questionnaireItem)).isTrue()
   }
 
   @Test
-  fun matcherShouldReturnTrueForAlternativeGpsCoordinateUrl() {
+  fun matcherShouldReturnTrueForOldGpsCoordinateUrl() {
     val questionnaireItem = Questionnaire.QuestionnaireItemComponent()
     questionnaireItem.addExtension(
-      LocationGpsCoordinateViewHolderFactory.ALTERNATIVE_GPS_COORDINATE_EXTENSION_URL,
+      LocationGpsCoordinateViewHolderFactory.GPS_COORDINATE_EXTENSION_URL,
       null,
     )
     assertThat(LocationGpsCoordinateViewHolderFactory.matcher(questionnaireItem)).isTrue()
