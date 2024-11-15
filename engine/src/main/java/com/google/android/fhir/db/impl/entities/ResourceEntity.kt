@@ -27,8 +27,8 @@ import org.hl7.fhir.r4.model.ResourceType
   indices =
     [
       Index(value = ["resourceUuid"], unique = true),
-      Index(value = ["resourceId", "resourceType"], unique = true),
-      Index(value = ["resourceType"]),
+      Index(value = ["resourceType", "resourceId"], unique = true),
+      Index(value = ["resourceUuid", "resourceType"]),
     ],
 )
 internal data class ResourceEntity(

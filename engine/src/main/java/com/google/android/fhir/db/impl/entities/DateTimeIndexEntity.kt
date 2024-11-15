@@ -32,10 +32,9 @@ import org.hl7.fhir.r4.model.ResourceType
       // need for accessing underlying table data.
       // Column ordered to minimise time to run sortJoinStatement in [MoreSearch], and to resolve:
       // https://github.com/google/android-fhir/issues/2040
-      Index(value = ["index_name", "resourceType", "index_from", "resourceUuid"]),
-      Index(value = ["index_name", "resourceType", "index_to", "resourceUuid"]),
+      Index(value = ["resourceType", "index_name", "resourceUuid", "index_from", "index_to"]),
       // Keep this index for faster foreign lookup
-      Index(value = ["resourceUuid"]),
+      Index(value = ["resourceUuid", "index_name"]),
     ],
   foreignKeys =
     [

@@ -28,8 +28,7 @@ import org.hl7.fhir.r4.model.ResourceType
 @Entity(
   indices =
     [
-      Index(value = ["resourceType", "index_longitude", "resourceUuid"]),
-      Index(value = ["resourceType", "index_latitude", "resourceUuid"]),
+      Index(value = ["resourceType", "index_latitude", "index_longitude", "resourceUuid"]),
       // keep this index for faster foreign lookup
       Index(value = ["resourceUuid"]),
     ],

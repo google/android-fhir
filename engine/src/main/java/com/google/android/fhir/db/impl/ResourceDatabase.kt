@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 8,
+  version = 9,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -212,6 +212,105 @@ internal val MIGRATION_7_8 =
 internal val MIGRATION_8_9 =
   object : Migration(8, 9) {
     override fun migrate(database: SupportSQLiteDatabase) {
-      TODO("Not yet implemented")
+      database.beginTransaction()
+      try {
+        database.execSQL("DROP INDEX IF EXISTS `index_DateIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceUuid`")
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceType_index_name_index_value`;",
+        )
+        database.execSQL("DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceUuid`;")
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_PositionIndexEntity_resourceType_index_latitude_index_longitude`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_QuantityIndexEntity_resourceType_index_name_index_value_index_code`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_ReferenceIndexEntity_resourceType_index_name_index_value`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_StringIndexEntity_resourceType_index_name_index_value`;",
+        )
+        database.execSQL("DROP INDEX IF EXISTS `index_StringIndexEntity_resourceUuid`;")
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_UriIndexEntity_resourceType_index_name_index_value`;",
+        )
+
+        // -------------------------------------------------------------------------------------------------------
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_DateIndexEntity_resourceType_index_name_index_from_index_to_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceType_index_name_index_from_index_to_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceType_index_name_index_value_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceType_index_name_resourceUuid`;",
+        )
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_StringIndexEntity_resourceType_index_name_index_value_resourceUuid`;",
+        )
+
+        //        ----------------------------------------------------------------------------
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `DateTimeIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)",
+        )
+
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name` ON `DateIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name` ON `DateTimeIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceType_index_name_resourceUuid_index_value` ON `NumberIndexEntity` (`resourceType`, `index_name`, `resourceUuid`, `index_value`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name` ON `NumberIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_PositionIndexEntity_resourceType_index_latitude_index_longitude_resourceUuid` ON `PositionIndexEntity` (`resourceType`, `index_latitude`, `index_longitude`, `resourceUuid`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_QuantityIndexEntity_resourceType_index_name_index_value_index_code_resourceUuid` ON `QuantityIndexEntity` (`resourceType`, `index_name`, `index_value`, `index_code`, `resourceUuid`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_ReferenceIndexEntity_index_value_index_name_resourceType_resourceUuid` ON `ReferenceIndexEntity` (`index_value`, `index_name`, `resourceType`, `resourceUuid`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_ResourceEntity_resourceUuid_resourceType` ON `ResourceEntity` (`resourceUuid`, `resourceType`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceType_index_name_resourceUuid` ON `StringIndexEntity` (`resourceType`, `index_name`, `resourceUuid`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name` ON `StringIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_index_value_resourceType_index_name_resourceUuid` ON `TokenIndexEntity` (`index_value`, `resourceType`, `index_name`, `resourceUuid`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_UriIndexEntity_index_value_resourceType_index_name_resourceUuid` ON `UriIndexEntity` (`index_value`, `resourceType`, `index_name`, `resourceUuid`);",
+        )
+
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
+      }
     }
   }
