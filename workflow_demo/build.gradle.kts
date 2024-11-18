@@ -66,10 +66,9 @@ dependencies {
   }
   implementation(project(":workflow")) {
     exclude(group = "com.google.android.fhir", module = "engine")
+    exclude(group = "com.google.android.fhir", module = "knowledge")
   }
-  implementation(project(":workflow-testing")) {
-    exclude(group = "com.google.android.fhir", module = "engine")
-  }
+  implementation(project(":workflow-testing"))
 
   testImplementation(libs.junit)
   constraints {
