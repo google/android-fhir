@@ -2292,8 +2292,8 @@ class SearchTest {
         """
           SELECT * FROM (
           SELECT rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           )
@@ -2334,8 +2334,8 @@ class SearchTest {
         """
           SELECT * FROM (
           SELECT rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
           AND re.resourceUuid IN (
@@ -2384,8 +2384,8 @@ class SearchTest {
         """
           SELECT * FROM (
           SELECT rie.index_name, rie.resourceUuid, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           LEFT JOIN StringIndexEntity b
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2445,8 +2445,8 @@ class SearchTest {
         """
         SELECT * FROM (
         SELECT rie.index_name, rie.resourceUuid, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
+        FROM ReferenceIndexEntity rie
+        JOIN ResourceEntity re
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2462,8 +2462,8 @@ class SearchTest {
         UNION ALL
         SELECT * FROM (
         SELECT rie.index_name, rie.resourceUuid, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
+        FROM ReferenceIndexEntity rie
+        JOIN ResourceEntity re
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
@@ -2517,17 +2517,17 @@ class SearchTest {
         """
           SELECT * FROM (
           SELECT rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceUuid = rie.resourceUuid
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
           )
           """
           .trimIndent(),
       )
 
     assertThat(query.args)
-      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02", "Condition")
+      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02")
       .inOrder()
   }
 
@@ -2555,10 +2555,10 @@ class SearchTest {
         """
         SELECT * FROM (
         SELECT rie.index_name, rie.index_value, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
+        FROM ReferenceIndexEntity rie
+        JOIN ResourceEntity re
         ON re.resourceUuid = rie.resourceUuid
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2574,7 +2574,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
@@ -2608,14 +2607,14 @@ class SearchTest {
         """
         SELECT * FROM (
         SELECT rie.index_name, rie.index_value, re.serializedResource
-        FROM ResourceEntity re
-        JOIN ReferenceIndexEntity rie
+        FROM ReferenceIndexEntity rie
+        JOIN ResourceEntity re
         ON re.resourceUuid = rie.resourceUuid
         LEFT JOIN DateIndexEntity b
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
         LEFT JOIN DateTimeIndexEntity c
         ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2636,7 +2635,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
@@ -2687,14 +2685,14 @@ class SearchTest {
         """
           SELECT * FROM (
           SELECT rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
           ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2706,14 +2704,14 @@ class SearchTest {
           UNION ALL
           SELECT * FROM (
           SELECT rie.index_name, rie.index_value, re.serializedResource
-          FROM ResourceEntity re
-          JOIN ReferenceIndexEntity rie
+          FROM ReferenceIndexEntity rie
+          JOIN ResourceEntity re
           ON re.resourceUuid = rie.resourceUuid
           LEFT JOIN DateIndexEntity b
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
           ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2735,7 +2733,6 @@ class SearchTest {
         "Patient/pa01",
         "Patient/pa02",
         "Encounter",
-        "Encounter",
         "status",
         "arrived",
         "http://hl7.org/fhir/encounter-status",
@@ -2745,7 +2742,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
