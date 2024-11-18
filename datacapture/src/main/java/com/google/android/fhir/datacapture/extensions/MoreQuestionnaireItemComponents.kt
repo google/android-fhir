@@ -62,7 +62,7 @@ internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
   "https://github.com/google/android-fhir/questionnaire-item-control"
 
 internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR =
-  "https://github.com/google/android-fhir/dialog"
+  "https://github.com/google/android-fhir/StructureDefinition/dialog"
 
 internal enum class StyleUrl(val url: String) {
   BASE("https://github.com/google/android-fhir/tree/master/datacapture/android-style"),

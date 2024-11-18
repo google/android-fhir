@@ -497,9 +497,8 @@ class QuestionnaireEditAdapterTest {
       .isEqualTo(QuestionnaireViewHolderType.DROP_DOWN.value)
   }
 
-  @Suppress("ktlint:standard:max-line-length")
   @Test
-  fun getItemViewType_choiceItemType_itemControlExtensionWithRadioButton_andDialogExtension_shouldReturnDialogSelectViewHolderType() {
+  fun `getItemViewType() with radio button and dialog extension should return dialog select view holder type`() {
     val questionnaireEditAdapter = QuestionnaireEditAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
@@ -536,9 +535,8 @@ class QuestionnaireEditAdapterTest {
       .isEqualTo(QuestionnaireViewHolderType.DIALOG_SELECT.value)
   }
 
-  @Suppress("ktlint:standard:max-line-length")
   @Test
-  fun getItemViewType_choiceItemType_itemControlExtensionWithCheckBox_andDialogExtension_shouldReturnDialogSelectViewHolderType() {
+  fun `getItemViewType() with check box and dialog extension should return dialog select view holder type`() {
     val questionnaireEditAdapter = QuestionnaireEditAdapter()
     val questionnaireItem =
       Questionnaire.QuestionnaireItemComponent().setType(Questionnaire.QuestionnaireItemType.CHOICE)
