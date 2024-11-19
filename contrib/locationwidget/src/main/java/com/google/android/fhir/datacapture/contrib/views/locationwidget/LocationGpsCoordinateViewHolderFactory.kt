@@ -156,7 +156,7 @@ object LocationGpsCoordinateViewHolderFactory :
   }
 
   const val PRIMARY_GPS_COORDINATE_EXTENSION_URL =
-    "https://github.com/google/StructureDefinition/gps-coordinate"
+    "https://github.com/google/android-fhir/StructureDefinition/gps-coordinate"
   const val GPS_COORDINATE_EXTENSION_URL = "gps-coordinate"
   const val GPS_COORDINATE_EXTENSION_VALUE_LATITUDE = "latitude"
   const val GPS_COORDINATE_EXTENSION_VALUE_LONGITUDE = "longitude"
