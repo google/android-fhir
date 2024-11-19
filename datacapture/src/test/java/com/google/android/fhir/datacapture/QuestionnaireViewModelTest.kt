@@ -501,7 +501,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -660,7 +660,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -756,7 +756,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -813,7 +813,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -877,7 +877,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -924,7 +924,7 @@ class QuestionnaireViewModelTest {
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -3654,7 +3654,7 @@ class QuestionnaireViewModelTest {
 
     assertQuestionnaireResponseEqualsIgnoringTimestamps(
       viewModel.getQuestionnaireResponse(),
-      questionnaireResponse
+      questionnaireResponse,
     )
   }
 
@@ -3845,7 +3845,7 @@ class QuestionnaireViewModelTest {
 
         assertQuestionnaireResponseEqualsIgnoringTimestamps(
           viewModel.getQuestionnaireResponse(),
-          questionnaireResponse
+          questionnaireResponse,
         )
       }
     }
@@ -4378,7 +4378,7 @@ class QuestionnaireViewModelTest {
 
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -4683,7 +4683,7 @@ class QuestionnaireViewModelTest {
 
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -7567,7 +7567,7 @@ class QuestionnaireViewModelTest {
      */
     private fun assertQuestionnaireResponseEqualsIgnoringTimestamps(
       actual: QuestionnaireResponse,
-      expected: QuestionnaireResponse
+      expected: QuestionnaireResponse,
     ) {
       val actualResponseWithoutTimestamp =
         actual.copy().apply {

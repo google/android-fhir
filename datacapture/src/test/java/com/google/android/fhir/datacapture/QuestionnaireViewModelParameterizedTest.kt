@@ -139,7 +139,7 @@ class QuestionnaireViewModelParameterizedTest(
     runTest {
       assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
-        questionnaireResponse
+        questionnaireResponse,
       )
     }
   }
@@ -199,7 +199,7 @@ class QuestionnaireViewModelParameterizedTest(
      */
     fun assertQuestionnaireResponseEqualsIgnoringTimestamps(
       actual: QuestionnaireResponse,
-      expected: QuestionnaireResponse
+      expected: QuestionnaireResponse,
     ) {
       val actualResponseWithoutTimestamp =
         actual.copy().apply {
