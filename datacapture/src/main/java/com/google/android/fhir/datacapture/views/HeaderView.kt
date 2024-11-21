@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -59,6 +60,7 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
     question.updateTextAndVisibility(
       appendAsteriskToQuestionText(question.context, questionnaireViewItem),
     )
+    question.movementMethod = LinkMovementMethod.getInstance()
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )

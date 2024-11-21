@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -57,6 +58,7 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
     // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(questionnaireViewItem.questionText)
+    question.movementMethod = LinkMovementMethod.getInstance()
     hint.updateTextAndVisibility(
       questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
     )
