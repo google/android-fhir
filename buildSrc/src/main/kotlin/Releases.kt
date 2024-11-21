@@ -98,6 +98,12 @@ object Releases {
     const val versionCode = 1
     const val versionName = "1.0"
   }
+
+  object WorkflowDemo {
+    const val applicationId = "com.google.android.fhir.workflow.demo"
+    const val versionCode = 1
+    const val versionName = "1.0"
+  }
 }
 
 fun Project.publishArtifact(artifact: LibraryArtifact) {
