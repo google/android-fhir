@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,6 @@ internal interface RetrofitHttpService : FhirHttpService {
             if (networkConfiguration.uploadWithGzip) {
               addInterceptor(GzipUploadInterceptor)
             }
-            httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
@@ -107,6 +106,7 @@ internal interface RetrofitHttpService : FhirHttpService {
                 },
               )
             }
+            httpLoggingInterceptor?.let { addInterceptor(it) }
             networkConfiguration.httpCache?.let { this.cache(Cache(it.cacheDir, it.maxSize)) }
           }
           .build()
