@@ -70,11 +70,11 @@ dependencies {
   implementation(Dependencies.Mlkit.barcodeScanning)
   implementation(Dependencies.Mlkit.objectDetection)
   implementation(Dependencies.Mlkit.objectDetectionCustom)
-  implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
+  implementation(libs.material)
 
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
