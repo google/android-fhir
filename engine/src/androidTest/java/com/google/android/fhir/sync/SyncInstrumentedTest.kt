@@ -86,7 +86,7 @@ class SyncInstrumentedTest {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val workManager = WorkManager.getInstance(context)
     runBlocking {
-      val (statusFlow, _) = Sync.oneTimeSync<TestSyncWorker>(context = context)
+      val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
       statusFlow
         .transformWhile { status ->
           emit(status is CurrentSyncJobStatus.Succeeded)
@@ -104,7 +104,7 @@ class SyncInstrumentedTest {
     WorkManagerTestInitHelper.initializeTestWorkManager(context)
     val states = mutableListOf<CurrentSyncJobStatus>()
     runBlocking {
-      val (statusFlow, _) = Sync.oneTimeSync<TestSyncWorker>(context = context)
+      val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
       launch {
         statusFlow
           .transformWhile { status ->
@@ -132,7 +132,7 @@ class SyncInstrumentedTest {
 
       // First one-time sync
       launch {
-          val (statusFlow, _) = Sync.oneTimeSync<TestSyncWorker>(context = context)
+          val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
           statusFlow.collect { status ->
             states.add(status)
             if (status is CurrentSyncJobStatus.Succeeded) {
@@ -144,7 +144,7 @@ class SyncInstrumentedTest {
 
       // Second one-time sync
       launch {
-          val (statusFlow, _) = Sync.oneTimeSync<TestSyncWorker>(context = context)
+          val statusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
           statusFlow.collect { status ->
             nextExecutionStates.add(status)
             if (status is CurrentSyncJobStatus.Succeeded) {
@@ -165,7 +165,7 @@ class SyncInstrumentedTest {
     val states = mutableListOf<CurrentSyncJobStatus>()
 
     runBlocking {
-      val (statusFlow, _) =
+      val statusFlow =
         Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
           context = context,
           retryConfiguration =
@@ -207,7 +207,7 @@ class SyncInstrumentedTest {
       val nextExecutionStates = mutableListOf<CurrentSyncJobStatus>()
 
       launch {
-          val (statusFlow, _) =
+          val statusFlow =
             Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
               context = context,
               retryConfiguration =
@@ -232,7 +232,7 @@ class SyncInstrumentedTest {
         .join()
 
       launch {
-          val (nextStatusFlow, _) =
+          val nextStatusFlow =
             Sync.oneTimeSync<TestSyncWorkerForDownloadFailing>(
               context = context,
               retryConfiguration =
@@ -267,7 +267,7 @@ class SyncInstrumentedTest {
     val states = mutableListOf<PeriodicSyncJobStatus>()
     // run and wait for periodic worker to finish
     runBlocking {
-      val (flow, _) =
+      val flow =
         Sync.periodicSync<TestSyncWorker>(
           context = context,
           periodicSyncConfiguration =
@@ -300,7 +300,7 @@ class SyncInstrumentedTest {
     val states = mutableListOf<PeriodicSyncJobStatus>()
 
     runBlocking {
-      val (statusFlow, _) =
+      val statusFlow =
         Sync.periodicSync<TestSyncWorkerForDownloadFailing>(
           context = context,
           periodicSyncConfiguration =
@@ -338,7 +338,7 @@ class SyncInstrumentedTest {
 
     // Run and wait for periodic worker to finish
     runBlocking {
-      val (statusFlow, periodicWorkerId) =
+      val statusFlow =
         Sync.periodicSync<TestSyncWorker>(
           context = context,
           periodicSyncConfiguration =
@@ -369,7 +369,7 @@ class SyncInstrumentedTest {
 
     // Start and complete a one-time job, and verify it does not remove the periodic worker
     runBlocking {
-      val (oneTimeStatusFlow, _) = Sync.oneTimeSync<TestSyncWorker>(context = context)
+      val oneTimeStatusFlow = Sync.oneTimeSync<TestSyncWorker>(context = context)
 
       oneTimeStatusFlow
         .transformWhile { status ->

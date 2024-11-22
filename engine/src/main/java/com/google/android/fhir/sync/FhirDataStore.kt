@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import java.time.OffsetDateTime
+import java.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -98,6 +99,31 @@ internal class FhirDataStore(context: Context) {
 
   internal fun writeLastSyncTimestamp(datetime: OffsetDateTime) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
+  }
+
+  /**
+   * Stores the given UUID in DataStore.
+   *
+   * @param uuid The UUID to store.
+   * @param workIdKey The key used to store the UUID.
+   */
+  @PublishedApi
+  internal suspend fun storeWorkId(uuid: UUID, workIdKey: String) {
+    dataStore.edit { preferences ->
+      preferences[stringPreferencesKey("$workIdKey-key")] = uuid.toString()
+    }
+  }
+
+  /**
+   * Fetches the stored UUID from DataStore.
+   *
+   * @param workIdKey The key used to fetch the UUID.
+   * @return The stored UUID, or null if not found.
+   */
+  @PublishedApi
+  internal suspend fun fetchWorkId(workIdKey: String): UUID? {
+    val preferences = dataStore.data.first()
+    return preferences[stringPreferencesKey("$workIdKey-key")]?.let { UUID.fromString(it) }
   }
 
   companion object {

@@ -66,11 +66,11 @@ object Sync {
    * @param retryConfiguration configuration to guide the retry mechanism, or `null` to stop retry.
    * @return a [Flow] of [CurrentSyncJobStatus]
    */
-  inline fun <reified W : FhirSyncWorker> oneTimeSync(
+  suspend inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
-  ): Pair<Flow<CurrentSyncJobStatus>, UUID> {
-    val uniqueWorkName = "${W::class.java.name}-oneTimeSync"
+  ): Flow<CurrentSyncJobStatus> {
+    val uniqueWorkName = createSyncUniqueName<W>("oneTimeSync")
     val flow = getWorkerInfo(context, uniqueWorkName)
     val oneTimeWorkRequest =
       createOneTimeWorkRequest(retryConfiguration, W::class.java, uniqueWorkName)
@@ -81,7 +81,8 @@ object Sync {
         oneTimeWorkRequest,
       )
     val workId = oneTimeWorkRequest.id
-    return Pair(combineSyncStateForOneTimeSync(context, uniqueWorkName, flow), workId)
+    FhirEngineProvider.getFhirDataStore(context).storeWorkId(workId, uniqueWorkName)
+    return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow)
   }
 
   /**
@@ -95,11 +96,11 @@ object Sync {
    * @return a [Flow] of [PeriodicSyncJobStatus]
    */
   @ExperimentalCoroutinesApi
-  inline fun <reified W : FhirSyncWorker> periodicSync(
+  suspend inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration,
-  ): Pair<Flow<PeriodicSyncJobStatus>, UUID> {
-    val uniqueWorkName = "${W::class.java.name}-periodicSync"
+  ): Flow<PeriodicSyncJobStatus> {
+    val uniqueWorkName = createSyncUniqueName<W>("periodicSync")
     val flow = getWorkerInfo(context, uniqueWorkName)
     val periodicWorkRequest =
       createPeriodicWorkRequest(periodicSyncConfiguration, W::class.java, uniqueWorkName)
@@ -110,7 +111,30 @@ object Sync {
         periodicWorkRequest,
       )
     val workId = periodicWorkRequest.id
-    return Pair(combineSyncStateForPeriodicSync(context, uniqueWorkName, flow), workId)
+    FhirEngineProvider.getFhirDataStore(context).storeWorkId(workId, uniqueWorkName)
+    return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
+  }
+
+  suspend inline fun <reified W : FhirSyncWorker> cancelOneTimeSync(context: Context) {
+    cancelSync<W>(context, "oneTimeSync")
+  }
+
+  suspend inline fun <reified W : FhirSyncWorker> cancelPeriodicSync(context: Context) {
+    cancelSync<W>(context, "periodicSync")
+  }
+
+  @PublishedApi
+  internal suspend inline fun <reified W : FhirSyncWorker> cancelSync(
+    context: Context,
+    syncType: String,
+  ) {
+    val uniqueWorkName = createSyncUniqueName<W>(syncType)
+    val workId = FhirEngineProvider.getFhirDataStore(context).fetchWorkId(uniqueWorkName)
+    if (workId != null) {
+      WorkManager.getInstance(context).cancelWorkById(workId)
+    } else {
+      Timber.w("No Work ID found for uniqueWorkName: $uniqueWorkName")
+    }
   }
 
   fun cancelWorkById(context: Context, workId: UUID) {
@@ -352,4 +376,9 @@ object Sync {
         else -> error("Inconsistent terminal syncJobStatus : $lastSyncJobStatus")
       }
     }
+
+  @PublishedApi
+  internal inline fun <reified W : FhirSyncWorker> createSyncUniqueName(syncType: String): String {
+    return "${W::class.java.name}-$syncType"
+  }
 }

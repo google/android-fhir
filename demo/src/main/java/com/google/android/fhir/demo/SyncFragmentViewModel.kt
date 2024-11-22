@@ -55,12 +55,9 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .flatMapLatest {
-        val (statusFlow, uuid) =
-          Sync.oneTimeSync<DemoFhirSyncWorker>(
-            context = application.applicationContext,
-          )
-        oneTimeSyncUuid = uuid
-        statusFlow
+        Sync.oneTimeSync<DemoFhirSyncWorker>(
+          context = application.applicationContext,
+        )
       }
       .map { it }
       .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
@@ -70,7 +67,7 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
   }
 
   fun cancelOneTimeSyncWork() {
-    oneTimeSyncUuid?.let { Sync.cancelWorkById(getApplication(), it) }
+    viewModelScope.launch { Sync.cancelOneTimeSync<DemoFhirSyncWorker>(getApplication()) }
   }
 
   /** Emits last sync time. */
