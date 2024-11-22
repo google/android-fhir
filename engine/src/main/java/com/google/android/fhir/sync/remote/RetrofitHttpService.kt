@@ -90,6 +90,7 @@ internal interface RetrofitHttpService : FhirHttpService {
             if (networkConfiguration.uploadWithGzip) {
               addInterceptor(GzipUploadInterceptor)
             }
+            httpLoggingInterceptor?.let { addInterceptor(it) }
             authenticator?.let {
               addInterceptor(
                 Interceptor { chain: Interceptor.Chain ->
@@ -106,7 +107,6 @@ internal interface RetrofitHttpService : FhirHttpService {
                 },
               )
             }
-            httpLoggingInterceptor?.let { addInterceptor(it) }
             networkConfiguration.httpCache?.let { this.cache(Cache(it.cacheDir, it.maxSize)) }
           }
           .build()
