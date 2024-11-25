@@ -27,7 +27,6 @@ import com.google.android.fhir.sync.CurrentSyncJobStatus
 import com.google.android.fhir.sync.Sync
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -41,7 +40,6 @@ import kotlinx.coroutines.launch
 /** View model for [MainActivity]. */
 @OptIn(ExperimentalCoroutinesApi::class)
 class SyncFragmentViewModel(application: Application) : AndroidViewModel(application) {
-  private var oneTimeSyncUuid: UUID? = null
   private val _lastSyncTimestampLiveData = MutableLiveData<String>()
   val lastSyncTimestampLiveData: LiveData<String>
     get() = _lastSyncTimestampLiveData

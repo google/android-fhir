@@ -137,10 +137,6 @@ object Sync {
     }
   }
 
-  fun cancelWorkById(context: Context, workId: UUID) {
-    WorkManager.getInstance(context).cancelWorkById(workId)
-  }
-
   /**
    * Retrieves the work information for a specific unique work name as a flow of pairs containing
    * the work state and the corresponding progress data if available.
@@ -195,7 +191,6 @@ object Sync {
           createSyncStateForPeriodicSync(
             workerInfoSyncJobStatusPairFromWorkManager.first,
             workerInfoSyncJobStatusPairFromWorkManager.second,
-            syncJobStatusFromDataStore,
           ),
       )
     }
@@ -333,11 +328,7 @@ object Sync {
   private fun createSyncStateForPeriodicSync(
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
-    syncJobStatusFromDataStore: SyncJobStatus?,
   ): CurrentSyncJobStatus {
-    Timber.d(
-      "currentSyncJobStatus : $syncJobStatusFromWorkManager syncJobStatusFromDataStore: $syncJobStatusFromDataStore workInfoState: $workInfoState",
-    )
     return when (workInfoState) {
       WorkInfo.State.ENQUEUED -> Enqueued
       WorkInfo.State.RUNNING -> {
