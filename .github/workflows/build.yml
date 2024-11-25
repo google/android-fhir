@@ -45,6 +45,9 @@ jobs:
   # Build will compile APK, test APK and run tests, lint, etc.
   build:
     runs-on: ubuntu-22.04-8core
+    container:
+      image: ubuntu:22.04
+      options: --security-opt=no-new-privileges
     timeout-minutes: 60
     permissions:
       actions: read
