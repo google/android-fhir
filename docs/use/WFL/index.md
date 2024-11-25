@@ -22,6 +22,7 @@ Future features of the library will provide support for Tasking and other Workfl
   * [Evaluate a Measure](Evaluate-a-Measure.md)
   * [Evaluate a Library](Evaluate-a-Library.md)
   * [Compile CQL](Compile-and-Execute-CQL.md)
+  * [Run an Activity Flow](Run-an-Activity-Flow.md)
 
 ## Data safety
 
