@@ -26,7 +26,7 @@ object TestExpressionValueEvaluator {
    * Doesn't handle expressions containing FHIRPath supplements
    * https://build.fhir.org/ig/HL7/sdc/expressions.html#fhirpath-supplements
    */
-  suspend fun evaluate(base: Base, expression: Expression): Type? =
+  fun evaluate(base: Base, expression: Expression): Type? =
     try {
       evaluateToBase(base, expression.expression).singleOrNull() as? Type
     } catch (_: Exception) {

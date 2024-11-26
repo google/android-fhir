@@ -56,7 +56,6 @@ import com.google.android.fhir.datacapture.extensions.createNestedQuestionnaireR
 import com.google.android.fhir.datacapture.extensions.entryMode
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.maxValue
-import com.google.android.fhir.datacapture.fhirpath.fhirPathEngineDefaultDispatcher
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
@@ -158,7 +157,6 @@ class QuestionnaireViewModelTest {
       "Few tests require a custom application class that implements DataCaptureConfig.Provider"
     }
     ReflectionHelpers.setStaticField(DataCapture::class.java, "configuration", null)
-    fhirPathEngineDefaultDispatcher = mainDispatcherRule.testDispatcher
   }
 
   // ==================================================================== //

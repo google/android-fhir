@@ -27,7 +27,6 @@ import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import java.util.Locale
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Attachment
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
@@ -2221,7 +2220,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `extractAnswerOptions should return answer options for coding`() = runTest {
+  fun `extractAnswerOptions should return answer options for coding`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -2254,7 +2253,7 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `extractAnswerOptions should return answer options for resources`() = runTest {
+  fun `extractAnswerOptions should return answer options for resources`() {
     val questionItem =
       Questionnaire()
         .addItem(
@@ -2303,35 +2302,34 @@ class MoreQuestionnaireItemComponentsTest {
   }
 
   @Test
-  fun `extractAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() =
-    runTest {
-      val questionItem =
-        Questionnaire()
-          .addItem(
-            Questionnaire.QuestionnaireItemComponent().apply {
-              linkId = "full-name"
-              type = Questionnaire.QuestionnaireItemType.CHOICE
-              extension =
-                listOf(
-                  Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
-                    addExtension(Extension("path", StringType("name.given")))
-                    addExtension(Extension("label", StringType("GIVEN")))
-                    addExtension(Extension("forDisplay", BooleanType(true)))
-                  },
-                )
-            },
-          )
+  fun `extractAnswerOptions should throw IllegalArgumentException when item type is not reference and data type is resource`() {
+    val questionItem =
+      Questionnaire()
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "full-name"
+            type = Questionnaire.QuestionnaireItemType.CHOICE
+            extension =
+              listOf(
+                Extension(EXTENSION_CHOICE_COLUMN_URL).apply {
+                  addExtension(Extension("path", StringType("name.given")))
+                  addExtension(Extension("label", StringType("GIVEN")))
+                  addExtension(Extension("forDisplay", BooleanType(true)))
+                },
+              )
+          },
+        )
 
-      assertThrows(IllegalArgumentException::class.java) {
-          runBlocking { questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient())) }
-        }
-        .run {
-          assertThat(this.message)
-            .isEqualTo(
-              "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource.",
-            )
-        }
-    }
+    assertThrows(IllegalArgumentException::class.java) {
+        questionItem.itemFirstRep.extractAnswerOptions(listOf(Patient()))
+      }
+      .run {
+        assertThat(this.message)
+          .isEqualTo(
+            "$EXTENSION_CHOICE_COLUMN_URL not applicable for 'choice'. Only type reference is allowed with resource.",
+          )
+      }
+  }
 
   @Test
   fun `sliderStepValue should return the integer value in the sliderStepValue extension`() {

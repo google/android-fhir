@@ -24,17 +24,12 @@ import com.google.android.fhir.datacapture.extensions.isFhirPath
 import com.google.android.fhir.datacapture.extensions.isReferencedBy
 import com.google.android.fhir.datacapture.extensions.isXFhirQuery
 import com.google.android.fhir.datacapture.extensions.variableExpressions
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.fold
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.merge
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model.Expression
+import org.hl7.fhir.r4.model.ExpressionNode
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -353,7 +348,7 @@ internal class ExpressionEvaluator(
    * Creates an x-fhir-query string for evaluation. For this, it evaluates both variables and
    * fhir-paths in the expression.
    */
-  internal suspend fun createXFhirQueryFromExpression(
+  internal fun createXFhirQueryFromExpression(
     expression: Expression,
     variablesMap: Map<String, Base?> = emptyMap(),
   ): String {
@@ -362,7 +357,6 @@ internal class ExpressionEvaluator(
       variablesMap
         .filterKeys { expression.expression.contains("{{%$it}}") }
         .map { Pair("{{%${it.key}}}", it.value?.primitiveValue() ?: "") }
-        .asFlow()
 
     val fhirPathsEvaluatedPairs =
       questionnaireLaunchContextMap
@@ -370,9 +364,9 @@ internal class ExpressionEvaluator(
         .takeIf { !it.isNullOrEmpty() }
         ?.also { it.put(questionnaireFhirPathSupplement, questionnaire) }
         ?.let { evaluateXFhirEnhancement(expression, it) }
-        ?: emptyFlow()
+        ?: emptySequence()
 
-    return merge(variablesEvaluatedPairs, fhirPathsEvaluatedPairs).fold(expression.expression) {
+    return (variablesEvaluatedPairs + fhirPathsEvaluatedPairs).fold(expression.expression) {
       acc: String,
       pair: Pair<String, String>,
       ->
@@ -389,17 +383,21 @@ internal class ExpressionEvaluator(
    *   Practitioner?active=true&{{Practitioner.name.family}}
    * @param launchContextMap the launch context to evaluate the expression against
    */
-  private suspend fun evaluateXFhirEnhancement(
+  private fun evaluateXFhirEnhancement(
     expression: Expression,
     launchContextMap: Map<String, Resource>,
-  ): Flow<Pair<String, String>> =
+  ): Sequence<Pair<String, String>> =
     xFhirQueryEnhancementRegex
       .findAll(expression.expression)
-      .asFlow()
       .map { it.groupValues }
       .map { (fhirPathWithParentheses, fhirPath) ->
+        val expressionNode = extractExpressionNode(fhirPath)
         val evaluatedResult =
-          evaluateToString(contextMap = launchContextMap, fhirPathString = fhirPath)
+          evaluateToString(
+            expression = expressionNode,
+            data = launchContextMap[extractResourceType(expressionNode)],
+            contextMap = launchContextMap,
+          )
 
         // If the result of evaluating the FHIRPath expressions is an invalid query, it returns
         // null. As per the spec:
@@ -531,6 +529,16 @@ internal class ExpressionEvaluator(
       Timber.w("Could not evaluate expression with FHIRPathEngine", exception)
       null
     }
+}
+
+/**
+ * Extract [ResourceType] string representation from constant or name property of given
+ * [ExpressionNode].
+ */
+private fun extractResourceType(expressionNode: ExpressionNode): String? {
+  // TODO(omarismail94): See if FHIRPathEngine.check() can be used to distinguish invalid
+  // expression vs an expression that is valid, but does not return one resource only.
+  return expressionNode.constant?.primitiveValue()?.substring(1) ?: expressionNode.name?.lowercase()
 }
 
 /** Pair of a [Questionnaire.QuestionnaireItemComponent] with its evaluated answers */

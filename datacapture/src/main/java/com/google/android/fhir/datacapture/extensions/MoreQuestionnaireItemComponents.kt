@@ -785,7 +785,7 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  *   resources [Resource], identifiers [Identifier] or codes [Coding]
  * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
  */
-internal suspend fun QuestionnaireItemComponent.extractAnswerOptions(
+internal fun QuestionnaireItemComponent.extractAnswerOptions(
   dataList: List<Base>,
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
   return when (this.type) {

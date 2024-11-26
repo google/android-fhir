@@ -28,7 +28,6 @@ import java.util.Calendar
 import java.util.Date
 import java.util.UUID
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Bundle
 import org.hl7.fhir.r4.model.DateType
@@ -894,7 +893,7 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should capture all FHIR paths`() = runTest {
+  fun `createXFhirQueryFromExpression() should capture all FHIR paths`() {
     val expression =
       Expression().apply {
         this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
@@ -920,38 +919,37 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate to empty string for field that does not exist in resource`() =
-    runTest {
-      val practitioner =
-        Practitioner().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          addName(HumanName().apply { this.family = "John" })
-        }
+  fun `createXFhirQueryFromExpression() should evaluate to empty string for field that does not exist in resource`() {
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        addName(HumanName().apply { this.family = "John" })
+      }
 
-      val expression =
-        Expression().apply {
-          this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-          this.expression = "Practitioner?gender={{Practitioner.gender}}"
-        }
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{Practitioner.gender}}"
+      }
 
-      val expressionEvaluator =
-        ExpressionEvaluator(
-          Questionnaire(),
-          QuestionnaireResponse(),
-          questionnaireItemParentMap = emptyMap(),
-          questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
-        )
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        Questionnaire(),
+        QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
+      )
 
-      val expressionsToEvaluate =
-        expressionEvaluator.createXFhirQueryFromExpression(
-          expression,
-        )
-      assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
-    }
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+      )
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
+  }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate correct expression`() = runTest {
+  fun `createXFhirQueryFromExpression() should evaluate correct expression`() {
     val practitioner =
       Practitioner().apply {
         id = UUID.randomUUID().toString()
@@ -983,39 +981,38 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should return empty string if the resource provided does not match the type in the expression`() =
-    runTest {
-      val practitioner =
-        Practitioner().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          gender = Enumerations.AdministrativeGender.MALE
-          addName(HumanName().apply { this.family = "John" })
-        }
+  fun `createXFhirQueryFromExpression() should return empty string if the resource provided does not match the type in the expression`() {
+    val practitioner =
+      Practitioner().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
 
-      val expression =
-        Expression().apply {
-          this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-          this.expression = "Practitioner?gender={{%patient.gender}}"
-        }
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression = "Practitioner?gender={{%patient.gender}}"
+      }
 
-      val expressionEvaluator =
-        ExpressionEvaluator(
-          Questionnaire(),
-          QuestionnaireResponse(),
-          questionnaireItemParentMap = emptyMap(),
-          questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
-        )
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        Questionnaire(),
+        QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap = mapOf(practitioner.resourceType.name to practitioner),
+      )
 
-      val expressionsToEvaluate =
-        expressionEvaluator.createXFhirQueryFromExpression(
-          expression,
-        )
-      assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
-    }
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+      )
+    assertThat(expressionsToEvaluate).isEqualTo("Practitioner?gender=")
+  }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate fhirPath with percent sign`() = runTest {
+  fun `createXFhirQueryFromExpression() should evaluate fhirPath with percent sign`() {
     val patient =
       Patient().apply {
         id = UUID.randomUUID().toString()
@@ -1046,54 +1043,53 @@ class ExpressionEvaluatorTest {
   }
 
   @Test
-  fun `createXFhirQueryFromExpression() should evaluate when multiple fhir paths are given`() =
-    runTest {
-      val patient =
-        Patient().apply {
-          id = UUID.randomUUID().toString()
-          active = true
-          gender = Enumerations.AdministrativeGender.MALE
-          addName(HumanName().apply { this.family = "John" })
-        }
+  fun `createXFhirQueryFromExpression() should evaluate when multiple fhir paths are given`() {
+    val patient =
+      Patient().apply {
+        id = UUID.randomUUID().toString()
+        active = true
+        gender = Enumerations.AdministrativeGender.MALE
+        addName(HumanName().apply { this.family = "John" })
+      }
 
-      val location =
-        Location().apply {
-          id = UUID.randomUUID().toString()
-          status = Location.LocationStatus.ACTIVE
-          mode = Location.LocationMode.INSTANCE
-          address =
-            Address().apply {
-              use = Address.AddressUse.HOME
-              type = Address.AddressType.PHYSICAL
-              city = "NAIROBI"
-            }
-        }
+    val location =
+      Location().apply {
+        id = UUID.randomUUID().toString()
+        status = Location.LocationStatus.ACTIVE
+        mode = Location.LocationMode.INSTANCE
+        address =
+          Address().apply {
+            use = Address.AddressUse.HOME
+            type = Address.AddressType.PHYSICAL
+            city = "NAIROBI"
+          }
+      }
 
-      val expression =
-        Expression().apply {
-          this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
-          this.expression =
-            "Patient?family={{%patient.name.family}}&address-city={{%location.address.city}}"
-        }
+    val expression =
+      Expression().apply {
+        this.language = Expression.ExpressionLanguage.APPLICATION_XFHIRQUERY.toCode()
+        this.expression =
+          "Patient?family={{%patient.name.family}}&address-city={{%location.address.city}}"
+      }
 
-      val expressionEvaluator =
-        ExpressionEvaluator(
-          Questionnaire(),
-          QuestionnaireResponse(),
-          questionnaireItemParentMap = emptyMap(),
-          questionnaireLaunchContextMap =
-            mapOf(
-              patient.resourceType.name.lowercase() to patient,
-              location.resourceType.name.lowercase() to location,
-            ),
-        )
+    val expressionEvaluator =
+      ExpressionEvaluator(
+        Questionnaire(),
+        QuestionnaireResponse(),
+        questionnaireItemParentMap = emptyMap(),
+        questionnaireLaunchContextMap =
+          mapOf(
+            patient.resourceType.name.lowercase() to patient,
+            location.resourceType.name.lowercase() to location,
+          ),
+      )
 
-      val expressionsToEvaluate =
-        expressionEvaluator.createXFhirQueryFromExpression(
-          expression,
-        )
-      assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
-    }
+    val expressionsToEvaluate =
+      expressionEvaluator.createXFhirQueryFromExpression(
+        expression,
+      )
+    assertThat(expressionsToEvaluate).isEqualTo("Patient?family=John&address-city=NAIROBI")
+  }
 
   @Test
   fun `createXFhirQueryFromExpression() should evaluate variables in answer expression when launch context is null`() {
