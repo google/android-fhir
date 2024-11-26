@@ -87,14 +87,6 @@ object Dependencies {
   const val playServicesLocation =
     "com.google.android.gms:play-services-location:${Versions.playServicesLocation}"
 
-  const val androidFhirGroup = "com.google.android.fhir"
-  const val androidFhirEngineModule = "engine"
-  const val androidFhirKnowledgeModule = "knowledge"
-  const val androidFhirCommon = "$androidFhirGroup:common:${Versions.androidFhirCommon}"
-  const val androidFhirEngine =
-    "$androidFhirGroup:$androidFhirEngineModule:${Versions.androidFhirEngine}"
-  const val androidFhirKnowledge = "$androidFhirGroup:knowledge:${Versions.androidFhirKnowledge}"
-
   const val apacheCommonsCompress =
     "org.apache.commons:commons-compress:${Versions.apacheCommonsCompress}"
 
@@ -109,7 +101,6 @@ object Dependencies {
   const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
 
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
-  const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
@@ -131,9 +122,6 @@ object Dependencies {
   const val xmlUnit = "org.xmlunit:xmlunit-core:${Versions.xmlUnit}"
 
   object Versions {
-    const val androidFhirCommon = "0.1.0-alpha05"
-    const val androidFhirEngine = "0.1.0-beta05"
-    const val androidFhirKnowledge = "0.1.0-alpha03"
     const val apacheCommonsCompress = "1.21"
     const val desugarJdkLibs = "2.0.3"
     const val caffeine = "2.9.1"
@@ -154,7 +142,6 @@ object Dependencies {
 
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
-    const val material = "1.9.0"
     const val retrofit = "2.9.0"
     const val gsonConverter = "2.1.0"
     const val sqlcipher = "4.5.4"
