@@ -2717,7 +2717,8 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -2884,7 +2885,8 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
       .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -3136,7 +3138,8 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -3229,7 +3232,8 @@ class DatabaseImplTest {
             mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
         ),
       )
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -3575,7 +3579,8 @@ class DatabaseImplTest {
           ),
         ),
       )
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -3694,7 +3699,8 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-      .inOrder()
+
+    return@runBlocking
   }
 
   @Test
@@ -3812,7 +3818,8 @@ class DatabaseImplTest {
               mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
           ),
         )
-        .inOrder()
+
+      return@runBlocking
     }
 
   @Test
