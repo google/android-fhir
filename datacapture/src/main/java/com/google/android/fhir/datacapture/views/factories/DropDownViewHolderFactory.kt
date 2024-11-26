@@ -69,6 +69,12 @@ internal object DropDownViewHolderFactory :
           hint = questionnaireViewItem.enabledDisplayItems.localizedFlyoverSpanned
           helperText = getRequiredOrOptionalText(questionnaireViewItem, context)
         }
+        val initialAnswerString =
+          if (questionnaireViewItem.questionnaireItem.hasInitial()) {
+            questionnaireViewItem.questionnaireItem.initial.first().valueStringType.valueAsString
+          } else {
+            context.getString(R.string.hyphen)
+          }
         val answerOptionList =
           this.questionnaireViewItem.enabledAnswerOptions
             .map {
@@ -82,8 +88,8 @@ internal object DropDownViewHolderFactory :
         answerOptionList.add(
           0,
           DropDownAnswerOption(
-            context.getString(R.string.hyphen),
-            context.getString(R.string.hyphen),
+            initialAnswerString,
+            initialAnswerString,
             null,
           ),
         )
