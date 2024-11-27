@@ -229,12 +229,7 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> search(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
-    val dbResult =
-      db.withTransaction {
-        resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-      }
-
-    return dbResult.pmap(
+    return resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
       Dispatchers.Default,
     ) {
       ResourceWithUUID(
@@ -247,37 +242,35 @@ internal class DatabaseImpl(
   override suspend fun searchForwardReferencedResources(
     query: SearchQuery,
   ): List<ForwardIncludeSearchResult> {
-    val dbResult =
-      db.withTransaction {
-        resourceDao.getForwardReferencedResources(
-          SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+    return resourceDao
+      .getForwardReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ForwardIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceUUID,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
         )
       }
-    return dbResult.pmap(Dispatchers.Default) {
-      ForwardIncludeSearchResult(
-        it.matchingIndex,
-        it.baseResourceUUID,
-        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as Resource,
-      )
-    }
   }
 
   override suspend fun searchReverseReferencedResources(
     query: SearchQuery,
   ): List<ReverseIncludeSearchResult> {
-    val dbResult =
-      db.withTransaction {
-        resourceDao.getReverseReferencedResources(
-          SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+    return resourceDao
+      .getReverseReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ReverseIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceTypeAndId,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
         )
       }
-    return dbResult.pmap(Dispatchers.Default) {
-      ReverseIncludeSearchResult(
-        it.matchingIndex,
-        it.baseResourceTypeAndId,
-        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as Resource,
-      )
-    }
   }
 
   override suspend fun count(query: SearchQuery): Long {
