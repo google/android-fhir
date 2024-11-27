@@ -365,19 +365,33 @@ internal fun Search.getQuery(
 
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
-  val filterQuery = getFilterQueries()
-  filterQuery.forEachIndexed { i, it ->
-    filterStatement +=
-      //  spotless:off
-      """
-      ${if (i == 0) "AND a.resourceUuid IN (" else "a.resourceUuid IN ("}
-      ${it.query}
-      )
-      ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
-      """.trimIndent()
-    //  spotless:on
-    filterArgs.addAll(it.args)
-  }
+  val nestedSearchQuery = nestedSearches.nestedQuery(type, operation)
+  val filterQuery =
+    getFilterQueries().let {
+      if (nestedSearchQuery != null) {
+        it + nestedSearchQuery
+      } else {
+        it
+      }
+    }
+  val filterJoinOperator =
+    when (operation) {
+      Operation.OR -> "\nUNION\n"
+      Operation.AND -> "\nINTERSECT\n"
+    }
+  filterQuery
+    .takeIf { it.isNotEmpty() }
+    ?.let {
+      filterStatement +=
+        it.joinToString(
+          separator = filterJoinOperator,
+          prefix = "AND a.resourceUuid IN (",
+          postfix = ")\n",
+        ) { fq ->
+          fq.query
+        }
+      filterArgs.addAll(it.flatMap { fq -> fq.args })
+    }
 
   var limitStatement = ""
   val limitArgs = mutableListOf<Any>()
@@ -390,10 +404,6 @@ internal fun Search.getQuery(
     }
   }
 
-  nestedSearches.nestedQuery(type, operation)?.let {
-    filterStatement += it.query
-    filterArgs.addAll(it.args)
-  }
   val whereArgs = mutableListOf<Any>()
   val nestedArgs = mutableListOf<Any>()
   val query =
