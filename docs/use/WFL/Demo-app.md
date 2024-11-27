@@ -17,4 +17,4 @@ Alternatively, run the following command to build and install the debug APK on y
 4. To restart the Activity click Restart Flow that removes all the resources related to the flow and moves the app back to step [2.].
 5. The overflow menu on the action bar may be used to switch between various Activities supported in the demo app.
 
-[!Video](workflow_demo_app.webm)
+[!Video](workflow_demo_app.mp4)
