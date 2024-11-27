@@ -45,7 +45,7 @@ file. If you need one, the FHIR specification has
 See the QuestionnaireFragment guide for details. To render a questionnaire in
 your app, follow these steps:
 
-* Add a `FragmentContainerView` to your activity's layout to contain the
+1. Add a `FragmentContainerView` to your activity's layout to contain the
     Questionnaire.
 
 ```xml
