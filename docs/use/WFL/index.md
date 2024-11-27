@@ -6,6 +6,8 @@ The [Workflow](https://build.fhir.org/workflow.html) Library provides decision s
 
 1. The [PlanDefinition](https://build.fhir.org/plandefinition.html) resource describes a plan or protocol for the care of a given patient. This could include a treatment plan for a specific condition, a discharge plan for a hospitalized patient, or a care plan for managing chronic illness. The output of this operation will be a CarePlan resource, which represents the plan that has been tailored and applied to the specific patient or group of patients. The CarePlan resource will include details about the actions that are part of the plan, the timing and frequency of those actions, and any relevant supporting information. It may also include references to other resources that are relevant to the plan, such as observations or procedures that are part of the plan. The Apply operator can be used to determine the specific actions or interventions that should be taken as part of a care plan, based on the patient's current status and other relevant factors. For example, it could be used to determine which medications a patient should be prescribed or to identify any necessary referrals to other healthcare providers.
 
+1. The [Activity Flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-flow) is based on the workflow module in FHIR. It is used to create activities for the request resources generated in a CarePlan and take them through the various phases(proposal, plan, order, and perform) of the activity lifecycle.
+
 1. The [Library](https://build.fhir.org/library.html) resource describes a container for clinical knowledge assets. One of these assets is a shareable library of clinical logic, written in Clinical Quality Language (CQL). Users of the Workflow library can call an evaluation operator directly from the Library resource and run individual expressions at will. The output will be Parameters resource with the results of each expression evaluated. This operator should be used when the use case does not fit into a PlanDefinition or a Measure Evaluate.
 
 It's recommended that these 3 types of resources are authored within the scope of a [FHIR IG](https://www.hl7.org/fhir/implementationguide.html). The IG can then be published online and imported by the Android SDK. To import an IG, Android SDK users must simply copy the required files from the IG package into the `assets` folder and parse those files using the regular FHIR Parser.
@@ -17,12 +19,14 @@ Future features of the library will provide support for Tasking and other Workfl
 ## Next Steps
 
 * [Getting Started](Getting-Started.md)
-* Guides
+* Workflow Guides
   * [Generate a Care Plan](Generate-A-Care-Plan.md)
+  * [Run an Activity Flow](Run-an-Activity-Flow.md)
   * [Evaluate a Measure](Evaluate-a-Measure.md)
+* Other Operations
   * [Evaluate a Library](Evaluate-a-Library.md)
   * [Compile CQL](Compile-and-Execute-CQL.md)
-  * [Run an Activity Flow](Run-an-Activity-Flow.md)
+  
 
 ## Data safety
 

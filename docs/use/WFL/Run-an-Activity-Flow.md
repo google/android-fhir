@@ -1,5 +1,7 @@
 # ActivityFlow
 
+![Activity Flow](activity_flow.svg)
+
 The `ActivityFlow` class manages the workflow of clinical recommendations according to the [FHIR Clinical Practice Guidelines (CPG) specification](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-lifecycle---request-phases-proposal-plan-order). It implements an activity flow as defined in the FHIR CPG IG, allowing you to guide clinical recommendations through various phases (proposal, plan, order, perform). 
 
 You can start new workflows with an appropriate request resource from the generated [CarePlan](Generate-A-Care-Plan.md) or resume existing ones from any phase.
@@ -15,6 +17,7 @@ Use the appropriate `ActivityFlow.of()` factory function to create an instance. 
 
 **Example:**
 ```kotlin 
+val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
 val request = CPGMedicationRequest( medicationRequestGeneratedByCarePlan)
 val flow = ActivityFlow.of(repository,  request)
 ```
@@ -60,8 +63,18 @@ val preparedPerformEvent = flow.preparePerform( CPGMedicationDispenseEvent::clas
 ## Updating States in a Phase
 
 * **`RequestPhase`:** (`ProposalPhase`, `PlanPhase`, `OrderPhase`) allows updating the request state using `update()`.
+```kotlin
+proposalPhase.update(
+  proposalPhase.getRequestResource().apply { setStatus(Status.ACTIVE) }
+)
+```
 * **`EventPhase`:** (`PerformPhase`) allows updating the event state using `update()` and completing the phase using `complete()`.
-
+```kotlin
+performPhase.update(
+  performPhase.getEventResource().apply {  setStatus(EventStatus.COMPLETED) }
+)
+```
+# API List
 ## Factory Functions
 
 * `ActivityFlow.of(...)`: Various overloads for creating `ActivityFlow` instances with different resource types. Refer to the code for specific usage.
@@ -76,8 +89,16 @@ val preparedPerformEvent = flow.preparePerform( CPGMedicationDispenseEvent::clas
 * `preparePerform(...)`: Prepares an event resource for the perform phase.
 * `initiatePerform(...)`: Initiates the perform phase.
 
+## Supported Activities
+The library currently doesn't implement all of the activities outlined in the [activity profiles](https://build.fhir.org/ig/HL7/cqf-recommendations/profiles.html#activity-profiles). New activities may be added as per the requirement from the application developers.
+
+| Activity           | Request                 | Event                 |
+|--------------------|-------------------------|-----------------------|
+| Send a message     | CPGCommunicationRequest | CPGCommunication      |
+| Order a medication | CPGMedicationRequest    | CPGMedicationDispense |
+
 ## Additional Resources
 
 * [FHIR Clinical Practice Guidelines IG](https://build.fhir.org/ig/HL7/cqf-recommendations/)
 * [Activity Flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-flow)
-* [Activity Profiles](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html)
+* [Activity Profiles](https://build.fhir.org/ig/HL7/cqf-recommendations/profiles.html#activity-profiles)
