@@ -61,7 +61,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.kotlinx.coroutines.core)
   implementation(project(":datacapture")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+    exclude(group = "com.google.android.fhir", module = "engine")
   }
   implementation(project(":engine"))
 

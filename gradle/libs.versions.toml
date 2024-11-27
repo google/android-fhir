@@ -1,6 +1,9 @@
 # see https://docs.gradle.org/current/userguide/platforms.html
 
 [versions]
+android-fhir-common = "0.1.0-alpha05"
+android-fhir-engine = "0.1.0-beta05"
+android-fhir-knowledge = "0.1.0-beta01"
 androidx-acivity = "1.7.2"
 androidx-appcompat = "1.6.1"
 androidx-arch-core = "2.2.0"
@@ -30,6 +33,9 @@ opencds-cqf-fhir = "3.8.0"
 truth = "1.1.5"
 
 [libraries]
+android-fhir-common = { module = "com.google.android.fhir:common", version.ref = "android-fhir-common" }
+android-fhir-engine = { module = "com.google.android.fhir:engine", version.ref = "android-fhir-engine" }
+android-fhir-knowledge = { module = "com.google.android.fhir:knowledge", version.ref = "android-fhir-knowledge" }
 androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-acivity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core" }
