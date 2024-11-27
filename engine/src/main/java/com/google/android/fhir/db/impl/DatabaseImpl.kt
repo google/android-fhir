@@ -230,50 +230,48 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> search(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
-    return db.withTransaction {
-      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
-        Dispatchers.Default,
-      ) {
-        ResourceWithUUID(
-          it.uuid,
-          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
-        )
-      }
+    return resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
+      Dispatchers.Default,
+    ) {
+      ResourceWithUUID(
+        it.uuid,
+        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
+      )
     }
   }
 
   override suspend fun searchForwardReferencedResources(
     query: SearchQuery,
   ): List<ForwardIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmap(Dispatchers.Default) {
-          ForwardIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceUUID,
-            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
-              as Resource,
-          )
-        }
-    }
+    return resourceDao
+      .getForwardReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ForwardIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceUUID,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
+        )
+      }
   }
 
   override suspend fun searchReverseReferencedResources(
     query: SearchQuery,
   ): List<ReverseIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmap(Dispatchers.Default) {
-          ReverseIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceTypeAndId,
-            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
-              as Resource,
-          )
-        }
-    }
+    return resourceDao
+      .getReverseReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ReverseIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceTypeAndId,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
+        )
+      }
   }
 
   override suspend fun count(query: SearchQuery): Long {
