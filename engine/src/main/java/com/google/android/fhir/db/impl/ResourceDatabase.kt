@@ -218,7 +218,7 @@ internal val Migration_8_9 =
           "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid`;",
         )
         database.execSQL(
-          "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_index_value_resourceType_index_name_resourceUuid` ON `TokenIndexEntity` (`index_value`, `resourceType`, `index_name`, `resourceUuid`);",
+          "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
         )
         database.setTransactionSuccessful()
       } finally {
