@@ -46,7 +46,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.material)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.androidx.core)
@@ -54,6 +53,7 @@ dependencies {
   implementation(libs.androidx.navigation.fragment)
   implementation(libs.androidx.navigation.ui)
   implementation(libs.kotlin.stdlib)
+  implementation(libs.material)
 
   implementation(project(path = ":datacapture"))
   implementation(project(path = ":engine"))
