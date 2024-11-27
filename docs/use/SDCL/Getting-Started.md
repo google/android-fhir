@@ -62,7 +62,7 @@ your app, follow these steps:
 </androidx.constraintlayout.widget.ConstraintLayout>
 ```
 
-* Create a bundle with the JSON questionnaire content for the fragment, in
+1. Create a bundle with the JSON questionnaire content for the fragment, in
     this case as a `String` read from a JSON file stored in the `assets` folder.
 
 ```kotlin
