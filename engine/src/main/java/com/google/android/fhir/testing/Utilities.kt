@@ -151,6 +151,10 @@ internal object TestFhirEngineImpl : FhirEngine {
     return Patient()
   }
 
+  override suspend fun get(type: ResourceType, vararg ids: String): List<Resource> {
+    return ids.map { Patient().apply { id = it } }
+  }
+
   override suspend fun delete(type: ResourceType, id: String) {}
 
   override suspend fun <R : Resource> search(search: Search): List<SearchResult<R>> {

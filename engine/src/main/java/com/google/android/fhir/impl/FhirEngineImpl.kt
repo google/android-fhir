@@ -52,6 +52,9 @@ internal class FhirEngineImpl(private val database: Database, private val contex
   override suspend fun get(type: ResourceType, id: String) =
     withContext(Dispatchers.IO) { database.select(type, id) }
 
+  override suspend fun get(type: ResourceType, vararg ids: String) =
+    withContext(Dispatchers.IO) { ids.map { id -> database.select(type, id) } }
+
   override suspend fun update(vararg resource: Resource) =
     withContext(Dispatchers.IO) { database.update(*resource) }
 
