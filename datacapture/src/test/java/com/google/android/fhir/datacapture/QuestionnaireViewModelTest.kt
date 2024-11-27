@@ -149,6 +149,8 @@ class QuestionnaireViewModelTest {
 
   @Before
   fun setUp() {
+    questionnaireViewModelCoroutineContext = mainDispatcherRule.testDispatcher
+
     state = SavedStateHandle()
     check(
       ApplicationProvider.getApplicationContext<DataCaptureTestApplication>()

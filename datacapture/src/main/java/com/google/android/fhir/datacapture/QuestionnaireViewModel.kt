@@ -64,13 +64,19 @@ import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
@@ -81,6 +87,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
+
+internal var questionnaireViewModelCoroutineContext: CoroutineContext = Dispatchers.Default
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -582,8 +590,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     this.shouldShowCancelButton = showCancelButton
   }
 
-  /** [QuestionnaireState] to be displayed in the UI. */
-  internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
+  private val _questionnaireStateFlow: Flow<QuestionnaireState> =
     combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
         getQuestionnaireState()
       }
@@ -595,16 +602,20 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         }
       }
       .map { it.value }
-      .stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        initialValue =
-          QuestionnaireState(
-            items = emptyList(),
-            displayMode = DisplayMode.InitMode,
-            bottomNavItem = null,
-          ),
-      )
+      .flowOn(questionnaireViewModelCoroutineContext)
+
+  /** [QuestionnaireState] to be displayed in the UI. */
+  internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
+    _questionnaireStateFlow.stateIn(
+      viewModelScope,
+      SharingStarted.Lazily,
+      initialValue =
+        QuestionnaireState(
+          items = emptyList(),
+          displayMode = DisplayMode.InitMode,
+          bottomNavItem = null,
+        ),
+    )
 
   /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
   private suspend fun initializeCalculatedExpressions() {
@@ -1112,6 +1123,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
+    val checkAllValid = {
+      if (
+        currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
+          it.item.validationResult is Valid
+        }
+      ) {
+        block()
+      }
+    }
+
     if (
       currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
         it.item.validationResult is NotValidated
@@ -1123,16 +1144,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
-      forceValidation = false
+
+      viewModelScope.launch {
+        _questionnaireStateFlow.take(1).collectLatest {
+          forceValidation = false
+          checkAllValid()
+        }
+      }
     }
 
-    if (
-      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-        it.item.validationResult is Valid
-      }
-    ) {
-      block()
-    }
+    checkAllValid()
   }
 }
 
