@@ -76,7 +76,7 @@ val bundle = bundleOf( QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to
 questionnaireJsonString )
 ```
 
-* Set the fragment to the `FragmentContainerView`.
+1. Set the fragment to the `FragmentContainerView`.
 
 ```kotlin
 if (savedInstanceState == null) {
