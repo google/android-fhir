@@ -109,6 +109,9 @@
         >@style/Widget.Material3.Chip.Input</item>
         <item name="questionnaireButtonStyle">@style/Questionnaire.ButtonStyle
         </item>
+        <item
+            name="questionnaireNextButtonCircularProgressIndicatorStyle"
+        >@style/Questionnaire.NextButtonCircularProgressIndicatorStyle</item>
         <item name="questionnaireErrorTextStyle">
             @style/Questionnaire.ErrorStyle
         </item>
@@ -439,6 +442,16 @@
     <style name="Questionnaire.ButtonStyle" parent="Widget.Material3.Button">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
+    </style>
+
+    <style
+        name="Questionnaire.NextButtonCircularProgressIndicatorStyle"
+        parent="Widget.Material3.CircularProgressIndicator"
+    >
+        <item name="trackThickness">2dp</item>
+        <item name="indicatorSize">18dp</item>
+        <item name="indicatorColor">@android:color/white</item>
+        <item name="android:indeterminate">true</item>
     </style>
 
     <style

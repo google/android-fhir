@@ -155,6 +155,7 @@ class QuestionnaireFragment : Fragment() {
 
     // Listen to updates from the view model.
     viewLifecycleOwner.lifecycleScope.launchWhenCreated {
+      viewModel.pages = viewModel.getQuestionnairePages()
       viewModel.questionnaireStateFlow.collect { state ->
         when (val displayMode = state.displayMode) {
           is DisplayMode.ReviewMode -> {
