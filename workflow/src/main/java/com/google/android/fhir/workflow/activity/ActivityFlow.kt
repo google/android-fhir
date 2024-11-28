@@ -221,10 +221,12 @@ private constructor(
             null
           }
 
-        val basedOnRequest = basedOn?.let {
-          repository.read(it.`class`, it.idType)?.let { CPGRequestResource.of(it) as R }
-        }
-        current = when (basedOnRequest?.getIntent()) {
+        val basedOnRequest =
+          basedOn?.let {
+            repository.read(it.`class`, it.idType)?.let { CPGRequestResource.of(it) as R }
+          }
+        current =
+          when (basedOnRequest?.getIntent()) {
             Intent.PROPOSAL -> ProposalPhase(repository, basedOnRequest)
             Intent.PLAN -> PlanPhase(repository, basedOnRequest)
             Intent.ORDER -> OrderPhase(repository, basedOnRequest)
@@ -358,9 +360,7 @@ private constructor(
     ): ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>> =
       ActivityFlow(repository, null, resource)
 
-    /**
-     * Returns a list of active flows associated with the [patientId].
-     */
+    /** Returns a list of active flows associated with the [patientId]. */
     fun of(
       repository: Repository,
       patientId: String,
@@ -412,7 +412,6 @@ private constructor(
           .map { CPGRequestResource.of(it) }
           .associateByTo(LinkedHashMap()) { "${it.resourceType}/${it.logicalId}" }
 
-
       fun addBasedOn(
         request: RequestChain,
       ): RequestChain? {
@@ -442,21 +441,24 @@ private constructor(
                 null
               }
             }
-      return requestChain.filter {
-        if (it.event != null) {
-          it.event.getStatus() != EventStatus.COMPLETED
-        } else if (it.request != null) {
-        it.request.getStatus() != Status.COMPLETED
-      } else {
-          false
+      return requestChain
+        .filter {
+          if (it.event != null) {
+            it.event.getStatus() != EventStatus.COMPLETED
+          } else if (it.request != null) {
+            it.request.getStatus() != Status.COMPLETED
+          } else {
+            false
+          }
         }
-      }.map { ActivityFlow(repository, it.request, it.event) }
+        .map { ActivityFlow(repository, it.request, it.event) }
     }
   }
 }
 
 /**
- * Represents the chain of event/requests of an activity flow. A [RequestChain] would either have a [request] or an [event].
+ * Represents the chain of event/requests of an activity flow. A [RequestChain] would either have a
+ * [request] or an [event].
  */
 internal data class RequestChain(
   val request: CPGRequestResource<*>? = null,
