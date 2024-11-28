@@ -22,7 +22,7 @@ val request = CPGMedicationRequest( medicationRequestGeneratedByCarePlan)
 val flow = ActivityFlow.of(repository,  request)
 ```
 
-## Navigating Phases
+## Navigating phases
 
 An `ActivityFlow` progresses through a series of phases, represented by the `Phase` class. Access the current phase using `getCurrentPhase()`.
 
@@ -35,7 +35,7 @@ An `ActivityFlow` progresses through a series of phases, represented by the `Pha
 }
 ```
 
-## Transitioning Between Phases
+## Transitioning between the phases
 
 `ActivityFlow` provides functions to prepare and initiate the next phase:
 
@@ -60,7 +60,7 @@ val preparedPerformEvent = flow.preparePerform( CPGMedicationDispenseEvent::clas
  val performPhase = flow.initiatePerform( preparedPerformEvent). getOrThrow( )
 ```
 
-## Updating States in a Phase
+## Updating states in a phase
 
 * **`RequestPhase`:** (`ProposalPhase`, `PlanPhase`, `OrderPhase`) allows updating the request state using `update()`.
 ```kotlin
@@ -74,14 +74,13 @@ performPhase.update(
   performPhase.getEventResource().apply {  setStatus(EventStatus.COMPLETED) }
 )
 ```
-# API List
-## Factory Functions
+## API List
+### Factory functions
 
 * `ActivityFlow.of(...)`: Various overloads for creating `ActivityFlow` instances with different resource types. Refer to the code for specific usage.
 
-## Public Methods
+### Phase transition API
 
-* `getCurrentPhase()`: Returns the current `Phase` of the workflow.
 * `preparePlan()`: Prepares a plan resource.
 * `initiatePlan(...)`: Initiates the plan phase.
 * `prepareOrder()`: Prepares an order resource.
@@ -89,7 +88,32 @@ performPhase.update(
 * `preparePerform(...)`: Prepares an event resource for the perform phase.
 * `initiatePerform(...)`: Initiates the perform phase.
 
-## Supported Activities
+### Other API
+* `getCurrentPhase()`: Returns the current `Phase` of the workflow.
+
+### Request phase API
+
+* `getRequestResource()`: Returns a copy of resource.
+* `update(..)`: Updates the resource.
+* `suspend(..)`: Suspends the phase.
+* `resume(..)`: Resumes the phase.
+* `enteredInError(..)`: Marks the request entered-in-error.
+* `reject(..)`: Rejects the phase.
+
+### Event phase API
+
+* `getEventResource()`: Returns a copy of resource.
+* `update(..)`: Updates the resource.
+* `suspend(..)`: Suspends the phase.
+* `resume(..)`: Resumes the phase.
+* `enteredInError(..)`: Marks the event entered-in-error.
+* `start(..)`: Starts the event.
+* `notDone(..)`: Marks the event not-done.
+* `stop(..)`: Stop the event.
+* `complete(..)`: Marks the event as complete.
+
+
+## Supported activities
 The library currently doesn't implement all of the activities outlined in the [activity profiles](https://build.fhir.org/ig/HL7/cqf-recommendations/profiles.html#activity-profiles). New activities may be added as per the requirement from the application developers.
 
 | Activity           | Request                 | Event                 |
@@ -97,7 +121,7 @@ The library currently doesn't implement all of the activities outlined in the [a
 | Send a message     | CPGCommunicationRequest | CPGCommunication      |
 | Order a medication | CPGMedicationRequest    | CPGMedicationDispense |
 
-## Additional Resources
+## Additional resources
 
 * [FHIR Clinical Practice Guidelines IG](https://build.fhir.org/ig/HL7/cqf-recommendations/)
 * [Activity Flow](https://build.fhir.org/ig/HL7/cqf-recommendations/activityflow.html#activity-flow)

@@ -16,7 +16,7 @@ The workflow library is dependent on the [Engine library](../FEL/index.md). Oper
 
 Future features of the library will provide support for Tasking and other Workflow related requirements
 
-## Next Steps
+## Next steps
 
 * [Getting Started](Getting-Started.md)
 * Workflow Guides
