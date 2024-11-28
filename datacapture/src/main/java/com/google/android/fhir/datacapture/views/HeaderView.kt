@@ -61,9 +61,10 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       appendAsteriskToQuestionText(question.context, questionnaireViewItem),
     )
     question.movementMethod = LinkMovementMethod.getInstance()
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    hint.apply {
+      updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned())
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)

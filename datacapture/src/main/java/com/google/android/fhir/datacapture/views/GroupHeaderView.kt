@@ -59,9 +59,10 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
     // CQF expression takes precedence over static question text
     question.updateTextAndVisibility(questionnaireViewItem.questionText)
     question.movementMethod = LinkMovementMethod.getInstance()
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    hint.apply {
+      updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned())
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     visibility = getHeaderViewVisibility(prefix, question, hint)
     applyCustomOrDefaultStyle(
       questionnaireViewItem.questionnaireItem,
