@@ -56,11 +56,11 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(
-      appendAsteriskToQuestionText(question.context, questionnaireViewItem),
-    )
-    question.movementMethod = LinkMovementMethod.getInstance()
+    question.apply {
+      // CQF expression takes precedence over static question text
+      updateTextAndVisibility(appendAsteriskToQuestionText(question.context, questionnaireViewItem))
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     hint.apply {
       updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned())
       movementMethod = LinkMovementMethod.getInstance()

@@ -56,9 +56,11 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(questionnaireViewItem.questionText)
-    question.movementMethod = LinkMovementMethod.getInstance()
+    question.apply {
+      // CQF expression takes precedence over static question text
+      updateTextAndVisibility(questionnaireViewItem.questionText)
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     hint.apply {
       updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned())
       movementMethod = LinkMovementMethod.getInstance()
