@@ -62,7 +62,9 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       movementMethod = LinkMovementMethod.getInstance()
     }
     hint.apply {
-      updateTextAndVisibility(questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned())
+      updateTextAndVisibility(
+        questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
+      )
       movementMethod = LinkMovementMethod.getInstance()
     }
     visibility = getHeaderViewVisibility(prefix, question, hint)
