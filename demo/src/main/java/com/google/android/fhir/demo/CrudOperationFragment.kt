@@ -35,13 +35,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.fhir.demo.helpers.PatientUiState
+import com.google.android.fhir.demo.helpers.PatientCreationHelper
+import com.google.android.material.tabs.TabLayout
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Enumerations
 
 class CrudOperationFragment : Fragment() {
   private val crudOperationViewModel: CrudOperationViewModel by viewModels()
+  private var currentTabPosition: Int = -1
   private var patientLogicalId: String? = null
 
   override fun onCreateView(
@@ -62,23 +64,26 @@ class CrudOperationFragment : Fragment() {
         crudOperationViewModel.patientUiState.collect { patientUiState ->
           patientUiState?.let {
             patientLogicalId = it.patientId
-            when (
-              requireView().findViewById<RadioGroup>(R.id.radioGroupCrud).checkedRadioButtonId
-            ) {
-              R.id.rbCreate -> {
+            when (currentTabPosition) {
+              TAB_CREATE -> {
                 Toast.makeText(requireContext(), "Patient is saved", Toast.LENGTH_SHORT).show()
               }
-              R.id.rbRead -> displayPatientDetails(it)
-              R.id.rbUpdate -> {
-                if (it.isReadOperation) {
+              TAB_READ -> displayPatientDetails(it)
+              TAB_UPDATE -> {
+                if (readOperationOnClick == ClickType.TAB_CLICK) {
                   displayPatientDetails(it)
                 } else {
                   Toast.makeText(requireContext(), "Patient is updated", Toast.LENGTH_SHORT).show()
                 }
               }
-              R.id.rbDelete -> {
-                requireView().findViewById<EditText>(R.id.etId).text.clear()
-                Toast.makeText(requireContext(), "Patient is deleted", Toast.LENGTH_SHORT).show()
+              TAB_DELETE -> {
+                if (readOperationOnClick == ClickType.TAB_CLICK) {
+                  displayPatientDetails(it)
+                } else {
+                  requireView().findViewById<EditText>(R.id.etId).text.clear()
+                  configureFieldsForOperation(OperationType.DELETE)
+                  Toast.makeText(requireContext(), "Patient is deleted", Toast.LENGTH_SHORT).show()
+                }
               }
             }
           }
@@ -104,58 +109,213 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun initializeUi() {
-    setupRadioGroupChangeListener()
-    requireView().findViewById<RadioGroup>(R.id.radioGroupCrud).check(R.id.rbCreate)
+  private fun displayPatientDetails(patientUiState: PatientUiState) {
+    requireView().findViewById<EditText>(R.id.etId).apply { setText(patientUiState.patientId) }
+    requireView().findViewById<EditText>(R.id.etFirstName).apply {
+      setText(patientUiState.firstName)
+    }
+    requireView().findViewById<EditText>(R.id.etLastName).apply {
+      setText(getValueBasedOnOperationType(patientUiState.lastName, "Unknown"))
+    }
+    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
+      setText(getValueBasedOnOperationType(patientUiState.birthDate, "Unknown"))
+    }
+    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).apply {
+      val genderRadioButtonId =
+        when (patientUiState.gender) {
+          Enumerations.AdministrativeGender.MALE -> R.id.rbMale
+          Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
+          Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
+          else -> null
+        }
+      genderRadioButtonId?.let { check(it) }
+    }
+    requireView().findViewById<CheckBox>(R.id.checkBoxActive).apply {
+      isChecked = patientUiState.isActive
+    }
+  }
 
+  private fun initializeUi() {
+    configureFieldsForOperation(OperationType.CREATE)
+    requireView().findViewById<EditText>(R.id.etId).setText(PatientCreationHelper.createPatientId())
+    setupTabLayoutChangeListener()
+    selectTab(TAB_CREATE)
     requireView().findViewById<Button>(R.id.btnSubmit).setOnClickListener {
-      when (requireView().findViewById<RadioGroup>(R.id.radioGroupCrud).checkedRadioButtonId) {
-        R.id.rbCreate -> {
-          createPatient()
+      readOperationOnClick = ClickType.SUBMIT_CLICK
+      when (currentTabPosition) {
+        TAB_CREATE -> createPatient()
+        TAB_READ -> {
+          /* No action needed for submit */
         }
-        R.id.rbRead -> {
-          //
-        }
-        R.id.rbUpdate -> {
-          updatePatient()
-        }
-        R.id.rbDelete -> {
-          deletePatient()
-        }
+        TAB_UPDATE -> updatePatient()
+        TAB_DELETE -> deletePatient()
       }
     }
   }
 
-  private fun setupRadioGroupChangeListener() {
-    requireView().findViewById<RadioGroup>(R.id.radioGroupCrud).setOnCheckedChangeListener {
-      _,
-      checkedId,
-      ->
-      when (checkedId) {
-        R.id.rbCreate -> {
-          configureFieldsForCreate()
+  private fun setupTabLayoutChangeListener() {
+    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
+    tabLayout.addOnTabSelectedListener(
+      object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+          handleTabSelection(tab?.position ?: TAB_CREATE)
         }
-        R.id.rbRead -> {
-          patientLogicalId?.let {
-            if (it.isNotEmpty()) {
-              crudOperationViewModel.getPatientById(it)
-            }
-          }
-          configureFieldsForRead()
-        }
-        R.id.rbUpdate -> {
-          patientLogicalId?.let {
-            if (it.isNotEmpty()) {
-              crudOperationViewModel.getPatientById(it)
-            }
-          }
-          configureFieldsForUpdate()
-        }
-        R.id.rbDelete -> {
-          configureFieldsForDelete()
-        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+      },
+    )
+  }
+
+  private fun handleTabSelection(tabPosition: Int) {
+    readOperationOnClick = ClickType.TAB_CLICK
+    when (tabPosition) {
+      TAB_CREATE -> {
+        clearTextFieldValues()
+        configureFieldsForOperation(OperationType.CREATE)
+        requireView()
+          .findViewById<EditText>(R.id.etId)
+          .setText(PatientCreationHelper.createPatientId())
+      }
+      TAB_READ,
+      TAB_UPDATE,
+      TAB_DELETE, -> {
+        patientLogicalId
+          ?.takeIf { it.isNotEmpty() }
+          ?.let { crudOperationViewModel.getPatientById(it) }
+        displayCreatePatientMessageIfNeeded()
+        requireView().findViewById<EditText>(R.id.etId).setText(patientLogicalId)
+        configureFieldsForOperation(getOperationTypeByTabPosition(tabPosition))
       }
     }
+    currentTabPosition = tabPosition
+  }
+
+  private fun getOperationTypeByTabPosition(tabPosition: Int): OperationType {
+    return when (tabPosition) {
+      TAB_CREATE -> {
+        OperationType.CREATE
+      }
+      TAB_READ -> {
+        OperationType.READ
+      }
+      TAB_UPDATE -> {
+        OperationType.UPDATE
+      }
+      TAB_DELETE -> {
+        OperationType.DELETE
+      }
+      else -> {
+        error("Invalid tab selection.")
+      }
+    }
+  }
+
+  private fun clearTextFieldValues() {
+    requireView().findViewById<EditText>(R.id.etId).text.clear()
+    requireView().findViewById<EditText>(R.id.etFirstName).text.clear()
+    requireView().findViewById<EditText>(R.id.etLastName).text.clear()
+    requireView().findViewById<EditText>(R.id.etBirthDate).text.clear()
+    requireView().findViewById<RadioButton>(R.id.rbOther).isChecked = true
+  }
+
+  private fun configureFieldsForOperation(operationType: OperationType) {
+    // Common field visibility and text settings
+    val visibility = if (patientLogicalId.isNullOrEmpty()) View.GONE else View.VISIBLE
+
+    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility =
+      when (operationType) {
+        OperationType.CREATE -> View.VISIBLE
+        OperationType.READ,
+        OperationType.UPDATE,
+        OperationType.DELETE, -> visibility
+      }
+    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility =
+      when (operationType) {
+        OperationType.CREATE -> View.VISIBLE
+        OperationType.READ,
+        OperationType.UPDATE,
+        OperationType.DELETE, -> visibility
+      }
+    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.DELETE, -> View.GONE
+        OperationType.READ,
+        OperationType.UPDATE, -> visibility
+      }
+    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.DELETE, -> View.GONE
+        OperationType.READ,
+        OperationType.UPDATE, -> visibility
+      }
+    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.DELETE, -> View.GONE
+        OperationType.READ,
+        OperationType.UPDATE, -> visibility
+      }
+    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.DELETE, -> View.GONE
+        OperationType.READ,
+        OperationType.UPDATE, -> visibility
+      }
+    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.DELETE, -> View.GONE
+        OperationType.READ,
+        OperationType.UPDATE, -> visibility
+      }
+    requireView().findViewById<Button>(R.id.btnSubmit).visibility =
+      when (operationType) {
+        OperationType.CREATE -> View.VISIBLE
+        OperationType.READ -> View.GONE
+        OperationType.UPDATE,
+        OperationType.DELETE, -> if (patientLogicalId.isNullOrEmpty()) View.GONE else View.VISIBLE
+      }
+    // Field editability
+    val isEditable = operationType == OperationType.CREATE || operationType == OperationType.UPDATE
+    requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = isEditable
+    requireView().findViewById<EditText>(R.id.etLastName).isEnabled = isEditable
+    requireView().findViewById<EditText>(R.id.etBirthDate).isEnabled = isEditable
+    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).isEnabled = isEditable
+    requireView().findViewById<RadioButton>(R.id.rbMale).isEnabled = isEditable
+    requireView().findViewById<RadioButton>(R.id.rbFemale).isEnabled = isEditable
+    requireView().findViewById<RadioButton>(R.id.rbOther).isEnabled = isEditable
+    requireView().findViewById<CheckBox>(R.id.checkBoxActive).isEnabled = isEditable
+  }
+
+  private fun displayCreatePatientMessageIfNeeded() {
+    if (patientLogicalId.isNullOrEmpty()) {
+      requireView().findViewById<EditText>(R.id.etId).text.clear()
+      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
+    }
+  }
+
+  private fun getValueBasedOnOperationType(
+    fieldValue: String?,
+    defaultValue: String,
+  ): String? {
+    return when (getOperationTypeByTabPosition(currentTabPosition)) {
+      OperationType.READ -> fieldValue?.takeIf { it.isNotEmpty() } ?: defaultValue
+      OperationType.CREATE,
+      OperationType.UPDATE,
+      OperationType.DELETE, -> fieldValue
+    }
+  }
+
+  private fun selectTab(position: Int) {
+    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
+    val tab = tabLayout.getTabAt(position)
+    tab?.select()
+    currentTabPosition = position
   }
 
   private fun createPatient() {
@@ -178,7 +338,11 @@ class CrudOperationFragment : Fragment() {
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
     val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
     val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
-
+    if (!PatientCreationHelper.isBirthdateParsed(birthDate)) {
+      Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
+        .show()
+      return
+    }
     // Gender selection
     val selectedGenderId =
       requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
@@ -218,151 +382,24 @@ class CrudOperationFragment : Fragment() {
     crudOperationViewModel.deletePatient(patientId)
   }
 
-  private fun configureFieldsForCreate() {
-    requireView().findViewById<EditText>(R.id.etId).setText(crudOperationViewModel.getPatientId())
-
-    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility = View.VISIBLE
-    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility = View.VISIBLE
-    requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = true
-    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility = View.GONE
-    //    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility = View.GONE
-    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility = View.GONE
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility = View.GONE
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility = View.GONE
-    requireView().findViewById<Button>(R.id.btnSubmit).visibility = View.VISIBLE
+  companion object {
+    private const val TAB_CREATE = 0
+    private const val TAB_READ = 1
+    private const val TAB_UPDATE = 2
+    private const val TAB_DELETE = 3
   }
 
-  private fun configureFieldsForRead() {
-    if (patientLogicalId.isNullOrEmpty()) {
-      requireView().findViewById<EditText>(R.id.etId).text.clear()
-      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
-    }
-
-    val visibility =
-      if (patientLogicalId.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-
-    requireView().findViewById<EditText>(R.id.etId).setText(patientLogicalId)
-    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility = visibility
-    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility = visibility
-    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility = visibility
-    //    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility = visibility
-    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility = visibility
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility = visibility
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility = visibility
-
-    // Configure fields as editable or non-editable based on the operation
-    requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = false
-    requireView().findViewById<EditText>(R.id.etLastName).isEnabled = false
-    //    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
-    //      isEnabled = false // BirthDate is always non-editable
-    //    }
-
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).isEnabled = false
-    requireView().findViewById<RadioButton>(R.id.rbMale).isEnabled = false
-    requireView().findViewById<RadioButton>(R.id.rbFemale).isEnabled = false
-    requireView().findViewById<RadioButton>(R.id.rbOther).isEnabled = false
-
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).isEnabled = false
-    requireView().findViewById<Button>(R.id.btnSubmit).visibility = View.GONE
+  enum class OperationType {
+    CREATE,
+    READ,
+    UPDATE,
+    DELETE,
   }
 
-  private fun configureFieldsForUpdate() {
-    if (patientLogicalId.isNullOrEmpty()) {
-      requireView().findViewById<EditText>(R.id.etId).text.clear()
-      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
-    }
+  private var readOperationOnClick = ClickType.TAB_CLICK
 
-    val visibility =
-      if (patientLogicalId.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-
-    requireView().findViewById<EditText>(R.id.etId).setText(patientLogicalId)
-    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility = visibility
-    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility = visibility
-    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility = visibility
-    //    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility = visibility
-    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility = visibility
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility = visibility
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility = visibility
-
-    // Configure fields as editable or non-editable based on the operation
-    requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = true
-    requireView().findViewById<EditText>(R.id.etLastName).isEnabled = true
-    //    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
-    //      isEnabled = false // BirthDate is always non-editable
-    //    }
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).isEnabled = true
-    requireView().findViewById<RadioButton>(R.id.rbMale).isEnabled = true
-    requireView().findViewById<RadioButton>(R.id.rbFemale).isEnabled = true
-    requireView().findViewById<RadioButton>(R.id.rbOther).isEnabled = true
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).isEnabled = true
-    requireView().findViewById<Button>(R.id.btnSubmit).visibility = visibility
-  }
-
-  private fun configureFieldsForDelete() {
-    if (patientLogicalId.isNullOrEmpty()) {
-      requireView().findViewById<EditText>(R.id.etId).text.clear()
-      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
-    }
-
-    val visibility =
-      if (patientLogicalId.isNullOrEmpty()) {
-        View.GONE
-      } else {
-        View.VISIBLE
-      }
-
-    requireView().findViewById<EditText>(R.id.etId).setText(patientLogicalId)
-    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility = visibility
-    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility = View.GONE
-
-    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility = View.GONE
-    //    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility = View.GONE
-    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility = View.GONE
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility = View.GONE
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility = View.GONE
-    requireView().findViewById<Button>(R.id.btnSubmit).visibility = visibility
-  }
-
-  private fun displayPatientDetails(patientUiState: PatientUiState) {
-    // Set ID field text
-    requireView().findViewById<EditText>(R.id.etId).apply { setText(patientUiState.patientId) }
-
-    // Set First Name field text
-    requireView().findViewById<EditText>(R.id.etFirstName).apply {
-      setText(patientUiState.firstName)
-    }
-
-    // Set Last Name field text
-    requireView().findViewById<EditText>(R.id.etLastName).apply { setText(patientUiState.lastName) }
-
-    // Set Birth Date field text
-    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
-      setText(patientUiState.birthDate)
-    }
-
-    // Set Gender field selection based on patient gender
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).apply {
-      val genderRadioButtonId =
-        when (patientUiState.gender) {
-          Enumerations.AdministrativeGender.MALE -> R.id.rbMale
-          Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
-          Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
-          else -> null
-        }
-      genderRadioButtonId?.let { check(it) }
-    }
-
-    // Set Active status checkbox based on patient state
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).apply {
-      isChecked = patientUiState.isActive
-    }
+  enum class ClickType {
+    TAB_CLICK,
+    SUBMIT_CLICK,
   }
 }

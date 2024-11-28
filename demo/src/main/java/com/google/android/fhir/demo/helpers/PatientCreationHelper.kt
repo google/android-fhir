@@ -17,7 +17,7 @@
 package com.google.android.fhir.demo.helpers
 
 import android.icu.text.SimpleDateFormat
-import com.google.android.fhir.datacapture.extensions.logicalId
+import java.text.ParseException
 import java.util.*
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.ContactPoint
@@ -30,8 +30,8 @@ object PatientCreationHelper {
   fun createPatient(
     patientId: String,
     firstName: String,
-    lastName: String,
-    birthDate: String,
+    lastName: String? = null,
+    birthDate: String? = null,
     gender: Enumerations.AdministrativeGender,
     phoneNumber: String? = null,
     city: String? = null,
@@ -48,8 +48,10 @@ object PatientCreationHelper {
     patient.addName(name)
 
     // Set patient birth date
-    val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
-    patient.birthDate = dob
+    birthDate?.let {
+      val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
+      patient.birthDate = dob
+    }
 
     // Set patient gender
     patient.gender = gender
@@ -228,30 +230,19 @@ object PatientCreationHelper {
     // Add more patients as needed
     return patients
   }
-}
 
-data class PatientUiState(
-  val patientId: String,
-  val firstName: String,
-  val lastName: String = "Unknown",
-  val birthDate: String = "1980-01-01",
-  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.UNKNOWN,
-  val isActive: Boolean = true,
-  val isReadOperation: Boolean = false,
-)
+  fun createPatientId(): String {
+    return UUID.randomUUID().toString()
+  }
 
-fun Patient.toPatientUiState(isReadOperation: Boolean = false): PatientUiState {
-  val patientId = this.logicalId ?: ""
-  val firstName = this.name?.firstOrNull()?.given?.firstOrNull()?.value ?: ""
-  val lastName = this.name?.firstOrNull()?.family ?: "Unknown"
-  val gender = this.gender ?: Enumerations.AdministrativeGender.OTHER
-  val isActive = this.active ?: true
-  return PatientUiState(
-    patientId,
-    firstName,
-    lastName,
-    gender = gender,
-    isActive = isActive,
-    isReadOperation = isReadOperation,
-  )
+  fun isBirthdateParsed(birthdate: String): Boolean {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    dateFormat.isLenient = false // Ensure strict parsing
+    return try {
+      dateFormat.parse(birthdate)
+      true
+    } catch (e: ParseException) {
+      false
+    }
+  }
 }

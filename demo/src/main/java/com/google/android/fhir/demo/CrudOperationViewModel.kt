@@ -17,18 +17,18 @@
 package com.google.android.fhir.demo
 
 import android.app.Application
+import android.icu.text.SimpleDateFormat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.delete
 import com.google.android.fhir.demo.helpers.PatientCreationHelper
-import com.google.android.fhir.demo.helpers.PatientUiState
-import com.google.android.fhir.demo.helpers.toPatientUiState
-import java.util.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import java.util.Locale
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Patient
@@ -36,22 +36,22 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class CrudOperationViewModel(application: Application) : AndroidViewModel(application) {
   private val fhirEngine: FhirEngine = FhirEngineProvider.getInstance(application)
-
-  private val _patientUiState = MutableStateFlow<PatientUiState?>(null)
-  val patientUiState: StateFlow<PatientUiState?> = _patientUiState.asStateFlow()
+  private val _patientUiState = MutableSharedFlow<PatientUiState>(replay = 1)
+  val patientUiState: SharedFlow<PatientUiState> = _patientUiState.asSharedFlow()
 
   fun getPatientById(patientId: String) {
+    // Launch coroutine to read patient
     viewModelScope.launch {
       val patient = fhirEngine.get(ResourceType.Patient, patientId) as Patient
-      _patientUiState.value = patient.toPatientUiState(isReadOperation = true)
+      _patientUiState.emit(patient.toPatientUiState())
     }
   }
 
   fun createPatient(
     patientId: String,
     firstName: String,
-    lastName: String = "Unknown",
-    birthDate: String = "1980-01-01",
+    lastName: String? = null,
+    birthDate: String? = null,
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
     isActive: Boolean = true,
   ) {
@@ -67,7 +67,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
           isActive = isActive,
         )
       fhirEngine.create(patient).firstOrNull()?.let {
-        _patientUiState.value = patient.toPatientUiState()
+        _patientUiState.emit(patient.toPatientUiState())
       }
     }
   }
@@ -75,12 +75,12 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   fun updatePatient(
     patientId: String,
     firstName: String,
-    lastName: String = "Unknown",
-    birthDate: String = "1980-01-01",
+    lastName: String? = null,
+    birthDate: String? = null,
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
     isActive: Boolean = true,
   ) {
-    // Launch coroutine to create patient
+    // Launch coroutine to update patient
     viewModelScope.launch {
       val patient =
         PatientCreationHelper.createPatient(
@@ -92,47 +92,46 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
           isActive = isActive,
         )
       fhirEngine.update(patient)
-      _patientUiState.value = patient.toPatientUiState()
+      _patientUiState.emit(patient.toPatientUiState())
     }
   }
 
   fun deletePatient(patientLogicalId: String) {
     viewModelScope.launch {
       fhirEngine.delete<Patient>(patientLogicalId)
-      _patientUiState.value = Patient().toPatientUiState()
+      _patientUiState.emit(Patient().toPatientUiState())
     }
   }
-
-  fun getPatientId(): String {
-    return UUID.randomUUID().toString()
-  }
-
-  //  fun updatePatient(patientUpdateData: PatientUpdateData) {
-  //    // Launch coroutine to update patient
-  //    viewModelScope.launch {
-  //      val patient = PatientCreationHelper.createPatient(
-  //        patientId = patientUpdateData.patientId,
-  //        firstName = patientUpdateData.firstName,
-  //        lastName = patientUpdateData.lastName,
-  //        birthDate = patientUpdateData.birthDate,
-  //        gender = patientUpdateData.gender,
-  //        isActive = patientUpdateData.isActive,
-  //      )
-  //      fhirEngine.update(patient)
-  //      _patientUiState.value = patient.toPatientUiState()
-  //    }
-  //  }
-
-  //  fun deletePatient() {
-  //    // Launch coroutine to delete patient
-  //  }
 }
 
-// data class PatientUpdateData(
-//  val patientId: String,
-//  val firstName: String,
-//  val lastName: String,
-//  val birthDate: String,
-//  val gender: Enumerations.AdministrativeGender,
-//  val isActive: Boolean
-// )
+data class PatientUiState(
+  val patientId: String,
+  val firstName: String,
+  val lastName: String? = null,
+  val birthDate: String? = null,
+  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.UNKNOWN,
+  val isActive: Boolean = true,
+  val isReadOperation: Boolean = false,
+)
+
+fun Patient.toPatientUiState(): PatientUiState {
+  val patientId = this.logicalId ?: ""
+  val firstName = this.name?.firstOrNull()?.given?.firstOrNull()?.value ?: ""
+  val lastName = this.name?.firstOrNull()?.family ?: ""
+  val birthDate =
+    if (hasBirthDateElement()) {
+      SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(this.birthDate)
+    } else {
+      null
+    }
+  val gender = this.gender ?: Enumerations.AdministrativeGender.OTHER
+  val isActive = this.active ?: true
+  return PatientUiState(
+    patientId,
+    firstName,
+    lastName,
+    birthDate,
+    gender = gender,
+    isActive = isActive,
+  )
+}

@@ -8,60 +8,56 @@
 >
 
   <!-- CRUD RadioGroup -->
-  <RadioGroup
-        android:id="@+id/radioGroupCrud"
-        android:layout_width="wrap_content"
+  <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutCrud"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="8dp"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabTextColor="@color/black"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
     >
 
-    <!-- Create Radio Button -->
-    <RadioButton
-            android:id="@+id/rbCreate"
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Create"
-            android:layout_marginStart="8dp"
         />
 
-    <!-- Read Radio Button -->
-    <RadioButton
-            android:id="@+id/rbRead"
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Read"
-            android:layout_marginStart="8dp"
         />
 
-    <!-- Update Radio Button -->
-    <RadioButton
-            android:id="@+id/rbUpdate"
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:text="Update"
         />
 
-    <!-- Delete Radio Button -->
-    <RadioButton
-            android:id="@+id/rbDelete"
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:text="Delete"
         />
+  </com.google.android.material.tabs.TabLayout>
 
-  </RadioGroup>
 
   <!-- Form Container in ScrollView -->
   <ScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/radioGroupCrud"
+        app:layout_constraintTop_toBottomOf="@id/tabLayoutCrud"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,6 +74,7 @@
                 android:id="@+id/tilId"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:hint="Id *"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -98,6 +95,7 @@
                 android:id="@+id/tilFirstName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:hint="First Name *"
                 app:layout_constraintTop_toBottomOf="@id/tilId"
                 app:layout_constraintStart_toStartOf="parent"
@@ -118,6 +116,7 @@
                 android:id="@+id/tilLastName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:hint="Last Name"
                 app:layout_constraintTop_toBottomOf="@id/tilFirstName"
                 app:layout_constraintStart_toStartOf="parent"
@@ -139,6 +138,7 @@
                 android:id="@+id/tilBirthDate"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:hint="Birth Date (yyyy-MM-dd) *"
                 app:layout_constraintTop_toBottomOf="@id/tilLastName"
                 app:layout_constraintStart_toStartOf="parent"
@@ -158,6 +158,7 @@
                 android:id="@+id/tvGenderLabel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Gender"
                 app:layout_constraintTop_toBottomOf="@id/tilBirthDate"
                 app:layout_constraintStart_toStartOf="parent"
@@ -209,6 +210,7 @@
                 android:id="@+id/checkBoxActive"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:text="Is Active"
                 app:layout_constraintTop_toBottomOf="@id/radioGroupGender"
                 app:layout_constraintStart_toStartOf="parent"
