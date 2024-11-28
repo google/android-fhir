@@ -17,23 +17,37 @@
 package com.google.android.fhir.workflow.activity
 
 import androidx.annotation.WorkerThread
+import ca.uhn.fhir.model.api.IQueryParameterType
+import ca.uhn.fhir.rest.param.ReferenceParam
 import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.ORDER
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PERFORM
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PLAN
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PROPOSAL
+import com.google.android.fhir.workflow.activity.phase.PreviousPhaseIterator
+import com.google.android.fhir.workflow.activity.phase.ReadOnlyRequestPhase
 import com.google.android.fhir.workflow.activity.phase.event.PerformPhase
+import com.google.android.fhir.workflow.activity.phase.event.PerformPhase.Companion.`class`
+import com.google.android.fhir.workflow.activity.phase.idType
 import com.google.android.fhir.workflow.activity.phase.request.OrderPhase
 import com.google.android.fhir.workflow.activity.phase.request.PlanPhase
 import com.google.android.fhir.workflow.activity.phase.request.ProposalPhase
 import com.google.android.fhir.workflow.activity.resource.event.CPGCommunicationEvent
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.event.CPGOrderMedicationEvent
+import com.google.android.fhir.workflow.activity.resource.event.EventStatus
 import com.google.android.fhir.workflow.activity.resource.request.CPGCommunicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.Intent
+import com.google.android.fhir.workflow.activity.resource.request.Status
+import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Communication
+import org.hl7.fhir.r4.model.CommunicationRequest
+import org.hl7.fhir.r4.model.MedicationDispense
+import org.hl7.fhir.r4.model.MedicationRequest
+import org.hl7.fhir.r4.model.Reference
 import org.opencds.cqf.fhir.api.Repository
 
 /**
@@ -182,6 +196,46 @@ private constructor(
   }
 
   /**
+   * Returns an iterator to go over the previous states of the activity flow. The iterator provides
+   * a read-only view to the phase.
+   */
+  fun getPreviousPhase(): PreviousPhaseIterator<R> {
+    return object : PreviousPhaseIterator<R> {
+      var current: Phase? = currentPhase
+
+      override fun hasPrevious(): Boolean {
+        return if (current is Phase.RequestPhase<*>) {
+          (current as? Phase.RequestPhase<*>)?.getRequestResource()?.getBasedOn() != null
+        } else {
+          (current as? Phase.EventPhase<*>)?.getEventResource()?.getBasedOn() != null
+        }
+      }
+
+      override fun previous(): ReadOnlyRequestPhase<R>? {
+        val basedOn: Reference? =
+          if (current is Phase.RequestPhase<*>) {
+            (current as Phase.RequestPhase<*>).getRequestResource().getBasedOn()
+          } else if (current is Phase.EventPhase<*>) {
+            (current as Phase.EventPhase<*>).getEventResource().getBasedOn()
+          } else {
+            null
+          }
+
+        val basedOnRequest = basedOn?.let {
+          repository.read(it.`class`, it.idType)?.let { CPGRequestResource.of(it) as R }
+        }
+        current = when (basedOnRequest?.getIntent()) {
+            Intent.PROPOSAL -> ProposalPhase(repository, basedOnRequest)
+            Intent.PLAN -> PlanPhase(repository, basedOnRequest)
+            Intent.ORDER -> OrderPhase(repository, basedOnRequest)
+            else -> null
+          }
+        return basedOnRequest?.let { ReadOnlyRequestPhase(it) }
+      }
+    }
+  }
+
+  /**
    * Prepares a plan resource based on the state of the [currentPhase] and returns it to the caller
    * without persisting any changes into [repository].
    *
@@ -303,5 +357,109 @@ private constructor(
       resource: CPGOrderMedicationEvent<*>,
     ): ActivityFlow<CPGMedicationRequest, CPGOrderMedicationEvent<*>> =
       ActivityFlow(repository, null, resource)
+
+    /**
+     * Returns a list of active flows associated with the [patientId].
+     */
+    fun of(
+      repository: Repository,
+      patientId: String,
+    ): List<ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>> {
+      val eventTypes =
+        listOf(
+          MedicationDispense::class.java,
+          Communication::class.java,
+        )
+
+      val events =
+        eventTypes
+          .flatMap {
+            repository
+              .search(
+                Bundle::class.java,
+                it,
+                mutableMapOf<String, MutableList<IQueryParameterType>>(
+                  "subject" to mutableListOf(ReferenceParam("Patient/$patientId")),
+                ),
+                null,
+              )
+              .entry
+              .map { it.resource }
+          }
+          .map { CPGEventResource.of(it) }
+
+      val requestTypes =
+        listOf(
+          MedicationRequest::class.java,
+          CommunicationRequest::class.java,
+        )
+
+      val cache: MutableMap<String, CPGRequestResource<*>> =
+        requestTypes
+          .flatMap {
+            repository
+              .search(
+                Bundle::class.java,
+                it,
+                mutableMapOf<String, MutableList<IQueryParameterType>>(
+                  "subject" to mutableListOf(ReferenceParam("Patient/$patientId")),
+                ),
+                null,
+              )
+              .entry
+              .map { it.resource }
+          }
+          .map { CPGRequestResource.of(it) }
+          .associateByTo(LinkedHashMap()) { "${it.resourceType}/${it.logicalId}" }
+
+
+      fun addBasedOn(
+        request: RequestChain,
+      ): RequestChain? {
+        val basedOn = request.request?.getBasedOn() ?: request.event?.getBasedOn()
+        // look up the cache for the parent resource and add to the chain
+        return basedOn?.let { reference ->
+          cache[reference.reference]?.let { requestResource ->
+            cache.remove(reference.reference)
+            RequestChain(request = requestResource).apply { this.basedOn = addBasedOn(this) }
+          }
+        }
+      }
+
+      val requestChain =
+        events.map { RequestChain(event = it).apply { this.basedOn = addBasedOn(this) } } +
+          cache.values
+            .filter {
+              it.getIntent() == Intent.ORDER ||
+                it.getIntent() == Intent.PLAN ||
+                it.getIntent() == Intent.PROPOSAL
+            }
+            .sortedByDescending { it.getIntent().code }
+            .mapNotNull {
+              if (cache.containsKey("${it.resourceType}/${it.logicalId}")) {
+                RequestChain(request = it).apply { this.basedOn = addBasedOn(this) }
+              } else {
+                null
+              }
+            }
+      return requestChain.filter {
+        if (it.event != null) {
+          it.event.getStatus() != EventStatus.COMPLETED
+        } else if (it.request != null) {
+        it.request.getStatus() != Status.COMPLETED
+      } else {
+          false
+        }
+      }.map { ActivityFlow(repository, it.request, it.event) }
+    }
   }
 }
+
+/**
+ * Represents the chain of event/requests of an activity flow. A [RequestChain] would either have a [request] or an [event].
+ */
+internal data class RequestChain(
+  val request: CPGRequestResource<*>? = null,
+  val event: CPGEventResource<*>? = null,
+  var basedOn: RequestChain? = null,
+)

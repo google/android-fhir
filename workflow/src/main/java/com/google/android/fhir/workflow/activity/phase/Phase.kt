@@ -19,6 +19,7 @@ package com.google.android.fhir.workflow.activity.phase
 import androidx.annotation.WorkerThread
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
+import com.google.android.fhir.workflow.activity.resource.request.Intent
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Reference
 
@@ -77,3 +78,28 @@ internal fun checkEquals(a: Reference, b: Reference) = a.reference == b.referenc
 /** Returns an [IdType] of a [Reference]. This is required for [Repository.read] api. */
 internal val Reference.idType
   get() = IdType(reference)
+
+/** Iterate through the previous phases of a current activity flow. */
+interface PreviousPhaseIterator<R : CPGRequestResource<*>> {
+  fun hasPrevious(): Boolean
+
+  fun previous(): ReadOnlyRequestPhase<R>?
+}
+
+/** Provides a read-only view of a request phase. */
+class ReadOnlyRequestPhase<R : CPGRequestResource<*>>(private val cpgRequestResource: R) {
+  /** Returns the [Phase.PhaseName] of this phase. */
+  fun getPhase() =
+    when (cpgRequestResource.getIntent()) {
+      Intent.PROPOSAL -> Phase.PhaseName.PROPOSAL
+      Intent.PLAN -> Phase.PhaseName.PLAN
+      Intent.ORDER -> Phase.PhaseName.ORDER
+      else ->
+        throw IllegalArgumentException(
+          "Resource intent can't be ${cpgRequestResource.getIntent().code} ",
+        )
+    }
+
+  /** Returns the underlying [CPGRequestResource] of this phase. */
+  fun getRequestResource() = cpgRequestResource
+}
