@@ -418,7 +418,55 @@ class ResourceDatabaseMigrationTest {
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
-  @Test fun migrate9To10_should_execute_with_no_exception(): Unit = runBlocking { TODO() }
+  @Test
+  fun migrate9To10_should_execute_with_no_exception(): Unit = runBlocking {
+    val patientId = "patient-001"
+    val patientResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val patient: String =
+      Patient().apply { id = patientId }.let { iParser.encodeResourceToString(it) }
+
+    val taskId = "bed-net-001"
+    val taskResourceUuid = "8593abf6-b8dd-44d7-a35f-1c8843bc2c45"
+    val bedNetTask =
+      Task()
+        .apply {
+          id = taskId
+          status = Task.TaskStatus.READY
+          `for` = Reference(patient)
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 9).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patientResourceUuid', 'Patient', '$patientId', '$patient');",
+      )
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$taskResourceUuid', 'Task', '$taskId', '$bedNetTask');",
+      )
+
+      execSQL(
+        "INSERT INTO ReferenceIndexEntity (resourceUuid, resourceType, index_name, index_path, index_value) VALUES ('$taskResourceUuid', 'Task', 'subject', 'Task.for', 'Patient/$patientId');",
+      )
+      close()
+    }
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 10, true, Migration_9_10)
+    val retrievedTask: String?
+    migratedDatabase
+      .query(
+        """
+      SELECT a.serializedResource FROM ResourceEntity a
+        WHERE a.resourceUuid IN (SELECT resourceUuid FROM ReferenceIndexEntity
+            WHERE resourceType = 'Task' AND index_name = 'subject' AND index_value = 'Patient/$patientId')
+            """
+          .trimIndent(),
+      )
+      .let {
+        it.moveToFirst()
+        retrievedTask = it.getString(0)
+      }
+    migratedDatabase.close()
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+  }
 
   companion object {
     const val DB_NAME = "migration_tests.db"
