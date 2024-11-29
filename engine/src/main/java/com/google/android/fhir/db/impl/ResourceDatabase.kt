@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 8,
+  version = 9,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -205,6 +205,24 @@ internal val MIGRATION_7_8 =
           }
           continueIterating = it.moveToNext()
         }
+      }
+    }
+  }
+
+internal val Migration_8_9 =
+  object : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.beginTransaction()
+      try {
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_TokenIndexEntity_resourceType_index_name_index_system_index_value_resourceUuid`;",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
+        )
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
       }
     }
   }
