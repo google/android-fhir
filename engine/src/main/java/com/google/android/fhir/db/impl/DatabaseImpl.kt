@@ -44,10 +44,14 @@ import com.google.android.fhir.toLocalChange
 import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.Dispatchers
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
+import java.util.Collections
 
 /**
  * The implementation for the persistence layer using Room. See docs for
@@ -149,6 +153,10 @@ internal class DatabaseImpl(
     return logicalIds
   }
 
+  override suspend fun <R : Resource> insertLocalOnly(vararg resource: R): List<String> {
+    return db.withTransaction { resourceDao.insertAllRemote(resource.toList()).map { it.toString() }.toList() }
+  }
+
   override suspend fun <R : Resource> insertRemote(vararg resource: R) {
     db.withTransaction { resourceDao.insertAllRemote(resource.toList()) }
   }
@@ -237,49 +245,54 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> search(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
-    return db.withTransaction {
-      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
-        Dispatchers.Default,
-      ) {
-        ResourceWithUUID(
-          it.uuid,
-          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
-        )
+    val dbResult =
+      db.withTransaction {
+        resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
       }
+
+    return dbResult.pmap(
+      Dispatchers.Default,
+    ) {
+      ResourceWithUUID(
+        it.uuid,
+        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
+      )
     }
   }
 
   override suspend fun searchForwardReferencedResources(
     query: SearchQuery,
   ): List<ForwardIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmap(Dispatchers.Default) {
-          ForwardIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceUUID,
-            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
-              as Resource,
-          )
-        }
+    val dbResult =
+      db.withTransaction {
+        resourceDao.getForwardReferencedResources(
+          SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+        )
+      }
+    return dbResult.pmap(Dispatchers.Default) {
+      ForwardIncludeSearchResult(
+        it.matchingIndex,
+        it.baseResourceUUID,
+        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as Resource,
+      )
     }
   }
 
   override suspend fun searchReverseReferencedResources(
     query: SearchQuery,
   ): List<ReverseIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .pmap(Dispatchers.Default) {
-          ReverseIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceTypeAndId,
-            FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
-              as Resource,
-          )
-        }
+    val dbResult =
+      db.withTransaction {
+        resourceDao.getReverseReferencedResources(
+          SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+        )
+      }
+    return dbResult.pmap(Dispatchers.Default) {
+      ReverseIncludeSearchResult(
+        it.matchingIndex,
+        it.baseResourceTypeAndId,
+        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as Resource,
+      )
     }
   }
 
@@ -328,8 +341,8 @@ internal class DatabaseImpl(
       val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
       val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
-      updateResourceEntity(resourceUuid, updatedResource)
-
+      updateResourceEntity(resourceUuid, updatedResource) 
+      
       if (currentResourceId == updatedResource.logicalId) {
         return@withTransaction
       }
@@ -455,6 +468,11 @@ internal class DatabaseImpl(
         )
       }
     }
+  }
+
+  /** Implementation of a parallelized map */
+  suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+    map { async { f(it) } }.awaitAll()
   }
 
   companion object {

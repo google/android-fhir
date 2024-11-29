@@ -16,7 +16,7 @@
             "text": "Check box"
           }
         },
-        {
+        { 
           "url": "https://github.com/google/android-fhir/StructureDefinition/dialog"
         }
       ],
