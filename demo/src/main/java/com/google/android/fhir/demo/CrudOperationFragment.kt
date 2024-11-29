@@ -58,7 +58,7 @@ class CrudOperationFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-    initializeUi()
+    setupUi()
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
         crudOperationViewModel.patientUiState.collect { patientUiState ->
@@ -80,7 +80,8 @@ class CrudOperationFragment : Fragment() {
                 if (readOperationOnClick == ClickType.TAB_CLICK) {
                   displayPatientDetails(it)
                 } else {
-                  requireView().findViewById<EditText>(R.id.etId).text.clear()
+                  // Reset the page as the patient has been deleted.
+                  clearTextFieldValues()
                   configureFieldsForOperation(OperationType.DELETE)
                   Toast.makeText(requireContext(), "Patient is deleted", Toast.LENGTH_SHORT).show()
                 }
@@ -109,33 +110,7 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun displayPatientDetails(patientUiState: PatientUiState) {
-    requireView().findViewById<EditText>(R.id.etId).apply { setText(patientUiState.patientId) }
-    requireView().findViewById<EditText>(R.id.etFirstName).apply {
-      setText(patientUiState.firstName)
-    }
-    requireView().findViewById<EditText>(R.id.etLastName).apply {
-      setText(getValueBasedOnOperationType(patientUiState.lastName, "Unknown"))
-    }
-    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
-      setText(getValueBasedOnOperationType(patientUiState.birthDate, "Unknown"))
-    }
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).apply {
-      val genderRadioButtonId =
-        when (patientUiState.gender) {
-          Enumerations.AdministrativeGender.MALE -> R.id.rbMale
-          Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
-          Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
-          else -> null
-        }
-      genderRadioButtonId?.let { check(it) }
-    }
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).apply {
-      isChecked = patientUiState.isActive
-    }
-  }
-
-  private fun initializeUi() {
+  private fun setupUi() {
     configureFieldsForOperation(OperationType.CREATE)
     requireView().findViewById<EditText>(R.id.etId).setText(PatientCreationHelper.createPatientId())
     setupTabLayoutChangeListener()
@@ -153,21 +128,6 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun setupTabLayoutChangeListener() {
-    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
-    tabLayout.addOnTabSelectedListener(
-      object : TabLayout.OnTabSelectedListener {
-        override fun onTabSelected(tab: TabLayout.Tab?) {
-          handleTabSelection(tab?.position ?: TAB_CREATE)
-        }
-
-        override fun onTabUnselected(tab: TabLayout.Tab?) {}
-
-        override fun onTabReselected(tab: TabLayout.Tab?) {}
-      },
-    )
-  }
-
   private fun handleTabSelection(tabPosition: Int) {
     readOperationOnClick = ClickType.TAB_CLICK
     when (tabPosition) {
@@ -183,32 +143,62 @@ class CrudOperationFragment : Fragment() {
       TAB_DELETE, -> {
         patientLogicalId
           ?.takeIf { it.isNotEmpty() }
-          ?.let { crudOperationViewModel.getPatientById(it) }
+          ?.let {
+            crudOperationViewModel.readPatientById(it)
+            requireView().findViewById<EditText>(R.id.etId).setText(it)
+          }
         displayCreatePatientMessageIfNeeded()
-        requireView().findViewById<EditText>(R.id.etId).setText(patientLogicalId)
         configureFieldsForOperation(getOperationTypeByTabPosition(tabPosition))
       }
     }
     currentTabPosition = tabPosition
   }
 
-  private fun getOperationTypeByTabPosition(tabPosition: Int): OperationType {
-    return when (tabPosition) {
-      TAB_CREATE -> {
-        OperationType.CREATE
-      }
-      TAB_READ -> {
-        OperationType.READ
-      }
-      TAB_UPDATE -> {
-        OperationType.UPDATE
-      }
-      TAB_DELETE -> {
-        OperationType.DELETE
-      }
-      else -> {
-        error("Invalid tab selection.")
-      }
+  private fun selectTab(position: Int) {
+    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
+    val tab = tabLayout.getTabAt(position)
+    tab?.select()
+    currentTabPosition = position
+  }
+
+  private fun setupTabLayoutChangeListener() {
+    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
+    tabLayout.addOnTabSelectedListener(
+      object : TabLayout.OnTabSelectedListener {
+        override fun onTabSelected(tab: TabLayout.Tab?) {
+          handleTabSelection(tab?.position ?: TAB_CREATE)
+        }
+
+        override fun onTabUnselected(tab: TabLayout.Tab?) {}
+
+        override fun onTabReselected(tab: TabLayout.Tab?) {}
+      },
+    )
+  }
+
+  private fun displayPatientDetails(patientUiState: PatientUiState) {
+    requireView().findViewById<EditText>(R.id.etId).apply { setText(patientUiState.patientId) }
+    requireView().findViewById<EditText>(R.id.etFirstName).apply {
+      setText(patientUiState.firstName)
+    }
+    requireView().findViewById<EditText>(R.id.etLastName).apply {
+      setText(getFieldValueBasedOnOperationType(patientUiState.lastName, "Unknown"))
+    }
+    requireView().findViewById<EditText>(R.id.etBirthDate).apply {
+      setText(getFieldValueBasedOnOperationType(patientUiState.birthDate, "Unknown"))
+    }
+    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).apply {
+      val genderRadioButtonId =
+        when (patientUiState.gender) {
+          Enumerations.AdministrativeGender.MALE -> R.id.rbMale
+          Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
+          Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
+          else -> null
+        }
+      genderRadioButtonId?.let { check(it) }
+    }
+    requireView().findViewById<CheckBox>(R.id.checkBoxActive).apply {
+      isChecked = patientUiState.isActive
     }
   }
 
@@ -281,7 +271,12 @@ class CrudOperationFragment : Fragment() {
         OperationType.DELETE, -> if (patientLogicalId.isNullOrEmpty()) View.GONE else View.VISIBLE
       }
     // Field editability
-    val isEditable = operationType == OperationType.CREATE || operationType == OperationType.UPDATE
+    val isEditable =
+      when (operationType) {
+        OperationType.CREATE,
+        OperationType.UPDATE, -> true
+        else -> false
+      }
     requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = isEditable
     requireView().findViewById<EditText>(R.id.etLastName).isEnabled = isEditable
     requireView().findViewById<EditText>(R.id.etBirthDate).isEnabled = isEditable
@@ -299,7 +294,7 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun getValueBasedOnOperationType(
+  private fun getFieldValueBasedOnOperationType(
     fieldValue: String?,
     defaultValue: String,
   ): String? {
@@ -311,11 +306,24 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun selectTab(position: Int) {
-    val tabLayout = requireView().findViewById<TabLayout>(R.id.tabLayoutCrud)
-    val tab = tabLayout.getTabAt(position)
-    tab?.select()
-    currentTabPosition = position
+  private fun getOperationTypeByTabPosition(tabPosition: Int): OperationType {
+    return when (tabPosition) {
+      TAB_CREATE -> {
+        OperationType.CREATE
+      }
+      TAB_READ -> {
+        OperationType.READ
+      }
+      TAB_UPDATE -> {
+        OperationType.UPDATE
+      }
+      TAB_DELETE -> {
+        OperationType.DELETE
+      }
+      else -> {
+        error("Invalid tab selection.")
+      }
+    }
   }
 
   private fun createPatient() {
@@ -364,7 +372,7 @@ class CrudOperationFragment : Fragment() {
     }
 
     crudOperationViewModel.updatePatient(
-      patientId = patientId,
+      patientLogicalId = patientId,
       firstName = firstName,
       lastName = lastName,
       birthDate = birthDate,

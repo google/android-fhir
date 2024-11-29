@@ -39,10 +39,9 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   private val _patientUiState = MutableSharedFlow<PatientUiState>(replay = 1)
   val patientUiState: SharedFlow<PatientUiState> = _patientUiState.asSharedFlow()
 
-  fun getPatientById(patientId: String) {
-    // Launch coroutine to read patient
+  fun readPatientById(patientLogicalId: String) {
     viewModelScope.launch {
-      val patient = fhirEngine.get(ResourceType.Patient, patientId) as Patient
+      val patient = fhirEngine.get(ResourceType.Patient, patientLogicalId) as Patient
       _patientUiState.emit(patient.toPatientUiState())
     }
   }
@@ -55,7 +54,6 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
     isActive: Boolean = true,
   ) {
-    // Launch coroutine to create patient
     viewModelScope.launch {
       val patient =
         PatientCreationHelper.createPatient(
@@ -73,18 +71,17 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   }
 
   fun updatePatient(
-    patientId: String,
+    patientLogicalId: String,
     firstName: String,
     lastName: String? = null,
     birthDate: String? = null,
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
     isActive: Boolean = true,
   ) {
-    // Launch coroutine to update patient
     viewModelScope.launch {
       val patient =
         PatientCreationHelper.createPatient(
-          patientId = patientId,
+          patientId = patientLogicalId,
           firstName = firstName,
           lastName = lastName,
           birthDate = birthDate,
