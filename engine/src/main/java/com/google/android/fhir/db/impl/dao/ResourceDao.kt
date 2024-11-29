@@ -202,6 +202,17 @@ internal abstract class ResourceDao {
 
   @Query(
     """
+        SELECT serializedResource
+        FROM ResourceEntity
+        WHERE resourceId IN (:resourceIds) AND resourceType = :resourceType""",
+  )
+  abstract suspend fun getResources(
+    vararg resourceIds: String,
+    resourceType: ResourceType,
+  ): List<String>?
+
+  @Query(
+    """
         SELECT *
         FROM ResourceEntity
         WHERE resourceId = :resourceId AND resourceType = :resourceType

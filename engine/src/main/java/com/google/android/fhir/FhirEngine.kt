@@ -73,6 +73,17 @@ interface FhirEngine {
   suspend fun create(vararg resource: Resource): List<String>
 
   /**
+   * Loads a FHIR resource given its [ResourceType] and logical ID.
+   *
+   * @param type The type of the resource to load.
+   * @param id The logical ID of the resource.
+   * @return The requested FHIR resource.
+   * @throws ResourceNotFoundException if the resource is not found.
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun get(type: ResourceType, id: String): Resource
+
+  /**
    * Loads multiple FHIR resources given [ResourceType] and logical IDs.
    *
    * @param type The type of the resource to load.
@@ -215,6 +226,19 @@ interface FhirEngine {
 }
 
 /**
+ * Retrieves a FHIR resource of type [R] with the given [id] from the local storage.
+ *
+ * @param R The type of the FHIR resource to retrieve.
+ * @param id The logical ID of the resource to retrieve.
+ * @return The requested FHIR resource.
+ * @throws ResourceNotFoundException if the resource is not found.
+ */
+@Throws(ResourceNotFoundException::class)
+suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
+  return get(getResourceType(R::class.java), id) as R
+}
+
+/**
  * Retrieves FHIR resources of type [R] with the given [ids] from the local storage.
  *
  * @param R The type of the FHIR resource to retrieve.
@@ -224,7 +248,7 @@ interface FhirEngine {
  */
 @Throws(ResourceNotFoundException::class)
 suspend inline fun <reified R : Resource> FhirEngine.get(vararg ids: String): List<R> {
-  return ids.map { id -> get(getResourceType(R::class.java), id) as R }
+  return get(getResourceType(R::class.java), *ids).map { it as R }
 }
 
 /**

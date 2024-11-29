@@ -85,6 +85,15 @@ internal interface Database {
   suspend fun select(type: ResourceType, id: String): Resource
 
   /**
+   * Selects the FHIR resources of type `clazz` with `ids`.
+   *
+   * @param <R> The resource type
+   * @throws ResourceNotFoundException if the resources are not found in the database
+   */
+  @Throws(ResourceNotFoundException::class)
+  suspend fun selectResources(type: ResourceType, vararg ids: String): List<Resource>
+
+  /**
    * Selects the saved `ResourceEntity` of type `clazz` with `id`.
    *
    * @param <R> The resource type

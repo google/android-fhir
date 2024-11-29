@@ -206,6 +206,14 @@ internal class DatabaseImpl(
       ?: throw ResourceNotFoundException(type.name, id)
   }
 
+  override suspend fun selectResources(type: ResourceType, vararg ids: String): List<Resource> {
+    val resources =
+      resourceDao.getResources(resourceIds = ids, resourceType = type)
+        ?: throw ResourceNotFoundException(type.name, ids.joinToString(","))
+
+    return resources.map { iParser.parseResource(it) as Resource }
+  }
+
   override suspend fun insertSyncedResources(resources: List<Resource>) {
     db.withTransaction { insertRemote(*resources.toTypedArray()) }
   }
