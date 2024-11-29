@@ -106,15 +106,15 @@ data class PatientUiState(
   val firstName: String,
   val lastName: String? = null,
   val birthDate: String? = null,
-  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.UNKNOWN,
+  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
   val isActive: Boolean = true,
   val isReadOperation: Boolean = false,
 )
 
 fun Patient.toPatientUiState(): PatientUiState {
-  val patientId = this.logicalId ?: ""
+  val patientId = this.logicalId
   val firstName = this.name?.firstOrNull()?.given?.firstOrNull()?.value ?: ""
-  val lastName = this.name?.firstOrNull()?.family ?: ""
+  val lastName = this.name?.firstOrNull()?.family
   val birthDate =
     if (hasBirthDateElement()) {
       SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(this.birthDate)
@@ -122,7 +122,7 @@ fun Patient.toPatientUiState(): PatientUiState {
       null
     }
   val gender = this.gender ?: Enumerations.AdministrativeGender.OTHER
-  val isActive = this.active ?: true
+  val isActive = this.active
   return PatientUiState(
     patientId,
     firstName,

@@ -80,7 +80,7 @@ object PatientCreationHelper {
     // Patient 1
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "John",
         lastName = "Doe",
         birthDate = "1990-01-01",
@@ -95,7 +95,7 @@ object PatientCreationHelper {
     // Patient 2
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Jane",
         lastName = "Smith",
         birthDate = "1985-05-15",
@@ -110,7 +110,7 @@ object PatientCreationHelper {
     // Patient 3
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Emily",
         lastName = "Johnson",
         birthDate = "1978-11-12",
@@ -125,7 +125,7 @@ object PatientCreationHelper {
     // Patient 4
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Michael",
         lastName = "Brown",
         birthDate = "1982-04-07",
@@ -140,7 +140,7 @@ object PatientCreationHelper {
     // Patient 5
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Sophia",
         lastName = "Davis",
         birthDate = "1995-08-22",
@@ -155,7 +155,7 @@ object PatientCreationHelper {
     // Patient 6
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Liam",
         lastName = "Wilson",
         birthDate = "2001-12-30",
@@ -170,7 +170,7 @@ object PatientCreationHelper {
     // Patient 7
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Olivia",
         lastName = "Martinez",
         birthDate = "1989-03-17",
@@ -185,7 +185,7 @@ object PatientCreationHelper {
     // Patient 8
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Noah",
         lastName = "Garcia",
         birthDate = "1975-07-05",
@@ -200,7 +200,7 @@ object PatientCreationHelper {
     // Patient 9
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Ava",
         lastName = "Anderson",
         birthDate = "1998-02-27",
@@ -215,7 +215,7 @@ object PatientCreationHelper {
     // Patient 10
     patients.add(
       createPatient(
-        patientId = UUID.randomUUID().toString(),
+        patientId = createPatientId(),
         firstName = "Ethan",
         lastName = "Harris",
         birthDate = "1993-09-10",
@@ -237,7 +237,7 @@ object PatientCreationHelper {
 
   fun isBirthdateParsed(birthdate: String): Boolean {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    dateFormat.isLenient = false // Ensure strict parsing
+    dateFormat.isLenient = false
     return try {
       dateFormat.parse(birthdate)
       true
