@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,10 @@ class PatientItemViewHolder(binding: PatientListItemViewBinding) :
 
   fun bind(patientItem: Patient) {
     nameTextView.text =
-      patientItem.name.first().let { it.given.joinToString(separator = " ") + " " + it.family }
-    genderTextView.text = patientItem.gender.display
+      patientItem.name.firstOrNull()?.let {
+        it.given.joinToString(separator = " ") + " " + it.family
+      }
+    genderTextView.text = patientItem.gender?.display
     cityTextView.text = patientItem.address.singleOrNull()?.city
   }
 }
