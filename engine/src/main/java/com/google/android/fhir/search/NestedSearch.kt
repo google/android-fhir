@@ -214,15 +214,20 @@ internal fun List<NestedSearch>.nestedQuery(
   return if (isEmpty()) {
     null
   } else {
+    val filterJoinOperator =
+      when (operation) {
+        Operation.OR -> "\nUNION\n"
+        Operation.AND -> "\nINTERSECT\n"
+      }
+
     map { it.nestedQuery(type) }
       .let { searchQueries ->
         SearchQuery(
           query =
             searchQueries.joinToString(
-              prefix = "AND a.resourceUuid IN ",
-              separator = " ${operation.logicalOperator} a.resourceUuid IN",
+              separator = " $filterJoinOperator",
             ) { searchQuery ->
-              "(\n${searchQuery.query}\n) "
+              "\n${searchQuery.query}\n"
             },
           args = searchQueries.flatMap { it.args },
         )

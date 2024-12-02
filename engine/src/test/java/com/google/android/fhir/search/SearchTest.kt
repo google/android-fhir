@@ -1919,8 +1919,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        )
-        AND a.resourceUuid IN (
+        INTERSECT
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -1930,8 +1929,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
-        )
-        AND a.resourceUuid IN (
+        INTERSECT
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -2001,7 +1999,7 @@ class SearchTest {
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
         )
-        )  AND a.resourceUuid IN(
+        INTERSECT
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
@@ -2156,8 +2154,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
-        )
-        OR a.resourceUuid IN (
+        UNION
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -2189,8 +2186,7 @@ class SearchTest {
         AND a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
-        )
-        AND a.resourceUuid IN (
+        INTERSECT
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value LIKE ? || '%' COLLATE NOCASE OR index_value LIKE ? || '%' COLLATE NOCASE)
         )
