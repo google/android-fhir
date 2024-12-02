@@ -96,4 +96,16 @@
             name="android:textAppearance"
         >?attr/textAppearanceBodyMedium</item>
     </style>
+
+    <style name="CrudButton" parent="Questionnaire.SubmitButtonStyle">
+        <item name="android:layout_marginEnd">8dp</item>
+    </style>
+
+    <!-- Style for Form Input Fields -->
+    <style name="FormField" parent="Questionnaire.TextInputEditTextStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginBottom">8dp</item>
+    </style>
+
 </resources>
