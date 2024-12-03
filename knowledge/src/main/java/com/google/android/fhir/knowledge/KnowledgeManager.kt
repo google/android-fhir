@@ -19,7 +19,7 @@ package com.google.android.fhir.knowledge
 import android.content.Context
 import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.KnowledgeDatabase
 import com.google.android.fhir.knowledge.db.entities.ImplementationGuideEntity
 import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
@@ -63,7 +63,6 @@ internal constructor(
   knowledgeDatabase: KnowledgeDatabase,
   private val npmFileManager: NpmFileManager,
   private val npmPackageDownloader: NpmPackageDownloader,
-  private val jsonParser: IParser = FhirContext.forR4().newJsonParser(),
 ) {
   private val knowledgeDao = knowledgeDatabase.knowledgeDao()
 
@@ -296,7 +295,8 @@ internal constructor(
   private suspend fun readResourceOrNull(file: File): IBaseResource? =
     withContext(Dispatchers.IO) {
       try {
-        FileInputStream(file).use(jsonParser::parseResource)
+        FileInputStream(file)
+          .use(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()::parseResource)
       } catch (e: Exception) {
         Timber.e(e, "Unable to load resource from $file")
         null
