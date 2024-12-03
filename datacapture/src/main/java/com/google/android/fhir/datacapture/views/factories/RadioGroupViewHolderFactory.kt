@@ -28,7 +28,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.ChoiceOrientationTypes
 import com.google.android.fhir.datacapture.extensions.choiceOrientation
-import com.google.android.fhir.datacapture.extensions.displayString
+import com.google.android.fhir.datacapture.extensions.displayStringSpanned
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -113,7 +113,7 @@ internal object RadioGroupViewHolderFactory :
         val radioButton =
           radioButtonItem.findViewById<RadioButton>(R.id.radio_button).apply {
             id = viewId
-            text = answerOption.value.displayString(header.context)
+            text = answerOption.value.displayStringSpanned(header.context)
             setCompoundDrawablesRelative(
               answerOption.itemAnswerOptionImage(radioGroup.context),
               null,

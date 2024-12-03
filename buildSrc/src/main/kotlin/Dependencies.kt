@@ -101,7 +101,6 @@ object Dependencies {
   const val mockWebServer = "com.squareup.okhttp3:mockwebserver:${Versions.http}"
 
   const val jsonToolsPatch = "com.github.java-json-tools:json-patch:${Versions.jsonToolsPatch}"
-  const val material = "com.google.android.material:material:${Versions.material}"
   const val sqlcipher = "net.zetetic:android-database-sqlcipher:${Versions.sqlcipher}"
   const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
   const val woodstox = "com.fasterxml.woodstox:woodstox-core:${Versions.woodstox}"
@@ -143,7 +142,6 @@ object Dependencies {
 
     const val jsonToolsPatch = "1.13"
     const val jsonAssert = "1.5.1"
-    const val material = "1.9.0"
     const val retrofit = "2.9.0"
     const val gsonConverter = "2.1.0"
     const val sqlcipher = "4.5.4"
