@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_STRING
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_QUESTIONNAIRE_RESPONSE_JSON_URI
 import com.google.android.fhir.datacapture.QuestionnaireFragment.Companion.EXTRA_SHOW_REVIEW_PAGE_FIRST
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.testing.DataCaptureTestApplication
 import com.google.common.truth.Truth.assertThat
 import java.io.File
@@ -89,7 +90,7 @@ class QuestionnaireViewModelParameterizedTest(
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
@@ -135,7 +136,12 @@ class QuestionnaireViewModelParameterizedTest(
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   private fun createQuestionnaireViewModel(
@@ -185,6 +191,28 @@ class QuestionnaireViewModelParameterizedTest(
     fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
       assertThat(printer.encodeResourceToString(actual))
         .isEqualTo(printer.encodeResourceToString(expected))
+    }
+
+    /**
+     * Asserts that the `expected` and the `actual` Questionnaire Responses are equal ignoring the
+     * stamp values
+     */
+    fun assertQuestionnaireResponseEqualsIgnoringTimestamps(
+      actual: QuestionnaireResponse,
+      expected: QuestionnaireResponse,
+    ) {
+      val actualResponseWithoutTimestamp =
+        actual.copy().apply {
+          extension.removeIf { ext -> ext.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+          authored = null
+        }
+      val expectedResponseWithoutTimestamp =
+        expected.copy().apply {
+          extension.removeIf { ext -> ext.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+          authored = null
+        }
+      assertThat(printer.encodeResourceToString(actualResponseWithoutTimestamp))
+        .isEqualTo(printer.encodeResourceToString(expectedResponseWithoutTimestamp))
     }
 
     @JvmStatic
