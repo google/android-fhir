@@ -90,7 +90,6 @@ dependencies {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(libs.android.fhir.common)
   implementation(libs.androidx.appcompat)
@@ -101,6 +100,7 @@ dependencies {
   implementation(libs.glide)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.material)
 
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
