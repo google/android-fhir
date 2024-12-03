@@ -1,0 +1,46 @@
+{
+    "resourceType": "ActivityDefinition",
+    "id": "DailyAppleActivity",
+    "url": "http://fhir.org/guides/cqf/cpg/example/ActivityDefinition/DailyAppleActivity",
+    "name": "DailyAppleActivity",
+    "title": "Daily Apple Activity",
+    "status": "active",
+    "experimental": true,
+    "description": "Activity to provide an apple daily",
+    "kind": "MedicationRequest",
+    "profile": "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-medicationrequest",
+    "intent": "proposal",
+    "priority": "routine",
+    "productCodeableConcept": {
+        "coding": [
+            {
+                "system": "http://snomed.info/sct",
+                "code": "735215001",
+                "display": "Apple (substance)"
+            }        
+        ],
+        "text": "Apple"
+    },
+    "dosage": [
+        {
+            "timing": {
+                "repeat": {
+                    "frequency": 1,
+                    "period": 1,
+                    "periodUnit": "d"
+                }
+            },
+            "doseAndRate": [
+                {
+                    "doseQuantity": {
+                        "value": 1,
+                        "code": "{apple}"
+                    },
+                    "rateQuantity": {
+                        "value": 1
+                    }
+                }
+            ]
+        }
+    ]
+}

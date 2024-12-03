@@ -1,0 +1,26 @@
+{
+    "resourceType": "PlanDefinition",
+    "id": "DailyAppleRecommendation",
+    "url": "http://fhir.org/guides/cqf/cpg/example/PlanDefinition/DailyAppleRecommendation",
+    "name": "DailyAppleRecommendation",
+    "title": "Daily Apple Recommendation",
+    "description": "An apple a day keeps the doctor away",
+    "library": [
+        "http://fhir.org/guides/cqf/cpg/example/Library/DailyAppleLogic"
+    ],
+    "action": [
+        {
+            "textEquivalent": "An apple a day keeps the doctor away",
+            "condition": [
+                {
+                    "kind": "applicability",
+                    "expression": {
+                        "language": "text/cql-identifier",
+                        "expression": "No Daily Apple Order"
+                    }
+                }
+            ],
+            "definitionCanonical": "http://fhir.org/guides/cqf/cpg/example/ActivityDefinition/DailyAppleActivity"
+        }
+    ]
+}
