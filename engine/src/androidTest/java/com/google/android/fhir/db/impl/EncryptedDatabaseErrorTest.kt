@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,7 +66,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -84,7 +83,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -115,7 +113,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -139,7 +136,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -169,7 +165,6 @@ class EncryptedDatabaseErrorTest {
       // GIVEN an unencrypted database.
       DatabaseImpl(
           context,
-          parser,
           terser,
           DatabaseConfig(
             inMemory = false,
@@ -193,7 +188,6 @@ class EncryptedDatabaseErrorTest {
       // THEN it should recreate the database
       DatabaseImpl(
           context,
-          parser,
           terser,
           DatabaseConfig(
             inMemory = false,
@@ -226,7 +220,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an encrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -244,7 +237,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should recreate database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
