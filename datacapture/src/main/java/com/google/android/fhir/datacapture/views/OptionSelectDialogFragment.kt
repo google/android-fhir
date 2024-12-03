@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewModel
 import com.google.android.fhir.datacapture.views.factories.SelectedOptions
@@ -208,7 +209,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           } else {
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
-        compoundButton.text = item.option.displayString
+        compoundButton.text = item.option.displayString.toSpanned()
         compoundButton.setCompoundDrawablesRelative(
           item.option.item.itemAnswerOptionImage(compoundButton.context),
           null,

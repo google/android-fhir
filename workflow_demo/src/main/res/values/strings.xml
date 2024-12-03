@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">WorkflowDemo</string>
+    <string name="initialize">Initialize</string>
+    <string name="restart">Restart Flow</string>
+    <string name="start">Start</string>
+    <string name="patient_name">Mr. John Doe Sr.</string>
+</resources>

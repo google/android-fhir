@@ -65,12 +65,12 @@ dependencies {
 
   implementation(project(":datacapture"))
   implementation(Dependencies.playServicesLocation)
-  implementation(Dependencies.material)
   implementation(Dependencies.timber)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
   implementation(libs.androidx.fragment)
   implementation(libs.kotlinx.coroutines.playservices)
+  implementation(libs.material)
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
