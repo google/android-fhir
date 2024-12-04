@@ -14,6 +14,10 @@
         tools:layout="@layout/fragment_home"
     >
     <action
+            android:id="@+id/action_home_fragment_to_addPatientFragment"
+            app:destination="@id/addPatientFragment"
+        />
+    <action
             android:id="@+id/action_home_fragment_to_patient_list"
             app:destination="@id/patient_list"
         />
