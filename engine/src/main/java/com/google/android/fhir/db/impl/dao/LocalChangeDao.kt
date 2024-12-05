@@ -21,6 +21,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.util.FhirTerser
 import ca.uhn.fhir.util.ResourceReferenceInfo
@@ -50,8 +51,6 @@ import timber.log.Timber
  */
 @Dao
 internal abstract class LocalChangeDao {
-
-  lateinit var iParser: IParser
   lateinit var fhirTerser: FhirTerser
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -70,7 +69,7 @@ internal abstract class LocalChangeDao {
   open suspend fun addInsert(resource: Resource, resourceUuid: UUID, timeOfLocalChange: Instant) {
     val resourceId = resource.logicalId
     val resourceType = resource.resourceType
-    val resourceString = iParser.encodeResourceToString(resource)
+    val resourceString = FhirContext.forR4Cached().newJsonParser().encodeResourceToString(resource)
 
     val localChangeEntity =
       LocalChangeEntity(
@@ -128,6 +127,7 @@ internal abstract class LocalChangeDao {
         "Unexpected DELETE when updating $resourceType/$resourceId. UPDATE failed.",
       )
     }
+    val iParser = FhirContext.forR4Cached().newJsonParser()
     val oldResource = iParser.parseResource(oldEntity.serializedResource) as Resource
     val jsonDiff = diff(iParser, oldResource, updatedResource)
     if (jsonDiff.length() == 0) {
@@ -475,6 +475,7 @@ internal abstract class LocalChangeDao {
     oldReference: String,
     updatedReference: String,
   ): LocalChangeEntity {
+    val iParser = FhirContext.forR4Cached().newJsonParser()
     return when (localChange.type) {
       LocalChangeEntity.Type.INSERT -> {
         val insertResourcePayload = iParser.parseResource(localChange.payload) as Resource

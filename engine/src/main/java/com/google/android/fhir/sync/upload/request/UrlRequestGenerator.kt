@@ -17,7 +17,6 @@
 package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
@@ -57,8 +56,6 @@ internal class UrlRequestGenerator(
       }
 
   companion object Factory {
-
-    private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
     private val createMapping =
       mapOf(
@@ -107,21 +104,24 @@ internal class UrlRequestGenerator(
       UrlUploadRequest(
         httpVerb = HttpVerb.DELETE,
         url = "${patch.resourceType}/${patch.resourceId}",
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun postForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.POST,
         url = patch.resourceType,
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun putForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.PUT,
         url = "${patch.resourceType}/${patch.resourceId}",
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun patchForUpdateResource(patch: Patch) =
