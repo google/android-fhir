@@ -3533,7 +3533,7 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .comparingElementsUsing(SearchResultCorrespondence)
+      .comparingElementsUsing(SearchResultCorrespondenceUnorderedIncludeRevInclude)
       .displayingDiffsPairedBy { it.resource.logicalId }
       .containsExactly(
         SearchResult(
@@ -5238,6 +5238,18 @@ class DatabaseImplTest {
         )
         .formattingDiffsUsing(::formatDiff)
 
+    /**
+     * [Correspondence] to provide a custom [equalityCheck] for the [SearchResult]s whereby
+     * [SearchResult.included] and [SearchResult.revIncluded] may not be in the correct order
+     */
+    val SearchResultCorrespondenceUnorderedIncludeRevInclude:
+      Correspondence<SearchResult<Resource>, SearchResult<Resource>> =
+      Correspondence.from<SearchResult<Resource>, SearchResult<Resource>>(
+          ::equalityCheckUnordered,
+          "is shallow equals (by logical id comparison) to the ",
+        )
+        .formattingDiffsUsing(::formatDiff)
+
     private fun <R : Resource> equalityCheck(
       actual: SearchResult<R>,
       expected: SearchResult<R>,
@@ -5247,6 +5259,15 @@ class DatabaseImplTest {
         equalsShallow(actual.revIncluded, expected.revIncluded)
     }
 
+    private fun <R : Resource> equalityCheckUnordered(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): Boolean {
+      return equalsShallow(actual.resource, expected.resource) &&
+        equalsShallow(actual.included, expected.included, inOrder = false) &&
+        equalsShallow(actual.revIncluded, expected.revIncluded, inOrder = false)
+    }
+
     private fun equalsShallow(first: Resource, second: Resource) =
       first.resourceType == second.resourceType && first.logicalId == second.logicalId
 
@@ -5254,13 +5275,24 @@ class DatabaseImplTest {
       first.size == second.size &&
         first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
 
+    private fun equalsShallowUnordered(first: List<Resource>, second: List<Resource>) =
+      first.size == second.size &&
+        first.map { it.resourceType to it.logicalId }.toSet() ==
+          second.map { it.resourceType to it.logicalId }.toSet()
+
     private fun equalsShallow(
       first: Map<SearchParamName, List<Resource>>?,
       second: Map<SearchParamName, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              equalsShallowUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size
@@ -5270,10 +5302,16 @@ class DatabaseImplTest {
     private fun equalsShallow(
       first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
       second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              equalsShallowUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size
