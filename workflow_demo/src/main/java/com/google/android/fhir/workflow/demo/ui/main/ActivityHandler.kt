@@ -23,7 +23,7 @@ import com.google.android.fhir.workflow.activity.resource.request.CPGRequestReso
 import com.google.android.fhir.workflow.activity.resource.request.Status
 
 class ActivityHandler(
-  private val activityFlow: ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>,
+  val activityFlow: ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>,
 ) {
 
   suspend fun prepareAndInitiatePlan(): Result<Boolean> {
