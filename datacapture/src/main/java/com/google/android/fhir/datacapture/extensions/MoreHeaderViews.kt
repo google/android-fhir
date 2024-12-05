@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.extensions
 import android.content.Context
 import android.text.SpannableStringBuilder
 import android.text.Spanned
+import android.text.method.LinkMovementMethod
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Button
@@ -82,7 +83,10 @@ fun initHelpViews(
         }
       }
   }
-  helpTextView.updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+  helpTextView.apply {
+    updateTextAndVisibility(questionnaireItem.localizedHelpSpanned)
+    movementMethod = LinkMovementMethod.getInstance()
+  }
 }
 
 /**
