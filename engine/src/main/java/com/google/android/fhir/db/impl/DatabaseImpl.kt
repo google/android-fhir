@@ -22,7 +22,6 @@ import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
@@ -121,18 +120,9 @@ internal class DatabaseImpl(
         .build()
   }
 
-  private val resourceDao by lazy {
-    db.resourceDao().also {
-      it.iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-      it.resourceIndexer = resourceIndexer
-    }
-  }
+  private val resourceDao by lazy { db.resourceDao().also { it.resourceIndexer = resourceIndexer } }
 
-  private val localChangeDao =
-    db.localChangeDao().also {
-      it.iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
-      it.fhirTerser = fhirTerser
-    }
+  private val localChangeDao = db.localChangeDao().also { it.fhirTerser = fhirTerser }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
@@ -190,7 +180,7 @@ internal class DatabaseImpl(
     db.withTransaction {
       resourceDao.getResourceEntity(oldResourceId, resourceType)?.let { oldResourceEntity ->
         val updatedResource =
-          (FhirContext.forCached(FhirVersionEnum.R4)
+          (FhirContext.forR4Cached()
               .newJsonParser()
               .parseResource(oldResourceEntity.serializedResource) as Resource)
             .apply {
@@ -204,7 +194,7 @@ internal class DatabaseImpl(
 
   override suspend fun select(type: ResourceType, id: String): Resource {
     return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-      FhirContext.forCached(FhirVersionEnum.R4).newJsonParser().parseResource(it) as Resource
+      FhirContext.forR4Cached().newJsonParser().parseResource(it) as Resource
     }
       ?: throw ResourceNotFoundException(type.name, id)
   }
@@ -320,7 +310,7 @@ internal class DatabaseImpl(
     db.withTransaction {
       val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
       val oldResource =
-        FhirContext.forCached(FhirVersionEnum.R4)
+        FhirContext.forR4Cached()
           .newJsonParser()
           .parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
@@ -380,7 +370,7 @@ internal class DatabaseImpl(
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
     referringResourcesUuids.forEach { resourceUuid ->
       resourceDao.getResourceEntity(resourceUuid)?.let {
-        val iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+        val iParser = FhirContext.forR4Cached().newJsonParser()
         val referringResource = iParser.parseResource(it.serializedResource) as Resource
         val updatedReferringResource =
           addUpdatedReferenceToResource(

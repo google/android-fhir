@@ -118,7 +118,7 @@ class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private val parser = FhirContext.forR4Cached().newJsonParser()
   private lateinit var services: FhirServices
   private lateinit var database: Database
 

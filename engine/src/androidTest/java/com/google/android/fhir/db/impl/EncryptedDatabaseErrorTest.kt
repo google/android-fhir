@@ -22,7 +22,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
@@ -49,8 +48,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EncryptedDatabaseErrorTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val parser = FhirContext.forR4().newJsonParser()
-  private val terser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
+  private val terser = FhirTerser(FhirContext.forR4Cached())
   private val resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl())
 
   @After

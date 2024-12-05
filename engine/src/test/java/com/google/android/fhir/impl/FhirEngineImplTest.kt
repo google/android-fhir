@@ -18,7 +18,6 @@ package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
@@ -76,7 +75,7 @@ import org.robolectric.RobolectricTestRunner
 class FhirEngineImplTest {
   private val services = builder(ApplicationProvider.getApplicationContext()).inMemory().build()
   private val fhirEngine = services.fhirEngine
-  private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
+  private val parser = FhirContext.forR4Cached().newJsonParser()
 
   @Before fun setUp(): Unit = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
 

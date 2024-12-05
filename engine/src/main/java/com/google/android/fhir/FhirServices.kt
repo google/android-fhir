@@ -18,7 +18,6 @@ package com.google.android.fhir
 
 import android.content.Context
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.DatabaseConfig
@@ -72,7 +71,7 @@ internal data class FhirServices(
     }
 
     fun build(): FhirServices {
-      val terser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
+      val terser = FhirTerser(FhirContext.forR4Cached())
       val searchParamMap =
         searchParameters?.asMapOfResourceTypeToSearchParamDefinitions() ?: emptyMap()
       val provider = SearchParamDefinitionsProviderImpl(searchParamMap)

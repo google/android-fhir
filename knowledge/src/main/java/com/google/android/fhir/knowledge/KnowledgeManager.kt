@@ -19,7 +19,6 @@ package com.google.android.fhir.knowledge
 import android.content.Context
 import androidx.room.Room
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.knowledge.db.KnowledgeDatabase
 import com.google.android.fhir.knowledge.db.entities.ImplementationGuideEntity
 import com.google.android.fhir.knowledge.db.entities.ResourceMetadataEntity
@@ -295,8 +294,7 @@ internal constructor(
   private suspend fun readResourceOrNull(file: File): IBaseResource? =
     withContext(Dispatchers.IO) {
       try {
-        FileInputStream(file)
-          .use(FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()::parseResource)
+        FileInputStream(file).use(FhirContext.forR4Cached().newJsonParser()::parseResource)
       } catch (e: Exception) {
         Timber.e(e, "Unable to load resource from $file")
         null
