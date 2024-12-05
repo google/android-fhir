@@ -2632,7 +2632,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
+  fun search_filter_param_values_disjunction_covid_immunization_records(): Unit = runBlocking {
     val resources =
       listOf(
         Immunization().apply {
@@ -2717,8 +2717,6 @@ class DatabaseImplTest {
 
     assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
       .containsExactly("XM1NL1", "XM5DF6")
-
-    return@runBlocking
   }
 
   @Test
@@ -2797,97 +2795,96 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() = runBlocking {
-    val resources =
-      listOf(
-        Patient().apply {
-          id = "patient-01"
-          addName(
-            HumanName().apply {
-              addGiven("John")
-              family = "Doe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-02"
-          addName(
-            HumanName().apply {
-              addGiven("Jane")
-              family = "Doe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-03"
-          addName(
-            HumanName().apply {
-              addGiven("John")
-              family = "Roe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-04"
-          addName(
-            HumanName().apply {
-              addGiven("Jane")
-              family = "Roe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-05"
-          addName(
-            HumanName().apply {
-              addGiven("Rocky")
-              family = "Balboa"
-            },
-          )
-        },
-      )
-    database.insert(*resources.toTypedArray())
-
-    val result =
-      database.search<Patient>(
-        Search(ResourceType.Patient)
-          .apply {
-            filter(
-              Patient.GIVEN,
-              {
-                value = "John"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
+  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction(): Unit =
+    runBlocking {
+      val resources =
+        listOf(
+          Patient().apply {
+            id = "patient-01"
+            addName(
+              HumanName().apply {
+                addGiven("John")
+                family = "Doe"
               },
-              {
-                value = "Jane"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-              },
-              operation = Operation.OR,
             )
-
-            filter(
-              Patient.FAMILY,
-              {
-                value = "Doe"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
+          },
+          Patient().apply {
+            id = "patient-02"
+            addName(
+              HumanName().apply {
+                addGiven("Jane")
+                family = "Doe"
               },
-              {
-                value = "Roe"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-              },
-              operation = Operation.OR,
             )
+          },
+          Patient().apply {
+            id = "patient-03"
+            addName(
+              HumanName().apply {
+                addGiven("John")
+                family = "Roe"
+              },
+            )
+          },
+          Patient().apply {
+            id = "patient-04"
+            addName(
+              HumanName().apply {
+                addGiven("Jane")
+                family = "Roe"
+              },
+            )
+          },
+          Patient().apply {
+            id = "patient-05"
+            addName(
+              HumanName().apply {
+                addGiven("Rocky")
+                family = "Balboa"
+              },
+            )
+          },
+        )
+      database.insert(*resources.toTypedArray())
 
-            operation = Operation.AND
-          }
-          .getQuery(),
-      )
+      val result =
+        database.search<Patient>(
+          Search(ResourceType.Patient)
+            .apply {
+              filter(
+                Patient.GIVEN,
+                {
+                  value = "John"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                {
+                  value = "Jane"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                operation = Operation.OR,
+              )
 
-    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
-      .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
+              filter(
+                Patient.FAMILY,
+                {
+                  value = "Doe"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                {
+                  value = "Roe"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                operation = Operation.OR,
+              )
 
-    return@runBlocking
-  }
+              operation = Operation.AND
+            }
+            .getQuery(),
+        )
+
+      assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
+        .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
+    }
 
   @Test
   fun search_patient_with_extension_as_search_param() = runBlocking {
@@ -3138,8 +3135,6 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-
-    return@runBlocking
   }
 
   @Test
@@ -3232,8 +3227,6 @@ class DatabaseImplTest {
             mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
         ),
       )
-
-    return@runBlocking
   }
 
   @Test
@@ -3537,7 +3530,7 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .comparingElementsUsing(SearchResultCorrespondence)
+      .comparingElementsUsing(SearchResultCorrespondenceUnorderedIncludeRevInclude)
       .displayingDiffsPairedBy { it.resource.logicalId }
       .containsExactly(
         SearchResult(
@@ -3579,8 +3572,6 @@ class DatabaseImplTest {
           ),
         ),
       )
-
-    return@runBlocking
   }
 
   @Test
@@ -3699,128 +3690,124 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-
-    return@runBlocking
   }
 
   @Test
-  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients() =
-    runBlocking {
-      val person1 =
-        Person().apply {
-          id = "person-1"
-          addName(
-            HumanName().apply {
-              family = "Person"
-              addGiven("First")
-            },
-          )
-          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
-          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
-        }
-
-      val person2 =
-        Person().apply {
-          id = "person-2"
-          addName(
-            HumanName().apply {
-              family = "Person"
-              addGiven("Second")
-            },
-          )
-          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
-          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
-        }
-
-      val person3 =
-        Person().apply {
-          id = "person-3"
-          addName(
-            HumanName().apply {
-              family = "Person"
-              addGiven("Third")
-            },
-          )
-          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
-          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
-        }
-
-      val patient01 =
-        Patient().apply {
-          id = "pa-01"
-          addName(
-            HumanName().apply {
-              addGiven("James")
-              family = "Gorden"
-            },
-          )
-        }
-
-      val patient02 =
-        Patient().apply {
-          id = "pa-02"
-          addName(
-            HumanName().apply {
-              addGiven("James")
-              family = "Bond"
-            },
-          )
-        }
-
-      val patient03 =
-        Patient().apply {
-          id = "pa-03"
-          addName(
-            HumanName().apply {
-              addGiven("Jamie")
-              family = "Bond"
-            },
-          )
-        }
-
-      database.insert(person1, person2, person3, patient01, patient02, patient03)
-
-      val result =
-        Search(ResourceType.Patient)
-          .apply {
-            filter(
-              Patient.GIVEN,
-              {
-                value = "Jam"
-                modifier = StringFilterModifier.STARTS_WITH
-              },
-            )
-
-            revInclude(ResourceType.Person, Person.LINK) { sort(Person.NAME, Order.ASCENDING) }
-          }
-          .execute<Patient>(database)
-
-      assertThat(result)
-        .comparingElementsUsing(SearchResultCorrespondence)
-        .displayingDiffsPairedBy { it.resource.logicalId }
-        .containsExactly(
-          SearchResult(
-            patient01,
-            included = null,
-            revIncluded =
-              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person3)),
-          ),
-          SearchResult(
-            patient02,
-            included = null,
-            revIncluded =
-              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person2)),
-          ),
-          SearchResult(
-            patient03,
-            included = null,
-            revIncluded =
-              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
-          ),
+  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients():
+    Unit = runBlocking {
+    val person1 =
+      Person().apply {
+        id = "person-1"
+        addName(
+          HumanName().apply {
+            family = "Person"
+            addGiven("First")
+          },
         )
+        addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+        addLink(PersonLinkComponent(Reference("Patient/pa-02")))
+      }
 
-      return@runBlocking
-    }
+    val person2 =
+      Person().apply {
+        id = "person-2"
+        addName(
+          HumanName().apply {
+            family = "Person"
+            addGiven("Second")
+          },
+        )
+        addLink(PersonLinkComponent(Reference("Patient/pa-02")))
+        addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+      }
+
+    val person3 =
+      Person().apply {
+        id = "person-3"
+        addName(
+          HumanName().apply {
+            family = "Person"
+            addGiven("Third")
+          },
+        )
+        addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+        addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+      }
+
+    val patient01 =
+      Patient().apply {
+        id = "pa-01"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Gorden"
+          },
+        )
+      }
+
+    val patient02 =
+      Patient().apply {
+        id = "pa-02"
+        addName(
+          HumanName().apply {
+            addGiven("James")
+            family = "Bond"
+          },
+        )
+      }
+
+    val patient03 =
+      Patient().apply {
+        id = "pa-03"
+        addName(
+          HumanName().apply {
+            addGiven("Jamie")
+            family = "Bond"
+          },
+        )
+      }
+
+    database.insert(person1, person2, person3, patient01, patient02, patient03)
+
+    val result =
+      Search(ResourceType.Patient)
+        .apply {
+          filter(
+            Patient.GIVEN,
+            {
+              value = "Jam"
+              modifier = StringFilterModifier.STARTS_WITH
+            },
+          )
+
+          revInclude(ResourceType.Person, Person.LINK) { sort(Person.NAME, Order.ASCENDING) }
+        }
+        .execute<Patient>(database)
+
+    assertThat(result)
+      .comparingElementsUsing(SearchResultCorrespondence)
+      .displayingDiffsPairedBy { it.resource.logicalId }
+      .containsExactly(
+        SearchResult(
+          patient01,
+          included = null,
+          revIncluded =
+            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person3)),
+        ),
+        SearchResult(
+          patient02,
+          included = null,
+          revIncluded =
+            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person2)),
+        ),
+        SearchResult(
+          patient03,
+          included = null,
+          revIncluded =
+            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
+        ),
+      )
+  }
 
   @Test
   fun search_patient_and_revInclude_encounters_sorted_by_date_descending(): Unit = runBlocking {
@@ -5245,6 +5232,18 @@ class DatabaseImplTest {
         )
         .formattingDiffsUsing(::formatDiff)
 
+    /**
+     * [Correspondence] to provide a custom [equalityCheck] for the [SearchResult]s whereby
+     * [SearchResult.included] and [SearchResult.revIncluded] may not be in the correct order
+     */
+    val SearchResultCorrespondenceUnorderedIncludeRevInclude:
+      Correspondence<SearchResult<Resource>, SearchResult<Resource>> =
+      Correspondence.from<SearchResult<Resource>, SearchResult<Resource>>(
+          ::equalityCheckUnordered,
+          "is shallow equals (by logical id comparison) to the ",
+        )
+        .formattingDiffsUsing(::formatDiff)
+
     private fun <R : Resource> equalityCheck(
       actual: SearchResult<R>,
       expected: SearchResult<R>,
@@ -5254,6 +5253,15 @@ class DatabaseImplTest {
         equalsShallow(actual.revIncluded, expected.revIncluded)
     }
 
+    private fun <R : Resource> equalityCheckUnordered(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): Boolean {
+      return equalsShallow(actual.resource, expected.resource) &&
+        equalsShallow(actual.included, expected.included, inOrder = false) &&
+        equalsShallow(actual.revIncluded, expected.revIncluded, inOrder = false)
+    }
+
     private fun equalsShallow(first: Resource, second: Resource) =
       first.resourceType == second.resourceType && first.logicalId == second.logicalId
 
@@ -5261,13 +5269,24 @@ class DatabaseImplTest {
       first.size == second.size &&
         first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
 
+    private fun equalsShallowUnordered(first: List<Resource>, second: List<Resource>) =
+      first.size == second.size &&
+        first.map { it.resourceType to it.logicalId }.toSet() ==
+          second.map { it.resourceType to it.logicalId }.toSet()
+
     private fun equalsShallow(
       first: Map<SearchParamName, List<Resource>>?,
       second: Map<SearchParamName, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              equalsShallowUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size
@@ -5277,10 +5296,16 @@ class DatabaseImplTest {
     private fun equalsShallow(
       first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
       second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              equalsShallowUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size
