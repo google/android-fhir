@@ -304,8 +304,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   private val modifiedQuestionnaireResponseItemSet =
     mutableSetOf<QuestionnaireResponseItemComponent>()
 
-  private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
-
   /**
    * True if the user has tapped the next/previous pagination buttons on the current page. This is
    * needed to avoid spewing validation errors before any questions are answered.
@@ -598,31 +596,39 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private val _questionnaireStateFlow: Flow<QuestionnaireState> =
-    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
+    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) {
+        modCount,
+        pageIndex,
+        inReview,
+        ->
+        println(Triple(modCount, pageIndex, inReview))
         getQuestionnaireState()
       }
+      .flowOn(questionnaireViewModelCoroutineContext)
+
+  /** [QuestionnaireState] to be displayed in the UI. */
+  internal val questionnaireStateStateFlow: StateFlow<QuestionnaireState> =
+    _questionnaireStateFlow
       .withIndex()
       .onEach {
         if (it.index == 0) {
+          println("how many times called")
           initializeCalculatedExpressions()
           modificationCount.update { count -> count + 1 }
         }
       }
-      .map { it.value }
       .flowOn(questionnaireViewModelCoroutineContext)
-
-  /** [QuestionnaireState] to be displayed in the UI. */
-  internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
-    _questionnaireStateFlow.stateIn(
-      viewModelScope,
-      SharingStarted.Lazily,
-      initialValue =
-        QuestionnaireState(
-          items = emptyList(),
-          displayMode = DisplayMode.InitMode,
-          bottomNavItem = null,
-        ),
-    )
+      .map { it.value }
+      .stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        initialValue =
+          QuestionnaireState(
+            items = emptyList(),
+            displayMode = DisplayMode.InitMode,
+            bottomNavItem = null,
+          ),
+      )
 
   /** Travers all [calculatedExpression] within a [Questionnaire] and evaluate them. */
   private suspend fun initializeCalculatedExpressions() {
@@ -722,8 +728,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
-   * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
-   * item.
+   * [questionnaireStateStateFlow] with matching pairs of questionnaire item and questionnaire
+   * response item.
    *
    * The traverse is carried out in the two lists in tandem.
    */
@@ -1043,7 +1049,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
         }
     }
-    currentPageItems = items
     return items
   }
 
@@ -1130,16 +1135,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
-    val checkAllValid = {
-      if (
-        currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-          it.item.validationResult is Valid
+    val checkPageItemsAllValid: (List<QuestionnaireAdapterItem>) -> Unit =
+      { questionnairePageItems ->
+        if (
+          questionnairePageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
+            it.item.validationResult is Valid
+          }
+        ) {
+          block()
         }
-      ) {
-        block()
       }
-    }
 
+    val currentPageItems = questionnaireStateStateFlow.value.items
     if (
       currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
         it.item.validationResult is NotValidated
@@ -1155,12 +1162,12 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       viewModelScope.launch {
         _questionnaireStateFlow.take(1).collectLatest {
           forceValidation = false
-          checkAllValid()
+          checkPageItemsAllValid(it.items)
         }
       }
+    } else {
+      checkPageItemsAllValid(currentPageItems)
     }
-
-    checkAllValid()
   }
 }
 
