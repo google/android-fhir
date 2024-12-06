@@ -42,6 +42,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.parser.IParser
 import com.google.android.fhir.datacapture.QuestionnaireFragment
+import com.google.android.fhir.datacapture.questionnaireViewModelCoroutineContext
 import com.google.android.fhir.datacapture.test.utilities.clickIcon
 import com.google.android.fhir.datacapture.test.utilities.clickOnText
 import com.google.android.fhir.datacapture.validation.Invalid
@@ -58,6 +59,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Calendar
 import java.util.Date
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers
 import org.hl7.fhir.r4.model.DateTimeType
@@ -68,10 +70,18 @@ import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.TestRule
+import org.junit.runner.Description
 import org.junit.runner.RunWith
+import org.junit.runners.model.Statement
 
 @RunWith(AndroidJUnit4::class)
 class QuestionnaireUiEspressoTest {
+
+  @Rule
+  @JvmField
+  var questionnaireViewModelCoroutineContextIdlerRule =
+    QuestionnaireViewModelCoroutineContextIdlerRule()
 
   @Rule
   @JvmField
@@ -744,4 +754,20 @@ class QuestionnaireUiEspressoTest {
     }
     return testQuestionnaireFragment!!.getQuestionnaireResponse()
   }
+}
+
+class QuestionnaireViewModelCoroutineContextIdlerRule : TestRule {
+  override fun apply(base: Statement?, description: Description?): Statement =
+    object : Statement() {
+      override fun evaluate() {
+        val espressoTrackedDispatcherDefault = EspressoTrackedDispatcher(Dispatchers.Default)
+        questionnaireViewModelCoroutineContext = espressoTrackedDispatcherDefault
+        try {
+          base?.evaluate()
+        } finally {
+          espressoTrackedDispatcherDefault.cleanUp()
+          questionnaireViewModelCoroutineContext = Dispatchers.Default
+        }
+      }
+    }
 }

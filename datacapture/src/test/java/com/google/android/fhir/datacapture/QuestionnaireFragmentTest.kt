@@ -239,17 +239,21 @@ class QuestionnaireFragmentTest {
   ]
 }
 """
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    view.findViewById<Button>(R.id.pagination_next_button).performClick()
-    assertThat(view.findViewById<Button>(R.id.pagination_next_button).visibility)
-      .isEqualTo(View.GONE)
+    runTest {
+      questionnaireViewModelCoroutineContext = testScheduler
+
+      val scenario =
+        launchFragment<QuestionnaireFragment>(
+          bundleOf(
+            EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          ),
+        )
+      scenario.moveToState(Lifecycle.State.RESUMED)
+      val view = scenario.withFragment { requireView() }
+      view.findViewById<Button>(R.id.pagination_next_button).performClick()
+      assertThat(view.findViewById<Button>(R.id.pagination_next_button).visibility)
+        .isEqualTo(View.GONE)
+    }
   }
 
   @Test
@@ -313,16 +317,20 @@ class QuestionnaireFragmentTest {
   ]
 }
 """
-    val scenario =
-      launchFragment<QuestionnaireFragment>(
-        bundleOf(
-          EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
-        ),
-      )
-    scenario.moveToState(Lifecycle.State.RESUMED)
-    val view = scenario.withFragment { requireView() }
-    assertThat(view.findViewById<Button>(R.id.pagination_previous_button).visibility)
-      .isEqualTo(View.GONE)
+    runTest {
+      questionnaireViewModelCoroutineContext = testScheduler
+
+      val scenario =
+        launchFragment<QuestionnaireFragment>(
+          bundleOf(
+            EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJson,
+          ),
+        )
+      scenario.moveToState(Lifecycle.State.RESUMED)
+      val view = scenario.withFragment { requireView() }
+      assertThat(view.findViewById<Button>(R.id.pagination_previous_button).visibility)
+        .isEqualTo(View.GONE)
+    }
   }
 
   @Test
