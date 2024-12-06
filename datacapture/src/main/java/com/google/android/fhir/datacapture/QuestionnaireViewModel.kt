@@ -596,12 +596,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
 
   private val _questionnaireStateFlow: Flow<QuestionnaireState> =
-    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) {
-        modCount,
-        pageIndex,
-        inReview,
+    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _,
         ->
-        println(Triple(modCount, pageIndex, inReview))
         getQuestionnaireState()
       }
       .flowOn(questionnaireViewModelCoroutineContext)
@@ -612,7 +608,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .withIndex()
       .onEach {
         if (it.index == 0) {
-          println("how many times called")
           initializeCalculatedExpressions()
           modificationCount.update { count -> count + 1 }
         }
