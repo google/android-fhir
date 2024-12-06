@@ -251,19 +251,22 @@ object ResourceMapper {
     questionnaireItem.initialExpression
       ?.let {
         evaluateToBase(
-            questionnaireResponse = null,
-            questionnaireResponseItem = null,
-            expression = it.expression,
-            contextMap = launchContexts,
-          )
-          .firstOrNull()
+          questionnaireResponse = null,
+          questionnaireResponseItem = null,
+          expression = it.expression,
+          contextMap = launchContexts,
+        )
       }
       ?.let {
         // Set initial value for the questionnaire item. Questionnaire items should not have both
         // initial value and initial expression.
-        val value = it.asExpectedType(questionnaireItem.type)
-        questionnaireItem.initial =
-          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
+        if (it.isNotEmpty()) {
+          questionnaireItem.initial =
+            it.map {
+              val value = it.asExpectedType(questionnaireItem.type)
+              Questionnaire.QuestionnaireItemInitialComponent().setValue(value)
+            }
+        }
       }
 
     populateInitialValues(questionnaireItem.item, launchContexts)
