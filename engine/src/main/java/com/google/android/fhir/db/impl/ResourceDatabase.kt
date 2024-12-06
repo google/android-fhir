@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 9,
+  version = 10,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -219,6 +219,35 @@ internal val Migration_8_9 =
         )
         database.execSQL(
           "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
+        )
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
+      }
+    }
+  }
+
+internal val Migration_9_10 =
+  object : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.beginTransaction()
+      try {
+        database.execSQL("DROP INDEX IF EXISTS `index_DateIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_DateTimeIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_NumberIndexEntity_resourceUuid`;")
+        database.execSQL("DROP INDEX IF EXISTS `index_StringIndexEntity_resourceUuid`;")
+
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name` ON `DateIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name` ON `DateTimeIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name` ON `NumberIndexEntity` (`resourceUuid`, `index_name`);",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name` ON `StringIndexEntity` (`resourceUuid`, `index_name`);",
         )
         database.setTransactionSuccessful()
       } finally {
