@@ -1955,12 +1955,14 @@ class ResourceMapperTest {
                 listOf(
                   Questionnaire.QuestionnaireItemAnswerOptionComponent(
                     Coding().apply {
+                      system = AdministrativeGender.MALE.system
                       code = AdministrativeGender.MALE.toCode()
                       display = AdministrativeGender.MALE.display
                     },
                   ),
                   Questionnaire.QuestionnaireItemAnswerOptionComponent(
                     Coding().apply {
+                      system = AdministrativeGender.FEMALE.system
                       code = AdministrativeGender.FEMALE.toCode()
                       display = AdministrativeGender.FEMALE.display
                     },
@@ -2011,12 +2013,14 @@ class ResourceMapperTest {
                   Coding().apply {
                     code = AdministrativeGender.MALE.toCode()
                     display = AdministrativeGender.MALE.display
+                    system = AdministrativeGender.MALE.system
                   },
                 ),
                 Questionnaire.QuestionnaireItemAnswerOptionComponent(
                   Coding().apply {
                     code = AdministrativeGender.FEMALE.toCode()
                     display = AdministrativeGender.FEMALE.display
+                    system = AdministrativeGender.MALE.system
                   },
                 ),
               )

@@ -19,6 +19,7 @@ package com.google.android.fhir.datacapture.mapping
 import com.google.android.fhir.datacapture.extensions.createQuestionnaireResponseItem
 import com.google.android.fhir.datacapture.extensions.filterByCodeInNameExtension
 import com.google.android.fhir.datacapture.extensions.initialExpression
+import com.google.android.fhir.datacapture.extensions.initialSelected
 import com.google.android.fhir.datacapture.extensions.logicalId
 import com.google.android.fhir.datacapture.extensions.questionnaireLaunchContexts
 import com.google.android.fhir.datacapture.extensions.targetStructureMap
@@ -248,22 +249,51 @@ object ResourceMapper {
       "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
     }
 
+    // Initial values can't be specified for groups or display items
+    if (questionnaireItem.initial.isNotEmpty() || questionnaireItem.initialExpression != null) {
+      check(
+        questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
+          questionnaireItem.type != Questionnaire.QuestionnaireItemType.DISPLAY,
+      ) {
+        "QuestionnaireItem item is not allowed to have initial value or initial expression for groups or display items."
+      }
+    }
+
     questionnaireItem.initialExpression
       ?.let {
         evaluateToBase(
-            questionnaireResponse = null,
-            questionnaireResponseItem = null,
-            expression = it.expression,
-            contextMap = launchContexts,
-          )
-          .firstOrNull()
+          questionnaireResponse = null,
+          questionnaireResponseItem = null,
+          expression = it.expression,
+          contextMap = launchContexts,
+        )
       }
       ?.let {
-        // Set initial value for the questionnaire item. Questionnaire items should not have both
-        // initial value and initial expression.
-        val value = it.asExpectedType(questionnaireItem.type)
-        questionnaireItem.initial =
-          mutableListOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
+        // Set initial value for the questionnaire item.
+        if (it.isEmpty()) return@let
+
+        val evaluatedExpressionResult = it.map { it.asExpectedType(questionnaireItem.type) }
+
+        if (questionnaireItem.answerOption.isNotEmpty()) {
+          questionnaireItem.answerOption.forEach { answerOption ->
+            answerOption.initialSelected =
+              evaluatedExpressionResult.any { answerOption.value.equalsDeep(it) }
+          }
+        } else {
+          // Handle initial values based on whether the questionnaire item repeats
+          questionnaireItem.initial =
+            if (questionnaireItem.repeats) {
+              evaluatedExpressionResult.map {
+                Questionnaire.QuestionnaireItemInitialComponent()
+                  .setValue(
+                    it,
+                  )
+              }
+            } else {
+              val value = evaluatedExpressionResult.first()
+              listOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
+            }
+        }
       }
 
     populateInitialValues(questionnaireItem.item, launchContexts)
