@@ -268,9 +268,11 @@ object ResourceMapper {
           contextMap = launchContexts,
         )
       }
-      ?.let { evaluatedExpressionResult ->
+      ?.let {
         // Set initial value for the questionnaire item.
-        if (evaluatedExpressionResult.isEmpty()) return@let
+        if (it.isEmpty()) return@let
+
+        val evaluatedExpressionResult = it.map { it.asExpectedType(questionnaireItem.type) }
 
         if (questionnaireItem.answerOption.isNotEmpty()) {
           questionnaireItem.answerOption.forEach { answerOption ->
@@ -284,11 +286,11 @@ object ResourceMapper {
               evaluatedExpressionResult.map {
                 Questionnaire.QuestionnaireItemInitialComponent()
                   .setValue(
-                    it.asExpectedType(questionnaireItem.type),
+                    it,
                   )
               }
             } else {
-              val value = evaluatedExpressionResult.first().asExpectedType(questionnaireItem.type)
+              val value = evaluatedExpressionResult.first()
               listOf(Questionnaire.QuestionnaireItemInitialComponent().setValue(value))
             }
         }
