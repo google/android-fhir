@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import ca.uhn.fhir.rest.gclient.StringClientParam
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.StringFilterModifier
@@ -29,6 +30,8 @@ import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -39,9 +42,11 @@ import org.hl7.fhir.r4.model.RiskAssessment
  */
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
-
+  val searchParameters: StateFlow<List<SearchParameter>> =
+    MutableStateFlow(SearchParameter.values().toList())
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
+  private var searchParameterLabel: String = ""
 
   init {
     updatePatientListAndPatientCount({ getSearchResults() }, { count() })
@@ -174,6 +179,57 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       throw IllegalArgumentException("Unknown ViewModel class")
     }
   }
+
+  fun setSearchParameter(label: String) {
+    searchParameterLabel = label
+  }
+
+  fun searchPatientsByParameter(value: String) {
+    viewModelScope.launch {
+      liveSearchedPatients.value = searchPatients(value)
+      patientCount.value = count()
+    }
+  }
+
+  private suspend fun searchPatients(value: String): List<PatientItem> {
+    val searchParam: StringClientParam? = getStringClientParamByLabel(searchParameterLabel)
+    val patients =
+      fhirEngine
+        .search<Patient> {
+          searchParam?.let {
+            filter(
+              it,
+              {
+                modifier = StringFilterModifier.CONTAINS
+                this.value = value
+              },
+            )
+          }
+          sort(Patient.GIVEN, Order.ASCENDING)
+          count = 100
+          from = 0
+        }
+        .mapIndexed { index, fhirPatient -> fhirPatient.resource.toPatientItem(index + 1) }
+        .toMutableList()
+
+    val risks = getRiskAssessments()
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
+        patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+      }
+    }
+    return patients
+  }
+
+  private fun getStringClientParamByLabel(filterLabel: String): StringClientParam? {
+    return when (filterLabel) {
+      SearchParameter.GIVEN.label -> Patient.GIVEN
+      SearchParameter.FAMILY.label -> Patient.FAMILY
+      SearchParameter.NAME.label -> Patient.NAME
+      SearchParameter.ADDRESS.label -> Patient.ADDRESS
+      else -> null
+    }
+  }
 }
 
 internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientItem {
@@ -205,4 +261,11 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
     isActive = isActive,
     html = html,
   )
+}
+
+enum class SearchParameter(val label: String) {
+  GIVEN("Given Name"),
+  FAMILY("Family Name"),
+  NAME("Name"),
+  ADDRESS("Address"),
 }
