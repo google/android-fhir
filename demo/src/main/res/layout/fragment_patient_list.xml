@@ -13,6 +13,20 @@
         android:focusableInTouchMode="true"
         android:orientation="vertical"
     >
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Questionnaire.DropdownLayoutStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="20dp"
+        >
+            <AutoCompleteTextView
+                android:id="@+id/search_parameter_dropdown"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Select Search Parameter"
+            />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search"
