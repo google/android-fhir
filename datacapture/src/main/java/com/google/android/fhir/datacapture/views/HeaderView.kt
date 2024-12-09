@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -55,13 +56,17 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(
-      appendAsteriskToQuestionText(question.context, questionnaireViewItem),
-    )
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    question.apply {
+      // CQF expression takes precedence over static question text
+      updateTextAndVisibility(appendAsteriskToQuestionText(question.context, questionnaireViewItem))
+      movementMethod = LinkMovementMethod.getInstance()
+    }
+    hint.apply {
+      updateTextAndVisibility(
+        questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
+      )
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)
