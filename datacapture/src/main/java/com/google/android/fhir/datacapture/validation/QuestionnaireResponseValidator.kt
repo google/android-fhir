@@ -151,10 +151,12 @@ object QuestionnaireResponseValidator {
     questionnaireResponseItemValidator: QuestionnaireResponseItemValidator,
     linkIdToValidationResultMap: MutableMap<String, MutableList<ValidationResult>>,
   ): Map<String, List<ValidationResult>> {
-    when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
-      Questionnaire.QuestionnaireItemType.DISPLAY,
-      Questionnaire.QuestionnaireItemType.NULL, -> Unit
-      Questionnaire.QuestionnaireItemType.GROUP ->
+    checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
+    when {
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY ||
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.NULL -> Unit
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        !questionnaireItem.repeats ->
         // Nested items under group
         // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
         validateQuestionnaireResponseItems(
@@ -262,10 +264,13 @@ object QuestionnaireResponseValidator {
     questionnaireItem: Questionnaire.QuestionnaireItemComponent,
     questionnaireResponseItem: QuestionnaireResponse.QuestionnaireResponseItemComponent,
   ) {
-    when (checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }) {
-      Questionnaire.QuestionnaireItemType.DISPLAY,
-      Questionnaire.QuestionnaireItemType.NULL, -> Unit
-      Questionnaire.QuestionnaireItemType.GROUP ->
+    checkNotNull(questionnaireItem.type) { "Questionnaire item must have type" }
+
+    when {
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY ||
+        questionnaireItem.type == Questionnaire.QuestionnaireItemType.NULL -> Unit
+      questionnaireItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        !questionnaireItem.repeats ->
         // Nested items under group
         // http://www.hl7.org/fhir/questionnaireresponse-definitions.html#QuestionnaireResponse.item.item
         checkQuestionnaireResponseItems(questionnaireItem.item, questionnaireResponseItem.item)
