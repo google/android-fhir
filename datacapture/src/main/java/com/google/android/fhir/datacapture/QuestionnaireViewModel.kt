@@ -66,13 +66,19 @@ import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.QuestionTextConfiguration
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import java.util.Date
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
@@ -84,6 +90,8 @@ import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemAnsw
 import org.hl7.fhir.r4.model.QuestionnaireResponse.QuestionnaireResponseItemComponent
 import org.hl7.fhir.r4.model.Resource
 import timber.log.Timber
+
+internal var questionnaireViewModelCoroutineContext: CoroutineContext = Dispatchers.Default
 
 internal class QuestionnaireViewModel(application: Application, state: SavedStateHandle) :
   AndroidViewModel(application) {
@@ -295,8 +303,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    */
   private val modifiedQuestionnaireResponseItemSet =
     mutableSetOf<QuestionnaireResponseItemComponent>()
-
-  private lateinit var currentPageItems: List<QuestionnaireAdapterItem>
 
   /**
    * True if the user has tapped the next/previous pagination buttons on the current page. This is
@@ -589,11 +595,16 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     this.shouldShowCancelButton = showCancelButton
   }
 
-  /** [QuestionnaireState] to be displayed in the UI. */
-  internal val questionnaireStateFlow: StateFlow<QuestionnaireState> =
-    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _ ->
+  private val _questionnaireStateFlow: Flow<QuestionnaireState> =
+    combine(modificationCount, currentPageIndexFlow, isInReviewModeFlow) { _, _, _,
+        ->
         getQuestionnaireState()
       }
+      .flowOn(questionnaireViewModelCoroutineContext)
+
+  /** [QuestionnaireState] to be displayed in the UI. */
+  internal val questionnaireStateStateFlow: StateFlow<QuestionnaireState> =
+    _questionnaireStateFlow
       .withIndex()
       .onEach {
         if (it.index == 0) {
@@ -601,6 +612,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           modificationCount.update { count -> count + 1 }
         }
       }
+      .flowOn(questionnaireViewModelCoroutineContext)
       .map { it.value }
       .stateIn(
         viewModelScope,
@@ -711,8 +723,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   /**
    * Traverses through the list of questionnaire items, the list of questionnaire response items and
    * the list of items in the questionnaire response answer list and populates
-   * [questionnaireStateFlow] with matching pairs of questionnaire item and questionnaire response
-   * item.
+   * [questionnaireStateStateFlow] with matching pairs of questionnaire item and questionnaire
+   * response item.
    *
    * The traverse is carried out in the two lists in tandem.
    */
@@ -1032,7 +1044,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           )
         }
     }
-    currentPageItems = items
     return items
   }
 
@@ -1119,6 +1130,18 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
    * are all [Valid].
    */
   private fun validateCurrentPageItems(block: () -> Unit) {
+    val checkPageItemsAllValid: (List<QuestionnaireAdapterItem>) -> Unit =
+      { questionnairePageItems ->
+        if (
+          questionnairePageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
+            it.item.validationResult is Valid
+          }
+        ) {
+          block()
+        }
+      }
+
+    val currentPageItems = questionnaireStateStateFlow.value.items
     if (
       currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
         it.item.validationResult is NotValidated
@@ -1130,15 +1153,15 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
-      forceValidation = false
-    }
 
-    if (
-      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-        it.item.validationResult is Valid
+      viewModelScope.launch {
+        _questionnaireStateFlow.take(1).collectLatest {
+          forceValidation = false
+          checkPageItemsAllValid(it.items)
+        }
       }
-    ) {
-      block()
+    } else {
+      checkPageItemsAllValid(currentPageItems)
     }
   }
 }
