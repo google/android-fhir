@@ -42,7 +42,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   fun readPatientById(patientLogicalId: String) {
     viewModelScope.launch {
       val patient = fhirEngine.get(ResourceType.Patient, patientLogicalId) as Patient
-      _patientUiState.emit(patient.toPatientUiState())
+      _patientUiState.emit(patient.toPatientUiState(OperationType.READ))
     }
   }
 
@@ -65,7 +65,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
           isActive = isActive,
         )
       fhirEngine.create(patient).firstOrNull()?.let {
-        _patientUiState.emit(patient.toPatientUiState())
+        _patientUiState.emit(patient.toPatientUiState(OperationType.CREATE))
       }
     }
   }
@@ -89,14 +89,14 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
           isActive = isActive,
         )
       fhirEngine.update(patient)
-      _patientUiState.emit(patient.toPatientUiState())
+      _patientUiState.emit(patient.toPatientUiState(OperationType.UPDATE))
     }
   }
 
   fun deletePatient(patientLogicalId: String) {
     viewModelScope.launch {
       fhirEngine.delete<Patient>(patientLogicalId)
-      _patientUiState.emit(Patient().toPatientUiState())
+      _patientUiState.emit(Patient().toPatientUiState(OperationType.DELETE))
     }
   }
 }
@@ -108,10 +108,10 @@ data class PatientUiState(
   val birthDate: String? = null,
   val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
   val isActive: Boolean = true,
-  val isReadOperation: Boolean = false,
+  val operationType: OperationType,
 )
 
-fun Patient.toPatientUiState(): PatientUiState {
+fun Patient.toPatientUiState(operationType: OperationType): PatientUiState {
   val patientId = this.logicalId
   val firstName = this.name?.firstOrNull()?.given?.firstOrNull()?.value ?: ""
   val lastName = this.name?.firstOrNull()?.family
@@ -130,5 +130,13 @@ fun Patient.toPatientUiState(): PatientUiState {
     birthDate,
     gender = gender,
     isActive = isActive,
+    operationType = operationType,
   )
+}
+
+enum class OperationType {
+  CREATE,
+  READ,
+  UPDATE,
+  DELETE,
 }
