@@ -418,6 +418,8 @@ class ResourceDatabaseMigrationTest {
     assertThat(retrievedTask).isEqualTo(bedNetTask)
   }
 
+  @Test fun migrate9To10_should_execute_with_no_exception(): Unit = runBlocking { TODO() }
+
   companion object {
     const val DB_NAME = "migration_tests.db"
   }
