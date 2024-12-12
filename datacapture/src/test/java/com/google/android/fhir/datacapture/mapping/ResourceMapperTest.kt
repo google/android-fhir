@@ -42,6 +42,7 @@ import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.Base
 import org.hl7.fhir.r4.model.BooleanType
 import org.hl7.fhir.r4.model.CodeType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.ContactPoint
 import org.hl7.fhir.r4.model.DateType
@@ -2976,6 +2977,160 @@ class ResourceMapperTest {
         "QuestionnaireItem item is not allowed to have both initial.value and initial expression. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression.",
       )
   }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem of group or display item has a initial value`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender-group-initial-expression"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%father.gender"
+                  },
+                ),
+              )
+            item =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "patient-gender-display-initial"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  initial =
+                    listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+                },
+              )
+          },
+        )
+        .addItem(
+          Questionnaire.QuestionnaireItemComponent().apply {
+            linkId = "patient-gender-group-initial"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
+            item =
+              mutableListOf(
+                Questionnaire.QuestionnaireItemComponent().apply {
+                  linkId = "patient-gender-display-initial-expression"
+                  type = Questionnaire.QuestionnaireItemType.DISPLAY
+                  extension =
+                    listOf(
+                      Extension(
+                        ITEM_INITIAL_EXPRESSION_URL,
+                        Expression().apply {
+                          language = "text/fhirpath"
+                          expression = "%father.gender"
+                        },
+                      ),
+                    )
+                },
+              )
+          },
+        )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          ResourceMapper.populate(questionnaire, mapOf("father" to patient))
+        }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have initial value or initial expression for groups or display items. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression.",
+      )
+  }
+
+  @Test
+  fun `populate() should select answerOption of type coding(without system) if initialExpression result matches its coding(without system)`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension(
+                    "name",
+                    Coding(
+                      CODE_SYSTEM_LAUNCH_CONTEXT,
+                      "observation",
+                      "Test Observation",
+                    ),
+                  ),
+                  Extension("type", CodeType("Observation")),
+                )
+            }
+          }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "observation-choice"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%observation.value.coding"
+                    },
+                  ),
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "correct-code-val"
+                      display = "correct-display-val"
+                    },
+                  ),
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "wrong-code-val"
+                      display = "wrong-display-val"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val observation =
+        Observation().apply {
+          value =
+            CodeableConcept().apply {
+              coding =
+                mutableListOf(
+                  Coding().apply {
+                    code = "correct-code-val"
+                    display = "correct-display-val"
+                  },
+                )
+            }
+        }
+
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("observation" to observation))
+
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
+        .isEqualTo("correct-code-val")
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+        .isEqualTo("correct-display-val")
+    }
 
   @Test
   fun `extract() definition based extraction should extract multiple values of a list field in a group`():
