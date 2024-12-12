@@ -255,7 +255,7 @@ object ResourceMapper {
         questionnaireItem.type != Questionnaire.QuestionnaireItemType.GROUP &&
           questionnaireItem.type != Questionnaire.QuestionnaireItemType.DISPLAY,
       ) {
-        "QuestionnaireItem item is not allowed to have initial value or initial expression for groups or display items."
+        "QuestionnaireItem item is not allowed to have initial value or initial expression for groups or display items. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression."
       }
     }
 
