@@ -39,6 +39,8 @@ nav:
               - use/WFL/Evaluate-a-Measure.md
               - use/WFL/Evaluate-a-Library.md
               - use/WFL/Compile-and-Execute-CQL.md
+              - use/WFL/Run-an-Activity-Flow.md
+          - Demo App: use/WFL/Demo-app.md
       - use/extensions.md
       - API Doc: use/api.md
       - Use Snapshots: use/snapshots.md

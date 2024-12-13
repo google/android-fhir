@@ -17,6 +17,7 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
@@ -55,11 +56,17 @@ class GroupHeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(con
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(questionnaireViewItem.questionText)
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    question.apply {
+      // CQF expression takes precedence over static question text
+      updateTextAndVisibility(questionnaireViewItem.questionText)
+      movementMethod = LinkMovementMethod.getInstance()
+    }
+    hint.apply {
+      updateTextAndVisibility(
+        questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
+      )
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     visibility = getHeaderViewVisibility(prefix, question, hint)
     applyCustomOrDefaultStyle(
       questionnaireViewItem.questionnaireItem,
