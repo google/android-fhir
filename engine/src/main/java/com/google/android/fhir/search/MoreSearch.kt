@@ -366,14 +366,8 @@ internal fun Search.getQuery(
   var filterStatement = ""
   val filterArgs = mutableListOf<Any>()
   val nestedSearchQuery = nestedSearches.nestedQuery(type, operation)
-  val filterQuery =
-    getFilterQueries().let {
-      if (nestedSearchQuery != null) {
-        it + nestedSearchQuery
-      } else {
-        it
-      }
-    }
+  val filterQuery = getFilterQueries() + (nestedSearchQuery?.let { listOf(it) } ?: emptyList())
+
   val filterJoinOperator =
     when (operation) {
       Operation.OR -> "\nUNION\n"

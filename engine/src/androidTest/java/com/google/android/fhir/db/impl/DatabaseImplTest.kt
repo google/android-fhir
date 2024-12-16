@@ -2531,6 +2531,92 @@ class DatabaseImplTest {
   }
 
   @Test
+  fun search_patient_with_given_disjoint_and_has_diabetes() {
+    runBlocking {
+      val jane =
+        Patient().apply {
+          id = "jane-001"
+          addName(
+            HumanName().apply {
+              addGiven("Jane")
+              family = "Doe"
+            },
+          )
+        }
+      val john =
+        Patient().apply {
+          id = "john-001"
+          addName(
+            HumanName().apply {
+              addGiven("John")
+              family = "Doe"
+            },
+          )
+        }
+      val jade =
+        Patient().apply {
+          id = "jade-001"
+          addName(
+            HumanName().apply {
+              addGiven("Jade")
+              family = "Doe"
+            },
+          )
+        }
+
+      val diabetes1 =
+        Condition().apply {
+          subject = Reference("Patient/${jane.logicalId}")
+          code = CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+        }
+      val diabetes2 =
+        Condition().apply {
+          subject = Reference("Patient/${john.logicalId}")
+          code = CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+        }
+      val diabetes3 =
+        Condition().apply {
+          subject = Reference("Patient/${jade.logicalId}")
+          code = CodeableConcept(Coding("http://snomed.info/sct", "44054006", "Diabetes"))
+        }
+      database.insert(jane, jade, john, diabetes1, diabetes2, diabetes3)
+
+      val result =
+        database.search<Patient>(
+          Search(ResourceType.Patient)
+            .apply {
+              has<Condition>(Condition.SUBJECT) {
+                filter(
+                  Condition.CODE,
+                  { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
+                )
+              }
+
+              filter(
+                Patient.GIVEN,
+                {
+                  value = "John"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+              )
+
+              filter(
+                Patient.GIVEN,
+                {
+                  value = "Jane"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+              )
+              operation = Operation.OR
+            }
+            .getQuery(),
+        )
+
+      assertThat(result.map { it.resource.logicalId }).containsExactly("jane-001", "john-001")
+    }
+  }
+
+  @Test
   fun search_patient_return_single_patient_who_has_diabetic_careplan() = runBlocking {
     val patient =
       Patient().apply {

@@ -1962,6 +1962,87 @@ class SearchTest {
   }
 
   @Test
+  fun search_patient_multiple_given_disjoint_has_condition_diabetes() {
+    val query =
+      Search(ResourceType.Patient)
+        .apply {
+          has<Condition>(Condition.SUBJECT) {
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
+            )
+          }
+
+          filter(
+            Patient.GIVEN,
+            {
+              value = "John"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+
+          filter(
+            Patient.GIVEN,
+            {
+              value = "Jane"
+              modifier = StringFilterModifier.MATCHES_EXACTLY
+            },
+          )
+          operation = Operation.OR
+        }
+        .getQuery()
+
+    assertThat(query.query)
+      .isEqualTo(
+        """
+        SELECT a.resourceUuid, a.serializedResource
+        FROM ResourceEntity a
+        WHERE a.resourceType = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        UNION
+        SELECT resourceUuid FROM StringIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND index_value = ?
+        INTERSECT
+        SELECT resourceUuid
+        FROM ResourceEntity a
+        WHERE a.resourceType = ? AND a.resourceId IN (
+        SELECT substr(a.index_value, 9)
+        FROM ReferenceIndexEntity a
+        WHERE a.resourceType = ? AND a.index_name = ?
+        AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        )
+        )
+        )
+                """
+          .trimIndent(),
+      )
+
+    assertThat(query.args)
+      .isEqualTo(
+        listOf(
+          "Patient",
+          "Patient",
+          "given",
+          "John",
+          "Patient",
+          "given",
+          "Jane",
+          "Patient",
+          "Condition",
+          "subject",
+          "Condition",
+          "code",
+          "44054006",
+          "http://snomed.info/sct",
+        ),
+      )
+  }
+
+  @Test
   fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
     val query =
       Search(ResourceType.Patient)
