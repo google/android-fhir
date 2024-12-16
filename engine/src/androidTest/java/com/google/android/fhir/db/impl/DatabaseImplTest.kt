@@ -118,6 +118,7 @@ class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val context: Context = ApplicationProvider.getApplicationContext()
+  private val parser = FhirContext.forR4Cached().newJsonParser()
   private lateinit var services: FhirServices
   private lateinit var database: Database
 
@@ -202,7 +203,7 @@ class DatabaseImplTest {
   fun getLocalChanges_withSingleLocaleChange_shouldReturnSingleLocalChanges() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
@@ -269,7 +270,7 @@ class DatabaseImplTest {
   fun clearDatabase_shouldClearAllTablesData() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
@@ -393,7 +394,7 @@ class DatabaseImplTest {
 
   @Test
   fun insert_shouldAddInsertLocalChange() = runBlocking {
-    val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
+    val testPatient2String = parser.encodeResourceToString(TEST_PATIENT_2)
     database.insert(TEST_PATIENT_2)
     val resourceLocalChanges =
       database.getAllLocalChanges().filter { it.resourceId.equals(TEST_PATIENT_2_ID) }
@@ -481,7 +482,7 @@ class DatabaseImplTest {
     database.insert(patient)
     patient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
-    services.parser.encodeResourceToString(patient)
+    parser.encodeResourceToString(patient)
     val localChangeTokenIds =
       database
         .getAllLocalChanges()
@@ -4095,7 +4096,7 @@ class DatabaseImplTest {
       val observationLocalChange = updatedObservationLocalChanges[0]
       assertThat(observationLocalChange.type).isEqualTo(LocalChange.Type.INSERT)
       val observationLocalChangePayload =
-        services.parser.parseResource(observationLocalChange.payload) as Observation
+        parser.parseResource(observationLocalChange.payload) as Observation
       assertThat(observationLocalChangePayload.subject.reference)
         .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
     }
