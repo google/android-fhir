@@ -68,20 +68,21 @@ import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import java.util.Date
 import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
@@ -305,12 +306,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     mutableSetOf<QuestionnaireResponseItemComponent>()
 
   /**
-   * True if the user has tapped the next/previous pagination buttons on the current page. This is
-   * needed to avoid spewing validation errors before any questions are answered.
-   */
-  private var forceValidation = false
-
-  /**
    * Map of [QuestionnaireResponseItemAnswerComponent] for
    * [Questionnaire.QuestionnaireItemComponent]s that are disabled now. The answers will be used to
    * pre-populate the [QuestionnaireResponseItemComponent] once the item is enabled again.
@@ -516,7 +511,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       .also { result ->
         if (result.values.flatten().filterIsInstance<Invalid>().isNotEmpty()) {
           // Update UI of current page if necessary
-          validateCurrentPageItems {}
+          validateCurrentPageItems()
         }
       }
 
@@ -543,7 +538,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     when (entryMode) {
       EntryMode.PRIOR_EDIT,
       EntryMode.SEQUENTIAL, -> {
-        validateCurrentPageItems {
+        val isCurrentPageItemsValid = validateCurrentPageItems()
+        if (isCurrentPageItemsValid) {
           val nextPageIndex =
             pages!!.indexOfFirst {
               it.index > currentPageIndexFlow.value!! && it.enabled && !it.hidden
@@ -568,7 +564,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
       when (entryMode) {
         EntryMode.PRIOR_EDIT,
         EntryMode.SEQUENTIAL, -> {
-          validateCurrentPageItems { isInReviewModeFlow.value = true }
+          val isCurrentPageItemsValid = validateCurrentPageItems()
+          if (isCurrentPageItemsValid) {
+            isInReviewModeFlow.value = true
+          }
         }
         EntryMode.RANDOM -> {
           isInReviewModeFlow.value = true
@@ -915,7 +914,6 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     val validationResult =
       if (
         modifiedQuestionnaireResponseItemSet.contains(questionnaireResponseItem) ||
-          forceValidation ||
           isInReviewModeFlow.value
       ) {
         questionnaireResponseItemValidator.validate(
@@ -1126,43 +1124,35 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     }
 
   /**
-   * Validates the current page items if any are [NotValidated], and then, invokes [block] if they
-   * are all [Valid].
+   * Validates the current page items if any are [NotValidated], and, returns true if they are all
+   * [Valid] else false.
    */
-  private fun validateCurrentPageItems(block: () -> Unit) {
-    val checkPageItemsAllValid: (List<QuestionnaireAdapterItem>) -> Unit =
-      { questionnairePageItems ->
-        if (
-          questionnairePageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().all {
-            it.item.validationResult is Valid
-          }
-        ) {
-          block()
-        }
-      }
+  private fun validateCurrentPageItems(): Boolean {
+    val currentPageQuestionItems =
+      questionnaireStateStateFlow.value.items.filterIsInstance<QuestionnaireAdapterItem.Question>()
 
-    val currentPageItems = questionnaireStateStateFlow.value.items
-    if (
-      currentPageItems.filterIsInstance<QuestionnaireAdapterItem.Question>().any {
-        it.item.validationResult is NotValidated
-      }
-    ) {
+    if (currentPageQuestionItems.any { it.item.validationResult is NotValidated }) {
       // Force update validation results for all questions on the current page. This is needed
       // when the user has not answered any questions so no validation has been done.
-      forceValidation = true
+      val currentPageQuestionnaireResponseItems =
+        currentPageQuestionItems.map { it.item.getQuestionnaireResponseItem() }
+      modifiedQuestionnaireResponseItemSet.addAll(currentPageQuestionnaireResponseItems)
       // Results in a new questionnaire state being generated synchronously, i.e., the current
       // thread will be suspended until the new state is generated.
       modificationCount.update { it + 1 }
 
-      viewModelScope.launch {
-        _questionnaireStateFlow.take(1).collectLatest {
-          forceValidation = false
-          checkPageItemsAllValid(it.items)
+      val questionnaireStateDeferred =
+        viewModelScope.async(questionnaireViewModelCoroutineContext) {
+          _questionnaireStateFlow
+            .first()
+            .items
+            .filterIsInstance<QuestionnaireAdapterItem.Question>()
         }
-      }
-    } else {
-      checkPageItemsAllValid(currentPageItems)
+      val validatedQuestions = runBlocking { questionnaireStateDeferred.await() }
+      return validatedQuestions.all { it.item.validationResult is Valid }
     }
+
+    return currentPageQuestionItems.all { it.item.validationResult is Valid }
   }
 }
 
