@@ -5270,7 +5270,7 @@ class DatabaseImplTest {
       first.size == second.size &&
         first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
 
-    private fun equalsShallowUnordered(first: List<Resource>, second: List<Resource>) =
+    private fun resourceTypeAndIdEqualUnordered(first: List<Resource>, second: List<Resource>) =
       first.size == second.size &&
         first.map { it.resourceType to it.logicalId }.toSet() ==
           second.map { it.resourceType to it.logicalId }.toSet()
@@ -5286,7 +5286,7 @@ class DatabaseImplTest {
             if (inOrder) {
               equalsShallow(x.value, y.value)
             } else {
-              equalsShallowUnordered(x.value, y.value)
+              resourceTypeAndIdEqualUnordered(x.value, y.value)
             }
         }
       } else {
@@ -5305,7 +5305,7 @@ class DatabaseImplTest {
             if (inOrder) {
               equalsShallow(x.value, y.value)
             } else {
-              equalsShallowUnordered(x.value, y.value)
+              resourceTypeAndIdEqualUnordered(x.value, y.value)
             }
         }
       } else {

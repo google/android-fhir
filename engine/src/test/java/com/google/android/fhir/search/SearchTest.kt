@@ -1874,7 +1874,7 @@ class SearchTest {
   }
 
   @Test
-  fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
+  fun search_has_patient_has_condition_diabetes_and_hypertension() {
     val query =
       Search(ResourceType.Patient)
         .apply {

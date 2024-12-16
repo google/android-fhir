@@ -152,7 +152,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
       ON re.resourceUuid = rie.resourceUuid
       ${join.query}
       WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString)
-      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
+      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
       $order
             """
         .trimIndent()
@@ -215,7 +215,7 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
       ON re.resourceType||"/"||re.resourceId = rie.index_value
       ${join.query}
       WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString)
-      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
+      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
       $order
       """
         .trimIndent()
@@ -388,14 +388,19 @@ internal fun Search.getQuery(
     }
   }
 
-  val nestedQueryFilterStatement = nestedSearches.nestedQuery(type, operation)?.query ?: ""
-  val nestedQueryFilterArgs = nestedSearches.nestedQuery(type, operation)?.args ?: emptyList()
+  val nestedFilterQuery = nestedSearches.nestedQuery(type, operation)
+  val nestedQueryFilterStatement = nestedFilterQuery?.query ?: ""
+  val nestedQueryFilterArgs = nestedFilterQuery?.args ?: emptyList()
 
+  // Combines filter statements derived from filter queries and nested queries, that use the
+  // resourceUuid field,
+  // and defaults to filter statement with the resourceType field when blank
   val filterStatement =
     listOf(filterQueryStatement, nestedQueryFilterStatement)
       .filter { it.isNotBlank() }
       .joinToString(separator = " AND ")
-  val filterArgs = filterQueryArgs + nestedQueryFilterArgs
+      .ifBlank { "a.resourceType = ?" }
+  val filterArgs = (filterQueryArgs + nestedQueryFilterArgs).ifEmpty { listOf(type.name) }
 
   val whereArgs = mutableListOf<Any>()
   val nestedArgs = mutableListOf<Any>()
@@ -407,7 +412,7 @@ internal fun Search.getQuery(
         SELECT COUNT(*)
         FROM ResourceEntity a
         $sortJoinStatement
-        WHERE ${filterStatement.ifBlank { "a.resourceType = ?" }}
+        WHERE $filterStatement
         $sortOrderStatement
         $limitStatement
         """
@@ -425,7 +430,7 @@ internal fun Search.getQuery(
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
-        WHERE a.index_name = ? AND ${filterStatement.ifBlank { "a.resourceType = ?" }}
+        WHERE a.index_name = ? AND $filterStatement
         $sortOrderStatement
         $limitStatement)
         """
@@ -437,7 +442,7 @@ internal fun Search.getQuery(
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
-        WHERE ${filterStatement.ifBlank { "a.resourceType = ?" }}
+        WHERE $filterStatement
         $sortOrderStatement
         $limitStatement
         """
@@ -449,7 +454,7 @@ internal fun Search.getQuery(
 
   return SearchQuery(
     query,
-    nestedArgs + sortArgs + whereArgs + filterArgs.ifEmpty { listOf(type.name) } + limitArgs,
+    nestedArgs + sortArgs + whereArgs + filterArgs + limitArgs,
   )
 }
 
