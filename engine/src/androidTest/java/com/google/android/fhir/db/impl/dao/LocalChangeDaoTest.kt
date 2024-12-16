@@ -49,6 +49,7 @@ import org.junit.runner.RunWith
 class LocalChangeDaoTest {
   private lateinit var database: ResourceDatabase
   private lateinit var localChangeDao: LocalChangeDao
+  private val iParser = FhirContext.forR4Cached().newJsonParser()
 
   @Before
   fun setupDatabase() {
@@ -62,7 +63,6 @@ class LocalChangeDaoTest {
 
     localChangeDao =
       database.localChangeDao().also {
-        it.iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
         it.fhirTerser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
       }
   }
@@ -97,8 +97,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceUuid).isEqualTo(carePlanResourceUuid)
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(carePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
-    assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(carePlan))
+    assertThat(carePlanLocalChange1.payload).isEqualTo(iParser.encodeResourceToString(carePlan))
     val carePlanLocalChange1Id = carePlanLocalChange1.id
 
     val localChangeResourceReferences =
@@ -150,7 +149,7 @@ class LocalChangeDaoTest {
           resourceId = originalCarePlan.logicalId,
           resourceType = originalCarePlan.resourceType,
           resourceUuid = carePlanResourceUuid,
-          serializedResource = localChangeDao.iParser.encodeResourceToString(originalCarePlan),
+          serializedResource = iParser.encodeResourceToString(originalCarePlan),
         ),
       updatedResource = modifiedCarePlan,
       timeOfLocalChange = carePlanUpdateTime,
@@ -163,7 +162,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(originalCarePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(originalCarePlan))
+      .isEqualTo(iParser.encodeResourceToString(originalCarePlan))
 
     val carePlanLocalChange2 = carePlanLocalChanges[1]
     assertThat(carePlanLocalChange2.resourceUuid).isEqualTo(carePlanResourceUuid)
@@ -224,8 +223,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceUuid).isEqualTo(carePlanResourceUuid)
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(carePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
-    assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(carePlan))
+    assertThat(carePlanLocalChange1.payload).isEqualTo(iParser.encodeResourceToString(carePlan))
 
     val carePlanLocalChange2 = carePlanLocalChanges[1]
     assertThat(carePlanLocalChange2.resourceUuid).isEqualTo(carePlanResourceUuid)
@@ -285,7 +283,7 @@ class LocalChangeDaoTest {
           resourceId = originalCarePlan.logicalId,
           resourceType = originalCarePlan.resourceType,
           resourceUuid = carePlanResourceUuid,
-          serializedResource = localChangeDao.iParser.encodeResourceToString(originalCarePlan),
+          serializedResource = iParser.encodeResourceToString(originalCarePlan),
         ),
       updatedResource = modifiedCarePlan,
       timeOfLocalChange = carePlanUpdateTime,
@@ -318,7 +316,7 @@ class LocalChangeDaoTest {
         activityFirstRep.detail.performer.add(Reference("Patient/$updatedPatientId"))
       }
     assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(updatedReferencesCarePlan))
+      .isEqualTo(iParser.encodeResourceToString(updatedReferencesCarePlan))
     val carePlanLocalChange1Id = carePlanLocalChange1.id
     // assert that LocalChangeReferences are updated as well
     val localChange1ResourceReferences =
