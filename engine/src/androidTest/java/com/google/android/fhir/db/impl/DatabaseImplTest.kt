@@ -2633,91 +2633,93 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_filter_param_values_disjunction_covid_immunization_records(): Unit = runBlocking {
-    val resources =
-      listOf(
-        Immunization().apply {
-          id = "immunization-1"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM1NL1",
-                "COVID-19 vaccine, inactivated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-2"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM5DF6",
-                "COVID-19 vaccine, live attenuated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-3"
-          vaccineCode =
-            CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-4"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://hl7.org/fhir/sid/cvx",
-                "140",
-                "Influenza, seasonal, injectable, preservative free",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-      )
+  fun search_filter_param_values_disjunction_covid_immunization_records() {
+    runBlocking {
+      val resources =
+        listOf(
+          Immunization().apply {
+            id = "immunization-1"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM1NL1",
+                  "COVID-19 vaccine, inactivated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-2"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM5DF6",
+                  "COVID-19 vaccine, live attenuated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-3"
+            vaccineCode =
+              CodeableConcept(
+                Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-4"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://hl7.org/fhir/sid/cvx",
+                  "140",
+                  "Influenza, seasonal, injectable, preservative free",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+        )
 
-    database.insert(*resources.toTypedArray())
+      database.insert(*resources.toTypedArray())
 
-    val result =
-      database.search<Immunization>(
-        Search(ResourceType.Immunization)
-          .apply {
-            filter(
-              Immunization.VACCINE_CODE,
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM1NL1",
-                      "COVID-19 vaccine, inactivated virus",
-                    ),
-                  )
-              },
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM5DF6",
-                      "COVID-19 vaccine, inactivated virus",
-                    ),
-                  )
-              },
-              operation = Operation.OR,
-            )
-          }
-          .getQuery(),
-      )
+      val result =
+        database.search<Immunization>(
+          Search(ResourceType.Immunization)
+            .apply {
+              filter(
+                Immunization.VACCINE_CODE,
+                {
+                  value =
+                    of(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM1NL1",
+                        "COVID-19 vaccine, inactivated virus",
+                      ),
+                    )
+                },
+                {
+                  value =
+                    of(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM5DF6",
+                        "COVID-19 vaccine, inactivated virus",
+                      ),
+                    )
+                },
+                operation = Operation.OR,
+              )
+            }
+            .getQuery(),
+        )
 
-    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
-      .containsExactly("XM1NL1", "XM5DF6")
+      assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
+        .containsExactly("XM1NL1", "XM5DF6")
+    }
   }
 
   @Test
@@ -2796,7 +2798,7 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction(): Unit =
+  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() {
     runBlocking {
       val resources =
         listOf(
@@ -2886,6 +2888,7 @@ class DatabaseImplTest {
       assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
         .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
     }
+  }
 
   @Test
   fun search_patient_with_extension_as_search_param() = runBlocking {
@@ -3694,120 +3697,121 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients():
-    Unit = runBlocking {
-    val person1 =
-      Person().apply {
-        id = "person-1"
-        addName(
-          HumanName().apply {
-            family = "Person"
-            addGiven("First")
-          },
-        )
-        addLink(PersonLinkComponent(Reference("Patient/pa-01")))
-        addLink(PersonLinkComponent(Reference("Patient/pa-02")))
-      }
-
-    val person2 =
-      Person().apply {
-        id = "person-2"
-        addName(
-          HumanName().apply {
-            family = "Person"
-            addGiven("Second")
-          },
-        )
-        addLink(PersonLinkComponent(Reference("Patient/pa-02")))
-        addLink(PersonLinkComponent(Reference("Patient/pa-03")))
-      }
-
-    val person3 =
-      Person().apply {
-        id = "person-3"
-        addName(
-          HumanName().apply {
-            family = "Person"
-            addGiven("Third")
-          },
-        )
-        addLink(PersonLinkComponent(Reference("Patient/pa-01")))
-        addLink(PersonLinkComponent(Reference("Patient/pa-03")))
-      }
-
-    val patient01 =
-      Patient().apply {
-        id = "pa-01"
-        addName(
-          HumanName().apply {
-            addGiven("James")
-            family = "Gorden"
-          },
-        )
-      }
-
-    val patient02 =
-      Patient().apply {
-        id = "pa-02"
-        addName(
-          HumanName().apply {
-            addGiven("James")
-            family = "Bond"
-          },
-        )
-      }
-
-    val patient03 =
-      Patient().apply {
-        id = "pa-03"
-        addName(
-          HumanName().apply {
-            addGiven("Jamie")
-            family = "Bond"
-          },
-        )
-      }
-
-    database.insert(person1, person2, person3, patient01, patient02, patient03)
-
-    val result =
-      Search(ResourceType.Patient)
-        .apply {
-          filter(
-            Patient.GIVEN,
-            {
-              value = "Jam"
-              modifier = StringFilterModifier.STARTS_WITH
+  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients() {
+    runBlocking {
+      val person1 =
+        Person().apply {
+          id = "person-1"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("First")
             },
           )
-
-          revInclude(ResourceType.Person, Person.LINK) { sort(Person.NAME, Order.ASCENDING) }
+          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
         }
-        .execute<Patient>(database)
 
-    assertThat(result)
-      .comparingElementsUsing(SearchResultCorrespondence)
-      .displayingDiffsPairedBy { it.resource.logicalId }
-      .containsExactly(
-        SearchResult(
-          patient01,
-          included = null,
-          revIncluded =
-            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person3)),
-        ),
-        SearchResult(
-          patient02,
-          included = null,
-          revIncluded =
-            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person2)),
-        ),
-        SearchResult(
-          patient03,
-          included = null,
-          revIncluded =
-            mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
-        ),
-      )
+      val person2 =
+        Person().apply {
+          id = "person-2"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("Second")
+            },
+          )
+          addLink(PersonLinkComponent(Reference("Patient/pa-02")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+        }
+
+      val person3 =
+        Person().apply {
+          id = "person-3"
+          addName(
+            HumanName().apply {
+              family = "Person"
+              addGiven("Third")
+            },
+          )
+          addLink(PersonLinkComponent(Reference("Patient/pa-01")))
+          addLink(PersonLinkComponent(Reference("Patient/pa-03")))
+        }
+
+      val patient01 =
+        Patient().apply {
+          id = "pa-01"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Gorden"
+            },
+          )
+        }
+
+      val patient02 =
+        Patient().apply {
+          id = "pa-02"
+          addName(
+            HumanName().apply {
+              addGiven("James")
+              family = "Bond"
+            },
+          )
+        }
+
+      val patient03 =
+        Patient().apply {
+          id = "pa-03"
+          addName(
+            HumanName().apply {
+              addGiven("Jamie")
+              family = "Bond"
+            },
+          )
+        }
+
+      database.insert(person1, person2, person3, patient01, patient02, patient03)
+
+      val result =
+        Search(ResourceType.Patient)
+          .apply {
+            filter(
+              Patient.GIVEN,
+              {
+                value = "Jam"
+                modifier = StringFilterModifier.STARTS_WITH
+              },
+            )
+
+            revInclude(ResourceType.Person, Person.LINK) { sort(Person.NAME, Order.ASCENDING) }
+          }
+          .execute<Patient>(database)
+
+      assertThat(result)
+        .comparingElementsUsing(SearchResultCorrespondence)
+        .displayingDiffsPairedBy { it.resource.logicalId }
+        .containsExactly(
+          SearchResult(
+            patient01,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person3)),
+          ),
+          SearchResult(
+            patient02,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person1, person2)),
+          ),
+          SearchResult(
+            patient03,
+            included = null,
+            revIncluded =
+              mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
+          ),
+        )
+    }
   }
 
   @Test
