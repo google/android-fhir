@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy.RECREATE_AT_OPEN
 import com.google.android.fhir.DatabaseErrorStrategy.UNSPECIFIED
@@ -49,8 +48,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class EncryptedDatabaseErrorTest {
   private val context: Context = ApplicationProvider.getApplicationContext()
-  private val parser = FhirContext.forR4().newJsonParser()
-  private val terser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
+  private val terser = FhirTerser(FhirContext.forR4Cached())
   private val resourceIndexer = ResourceIndexer(SearchParamDefinitionsProviderImpl())
 
   @After
@@ -66,7 +64,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -84,7 +81,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -115,7 +111,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an unencrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -139,7 +134,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should throw SQLiteException
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -169,7 +163,6 @@ class EncryptedDatabaseErrorTest {
       // GIVEN an unencrypted database.
       DatabaseImpl(
           context,
-          parser,
           terser,
           DatabaseConfig(
             inMemory = false,
@@ -193,7 +186,6 @@ class EncryptedDatabaseErrorTest {
       // THEN it should recreate the database
       DatabaseImpl(
           context,
-          parser,
           terser,
           DatabaseConfig(
             inMemory = false,
@@ -226,7 +218,6 @@ class EncryptedDatabaseErrorTest {
         // GIVEN an encrypted database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,
@@ -244,7 +235,6 @@ class EncryptedDatabaseErrorTest {
         // THEN it should recreate database.
         DatabaseImpl(
             context,
-            parser,
             terser,
             DatabaseConfig(
               inMemory = false,

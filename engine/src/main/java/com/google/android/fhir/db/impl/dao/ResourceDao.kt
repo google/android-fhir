@@ -24,7 +24,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
-import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.db.ResourceNotFoundException
 import com.google.android.fhir.db.impl.entities.DateIndexEntity
 import com.google.android.fhir.db.impl.entities.DateTimeIndexEntity
@@ -55,7 +55,6 @@ import org.hl7.fhir.r4.model.ResourceType
 internal abstract class ResourceDao {
   // this is ugly but there is no way to inject these right now in Room as it is the one creating
   // the dao
-  lateinit var iParser: IParser
   lateinit var resourceIndexer: ResourceIndexer
 
   /**
@@ -69,7 +68,8 @@ internal abstract class ResourceDao {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
       val entity =
         it.copy(
-          serializedResource = iParser.encodeResourceToString(resource),
+          serializedResource =
+            FhirContext.forR4Cached().newJsonParser().encodeResourceToString(resource),
           lastUpdatedLocal = timeOfLocalChange,
           lastUpdatedRemote = resource.meta.lastUpdated?.toInstant() ?: it.lastUpdatedRemote,
         )
@@ -86,7 +86,8 @@ internal abstract class ResourceDao {
       val entity =
         it.copy(
           resourceId = updatedResource.logicalId,
-          serializedResource = iParser.encodeResourceToString(updatedResource),
+          serializedResource =
+            FhirContext.forR4Cached().newJsonParser().encodeResourceToString(updatedResource),
           lastUpdatedRemote = updatedResource.lastUpdated ?: it.lastUpdatedRemote,
           versionId = updatedResource.versionId ?: it.versionId,
         )
@@ -107,7 +108,8 @@ internal abstract class ResourceDao {
     getResourceEntity(resource.logicalId, resource.resourceType)?.let {
       val entity =
         it.copy(
-          serializedResource = iParser.encodeResourceToString(resource),
+          serializedResource =
+            FhirContext.forR4Cached().newJsonParser().encodeResourceToString(resource),
           lastUpdatedRemote = resource.meta.lastUpdated?.toInstant(),
           versionId = resource.versionId,
         )
@@ -278,7 +280,8 @@ internal abstract class ResourceDao {
         resourceType = resource.resourceType,
         resourceUuid = resourceUuid,
         resourceId = resource.logicalId,
-        serializedResource = iParser.encodeResourceToString(resource),
+        serializedResource =
+          FhirContext.forR4Cached().newJsonParser().encodeResourceToString(resource),
         versionId = resource.versionId,
         lastUpdatedRemote = resource.lastUpdated,
         lastUpdatedLocal = lastUpdatedLocal,
@@ -308,7 +311,10 @@ internal abstract class ResourceDao {
     lastUpdatedRemote: Instant?,
   ) {
     getResourceEntity(resourceId, resourceType)?.let { oldResourceEntity ->
-      val resource = iParser.parseResource(oldResourceEntity.serializedResource) as Resource
+      val resource =
+        FhirContext.forR4Cached()
+          .newJsonParser()
+          .parseResource(oldResourceEntity.serializedResource) as Resource
       resource.updateMeta(versionId, lastUpdatedRemote)
       updateResourceWithUuid(oldResourceEntity.resourceUuid, resource)
     }

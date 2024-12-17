@@ -38,7 +38,6 @@ dependencies {
 
   coreLibraryDesugaring(Dependencies.desugarJdkLibs)
 
-  implementation(Dependencies.material)
   implementation(Dependencies.Retrofit.coreRetrofit)
   implementation(Dependencies.Retrofit.gsonConverter)
   implementation(Dependencies.httpInterceptor)
@@ -48,6 +47,7 @@ dependencies {
   implementation(libs.android.fhir.engine)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.core)
+  implementation(libs.material)
 
   testImplementation(Dependencies.robolectric)
   testImplementation(Dependencies.mockitoKotlin)
