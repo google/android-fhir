@@ -61,6 +61,16 @@ internal const val EXTENSION_ITEM_CONTROL_URL_ANDROID_FHIR =
 internal const val EXTENSION_ITEM_CONTROL_SYSTEM_ANDROID_FHIR =
   "https://github.com/google/android-fhir/questionnaire-item-control"
 
+internal const val EXTENSION_DIALOG_URL_ANDROID_FHIR =
+  "https://github.com/google/android-fhir/StructureDefinition/dialog"
+
+internal enum class StyleUrl(val url: String) {
+  BASE("https://github.com/google/android-fhir/tree/master/datacapture/android-style"),
+  PREFIX_TEXT_VIEW("prefix_text_view"),
+  QUESTION_TEXT_VIEW("question_text_view"),
+  SUBTITLE_TEXT_VIEW("subtitle_text_view"),
+}
+
 // Below URLs exist and are supported by HL7
 
 internal const val EXTENSION_ANSWER_EXPRESSION_URL: String =
@@ -197,14 +207,14 @@ enum class ItemControlTypes(
  * The initial-expression extension on [QuestionnaireItemComponent] to allow dynamic selection of
  * default or initially selected answers
  */
-val Questionnaire.QuestionnaireItemComponent.initialExpression: Expression?
+val QuestionnaireItemComponent.initialExpression: Expression?
   get() {
     return this.extension
       .firstOrNull { it.url == ITEM_INITIAL_EXPRESSION_URL }
       ?.let { it.value as Expression }
   }
 
-val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
+val QuestionnaireItemComponent.itemControlCode: String?
   get() {
     val codeableConcept =
       this.extension
@@ -227,8 +237,17 @@ val Questionnaire.QuestionnaireItemComponent.itemControlCode: String?
  *
  * See http://hl7.org/fhir/R4/extension-questionnaire-itemcontrol.html.
  */
-val Questionnaire.QuestionnaireItemComponent.itemControl: ItemControlTypes?
+val QuestionnaireItemComponent.itemControl: ItemControlTypes?
   get() = ItemControlTypes.values().firstOrNull { it.extensionCode == itemControlCode }
+
+private val QuestionnaireItemComponent.hasDialogExtension: Boolean
+  get() = this.extension.any { it.url == EXTENSION_DIALOG_URL_ANDROID_FHIR }
+
+val QuestionnaireItemComponent.shouldUseDialog: Boolean
+  get() =
+    this.hasDialogExtension &&
+      (this.itemControl?.viewHolderType == QuestionnaireViewHolderType.CHECK_BOX_GROUP ||
+        this.itemControl?.viewHolderType == QuestionnaireViewHolderType.RADIO_GROUP)
 
 /**
  * The desired orientation for the list of choices.
@@ -241,7 +260,7 @@ enum class ChoiceOrientationTypes(val extensionCode: String) {
 }
 
 /** Desired orientation to render a list of choices. */
-val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
+val QuestionnaireItemComponent.choiceOrientation: ChoiceOrientationTypes?
   get() {
     val code =
       (this.extension.firstOrNull { it.url == EXTENSION_CHOICE_ORIENTATION_URL }?.value
@@ -253,7 +272,7 @@ val Questionnaire.QuestionnaireItemComponent.choiceOrientation: ChoiceOrientatio
 /**
  * Whether the QuestionnaireItem should be hidden according to the hidden extension or lack thereof.
  */
-internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
+internal val QuestionnaireItemComponent.isHidden: Boolean
   get() {
     val extension = this.extension.singleOrNull { it.url == EXTENSION_HIDDEN_URL } ?: return false
     val value = extension.value
@@ -266,7 +285,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isHidden: Boolean
 /**
  * The entry format specified in the extension https://hl7.org/fhir/R4/extension-entryformat.html.
  */
-val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
+val QuestionnaireItemComponent.entryFormat: String?
   get() {
     val extension = extension.singleOrNull { it.url == EXTENSION_ENTRY_FORMAT_URL } ?: return null
     val value = extension.value
@@ -280,7 +299,7 @@ val Questionnaire.QuestionnaireItemComponent.entryFormat: String?
  * The date entry format for the questionnaire item component if one is specified, otherwise, the
  * system default date entry format.
  */
-val Questionnaire.QuestionnaireItemComponent.dateEntryFormatOrSystemDefault: String
+val QuestionnaireItemComponent.dateEntryFormatOrSystemDefault: String
   get() {
     return if (isValidDateEntryFormat(entryFormat)) {
       entryFormat!!
@@ -304,7 +323,7 @@ private fun isValidDateEntryFormat(entryFormat: String?): Boolean {
 }
 
 /** Slider step extension value. */
-val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
+val QuestionnaireItemComponent.sliderStepValue: Int?
   get() {
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_SLIDER_STEP_VALUE_URL } ?: return null
@@ -315,16 +334,16 @@ val Questionnaire.QuestionnaireItemComponent.sliderStepValue: Int?
     return null
   }
 
-internal val Questionnaire.QuestionnaireItemComponent.minValue
+internal val QuestionnaireItemComponent.minValue
   get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value
 
-internal val Questionnaire.QuestionnaireItemComponent.minValueCqfCalculatedValueExpression
+internal val QuestionnaireItemComponent.minValueCqfCalculatedValueExpression
   get() = getExtensionByUrl(MIN_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
 
-internal val Questionnaire.QuestionnaireItemComponent.maxValue
+internal val QuestionnaireItemComponent.maxValue
   get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value
 
-internal val Questionnaire.QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
+internal val QuestionnaireItemComponent.maxValueCqfCalculatedValueExpression
   get() = getExtensionByUrl(MAX_VALUE_EXTENSION_URL)?.value?.cqfCalculatedValueExpression
 
 // ********************************************************************************************** //
@@ -342,7 +361,7 @@ internal enum class DisplayItemControlType(val extensionCode: String) {
 }
 
 /** Item control to show instruction text */
-internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: DisplayItemControlType?
+internal val QuestionnaireItemComponent.displayItemControl: DisplayItemControlType?
   get() {
     val codeableConcept =
       this.extension.firstOrNull { it.url == EXTENSION_ITEM_CONTROL_URL }?.value as CodeableConcept?
@@ -352,7 +371,7 @@ internal val Questionnaire.QuestionnaireItemComponent.displayItemControl: Displa
   }
 
 /** Whether any one of the nested display item has [DisplayItemControlType.HELP] control. */
-val Questionnaire.QuestionnaireItemComponent.hasHelpButton: Boolean
+val QuestionnaireItemComponent.hasHelpButton: Boolean
   get() {
     return item.any { it.isHelpCode }
   }
@@ -369,14 +388,14 @@ internal fun String.toSpanned(): Spanned {
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.text] if translation is
  * present. Default value otherwise.
  */
-val Questionnaire.QuestionnaireItemComponent.localizedTextSpanned: Spanned?
+val QuestionnaireItemComponent.localizedTextSpanned: Spanned?
   get() = textElement?.getLocalizedText()?.toSpanned()
 
 /**
  * Localized and spanned value of [Questionnaire.QuestionnaireItemComponent.prefix] if translation
  * is present. Default value otherwise.
  */
-val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
+val QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
   get() = prefixElement?.getLocalizedText()?.toSpanned()
 
 /**
@@ -384,7 +403,7 @@ val Questionnaire.QuestionnaireItemComponent.localizedPrefixSpanned: Spanned?
  * [EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS] code is used as the instructions of the parent
  * question.
  */
-val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned
+val QuestionnaireItemComponent.localizedInstructionsSpanned: Spanned
   get() = item.getLocalizedInstructionsSpanned()
 
 /**
@@ -392,7 +411,7 @@ val Questionnaire.QuestionnaireItemComponent.localizedInstructionsSpanned: Spann
  * list that are of type `Questionnaire.QuestionnaireItemType.DISPLAY` and have the
  * `isInstructionsCode` flag set. The instructions are separated by newlines.
  */
-fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
+fun List<QuestionnaireItemComponent>.getLocalizedInstructionsSpanned(
   separator: String = "\n",
 ) =
   SpannableStringBuilder().apply {
@@ -408,11 +427,11 @@ fun List<Questionnaire.QuestionnaireItemComponent>.getLocalizedInstructionsSpann
  * A nested questionnaire item of type display with code [DisplayItemControlType.FLYOVER] (if
  * present) is used as the fly-over text of the parent question.
  */
-internal val Questionnaire.QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
+internal val QuestionnaireItemComponent.localizedFlyoverSpanned: Spanned?
   get() = item.localizedFlyoverSpanned
 
 /** [localizedFlyoverSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
+val List<QuestionnaireItemComponent>.localizedFlyoverSpanned: Spanned?
   get() =
     this.firstOrNull { questionnaireItem ->
         questionnaireItem.type == Questionnaire.QuestionnaireItemType.DISPLAY &&
@@ -425,18 +444,18 @@ val List<Questionnaire.QuestionnaireItemComponent>.localizedFlyoverSpanned: Span
  * [EXTENSION_DISPLAY_CATEGORY_INSTRUCTIONS] code is used as the instructions of the parent
  * question.
  */
-val Questionnaire.QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
+val QuestionnaireItemComponent.localizedHelpSpanned: Spanned?
   get() = item.localizedHelpSpanned
 
 /** [localizedHelpSpanned] over list of [Questionnaire.QuestionnaireItemComponent] */
-val List<Questionnaire.QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
+val List<QuestionnaireItemComponent>.localizedHelpSpanned: Spanned?
   get() {
     return this.firstOrNull { questionnaireItem -> questionnaireItem.isHelpCode }
       ?.localizedTextSpanned
   }
 
 /** Returns `true` if extension is display category extension and contains 'instructions' code. */
-internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolean
+internal val QuestionnaireItemComponent.isInstructionsCode: Boolean
   get() {
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
@@ -460,7 +479,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isInstructionsCode: Boolea
  * Returns `true` if item type is display and [displayItemControl] is
  * [DisplayItemControlType.FLYOVER].
  */
-internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
+internal val QuestionnaireItemComponent.isFlyoverCode: Boolean
   get() {
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
@@ -473,7 +492,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isFlyoverCode: Boolean
   }
 
 /** Whether item type is display and [displayItemControl] is [DisplayItemControlType.HELP]. */
-internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
+internal val QuestionnaireItemComponent.isHelpCode: Boolean
   get() {
     return when (type) {
       Questionnaire.QuestionnaireItemType.DISPLAY -> {
@@ -486,7 +505,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isHelpCode: Boolean
   }
 
 /** Whether item type is display. */
-internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
+internal val QuestionnaireItemComponent.isDisplayItem: Boolean
   get() =
     (type == Questionnaire.QuestionnaireItemType.DISPLAY &&
       (isInstructionsCode || isFlyoverCode || isHelpCode))
@@ -500,7 +519,7 @@ internal val Questionnaire.QuestionnaireItemComponent.isDisplayItem: Boolean
 // ********************************************************************************************** //
 
 /** Identifies the kinds of attachment allowed to be sent for an element. */
-val Questionnaire.QuestionnaireItemComponent.mimeTypes: List<String>
+val QuestionnaireItemComponent.mimeTypes: List<String>
   get() {
     return extension
       .filter { it.url == EXTENSION_MIME_TYPE }
@@ -520,17 +539,17 @@ enum class MimeType(val value: String) {
 private fun getMimeType(mimeType: String): String = mimeType.substringBefore("/")
 
 /** Returns true if at least one mime type matches the given type. */
-fun Questionnaire.QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
+fun QuestionnaireItemComponent.hasMimeType(type: String): Boolean {
   return mimeTypes.any { it.substringBefore("/") == type }
 }
 
 /** Returns true if all mime types match the given type. */
-fun Questionnaire.QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
+fun QuestionnaireItemComponent.hasMimeTypeOnly(type: String): Boolean {
   return mimeTypes.all { it.substringBefore("/") == type }
 }
 
 /** The maximum size of an attachment in Bytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInBytes: BigDecimal?
+internal val QuestionnaireItemComponent.maxSizeInBytes: BigDecimal?
   get() =
     (extension.firstOrNull { it.url == EXTENSION_MAX_SIZE }?.valueAsPrimitive as DecimalType?)
       ?.value
@@ -538,27 +557,27 @@ internal val Questionnaire.QuestionnaireItemComponent.maxSizeInBytes: BigDecimal
 private val BYTES_PER_KIB = BigDecimal(1024)
 
 /** The maximum size of an attachment in Kibibytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInKiBs: BigDecimal?
+internal val QuestionnaireItemComponent.maxSizeInKiBs: BigDecimal?
   get() = maxSizeInBytes?.div(BYTES_PER_KIB)
 
 private val BYTES_PER_MIB = BigDecimal(1048576)
 
 /** The maximum size of an attachment in Mebibytes. */
-internal val Questionnaire.QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
+internal val QuestionnaireItemComponent.maxSizeInMiBs: BigDecimal?
   get() = maxSizeInBytes?.div(BYTES_PER_MIB)
 
 /** The default maximum size of an attachment is 1 Mebibytes. */
 private val DEFAULT_SIZE = BigDecimal(1048576)
 
 /** Returns true if given size is above maximum size allowed. */
-internal fun Questionnaire.QuestionnaireItemComponent.isGivenSizeOverLimit(
+internal fun QuestionnaireItemComponent.isGivenSizeOverLimit(
   size: BigDecimal,
 ): Boolean {
   return size > (maxSizeInBytes ?: DEFAULT_SIZE)
 }
 
 /** A media that is attached to a [Questionnaire.QuestionnaireItemComponent]. */
-internal val Questionnaire.QuestionnaireItemComponent.itemMedia: Attachment?
+internal val QuestionnaireItemComponent.itemMedia: Attachment?
   get() =
     (getExtensionByUrl(EXTENSION_ITEM_MEDIA)?.value as? Attachment)?.takeIf { it.hasContentType() }
 
@@ -597,7 +616,7 @@ private fun ByteArray.decodeToBitmap(): Bitmap? {
  *
  * See http://hl7.org/fhir/R4/extension-questionnaire-unit.html.
  */
-internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
+internal val QuestionnaireItemComponent.unit: Coding?
   get() {
     val extension =
       this.extension.singleOrNull { it.url == EXTENSION_QUESTIONNAIRE_UNIT_URL } ?: return null
@@ -613,7 +632,7 @@ internal val Questionnaire.QuestionnaireItemComponent.unit: Coding?
  *
  * See http://hl7.org/fhir/R4/extension-questionnaire-unitoption.html.
  */
-internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
+internal val QuestionnaireItemComponent.unitOption: List<Coding>
   get() {
     return this.extension
       .filter { it.url == EXTENSION_QUESTIONNAIRE_UNIT_OPTION_URL }
@@ -635,7 +654,7 @@ internal val Questionnaire.QuestionnaireItemComponent.unitOption: List<Coding>
 //                                                                                                //
 // ********************************************************************************************** //
 
-internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpressions
+internal val QuestionnaireItemComponent.answerOptionsToggleExpressions
   get() =
     this.extension
       .filter { it.url == EXTENSION_ANSWER_OPTION_TOGGLE_EXPRESSION_URL }
@@ -657,14 +676,14 @@ internal val Questionnaire.QuestionnaireItemComponent.answerOptionsToggleExpress
       }
 
 // Return expression if QuestionnaireItemComponent has ENABLE WHEN EXPRESSION URL
-val Questionnaire.QuestionnaireItemComponent.enableWhenExpression: Expression?
+val QuestionnaireItemComponent.enableWhenExpression: Expression?
   get() {
     return this.extension
       .firstOrNull { it.url == EXTENSION_ENABLE_WHEN_EXPRESSION_URL }
       ?.let { it.value as Expression }
   }
 
-internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<Expression>
+internal val QuestionnaireItemComponent.variableExpressions: List<Expression>
   get() =
     this.extension.filter { it.url == EXTENSION_VARIABLE_URL }.map { it.castToExpression(it.value) }
 
@@ -675,21 +694,21 @@ internal val Questionnaire.QuestionnaireItemComponent.variableExpressions: List<
  * @param variableName the [String] to match the variable
  * @return an [Expression]
  */
-internal fun Questionnaire.QuestionnaireItemComponent.findVariableExpression(
+internal fun QuestionnaireItemComponent.findVariableExpression(
   variableName: String,
 ): Expression? {
   return variableExpressions.find { it.name == variableName }
 }
 
 /** Returns Calculated expression, or null */
-internal val Questionnaire.QuestionnaireItemComponent.calculatedExpression: Expression?
+internal val QuestionnaireItemComponent.calculatedExpression: Expression?
   get() =
     this.getExtensionByUrl(EXTENSION_CALCULATED_EXPRESSION_URL)?.let {
       it.castToExpression(it.value)
     }
 
 /** Returns list of extensions whose value is of type [Expression] */
-internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
+internal val QuestionnaireItemComponent.expressionBasedExtensions
   get() = this.extension.filter { it.value is Expression }
 
 /**
@@ -697,8 +716,8 @@ internal val Questionnaire.QuestionnaireItemComponent.expressionBasedExtensions
  * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
  * `this-question` is the link ID of the current questionnaire item).
  */
-internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
-  item: Questionnaire.QuestionnaireItemComponent,
+internal fun QuestionnaireItemComponent.isReferencedBy(
+  item: QuestionnaireItemComponent,
 ) =
   item.expressionBasedExtensions.any {
     it
@@ -708,13 +727,13 @@ internal fun Questionnaire.QuestionnaireItemComponent.isReferencedBy(
       .contains(Regex(".*linkId='${this.linkId}'.*"))
   }
 
-internal val Questionnaire.QuestionnaireItemComponent.answerExpression: Expression?
+internal val QuestionnaireItemComponent.answerExpression: Expression?
   get() =
     ToolingExtensions.getExtension(this, EXTENSION_ANSWER_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
     }
 
-internal val Questionnaire.QuestionnaireItemComponent.candidateExpression: Expression?
+internal val QuestionnaireItemComponent.candidateExpression: Expression?
   get() =
     ToolingExtensions.getExtension(this, EXTENSION_CANDIDATE_EXPRESSION_URL)?.value?.let {
       it.castToExpression(it)
@@ -732,7 +751,7 @@ internal val Questionnaire.QuestionnaireItemComponent.candidateExpression: Expre
  * - label -> the label of given column of table or answerOption
  * - forDisplay -> if the column should be shown on UI
  */
-internal val Questionnaire.QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
+internal val QuestionnaireItemComponent.choiceColumn: List<ChoiceColumn>?
   get() =
     ToolingExtensions.getExtensions(this, EXTENSION_CHOICE_COLUMN_URL)?.map { extension ->
       extension.extension.let { nestedExtensions ->
@@ -769,7 +788,7 @@ internal data class ChoiceColumn(val path: String, val label: String?, val forDi
  *   resources [Resource], identifiers [Identifier] or codes [Coding]
  * @return list of answer options [Questionnaire.QuestionnaireItemAnswerOptionComponent]
  */
-internal fun Questionnaire.QuestionnaireItemComponent.extractAnswerOptions(
+internal fun QuestionnaireItemComponent.extractAnswerOptions(
   dataList: List<Base>,
 ): List<Questionnaire.QuestionnaireItemAnswerOptionComponent> {
   return when (this.type) {
@@ -824,11 +843,11 @@ enum class ConstraintSeverityTypes(
  * QuestionnaireResponseItemComponent with same linkId. So these items are grouped with linkId and
  * associated with its questionnaire item linkId.
  */
-internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLinkId(
+internal inline fun <T> List<QuestionnaireItemComponent>.zipByLinkId(
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   transform:
     (
-      Questionnaire.QuestionnaireItemComponent,
+      QuestionnaireItemComponent,
       QuestionnaireResponse.QuestionnaireResponseItemComponent,
     ) -> T,
 ): List<T> {
@@ -852,11 +871,11 @@ internal inline fun <T> List<Questionnaire.QuestionnaireItemComponent>.zipByLink
  * associated with its questionnaire item linkId.
  */
 internal inline fun <T> groupByAndZipByLinkId(
-  questionnaireItemList: List<Questionnaire.QuestionnaireItemComponent>,
+  questionnaireItemList: List<QuestionnaireItemComponent>,
   questionnaireResponseItemList: List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
   transform:
     (
-      List<Questionnaire.QuestionnaireItemComponent>,
+      List<QuestionnaireItemComponent>,
       List<QuestionnaireResponse.QuestionnaireResponseItemComponent>,
     ) -> T,
 ): List<T> {
@@ -886,39 +905,64 @@ internal inline fun <T> groupByAndZipByLinkId(
  *
  * For background, see https://build.fhir.org/questionnaireresponse.html#link.
  */
-internal val Questionnaire.QuestionnaireItemComponent.shouldHaveNestedItemsUnderAnswers: Boolean
-  get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || !repeats)
+internal val QuestionnaireItemComponent.shouldHaveNestedItemsUnderAnswers: Boolean
+  get() = item.isNotEmpty() && (type != Questionnaire.QuestionnaireItemType.GROUP || repeats)
 
 /**
- * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s from the nested
- * items in the [Questionnaire.QuestionnaireItemComponent].
+ * Creates a list of [QuestionnaireResponse.QuestionnaireResponseItemComponent]s corresponding to
+ * the nested items under the questionnaire item.
+ *
+ * The list can be added as nested items under answers in a corresponding questionnaire response
+ * item. This may be because
+ * 1. the questionnaire item is a question with nested questions, in which case each answer in the
+ *    questionnaire response item needs to have the same nested questions, or
+ * 2. the questionnaire item is a repeated group, in which case each answer in the questionnaire
+ *    response item represents an instance of the repeated group, and needs to have the same nested
+ *    questions.
  *
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-fun Questionnaire.QuestionnaireItemComponent.getNestedQuestionnaireResponseItems() =
+internal fun QuestionnaireItemComponent.createNestedQuestionnaireResponseItems() =
   item.map { it.createQuestionnaireResponseItem() }
 
 /**
- * Creates a [QuestionnaireResponse.QuestionnaireResponseItemComponent] from the provided
- * [Questionnaire.QuestionnaireItemComponent].
+ * Creates a corresponding [QuestionnaireResponse.QuestionnaireResponseItemComponent] for the
+ * questionnaire item with the following properties:
+ * - same `linkId` as the questionnaire item,
+ * - any initial answer(s) specified either in the `initial` element or as `initialSelected`
+ *   `answerOption`(s),
+ * - any nested questions under the initial answers (there will be no user input yet since this is
+ *   just being created) if this is a question with nested questions, and
+ * - any nested questions if this is a non-repeated group.
+ *
+ * Note that although initial answers to a repeated group may be interpreted as initial instances of
+ * the repeated group in the in-memory representation of questionnaire response, they are not
+ * defined as such in the standard. As a result, we are not treating them as such in this function
+ * to be conformant.
  *
  * The hierarchy and order of child items will be retained as specified in the standard. See
  * https://www.hl7.org/fhir/questionnaireresponse.html#notes for more details.
  */
-fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
+internal fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
   QuestionnaireResponse.QuestionnaireResponseItemComponent {
   return QuestionnaireResponse.QuestionnaireResponseItemComponent().apply {
     linkId = this@createQuestionnaireResponseItem.linkId
     answer = createQuestionnaireResponseItemAnswers()
-    if (shouldHaveNestedItemsUnderAnswers && answer.isNotEmpty()) {
-      this.addNestedItemsToAnswer(this@createQuestionnaireResponseItem)
+    if (
+      type != Questionnaire.QuestionnaireItemType.GROUP &&
+        this@createQuestionnaireResponseItem.item.isNotEmpty() &&
+        answer.isNotEmpty()
+    ) {
+      this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
     } else if (
       this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
         !repeats
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
-        this.addItem(it.createQuestionnaireResponseItem())
+        if (!it.isRepeatedGroup) {
+          this.addItem(it.createQuestionnaireResponseItem())
+        }
       }
     }
   }
@@ -928,7 +972,7 @@ fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItem():
  * Returns a list of answers from the initial values of the questionnaire item. `null` if no initial
  * value.
  */
-private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
+private fun QuestionnaireItemComponent.createQuestionnaireResponseItemAnswers():
   MutableList<QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent>? {
   // TODO https://github.com/google/android-fhir/issues/2161
   // The rule can be by-passed if initial value was set by an initial-expression.
@@ -975,12 +1019,11 @@ private fun Questionnaire.QuestionnaireItemComponent.createQuestionnaireResponse
  * Flatten a nested list of [Questionnaire.QuestionnaireItemComponent] recursively and returns a
  * flat list of all items into list embedded at any level
  */
-fun List<Questionnaire.QuestionnaireItemComponent>.flattened():
-  List<Questionnaire.QuestionnaireItemComponent> =
-  mutableListOf<Questionnaire.QuestionnaireItemComponent>().also { flattenInto(it) }
+fun List<QuestionnaireItemComponent>.flattened(): List<QuestionnaireItemComponent> =
+  mutableListOf<QuestionnaireItemComponent>().also { flattenInto(it) }
 
-private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
-  output: MutableList<Questionnaire.QuestionnaireItemComponent>,
+private fun List<QuestionnaireItemComponent>.flattenInto(
+  output: MutableList<QuestionnaireItemComponent>,
 ) {
   forEach {
     output.add(it)
@@ -988,7 +1031,7 @@ private fun List<Questionnaire.QuestionnaireItemComponent>.flattenInto(
   }
 }
 
-internal val Questionnaire.QuestionnaireItemComponent.isRepeatedGroup: Boolean
+internal val QuestionnaireItemComponent.isRepeatedGroup: Boolean
   get() = type == Questionnaire.QuestionnaireItemType.GROUP && repeats
 
 // TODO: Move this elsewhere.
@@ -996,3 +1039,17 @@ val Resource.logicalId: String
   get() {
     return this.idElement?.idPart.orEmpty()
   }
+
+internal fun QuestionnaireItemComponent.readCustomStyleExtension(styleUrl: StyleUrl): String? {
+  // Find the base extension
+  val baseExtension = extension.find { it.url == StyleUrl.BASE.url }
+  baseExtension?.let { ext ->
+    // Extract nested extension based on the given StyleUrl
+    ext.extension.forEach { nestedExt ->
+      if (nestedExt.url == styleUrl.url) {
+        return nestedExt.value.asStringValue()
+      }
+    }
+  }
+  return null
+}

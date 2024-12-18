@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.itemAnswerOptionImage
 import com.google.android.fhir.datacapture.extensions.optionExclusive
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.views.factories.OptionSelectOption
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewModel
 import com.google.android.fhir.datacapture.views.factories.SelectedOptions
@@ -107,12 +108,14 @@ internal class OptionSelectDialogFragment(
                 WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM,
             )
             // Adjust the dialog after the keyboard is on so that OK-CANCEL buttons are visible.
-            // SOFT_INPUT_ADJUST_RESIZE is deprecated and the suggested alternative
-            // setDecorFitsSystemWindows is available api level 30 and above.
+            // Ideally SOFT_INPUT_ADJUST_RESIZE supposed to be used, but in some devices the
+            // keyboard immediately hide itself after being opened, that's why SOFT_INPUT_ADJUST_PAN
+            // is used instead. There's no issue with setDecorFitsSystemWindows and is only
+            // available for api level 30 and above.
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
               it.setDecorFitsSystemWindows(false)
             } else {
-              it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
+              it.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN)
             }
           }
         }
@@ -136,7 +139,13 @@ internal class OptionSelectDialogFragment(
         SelectedOptions(
           options = currentList.filterIsInstance<OptionSelectRow.Option>().map { it.option },
           otherOptions =
-            currentList.filterIsInstance<OptionSelectRow.OtherEditText>().map { it.currentText },
+            currentList
+              .filterIsInstance<OptionSelectRow.OtherEditText>()
+              .filter {
+                it.currentText.isNotEmpty()
+              } // Filters out empty answers when the user inputs nothing into a new option choice
+              // edit text field.
+              .map { it.currentText },
         ),
       )
     }
@@ -200,7 +209,7 @@ private class OptionSelectAdapter(val multiSelectEnabled: Boolean) :
           } else {
             (holder as OptionSelectViewHolder.OptionSingle).radioButton
           }
-        compoundButton.text = item.option.displayString
+        compoundButton.text = item.option.displayString.toSpanned()
         compoundButton.setCompoundDrawablesRelative(
           item.option.item.itemAnswerOptionImage(compoundButton.context),
           null,

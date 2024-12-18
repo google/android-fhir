@@ -17,12 +17,14 @@
 package com.google.android.fhir.datacapture.views
 
 import android.content.Context
+import android.text.method.LinkMovementMethod
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.appendAsteriskToQuestionText
+import com.google.android.fhir.datacapture.extensions.applyCustomOrDefaultStyle
 import com.google.android.fhir.datacapture.extensions.getHeaderViewVisibility
 import com.google.android.fhir.datacapture.extensions.getLocalizedInstructionsSpanned
 import com.google.android.fhir.datacapture.extensions.initHelpViews
@@ -54,16 +56,26 @@ class HeaderView(context: Context, attrs: AttributeSet?) : LinearLayout(context,
       helpCardStateChangedCallback = questionnaireViewItem.helpCardStateChangedCallback,
     )
     prefix.updateTextAndVisibility(questionnaireViewItem.questionnaireItem.localizedPrefixSpanned)
-    // CQF expression takes precedence over static question text
-    question.updateTextAndVisibility(
-      appendAsteriskToQuestionText(question.context, questionnaireViewItem),
-    )
-    hint.updateTextAndVisibility(
-      questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
-    )
+    question.apply {
+      // CQF expression takes precedence over static question text
+      updateTextAndVisibility(appendAsteriskToQuestionText(question.context, questionnaireViewItem))
+      movementMethod = LinkMovementMethod.getInstance()
+    }
+    hint.apply {
+      updateTextAndVisibility(
+        questionnaireViewItem.enabledDisplayItems.getLocalizedInstructionsSpanned(),
+      )
+      movementMethod = LinkMovementMethod.getInstance()
+    }
     // Make the entire view GONE if there is nothing to show. This is to avoid an empty row in the
     // questionnaire.
     visibility = getHeaderViewVisibility(prefix, question, hint)
+    applyCustomOrDefaultStyle(
+      questionnaireViewItem.questionnaireItem,
+      prefixTextView = prefix,
+      questionTextView = question,
+      instructionTextView = hint,
+    )
   }
 
   /**

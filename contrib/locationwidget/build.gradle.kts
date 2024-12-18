@@ -13,9 +13,9 @@ createJacocoTestReportTask()
 
 android {
   namespace = "com.google.android.fhir.datacapture.contrib.views.locationwidget"
-  compileSdk = Sdk.compileSdk
+  compileSdk = Sdk.COMPILE_SDK
   defaultConfig {
-    minSdk = Sdk.minSdk
+    minSdk = Sdk.MIN_SDK
     testInstrumentationRunner = Dependencies.androidJunitRunner
     // Need to specify this to prevent junit runner from going deep into our dependencies
     testInstrumentationRunnerArguments["package"] = "com.google.android.fhir.datacapture"
@@ -28,6 +28,11 @@ android {
       isMinifyEnabled = false
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
     }
+  }
+  compileOptions {
+    // Flag to enable support for the new language APIs
+    // See https://developer.android.com/studio/write/java8-support
+    isCoreLibraryDesugaringEnabled = true
   }
 
   packaging {
@@ -50,26 +55,28 @@ android {
 configurations { all { removeIncompatibleDependencies() } }
 
 dependencies {
+  androidTestImplementation(libs.androidx.fragment.testing)
+  androidTestImplementation(libs.androidx.test.core)
+  androidTestImplementation(libs.androidx.test.ext.junit)
+  androidTestImplementation(libs.androidx.test.ext.junit.ktx)
+  androidTestImplementation(libs.androidx.test.rules)
+  androidTestImplementation(libs.androidx.test.runner)
+  androidTestImplementation(libs.truth)
+
   implementation(project(":datacapture"))
-  implementation(Dependencies.Androidx.coreKtx)
-  implementation(Dependencies.Androidx.fragmentKtx)
   implementation(Dependencies.playServicesLocation)
-  implementation(Dependencies.Kotlin.kotlinCoroutinesPlay)
-  implementation(Dependencies.material)
   implementation(Dependencies.timber)
-  implementation(Dependencies.Androidx.appCompat)
+  implementation(libs.androidx.appcompat)
+  implementation(libs.androidx.core)
+  implementation(libs.androidx.fragment)
+  implementation(libs.kotlinx.coroutines.playservices)
+  implementation(libs.material)
 
-  testImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  testImplementation(Dependencies.Kotlin.kotlinTestJunit)
-  testImplementation(Dependencies.junit)
+  coreLibraryDesugaring(Dependencies.desugarJdkLibs)
+
   testImplementation(Dependencies.robolectric)
-  testImplementation(Dependencies.truth)
-
-  androidTestImplementation(Dependencies.AndroidxTest.core)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunit)
-  androidTestImplementation(Dependencies.AndroidxTest.extJunitKtx)
-  androidTestImplementation(Dependencies.AndroidxTest.fragmentTesting)
-  androidTestImplementation(Dependencies.AndroidxTest.rules)
-  androidTestImplementation(Dependencies.AndroidxTest.runner)
-  androidTestImplementation(Dependencies.truth)
+  testImplementation(libs.androidx.fragment.testing)
+  testImplementation(libs.junit)
+  testImplementation(libs.kotlin.test.junit)
+  testImplementation(libs.truth)
 }

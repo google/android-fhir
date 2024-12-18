@@ -17,6 +17,8 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.context.FhirContext
+import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
 import com.google.android.fhir.LocalChange
@@ -26,10 +28,13 @@ import com.google.android.fhir.get
 import com.google.android.fhir.lastUpdated
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.search.LOCAL_LAST_UPDATED_PARAM
+import com.google.android.fhir.search.filter.TokenParamFilterCriterion
 import com.google.android.fhir.search.search
 import com.google.android.fhir.sync.AcceptLocalConflictResolver
 import com.google.android.fhir.sync.AcceptRemoteConflictResolver
 import com.google.android.fhir.sync.ResourceSyncException
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
@@ -48,12 +53,16 @@ import kotlinx.coroutines.test.runTest
 import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Address
 import org.hl7.fhir.r4.model.CanonicalType
+import org.hl7.fhir.r4.model.CodeableConcept
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.DateTimeType
+import org.hl7.fhir.r4.model.Encounter
 import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.HumanName
 import org.hl7.fhir.r4.model.Meta
+import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
+import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.ResourceType
 import org.junit.Assert.assertThrows
 import org.junit.Before
@@ -66,6 +75,7 @@ import org.robolectric.RobolectricTestRunner
 class FhirEngineImplTest {
   private val services = builder(ApplicationProvider.getApplicationContext()).inMemory().build()
   private val fhirEngine = services.fhirEngine
+  private val parser = FhirContext.forR4Cached().newJsonParser()
 
   @Before fun setUp(): Unit = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
 
@@ -318,18 +328,55 @@ class FhirEngineImplTest {
   }
 
   @Test
+  fun `search() should return patients filtered by param _id`() = runTest {
+    val patient1 = Patient().apply { id = "patient-1" }
+    val patient2 = Patient().apply { id = "patient-2" }
+    val patient3 = Patient().apply { id = "patient-45" }
+    val patient4 = Patient().apply { id = "patient-4355" }
+    val patient5 = Patient().apply { id = "patient-899" }
+    val patient6 = Patient().apply { id = "patient-883376" }
+    fhirEngine.create(patient1, patient2, patient3, patient4, patient5, patient6)
+
+    val filterValues =
+      listOf(patient2, patient3, patient1, patient5, patient4, patient6).map<
+        Patient,
+        TokenParamFilterCriterion.() -> Unit,
+      > {
+        { value = of(it.logicalId) }
+      }
+    val patientSearchResult =
+      fhirEngine.search<Patient> { filter(TokenClientParam("_id"), *filterValues.toTypedArray()) }
+    assertThat(patientSearchResult.map { it.resource.logicalId })
+      .containsExactly(
+        "patient-2",
+        "patient-45",
+        "patient-1",
+        "patient-4355",
+        "patient-899",
+        "patient-883376",
+      )
+  }
+
+  @Test
   fun syncUpload_uploadLocalChange_success() = runTest {
     val localChanges = mutableListOf<LocalChange>()
     val emittedProgress = mutableListOf<SyncUploadProgress>()
 
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
-        localChanges.addAll(it)
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
+        localChanges.addAll(lcs)
         flowOf(
           UploadRequestResult.Success(
             listOf(
               ResourceUploadResponseMapping(
-                it,
+                lcs,
                 TEST_PATIENT_1,
               ),
             ),
@@ -343,7 +390,7 @@ class FhirEngineImplTest {
       assertThat(resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(resourceId).isEqualTo(TEST_PATIENT_1.id)
       assertThat(type).isEqualTo(Type.INSERT)
-      assertThat(payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(payload).isEqualTo(parser.encodeResourceToString(TEST_PATIENT_1))
     }
 
     assertThat(emittedProgress).hasSize(2)
@@ -356,10 +403,17 @@ class FhirEngineImplTest {
     val emittedProgress = mutableListOf<SyncUploadProgress>()
     val uploadError = ResourceSyncException(ResourceType.Patient, FHIRException("Did not work"))
     fhirEngine
-      .syncUpload(UploadStrategy.AllChangesSquashedBundlePut) {
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Failure(
-            it,
+            lcs,
             uploadError,
           ),
         )
@@ -394,7 +448,7 @@ class FhirEngineImplTest {
   fun `getLocalChanges() should return single local change`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
     with(resourceLocalChanges) {
       assertThat(size).isEqualTo(1)
@@ -445,7 +499,7 @@ class FhirEngineImplTest {
   fun `clearDatabase() should clear all tables data`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
     with(resourceLocalChanges) {
       assertThat(size).isEqualTo(1)
@@ -767,12 +821,18 @@ class FhirEngineImplTest {
   fun `test local changes are consumed when using POST upload strategy`() = runBlocking {
     assertThat(services.database.getLocalChangesCount()).isEqualTo(1)
     fhirEngine
-      .syncUpload(UploadStrategy.SingleResourcePost) {
+      .syncUpload(
+        UploadStrategy.forIndividualRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+        ),
+      ) { lcs, _ ->
         flowOf(
           UploadRequestResult.Success(
             listOf(
               ResourceUploadResponseMapping(
-                it,
+                lcs,
                 TEST_PATIENT_1,
               ),
             ),
@@ -781,6 +841,60 @@ class FhirEngineImplTest {
       }
       .collect {}
     assertThat(services.database.getLocalChangesCount()).isEqualTo(0)
+  }
+
+  @Test
+  fun `withTransaction saves changes successfully`() = runTest {
+    fhirEngine.withTransaction {
+      val patient01 =
+        Patient().apply {
+          id = "patient-01"
+          gender = Enumerations.AdministrativeGender.FEMALE
+        }
+      this.create(patient01)
+
+      val patient01Observation =
+        Observation().apply {
+          id = "patient-01-observation"
+          status = Observation.ObservationStatus.FINAL
+          code = CodeableConcept()
+          subject = Reference(patient01)
+        }
+      this.create(patient01Observation)
+    }
+
+    assertThat(
+        fhirEngine.get<Patient>("patient-01"),
+      )
+      .isNotNull()
+    assertThat(fhirEngine.get<Observation>("patient-01-observation")).isNotNull()
+    assertThat(
+        fhirEngine.get<Observation>("patient-01-observation").subject.reference,
+      )
+      .isEqualTo("Patient/patient-01")
+  }
+
+  @Test
+  fun `withTransaction rolls back changes when an error occurs`() = runTest {
+    try {
+      fhirEngine.withTransaction {
+        val patientEncounter =
+          Encounter().apply {
+            id = "enc-01"
+            status = Encounter.EncounterStatus.FINISHED
+            class_ = Coding()
+          }
+
+        this.create(patientEncounter)
+
+        // An exception will rollback the entire block
+        this.get(ResourceType.Patient, "non_existent_id") as Patient
+      }
+    } catch (_: ResourceNotFoundException) {}
+
+    assertThrows(ResourceNotFoundException::class.java) {
+      runBlocking { fhirEngine.get<Encounter>("enc-01") }
+    }
   }
 
   companion object {

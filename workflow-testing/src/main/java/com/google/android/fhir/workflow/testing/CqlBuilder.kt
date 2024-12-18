@@ -120,7 +120,7 @@ object CqlBuilder : Loadable() {
       version = libVersion
       status = Enumerations.PublicationStatus.ACTIVE
       experimental = true
-      url = "http://localhost/Library/$libName|$libVersion"
+      url = "http://localhost/Library/$libName"
       attachmentCql?.let { addContent(it) }
       attachmentJson?.let { addContent(it) }
       attachmentXml?.let { addContent(it) }

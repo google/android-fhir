@@ -32,7 +32,7 @@ import com.google.android.fhir.datacapture.extensions.getRequiredOrOptionalText
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
 import com.google.android.fhir.datacapture.extensions.itemControl
 import com.google.android.fhir.datacapture.extensions.localizedFlyoverSpanned
-import com.google.android.fhir.datacapture.extensions.localizedTextSpanned
+import com.google.android.fhir.datacapture.extensions.toSpanned
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.HeaderView
@@ -77,12 +77,12 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
 
         val questionnaireItem = questionnaireViewItem.questionnaireItem
         val selectedOptions = questionnaireViewItem.extractInitialOptions(holder.header.context)
-        holder.summary.text = selectedOptions.selectedSummary
+        holder.summary.text = selectedOptions.selectedSummary.toSpanned()
         selectedOptionsJob =
           activity.lifecycleScope.launch {
             // Listen for changes to selected options to update summary + FHIR data model
             viewModel.getSelectedOptionsFlow(questionnaireItem.linkId).collect { selectedOptions ->
-              holder.summary.text = selectedOptions.selectedSummary
+              holder.summary.text = selectedOptions.selectedSummary.toSpanned()
               updateAnswers(selectedOptions)
             }
           }
@@ -92,7 +92,10 @@ internal object QuestionnaireItemDialogSelectViewHolderFactory :
           View.OnClickListener {
             val fragment =
               OptionSelectDialogFragment(
-                title = questionnaireItem.localizedTextSpanned ?: "",
+                // We use the question text for the dialog title. If there is no question text, we
+                // use flyover text as it is sometimes used in text fields instead of question text.
+                title = questionnaireViewItem.questionText
+                    ?: questionnaireItem.localizedFlyoverSpanned ?: "",
                 config = questionnaireItem.buildConfig(),
                 selectedOptions = selectedOptions,
               )

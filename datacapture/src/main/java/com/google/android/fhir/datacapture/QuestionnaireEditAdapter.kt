@@ -16,15 +16,17 @@
 
 package com.google.android.fhir.datacapture
 
+import android.annotation.SuppressLint
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.extensions.shouldUseDialog
+import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
@@ -43,6 +45,7 @@ import com.google.android.fhir.datacapture.views.factories.QuantityViewHolderFac
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemDialogSelectViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
@@ -64,7 +67,16 @@ internal class QuestionnaireEditAdapter(
         ViewHolder.QuestionHolder(onCreateViewHolderQuestion(parent = parent, subtype = subtype))
       ViewType.Type.REPEATED_GROUP_HEADER -> {
         ViewHolder.RepeatedGroupHeaderHolder(
-          parent.inflate(R.layout.repeated_group_instance_header_view),
+          RepeatedGroupHeaderItemViewHolder(
+            parent.inflate(R.layout.repeated_group_instance_header_view),
+          ),
+        )
+      }
+      ViewType.Type.NAVIGATION -> {
+        ViewHolder.NavigationHolder(
+          NavigationViewHolder(
+            parent.inflate(R.layout.pagination_navigation_view),
+          ),
         )
       }
     }
@@ -118,8 +130,11 @@ internal class QuestionnaireEditAdapter(
       }
       is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
         holder as ViewHolder.RepeatedGroupHeaderHolder
-        holder.header.text = "Group ${item.index + 1}"
-        holder.delete.setOnClickListener { item.onDeleteClicked() }
+        holder.viewHolder.bind(item)
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        holder as ViewHolder.NavigationHolder
+        holder.viewHolder.bind(item.questionnaireNavigationUIState)
       }
     }
   }
@@ -141,6 +156,10 @@ internal class QuestionnaireEditAdapter(
         type = ViewType.Type.REPEATED_GROUP_HEADER
         // All of the repeated group headers will be rendered identically
         subtype = 0
+      }
+      is QuestionnaireAdapterItem.Navigation -> {
+        type = ViewType.Type.NAVIGATION
+        subtype = 0xFFFFFF
       }
     }
     return ViewType.from(type = type, subtype = subtype).viewType
@@ -173,6 +192,7 @@ internal class QuestionnaireEditAdapter(
     enum class Type {
       QUESTION,
       REPEATED_GROUP_HEADER,
+      NAVIGATION,
     }
   }
 
@@ -222,8 +242,11 @@ internal class QuestionnaireEditAdapter(
   ): QuestionnaireViewHolderType {
     val questionnaireItem = questionnaireViewItem.questionnaireItem
 
-    // Use the view type that the client wants if they specified an itemControl
-    return questionnaireItem.itemControl?.viewHolderType
+    // Use the view type that the client wants if they specified an itemControl or dialog extension
+    return when {
+      questionnaireItem.shouldUseDialog -> QuestionnaireViewHolderType.DIALOG_SELECT
+      else -> questionnaireItem.itemControl?.viewHolderType
+    }
     // Otherwise, choose a sensible UI element automatically
     ?: run {
         val numOptions = questionnaireViewItem.enabledAnswerOptions.size
@@ -266,10 +289,10 @@ internal class QuestionnaireEditAdapter(
   internal sealed class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     class QuestionHolder(val holder: QuestionnaireItemViewHolder) : ViewHolder(holder.itemView)
 
-    class RepeatedGroupHeaderHolder(itemView: View) : ViewHolder(itemView) {
-      val header: TextView = itemView.findViewById(R.id.repeated_group_instance_header_title)
-      val delete: View = itemView.findViewById(R.id.repeated_group_instance_header_delete_button)
-    }
+    class RepeatedGroupHeaderHolder(val viewHolder: RepeatedGroupHeaderItemViewHolder) :
+      ViewHolder(viewHolder.itemView)
+
+    class NavigationHolder(val viewHolder: NavigationViewHolder) : ViewHolder(viewHolder.itemView)
   }
 
   internal companion object {
@@ -297,6 +320,7 @@ internal object DiffCallbacks {
             newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
               oldItem.index == newItem.index
           }
+          is QuestionnaireAdapterItem.Navigation -> newItem is QuestionnaireAdapterItem.Navigation
         }
 
       override fun areContentsTheSame(
@@ -309,8 +333,32 @@ internal object DiffCallbacks {
               QUESTIONS.areContentsTheSame(oldItem, newItem)
           }
           is QuestionnaireAdapterItem.RepeatedGroupHeader -> {
-            newItem is QuestionnaireAdapterItem.RepeatedGroupHeader &&
-              oldItem.responses == newItem.responses
+            if (newItem is QuestionnaireAdapterItem.RepeatedGroupHeader) {
+              // The `onDeleteClicked` function is a function closure generated in the questionnaire
+              // viewmodel with a reference to the parent questionnaire view item. When it is
+              // invoked, it deletes the current repeated group instance from the parent
+              // questionnaire view item by removing it from the list of children in the parent
+              // questionnaire view.
+              // In other words, although the `onDeleteClicked` function is not a data field, it is
+              // a function closure with references to data structures. Because
+              // `RepeatedGroupHeader` does not include any other data fields besides the index, it
+              // is particularly important to distinguish between different `RepeatedGroupHeader`s
+              // by the `onDeleteClicked` function.
+              // If this check is not here, an old RepeatedGroupHeader might be mistakenly
+              // considered up-to-date and retained in the recycler view even though a newer
+              // version includes a different `onDeleteClicked` function referencing a parent item
+              // with a different list of children. As a result clicking the delete function might
+              // result in deleting from an old list.
+              @SuppressLint("DiffUtilEquals")
+              val onDeleteClickedCallbacksEqual = oldItem.onDeleteClicked == newItem.onDeleteClicked
+              onDeleteClickedCallbacksEqual
+            } else {
+              false
+            }
+          }
+          is QuestionnaireAdapterItem.Navigation -> {
+            newItem is QuestionnaireAdapterItem.Navigation &&
+              oldItem.questionnaireNavigationUIState == newItem.questionnaireNavigationUIState
           }
         }
     }

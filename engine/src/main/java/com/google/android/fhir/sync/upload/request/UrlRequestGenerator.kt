@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package com.google.android.fhir.sync.upload.request
 
 import ca.uhn.fhir.context.FhirContext
-import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.ContentTypes
 import com.google.android.fhir.sync.upload.patch.Patch
 import com.google.android.fhir.sync.upload.patch.PatchMapping
+import com.google.android.fhir.sync.upload.patch.StronglyConnectedPatchMappings
 import org.hl7.fhir.r4.model.Binary
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.codesystems.HttpVerb
@@ -30,19 +30,32 @@ internal class UrlRequestGenerator(
   private val getUrlRequestForPatch: (patch: Patch) -> UrlUploadRequest,
 ) : UploadRequestGenerator {
 
+  /**
+   * Since a [UrlUploadRequest] can only handle a single resource request, the
+   * [StronglyConnectedPatchMappings.patchMappings] are flattened and handled as acyclic mapping to
+   * generate [UrlUploadRequestMapping] for each [PatchMapping].
+   *
+   * **NOTE**
+   *
+   * Since the referential integrity on the sever may get violated if the subsequent requests have
+   * cyclic dependency on each other, We may introduce configuration for application to provide
+   * server's referential integrity settings and make it illegal to generate [UrlUploadRequest] when
+   * server has strict referential integrity and the requests have cyclic dependency amongst itself.
+   */
   override fun generateUploadRequests(
-    mappedPatches: List<PatchMapping>,
+    mappedPatches: List<StronglyConnectedPatchMappings>,
   ): List<UrlUploadRequestMapping> =
-    mappedPatches.map {
-      UrlUploadRequestMapping(
-        localChanges = it.localChanges,
-        generatedRequest = getUrlRequestForPatch(it.generatedPatch),
-      )
-    }
+    mappedPatches
+      .map { it.patchMappings }
+      .flatten()
+      .map {
+        UrlUploadRequestMapping(
+          localChanges = it.localChanges,
+          generatedRequest = getUrlRequestForPatch(it.generatedPatch),
+        )
+      }
 
   companion object Factory {
-
-    private val parser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
 
     private val createMapping =
       mapOf(
@@ -91,21 +104,24 @@ internal class UrlRequestGenerator(
       UrlUploadRequest(
         httpVerb = HttpVerb.DELETE,
         url = "${patch.resourceType}/${patch.resourceId}",
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun postForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.POST,
         url = patch.resourceType,
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun putForCreateResource(patch: Patch) =
       UrlUploadRequest(
         httpVerb = HttpVerb.PUT,
         url = "${patch.resourceType}/${patch.resourceId}",
-        resource = parser.parseResource(patch.payload) as Resource,
+        resource =
+          FhirContext.forR4Cached().newJsonParser().parseResource(patch.payload) as Resource,
       )
 
     private fun patchForUpdateResource(patch: Patch) =

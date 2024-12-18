@@ -22,7 +22,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
-import com.google.android.fhir.datacapture.extensions.getNestedQuestionnaireResponseItems
 import com.google.android.fhir.datacapture.extensions.tryUnwrapContext
 import com.google.android.fhir.datacapture.validation.Invalid
 import com.google.android.fhir.datacapture.validation.NotValidated
@@ -52,16 +51,18 @@ internal object GroupViewHolderFactory :
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
+        addItemButton.text =
+          context.getString(
+            R.string.add_repeated_group_item,
+            questionnaireViewItem.questionText ?: "",
+          )
         addItemButton.visibility =
           if (questionnaireViewItem.questionnaireItem.repeats) View.VISIBLE else View.GONE
         addItemButton.setOnClickListener {
           context.lifecycleScope.launch {
             questionnaireViewItem.addAnswer(
-              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
-                // TODO(jingtang10): This can be removed since we already do this in the
-                // answerChangedCallback in the QuestionnaireViewModel.
-                item = questionnaireViewItem.questionnaireItem.getNestedQuestionnaireResponseItems()
-              },
+              // Nested items will be added in answerChangedCallback in the QuestionnaireViewModel
+              QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent(),
             )
           }
         }

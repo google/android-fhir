@@ -20,6 +20,7 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.common.truth.Truth.assertThat
 import org.hl7.fhir.r4.model.BooleanType
+import org.hl7.fhir.r4.model.DateTimeType
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -246,6 +247,121 @@ class MoreQuestionnaireResponsesTest {
                     addAnswer(
                       QuestionnaireResponseItemAnswerComponent().apply {
                         value = BooleanType(false)
+                      },
+                    )
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    questionnaireResponse.packRepeatedGroups(questionnaire)
+    assertResourceEquals(questionnaireResponse, packedQuestionnaireResponse)
+  }
+
+  @Test
+  fun `should pack repeated groups recursively`() {
+    val questionnaire =
+      Questionnaire().apply {
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "repeated-group"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            repeats = true
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "nested-repeated-group"
+                type = Questionnaire.QuestionnaireItemType.GROUP
+                repeats = true
+                addItem(
+                  QuestionnaireItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    val questionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-repeated-group"
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(true)
+                      },
+                    )
+                  },
+                )
+              },
+            )
+            addItem(
+              QuestionnaireResponseItemComponent().apply {
+                linkId = "nested-repeated-group"
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-nested-question"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        value = BooleanType(false)
+                      },
+                    )
+                  },
+                )
+              },
+            )
+          },
+        )
+      }
+
+    val packedQuestionnaireResponse =
+      QuestionnaireResponse().apply {
+        addItem(
+          QuestionnaireResponseItemComponent().apply {
+            linkId = "repeated-group"
+            addAnswer(
+              QuestionnaireResponseItemAnswerComponent().apply {
+                addItem(
+                  QuestionnaireResponseItemComponent().apply {
+                    linkId = "nested-repeated-group"
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        addItem(
+                          QuestionnaireResponseItemComponent().apply {
+                            linkId = "nested-nested-question"
+                            addAnswer(
+                              QuestionnaireResponseItemAnswerComponent().apply {
+                                value = BooleanType(true)
+                              },
+                            )
+                          },
+                        )
+                      },
+                    )
+                    addAnswer(
+                      QuestionnaireResponseItemAnswerComponent().apply {
+                        addItem(
+                          QuestionnaireResponseItemComponent().apply {
+                            linkId = "nested-nested-question"
+                            addAnswer(
+                              QuestionnaireResponseItemAnswerComponent().apply {
+                                value = BooleanType(false)
+                              },
+                            )
+                          },
+                        )
                       },
                     )
                   },
@@ -694,5 +810,30 @@ class MoreQuestionnaireResponsesTest {
   private fun assertResourceEquals(expected: Resource, actual: Resource) {
     assertThat(iParser.encodeResourceToString(actual))
       .isEqualTo(iParser.encodeResourceToString(expected))
+  }
+
+  @Test
+  fun `should add launchTimestamp`() {
+    val questionnaireResponse = QuestionnaireResponse()
+    val dateTimeType = DateTimeType("2024-07-05T00:00:00Z")
+    questionnaireResponse.launchTimestamp = dateTimeType
+
+    assertThat(dateTimeType).isEqualTo(questionnaireResponse.launchTimestamp)
+  }
+
+  @Test
+  fun `launchTimestamp should be null when not added`() {
+    assertThat(QuestionnaireResponse().launchTimestamp).isNull()
+  }
+
+  @Test
+  fun `launchTimestamp should update if already exists`() {
+    val questionnaireResponse = QuestionnaireResponse()
+    val oldDateTimeType = DateTimeType("2024-07-01T00:00:00Z")
+    val newDateTimeType = DateTimeType("2024-07-05T00:00:00Z")
+    questionnaireResponse.launchTimestamp = oldDateTimeType
+    questionnaireResponse.launchTimestamp = newDateTimeType
+
+    assertThat(newDateTimeType).isEqualTo(questionnaireResponse.launchTimestamp)
   }
 }

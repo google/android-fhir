@@ -38,6 +38,7 @@ import org.hl7.fhir.r4.model.Enumerations
 import org.hl7.fhir.r4.model.Observation
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Reference
+import org.hl7.fhir.r4.model.Task
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -48,6 +49,7 @@ import org.junit.runner.RunWith
 class LocalChangeDaoTest {
   private lateinit var database: ResourceDatabase
   private lateinit var localChangeDao: LocalChangeDao
+  private val iParser = FhirContext.forR4Cached().newJsonParser()
 
   @Before
   fun setupDatabase() {
@@ -61,7 +63,6 @@ class LocalChangeDaoTest {
 
     localChangeDao =
       database.localChangeDao().also {
-        it.iParser = FhirContext.forCached(FhirVersionEnum.R4).newJsonParser()
         it.fhirTerser = FhirTerser(FhirContext.forCached(FhirVersionEnum.R4))
       }
   }
@@ -96,8 +97,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceUuid).isEqualTo(carePlanResourceUuid)
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(carePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
-    assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(carePlan))
+    assertThat(carePlanLocalChange1.payload).isEqualTo(iParser.encodeResourceToString(carePlan))
     val carePlanLocalChange1Id = carePlanLocalChange1.id
 
     val localChangeResourceReferences =
@@ -149,7 +149,7 @@ class LocalChangeDaoTest {
           resourceId = originalCarePlan.logicalId,
           resourceType = originalCarePlan.resourceType,
           resourceUuid = carePlanResourceUuid,
-          serializedResource = localChangeDao.iParser.encodeResourceToString(originalCarePlan),
+          serializedResource = iParser.encodeResourceToString(originalCarePlan),
         ),
       updatedResource = modifiedCarePlan,
       timeOfLocalChange = carePlanUpdateTime,
@@ -162,7 +162,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(originalCarePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
     assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(originalCarePlan))
+      .isEqualTo(iParser.encodeResourceToString(originalCarePlan))
 
     val carePlanLocalChange2 = carePlanLocalChanges[1]
     assertThat(carePlanLocalChange2.resourceUuid).isEqualTo(carePlanResourceUuid)
@@ -223,8 +223,7 @@ class LocalChangeDaoTest {
     assertThat(carePlanLocalChange1.resourceUuid).isEqualTo(carePlanResourceUuid)
     assertThat(carePlanLocalChange1.resourceId).isEqualTo(carePlan.id)
     assertThat(carePlanLocalChange1.type).isEqualTo(LocalChangeEntity.Type.INSERT)
-    assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(carePlan))
+    assertThat(carePlanLocalChange1.payload).isEqualTo(iParser.encodeResourceToString(carePlan))
 
     val carePlanLocalChange2 = carePlanLocalChanges[1]
     assertThat(carePlanLocalChange2.resourceUuid).isEqualTo(carePlanResourceUuid)
@@ -284,7 +283,7 @@ class LocalChangeDaoTest {
           resourceId = originalCarePlan.logicalId,
           resourceType = originalCarePlan.resourceType,
           resourceUuid = carePlanResourceUuid,
-          serializedResource = localChangeDao.iParser.encodeResourceToString(originalCarePlan),
+          serializedResource = iParser.encodeResourceToString(originalCarePlan),
         ),
       updatedResource = modifiedCarePlan,
       timeOfLocalChange = carePlanUpdateTime,
@@ -295,7 +294,7 @@ class LocalChangeDaoTest {
     localChangeDao.updateResourceIdAndReferences(
       resourceUuid = patientResourceUuid,
       oldResource = patient,
-      updatedResource = updatedPatient,
+      updatedResourceId = updatedPatient.logicalId,
     )
 
     // assert that Patient's new ID is reflected in the Patient Resource Change
@@ -317,7 +316,7 @@ class LocalChangeDaoTest {
         activityFirstRep.detail.performer.add(Reference("Patient/$updatedPatientId"))
       }
     assertThat(carePlanLocalChange1.payload)
-      .isEqualTo(localChangeDao.iParser.encodeResourceToString(updatedReferencesCarePlan))
+      .isEqualTo(iParser.encodeResourceToString(updatedReferencesCarePlan))
     val carePlanLocalChange1Id = carePlanLocalChange1.id
     // assert that LocalChangeReferences are updated as well
     val localChange1ResourceReferences =
@@ -357,6 +356,39 @@ class LocalChangeDaoTest {
     assertThat(localChangeResourceReferences[2].resourceReferenceValue)
       .isEqualTo(practitionerReference)
   }
+
+  // https://github.com/google/android-fhir/issues/2559
+  @Test
+  fun updateResourceIdAndReferences_shouldSafelyUpdateLocalChangesReferencesAboveSQLiteInOpLimit() =
+    runBlocking {
+      val localPatientId = "local-patient-id"
+      val patientResourceUuid = UUID.randomUUID()
+      val localPatient = Patient().apply { id = localPatientId }
+      val patientCreationTime = Instant.now()
+      localChangeDao.addInsert(localPatient, patientResourceUuid, patientCreationTime)
+
+      val countAboveLimit = LocalChangeDao.SQLITE_LIMIT_MAX_VARIABLE_NUMBER * 10
+      (1..countAboveLimit).forEach {
+        val taskResourceUuid = UUID.randomUUID()
+        val task =
+          Task().apply {
+            id = "local-task-$it"
+            `for` = Reference("Patient/$localPatientId")
+          }
+        val taskCreationTime = Instant.now()
+        localChangeDao.addInsert(task, taskResourceUuid, taskCreationTime)
+      }
+
+      val updatedPatientId = "synced-patient-id"
+      val updatedLocalPatient = localPatient.copy().apply { id = updatedPatientId }
+      val updatedReferences =
+        localChangeDao.updateResourceIdAndReferences(
+          patientResourceUuid,
+          oldResource = localPatient,
+          updatedResourceId = updatedLocalPatient.logicalId,
+        )
+      assertThat(updatedReferences.size).isEqualTo(countAboveLimit)
+    }
 
   @Test
   fun getReferencesForLocalChanges_should_return_all_changes(): Unit = runBlocking {
