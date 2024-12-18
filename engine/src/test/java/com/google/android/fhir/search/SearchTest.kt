@@ -156,8 +156,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
@@ -178,7 +177,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           diffStart,
@@ -209,8 +207,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
@@ -221,7 +218,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.epochDay,
@@ -249,8 +245,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
@@ -261,7 +256,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.epochDay,
@@ -289,8 +283,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
@@ -301,7 +294,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay,
@@ -324,8 +316,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
@@ -336,7 +327,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay,
@@ -367,8 +357,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
@@ -379,7 +368,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.epochDay,
@@ -407,8 +395,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
@@ -419,7 +406,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.epochDay,
@@ -447,8 +433,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
@@ -459,7 +444,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay,
@@ -487,8 +471,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
@@ -499,7 +482,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateType("2013-03-14").value.epochDay,
@@ -532,8 +514,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
@@ -555,7 +536,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           diffStart,
@@ -586,8 +566,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from > ?
         )
@@ -598,7 +577,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-15").value.time - 1,
@@ -626,8 +604,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to < ?
         )
@@ -638,7 +615,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
@@ -666,8 +642,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from NOT BETWEEN ? AND ? OR index_to NOT BETWEEN ? AND ?)
         )
@@ -678,7 +653,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
@@ -709,8 +683,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_from BETWEEN ? AND ? AND index_to BETWEEN ? AND ?)
         )
@@ -721,7 +694,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
@@ -752,8 +724,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to > ?
         )
@@ -764,7 +735,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-15").value.time - 1,
@@ -792,8 +762,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_to >= ?
         )
@@ -804,7 +773,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
@@ -832,8 +800,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from < ?
         )
@@ -844,7 +811,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-14").value.time,
@@ -872,8 +838,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM DateTimeIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_from <= ?
         )
@@ -884,7 +849,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.BIRTHDATE.paramName,
           DateTimeType("2013-03-15").value.time - 1,
@@ -904,8 +868,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
@@ -914,7 +877,6 @@ class SearchTest {
       )
     assertThat(query.args)
       .containsExactly(
-        ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
         "someValue",
@@ -941,8 +903,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -951,7 +912,6 @@ class SearchTest {
       )
     assertThat(query.args)
       .containsExactly(
-        ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
         "someValue",
@@ -978,8 +938,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE '%' || ? || '%' COLLATE NOCASE
         )
@@ -988,7 +947,6 @@ class SearchTest {
       )
     assertThat(query.args)
       .containsExactly(
-        ResourceType.Patient.name,
         ResourceType.Patient.name,
         Patient.ADDRESS.paramName,
         "someValue",
@@ -1015,8 +973,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1026,7 +983,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
           "male",
@@ -1055,8 +1011,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1066,7 +1021,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Immunization.name,
           ResourceType.Immunization.name,
           Immunization.VACCINE_CODE.paramName,
           "260385009",
@@ -1090,8 +1044,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1101,7 +1054,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
           "12345",
@@ -1135,8 +1087,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1146,7 +1097,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
           "test@gmail.com",
@@ -1179,8 +1129,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1190,7 +1139,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.TELECOM.paramName,
           "test@gmail.com",
@@ -1209,8 +1157,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1220,7 +1167,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.GENDER.paramName,
           "male",
@@ -1238,8 +1184,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1249,7 +1194,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.ACTIVE.paramName,
           "true",
@@ -1274,8 +1218,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1285,7 +1228,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.IDENTIFIER.paramName,
           "16009886-bd57-11eb-8529-0242ac130003",
@@ -1305,8 +1247,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1316,7 +1257,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.PHONE.paramName,
           "+14845219791",
@@ -1344,8 +1284,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value >= ? AND index_value < ?)
         )
@@ -1355,7 +1294,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "g",
@@ -1385,8 +1323,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_code = ? AND index_value < ?)
         )
@@ -1396,7 +1333,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "g",
@@ -1425,8 +1361,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value <= ?)
         )
@@ -1436,7 +1371,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
@@ -1465,8 +1399,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_value > ?)
         )
@@ -1476,7 +1409,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
@@ -1504,8 +1436,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value >= ?
         )
@@ -1515,7 +1446,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.403").toDouble(),
@@ -1542,8 +1472,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value < ? OR index_value >= ?)
         )
@@ -1553,7 +1482,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.4025").toDouble(),
@@ -1581,8 +1509,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value > ?
         )
@@ -1592,7 +1519,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.403").toDouble(),
@@ -1619,8 +1545,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value < ?
         )
@@ -1630,7 +1555,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           BigDecimal("5.403").toDouble(),
@@ -1659,8 +1583,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM QuantityIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_system = ? AND index_code = ? AND index_value >= ? AND index_value < ?)
         )
@@ -1670,7 +1593,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOfNotNull(
-          ResourceType.Observation.name,
           ResourceType.Observation.name,
           Observation.VALUE_QUANTITY.paramName,
           "http://unitsofmeasure.org",
@@ -1691,8 +1613,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM UriIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1701,7 +1622,6 @@ class SearchTest {
       )
     assertThat(query.args)
       .containsExactly(
-        ResourceType.Library.name,
         ResourceType.Library.name,
         Library.URL.paramName,
         "someValue",
@@ -1794,8 +1714,7 @@ class SearchTest {
         FROM ResourceEntity a
         LEFT JOIN StringIndexEntity b
         ON a.resourceUuid = b.resourceUuid AND b.index_name = ?
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
@@ -1810,7 +1729,6 @@ class SearchTest {
       .isEqualTo(
         listOf(
           Patient.GIVEN.paramName,
-          ResourceType.Patient.name,
           ResourceType.Patient.name,
           Patient.FAMILY.paramName,
           "Jones",
@@ -1839,15 +1757,13 @@ class SearchTest {
         """ 
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
-        WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceUuid IN (
+        WHERE a.index_name = ? AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1861,8 +1777,6 @@ class SearchTest {
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
-          ResourceType.Patient.name,
-          ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
@@ -1915,8 +1829,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -1926,8 +1839,7 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
-        WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceUuid IN (
+        WHERE a.index_name = ? AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1945,11 +1857,9 @@ class SearchTest {
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
-          ResourceType.Patient.name,
           Patient.ADDRESS_COUNTRY.paramName,
           "IN",
           ResourceType.Patient.name,
-          ResourceType.Immunization.name,
           Immunization.PATIENT.paramName,
           ResourceType.Immunization.name,
           Immunization.VACCINE_CODE.paramName,
@@ -1964,7 +1874,7 @@ class SearchTest {
   }
 
   @Test
-  fun practitioner_has_patient_has_condition_diabetes_and_hypertension() {
+  fun search_has_patient_has_condition_diabetes_and_hypertension() {
     val query =
       Search(ResourceType.Patient)
         .apply {
@@ -1988,15 +1898,13 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid
         FROM ResourceEntity a
         WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
-        WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceUuid IN (
+        WHERE a.index_name = ? AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -2007,8 +1915,7 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
-        WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceUuid IN (
+        WHERE a.index_name = ? AND a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -2022,15 +1929,12 @@ class SearchTest {
       .isEqualTo(
         listOf(
           ResourceType.Patient.name,
-          ResourceType.Patient.name,
-          ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
           "44054006",
           "http://snomed.info/sct",
           ResourceType.Patient.name,
-          ResourceType.Condition.name,
           Condition.SUBJECT.paramName,
           ResourceType.Condition.name,
           Condition.CODE.paramName,
@@ -2111,8 +2015,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
         )
@@ -2120,7 +2023,7 @@ class SearchTest {
           .trimIndent(),
       )
 
-    assertThat(query.args).isEqualTo(listOf("Patient", "Patient", "given", "John", "Jane"))
+    assertThat(query.args).isEqualTo(listOf("Patient", "given", "John", "Jane"))
   }
 
   @Test
@@ -2152,8 +2055,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -2165,8 +2067,7 @@ class SearchTest {
           .trimIndent(),
       )
 
-    assertThat(query.args)
-      .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "given", "Jane"))
+    assertThat(query.args).isEqualTo(listOf("Patient", "given", "John", "Patient", "given", "Jane"))
   }
 
   // Test for https://github.com/google/android-fhir/issues/903
@@ -2185,8 +2086,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value LIKE ? || '%' COLLATE NOCASE
         )
@@ -2199,7 +2099,7 @@ class SearchTest {
       )
 
     assertThat(query.args)
-      .isEqualTo(listOf("Patient", "Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
+      .isEqualTo(listOf("Patient", "given", "John", "Patient", "family", "Doe", "Roe"))
   }
 
   @Test
@@ -2216,8 +2116,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         )
@@ -2225,8 +2124,7 @@ class SearchTest {
           .trimIndent(),
       )
 
-    assertThat(query.args)
-      .isEqualTo(listOf("Condition", "Condition", "clinical-status", "test-code"))
+    assertThat(query.args).isEqualTo(listOf("Condition", "clinical-status", "test-code"))
   }
 
   @Test
@@ -2254,8 +2152,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -2266,7 +2163,6 @@ class SearchTest {
     assertThat(query.args)
       .isEqualTo(
         listOf(
-          "Condition",
           "Condition",
           "clinical-status",
           "test-code",
@@ -2295,7 +2191,8 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?)
+          AND re.resourceType = ?
           )
           """
           .trimIndent(),
@@ -2337,7 +2234,7 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceType||"/"||re.resourceId = rie.index_value
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND index_value = ?
@@ -2354,7 +2251,6 @@ class SearchTest {
         "general-practitioner",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
         "Practitioner",
         "active",
         "true",
@@ -2389,7 +2285,7 @@ class SearchTest {
           ON re.resourceType||"/"||re.resourceId = rie.index_value
           LEFT JOIN StringIndexEntity b
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND index_value = ?
@@ -2410,7 +2306,6 @@ class SearchTest {
         "general-practitioner",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Practitioner",
         "Practitioner",
         "active",
         "true",
@@ -2450,7 +2345,7 @@ class SearchTest {
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
@@ -2467,7 +2362,7 @@ class SearchTest {
         ON re.resourceType||"/"||re.resourceId = rie.index_value
         LEFT JOIN StringIndexEntity b
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
@@ -2489,7 +2384,6 @@ class SearchTest {
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
         "Practitioner",
-        "Practitioner",
         "active",
         "true",
         "name",
@@ -2497,7 +2391,6 @@ class SearchTest {
         "organization",
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-2029-a12c-108d1eb5bedb")),
         convertUUIDToByte(UUID.fromString("e2c79e28-ed4d-4029-a12c-108d1eb5bedb")),
-        "Organization",
         "Organization",
         "active",
         "true",
@@ -2520,7 +2413,8 @@ class SearchTest {
           FROM ResourceEntity re
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
+          AND re.resourceType = ?
           )
           """
           .trimIndent(),
@@ -2558,7 +2452,7 @@ class SearchTest {
         FROM ResourceEntity re
         JOIN ReferenceIndexEntity rie
         ON re.resourceUuid = rie.resourceUuid
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2574,7 +2468,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
@@ -2615,7 +2508,7 @@ class SearchTest {
         ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
         LEFT JOIN DateTimeIndexEntity c
         ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+        WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
         AND re.resourceUuid IN (
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2636,7 +2529,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
@@ -2694,7 +2586,7 @@ class SearchTest {
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
           ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2713,7 +2605,7 @@ class SearchTest {
           ON re.resourceUuid = b.resourceUuid AND b.index_name = ?
           LEFT JOIN DateTimeIndexEntity c
           ON re.resourceUuid = c.resourceUuid AND c.index_name = ?
-          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?) AND re.resourceType = ?
+          WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
           AND re.resourceUuid IN (
           SELECT resourceUuid FROM TokenIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
@@ -2735,7 +2627,6 @@ class SearchTest {
         "Patient/pa01",
         "Patient/pa02",
         "Encounter",
-        "Encounter",
         "status",
         "arrived",
         "http://hl7.org/fhir/encounter-status",
@@ -2745,7 +2636,6 @@ class SearchTest {
         "subject",
         "Patient/pa01",
         "Patient/pa02",
-        "Condition",
         "Condition",
         "code",
         "44054006",
@@ -2772,8 +2662,7 @@ class SearchTest {
         """
           SELECT a.resourceUuid, a.serializedResource
           FROM ResourceEntity a
-          WHERE a.resourceType = ?
-          AND a.resourceUuid IN (
+          WHERE a.resourceUuid IN (
           SELECT resourceUuid FROM ReferenceIndexEntity
           WHERE resourceType = ? AND index_name = ? AND (((((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR (((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))))) OR (((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))))) OR ((((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR (((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))))) OR (((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))) OR ((((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))))) OR (((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))) OR ((((index_value = ? OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))) OR ((((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))) OR (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))))))))))
           )
@@ -2783,7 +2672,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         *patientIdReferenceList.toTypedArray(),
@@ -2801,8 +2689,7 @@ class SearchTest {
         """
               SELECT a.resourceUuid, a.serializedResource
               FROM ResourceEntity a
-              WHERE a.resourceType = ?
-              AND a.resourceUuid IN (
+              WHERE a.resourceUuid IN (
               SELECT resourceUuid FROM ReferenceIndexEntity
               WHERE resourceType = ? AND index_name = ?
               )
@@ -2812,7 +2699,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
       )
@@ -2832,8 +2718,7 @@ class SearchTest {
         """
               SELECT a.resourceUuid, a.serializedResource
               FROM ResourceEntity a
-              WHERE a.resourceType = ?
-              AND a.resourceUuid IN (
+              WHERE a.resourceUuid IN (
               SELECT resourceUuid FROM ReferenceIndexEntity
               WHERE resourceType = ? AND index_name = ? AND index_value = ?
               )
@@ -2843,7 +2728,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         "Patient/patient-0",
@@ -2866,8 +2750,7 @@ class SearchTest {
         """
               SELECT a.resourceUuid, a.serializedResource
               FROM ResourceEntity a
-              WHERE a.resourceType = ?
-              AND a.resourceUuid IN (
+              WHERE a.resourceUuid IN (
               SELECT resourceUuid FROM ReferenceIndexEntity
               WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR index_value = ?)
               )
@@ -2877,7 +2760,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         "Patient/patient-0",
@@ -2906,8 +2788,7 @@ class SearchTest {
         """
               SELECT a.resourceUuid, a.serializedResource
               FROM ResourceEntity a
-              WHERE a.resourceType = ?
-              AND a.resourceUuid IN (
+              WHERE a.resourceUuid IN (
               SELECT resourceUuid FROM ReferenceIndexEntity
               WHERE resourceType = ? AND index_name = ? AND (index_value = ? OR (index_value = ? OR index_value = ?))
               )
@@ -2917,7 +2798,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         "Patient/patient-0",
@@ -2948,8 +2828,7 @@ class SearchTest {
         """
               SELECT a.resourceUuid, a.serializedResource
               FROM ResourceEntity a
-              WHERE a.resourceType = ?
-              AND a.resourceUuid IN (
+              WHERE a.resourceUuid IN (
               SELECT resourceUuid FROM ReferenceIndexEntity
               WHERE resourceType = ? AND index_name = ? AND ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?))
               )
@@ -2959,7 +2838,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         "Patient/patient-0",
@@ -2987,8 +2865,7 @@ class SearchTest {
         """
                 SELECT a.resourceUuid, a.serializedResource
                 FROM ResourceEntity a
-                WHERE a.resourceType = ?
-                AND a.resourceUuid IN (
+                WHERE a.resourceUuid IN (
                 SELECT resourceUuid FROM ReferenceIndexEntity
                 WHERE resourceType = ? AND index_name = ? AND (((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)) OR ((index_value = ? OR index_value = ?) OR (index_value = ? OR index_value = ?)))
                 )
@@ -2998,7 +2875,6 @@ class SearchTest {
 
     assertThat(query.args)
       .containsExactly(
-        "CarePlan",
         "CarePlan",
         "subject",
         *patientIdReferenceList.toTypedArray(),
