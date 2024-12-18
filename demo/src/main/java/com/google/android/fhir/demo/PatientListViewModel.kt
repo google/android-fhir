@@ -46,7 +46,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     MutableStateFlow(SearchParameter.values().toList())
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
-  private var searchParameterLabel: String = ""
+  var searchParameterLabel: String? = null
 
   init {
     updatePatientListAndPatientCount({ getSearchResults() }, { count() })
@@ -221,7 +221,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     return patients
   }
 
-  private fun getStringClientParamByLabel(filterLabel: String): StringClientParam? {
+  private fun getStringClientParamByLabel(filterLabel: String?): StringClientParam? {
     return when (filterLabel) {
       SearchParameter.GIVEN.label -> Patient.GIVEN
       SearchParameter.FAMILY.label -> Patient.FAMILY

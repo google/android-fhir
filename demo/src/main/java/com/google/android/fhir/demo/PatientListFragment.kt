@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
@@ -129,7 +130,7 @@ class PatientListFragment : Fragment() {
           }
         },
       )
-
+    enableSearchView(false)
     setHasOptionsMenu(true)
   }
 
@@ -167,8 +168,18 @@ class PatientListFragment : Fragment() {
         dropdown.setOnClickListener { dropdown.showDropDown() }
         dropdown.setOnItemClickListener { _, _, _, _ ->
           patientListViewModel.setSearchParameter(dropdown.text.toString())
+          searchView.queryHint =
+            getString(R.string.query_hint_patient_search_parameter, dropdown.text)
+          enableSearchView(true)
         }
       }
     }
+  }
+
+  private fun enableSearchView(isEnabled: Boolean) {
+    val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+    searchEditText.isFocusable = isEnabled
+    searchEditText.isFocusableInTouchMode = isEnabled
+    searchEditText.isEnabled = isEnabled
   }
 }

@@ -24,6 +24,7 @@
                 android:id="@+id/search_parameter_dropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="none"
                 android:hint="Select Search Parameter"
             />
         </com.google.android.material.textfield.TextInputLayout>
