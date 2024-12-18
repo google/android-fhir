@@ -376,9 +376,6 @@ val QuestionnaireItemComponent.hasHelpButton: Boolean
     return item.any { it.isHelpCode }
   }
 
-val Questionnaire.QuestionnaireItemComponent.isPage: Boolean
-  get() = displayItemControl == DisplayItemControlType.PAGE
-
 /** Converts Text with HTML Tag to formatted text. */
 internal fun String.toSpanned(): Spanned {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)

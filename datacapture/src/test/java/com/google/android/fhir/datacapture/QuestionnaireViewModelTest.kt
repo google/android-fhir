@@ -1533,6 +1533,102 @@ class QuestionnaireViewModelTest {
   //                              Pagination                              //
   //                                                                      //
   // ==================================================================== //
+  @Test
+  fun `should include all top level items as pages when any item has page extension`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page1-noExtension"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page3-noExtension"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page4-noExtension"
+            addExtension(hiddenExtension)
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page4-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 4"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page5"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page5-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 5"
+              },
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
+                QuestionnairePage(3, enabled = true, hidden = true),
+                QuestionnairePage(4, enabled = true, hidden = false),
+              ),
+            currentPageIndex = 0,
+          ),
+        )
+    }
+  }
 
   @Test
   fun `should show current page`() = runTest {
@@ -1830,8 +1926,11 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
+      val questionnaireStatePagination =
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          questionnaireStatePagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1845,6 +1944,83 @@ class QuestionnaireViewModelTest {
             currentPageIndex = 1,
           ),
         )
+
+      assertThat(questionnaireStatePagination.hasPreviousPage).isFalse()
+    }
+  }
+
+  @Test
+  fun `should skip last page if it is hidden`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              },
+            )
+          },
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      val questionnaireStatePagination =
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+
+      assertThat(
+          questionnaireStatePagination,
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = true),
+              ),
+            currentPageIndex = 1,
+          ),
+        )
+
+      assertThat(questionnaireStatePagination.hasNextPage).isFalse()
     }
   }
 
