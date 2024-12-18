@@ -1872,7 +1872,7 @@ class SearchTest {
   }
 
   @Test
-  fun search_patient_multiple_given_disjoint_has_condition_diabetes() {
+  fun search_patient_multiple_given_disjoint_has_condition_diabetes_or_hypertension() {
     val query =
       Search(ResourceType.Patient)
         .apply {
@@ -1881,6 +1881,11 @@ class SearchTest {
               Condition.CODE,
               { value = of(Coding("http://snomed.info/sct", "44054006", "Diabetes")) },
             )
+            filter(
+              Condition.CODE,
+              { value = of(Coding("http://snomed.info/sct", "827069000", "Hypertension stage 1")) },
+            )
+            operation = Operation.OR
           }
 
           filter(
@@ -1907,8 +1912,7 @@ class SearchTest {
         """
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
-        WHERE a.resourceType = ?
-        AND a.resourceUuid IN (
+        WHERE a.resourceUuid IN (
         SELECT resourceUuid FROM StringIndexEntity
         WHERE resourceType = ? AND index_name = ? AND index_value = ?
         UNION
@@ -1920,8 +1924,10 @@ class SearchTest {
         WHERE a.resourceType = ? AND a.resourceId IN (
         SELECT substr(a.index_value, 9)
         FROM ReferenceIndexEntity a
-        WHERE a.resourceType = ? AND a.index_name = ?
-        AND a.resourceUuid IN (
+        WHERE a.index_name = ? AND a.resourceUuid IN (
+        SELECT resourceUuid FROM TokenIndexEntity
+        WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
+        UNION
         SELECT resourceUuid FROM TokenIndexEntity
         WHERE resourceType = ? AND index_name = ? AND (index_value = ? AND IFNULL(index_system,'') = ?)
         )
@@ -1935,18 +1941,20 @@ class SearchTest {
       .isEqualTo(
         listOf(
           "Patient",
-          "Patient",
           "given",
           "John",
           "Patient",
           "given",
           "Jane",
           "Patient",
-          "Condition",
           "subject",
           "Condition",
           "code",
           "44054006",
+          "http://snomed.info/sct",
+          "Condition",
+          "code",
+          "827069000",
           "http://snomed.info/sct",
         ),
       )

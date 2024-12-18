@@ -364,17 +364,13 @@ internal fun Search.getQuery(
   val sortArgs = join.args
 
   val filterQuery = getFilterQueries()
-  val filterQueryStatement =
-    filterQuery.joinToString(separator = "${operation.logicalOperator} ") {
-      //  spotless:off
-    """
-      a.resourceUuid IN (
-      ${it.query}
-      )
-      
-      """.trimIndent()
-    //  spotless:on
+  val filterQueryJoinOperator =
+    when (operation) {
+      Operation.OR -> "\nUNION\n"
+      Operation.AND -> "\nINTERSECT\n"
     }
+  val filterQueryStatement =
+    filterQuery.joinToString(separator = filterQueryJoinOperator) { it.query.trimIndent() }
   val filterQueryArgs = filterQuery.flatMap { it.args }
 
   var limitStatement = ""
@@ -398,8 +394,14 @@ internal fun Search.getQuery(
   val filterStatement =
     listOf(filterQueryStatement, nestedQueryFilterStatement)
       .filter { it.isNotBlank() }
-      .joinToString(separator = " AND ")
-      .ifBlank { "a.resourceType = ?" }
+      .joinToString(separator = "\nINTERSECT\n")
+      .takeIf { it.isNotBlank() }
+      ?.let { """a.resourceUuid IN (
+          $it
+          )
+          """ }
+      ?: "a.resourceType = ?"
+
   val filterArgs = (filterQueryArgs + nestedQueryFilterArgs).ifEmpty { listOf(type.name) }
 
   val whereArgs = mutableListOf<Any>()

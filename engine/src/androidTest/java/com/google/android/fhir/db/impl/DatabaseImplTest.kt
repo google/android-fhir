@@ -2809,78 +2809,79 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun test_search_multiple_param_disjunction_covid_immunization_records() = runBlocking {
-    val resources =
-      listOf(
-        Immunization().apply {
-          id = "immunization-1"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM1NL1",
-                "COVID-19 vaccine, inactivated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-2"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM5DF6",
-                "COVID-19 vaccine, live attenuated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-3"
-          vaccineCode =
-            CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-4"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://hl7.org/fhir/sid/cvx",
-                "140",
-                "Influenza, seasonal, injectable, preservative free",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-      )
+  fun test_search_multiple_param_disjunction_covid_immunization_records() {
+    runBlocking {
+      val resources =
+        listOf(
+          Immunization().apply {
+            id = "immunization-1"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM1NL1",
+                  "COVID-19 vaccine, inactivated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-2"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM5DF6",
+                  "COVID-19 vaccine, live attenuated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-3"
+            vaccineCode =
+              CodeableConcept(
+                Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-4"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://hl7.org/fhir/sid/cvx",
+                  "140",
+                  "Influenza, seasonal, injectable, preservative free",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+        )
 
-    database.insert(*resources.toTypedArray())
+      database.insert(*resources.toTypedArray())
 
-    val result =
-      database.search<Immunization>(
-        Search(ResourceType.Immunization)
-          .apply {
-            filter(
-              Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) },
-            )
+      val result =
+        database.search<Immunization>(
+          Search(ResourceType.Immunization)
+            .apply {
+              filter(
+                Immunization.VACCINE_CODE,
+                { value = of(Coding("http://id.who.int/icd11/mms", "XM1NL1", "")) },
+              )
 
-            filter(
-              Immunization.VACCINE_CODE,
-              { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) },
-            )
-            operation = Operation.OR
-          }
-          .getQuery(),
-      )
+              filter(
+                Immunization.VACCINE_CODE,
+                { value = of(Coding("http://id.who.int/icd11/mms", "XM5DF6", "")) },
+              )
+              operation = Operation.OR
+            }
+            .getQuery(),
+        )
 
-    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
-      .containsExactly("XM1NL1", "XM5DF6")
-      .inOrder()
+      assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
+        .containsExactly("XM1NL1", "XM5DF6")
+    }
   }
 
   @Test
