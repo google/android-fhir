@@ -25,11 +25,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.ArrayAdapter
+import android.widget.AutoCompleteTextView
+import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -37,6 +41,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
@@ -69,6 +75,7 @@ class PatientListFragment : Fragment() {
           PatientListViewModelFactory(requireActivity().application, fhirEngine),
         )
         .get(PatientListViewModel::class.java)
+    setupDropDownView()
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
@@ -91,12 +98,12 @@ class PatientListFragment : Fragment() {
     searchView.setOnQueryTextListener(
       object : SearchView.OnQueryTextListener {
         override fun onQueryTextChange(newText: String): Boolean {
-          patientListViewModel.searchPatientsByName(newText)
+          patientListViewModel.searchPatientsByParameter(newText)
           return true
         }
 
         override fun onQueryTextSubmit(query: String): Boolean {
-          patientListViewModel.searchPatientsByName(query)
+          patientListViewModel.searchPatientsByParameter(query)
           return true
         }
       },
@@ -123,7 +130,7 @@ class PatientListFragment : Fragment() {
           }
         },
       )
-
+    enableSearchView(false)
     setHasOptionsMenu(true)
   }
 
@@ -145,5 +152,34 @@ class PatientListFragment : Fragment() {
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
+  }
+
+  private fun setupDropDownView() {
+    val dropdown = requireView().findViewById<AutoCompleteTextView>(R.id.search_parameter_dropdown)
+    viewLifecycleOwner.lifecycleScope.launch {
+      patientListViewModel.searchParameters.collectLatest { parameters ->
+        val adapter =
+          ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_dropdown_item_1line,
+            parameters.map { it.label },
+          )
+        dropdown.setAdapter(adapter)
+        dropdown.setOnClickListener { dropdown.showDropDown() }
+        dropdown.setOnItemClickListener { _, _, _, _ ->
+          patientListViewModel.setSearchParameter(dropdown.text.toString())
+          searchView.queryHint =
+            getString(R.string.query_hint_patient_search_parameter, dropdown.text)
+          enableSearchView(true)
+        }
+      }
+    }
+  }
+
+  private fun enableSearchView(isEnabled: Boolean) {
+    val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
+    searchEditText.isFocusable = isEnabled
+    searchEditText.isFocusableInTouchMode = isEnabled
+    searchEditText.isEnabled = isEnabled
   }
 }
