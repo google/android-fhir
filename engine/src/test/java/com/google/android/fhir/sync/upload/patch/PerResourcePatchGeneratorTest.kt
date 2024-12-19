@@ -20,7 +20,6 @@ import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.context.FhirVersionEnum
 import com.google.android.fhir.LocalChange
 import com.google.android.fhir.LocalChangeToken
-import com.google.android.fhir.db.Database
 import com.google.android.fhir.db.impl.dao.diff
 import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.logicalId
@@ -42,27 +41,14 @@ import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
 import org.json.JSONArray
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.MockitoAnnotations
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
 class PerResourcePatchGeneratorTest {
 
-  @Mock private lateinit var database: Database
-  private lateinit var patchGenerator: PerResourcePatchGenerator
-
-  @Before
-  fun setUp() {
-    MockitoAnnotations.openMocks(this)
-    runTest { whenever(database.getLocalChangeResourceReferences(any())).thenReturn(emptyList()) }
-    patchGenerator = PerResourcePatchGenerator.with(database)
-  }
+  private val patchGenerator = PerResourcePatchGenerator
 
   @Test
   fun `should generate a single insert patch if the resource is inserted`() = runTest {
@@ -70,7 +56,9 @@ class PerResourcePatchGeneratorTest {
     val insertionLocalChange = createInsertLocalChange(patient)
 
     val patches =
-      patchGenerator.generate(listOf(insertionLocalChange)).map { it.patchMappings.single() }
+      patchGenerator.generate(listOf(insertionLocalChange), emptyList()).map {
+        it.patchMappings.single()
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -102,7 +90,9 @@ class PerResourcePatchGeneratorTest {
     val updatePatch = readJsonArrayFromFile("/update_patch_1.json")
 
     val patches =
-      patchGenerator.generate(listOf(updateLocalChange1)).map { it.patchMappings.single() }
+      patchGenerator.generate(listOf(updateLocalChange1), emptyList()).map {
+        it.patchMappings.single()
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -132,7 +122,9 @@ class PerResourcePatchGeneratorTest {
     val deleteLocalChange = createDeleteLocalChange(remotePatient, 3L)
 
     val patches =
-      patchGenerator.generate(listOf(deleteLocalChange)).map { it.patchMappings.single() }
+      patchGenerator.generate(listOf(deleteLocalChange), emptyList()).map {
+        it.patchMappings.single()
+      }
 
     with(patches.single()) {
       with(generatedPatch) {
@@ -159,7 +151,7 @@ class PerResourcePatchGeneratorTest {
     val patientString = jsonParser.encodeResourceToString(updatedPatient)
 
     val patches =
-      patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange)).map {
+      patchGenerator.generate(listOf(insertionLocalChange, updateLocalChange), emptyList()).map {
         it.patchMappings.single()
       }
 
@@ -218,7 +210,7 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(2)) },
       )
-    val patchToUpload = patchGenerator.generate(changes)
+    val patchToUpload = patchGenerator.generate(changes, emptyList())
 
     assertThat(patchToUpload).isEmpty()
   }
@@ -296,7 +288,7 @@ class PerResourcePatchGeneratorTest {
           .toLocalChange()
           .apply { LocalChangeToken(listOf(3)) },
       )
-    val patchToUpload = patchGenerator.generate(changes)
+    val patchToUpload = patchGenerator.generate(changes, emptyList())
 
     assertThat(patchToUpload).isEmpty()
   }
@@ -319,7 +311,7 @@ class PerResourcePatchGeneratorTest {
     val updatePatch = readJsonArrayFromFile("/update_patch_2.json")
 
     val patches =
-      patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2)).map {
+      patchGenerator.generate(listOf(updateLocalChange1, updateLocalChange2), emptyList()).map {
         it.patchMappings.single()
       }
 
@@ -367,7 +359,7 @@ class PerResourcePatchGeneratorTest {
         )
 
       val patches =
-        patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2)).map {
+        patchGenerator.generate(listOf(updatedLocalChange1, updatedLocalChange2), emptyList()).map {
           it.patchMappings.single()
         }
 
@@ -400,6 +392,7 @@ class PerResourcePatchGeneratorTest {
       patchGenerator
         .generate(
           listOf(updateLocalChange1, updateLocalChange2, deleteLocalChange),
+          emptyList(),
         )
         .map { it.patchMappings.single() }
 
@@ -448,7 +441,7 @@ class PerResourcePatchGeneratorTest {
       )
 
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes) }
+      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes, emptyList()) }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Changes after deletion of resource are not permitted")
@@ -495,7 +488,7 @@ class PerResourcePatchGeneratorTest {
           .apply { LocalChangeToken(listOf(2)) },
       )
     val errorMessage =
-      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes) }
+      assertFailsWith<IllegalArgumentException> { patchGenerator.generate(changes, emptyList()) }
         .localizedMessage
 
     assertThat(errorMessage).isEqualTo("Changes before creation of resource are not permitted")

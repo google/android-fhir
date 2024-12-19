@@ -125,7 +125,7 @@ file of your project:
 dependencies {
     // ...
 
-    implementation("com.google.android.fhir:engine:0.1.0-beta05")
+    implementation("com.google.android.fhir:engine:1.1.0")
 }
 ```
 
@@ -256,6 +256,14 @@ outlined below will guide you through the process.
       override fun getConflictResolver() = AcceptLocalConflictResolver
 
       override fun getFhirEngine() = FhirApplication.fhirEngine(applicationContext)
+    
+      override fun getUploadStrategy() =
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        )
     }
     ```
 
@@ -282,7 +290,7 @@ outlined below will guide you through the process.
 
     ```kotlin
     when (syncJobStatus) {
-        is SyncJobStatus.Finished -> {
+        is CurrentSyncJobStatus.Succeeded -> {
             Toast.makeText(requireContext(), "Sync Finished", Toast.LENGTH_SHORT).show()
             viewModel.searchPatientsByName("")
         }
@@ -434,20 +442,20 @@ the UI to update, incorporate the following conditional code block:
 
 ```kotlin
     viewModelScope.launch {
-  val fhirEngine = FhirApplication.fhirEngine(getApplication())
-  if (nameQuery.isNotEmpty()) {
-    val searchResult = fhirEngine.search<Patient> {
-      filter(
-        Patient.NAME,
-        {
-          modifier = StringFilterModifier.CONTAINS
-          value = nameQuery
-        },
-      )
+        val fhirEngine = FhirApplication.fhirEngine(getApplication())
+        val searchResult = fhirEngine.search<Patient> {
+            if (nameQuery.isNotEmpty()) {
+              filter(
+                Patient.NAME,
+                {
+                  modifier = StringFilterModifier.CONTAINS
+                  value = nameQuery
+                },
+              )
+            }
+        }
+        liveSearchedPatients.value  =  searchResult.map { it.resource }
     }
-    liveSearchedPatients.value  =  searchResult.map { it.resource }
-  }
-}
 ```
 
 Here, if the `nameQuery` is not empty, the search function will filter the

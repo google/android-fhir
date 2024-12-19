@@ -1,7 +1,10 @@
 # see https://docs.gradle.org/current/userguide/platforms.html
 
 [versions]
-androidx-acivity = "1.7.2"
+android-fhir-common = "0.1.0-alpha05"
+android-fhir-engine = "0.1.0-beta05"
+android-fhir-knowledge = "0.1.0-beta01"
+androidx-activity = "1.7.2"
 androidx-appcompat = "1.6.1"
 androidx-arch-core = "2.2.0"
 androidx-benchmark = "1.1.1"
@@ -28,9 +31,13 @@ kotlinx-coroutines = "1.8.1"
 logback-android = "3.0.0"
 opencds-cqf-fhir = "3.8.0"
 truth = "1.1.5"
+material = "1.9.0"
 
 [libraries]
-androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-acivity" }
+android-fhir-common = { module = "com.google.android.fhir:common", version.ref = "android-fhir-common" }
+android-fhir-engine = { module = "com.google.android.fhir:engine", version.ref = "android-fhir-engine" }
+android-fhir-knowledge = { module = "com.google.android.fhir:knowledge", version.ref = "android-fhir-knowledge" }
+androidx-activity = { module = "androidx.activity:activity", version.ref = "androidx-activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core" }
 androidx-benchmark-junit4 = { module = "androidx.benchmark:benchmark-junit4", version.ref = "androidx-benchmark" }
@@ -72,6 +79,7 @@ opencds-cqf-fhir-cr = { module = "org.opencds.cqf.fhir:cqf-fhir-cr", version.ref
 opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", version.ref = "opencds-cqf-fhir" }
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 [bundles]
 

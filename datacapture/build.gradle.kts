@@ -90,9 +90,8 @@ dependencies {
     exclude(module = "commons-logging")
     exclude(module = "httpclient")
   }
-  implementation(Dependencies.androidFhirCommon)
-  implementation(Dependencies.material)
   implementation(Dependencies.timber)
+  implementation(libs.android.fhir.common)
   implementation(libs.androidx.appcompat)
   implementation(libs.androidx.constraintlayout)
   implementation(libs.androidx.core)
@@ -101,12 +100,13 @@ dependencies {
   implementation(libs.glide)
   implementation(libs.kotlin.stdlib)
   implementation(libs.kotlinx.coroutines.core)
+  implementation(libs.material)
 
   testImplementation(Dependencies.mockitoInline)
   testImplementation(Dependencies.mockitoKotlin)
   testImplementation(Dependencies.robolectric)
   testImplementation(project(":knowledge")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+    exclude(group = "com.google.android.fhir", module = "engine")
   }
   testImplementation(libs.androidx.test.core)
   testImplementation(libs.androidx.fragment.testing)

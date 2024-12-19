@@ -116,7 +116,6 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
     args.add(resourceToInclude.name)
     args.add(param.paramName)
     args.addAll(includeIds)
-    args.add(resourceToInclude.name)
 
     var filterQuery = ""
     val filters = search.getFilterQueries()
@@ -136,6 +135,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
           }
       }
     }
+    if (filters.isEmpty()) args.add(resourceToInclude.name)
     return filterQuery
   }
 
@@ -151,8 +151,8 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
       JOIN ReferenceIndexEntity rie
       ON re.resourceUuid = rie.resourceUuid
       ${join.query}
-      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString) AND re.resourceType = ?
-      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString)
+      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
       $order
             """
         .trimIndent()
@@ -179,7 +179,6 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
     args.add(baseResourceType.name)
     args.add(param.paramName)
     args.addAll(includeIds.map { convertUUIDToByte(it) })
-    args.add(resourceToInclude.name)
 
     var filterQuery = ""
     val filters = search.getFilterQueries()
@@ -199,6 +198,7 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
           }
       }
     }
+    if (filters.isEmpty()) args.add(resourceToInclude.name)
     return filterQuery
   }
 
@@ -214,8 +214,8 @@ internal fun Search.getIncludeQuery(includeIds: List<UUID>): SearchQuery {
       JOIN ReferenceIndexEntity rie
       ON re.resourceType||"/"||re.resourceId = rie.index_value
       ${join.query}
-      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString) AND re.resourceType = ?
-      ${if (filterQuery.isNotEmpty()) "AND re.resourceUuid IN ($filterQuery)" else ""}
+      WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.resourceUuid IN ($uuidsString)
+      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
       $order
       """
         .trimIndent()
@@ -363,21 +363,19 @@ internal fun Search.getQuery(
   val sortOrderStatement = order
   val sortArgs = join.args
 
-  var filterStatement = ""
-  val filterArgs = mutableListOf<Any>()
   val filterQuery = getFilterQueries()
-  filterQuery.forEachIndexed { i, it ->
-    filterStatement +=
+  val filterQueryStatement =
+    filterQuery.joinToString(separator = "${operation.logicalOperator} ") {
       //  spotless:off
-      """
-      ${if (i == 0) "AND a.resourceUuid IN (" else "a.resourceUuid IN ("}
+    """
+      a.resourceUuid IN (
       ${it.query}
       )
-      ${if (i != filterQuery.lastIndex) "${operation.logicalOperator} " else ""}
+      
       """.trimIndent()
     //  spotless:on
-    filterArgs.addAll(it.args)
-  }
+    }
+  val filterQueryArgs = filterQuery.flatMap { it.args }
 
   var limitStatement = ""
   val limitArgs = mutableListOf<Any>()
@@ -390,10 +388,20 @@ internal fun Search.getQuery(
     }
   }
 
-  nestedSearches.nestedQuery(type, operation)?.let {
-    filterStatement += it.query
-    filterArgs.addAll(it.args)
-  }
+  val nestedFilterQuery = nestedSearches.nestedQuery(type, operation)
+  val nestedQueryFilterStatement = nestedFilterQuery?.query ?: ""
+  val nestedQueryFilterArgs = nestedFilterQuery?.args ?: emptyList()
+
+  // Combines filter statements derived from filter queries and nested queries, that use the
+  // resourceUuid field,
+  // and defaults to filter statement with the resourceType field when blank
+  val filterStatement =
+    listOf(filterQueryStatement, nestedQueryFilterStatement)
+      .filter { it.isNotBlank() }
+      .joinToString(separator = " AND ")
+      .ifBlank { "a.resourceType = ?" }
+  val filterArgs = (filterQueryArgs + nestedQueryFilterArgs).ifEmpty { listOf(type.name) }
+
   val whereArgs = mutableListOf<Any>()
   val nestedArgs = mutableListOf<Any>()
   val query =
@@ -404,8 +412,7 @@ internal fun Search.getQuery(
         SELECT COUNT(*)
         FROM ResourceEntity a
         $sortJoinStatement
-        WHERE a.resourceType = ?
-        $filterStatement
+        WHERE $filterStatement
         $sortOrderStatement
         $limitStatement
         """
@@ -423,8 +430,7 @@ internal fun Search.getQuery(
         SELECT substr(a.index_value, $start)
         FROM ReferenceIndexEntity a
         $sortJoinStatement
-        WHERE a.resourceType = ? AND a.index_name = ?
-        $filterStatement
+        WHERE a.index_name = ? AND $filterStatement
         $sortOrderStatement
         $limitStatement)
         """
@@ -436,8 +442,7 @@ internal fun Search.getQuery(
         SELECT a.resourceUuid, a.serializedResource
         FROM ResourceEntity a
         $sortJoinStatement
-        WHERE a.resourceType = ?
-        $filterStatement
+        WHERE $filterStatement
         $sortOrderStatement
         $limitStatement
         """
@@ -446,7 +451,11 @@ internal fun Search.getQuery(
       .split("\n")
       .filter { it.isNotBlank() }
       .joinToString("\n") { it.trim() }
-  return SearchQuery(query, nestedArgs + sortArgs + type.name + whereArgs + filterArgs + limitArgs)
+
+  return SearchQuery(
+    query,
+    nestedArgs + sortArgs + whereArgs + filterArgs + limitArgs,
+  )
 }
 
 private val Order?.sqlString: String
@@ -685,6 +694,8 @@ internal val DateTimeType.rangeEpochMillis
 
 data class ConditionParam<T>(val condition: String, val params: List<T>) {
   constructor(condition: String, vararg params: T) : this(condition, params.asList())
+
+  val queryString = if (params.size > 1) "($condition)" else condition
 }
 
 private enum class SortTableInfo(val tableName: String, val columnName: String) {

@@ -21,7 +21,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.room.Room
 import androidx.room.withTransaction
 import androidx.sqlite.db.SimpleSQLiteQuery
-import ca.uhn.fhir.parser.IParser
+import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.util.FhirTerser
 import com.google.android.fhir.DatabaseErrorStrategy
 import com.google.android.fhir.LocalChange
@@ -37,11 +37,13 @@ import com.google.android.fhir.db.impl.entities.LocalChangeEntity
 import com.google.android.fhir.db.impl.entities.ResourceEntity
 import com.google.android.fhir.index.ResourceIndexer
 import com.google.android.fhir.logicalId
+import com.google.android.fhir.pmap
 import com.google.android.fhir.search.SearchQuery
 import com.google.android.fhir.toLocalChange
 import com.google.android.fhir.updateMeta
 import java.time.Instant
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -53,7 +55,6 @@ import org.hl7.fhir.r4.model.ResourceType
 @Suppress("UNCHECKED_CAST")
 internal class DatabaseImpl(
   private val context: Context,
-  private val iParser: IParser,
   private val fhirTerser: FhirTerser,
   databaseConfig: DatabaseConfig,
   private val resourceIndexer: ResourceIndexer,
@@ -113,23 +114,15 @@ internal class DatabaseImpl(
             MIGRATION_5_6,
             MIGRATION_6_7,
             MIGRATION_7_8,
+            Migration_8_9,
           )
         }
         .build()
   }
 
-  private val resourceDao by lazy {
-    db.resourceDao().also {
-      it.iParser = iParser
-      it.resourceIndexer = resourceIndexer
-    }
-  }
+  private val resourceDao by lazy { db.resourceDao().also { it.resourceIndexer = resourceIndexer } }
 
-  private val localChangeDao =
-    db.localChangeDao().also {
-      it.iParser = iParser
-      it.fhirTerser = fhirTerser
-    }
+  private val localChangeDao = db.localChangeDao().also { it.fhirTerser = fhirTerser }
 
   override suspend fun <R : Resource> insert(vararg resource: R): List<String> {
     val logicalIds = mutableListOf<String>()
@@ -187,10 +180,13 @@ internal class DatabaseImpl(
     db.withTransaction {
       resourceDao.getResourceEntity(oldResourceId, resourceType)?.let { oldResourceEntity ->
         val updatedResource =
-          (iParser.parseResource(oldResourceEntity.serializedResource) as Resource).apply {
-            idElement = IdType(newResourceId)
-            updateMeta(versionId, lastUpdatedRemote)
-          }
+          (FhirContext.forR4Cached()
+              .newJsonParser()
+              .parseResource(oldResourceEntity.serializedResource) as Resource)
+            .apply {
+              idElement = IdType(newResourceId)
+              updateMeta(versionId, lastUpdatedRemote)
+            }
         updateResourceAndReferences(oldResourceId, updatedResource)
       }
     }
@@ -198,7 +194,7 @@ internal class DatabaseImpl(
 
   override suspend fun select(type: ResourceType, id: String): Resource {
     return resourceDao.getResource(resourceId = id, resourceType = type)?.let {
-      iParser.parseResource(it) as Resource
+      FhirContext.forR4Cached().newJsonParser().parseResource(it) as Resource
     }
       ?: throw ResourceNotFoundException(type.name, id)
   }
@@ -226,43 +222,48 @@ internal class DatabaseImpl(
   override suspend fun <R : Resource> search(
     query: SearchQuery,
   ): List<ResourceWithUUID<R>> {
-    return db.withTransaction {
-      resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).map {
-        ResourceWithUUID(it.uuid, iParser.parseResource(it.serializedResource) as R)
-      }
+    return resourceDao.getResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray())).pmap(
+      Dispatchers.Default,
+    ) {
+      ResourceWithUUID(
+        it.uuid,
+        FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource) as R,
+      )
     }
   }
 
   override suspend fun searchForwardReferencedResources(
     query: SearchQuery,
   ): List<ForwardIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getForwardReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
-          ForwardIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceUUID,
-            iParser.parseResource(it.serializedResource) as Resource,
-          )
-        }
-    }
+    return resourceDao
+      .getForwardReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ForwardIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceUUID,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
+        )
+      }
   }
 
   override suspend fun searchReverseReferencedResources(
     query: SearchQuery,
   ): List<ReverseIncludeSearchResult> {
-    return db.withTransaction {
-      resourceDao
-        .getReverseReferencedResources(SimpleSQLiteQuery(query.query, query.args.toTypedArray()))
-        .map {
-          ReverseIncludeSearchResult(
-            it.matchingIndex,
-            it.baseResourceTypeAndId,
-            iParser.parseResource(it.serializedResource) as Resource,
-          )
-        }
-    }
+    return resourceDao
+      .getReverseReferencedResources(
+        SimpleSQLiteQuery(query.query, query.args.toTypedArray()),
+      )
+      .pmap(Dispatchers.Default) {
+        ReverseIncludeSearchResult(
+          it.matchingIndex,
+          it.baseResourceTypeAndId,
+          FhirContext.forR4Cached().newJsonParser().parseResource(it.serializedResource)
+            as Resource,
+        )
+      }
   }
 
   override suspend fun count(query: SearchQuery): Long {
@@ -308,7 +309,10 @@ internal class DatabaseImpl(
   ) {
     db.withTransaction {
       val currentResourceEntity = selectEntity(updatedResource.resourceType, currentResourceId)
-      val oldResource = iParser.parseResource(currentResourceEntity.serializedResource) as Resource
+      val oldResource =
+        FhirContext.forR4Cached()
+          .newJsonParser()
+          .parseResource(currentResourceEntity.serializedResource) as Resource
       val resourceUuid = currentResourceEntity.resourceUuid
       updateResourceEntity(resourceUuid, updatedResource)
 
@@ -366,6 +370,7 @@ internal class DatabaseImpl(
     val updatedReferenceValue = "${updatedResource.resourceType.name}/${updatedResource.logicalId}"
     referringResourcesUuids.forEach { resourceUuid ->
       resourceDao.getResourceEntity(resourceUuid)?.let {
+        val iParser = FhirContext.forR4Cached().newJsonParser()
         val referringResource = iParser.parseResource(it.serializedResource) as Resource
         val updatedReferringResource =
           addUpdatedReferenceToResource(

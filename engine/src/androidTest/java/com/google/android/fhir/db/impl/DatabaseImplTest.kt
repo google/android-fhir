@@ -39,13 +39,16 @@ import com.google.android.fhir.search.Order
 import com.google.android.fhir.search.Search
 import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.execute
+import com.google.android.fhir.search.filter.ReferenceParamFilterCriterion
 import com.google.android.fhir.search.getQuery
 import com.google.android.fhir.search.has
 import com.google.android.fhir.search.include
 import com.google.android.fhir.search.revInclude
+import com.google.android.fhir.sync.upload.HttpCreateMethod
+import com.google.android.fhir.sync.upload.HttpUpdateMethod
 import com.google.android.fhir.sync.upload.ResourceUploadResponseMapping
 import com.google.android.fhir.sync.upload.UploadRequestResult
-import com.google.android.fhir.sync.upload.UploadStrategy.AllChangesSquashedBundlePut
+import com.google.android.fhir.sync.upload.UploadStrategy
 import com.google.android.fhir.testing.assertJsonArrayEqualsIgnoringOrder
 import com.google.android.fhir.testing.assertResourceEquals
 import com.google.android.fhir.testing.readFromFile
@@ -115,6 +118,7 @@ class DatabaseImplTest {
   @JvmField @Parameterized.Parameter(0) var encrypted: Boolean = false
 
   private val context: Context = ApplicationProvider.getApplicationContext()
+  private val parser = FhirContext.forR4Cached().newJsonParser()
   private lateinit var services: FhirServices
   private lateinit var database: Database
 
@@ -199,7 +203,7 @@ class DatabaseImplTest {
   fun getLocalChanges_withSingleLocaleChange_shouldReturnSingleLocalChanges() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
@@ -266,7 +270,7 @@ class DatabaseImplTest {
   fun clearDatabase_shouldClearAllTablesData() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     database.insert(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = database.getLocalChanges(patient.resourceType, patient.logicalId)
     assertThat(resourceLocalChanges.size).isEqualTo(1)
     with(resourceLocalChanges[0]) {
@@ -390,7 +394,7 @@ class DatabaseImplTest {
 
   @Test
   fun insert_shouldAddInsertLocalChange() = runBlocking {
-    val testPatient2String = services.parser.encodeResourceToString(TEST_PATIENT_2)
+    val testPatient2String = parser.encodeResourceToString(TEST_PATIENT_2)
     database.insert(TEST_PATIENT_2)
     val resourceLocalChanges =
       database.getAllLocalChanges().filter { it.resourceId.equals(TEST_PATIENT_2_ID) }
@@ -478,7 +482,7 @@ class DatabaseImplTest {
     database.insert(patient)
     patient = readFromFile(Patient::class.java, "/update_test_patient_1.json")
     database.update(patient)
-    services.parser.encodeResourceToString(patient)
+    parser.encodeResourceToString(patient)
     val localChangeTokenIds =
       database
         .getAllLocalChanges()
@@ -559,8 +563,15 @@ class DatabaseImplTest {
     // Delete the patient created in setup as we only want to upload the patient in this test
     database.deleteUpdates(listOf(TEST_PATIENT_1))
     services.fhirEngine
-      .syncUpload(AllChangesSquashedBundlePut) {
-        it
+      .syncUpload(
+        UploadStrategy.forBundleRequest(
+          methodForCreate = HttpCreateMethod.PUT,
+          methodForUpdate = HttpUpdateMethod.PATCH,
+          squash = true,
+          bundleSize = 500,
+        ),
+      ) { lcs, _ ->
+        lcs
           .first { it.resourceId == "remote-patient-3" }
           .let {
             flowOf(
@@ -2622,92 +2633,93 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun search_filter_param_values_disjunction_covid_immunization_records() = runBlocking {
-    val resources =
-      listOf(
-        Immunization().apply {
-          id = "immunization-1"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM1NL1",
-                "COVID-19 vaccine, inactivated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-2"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://id.who.int/icd11/mms",
-                "XM5DF6",
-                "COVID-19 vaccine, live attenuated virus",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-3"
-          vaccineCode =
-            CodeableConcept(
-              Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-        Immunization().apply {
-          id = "immunization-4"
-          vaccineCode =
-            CodeableConcept(
-              Coding(
-                "http://hl7.org/fhir/sid/cvx",
-                "140",
-                "Influenza, seasonal, injectable, preservative free",
-              ),
-            )
-          status = Immunization.ImmunizationStatus.COMPLETED
-        },
-      )
+  fun search_filter_param_values_disjunction_covid_immunization_records() {
+    runBlocking {
+      val resources =
+        listOf(
+          Immunization().apply {
+            id = "immunization-1"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM1NL1",
+                  "COVID-19 vaccine, inactivated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-2"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://id.who.int/icd11/mms",
+                  "XM5DF6",
+                  "COVID-19 vaccine, live attenuated virus",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-3"
+            vaccineCode =
+              CodeableConcept(
+                Coding("http://id.who.int/icd11/mms", "XM6AT1", "COVID-19 vaccine, DNA based"),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+          Immunization().apply {
+            id = "immunization-4"
+            vaccineCode =
+              CodeableConcept(
+                Coding(
+                  "http://hl7.org/fhir/sid/cvx",
+                  "140",
+                  "Influenza, seasonal, injectable, preservative free",
+                ),
+              )
+            status = Immunization.ImmunizationStatus.COMPLETED
+          },
+        )
 
-    database.insert(*resources.toTypedArray())
+      database.insert(*resources.toTypedArray())
 
-    val result =
-      database.search<Immunization>(
-        Search(ResourceType.Immunization)
-          .apply {
-            filter(
-              Immunization.VACCINE_CODE,
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM1NL1",
-                      "COVID-19 vaccine, inactivated virus",
-                    ),
-                  )
-              },
-              {
-                value =
-                  of(
-                    Coding(
-                      "http://id.who.int/icd11/mms",
-                      "XM5DF6",
-                      "COVID-19 vaccine, inactivated virus",
-                    ),
-                  )
-              },
-              operation = Operation.OR,
-            )
-          }
-          .getQuery(),
-      )
+      val result =
+        database.search<Immunization>(
+          Search(ResourceType.Immunization)
+            .apply {
+              filter(
+                Immunization.VACCINE_CODE,
+                {
+                  value =
+                    of(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM1NL1",
+                        "COVID-19 vaccine, inactivated virus",
+                      ),
+                    )
+                },
+                {
+                  value =
+                    of(
+                      Coding(
+                        "http://id.who.int/icd11/mms",
+                        "XM5DF6",
+                        "COVID-19 vaccine, inactivated virus",
+                      ),
+                    )
+                },
+                operation = Operation.OR,
+              )
+            }
+            .getQuery(),
+        )
 
-    assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
-      .containsExactly("XM1NL1", "XM5DF6")
-      .inOrder()
+      assertThat(result.map { it.resource.vaccineCode.codingFirstRep.code })
+        .containsExactly("XM1NL1", "XM5DF6")
+    }
   }
 
   @Test
@@ -2786,95 +2798,96 @@ class DatabaseImplTest {
   }
 
   @Test
-  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() = runBlocking {
-    val resources =
-      listOf(
-        Patient().apply {
-          id = "patient-01"
-          addName(
-            HumanName().apply {
-              addGiven("John")
-              family = "Doe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-02"
-          addName(
-            HumanName().apply {
-              addGiven("Jane")
-              family = "Doe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-03"
-          addName(
-            HumanName().apply {
-              addGiven("John")
-              family = "Roe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-04"
-          addName(
-            HumanName().apply {
-              addGiven("Jane")
-              family = "Roe"
-            },
-          )
-        },
-        Patient().apply {
-          id = "patient-05"
-          addName(
-            HumanName().apply {
-              addGiven("Rocky")
-              family = "Balboa"
-            },
-          )
-        },
-      )
-    database.insert(*resources.toTypedArray())
-
-    val result =
-      database.search<Patient>(
-        Search(ResourceType.Patient)
-          .apply {
-            filter(
-              Patient.GIVEN,
-              {
-                value = "John"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
+  fun test_search_multiple_param_conjunction_with_multiple_values_disjunction() {
+    runBlocking {
+      val resources =
+        listOf(
+          Patient().apply {
+            id = "patient-01"
+            addName(
+              HumanName().apply {
+                addGiven("John")
+                family = "Doe"
               },
-              {
-                value = "Jane"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-              },
-              operation = Operation.OR,
             )
-
-            filter(
-              Patient.FAMILY,
-              {
-                value = "Doe"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
+          },
+          Patient().apply {
+            id = "patient-02"
+            addName(
+              HumanName().apply {
+                addGiven("Jane")
+                family = "Doe"
               },
-              {
-                value = "Roe"
-                modifier = StringFilterModifier.MATCHES_EXACTLY
-              },
-              operation = Operation.OR,
             )
+          },
+          Patient().apply {
+            id = "patient-03"
+            addName(
+              HumanName().apply {
+                addGiven("John")
+                family = "Roe"
+              },
+            )
+          },
+          Patient().apply {
+            id = "patient-04"
+            addName(
+              HumanName().apply {
+                addGiven("Jane")
+                family = "Roe"
+              },
+            )
+          },
+          Patient().apply {
+            id = "patient-05"
+            addName(
+              HumanName().apply {
+                addGiven("Rocky")
+                family = "Balboa"
+              },
+            )
+          },
+        )
+      database.insert(*resources.toTypedArray())
 
-            operation = Operation.AND
-          }
-          .getQuery(),
-      )
+      val result =
+        database.search<Patient>(
+          Search(ResourceType.Patient)
+            .apply {
+              filter(
+                Patient.GIVEN,
+                {
+                  value = "John"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                {
+                  value = "Jane"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                operation = Operation.OR,
+              )
 
-    assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
-      .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
-      .inOrder()
+              filter(
+                Patient.FAMILY,
+                {
+                  value = "Doe"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                {
+                  value = "Roe"
+                  modifier = StringFilterModifier.MATCHES_EXACTLY
+                },
+                operation = Operation.OR,
+              )
+
+              operation = Operation.AND
+            }
+            .getQuery(),
+        )
+
+      assertThat(result.map { it.resource.nameFirstRep.nameAsSingleString })
+        .containsExactly("John Doe", "Jane Doe", "John Roe", "Jane Roe")
+    }
   }
 
   @Test
@@ -3126,7 +3139,6 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-      .inOrder()
   }
 
   @Test
@@ -3219,7 +3231,6 @@ class DatabaseImplTest {
             mapOf((ResourceType.Condition to Condition.SUBJECT.paramName) to listOf(con3)),
         ),
       )
-      .inOrder()
   }
 
   @Test
@@ -3523,7 +3534,7 @@ class DatabaseImplTest {
         .execute<Patient>(database)
 
     assertThat(result)
-      .comparingElementsUsing(SearchResultCorrespondence)
+      .comparingElementsUsing(SearchResultCorrespondenceUnorderedIncludeRevInclude)
       .displayingDiffsPairedBy { it.resource.logicalId }
       .containsExactly(
         SearchResult(
@@ -3565,7 +3576,6 @@ class DatabaseImplTest {
           ),
         ),
       )
-      .inOrder()
   }
 
   @Test
@@ -3684,11 +3694,10 @@ class DatabaseImplTest {
           revIncluded = null,
         ),
       )
-      .inOrder()
   }
 
   @Test
-  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients() =
+  fun search_patient_and_revinclude_person_should_map_common_person_to_all_matching_patients() {
     runBlocking {
       val person1 =
         Person().apply {
@@ -3802,8 +3811,8 @@ class DatabaseImplTest {
               mapOf(Pair(ResourceType.Person, Person.LINK.paramName) to listOf(person2, person3)),
           ),
         )
-        .inOrder()
     }
+  }
 
   @Test
   fun search_patient_and_revInclude_encounters_sorted_by_date_descending(): Unit = runBlocking {
@@ -4091,7 +4100,7 @@ class DatabaseImplTest {
       val observationLocalChange = updatedObservationLocalChanges[0]
       assertThat(observationLocalChange.type).isEqualTo(LocalChange.Type.INSERT)
       val observationLocalChangePayload =
-        services.parser.parseResource(observationLocalChange.payload) as Observation
+        parser.parseResource(observationLocalChange.payload) as Observation
       assertThat(observationLocalChangePayload.subject.reference)
         .isEqualTo("Patient/$remotelyCreatedPatientResourceId")
     }
@@ -5169,6 +5178,32 @@ class DatabaseImplTest {
       assertThat(localChangeResourceReferences.size).isEqualTo(locallyCreatedPatients.size)
     }
 
+  @Test
+  fun searchTasksForManyPatientsReturnCorrectly() = runBlocking {
+    val patients = (0 until 990).map { Patient().apply { id = "task-patient-index-$it" } }
+    database.insert(*patients.toTypedArray())
+    val tasks =
+      patients.mapIndexed { index, patient ->
+        Task().apply {
+          id = "patient-$index-task"
+          `for` = Reference().apply { reference = "Patient/${patient.logicalId}" }
+        }
+      }
+    database.insert(*tasks.toTypedArray())
+
+    val patientsSearchIdList =
+      patients.take(980).map<Patient, ReferenceParamFilterCriterion.() -> Unit> {
+        { value = "Patient/${it.logicalId}" }
+      }
+    val searchQuery =
+      Search(ResourceType.Task)
+        .apply { filter(Task.SUBJECT, *patientsSearchIdList.toTypedArray()) }
+        .getQuery()
+
+    val searchResults = database.search<Task>(searchQuery)
+    assertThat(searchResults.size).isEqualTo(980)
+  }
+
   private companion object {
     const val mockEpochTimeStamp = 1628516301000
     const val TEST_PATIENT_1_ID = "test_patient_1"
@@ -5202,6 +5237,18 @@ class DatabaseImplTest {
         )
         .formattingDiffsUsing(::formatDiff)
 
+    /**
+     * [Correspondence] to provide a custom [equalityCheck] for the [SearchResult]s whereby
+     * [SearchResult.included] and [SearchResult.revIncluded] may not be in the correct order
+     */
+    val SearchResultCorrespondenceUnorderedIncludeRevInclude:
+      Correspondence<SearchResult<Resource>, SearchResult<Resource>> =
+      Correspondence.from<SearchResult<Resource>, SearchResult<Resource>>(
+          ::equalityCheckUnordered,
+          "is shallow equals (by logical id comparison) to the ",
+        )
+        .formattingDiffsUsing(::formatDiff)
+
     private fun <R : Resource> equalityCheck(
       actual: SearchResult<R>,
       expected: SearchResult<R>,
@@ -5211,6 +5258,15 @@ class DatabaseImplTest {
         equalsShallow(actual.revIncluded, expected.revIncluded)
     }
 
+    private fun <R : Resource> equalityCheckUnordered(
+      actual: SearchResult<R>,
+      expected: SearchResult<R>,
+    ): Boolean {
+      return equalsShallow(actual.resource, expected.resource) &&
+        equalsShallow(actual.included, expected.included, inOrder = false) &&
+        equalsShallow(actual.revIncluded, expected.revIncluded, inOrder = false)
+    }
+
     private fun equalsShallow(first: Resource, second: Resource) =
       first.resourceType == second.resourceType && first.logicalId == second.logicalId
 
@@ -5218,13 +5274,24 @@ class DatabaseImplTest {
       first.size == second.size &&
         first.asSequence().zip(second.asSequence()).all { (x, y) -> equalsShallow(x, y) }
 
+    private fun resourceTypeAndIdEqualUnordered(first: List<Resource>, second: List<Resource>) =
+      first.size == second.size &&
+        first.map { it.resourceType to it.logicalId }.toSet() ==
+          second.map { it.resourceType to it.logicalId }.toSet()
+
     private fun equalsShallow(
       first: Map<SearchParamName, List<Resource>>?,
       second: Map<SearchParamName, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              resourceTypeAndIdEqualUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size
@@ -5234,10 +5301,16 @@ class DatabaseImplTest {
     private fun equalsShallow(
       first: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
       second: Map<Pair<ResourceType, SearchParamName>, List<Resource>>?,
+      inOrder: Boolean = true,
     ) =
       if (first != null && second != null && first.size == second.size) {
         first.entries.asSequence().zip(second.entries.asSequence()).all { (x, y) ->
-          x.key == y.key && equalsShallow(x.value, y.value)
+          x.key == y.key &&
+            if (inOrder) {
+              equalsShallow(x.value, y.value)
+            } else {
+              resourceTypeAndIdEqualUnordered(x.value, y.value)
+            }
         }
       } else {
         first?.size == second?.size

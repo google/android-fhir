@@ -70,11 +70,11 @@ dependencies {
   androidTestImplementation(libs.truth)
   androidTestImplementation(project(":engine"))
   androidTestImplementation(project(":knowledge")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
+    exclude(group = "com.google.android.fhir", module = "engine")
   }
   androidTestImplementation(project(":workflow")) {
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirEngineModule)
-    exclude(group = Dependencies.androidFhirGroup, module = Dependencies.androidFhirKnowledgeModule)
+    exclude(group = "com.google.android.fhir", module = "engine")
+    exclude(group = "com.google.android.fhir", module = "knowledge")
   }
   androidTestImplementation(project(":workflow-testing"))
 
