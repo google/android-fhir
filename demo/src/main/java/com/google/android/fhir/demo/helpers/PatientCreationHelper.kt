@@ -48,10 +48,12 @@ object PatientCreationHelper {
     patient.addName(name)
 
     // Set patient birth date
-    birthDate?.let {
-      val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
-      patient.birthDate = dob
-    }
+    birthDate
+      ?.takeIf { it.isNotEmpty() }
+      ?.let {
+        val dob = SimpleDateFormat("yyyy-MM-dd").parse(birthDate)
+        patient.birthDate = dob
+      }
 
     // Set patient gender
     patient.gender = gender

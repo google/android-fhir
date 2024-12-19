@@ -36,7 +36,10 @@ import org.hl7.fhir.r4.model.ResourceType
 
 class CrudOperationViewModel(application: Application) : AndroidViewModel(application) {
   private val fhirEngine: FhirEngine = FhirEngineProvider.getInstance(application)
-  private val _patientUiState = MutableSharedFlow<PatientUiState>(replay = 1)
+  private val _patientUiState = MutableSharedFlow<PatientUiState>(replay = 0)
+  var currentPatientLogicalId: String? = null
+    private set
+
   val patientUiState: SharedFlow<PatientUiState> = _patientUiState.asSharedFlow()
 
   fun readPatientById(patientLogicalId: String) {
@@ -52,7 +55,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
     lastName: String? = null,
     birthDate: String? = null,
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
-    isActive: Boolean = true,
+    isActive: Boolean = false,
   ) {
     viewModelScope.launch {
       val patient =
@@ -65,6 +68,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
           isActive = isActive,
         )
       fhirEngine.create(patient).firstOrNull()?.let {
+        currentPatientLogicalId = patientId
         _patientUiState.emit(patient.toPatientUiState(OperationType.CREATE))
       }
     }
@@ -76,7 +80,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
     lastName: String? = null,
     birthDate: String? = null,
     gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
-    isActive: Boolean = true,
+    isActive: Boolean = false,
   ) {
     viewModelScope.launch {
       val patient =
@@ -96,6 +100,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   fun deletePatient(patientLogicalId: String) {
     viewModelScope.launch {
       fhirEngine.delete<Patient>(patientLogicalId)
+      currentPatientLogicalId = null
       _patientUiState.emit(Patient().toPatientUiState(OperationType.DELETE))
     }
   }

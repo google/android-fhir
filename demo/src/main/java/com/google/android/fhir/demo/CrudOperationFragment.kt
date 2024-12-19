@@ -26,7 +26,6 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -37,13 +36,11 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.fhir.demo.helpers.PatientCreationHelper
 import com.google.android.material.tabs.TabLayout
-import com.google.android.material.textfield.TextInputLayout
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Enumerations
 
 class CrudOperationFragment : Fragment() {
   private val crudOperationViewModel: CrudOperationViewModel by viewModels()
-  private var patientLogicalId: String? = null
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -57,12 +54,11 @@ class CrudOperationFragment : Fragment() {
     super.onViewCreated(view, savedInstanceState)
     setUpActionBar()
     setHasOptionsMenu(true)
-    setupUi()
+    setupUiOnScreenLaunch()
     viewLifecycleOwner.lifecycleScope.launch {
       viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
         crudOperationViewModel.patientUiState.collect { patientUiState ->
           patientUiState?.let {
-            patientLogicalId = it.patientId
             when (it.operationType) {
               OperationType.CREATE -> {
                 Toast.makeText(requireContext(), "Patient is saved", Toast.LENGTH_SHORT).show()
@@ -73,7 +69,7 @@ class CrudOperationFragment : Fragment() {
               }
               OperationType.DELETE -> {
                 // Reset the page as the patient has been deleted.
-                clearTextFieldValues()
+                clearUiFieldValues()
                 configureFieldsForOperation(OperationType.DELETE)
                 Toast.makeText(requireContext(), "Patient is deleted", Toast.LENGTH_SHORT).show()
               }
@@ -101,10 +97,10 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun setupUi() {
+  private fun setupUiOnScreenLaunch() {
     setupTabLayoutChangeListener()
     selectTab(TAB_CREATE)
-    setupUiByOperationType(OperationType.CREATE)
+    setupUiForCrudOperation(OperationType.CREATE)
     requireView().findViewById<Button>(R.id.btnSubmit).setOnClickListener {
       val currentOperationType =
         getOperationTypeByTabPosition(
@@ -113,7 +109,10 @@ class CrudOperationFragment : Fragment() {
       when (currentOperationType) {
         OperationType.CREATE -> createPatient()
         OperationType.READ -> {
-          error("Invalid operation.")
+          crudOperationViewModel.currentPatientLogicalId?.let {
+            crudOperationViewModel.readPatientById(it)
+          }
+            ?: displayCreatePatientMessageIfNeeded()
         }
         OperationType.UPDATE -> updatePatient()
         OperationType.DELETE -> deletePatient()
@@ -121,25 +120,30 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun setupUiByOperationType(operationType: OperationType) {
+  private fun setupUiForCrudOperation(operationType: OperationType) {
     when (operationType) {
       OperationType.CREATE -> {
-        clearTextFieldValues()
+        clearUiFieldValues()
         configureFieldsForOperation(OperationType.CREATE)
         requireView()
           .findViewById<EditText>(R.id.etId)
           .setText(PatientCreationHelper.createPatientId())
       }
-      OperationType.READ,
+      OperationType.READ -> {
+        clearUiFieldValues()
+        configureFieldsForOperation(operationType)
+        requireView()
+          .findViewById<EditText>(R.id.etId)
+          .setText(crudOperationViewModel.currentPatientLogicalId)
+      }
       OperationType.UPDATE,
       OperationType.DELETE, -> {
-        patientLogicalId
+        crudOperationViewModel.currentPatientLogicalId
           ?.takeIf { it.isNotEmpty() }
           ?.let {
             crudOperationViewModel.readPatientById(it)
             requireView().findViewById<EditText>(R.id.etId).setText(it)
           }
-        displayCreatePatientMessageIfNeeded()
         configureFieldsForOperation(operationType)
       }
     }
@@ -157,7 +161,7 @@ class CrudOperationFragment : Fragment() {
       object : TabLayout.OnTabSelectedListener {
         override fun onTabSelected(tab: TabLayout.Tab?) {
           val currentOperationType = getOperationTypeByTabPosition(tab?.position ?: TAB_CREATE)
-          setupUiByOperationType(currentOperationType)
+          setupUiForCrudOperation(currentOperationType)
         }
 
         override fun onTabUnselected(tab: TabLayout.Tab?) {}
@@ -167,89 +171,50 @@ class CrudOperationFragment : Fragment() {
     )
   }
 
-  private fun clearTextFieldValues() {
-    requireView().findViewById<EditText>(R.id.etId).text.clear()
-    requireView().findViewById<EditText>(R.id.etFirstName).text.clear()
-    requireView().findViewById<EditText>(R.id.etLastName).text.clear()
-    requireView().findViewById<EditText>(R.id.etBirthDate).text.clear()
-    requireView().findViewById<RadioButton>(R.id.rbOther).isChecked = true
+  private fun clearUiFieldValues() {
+    val editTexts =
+      listOf(
+        R.id.etId,
+        R.id.etFirstName,
+        R.id.etLastName,
+        R.id.etBirthDate,
+      )
+    editTexts.forEach { editTextId ->
+      requireView().findViewById<EditText>(editTextId).apply {
+        text.clear()
+        clearFocus()
+      }
+    }
+    val radioButtons =
+      listOf(
+        R.id.rbMale,
+        R.id.rbFemale,
+        R.id.rbOther,
+      )
+    radioButtons.forEach { radioButtonId ->
+      requireView().findViewById<RadioButton>(radioButtonId).isChecked = false
+    }
   }
 
   private fun configureFieldsForOperation(operationType: OperationType) {
-    // Common field visibility and text settings
-    val visibility = if (patientLogicalId.isNullOrEmpty()) View.GONE else View.VISIBLE
-
-    requireView().findViewById<TextInputLayout>(R.id.tilId).visibility =
-      when (operationType) {
-        OperationType.CREATE -> View.VISIBLE
-        OperationType.READ,
-        OperationType.UPDATE,
-        OperationType.DELETE, -> visibility
-      }
-    requireView().findViewById<TextInputLayout>(R.id.tilFirstName).visibility =
-      when (operationType) {
-        OperationType.CREATE -> View.VISIBLE
-        OperationType.READ,
-        OperationType.UPDATE,
-        OperationType.DELETE, -> visibility
-      }
-    requireView().findViewById<TextInputLayout>(R.id.tilLastName).visibility =
-      when (operationType) {
-        OperationType.CREATE,
-        OperationType.DELETE, -> View.GONE
-        OperationType.READ,
-        OperationType.UPDATE, -> visibility
-      }
-    requireView().findViewById<TextInputLayout>(R.id.tilBirthDate).visibility =
-      when (operationType) {
-        OperationType.CREATE,
-        OperationType.DELETE, -> View.GONE
-        OperationType.READ,
-        OperationType.UPDATE, -> visibility
-      }
-    requireView().findViewById<TextView>(R.id.tvGenderLabel).visibility =
-      when (operationType) {
-        OperationType.CREATE,
-        OperationType.DELETE, -> View.GONE
-        OperationType.READ,
-        OperationType.UPDATE, -> visibility
-      }
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).visibility =
-      when (operationType) {
-        OperationType.CREATE,
-        OperationType.DELETE, -> View.GONE
-        OperationType.READ,
-        OperationType.UPDATE, -> visibility
-      }
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).visibility =
-      when (operationType) {
-        OperationType.CREATE,
-        OperationType.DELETE, -> View.GONE
-        OperationType.READ,
-        OperationType.UPDATE, -> visibility
-      }
-    requireView().findViewById<Button>(R.id.btnSubmit).visibility =
-      when (operationType) {
-        OperationType.CREATE -> View.VISIBLE
-        OperationType.READ -> View.GONE
-        OperationType.UPDATE,
-        OperationType.DELETE, -> if (patientLogicalId.isNullOrEmpty()) View.GONE else View.VISIBLE
-      }
-    // Field editability
     val isEditable =
       when (operationType) {
         OperationType.CREATE,
         OperationType.UPDATE, -> true
         else -> false
       }
-    requireView().findViewById<EditText>(R.id.etFirstName).isEnabled = isEditable
-    requireView().findViewById<EditText>(R.id.etLastName).isEnabled = isEditable
-    requireView().findViewById<EditText>(R.id.etBirthDate).isEnabled = isEditable
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).isEnabled = isEditable
-    requireView().findViewById<RadioButton>(R.id.rbMale).isEnabled = isEditable
-    requireView().findViewById<RadioButton>(R.id.rbFemale).isEnabled = isEditable
-    requireView().findViewById<RadioButton>(R.id.rbOther).isEnabled = isEditable
-    requireView().findViewById<CheckBox>(R.id.checkBoxActive).isEnabled = isEditable
+    val views =
+      listOf(
+        R.id.etFirstName,
+        R.id.etLastName,
+        R.id.etBirthDate,
+        R.id.radioGroupGender,
+        R.id.rbMale,
+        R.id.rbFemale,
+        R.id.rbOther,
+        R.id.checkBoxActive,
+      )
+    views.forEach { viewId -> requireView().findViewById<View>(viewId).isEnabled = isEditable }
   }
 
   private fun displayPatientDetails(patientUiState: PatientUiState) {
@@ -279,7 +244,7 @@ class CrudOperationFragment : Fragment() {
   }
 
   private fun displayCreatePatientMessageIfNeeded() {
-    if (patientLogicalId.isNullOrEmpty()) {
+    if (crudOperationViewModel.currentPatientLogicalId.isNullOrEmpty()) {
       requireView().findViewById<EditText>(R.id.etId).text.clear()
       Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
     }
@@ -308,7 +273,6 @@ class CrudOperationFragment : Fragment() {
   private fun createPatient() {
     val patientId = requireView().findViewById<EditText>(R.id.etId).text.toString()
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
-    // Validation: Check if first name is blank
     if (firstName.isBlank()) {
       Toast.makeText(requireContext(), "First name is blank", Toast.LENGTH_SHORT).show()
       return
@@ -325,12 +289,6 @@ class CrudOperationFragment : Fragment() {
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
     val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
     val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
-    if (!PatientCreationHelper.isBirthdateParsed(birthDate)) {
-      Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
-        .show()
-      return
-    }
-    // Gender selection
     val selectedGenderId =
       requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
     val gender =
@@ -340,11 +298,7 @@ class CrudOperationFragment : Fragment() {
         R.id.rbOther -> Enumerations.AdministrativeGender.OTHER
         else -> null
       }
-
-    // Active status
     val isActive = requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked
-
-    // Validation (ensure firstName is not blank)
     if (firstName.isBlank()) {
       Toast.makeText(requireContext(), "First name is required.", Toast.LENGTH_SHORT).show()
       return
