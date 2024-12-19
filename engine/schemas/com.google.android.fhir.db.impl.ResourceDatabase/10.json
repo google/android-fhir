@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 10,
-    "identityHash": "d3b9179ed5c73e211a5fec3728d88036",
+    "identityHash": "b22554c7d1b5c2289ddc13d5d26c7eca",
     "entities": [
       {
         "tableName": "ResourceEntity",
@@ -146,14 +146,15 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
           },
           {
-            "name": "index_StringIndexEntity_resourceUuid_index_name",
+            "name": "index_StringIndexEntity_resourceUuid_index_name_index_value",
             "unique": false,
             "columnNames": [
               "resourceUuid",
-              "index_name"
+              "index_name",
+              "index_value"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name_index_value` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`, `index_value`)"
           }
         ],
         "foreignKeys": [
@@ -590,14 +591,15 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
           },
           {
-            "name": "index_DateIndexEntity_resourceUuid_index_name",
+            "name": "index_DateIndexEntity_resourceUuid_index_name_index_from",
             "unique": false,
             "columnNames": [
               "resourceUuid",
-              "index_name"
+              "index_name",
+              "index_from"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name_index_from` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`, `index_from`)"
           }
         ],
         "foreignKeys": [
@@ -682,14 +684,15 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceType_index_name_resourceUuid_index_from_index_to` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `resourceUuid`, `index_from`, `index_to`)"
           },
           {
-            "name": "index_DateTimeIndexEntity_resourceUuid_index_name",
+            "name": "index_DateTimeIndexEntity_resourceUuid_index_name_index_from",
             "unique": false,
             "columnNames": [
               "resourceUuid",
-              "index_name"
+              "index_name",
+              "index_from"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name_index_from` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`, `index_from`)"
           }
         ],
         "foreignKeys": [
@@ -766,14 +769,15 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceType_index_name_index_value` ON `${TABLE_NAME}` (`resourceType`, `index_name`, `index_value`)"
           },
           {
-            "name": "index_NumberIndexEntity_resourceUuid_index_name",
+            "name": "index_NumberIndexEntity_resourceUuid_index_name_index_value",
             "unique": false,
             "columnNames": [
               "resourceUuid",
-              "index_name"
+              "index_name",
+              "index_value"
             ],
             "orders": [],
-            "createSql": "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`)"
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name_index_value` ON `${TABLE_NAME}` (`resourceUuid`, `index_name`, `index_value`)"
           }
         ],
         "foreignKeys": [
@@ -1022,7 +1026,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd3b9179ed5c73e211a5fec3728d88036')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b22554c7d1b5c2289ddc13d5d26c7eca')"
     ]
   }
 }

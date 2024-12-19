@@ -238,16 +238,16 @@ internal val Migration_9_10 =
         database.execSQL("DROP INDEX IF EXISTS `index_StringIndexEntity_resourceUuid`;")
 
         database.execSQL(
-          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name` ON `DateIndexEntity` (`resourceUuid`, `index_name`);",
+          "CREATE INDEX IF NOT EXISTS `index_DateIndexEntity_resourceUuid_index_name_index_from` ON `DateIndexEntity` (`resourceUuid`, `index_name`, `index_from`);",
         )
         database.execSQL(
-          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name` ON `DateTimeIndexEntity` (`resourceUuid`, `index_name`);",
+          "CREATE INDEX IF NOT EXISTS `index_DateTimeIndexEntity_resourceUuid_index_name_index_from` ON `DateTimeIndexEntity` (`resourceUuid`, `index_name`, `index_from`);",
         )
         database.execSQL(
-          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name` ON `NumberIndexEntity` (`resourceUuid`, `index_name`);",
+          "CREATE INDEX IF NOT EXISTS `index_NumberIndexEntity_resourceUuid_index_name_index_value` ON `NumberIndexEntity` (`resourceUuid`, `index_name`, `index_value`);",
         )
         database.execSQL(
-          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name` ON `StringIndexEntity` (`resourceUuid`, `index_name`);",
+          "CREATE INDEX IF NOT EXISTS `index_StringIndexEntity_resourceUuid_index_name_index_value` ON `StringIndexEntity` (`resourceUuid`, `index_name`, `index_value`);",
         )
         database.setTransactionSuccessful()
       } finally {

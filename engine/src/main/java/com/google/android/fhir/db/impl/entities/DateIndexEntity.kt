@@ -34,7 +34,7 @@ import org.hl7.fhir.r4.model.ResourceType
       // https://github.com/google/android-fhir/issues/2040
       Index(value = ["resourceType", "index_name", "resourceUuid", "index_from", "index_to"]),
       // Keep this index for faster foreign lookup
-      Index(value = ["resourceUuid", "index_name"]),
+      Index(value = ["resourceUuid", "index_name", "index_from"]),
     ],
   foreignKeys =
     [

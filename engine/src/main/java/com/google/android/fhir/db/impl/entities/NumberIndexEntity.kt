@@ -30,7 +30,7 @@ import org.hl7.fhir.r4.model.ResourceType
     [
       Index(value = ["resourceType", "index_name", "index_value"]),
       // keep this index for faster foreign lookup
-      Index(value = ["resourceUuid", "index_name"]),
+      Index(value = ["resourceUuid", "index_name", "index_value"]),
     ],
   foreignKeys =
     [
