@@ -194,6 +194,7 @@ class CrudOperationFragment : Fragment() {
     radioButtons.forEach { radioButtonId ->
       requireView().findViewById<RadioButton>(radioButtonId).isChecked = false
     }
+    requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked = false
   }
 
   private fun configureFieldsForOperation(operationType: OperationType) {
