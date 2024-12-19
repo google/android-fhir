@@ -17,6 +17,7 @@
 package com.google.android.fhir.impl
 
 import androidx.test.core.app.ApplicationProvider
+import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.gclient.TokenClientParam
 import ca.uhn.fhir.rest.param.ParamPrefixEnum
 import com.google.android.fhir.FhirServices.Companion.builder
@@ -74,6 +75,7 @@ import org.robolectric.RobolectricTestRunner
 class FhirEngineImplTest {
   private val services = builder(ApplicationProvider.getApplicationContext()).inMemory().build()
   private val fhirEngine = services.fhirEngine
+  private val parser = FhirContext.forR4Cached().newJsonParser()
 
   @Before fun setUp(): Unit = runBlocking { fhirEngine.create(TEST_PATIENT_1) }
 
@@ -388,7 +390,7 @@ class FhirEngineImplTest {
       assertThat(resourceType).isEqualTo(ResourceType.Patient.toString())
       assertThat(resourceId).isEqualTo(TEST_PATIENT_1.id)
       assertThat(type).isEqualTo(Type.INSERT)
-      assertThat(payload).isEqualTo(services.parser.encodeResourceToString(TEST_PATIENT_1))
+      assertThat(payload).isEqualTo(parser.encodeResourceToString(TEST_PATIENT_1))
     }
 
     assertThat(emittedProgress).hasSize(2)
@@ -446,7 +448,7 @@ class FhirEngineImplTest {
   fun `getLocalChanges() should return single local change`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
     with(resourceLocalChanges) {
       assertThat(size).isEqualTo(1)
@@ -497,7 +499,7 @@ class FhirEngineImplTest {
   fun `clearDatabase() should clear all tables data`() = runBlocking {
     val patient: Patient = readFromFile(Patient::class.java, "/date_test_patient.json")
     fhirEngine.create(patient)
-    val patientString = services.parser.encodeResourceToString(patient)
+    val patientString = parser.encodeResourceToString(patient)
     val resourceLocalChanges = fhirEngine.getLocalChanges(patient.resourceType, patient.logicalId)
     with(resourceLocalChanges) {
       assertThat(size).isEqualTo(1)
