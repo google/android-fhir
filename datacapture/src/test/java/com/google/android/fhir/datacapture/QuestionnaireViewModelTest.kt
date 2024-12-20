@@ -1580,7 +1580,7 @@ class QuestionnaireViewModelTest {
         )
         addItem(
           QuestionnaireItemComponent().apply {
-            linkId = "page4-noExtension"
+            linkId = "page4-noExtension-hidden"
             addExtension(hiddenExtension)
             type = Questionnaire.QuestionnaireItemType.GROUP
             addItem(
