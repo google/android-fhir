@@ -42,10 +42,12 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
 
   val patientUiState: SharedFlow<PatientUiState> = _patientUiState.asSharedFlow()
 
-  fun readPatientById(patientLogicalId: String) {
+  fun readPatientById() {
     viewModelScope.launch {
-      val patient = fhirEngine.get(ResourceType.Patient, patientLogicalId) as Patient
-      _patientUiState.emit(patient.toPatientUiState(OperationType.READ))
+      currentPatientLogicalId?.let {
+        val patient = fhirEngine.get(ResourceType.Patient, it) as Patient
+        _patientUiState.emit(patient.toPatientUiState(OperationType.READ))
+      }
     }
   }
 
@@ -54,7 +56,7 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
     firstName: String,
     lastName: String? = null,
     birthDate: String? = null,
-    gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
+    gender: Enumerations.AdministrativeGender? = null,
     isActive: Boolean = false,
   ) {
     viewModelScope.launch {
@@ -75,35 +77,40 @@ class CrudOperationViewModel(application: Application) : AndroidViewModel(applic
   }
 
   fun updatePatient(
-    patientLogicalId: String,
     firstName: String,
     lastName: String? = null,
     birthDate: String? = null,
-    gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
+    gender: Enumerations.AdministrativeGender? = null,
     isActive: Boolean = false,
   ) {
     viewModelScope.launch {
-      val patient =
-        PatientCreationHelper.createPatient(
-          patientId = patientLogicalId,
-          firstName = firstName,
-          lastName = lastName,
-          birthDate = birthDate,
-          gender = gender,
-          isActive = isActive,
-        )
-      fhirEngine.update(patient)
-      _patientUiState.emit(patient.toPatientUiState(OperationType.UPDATE))
+      currentPatientLogicalId?.let {
+        val patient =
+          PatientCreationHelper.createPatient(
+            patientId = it,
+            firstName = firstName,
+            lastName = lastName,
+            birthDate = birthDate,
+            gender = gender,
+            isActive = isActive,
+          )
+        fhirEngine.update(patient)
+        _patientUiState.emit(patient.toPatientUiState(OperationType.UPDATE))
+      }
     }
   }
 
-  fun deletePatient(patientLogicalId: String) {
+  fun deletePatient() {
     viewModelScope.launch {
-      fhirEngine.delete<Patient>(patientLogicalId)
-      currentPatientLogicalId = null
-      _patientUiState.emit(Patient().toPatientUiState(OperationType.DELETE))
+      currentPatientLogicalId?.let {
+        fhirEngine.delete<Patient>(it)
+        currentPatientLogicalId = null
+        _patientUiState.emit(Patient().toPatientUiState(OperationType.DELETE))
+      }
     }
   }
+
+  fun isBirthDateValid(dateString: String) = PatientCreationHelper.isBirthdateParsed(dateString)
 }
 
 data class PatientUiState(
@@ -111,7 +118,7 @@ data class PatientUiState(
   val firstName: String,
   val lastName: String? = null,
   val birthDate: String? = null,
-  val gender: Enumerations.AdministrativeGender = Enumerations.AdministrativeGender.OTHER,
+  val gender: Enumerations.AdministrativeGender? = null,
   val isActive: Boolean = true,
   val operationType: OperationType,
 )
@@ -126,7 +133,7 @@ fun Patient.toPatientUiState(operationType: OperationType): PatientUiState {
     } else {
       null
     }
-  val gender = this.gender ?: Enumerations.AdministrativeGender.OTHER
+  val gender = this.gender
   val isActive = this.active
   return PatientUiState(
     patientId,

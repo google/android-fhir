@@ -27,28 +27,28 @@
             android:id="@+id/tabCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Create"
+            android:text="@string/create"
         />
 
     <com.google.android.material.tabs.TabItem
             android:id="@+id/tabRead"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Read"
+            android:text="@string/read"
         />
 
     <com.google.android.material.tabs.TabItem
             android:id="@+id/tabUpdate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Update"
+            android:text="@string/update"
         />
 
     <com.google.android.material.tabs.TabItem
             android:id="@+id/tabDelete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Delete"
+            android:text="@string/delete"
         />
   </com.google.android.material.tabs.TabLayout>
 

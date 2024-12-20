@@ -32,7 +32,7 @@ object PatientCreationHelper {
     firstName: String,
     lastName: String? = null,
     birthDate: String? = null,
-    gender: Enumerations.AdministrativeGender,
+    gender: Enumerations.AdministrativeGender? = null,
     phoneNumber: String? = null,
     city: String? = null,
     country: String? = null,

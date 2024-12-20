@@ -24,7 +24,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
-import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -109,10 +108,8 @@ class CrudOperationFragment : Fragment() {
       when (currentOperationType) {
         OperationType.CREATE -> createPatient()
         OperationType.READ -> {
-          crudOperationViewModel.currentPatientLogicalId?.let {
-            crudOperationViewModel.readPatientById(it)
-          }
-            ?: displayCreatePatientMessageIfNeeded()
+          isPatientCreationRequired()
+          crudOperationViewModel.readPatientById()
         }
         OperationType.UPDATE -> updatePatient()
         OperationType.DELETE -> deletePatient()
@@ -124,29 +121,32 @@ class CrudOperationFragment : Fragment() {
     when (operationType) {
       OperationType.CREATE -> {
         clearUiFieldValues()
-        configureFieldsForOperation(OperationType.CREATE)
-        requireView()
-          .findViewById<EditText>(R.id.etId)
-          .setText(PatientCreationHelper.createPatientId())
+        setPatientIdUiFieldText(PatientCreationHelper.createPatientId())
+        updateSubmitButtonText(getString(R.string.create))
       }
       OperationType.READ -> {
         clearUiFieldValues()
-        configureFieldsForOperation(operationType)
-        requireView()
-          .findViewById<EditText>(R.id.etId)
-          .setText(crudOperationViewModel.currentPatientLogicalId)
+        setPatientIdUiFieldText(crudOperationViewModel.currentPatientLogicalId)
+        updateSubmitButtonText(getString(R.string.read))
       }
-      OperationType.UPDATE,
-      OperationType.DELETE, -> {
-        crudOperationViewModel.currentPatientLogicalId
-          ?.takeIf { it.isNotEmpty() }
-          ?.let {
-            crudOperationViewModel.readPatientById(it)
-            requireView().findViewById<EditText>(R.id.etId).setText(it)
-          }
-        configureFieldsForOperation(operationType)
+      OperationType.UPDATE -> {
+        updateSubmitButtonText(getString(R.string.update))
+        crudOperationViewModel.readPatientById()
+      }
+      OperationType.DELETE -> {
+        updateSubmitButtonText(getString(R.string.delete))
+        crudOperationViewModel.readPatientById()
       }
     }
+    configureFieldsForOperation(operationType)
+  }
+
+  private fun updateSubmitButtonText(text: String) {
+    requireView().findViewById<Button>(R.id.btnSubmit).text = text
+  }
+
+  private fun setPatientIdUiFieldText(patientId: String?) {
+    requireView().findViewById<EditText>(R.id.etId).setText(patientId)
   }
 
   private fun selectTab(position: Int) {
@@ -185,15 +185,7 @@ class CrudOperationFragment : Fragment() {
         clearFocus()
       }
     }
-    val radioButtons =
-      listOf(
-        R.id.rbMale,
-        R.id.rbFemale,
-        R.id.rbOther,
-      )
-    radioButtons.forEach { radioButtonId ->
-      requireView().findViewById<RadioButton>(radioButtonId).isChecked = false
-    }
+    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).clearCheck()
     requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked = false
   }
 
@@ -219,7 +211,7 @@ class CrudOperationFragment : Fragment() {
   }
 
   private fun displayPatientDetails(patientUiState: PatientUiState) {
-    requireView().findViewById<EditText>(R.id.etId).apply { setText(patientUiState.patientId) }
+    setPatientIdUiFieldText(patientUiState.patientId)
     requireView().findViewById<EditText>(R.id.etFirstName).apply {
       setText(patientUiState.firstName)
     }
@@ -229,26 +221,29 @@ class CrudOperationFragment : Fragment() {
     requireView().findViewById<EditText>(R.id.etBirthDate).apply {
       setText(patientUiState.birthDate ?: "")
     }
-    requireView().findViewById<RadioGroup>(R.id.radioGroupGender).apply {
-      val genderRadioButtonId =
-        when (patientUiState.gender) {
-          Enumerations.AdministrativeGender.MALE -> R.id.rbMale
-          Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
-          Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
-          else -> null
-        }
-      genderRadioButtonId?.let { check(it) }
-    }
+
+    val radioGroupGender = requireView().findViewById<RadioGroup>(R.id.radioGroupGender)
+    radioGroupGender.clearCheck()
+    val genderRadioButtonId =
+      when (patientUiState.gender) {
+        Enumerations.AdministrativeGender.MALE -> R.id.rbMale
+        Enumerations.AdministrativeGender.FEMALE -> R.id.rbFemale
+        Enumerations.AdministrativeGender.OTHER -> R.id.rbOther
+        else -> null
+      }
+    genderRadioButtonId?.let { radioGroupGender.check(it) }
+
     requireView().findViewById<CheckBox>(R.id.checkBoxActive).apply {
       isChecked = patientUiState.isActive
     }
   }
 
-  private fun displayCreatePatientMessageIfNeeded() {
+  private fun isPatientCreationRequired(): Boolean {
     if (crudOperationViewModel.currentPatientLogicalId.isNullOrEmpty()) {
-      requireView().findViewById<EditText>(R.id.etId).text.clear()
       Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
+      return true
     }
+    return false
   }
 
   private fun getOperationTypeByTabPosition(tabPosition: Int): OperationType {
@@ -275,21 +270,48 @@ class CrudOperationFragment : Fragment() {
     val patientId = requireView().findViewById<EditText>(R.id.etId).text.toString()
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
     if (firstName.isBlank()) {
-      Toast.makeText(requireContext(), "First name is blank", Toast.LENGTH_SHORT).show()
+      Toast.makeText(requireContext(), "First name is required.", Toast.LENGTH_SHORT).show()
       return
     }
-    crudOperationViewModel.createPatient(patientId, firstName)
+    val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
+    val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
+    if (crudOperationViewModel.isBirthDateValid(birthDate)) {
+      Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
+        .show()
+      return
+    }
+    val selectedGenderId =
+      requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
+    val gender =
+      when (selectedGenderId) {
+        R.id.rbMale -> Enumerations.AdministrativeGender.MALE
+        R.id.rbFemale -> Enumerations.AdministrativeGender.FEMALE
+        R.id.rbOther -> Enumerations.AdministrativeGender.OTHER
+        else -> null
+      }
+    val isActive = requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked
+    crudOperationViewModel.createPatient(
+      patientId = patientId,
+      firstName = firstName,
+      lastName = lastName,
+      birthDate = birthDate,
+      gender = gender,
+      isActive = isActive,
+    )
   }
 
   private fun updatePatient() {
-    val patientId = requireView().findViewById<EditText>(R.id.etId).text.toString()
-    if (patientId.isBlank()) {
-      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
+    if (isPatientCreationRequired()) {
       return
     }
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
     val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
     val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
+    if (crudOperationViewModel.isBirthDateValid(birthDate)) {
+      Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
+        .show()
+      return
+    }
     val selectedGenderId =
       requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
     val gender =
@@ -304,24 +326,20 @@ class CrudOperationFragment : Fragment() {
       Toast.makeText(requireContext(), "First name is required.", Toast.LENGTH_SHORT).show()
       return
     }
-
     crudOperationViewModel.updatePatient(
-      patientLogicalId = patientId,
       firstName = firstName,
       lastName = lastName,
       birthDate = birthDate,
-      gender = gender ?: Enumerations.AdministrativeGender.UNKNOWN,
+      gender = gender,
       isActive = isActive,
     )
   }
 
   private fun deletePatient() {
-    val patientId = requireView().findViewById<EditText>(R.id.etId).text.toString()
-    if (patientId.isBlank()) {
-      Toast.makeText(requireContext(), "Please create a patient first.", Toast.LENGTH_SHORT).show()
+    if (isPatientCreationRequired()) {
       return
     }
-    crudOperationViewModel.deletePatient(patientId)
+    crudOperationViewModel.currentPatientLogicalId?.let { crudOperationViewModel.deletePatient() }
   }
 
   companion object {
