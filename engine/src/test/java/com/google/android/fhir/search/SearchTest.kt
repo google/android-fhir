@@ -2414,14 +2414,13 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
-          AND re.resourceType = ?
           )
           """
           .trimIndent(),
       )
 
     assertThat(query.args)
-      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02", "Condition")
+      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02")
       .inOrder()
   }
 
