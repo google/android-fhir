@@ -1,6 +1,9 @@
 import androidx.build.gradle.gcpbuildcache.GcpBuildCache
 import androidx.build.gradle.gcpbuildcache.GcpBuildCacheServiceFactory
 
+include(":contrib:timeselector")
+
+
 plugins {
   id("com.gradle.enterprise") version ("3.10")
   id("androidx.build.gradle.gcpbuildcache") version "1.0.0-beta07"

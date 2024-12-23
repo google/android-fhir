@@ -59,6 +59,7 @@ dependencies {
   implementation(project(path = ":engine"))
   implementation(project(path = ":contrib:barcode"))
   implementation(project(path = ":contrib:locationwidget"))
+  implementation(project(path = ":contrib:timeselector"))
 
   testImplementation(libs.junit)
 }

@@ -142,8 +142,13 @@ class DemoQuestionnaireFragment : Fragment() {
             QuestionnaireFragment.builder()
               .apply {
                 setCustomQuestionnaireItemViewHolderFactoryMatchersProvider(
-                  ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
-                    .LOCATION_WIDGET_PROVIDER,
+                  if (args.questionnaireTitleKey == getString(R.string.component_name_time_picker)) {
+                    ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                      .TIME_WIDGET_PROVIDER
+                  } else {
+                    ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory
+                      .LOCATION_WIDGET_PROVIDER
+                  }
                 )
                 setQuestionnaire(args.questionnaireJsonStringKey!!)
               }

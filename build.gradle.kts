@@ -13,6 +13,7 @@ buildscript {
     classpath(Plugins.kotlinGradlePlugin)
     classpath(Plugins.navSafeArgsGradlePlugin)
     classpath(Plugins.rulerGradlePlugin)
+    classpath(libs.kotlin.gradle.plugin)
   }
 }
 
