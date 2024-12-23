@@ -102,6 +102,12 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       "component_date_picker.json",
       "component_date_picker_with_validation.json",
     ),
+    TIME_PICKER(
+      R.drawable.ic_timepicker,
+      R.string.component_name_time_picker,
+      "component_time_picker.json",
+      "component_time_picker_with_validation.json",
+    ),
     DATE_TIME_PICKER(
       R.drawable.ic_timepicker,
       R.string.component_name_date_time_picker,
@@ -171,6 +177,7 @@ class ComponentListViewModel(application: Application, private val state: SavedS
       ViewItem.ComponentItem(Component.TEXT_FIELD),
       ViewItem.ComponentItem(Component.AUTO_COMPLETE),
       ViewItem.ComponentItem(Component.DATE_PICKER),
+      ViewItem.ComponentItem(Component.TIME_PICKER),
       ViewItem.ComponentItem(Component.DATE_TIME_PICKER),
       ViewItem.ComponentItem(Component.SLIDER),
       ViewItem.ComponentItem(Component.QUANTITY),

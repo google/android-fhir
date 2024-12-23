@@ -47,6 +47,7 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireEditAdapter(
@@ -103,6 +104,7 @@ internal class QuestionnaireEditAdapter(
         QuestionnaireViewHolderType.GROUP -> GroupViewHolderFactory
         QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewHolderFactory
         QuestionnaireViewHolderType.DATE_PICKER -> DatePickerViewHolderFactory
+        QuestionnaireViewHolderType.TIME_PICKER -> TimePickerViewHolderFactory
         QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimePickerViewHolderFactory
         QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewHolderFactory
         QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewHolderFactory
@@ -223,6 +225,7 @@ internal class QuestionnaireEditAdapter(
       QuestionnaireItemType.GROUP -> QuestionnaireViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER
       QuestionnaireItemType.DATE -> QuestionnaireViewHolderType.DATE_PICKER
+      QuestionnaireItemType.TIME -> QuestionnaireViewHolderType.TIME_PICKER
       QuestionnaireItemType.DATETIME -> QuestionnaireViewHolderType.DATE_TIME_PICKER
       QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireViewItem)
       QuestionnaireItemType.TEXT -> QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE
