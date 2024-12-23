@@ -53,13 +53,19 @@ class SyncFragmentViewModel(application: Application) : AndroidViewModel(applica
   val pollState: SharedFlow<CurrentSyncJobStatus> =
     _oneTimeSyncTrigger
       .flatMapLatest {
-        Sync.oneTimeSync<DemoFhirSyncWorker>(context = application.applicationContext)
+        Sync.oneTimeSync<DemoFhirSyncWorker>(
+          context = application.applicationContext,
+        )
       }
       .map { it }
-      .shareIn(viewModelScope, SharingStarted.Eagerly, 0)
+      .shareIn(viewModelScope, SharingStarted.Eagerly, replay = 0)
 
   fun triggerOneTimeSync() {
     viewModelScope.launch { _oneTimeSyncTrigger.emit(true) }
+  }
+
+  fun cancelOneTimeSyncWork() {
+    viewModelScope.launch { Sync.cancelOneTimeSync<DemoFhirSyncWorker>(getApplication()) }
   }
 
   /** Emits last sync time. */
