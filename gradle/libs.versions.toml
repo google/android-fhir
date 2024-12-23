@@ -32,6 +32,7 @@ logback-android = "3.0.0"
 opencds-cqf-fhir = "3.8.0"
 truth = "1.1.5"
 material = "1.9.0"
+kotlin-gradle-plugin = "1.9.22"
 
 [libraries]
 android-fhir-common = { module = "com.google.android.fhir:common", version.ref = "android-fhir-common" }
@@ -80,6 +81,7 @@ opencds-cqf-fhir-jackson = { module = "org.opencds.cqf.fhir:cqf-fhir-jackson", v
 opencds-cqf-fhir-utility = { module = "org.opencds.cqf.fhir:cqf-fhir-utility", version.ref = "opencds-cqf-fhir" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin-gradle-plugin" }
 
 [bundles]
 
