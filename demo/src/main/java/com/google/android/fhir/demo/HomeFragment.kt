@@ -45,5 +45,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
       findNavController()
         .navigate(HomeFragmentDirections.actionHomeFragmentToPeriodicSyncFragment())
     }
+    requireView().findViewById<CardView>(R.id.item_crud).setOnClickListener {
+      findNavController()
+        .navigate(HomeFragmentDirections.actionHomeFragmentToCrudOperationFragment())
+    }
   }
 }

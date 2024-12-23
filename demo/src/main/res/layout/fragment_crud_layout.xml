@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="8dp"
+>
+
+  <!-- CRUD RadioGroup -->
+  <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayoutCrud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="8dp"
+        app:tabIndicatorColor="?attr/colorPrimary"
+        app:tabTextColor="@color/black"
+        app:tabSelectedTextColor="?attr/colorPrimary"
+        app:tabMode="fixed"
+        app:tabGravity="fill"
+    >
+
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabCreate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/create"
+        />
+
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabRead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/read"
+        />
+
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabUpdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/update"
+        />
+
+    <com.google.android.material.tabs.TabItem
+            android:id="@+id/tabDelete"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/delete"
+        />
+  </com.google.android.material.tabs.TabLayout>
+
+
+  <!-- Form Container in ScrollView -->
+  <ScrollView
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/tabLayoutCrud"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+    >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+        >
+
+      <!-- Id -->
+      <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Id *"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+            >
+
+        <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:enabled="false"
+                    android:textIsSelectable="true"
+                />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <!-- First Name Input -->
+      <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilFirstName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="First Name *"
+                app:layout_constraintTop_toBottomOf="@id/tilId"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_goneMarginTop="16dp"
+            >
+
+        <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etFirstName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <!-- Last Name Input -->
+      <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilLastName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Last Name"
+                app:layout_constraintTop_toBottomOf="@id/tilFirstName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_goneMarginTop="16dp"
+            >
+
+        <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etLastName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                />
+      </com.google.android.material.textfield.TextInputLayout>
+
+      <!-- Birth Date Input -->
+      <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilBirthDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:hint="Birth Date (yyyy-MM-dd) "
+                app:layout_constraintTop_toBottomOf="@id/tilLastName"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_goneMarginTop="16dp"
+            >
+
+        <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/etBirthDate"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="date"
+                />
+      </com.google.android.material.textfield.TextInputLayout>
+      <TextView
+                android:id="@+id/tvGenderLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Gender"
+                app:layout_constraintTop_toBottomOf="@id/tilBirthDate"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_goneMarginTop="16dp"
+            />
+      <!-- Gender RadioGroup -->
+      <RadioGroup
+                android:id="@+id/radioGroupGender"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintTop_toBottomOf="@id/tvGenderLabel"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_goneMarginTop="16dp"
+            >
+
+        <!-- Male Radio Button -->
+        <RadioButton
+                    android:id="@+id/rbMale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Male"
+                />
+
+        <!-- Female Radio Button -->
+        <RadioButton
+                    android:id="@+id/rbFemale"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Female"
+                    android:layout_marginStart="16dp"
+                />
+
+        <!-- Other Radio Button -->
+        <RadioButton
+                    android:id="@+id/rbOther"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Other"
+                    android:layout_marginStart="16dp"
+                />
+      </RadioGroup>
+
+      <!-- Active Status Checkbox -->
+      <CheckBox
+                android:id="@+id/checkBoxActive"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Is Active"
+                android:checked="false"
+                app:layout_constraintTop_toBottomOf="@id/radioGroupGender"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_goneMarginTop="16dp"
+            />
+
+      <!-- Submit Button -->
+      <Button
+                android:id="@+id/btnSubmit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Questionnaire.SubmitButtonStyle"
+                android:text="Submit"
+                app:layout_constraintTop_toBottomOf="@id/checkBoxActive"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_goneMarginTop="16dp"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+  </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
