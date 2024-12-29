@@ -188,6 +188,5 @@ class ComponentListViewModel(application: Application, private val state: SavedS
   fun isComponent(context: Context, title: String) =
     viewItemList
       .filterIsInstance<ViewItem.ComponentItem>()
-      .map { context.getString(it.component.textId) }
-      .contains(title)
+      .any { context.getString(it.component.textId) == title }
 }
