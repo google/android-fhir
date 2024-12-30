@@ -219,7 +219,7 @@ internal fun List<NestedSearch>.nestedQuery(
         SearchQuery(
           query =
             searchQueries.joinToString(
-              prefix = "AND a.resourceUuid IN ",
+              prefix = "a.resourceUuid IN ",
               separator = " ${operation.logicalOperator} a.resourceUuid IN",
             ) { searchQuery ->
               "(\n${searchQuery.query}\n) "
