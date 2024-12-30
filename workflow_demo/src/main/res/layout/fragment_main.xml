@@ -19,47 +19,44 @@
         android:layout_marginEnd="9dp"
         android:layout_marginRight="9dp"
         android:layout_marginBottom="10dp"
-        app:cardCornerRadius="5dp"
-        app:cardElevation="5dp"
         app:contentPadding="5dp"
         app:layout_constraintBottom_toTopOf="@+id/install_dependencies"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:strokeWidth="2dp"
     >
 
 
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/patient_name"
-            style="@style/TextAppearance.AppCompat.Headline"
+            style="@style/AppTheme.headline"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Mr. John Doe Sr."
+            android:text="@string/patient_name"
         />
 
 
     </com.google.android.material.card.MaterialCardView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/restart_flow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
         android:layout_marginRight="20dp"
-        android:text="Restart Flow"
+        android:text="@string/restart"
         app:layout_constraintBottom_toTopOf="@+id/phase_view_pager"
         app:layout_constraintEnd_toEndOf="@+id/phase_view_pager"
     />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/install_dependencies"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginLeft="20dp"
         android:layout_marginTop="180dp"
-        android:text="Initialize"
+        android:text="@string/initialize"
         app:layout_constraintStart_toStartOf="@+id/phase_view_pager"
         app:layout_constraintTop_toTopOf="parent"
     />
