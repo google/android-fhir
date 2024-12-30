@@ -17,9 +17,9 @@
 package com.google.android.fhir.workflow.activity.phase
 
 import androidx.annotation.WorkerThread
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
-import com.google.android.fhir.workflow.activity.resource.request.Intent
 import org.hl7.fhir.r4.model.IdType
 import org.hl7.fhir.r4.model.Reference
 
@@ -36,8 +36,7 @@ sealed interface Phase {
   fun getPhaseName(): PhaseName
 
   /** Activity Phases for a CPG Request. */
-  interface RequestPhase<R : CPGRequestResource<*>> : Phase {
-    fun getRequestResource(): R
+  interface RequestPhase<R : CPGRequestResource<*>> : Phase, ReadOnlyRequestPhase<R> {
 
     @WorkerThread fun update(r: R): Result<Unit>
 
@@ -79,27 +78,10 @@ internal fun checkEquals(a: Reference, b: Reference) = a.reference == b.referenc
 internal val Reference.idType
   get() = IdType(reference)
 
-/** Iterate through the previous phases of a current activity flow. */
-interface PreviousPhaseIterator<R : CPGRequestResource<*>> {
-  fun hasPrevious(): Boolean
-
-  fun previous(): ReadOnlyRequestPhase<R>?
-}
-
 /** Provides a read-only view of a request phase. */
-class ReadOnlyRequestPhase<R : CPGRequestResource<*>>(private val cpgRequestResource: R) {
+interface ReadOnlyRequestPhase<R : CPGRequestResource<*>> {
   /** Returns the [Phase.PhaseName] of this phase. */
-  fun getPhase() =
-    when (cpgRequestResource.getIntent()) {
-      Intent.PROPOSAL -> Phase.PhaseName.PROPOSAL
-      Intent.PLAN -> Phase.PhaseName.PLAN
-      Intent.ORDER -> Phase.PhaseName.ORDER
-      else ->
-        throw IllegalArgumentException(
-          "Resource intent can't be ${cpgRequestResource.getIntent().code} ",
-        )
-    }
+  fun getPhaseName(): PhaseName
 
-  /** Returns the underlying [CPGRequestResource] of this phase. */
-  fun getRequestResource() = cpgRequestResource
+  fun getRequestResource(): R
 }

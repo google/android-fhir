@@ -25,7 +25,6 @@ import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.ORDER
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PERFORM
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PLAN
 import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName.PROPOSAL
-import com.google.android.fhir.workflow.activity.phase.PreviousPhaseIterator
 import com.google.android.fhir.workflow.activity.phase.ReadOnlyRequestPhase
 import com.google.android.fhir.workflow.activity.phase.event.PerformPhase
 import com.google.android.fhir.workflow.activity.phase.event.PerformPhase.Companion.`class`
@@ -195,46 +194,35 @@ private constructor(
     return currentPhase
   }
 
-  /**
-   * Returns an iterator to go over the previous states of the activity flow. The iterator provides
-   * a read-only view to the phase.
-   */
-  fun getPreviousPhase(): PreviousPhaseIterator<R> {
-    return object : PreviousPhaseIterator<R> {
-      var current: Phase? = currentPhase
+  /** Returns a read only list of all the previous phases of the flow. */
+  fun getPreviousPhases(): List<ReadOnlyRequestPhase<R>> {
+    val phases = mutableListOf<ReadOnlyRequestPhase<R>>()
+    var current: Phase? = currentPhase
 
-      override fun hasPrevious(): Boolean {
-        return if (current is Phase.RequestPhase<*>) {
-          (current as? Phase.RequestPhase<*>)?.getRequestResource()?.getBasedOn() != null
+    while (current != null) {
+      val basedOn: Reference? =
+        if (current is Phase.RequestPhase<*>) {
+          (current).getRequestResource().getBasedOn()
+        } else if (current is Phase.EventPhase<*>) {
+          (current).getEventResource().getBasedOn()
         } else {
-          (current as? Phase.EventPhase<*>)?.getEventResource()?.getBasedOn() != null
+          null
         }
-      }
 
-      override fun previous(): ReadOnlyRequestPhase<R>? {
-        val basedOn: Reference? =
-          if (current is Phase.RequestPhase<*>) {
-            (current as Phase.RequestPhase<*>).getRequestResource().getBasedOn()
-          } else if (current is Phase.EventPhase<*>) {
-            (current as Phase.EventPhase<*>).getEventResource().getBasedOn()
-          } else {
-            null
-          }
-
-        val basedOnRequest =
-          basedOn?.let {
-            repository.read(it.`class`, it.idType)?.let { CPGRequestResource.of(it) as R }
-          }
-        current =
-          when (basedOnRequest?.getIntent()) {
-            Intent.PROPOSAL -> ProposalPhase(repository, basedOnRequest)
-            Intent.PLAN -> PlanPhase(repository, basedOnRequest)
-            Intent.ORDER -> OrderPhase(repository, basedOnRequest)
-            else -> null
-          }
-        return basedOnRequest?.let { ReadOnlyRequestPhase(it) }
-      }
+      val basedOnRequest =
+        basedOn?.let {
+          repository.read(it.`class`, it.idType)?.let { CPGRequestResource.of(it) as R }
+        }
+      current =
+        when (basedOnRequest?.getIntent()) {
+          Intent.PROPOSAL -> ProposalPhase(repository, basedOnRequest)
+          Intent.PLAN -> PlanPhase(repository, basedOnRequest)
+          Intent.ORDER -> OrderPhase(repository, basedOnRequest)
+          else -> null
+        }
+      current?.let { phases.add(it as ReadOnlyRequestPhase<R>) }
     }
+    return phases
   }
 
   /**
@@ -394,7 +382,8 @@ private constructor(
           CommunicationRequest::class.java,
         )
 
-      val cache: MutableMap<String, CPGRequestResource<*>> =
+      // This is used to fetch the `basedOn` resource for a request/event to form RequestChain
+      val idToRequestMap: MutableMap<String, CPGRequestResource<*>> =
         requestTypes
           .flatMap {
             repository
@@ -418,8 +407,8 @@ private constructor(
         val basedOn = request.request?.getBasedOn() ?: request.event?.getBasedOn()
         // look up the cache for the parent resource and add to the chain
         return basedOn?.let { reference ->
-          cache[reference.reference]?.let { requestResource ->
-            cache.remove(reference.reference)
+          idToRequestMap[reference.reference]?.let { requestResource ->
+            idToRequestMap.remove(reference.reference)
             RequestChain(request = requestResource).apply { this.basedOn = addBasedOn(this) }
           }
         }
@@ -427,7 +416,7 @@ private constructor(
 
       val requestChain =
         events.map { RequestChain(event = it).apply { this.basedOn = addBasedOn(this) } } +
-          cache.values
+          idToRequestMap.values
             .filter {
               it.getIntent() == Intent.ORDER ||
                 it.getIntent() == Intent.PLAN ||
@@ -435,7 +424,7 @@ private constructor(
             }
             .sortedByDescending { it.getIntent().code }
             .mapNotNull {
-              if (cache.containsKey("${it.resourceType}/${it.logicalId}")) {
+              if (idToRequestMap.containsKey("${it.resourceType}/${it.logicalId}")) {
                 RequestChain(request = it).apply { this.basedOn = addBasedOn(this) }
               } else {
                 null
@@ -460,7 +449,7 @@ private constructor(
  * Represents the chain of event/requests of an activity flow. A [RequestChain] would either have a
  * [request] or an [event].
  */
-internal data class RequestChain(
+private data class RequestChain(
   val request: CPGRequestResource<*>? = null,
   val event: CPGEventResource<*>? = null,
   var basedOn: RequestChain? = null,

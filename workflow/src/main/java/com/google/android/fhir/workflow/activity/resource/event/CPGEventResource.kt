@@ -76,12 +76,12 @@ sealed class CPGEventResource<out R>(
       }
     }
 
-    fun of(request: Resource): CPGEventResource<*> {
-      return when (request) {
-        is Communication -> CPGCommunicationEvent(request)
-        is MedicationDispense -> CPGMedicationDispenseEvent(request)
+    fun of(event: Resource): CPGEventResource<*> {
+      return when (event) {
+        is Communication -> CPGCommunicationEvent(event)
+        is MedicationDispense -> CPGMedicationDispenseEvent(event)
         else -> {
-          throw IllegalArgumentException("Unknown CPG event type ${request::class}.")
+          throw IllegalArgumentException("Unknown CPG event type ${event::class}.")
         }
       }
     }
