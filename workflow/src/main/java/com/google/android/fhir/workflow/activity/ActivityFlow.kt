@@ -353,6 +353,12 @@ private constructor(
       repository: Repository,
       patientId: String,
     ): List<ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>> {
+      /**
+       * NOTE: After adding a new
+       * [activity](https://build.fhir.org/ig/HL7/cqf-recommendations/examples-activities.html), add
+       * appropriate resource classes to eventTypes & requestTypes for the api to be able to search
+       * for flows in database.
+       */
       val eventTypes =
         listOf(
           MedicationDispense::class.java,
