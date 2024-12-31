@@ -217,11 +217,8 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     activityHandler?.let {
       val curPhase = it.activityFlow.getCurrentPhase()
       setPhase(curPhase)
-      val previousPhaseIterator = it.activityFlow.getPreviousPhases().iterator()
-      while (previousPhaseIterator.hasNext()) {
-        previousPhaseIterator.next().let {
-          setPhase(it.getPhaseName(), it.getRequestResource().resource)
-        }
+      it.activityFlow.getPreviousPhases().forEach {
+        setPhase(it.getPhaseName(), it.getRequestResource().resource)
       }
     }
 
