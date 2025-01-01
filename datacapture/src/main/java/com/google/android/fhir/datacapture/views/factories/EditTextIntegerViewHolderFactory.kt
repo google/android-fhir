@@ -24,6 +24,8 @@ import android.text.InputType
 import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
+import com.google.android.fhir.datacapture.validation.MAX_VALUE_EXTENSION_URL
+import com.google.android.fhir.datacapture.validation.MIN_VALUE_EXTENSION_URL
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -38,6 +40,22 @@ internal object EditTextIntegerViewHolderFactory :
       QuestionnaireItemEditTextViewHolderDelegate(
         InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_FLAG_SIGNED,
       ) {
+
+      private val minValue: Int by lazy {
+        getExtensionValueOrDefault(MIN_VALUE_EXTENSION_URL, Int.MIN_VALUE)
+      }
+
+      private val maxValue: Int by lazy {
+        getExtensionValueOrDefault(MAX_VALUE_EXTENSION_URL, Int.MAX_VALUE)
+      }
+
+      private fun getExtensionValueOrDefault(url: String, defaultValue: Int): Int {
+        return questionnaireViewItem.questionnaireItem.extension
+          .find { it.url == url }
+          ?.let { (it.value as? IntegerType)?.value }
+          ?: defaultValue
+      }
+
       override suspend fun handleInput(
         editable: Editable,
         questionnaireViewItem: QuestionnaireViewItem,
@@ -95,8 +113,8 @@ internal object EditTextIntegerViewHolderFactory :
           textInputLayout.error =
             textInputLayout.context.getString(
               R.string.integer_format_validation_error_msg,
-              formatInteger(Int.MIN_VALUE),
-              formatInteger(Int.MAX_VALUE),
+              formatInteger(minValue),
+              formatInteger(maxValue),
             )
         }
       }
