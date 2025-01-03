@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -94,6 +94,10 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
   }
   private val externalValueSetResolver: ExternalAnswerValueSetResolver? by lazy {
     DataCapture.getConfiguration(application).valueSetResolverExternal
+  }
+
+  private val callbacks: Map<CustomCallbackType, CustomCallback>? by lazy {
+    DataCapture.getConfiguration(application).callbacks
   }
 
   /** The current questionnaire as questions are being answered. */
@@ -985,6 +989,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
+            callbacks = callbacks,
           ),
         )
       add(question)

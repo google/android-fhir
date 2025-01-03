@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewAnswerOption
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewHolderFactory
@@ -390,4 +391,13 @@ internal object DiffCallbacks {
           oldItem.item.hasTheSameValidationResult(newItem.item)
       }
     }
+}
+
+sealed class CustomCallback {
+  data class AutoCompleteCallback(val callback: (String) -> List<AutoCompleteViewAnswerOption>) :
+    CustomCallback()
+}
+
+enum class CustomCallbackType {
+  AUTO_COMPLETE,
 }
