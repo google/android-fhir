@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
-import android.widget.AutoCompleteTextView
-import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -41,8 +38,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.demo.PatientListViewModel.PatientListViewModelFactory
 import com.google.android.fhir.demo.databinding.FragmentPatientListBinding
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class PatientListFragment : Fragment() {
@@ -59,6 +54,35 @@ class PatientListFragment : Fragment() {
     savedInstanceState: Bundle?,
   ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
+
+    val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+    binding.givenNameEditText.apply {
+      addTextChangedListener(
+        onTextChanged = { text, _, _, _ ->
+          patientListViewModel.collectGivenValueToSearchPatient(text.toString())
+        },
+      )
+      setOnFocusChangeListener { view, hasFocus ->
+        if (!hasFocus) {
+          imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+      }
+    }
+
+    binding.familyNameEditText.apply {
+      addTextChangedListener(
+        onTextChanged = { text, _, _, _ ->
+          patientListViewModel.collectFamilyValueToSearchPatient(text.toString())
+        },
+      )
+      setOnFocusChangeListener { view, hasFocus ->
+        if (!hasFocus) {
+          imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+      }
+    }
+
     return binding.root
   }
 
@@ -75,7 +99,6 @@ class PatientListFragment : Fragment() {
           PatientListViewModelFactory(requireActivity().application, fhirEngine),
         )
         .get(PatientListViewModel::class.java)
-    setupDropDownView()
     val recyclerView: RecyclerView = binding.patientListContainer.patientList
     val adapter = PatientItemRecyclerViewAdapter(this::onPatientItemClicked)
     recyclerView.adapter = adapter
@@ -94,27 +117,6 @@ class PatientListFragment : Fragment() {
       binding.patientListContainer.patientCount.text = "$it Patient(s)"
     }
 
-    searchView = binding.search
-    searchView.setOnQueryTextListener(
-      object : SearchView.OnQueryTextListener {
-        override fun onQueryTextChange(newText: String): Boolean {
-          patientListViewModel.searchPatientsByParameter(newText)
-          return true
-        }
-
-        override fun onQueryTextSubmit(query: String): Boolean {
-          patientListViewModel.searchPatientsByParameter(query)
-          return true
-        }
-      },
-    )
-    searchView.setOnQueryTextFocusChangeListener { view, focused ->
-      if (!focused) {
-        // hide soft keyboard
-        (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     requireActivity()
       .onBackPressedDispatcher
       .addCallback(
@@ -130,7 +132,6 @@ class PatientListFragment : Fragment() {
           }
         },
       )
-    enableSearchView(false)
     setHasOptionsMenu(true)
   }
 
@@ -152,34 +153,5 @@ class PatientListFragment : Fragment() {
   private fun onPatientItemClicked(patientItem: PatientListViewModel.PatientItem) {
     findNavController()
       .navigate(PatientListFragmentDirections.navigateToProductDetail(patientItem.resourceId))
-  }
-
-  private fun setupDropDownView() {
-    val dropdown = requireView().findViewById<AutoCompleteTextView>(R.id.search_parameter_dropdown)
-    viewLifecycleOwner.lifecycleScope.launch {
-      patientListViewModel.searchParameters.collectLatest { parameters ->
-        val adapter =
-          ArrayAdapter(
-            requireContext(),
-            android.R.layout.simple_dropdown_item_1line,
-            parameters.map { it.label },
-          )
-        dropdown.setAdapter(adapter)
-        dropdown.setOnClickListener { dropdown.showDropDown() }
-        dropdown.setOnItemClickListener { _, _, _, _ ->
-          patientListViewModel.setSearchParameter(dropdown.text.toString())
-          searchView.queryHint =
-            getString(R.string.query_hint_patient_search_parameter, dropdown.text)
-          enableSearchView(true)
-        }
-      }
-    }
-  }
-
-  private fun enableSearchView(isEnabled: Boolean) {
-    val searchEditText = searchView.findViewById<EditText>(androidx.appcompat.R.id.search_src_text)
-    searchEditText.isFocusable = isEnabled
-    searchEditText.isFocusableInTouchMode = isEnabled
-    searchEditText.isEnabled = isEnabled
   }
 }
