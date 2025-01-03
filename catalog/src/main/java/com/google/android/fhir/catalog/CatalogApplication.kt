@@ -21,7 +21,10 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.datacapture.CustomCallback.AutoCompleteCallback
+import com.google.android.fhir.datacapture.CustomCallbackType
 import com.google.android.fhir.datacapture.DataCaptureConfig
+import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewAnswerOption
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +47,15 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
         xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } },
         questionnaireItemViewHolderFactoryMatchersProviderFactory =
           ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory,
+        callbacks = mapOf(Pair(CustomCallbackType.AUTO_COMPLETE, AutoCompleteCallback(
+          callback = { query ->
+            run {
+              listOf(AutoCompleteViewAnswerOption("a", "Type 2 Diabetes Mellitus"),
+                AutoCompleteViewAnswerOption("b", "Test")
+                )
+            }
+          }
+        )))
       )
 
     CoroutineScope(Dispatchers.IO).launch {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,6 +56,12 @@ data class DataCaptureConfig(
   var questionnaireItemViewHolderFactoryMatchersProviderFactory:
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
+
+  /**
+   * A [CustomCallback] may be set by the client to override the behaviour of an existing component
+   * in the sdc. Currently only supports [CustomCallbackType.AUTO_COMPLETE].
+   */
+  var callbacks: Map<CustomCallbackType, CustomCallback>? = null,
 ) {
 
   /**
