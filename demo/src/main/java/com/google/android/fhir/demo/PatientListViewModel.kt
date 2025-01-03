@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,6 @@ import org.hl7.fhir.r4.model.RiskAssessment
  */
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
-
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
 
@@ -173,6 +172,60 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       }
       throw IllegalArgumentException("Unknown ViewModel class")
     }
+  }
+
+  private var givenString: String? = null
+  private var familyString: String? = null
+
+  fun collectGivenValueToSearchPatient(given: String) {
+    givenString = given
+    searchPatientsByParameter()
+  }
+
+  fun collectFamilyValueToSearchPatient(given: String) {
+    familyString = given
+    searchPatientsByParameter()
+  }
+
+  private fun searchPatientsByParameter() {
+    viewModelScope.launch {
+      liveSearchedPatients.value = searchPatients()
+      patientCount.value = count()
+    }
+  }
+
+  private suspend fun searchPatients(): List<PatientItem> {
+    val patients =
+      fhirEngine
+        .search<Patient> {
+          filter(
+            Patient.GIVEN,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              this.value = givenString ?: ""
+            },
+          )
+          filter(
+            Patient.FAMILY,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              this.value = familyString ?: ""
+            },
+          )
+          sort(Patient.GIVEN, Order.ASCENDING)
+          count = 100
+          from = 0
+        }
+        .mapIndexed { index, fhirPatient -> fhirPatient.resource.toPatientItem(index + 1) }
+        .toMutableList()
+
+    val risks = getRiskAssessments()
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
+        patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+      }
+    }
+    return patients
   }
 }
 
