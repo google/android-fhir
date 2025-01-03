@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.text.Spanned
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.fhir.datacapture.CustomCallback
+import com.google.android.fhir.datacapture.CustomCallbackType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -93,6 +95,7 @@ data class QuestionnaireViewItem(
   val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
     { _, _ ->
     },
+  val callbacks: Map<CustomCallbackType, CustomCallback>? = null,
 ) {
 
   fun getQuestionnaireResponseItem(): QuestionnaireResponseItemComponent = questionnaireResponseItem

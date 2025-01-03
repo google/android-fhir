@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,13 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
+import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
+import com.google.android.fhir.datacapture.CustomCallback.AutoCompleteCallback
+import com.google.android.fhir.datacapture.CustomCallbackType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
@@ -33,6 +36,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertNotNull
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -464,5 +468,42 @@ class AutoCompleteViewHolderFactoryTest {
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
       .isEqualTo(View.GONE)
+  }
+
+  @Test
+  fun givenCustomCallback_thenDisplayCallbackResponse() {
+    viewHolder.bind(
+      QuestionnaireViewItem(
+        Questionnaire.QuestionnaireItemComponent().apply { text = "Question" },
+        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
+        validationResult = NotValidated,
+        answersChangedCallback = { _, _, _, _ -> },
+        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
+        callbacks =
+          mapOf(
+            Pair(
+              CustomCallbackType.AUTO_COMPLETE,
+              AutoCompleteCallback(
+                callback = { _ ->
+                  run {
+                    listOf(
+                      AutoCompleteViewAnswerOption("a", "Answer A"),
+                      AutoCompleteViewAnswerOption("b", "Answer B"),
+                    )
+                  }
+                },
+              ),
+            ),
+          ),
+      ),
+    )
+
+    val autoCompleteTextView =
+      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
+
+    autoCompleteTextView.setText("t2")
+    val adapter = autoCompleteTextView.adapter
+    assertNotNull(adapter)
+    assertThat(adapter.count).isEqualTo(2)
   }
 }
