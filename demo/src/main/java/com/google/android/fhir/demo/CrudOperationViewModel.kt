@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -121,6 +121,14 @@ data class PatientUiState(
   val gender: Enumerations.AdministrativeGender? = null,
   val isActive: Boolean = true,
   val operationType: OperationType,
+)
+
+data class PatientInput(
+  val firstName: String,
+  val lastName: String?,
+  val birthDate: String?,
+  val gender: Enumerations.AdministrativeGender?,
+  val isActive: Boolean,
 )
 
 fun Patient.toPatientUiState(operationType: OperationType): PatientUiState {

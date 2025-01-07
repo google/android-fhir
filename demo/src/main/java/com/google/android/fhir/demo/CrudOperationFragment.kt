@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Google LLC
+ * Copyright 2024-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,6 +100,7 @@ class CrudOperationFragment : Fragment() {
     setupTabLayoutChangeListener()
     selectTab(TAB_CREATE)
     setupUiForCrudOperation(OperationType.CREATE)
+
     requireView().findViewById<Button>(R.id.btnSubmit).setOnClickListener {
       val currentOperationType =
         getOperationTypeByTabPosition(
@@ -266,19 +267,18 @@ class CrudOperationFragment : Fragment() {
     }
   }
 
-  private fun createPatient() {
-    val patientId = requireView().findViewById<EditText>(R.id.etId).text.toString()
+  private fun getPatientInput(): PatientInput? {
     val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
     if (firstName.isBlank()) {
       Toast.makeText(requireContext(), "First name is required.", Toast.LENGTH_SHORT).show()
-      return
+      return null
     }
     val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
     val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
-    if (crudOperationViewModel.isBirthDateValid(birthDate)) {
+    if (birthDate.isNotEmpty() && !crudOperationViewModel.isBirthDateValid(birthDate)) {
       Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
         .show()
-      return
+      return null
     }
     val selectedGenderId =
       requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
@@ -290,49 +290,36 @@ class CrudOperationFragment : Fragment() {
         else -> null
       }
     val isActive = requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked
-    crudOperationViewModel.createPatient(
-      patientId = patientId,
-      firstName = firstName,
-      lastName = lastName,
-      birthDate = birthDate,
-      gender = gender,
-      isActive = isActive,
-    )
+
+    return PatientInput(firstName, lastName, birthDate, gender, isActive)
+  }
+
+  private fun createPatient() {
+    getPatientInput()?.let {
+      crudOperationViewModel.createPatient(
+        patientId = requireView().findViewById<EditText>(R.id.etId).text.toString(),
+        firstName = it.firstName,
+        lastName = it.lastName,
+        birthDate = it.birthDate,
+        gender = it.gender,
+        isActive = it.isActive,
+      )
+    }
   }
 
   private fun updatePatient() {
     if (isPatientCreationRequired()) {
       return
     }
-    val firstName = requireView().findViewById<EditText>(R.id.etFirstName).text.toString().trim()
-    val lastName = requireView().findViewById<EditText>(R.id.etLastName).text.toString().trim()
-    val birthDate = requireView().findViewById<EditText>(R.id.etBirthDate).text.toString().trim()
-    if (crudOperationViewModel.isBirthDateValid(birthDate)) {
-      Toast.makeText(requireContext(), "Please enter a valid birth date.", Toast.LENGTH_SHORT)
-        .show()
-      return
+    getPatientInput()?.let {
+      crudOperationViewModel.updatePatient(
+        firstName = it.firstName,
+        lastName = it.lastName,
+        birthDate = it.birthDate,
+        gender = it.gender,
+        isActive = it.isActive,
+      )
     }
-    val selectedGenderId =
-      requireView().findViewById<RadioGroup>(R.id.radioGroupGender).checkedRadioButtonId
-    val gender =
-      when (selectedGenderId) {
-        R.id.rbMale -> Enumerations.AdministrativeGender.MALE
-        R.id.rbFemale -> Enumerations.AdministrativeGender.FEMALE
-        R.id.rbOther -> Enumerations.AdministrativeGender.OTHER
-        else -> null
-      }
-    val isActive = requireView().findViewById<CheckBox>(R.id.checkBoxActive).isChecked
-    if (firstName.isBlank()) {
-      Toast.makeText(requireContext(), "First name is required.", Toast.LENGTH_SHORT).show()
-      return
-    }
-    crudOperationViewModel.updatePatient(
-      firstName = firstName,
-      lastName = lastName,
-      birthDate = birthDate,
-      gender = gender,
-      isActive = isActive,
-    )
   }
 
   private fun deletePatient() {
