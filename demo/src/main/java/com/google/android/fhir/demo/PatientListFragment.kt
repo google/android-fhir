@@ -60,7 +60,7 @@ class PatientListFragment : Fragment() {
     binding.givenNameEditText.apply {
       addTextChangedListener(
         onTextChanged = { text, _, _, _ ->
-          patientListViewModel.collectGivenValueToSearchPatient(text.toString())
+          patientListViewModel.setPatientGivenName(text.toString())
         },
       )
       setOnFocusChangeListener { view, hasFocus ->
@@ -73,7 +73,7 @@ class PatientListFragment : Fragment() {
     binding.familyNameEditText.apply {
       addTextChangedListener(
         onTextChanged = { text, _, _, _ ->
-          patientListViewModel.collectFamilyValueToSearchPatient(text.toString())
+          patientListViewModel.setPatientFamilyName(text.toString())
         },
       )
       setOnFocusChangeListener { view, hasFocus ->

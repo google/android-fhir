@@ -43,7 +43,7 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
   val patientCount = MutableLiveData<Long>()
 
   init {
-    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
+    updatePatientListAndPatientCount({ getSearchResults() }, { searchedPatientCount() })
   }
 
   fun searchPatientsByName(nameQuery: String) {
@@ -174,23 +174,23 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
     }
   }
 
-  private var givenString: String? = null
-  private var familyString: String? = null
+  private var patientGivenName: String? = null
+  private var patientFamilyName: String? = null
 
-  fun collectGivenValueToSearchPatient(given: String) {
-    givenString = given
+  fun setPatientGivenName(givenName: String) {
+    patientGivenName = givenName
     searchPatientsByParameter()
   }
 
-  fun collectFamilyValueToSearchPatient(given: String) {
-    familyString = given
+  fun setPatientFamilyName(familyName: String) {
+    patientFamilyName = familyName
     searchPatientsByParameter()
   }
 
   private fun searchPatientsByParameter() {
     viewModelScope.launch {
       liveSearchedPatients.value = searchPatients()
-      patientCount.value = count()
+      patientCount.value = searchedPatientCount()
     }
   }
 
@@ -202,14 +202,14 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
             Patient.GIVEN,
             {
               modifier = StringFilterModifier.CONTAINS
-              this.value = givenString ?: ""
+              this.value = patientGivenName ?: ""
             },
           )
           filter(
             Patient.FAMILY,
             {
               modifier = StringFilterModifier.CONTAINS
-              this.value = familyString ?: ""
+              this.value = patientFamilyName ?: ""
             },
           )
           sort(Patient.GIVEN, Order.ASCENDING)
@@ -226,6 +226,25 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       }
     }
     return patients
+  }
+
+  private suspend fun searchedPatientCount(): Long {
+    return fhirEngine.count<Patient> {
+      filter(
+        Patient.GIVEN,
+        {
+          modifier = StringFilterModifier.CONTAINS
+          this.value = patientGivenName ?: ""
+        },
+      )
+      filter(
+        Patient.FAMILY,
+        {
+          modifier = StringFilterModifier.CONTAINS
+          this.value = patientFamilyName ?: ""
+        },
+      )
+    }
   }
 }
 
