@@ -17,6 +17,7 @@
 package com.google.android.fhir.workflow.activity.phase
 
 import androidx.annotation.WorkerThread
+import com.google.android.fhir.workflow.activity.phase.Phase.PhaseName
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import org.hl7.fhir.r4.model.IdType
@@ -35,8 +36,7 @@ sealed interface Phase {
   fun getPhaseName(): PhaseName
 
   /** Activity Phases for a CPG Request. */
-  interface RequestPhase<R : CPGRequestResource<*>> : Phase {
-    fun getRequestResource(): R
+  interface RequestPhase<R : CPGRequestResource<*>> : Phase, ReadOnlyRequestPhase<R> {
 
     @WorkerThread fun update(r: R): Result<Unit>
 
@@ -77,3 +77,11 @@ internal fun checkEquals(a: Reference, b: Reference) = a.reference == b.referenc
 /** Returns an [IdType] of a [Reference]. This is required for [Repository.read] api. */
 internal val Reference.idType
   get() = IdType(reference)
+
+/** Provides a read-only view of a request phase. */
+interface ReadOnlyRequestPhase<R : CPGRequestResource<*>> {
+  /** Returns the [Phase.PhaseName] of this phase. */
+  fun getPhaseName(): PhaseName
+
+  fun getRequestResource(): R
+}
