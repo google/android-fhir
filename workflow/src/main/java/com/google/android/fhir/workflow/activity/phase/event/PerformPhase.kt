@@ -139,7 +139,7 @@ class PerformPhase<E : CPGEventResource<*>>(
      * Returns the [Resource] class for the resource. e.g. If the Reference is `Patient/1234`, then
      * this would return the `Class` for `org.hl7.fhir.r4.model.Patient`.
      */
-    private val Reference.`class`
+    internal val Reference.`class`
       get() = getResourceClass<Resource>(reference.split("/")[0])
 
     /**
@@ -165,7 +165,7 @@ class PerformPhase<E : CPGEventResource<*>>(
         "${inputPhase.getPhaseName().name} request is still in ${inputRequest.getStatusCode()} status."
       }
 
-      val eventRequest = CPGEventResource.of(inputRequest, eventClass)
+      val eventRequest = CPGEventResource.from(inputRequest, eventClass)
       eventRequest.setStatus(EventStatus.PREPARATION)
       eventRequest.setBasedOn(inputRequest.asReference())
       eventRequest as E
