@@ -25,18 +25,18 @@ import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.knowledge.KnowledgeManager
-import com.google.android.fhir.search.search
 import com.google.android.fhir.workflow.FhirOperator
 import com.google.android.fhir.workflow.activity.ActivityFlow
+import com.google.android.fhir.workflow.activity.phase.Phase
 import com.google.android.fhir.workflow.activity.resource.event.CPGEventResource
 import com.google.android.fhir.workflow.activity.resource.event.CPGMedicationDispenseEvent
-import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationRequest
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.repositories.FhirEngineRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.hl7.fhir.r4.model.MedicationDispense
@@ -89,42 +89,22 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
 
   val adapterData =
     combine(activityOptionFlow, enabledPhaseFlow) { configuration, phase ->
-      Log.d("TAG", "phaseFlow configuration: $configuration phase: $phase")
-      val nextPhase = loadChainAndReturnNextPhase()
-      enabledPhaseFlow.value = nextPhase
+        Log.d("MVModel", "phaseFlow configuration: ${configuration.id} phase: $phase")
+        val nextPhase = loadChainAndReturnNextPhase()
 
-      // Initialize the activity flow
-      if (activityHandler == null) {
-        val resource =
-          if (order != null) {
-            order
-          } else if (plan != null) {
-            plan
-          } else if (proposal != null) {
-            proposal
-          } else {
-            null
+        // Initialize the activity flow
+        if (activityHandler == null) {
+          ActivityFlow.of(repository, "active_apple_guy").firstOrNull()?.let {
+            activityHandler = ActivityHandler(it)
           }
-
-        resource?.let {
-          activityHandler =
-            perform?.let {
-              ActivityHandler(
-                ActivityFlow.of(repository, CPGMedicationDispenseEvent(it as MedicationDispense))
-                  as ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>,
-              )
-            }
-              ?: ActivityHandler(
-                ActivityFlow.of(repository, CPGRequestResource.of(it) as CPGMedicationRequest)
-                  as ActivityFlow<CPGRequestResource<*>, CPGEventResource<*>>,
-              )
         }
+        enabledPhaseFlow.value = nextPhase
+        generateData(nextPhase, ::handleOnClick)
       }
-      generateData(nextPhase, ::handleOnClick)
-    }
+      .flowOn(Dispatchers.IO)
 
   private fun handleOnClick(phase: FlowPhase) {
-    Log.d("TAG", "handleOnClick: $phase")
+    Log.d("MVModel", "handleOnClick: $phase")
     viewModelScope.launch(Dispatchers.IO) {
       when (phase) {
         FlowPhase.PROPOSAL -> {
@@ -206,36 +186,41 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
   }
 
   private suspend fun loadChainAndReturnNextPhase(): FlowPhase {
-    // TODO : Add logic to load resources as per the selected configuration.
-    val request =
-      fhirEngine.search<MedicationRequest> {
-        filter(MedicationRequest.SUBJECT, { value = "Patient/active_apple_guy" })
-      }
-
-    val request2 =
-      fhirEngine.search<MedicationDispense> {
-        filter(MedicationRequest.SUBJECT, { value = "Patient/active_apple_guy" })
-      }
-
-    // take the last resource and move backwards
-
     proposal = null
     plan = null
     order = null
     perform = null
-    request.forEach {
-      if (it.resource.intent == MedicationRequest.MedicationRequestIntent.PROPOSAL) {
-        proposal = it.resource
-      } else if (it.resource.intent == MedicationRequest.MedicationRequestIntent.PLAN) {
-        plan = it.resource
-      } else if (it.resource.intent == MedicationRequest.MedicationRequestIntent.ORDER) {
-        order = it.resource
-      } else {
-        // perform = it.resource
+
+    fun setPhase(curPhase: Phase.PhaseName, resource: Resource) {
+      if (curPhase == Phase.PhaseName.PERFORM) {
+        perform = resource
+      } else if (curPhase == Phase.PhaseName.ORDER) {
+        order = resource
+      } else if (curPhase == Phase.PhaseName.PLAN) {
+        plan = resource
+      } else if (curPhase == Phase.PhaseName.PROPOSAL) {
+        proposal = resource
       }
     }
 
-    perform = request2.firstOrNull()?.resource
+    fun setPhase(curPhase: Phase) {
+      if (curPhase is Phase.EventPhase<*>) {
+        setPhase(curPhase.getPhaseName(), curPhase.getEventResource().resource)
+      } else {
+        setPhase(
+          curPhase.getPhaseName(),
+          (curPhase as Phase.RequestPhase<*>).getRequestResource().resource,
+        )
+      }
+    }
+
+    activityHandler?.let {
+      val curPhase = it.activityFlow.getCurrentPhase()
+      setPhase(curPhase)
+      it.activityFlow.getPreviousPhases().forEach {
+        setPhase(it.getPhaseName(), it.getRequestResource().resource)
+      }
+    }
 
     return if (!proposalHandler.checkInstalledDependencies(activityOptionFlow.value)) {
       FlowPhase.INITIALIZE
@@ -287,79 +272,41 @@ class MainViewModel(private val application: Application) : AndroidViewModel(app
     return list
   }
 
-  //  TODO: CPGRequestResource : make getIntent public and then uncomment this.
-  //  private fun getPhaseDetails(requestResource: Resource?): String {
-  //    return if (requestResource == null) {
-  //      ""
-  //    } else if (requestResource is MedicationRequest) {
-  //      val cpgRequestResource = CPGRequestResource.of(requestResource)
-  //
-  //      val dosage =
-  //        FhirContext.forR4Cached()
-  //          .newJsonParser()
-  //          .encodeToString(requestResource.dosageInstruction.first())
-  //
-  //      """
-  //        ID     : ${cpgRequestResource.resourceType}/${cpgRequestResource.logicalId}
-  //        Intent : ${cpgRequestResource.getIntent().code}
-  //        Status : ${cpgRequestResource.getStatusCode()}
-  //        BasedOn: ${cpgRequestResource.getBasedOn()?.reference}
-  //
-  //        Additional Info: $dosage
-  //            """
-  //        .trimIndent()
-  //    } else if (requestResource is MedicationDispense) {
-  //      val cpgRequestResource = CPGMedicationDispenseEvent(requestResource)
-  //
-  //      val dosage =
-  //        FhirContext.forR4Cached()
-  //          .newJsonParser()
-  //          .encodeToString(requestResource.dosageInstruction.first())
-  //
-  //      """
-  //        ID     : ${cpgRequestResource.resourceType}/${cpgRequestResource.logicalId}
-  //        Status : ${cpgRequestResource.getStatusCode()}
-  //        BasedOn: ${cpgRequestResource.getBasedOn()?.reference}
-  //
-  //        Additional Info: $dosage
-  //            """
-  //        .trimIndent()
-  //    } else {
-  //      ""
-  //    }
-  //  }
-
   private fun getPhaseDetails(requestResource: Resource?): String {
     return if (requestResource == null) {
       ""
     } else if (requestResource is MedicationRequest) {
+      val cpgRequestResource = CPGRequestResource.of(requestResource)
+
       val dosage =
         FhirContext.forR4Cached()
           .newJsonParser()
           .encodeToString(requestResource.dosageInstruction.first())
 
       """
-        ID     : ${requestResource.resourceType}/${requestResource.logicalId}
-        Intent : ${requestResource.intent.display}
-        Status : ${requestResource.status.display}
-        BasedOn: ${requestResource.getBasedOn().firstOrNull()?.reference}
-        
-        Additional Info: $dosage
-            """
+          ID     : ${cpgRequestResource.resourceType}/${cpgRequestResource.logicalId}
+          Intent : ${cpgRequestResource.getIntent().code}
+          Status : ${cpgRequestResource.getStatusCode()}
+          BasedOn: ${cpgRequestResource.getBasedOn()?.reference}
+
+          Additional Info: $dosage
+              """
         .trimIndent()
     } else if (requestResource is MedicationDispense) {
+      val cpgRequestResource = CPGMedicationDispenseEvent(requestResource)
+
       val dosage =
         FhirContext.forR4Cached()
           .newJsonParser()
           .encodeToString(requestResource.dosageInstruction.first())
 
       """
-        ID     : ${requestResource.resourceType}/${requestResource.logicalId}
-        Status : ${requestResource.status.display}
-        BasedOn: ${requestResource.authorizingPrescription.firstOrNull()?.reference}
-        
-        Additional Info: $dosage
-            """
+          ID     : ${cpgRequestResource.resourceType}/${cpgRequestResource.logicalId}
+          Status : ${cpgRequestResource.getStatusCode()}
+          BasedOn: ${cpgRequestResource.getBasedOn()?.reference}
+
+          Additional Info: $dosage
+              """
         .trimIndent()
     } else {
       ""
