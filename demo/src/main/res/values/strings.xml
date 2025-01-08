@@ -25,7 +25,6 @@
 
   <!-- For display observations in brief, for a patient -->
   <string name="observation_brief_text">%1$s: %2$s\nEffective: %3$s</string>
-  <string name="query_hint_patient_search">Find by Patient Name</string>
   <string
         name="cancel_questionnaire_message"
     >Are you sure you want to discard the answers?</string>
@@ -74,4 +73,7 @@
   <string name="last_sync_status">Last sync status: %1$s</string>
   <string name="last_sync_status_na">Last sync status: Not available</string>
   <string name="periodic_sync">Periodic sync</string>
+  <string name="search_patient_by">Search Patient by</string>
+  <string name="given_name">Given name</string>
+  <string name="family_name">Family name</string>
 </resources>

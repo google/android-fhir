@@ -642,4 +642,45 @@ class ActivityFlowTest {
       // check that the flow is still in old phase (proposal).
       assertThat(flow.getCurrentPhase().getPhaseName()).isEqualTo(Phase.PhaseName.PROPOSAL)
     }
+
+  @Test
+  fun `getPreviousPhases should return a list of all previous phases`(): Unit =
+    runBlockingOnWorkerThread {
+      val cpgCommunicationRequest =
+        CPGRequestResource.of(
+            CommunicationRequest().apply {
+              id = "com-req-01"
+              status = CommunicationRequest.CommunicationRequestStatus.ACTIVE
+              subject = Reference("Patient/pat-01")
+              meta.addProfile(
+                "http://hl7.org/fhir/uv/cpg/StructureDefinition/cpg-communicationrequest",
+              )
+
+              addPayload().apply { content = StringType("Proposal") }
+            },
+          )
+          .apply { setIntent(Intent.PROPOSAL) }
+      val repository = FhirEngineRepository(FhirContext.forR4Cached(), fhirEngine)
+      repository.create(cpgCommunicationRequest.resource)
+
+      val flow = ActivityFlow.of(repository, cpgCommunicationRequest)
+
+      flow.initiatePlan(
+        flow.preparePlan().getOrThrow().apply { setStatus(Status.ACTIVE) },
+      )
+
+      flow.initiateOrder(
+        flow.prepareOrder().getOrThrow().apply { setStatus(Status.ACTIVE) },
+      )
+
+      flow.initiatePerform(
+        flow.preparePerform(CPGCommunicationEvent::class.java).getOrThrow().apply {
+          setStatus(EventStatus.INPROGRESS)
+        },
+      )
+
+      val result = flow.getPreviousPhases()
+      assertThat(result.map { it.getPhaseName() })
+        .containsExactly(Phase.PhaseName.ORDER, Phase.PhaseName.PLAN, Phase.PhaseName.PROPOSAL)
+    }
 }
