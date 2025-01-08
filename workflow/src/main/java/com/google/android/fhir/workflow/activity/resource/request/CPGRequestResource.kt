@@ -19,7 +19,6 @@ package com.google.android.fhir.workflow.activity.resource.request
 import com.google.android.fhir.logicalId
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource.Companion.of
 import com.google.android.fhir.workflow.activity.resource.request.Intent.ORDER
-import com.google.android.fhir.workflow.activity.resource.request.Intent.OTHER
 import com.google.android.fhir.workflow.activity.resource.request.Intent.PLAN
 import com.google.android.fhir.workflow.activity.resource.request.Intent.PROPOSAL
 import org.hl7.fhir.r4.model.CommunicationRequest
@@ -28,8 +27,6 @@ import org.hl7.fhir.r4.model.MedicationRequest
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
-import org.hl7.fhir.r4.model.ServiceRequest
-import org.hl7.fhir.r4.model.Task
 
 /**
  * This abstracts the
@@ -52,7 +49,7 @@ import org.hl7.fhir.r4.model.Task
  * create the appropriate [CPGRequestResource].
  */
 sealed class CPGRequestResource<R>(
-  internal open val resource: R,
+  open val resource: R,
   internal val mapper: StatusCodeMapper,
 ) where R : Resource {
 
@@ -64,7 +61,7 @@ sealed class CPGRequestResource<R>(
 
   internal abstract fun setIntent(intent: Intent)
 
-  internal abstract fun getIntent(): Intent
+  abstract fun getIntent(): Intent
 
   abstract fun setStatus(status: Status, reason: String? = null)
 
@@ -125,9 +122,7 @@ sealed class CPGRequestResource<R>(
      */
     fun <R : Resource> of(resource: R): CPGRequestResource<R> {
       return when (resource) {
-        is Task -> of(resource)
         is MedicationRequest -> of(resource)
-        is ServiceRequest -> of(resource)
         is CommunicationRequest -> of(resource)
         else -> {
           throw IllegalArgumentException("Unknown CPG Request type ${resource::class}.")
@@ -145,7 +140,7 @@ sealed class CPGRequestResource<R>(
  * See [codesystem-request-intent](https://www.hl7.org/FHIR/codesystem-request-intent.html) for the
  * list of intents.
  */
-internal sealed class Intent(val code: String?) {
+sealed class Intent(val code: String?) {
   data object PROPOSAL : Intent("proposal")
 
   data object PLAN : Intent("plan")
