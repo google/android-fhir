@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -183,7 +183,7 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob =
     if (hasBirthDateElement()) {
-      LocalDate.parse(birthDateElement.valueAsString, DateTimeFormatter.ISO_DATE)
+      birthDateElement.value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     } else {
       null
     }
