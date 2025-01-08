@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="20dp"
-            android:text="Search Patient by"
+            android:text="@string/search_patient_by"
             android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
         />
 
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:hintEnabled="true"
-                android:hint="Given name"
+                android:hint="@string/given_name"
             >
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/given_name_edit_text"
@@ -49,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 app:hintEnabled="true"
-                android:hint="Family name"
+                android:hint="@string/family_name"
                 android:layout_marginStart="10dp"
             >
                 <com.google.android.material.textfield.TextInputEditText
