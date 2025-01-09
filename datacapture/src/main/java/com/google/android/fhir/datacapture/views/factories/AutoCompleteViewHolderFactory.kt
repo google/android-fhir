@@ -30,7 +30,6 @@ import androidx.core.view.get
 import androidx.core.view.isEmpty
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.CustomCallback
-import com.google.android.fhir.datacapture.CustomCallbackType
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
@@ -64,11 +63,8 @@ internal object AutoCompleteViewHolderFactory :
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
 
-      private val callback: ((String) -> List<AutoCompleteViewAnswerOption>)?
-        get() =
-          (questionnaireViewItem.callbacks?.get(CustomCallbackType.AUTO_COMPLETE)
-              as? CustomCallback.AutoCompleteCallback)
-            ?.callback
+      private val callback: CustomCallback<*>?
+        get() = questionnaireViewItem.callback
 
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var errorTextView: TextView
@@ -102,6 +98,7 @@ internal object AutoCompleteViewHolderFactory :
             textViewResourceId = R.id.answer_option_textview,
             objects = answerOptionValues,
             callback = callback,
+            answerValueSet = questionnaireViewItem.questionnaireItem.answerValueSet,
           )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
@@ -286,7 +283,8 @@ internal class AutoCompleteArrayAdapter(
   val resource: Int,
   val textViewResourceId: Int,
   private val objects: List<AutoCompleteViewAnswerOption>,
-  private val callback: ((String) -> List<AutoCompleteViewAnswerOption>)? = null,
+  private val callback: CustomCallback<*>? = null,
+  private val answerValueSet: String? = null,
 ) : ArrayAdapter<AutoCompleteViewAnswerOption>(context, resource, textViewResourceId, objects) {
 
   private var items = listOf<AutoCompleteViewAnswerOption>()
@@ -311,13 +309,18 @@ internal class AutoCompleteArrayAdapter(
 
   override fun getItem(position: Int): AutoCompleteViewAnswerOption? = items.getOrNull(position)
 
+  @Suppress("UNCHECKED_CAST")
   override fun getFilter(): Filter {
     return object : Filter() {
       override fun performFiltering(constraint: CharSequence?): FilterResults {
         val query = (constraint?.toString() ?: "").trim()
         val filteredResults: List<AutoCompleteViewAnswerOption> =
-          if (callback != null && objects.isEmpty()) {
-            callback.invoke(query)
+          if (callback != null && answerValueSet != null && objects.isEmpty()) {
+            (callback as? CustomCallback<AutoCompleteViewAnswerOption>)?.invoke(
+              query,
+              answerValueSet,
+            )
+              ?: emptyList()
           } else {
             objects.filter { it.answerDisplay.contains(query, ignoreCase = true) }
           }

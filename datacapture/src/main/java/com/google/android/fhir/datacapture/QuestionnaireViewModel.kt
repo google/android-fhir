@@ -96,8 +96,8 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
     DataCapture.getConfiguration(application).valueSetResolverExternal
   }
 
-  private val callbacks: Map<CustomCallbackType, CustomCallback>? by lazy {
-    DataCapture.getConfiguration(application).callbacks
+  private val callback: CustomCallback<*>? by lazy {
+    DataCapture.getConfiguration(application).callback
   }
 
   /** The current questionnaire as questions are being answered. */
@@ -989,7 +989,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
               ),
             isHelpCardOpen = isHelpCard && isHelpCardOpen,
             helpCardStateChangedCallback = helpCardStateChangedCallback,
-            callbacks = callbacks,
+            callback = callback,
           ),
         )
       add(question)

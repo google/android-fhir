@@ -59,9 +59,9 @@ data class DataCaptureConfig(
 
   /**
    * A [CustomCallback] may be set by the client to override the behaviour of an existing component
-   * in the sdc. Currently only supports [CustomCallbackType.AUTO_COMPLETE].
+   * in the sdc.
    */
-  var callbacks: Map<CustomCallbackType, CustomCallback>? = null,
+  var callback: CustomCallback<*>? = null,
 ) {
 
   /**

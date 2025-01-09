@@ -29,7 +29,6 @@ import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
-import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewAnswerOption
 import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.BooleanChoiceViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.CheckBoxGroupViewHolderFactory
@@ -393,11 +392,4 @@ internal object DiffCallbacks {
     }
 }
 
-sealed class CustomCallback {
-  data class AutoCompleteCallback(val callback: (String) -> List<AutoCompleteViewAnswerOption>) :
-    CustomCallback()
-}
-
-enum class CustomCallbackType {
-  AUTO_COMPLETE,
-}
+typealias CustomCallback<T> = (String, String) -> List<T>
