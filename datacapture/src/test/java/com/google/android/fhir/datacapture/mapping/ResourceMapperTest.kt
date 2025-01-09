@@ -3134,202 +3134,204 @@ class ResourceMapperTest {
     }
 
   @Test
-  fun `populate() should select single answer for non repeating question with answerOption`() = runBlocking {
-    val questionnaire =
-      Questionnaire()
-        .apply {
-          addExtension().apply {
-            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
-            extension =
-              listOf(
-                Extension(
-                  "name",
-                  Coding(
-                    CODE_SYSTEM_LAUNCH_CONTEXT,
-                    "observations",
-                    "List of observations",
+  fun `populate() should select single answer for non repeating question with answerOption`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension(
+                    "name",
+                    Coding(
+                      CODE_SYSTEM_LAUNCH_CONTEXT,
+                      "observations",
+                      "List of observations",
+                    ),
                   ),
-                ),
-                Extension("type", CodeType("Observation")),
-              )
+                  Extension("type", CodeType("Observation")),
+                )
+            }
           }
-        }
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "observation-choice"
-            type = Questionnaire.QuestionnaireItemType.CHOICE
-            repeats = false
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "%observations.entry.resource.value.coding"
-                  },
-                ),
-              )
-            answerOption =
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "observation-choice"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = false
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%observations.entry.resource.value.coding"
+                    },
+                  ),
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "correct-code-val"
+                      display = "correct-display-val"
+                    },
+                  ),
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "wrong-code-val"
+                      display = "wrong-display-val"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val observation1 =
+        Observation().apply {
+          status = Observation.ObservationStatus.FINAL
+          value =
+            CodeableConcept().apply {
+              coding =
+                mutableListOf(
                   Coding().apply {
                     code = "correct-code-val"
                     display = "correct-display-val"
                   },
-                ),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                )
+            }
+        }
+      val observation2 =
+        Observation().apply {
+          status = Observation.ObservationStatus.FINAL
+          value =
+            CodeableConcept().apply {
+              coding =
+                mutableListOf(
                   Coding().apply {
-                    code = "wrong-code-val"
-                    display = "wrong-display-val"
+                    code = "correct-code-val"
+                    display = "correct-display-val"
                   },
-                ),
-              )
-          },
-        )
+                )
+            }
+        }
+      val observationBundle =
+        Bundle().apply {
+          addEntry().resource = observation1
+          addEntry().resource = observation2
+        }
 
-    val observation1 =
-      Observation().apply {
-        status = Observation.ObservationStatus.FINAL
-        value =
-          CodeableConcept().apply {
-            coding =
-              mutableListOf(
-                Coding().apply {
-                  code = "correct-code-val"
-                  display = "correct-display-val"
-                },
-              )
-          }
-      }
-    val observation2 =
-      Observation().apply {
-        status = Observation.ObservationStatus.FINAL
-        value =
-          CodeableConcept().apply {
-            coding =
-              mutableListOf(
-                Coding().apply {
-                  code = "correct-code-val"
-                  display = "correct-display-val"
-                },
-              )
-          }
-      }
-    val observationBundle =
-      Bundle().apply {
-        addEntry().resource = observation1
-        addEntry().resource = observation2
-      }
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("observations" to observationBundle))
 
-    val questionnaireResponse =
-      ResourceMapper.populate(questionnaire, mapOf("observations" to observationBundle))
-
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
-      .isEqualTo("correct-code-val")
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-      .isEqualTo("correct-display-val")
-  }
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
+        .isEqualTo("correct-code-val")
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+        .isEqualTo("correct-display-val")
+    }
 
   @Test
-  fun `populate() should select multiple answer for repeating question with answerOption`() = runBlocking {
-    val questionnaire =
-      Questionnaire()
-        .apply {
-          addExtension().apply {
-            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
-            extension =
-              listOf(
-                Extension(
-                  "name",
-                  Coding(
-                    CODE_SYSTEM_LAUNCH_CONTEXT,
-                    "observations",
-                    "List of observations",
+  fun `populate() should select multiple answer for repeating question with answerOption`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension(
+                    "name",
+                    Coding(
+                      CODE_SYSTEM_LAUNCH_CONTEXT,
+                      "observations",
+                      "List of observations",
+                    ),
                   ),
-                ),
-                Extension("type", CodeType("Observation")),
-              )
+                  Extension("type", CodeType("Observation")),
+                )
+            }
           }
-        }
-        .addItem(
-          Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "observation-choice"
-            type = Questionnaire.QuestionnaireItemType.CHOICE
-            repeats = true
-            extension =
-              listOf(
-                Extension(
-                  ITEM_INITIAL_EXPRESSION_URL,
-                  Expression().apply {
-                    language = "text/fhirpath"
-                    expression = "%observations.entry.resource.value.coding"
-                  },
-                ),
-              )
-            answerOption =
-              listOf(
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "observation-choice"
+              type = Questionnaire.QuestionnaireItemType.CHOICE
+              repeats = true
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%observations.entry.resource.value.coding"
+                    },
+                  ),
+                )
+              answerOption =
+                listOf(
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "correct-code-val"
+                      display = "correct-display-val"
+                    },
+                  ),
+                  Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                    Coding().apply {
+                      code = "correct2-code-val"
+                      display = "correct2-display-val"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val observation1 =
+        Observation().apply {
+          status = Observation.ObservationStatus.FINAL
+          value =
+            CodeableConcept().apply {
+              coding =
+                mutableListOf(
                   Coding().apply {
                     code = "correct-code-val"
                     display = "correct-display-val"
                   },
-                ),
-                Questionnaire.QuestionnaireItemAnswerOptionComponent(
+                )
+            }
+        }
+      val observation2 =
+        Observation().apply {
+          status = Observation.ObservationStatus.FINAL
+          value =
+            CodeableConcept().apply {
+              coding =
+                mutableListOf(
                   Coding().apply {
                     code = "correct2-code-val"
                     display = "correct2-display-val"
                   },
-                ),
-              )
-          },
-        )
+                )
+            }
+        }
+      val observationBundle =
+        Bundle().apply {
+          addEntry().resource = observation1
+          addEntry().resource = observation2
+        }
 
-    val observation1 =
-      Observation().apply {
-        status = Observation.ObservationStatus.FINAL
-        value =
-          CodeableConcept().apply {
-            coding =
-              mutableListOf(
-                Coding().apply {
-                  code = "correct-code-val"
-                  display = "correct-display-val"
-                },
-              )
-          }
-      }
-    val observation2 =
-      Observation().apply {
-        status = Observation.ObservationStatus.FINAL
-        value =
-          CodeableConcept().apply {
-            coding =
-              mutableListOf(
-                Coding().apply {
-                  code = "correct2-code-val"
-                  display = "correct2-display-val"
-                },
-              )
-          }
-      }
-    val observationBundle =
-      Bundle().apply {
-        addEntry().resource = observation1
-        addEntry().resource = observation2
-      }
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("observations" to observationBundle))
 
-    val questionnaireResponse =
-      ResourceMapper.populate(questionnaire, mapOf("observations" to observationBundle))
-
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
-      .isEqualTo("correct-code-val")
-    assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-      .isEqualTo("correct-display-val")
-    assertThat((questionnaireResponse.item[0].answer[1].value as Coding).code)
-      .isEqualTo("correct2-code-val")
-    assertThat((questionnaireResponse.item[0].answer[1].value as Coding).display)
-      .isEqualTo("correct2-display-val")
-  }
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
+        .isEqualTo("correct-code-val")
+      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
+        .isEqualTo("correct-display-val")
+      assertThat((questionnaireResponse.item[0].answer[1].value as Coding).code)
+        .isEqualTo("correct2-code-val")
+      assertThat((questionnaireResponse.item[0].answer[1].value as Coding).display)
+        .isEqualTo("correct2-display-val")
+    }
 
   @Test
   fun `populate() should select a single initial answer for non repeating question without answerOption`() =
