@@ -24,8 +24,6 @@ import android.text.InputType
 import androidx.annotation.RequiresApi
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.getValidationErrorMessage
-import com.google.android.fhir.datacapture.extensions.maxValue
-import com.google.android.fhir.datacapture.extensions.minValue
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -95,9 +93,9 @@ internal object EditTextIntegerViewHolderFactory :
           )
 
         val minValue =
-          (questionnaireViewItem.questionnaireItem.minValue as? IntegerType)?.value ?: Int.MIN_VALUE
+          (questionnaireViewItem.minAnswerValue as? IntegerType)?.value ?: Int.MIN_VALUE
         val maxValue =
-          (questionnaireViewItem.questionnaireItem.maxValue as? IntegerType)?.value ?: Int.MAX_VALUE
+          (questionnaireViewItem.maxAnswerValue as? IntegerType)?.value ?: Int.MAX_VALUE
 
         // Update error message if draft answer present
         if (questionnaireViewItem.draftAnswer != null) {
