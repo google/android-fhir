@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package com.google.android.fhir.datacapture
 sealed interface QuestionnaireNavigationViewUIState {
   data object Hidden : QuestionnaireNavigationViewUIState
 
-  data class Enabled(val labelText: String? = null, val onClickAction: () -> Unit = {}) :
+  data class Enabled(val labelText: String? = null, val onClickAction: () -> Unit) :
     QuestionnaireNavigationViewUIState
 }
 
@@ -29,6 +29,4 @@ data class QuestionnaireNavigationUIState(
   val navSubmit: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
   val navCancel: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
   val navReview: QuestionnaireNavigationViewUIState = QuestionnaireNavigationViewUIState.Hidden,
-  val navNextProgressBar: QuestionnaireNavigationViewUIState =
-    QuestionnaireNavigationViewUIState.Hidden,
 )

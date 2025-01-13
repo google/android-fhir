@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.QuestionnaireNavigationUIState
 import com.google.android.fhir.datacapture.QuestionnaireNavigationViewUIState
 import com.google.android.fhir.datacapture.R
-import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -42,9 +41,6 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     itemView
       .findViewById<Button>(R.id.submit_questionnaire)
       .updateState(questionnaireNavigationUIState.navSubmit)
-    itemView
-      .findViewById<CircularProgressIndicator>(R.id.pagination_next_button_progress_bar)
-      .updateState(questionnaireNavigationUIState.navNextProgressBar)
   }
 
   private fun Button.updateState(navigationViewState: QuestionnaireNavigationViewUIState) {
@@ -52,26 +48,14 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
-        text = navigationViewState.labelText
+        if (navigationViewState.labelText.isNullOrBlank().not() && this is Button) {
+          text = navigationViewState.labelText
+        }
         setOnClickListener { navigationViewState.onClickAction() }
       }
       QuestionnaireNavigationViewUIState.Hidden -> {
         visibility = View.GONE
       }
     }
-  }
-
-  private fun CircularProgressIndicator.updateState(
-    navigationViewState: QuestionnaireNavigationViewUIState,
-  ) {
-    visibility =
-      when (navigationViewState) {
-        is QuestionnaireNavigationViewUIState.Enabled -> {
-          View.VISIBLE
-        }
-        QuestionnaireNavigationViewUIState.Hidden -> {
-          View.GONE
-        }
-      }
   }
 }

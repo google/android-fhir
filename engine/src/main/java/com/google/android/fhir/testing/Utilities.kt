@@ -143,7 +143,7 @@ internal open class TestDownloadManagerImpl(
 }
 
 internal object TestFhirEngineImpl : FhirEngine {
-  override suspend fun create(vararg resource: Resource, isLocalOnly: Boolean) = emptyList<String>()
+  override suspend fun create(vararg resource: Resource) = emptyList<String>()
 
   override suspend fun update(vararg resource: Resource) {}
 
@@ -205,10 +205,6 @@ internal object TestFhirEngineImpl : FhirEngine {
         timestamp = Instant.now(),
       ),
     )
-  }
-
-  override suspend fun getUnsyncedLocalChanges(): List<LocalChange> {
-    TODO("Not yet implemented")
   }
 
   override suspend fun purge(type: ResourceType, id: String, forcePurge: Boolean) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2025 Google LLC
+ * Copyright 2023-2024 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -705,10 +705,6 @@ internal val QuestionnaireItemComponent.calculatedExpression: Expression?
     }
 
 /** Returns list of extensions whose value is of type [Expression] */
-internal val Questionnaire.expressionBasedExtensions
-  get() = this.extension.filter { it.value is Expression }
-
-/** Returns list of extensions whose value is of type [Expression] */
 internal val QuestionnaireItemComponent.expressionBasedExtensions
   get() = this.extension.filter { it.value is Expression }
 
@@ -717,7 +713,7 @@ internal val QuestionnaireItemComponent.expressionBasedExtensions
  * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
  * `this-question` is the link ID of the current questionnaire item).
  */
-internal fun Questionnaire.QuestionnaireItemComponent.isExpressionReferencedBy(
+internal fun QuestionnaireItemComponent.isReferencedBy(
   item: QuestionnaireItemComponent,
 ) =
   item.expressionBasedExtensions.any {
@@ -727,26 +723,6 @@ internal fun Questionnaire.QuestionnaireItemComponent.isExpressionReferencedBy(
       .replace(" ", "")
       .contains(Regex(".*linkId='${this.linkId}'.*"))
   }
-
-internal fun Questionnaire.QuestionnaireItemComponent.isExpressionReferencedBy(
-  questionnaire: Questionnaire,
-) =
-  questionnaire.expressionBasedExtensions.any {
-    it
-      .castToExpression(it.value)
-      .expression
-      .replace(" ", "")
-      .contains(Regex(".*linkId='${this.linkId}'.*"))
-  }
-
-/**
- * Whether [item] has any expression directly referencing the current questionnaire item by link ID
- * (e.g. if [item] has an expression `%resource.item.where(linkId='this-question')` where
- * `this-question` is the link ID of the current questionnaire item).
- */
-internal fun Questionnaire.QuestionnaireItemComponent.isEnableWhenReferencedBy(
-  item: Questionnaire.QuestionnaireItemComponent,
-) = item.enableWhen.any { it.question == this.linkId }
 
 internal val QuestionnaireItemComponent.answerExpression: Expression?
   get() =
@@ -977,10 +953,13 @@ internal fun QuestionnaireItemComponent.createQuestionnaireResponseItem():
     ) {
       this.copyNestedItemsToChildlessAnswers(this@createQuestionnaireResponseItem)
     } else if (
-      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP
+      this@createQuestionnaireResponseItem.type == Questionnaire.QuestionnaireItemType.GROUP &&
+        !repeats
     ) {
       this@createQuestionnaireResponseItem.item.forEach {
-        this.addItem(it.createQuestionnaireResponseItem())
+        if (!it.isRepeatedGroup) {
+          this.addItem(it.createQuestionnaireResponseItem())
+        }
       }
     }
   }

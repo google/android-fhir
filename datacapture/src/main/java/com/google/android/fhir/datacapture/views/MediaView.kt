@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2025 Google LLC
+ * Copyright 2022 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.MimeType
 import com.google.android.fhir.datacapture.extensions.decodeToBitmap
@@ -90,12 +91,12 @@ class MediaView(context: Context, attrs: AttributeSet?) : LinearLayout(context, 
   }
 
   private fun loadImage(image: Bitmap) {
-    imageAttachment.setImageBitmap(image)
+    Glide.with(context).load(image).into(imageAttachment)
     imageAttachment.visibility = View.VISIBLE
   }
 
   private fun clearImage() {
-    imageAttachment.setImageBitmap(null)
+    Glide.with(context).clear(imageAttachment)
     imageAttachment.visibility = View.GONE
   }
 
