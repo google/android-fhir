@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -197,6 +197,15 @@ internal class DatabaseImpl(
       FhirContext.forR4Cached().newJsonParser().parseResource(it) as Resource
     }
       ?: throw ResourceNotFoundException(type.name, id)
+  }
+
+  override suspend fun selectResources(type: ResourceType, vararg ids: String): List<Resource> {
+    val resources =
+      resourceDao.getResources(resourceIds = ids, resourceType = type)?.takeIf { it.isNotEmpty() }
+        ?: throw ResourceNotFoundException(type.name, *ids)
+    return resources.pmap(Dispatchers.Default) {
+      FhirContext.forR4Cached().newJsonParser().parseResource(it) as Resource
+    }
   }
 
   override suspend fun insertSyncedResources(resources: List<Resource>) {

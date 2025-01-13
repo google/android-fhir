@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import com.google.android.fhir.sync.upload.SyncUploadProgress
 import com.google.android.fhir.sync.upload.UploadRequestResult
 import com.google.android.fhir.sync.upload.UploadStrategy
 import java.time.OffsetDateTime
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -66,6 +67,7 @@ interface FhirEngine {
    * [create], the resource created in `FhirEngine` will have the same `id`. If no `id` is
    * specified, `FhirEngine` will generate a UUID as that resource's `id` and include it in the
    * returned list of IDs.
+   *
    * @param resource The FHIR resources to create.
    * @param isLocalOnly - Setting the value to [true] instructs engine that the resource and its
    *   subsequent updates should never be synced to the server.
@@ -93,7 +95,7 @@ interface FhirEngine {
    * @throws ResourceNotFoundException if the resources are not found.
    */
   @Throws(ResourceNotFoundException::class)
-  suspend fun get(type: ResourceType, vararg ids: String): List<Resource>
+  suspend fun getResources(type: ResourceType, vararg ids: String): List<Resource>
 
   /**
    * Updates one or more FHIR [Resource]s in the local storage.
@@ -250,8 +252,8 @@ suspend inline fun <reified R : Resource> FhirEngine.get(id: String): R {
  * @throws ResourceNotFoundException if the resource is not found.
  */
 @Throws(ResourceNotFoundException::class)
-suspend inline fun <reified R : Resource> FhirEngine.get(vararg ids: String): List<R> {
-  return get(getResourceType(R::class.java), *ids).map { it as R }
+suspend inline fun <reified R : Resource> FhirEngine.getResources(vararg ids: String): List<R> {
+  return getResources(getResourceType(R::class.java), *ids).pmap(Dispatchers.Default) { it as R }
 }
 
 /**
