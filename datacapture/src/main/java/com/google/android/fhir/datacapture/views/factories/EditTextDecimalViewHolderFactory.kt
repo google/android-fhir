@@ -76,8 +76,14 @@ internal object EditTextDecimalViewHolderFactory :
           )
         // Update error message if draft answer present
         if (questionnaireViewItem.draftAnswer != null) {
+          val minValue = questionnaireViewItem.minAnswerValue?.toString() ?: DecimalType(Int.MIN_VALUE).toString()
+          val maxValue = questionnaireViewItem.maxAnswerValue?.toString() ?: DecimalType(Int.MAX_VALUE).toString()
           textInputLayout.error =
-            textInputLayout.context.getString(R.string.decimal_format_validation_error_msg)
+            textInputLayout.context.getString(
+              R.string.decimal_format_validation_error_msg,
+              minValue,
+              maxValue
+            )
         }
       }
     }
