@@ -13,15 +13,54 @@
         android:focusableInTouchMode="true"
         android:orientation="vertical"
     >
-
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search"
+        <!-- Label for Search -->
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:iconifiedByDefault="false"
-            app:queryHint="@string/query_hint_patient_search"
+            android:layout_marginHorizontal="20dp"
+            android:text="@string/search_patient_by"
+            android:textAppearance="@style/TextAppearance.Material3.LabelLarge"
         />
 
+        <!-- Horizontal layout for Given Name and Family Name -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="10dp"
+        >
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:hintEnabled="true"
+                android:hint="@string/given_name"
+            >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/given_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                app:hintEnabled="true"
+                android:hint="@string/family_name"
+                android:layout_marginStart="10dp"
+            >
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/family_name_edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <!-- Patient List -->
         <include
             android:id="@+id/patient_list_container"
             layout="@layout/patient_list_view"
