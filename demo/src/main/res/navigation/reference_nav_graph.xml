@@ -25,6 +25,10 @@
             android:id="@+id/action_home_fragment_to_periodic_sync_fragment"
             app:destination="@id/periodicSyncFragment"
         />
+    <action
+            android:id="@+id/action_home_fragment_to_crud_operation_fragment"
+            app:destination="@id/crudOperationFragment"
+        />
   </fragment>
 
   <fragment
@@ -89,6 +93,12 @@
         android:name="com.google.android.fhir.demo.SyncFragment"
         android:label="fragment_manual_sync"
         tools:layout="@layout/sync"
+    />
+  <fragment
+        android:id="@+id/crudOperationFragment"
+        android:name="com.google.android.fhir.demo.CrudOperationFragment"
+        android:label="fragment_layout"
+        tools:layout="@layout/fragment_crud_layout"
     />
 
   <fragment
