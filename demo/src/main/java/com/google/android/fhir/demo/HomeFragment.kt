@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     requireView().findViewById<CardView>(R.id.item_periodic_sync).setOnClickListener {
       findNavController()
         .navigate(HomeFragmentDirections.actionHomeFragmentToPeriodicSyncFragment())
+    }
+    requireView().findViewById<CardView>(R.id.item_crud).setOnClickListener {
+      findNavController()
+        .navigate(HomeFragmentDirections.actionHomeFragmentToCrudOperationFragment())
     }
   }
 }

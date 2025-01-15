@@ -73,6 +73,11 @@
   <string name="last_sync_status">Last sync status: %1$s</string>
   <string name="last_sync_status_na">Last sync status: Not available</string>
   <string name="periodic_sync">Periodic sync</string>
+  <string name="crud_operations">CRUD operations</string>
+  <string name="create">Create</string>
+  <string name="read">Read</string>
+  <string name="update">Update</string>
+  <string name="delete">Delete</string>
   <string name="search_patient_by">Search Patient by</string>
   <string name="given_name">Given name</string>
   <string name="family_name">Family name</string>
