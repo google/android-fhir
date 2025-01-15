@@ -1183,7 +1183,7 @@ internal data class QuestionnairePage(
 )
 
 internal val QuestionnairePagination.hasPreviousPage: Boolean
-  get() = pages.any { it.index < currentPageIndex && it.enabled }
+  get() = pages.any { it.index < currentPageIndex && it.enabled && !it.hidden }
 
 internal val QuestionnairePagination.hasNextPage: Boolean
-  get() = pages.any { it.index > currentPageIndex && it.enabled }
+  get() = pages.any { it.index > currentPageIndex && it.enabled && !it.hidden }
