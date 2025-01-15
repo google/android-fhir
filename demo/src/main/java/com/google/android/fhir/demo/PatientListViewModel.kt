@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import com.google.android.fhir.search.StringFilterModifier
 import com.google.android.fhir.search.count
 import com.google.android.fhir.search.search
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import java.time.ZoneId
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Patient
 import org.hl7.fhir.r4.model.RiskAssessment
@@ -39,12 +39,11 @@ import org.hl7.fhir.r4.model.RiskAssessment
  */
 class PatientListViewModel(application: Application, private val fhirEngine: FhirEngine) :
   AndroidViewModel(application) {
-
   val liveSearchedPatients = MutableLiveData<List<PatientItem>>()
   val patientCount = MutableLiveData<Long>()
 
   init {
-    updatePatientListAndPatientCount({ getSearchResults() }, { count() })
+    updatePatientListAndPatientCount({ getSearchResults() }, { searchedPatientCount() })
   }
 
   fun searchPatientsByName(nameQuery: String) {
@@ -174,6 +173,79 @@ class PatientListViewModel(application: Application, private val fhirEngine: Fhi
       throw IllegalArgumentException("Unknown ViewModel class")
     }
   }
+
+  private var patientGivenName: String? = null
+  private var patientFamilyName: String? = null
+
+  fun setPatientGivenName(givenName: String) {
+    patientGivenName = givenName
+    searchPatientsByParameter()
+  }
+
+  fun setPatientFamilyName(familyName: String) {
+    patientFamilyName = familyName
+    searchPatientsByParameter()
+  }
+
+  private fun searchPatientsByParameter() {
+    viewModelScope.launch {
+      liveSearchedPatients.value = searchPatients()
+      patientCount.value = searchedPatientCount()
+    }
+  }
+
+  private suspend fun searchPatients(): List<PatientItem> {
+    val patients =
+      fhirEngine
+        .search<Patient> {
+          filter(
+            Patient.GIVEN,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              this.value = patientGivenName ?: ""
+            },
+          )
+          filter(
+            Patient.FAMILY,
+            {
+              modifier = StringFilterModifier.CONTAINS
+              this.value = patientFamilyName ?: ""
+            },
+          )
+          sort(Patient.GIVEN, Order.ASCENDING)
+          count = 100
+          from = 0
+        }
+        .mapIndexed { index, fhirPatient -> fhirPatient.resource.toPatientItem(index + 1) }
+        .toMutableList()
+
+    val risks = getRiskAssessments()
+    patients.forEach { patient ->
+      risks["Patient/${patient.resourceId}"]?.let {
+        patient.risk = it.prediction?.first()?.qualitativeRisk?.coding?.first()?.code
+      }
+    }
+    return patients
+  }
+
+  private suspend fun searchedPatientCount(): Long {
+    return fhirEngine.count<Patient> {
+      filter(
+        Patient.GIVEN,
+        {
+          modifier = StringFilterModifier.CONTAINS
+          this.value = patientGivenName ?: ""
+        },
+      )
+      filter(
+        Patient.FAMILY,
+        {
+          modifier = StringFilterModifier.CONTAINS
+          this.value = patientFamilyName ?: ""
+        },
+      )
+    }
+  }
 }
 
 internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientItem {
@@ -183,7 +255,7 @@ internal fun Patient.toPatientItem(position: Int): PatientListViewModel.PatientI
   val gender = if (hasGenderElement()) genderElement.valueAsString else ""
   val dob =
     if (hasBirthDateElement()) {
-      LocalDate.parse(birthDateElement.valueAsString, DateTimeFormatter.ISO_DATE)
+      birthDateElement.value.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
     } else {
       null
     }

@@ -23,6 +23,7 @@ import com.google.android.fhir.workflow.activity.resource.request.CPGMedicationR
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource
 import com.google.android.fhir.workflow.activity.resource.request.CPGRequestResource.Companion.of
 import org.hl7.fhir.r4.model.Communication
+import org.hl7.fhir.r4.model.MedicationDispense
 import org.hl7.fhir.r4.model.Reference
 import org.hl7.fhir.r4.model.Resource
 import org.hl7.fhir.r4.model.ResourceType
@@ -41,7 +42,7 @@ import org.hl7.fhir.r4.model.ResourceType
  * [CPGEventResource]s.
  */
 sealed class CPGEventResource<out R>(
-  internal open val resource: R,
+  open val resource: R,
   internal val mapper: EventStatusCodeMapper,
 ) where R : Resource {
 
@@ -65,12 +66,22 @@ sealed class CPGEventResource<out R>(
 
   companion object {
 
-    fun of(request: CPGRequestResource<*>, eventClass: Class<*>): CPGEventResource<*> {
-      return when (request) {
-        is CPGCommunicationRequest -> CPGCommunicationEvent.from(request)
-        is CPGMedicationRequest -> CPGOrderMedicationEvent.from(request, eventClass)
+    internal fun from(from: CPGRequestResource<*>, to: Class<*>): CPGEventResource<*> {
+      return when (from) {
+        is CPGCommunicationRequest -> CPGCommunicationEvent.from(from)
+        is CPGMedicationRequest -> CPGOrderMedicationEvent.from(from, to)
         else -> {
-          throw IllegalArgumentException("Unknown CPG Request type ${request::class}.")
+          throw IllegalArgumentException("Unknown CPG Request type ${from::class}.")
+        }
+      }
+    }
+
+    fun of(event: Resource): CPGEventResource<*> {
+      return when (event) {
+        is Communication -> CPGCommunicationEvent(event)
+        is MedicationDispense -> CPGMedicationDispenseEvent(event)
+        else -> {
+          throw IllegalArgumentException("Unknown CPG event type ${event::class}.")
         }
       }
     }
