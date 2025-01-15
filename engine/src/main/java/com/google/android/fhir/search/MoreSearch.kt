@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -135,7 +135,6 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
           }
       }
     }
-    if (filters.isEmpty()) args.add(resourceToInclude.name)
     return filterQuery
   }
 
@@ -152,7 +151,7 @@ internal fun Search.getRevIncludeQuery(includeIds: List<String>): SearchQuery {
       ON re.resourceUuid = rie.resourceUuid
       ${join.query}
       WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN ($uuidsString)
-      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else "AND re.resourceType = ?"}
+      ${if (filterQuery.isNotBlank()) "AND re.resourceUuid IN ($filterQuery)" else ""}
       $order
             """
         .trimIndent()

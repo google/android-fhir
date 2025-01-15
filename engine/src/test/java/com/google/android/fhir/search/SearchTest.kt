@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2414,14 +2414,13 @@ class SearchTest {
           JOIN ReferenceIndexEntity rie
           ON re.resourceUuid = rie.resourceUuid
           WHERE rie.resourceType = ?  AND rie.index_name = ?  AND rie.index_value IN (?, ?)
-          AND re.resourceType = ?
           )
           """
           .trimIndent(),
       )
 
     assertThat(query.args)
-      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02", "Condition")
+      .containsExactly("Condition", "subject", "Patient/pa01", "Patient/pa02")
       .inOrder()
   }
 

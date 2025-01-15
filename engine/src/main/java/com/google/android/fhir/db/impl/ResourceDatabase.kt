@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,7 +54,7 @@ import org.json.JSONObject
       PositionIndexEntity::class,
       LocalChangeResourceReferenceEntity::class,
     ],
-  version = 9,
+  version = 10,
   exportSchema = true,
 )
 @TypeConverters(DbTypeConverters::class)
@@ -219,6 +219,24 @@ internal val Migration_8_9 =
         )
         database.execSQL(
           "CREATE INDEX IF NOT EXISTS `index_TokenIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `TokenIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
+        )
+        database.setTransactionSuccessful()
+      } finally {
+        database.endTransaction()
+      }
+    }
+  }
+
+internal val Migration_9_10 =
+  object : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.beginTransaction()
+      try {
+        database.execSQL(
+          "DROP INDEX IF EXISTS `index_ReferenceIndexEntity_resourceType_index_name_index_value`;",
+        )
+        database.execSQL(
+          "CREATE INDEX IF NOT EXISTS `index_ReferenceIndexEntity_resourceType_index_name_index_value_resourceUuid` ON `ReferenceIndexEntity` (`resourceType`, `index_name`, `index_value`, `resourceUuid`);",
         )
         database.setTransactionSuccessful()
       } finally {
