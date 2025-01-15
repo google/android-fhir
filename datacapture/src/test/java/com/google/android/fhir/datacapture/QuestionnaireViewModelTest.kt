@@ -48,6 +48,7 @@ import com.google.android.fhir.datacapture.extensions.EXTENSION_ENTRY_MODE_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_SYSTEM
 import com.google.android.fhir.datacapture.extensions.EXTENSION_ITEM_CONTROL_URL
+import com.google.android.fhir.datacapture.extensions.EXTENSION_LAST_LAUNCHED_TIMESTAMP
 import com.google.android.fhir.datacapture.extensions.EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
 import com.google.android.fhir.datacapture.extensions.EXTENSION_VARIABLE_URL
 import com.google.android.fhir.datacapture.extensions.EntryMode
@@ -187,7 +188,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           this.questionnaire = "http://www.sample-org/FHIR/Resources/Questionnaire/a-questionnaire"
@@ -213,7 +214,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -251,7 +252,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -324,7 +325,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -422,7 +423,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -497,7 +498,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -565,7 +571,7 @@ class QuestionnaireViewModelTest {
       }
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         createQuestionnaireViewModel(
             questionnaire,
             questionnaireResponse,
@@ -651,7 +657,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(questionnaireResponse, viewModel.getQuestionnaireResponse()) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -742,7 +753,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -794,7 +810,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -853,7 +874,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -895,7 +921,12 @@ class QuestionnaireViewModelTest {
 
     val viewModel = createQuestionnaireViewModel(questionnaire, questionnaireResponse)
 
-    runTest { assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse) }
+    runTest {
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
+    }
   }
 
   @Test
@@ -1006,7 +1037,7 @@ class QuestionnaireViewModelTest {
         printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
           as QuestionnaireResponse
 
-      assertResourceEquals(value, expectedResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(value, expectedResponse)
     }
   }
 
@@ -1134,7 +1165,7 @@ class QuestionnaireViewModelTest {
         printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
           as QuestionnaireResponse
 
-      assertResourceEquals(value, expectedResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(value, expectedResponse)
     }
   }
 
@@ -1502,6 +1533,102 @@ class QuestionnaireViewModelTest {
   //                              Pagination                              //
   //                                                                      //
   // ==================================================================== //
+  @Test
+  fun `should include all top level items as pages when any item has page extension`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page1-noExtension"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page3-noExtension"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page4-noExtension-hidden"
+            addExtension(hiddenExtension)
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page4-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 4"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page5"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page5-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 5"
+              },
+            )
+          },
+        )
+      }
+
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      assertThat(
+          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = false),
+                QuestionnairePage(3, enabled = true, hidden = true),
+                QuestionnairePage(4, enabled = true, hidden = false),
+              ),
+            currentPageIndex = 0,
+          ),
+        )
+    }
+  }
 
   @Test
   fun `should show current page`() = runTest {
@@ -1799,8 +1926,11 @@ class QuestionnaireViewModelTest {
       }
     val viewModel = createQuestionnaireViewModel(questionnaire)
     viewModel.runViewModelBlocking {
+      val questionnaireStatePagination =
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+
       assertThat(
-          (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination,
+          questionnaireStatePagination,
         )
         .isEqualTo(
           QuestionnairePagination(
@@ -1814,6 +1944,83 @@ class QuestionnaireViewModelTest {
             currentPageIndex = 1,
           ),
         )
+
+      assertThat(questionnaireStatePagination.hasPreviousPage).isFalse()
+    }
+  }
+
+  @Test
+  fun `should skip last page if it is hidden`() = runTest {
+    val questionnaire =
+      Questionnaire().apply {
+        id = "a-questionnaire"
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page1"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page1-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 1"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page2"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page2-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 2"
+              },
+            )
+          },
+        )
+        addItem(
+          QuestionnaireItemComponent().apply {
+            linkId = "page3"
+            type = Questionnaire.QuestionnaireItemType.GROUP
+            addExtension(paginationExtension)
+            addExtension(hiddenExtension)
+            addItem(
+              QuestionnaireItemComponent().apply {
+                linkId = "page3-1"
+                type = Questionnaire.QuestionnaireItemType.BOOLEAN
+                text = "Question on page 3"
+              },
+            )
+          },
+        )
+      }
+    val viewModel = createQuestionnaireViewModel(questionnaire)
+    viewModel.runViewModelBlocking {
+      viewModel.goToNextPage()
+      val questionnaireStatePagination =
+        (viewModel.questionnaireStateFlow.value.displayMode as DisplayMode.EditMode).pagination
+
+      assertThat(
+          questionnaireStatePagination,
+        )
+        .isEqualTo(
+          QuestionnairePagination(
+            isPaginated = true,
+            pages =
+              listOf(
+                QuestionnairePage(0, enabled = true, hidden = false),
+                QuestionnairePage(1, enabled = true, hidden = false),
+                QuestionnairePage(2, enabled = true, hidden = true),
+              ),
+            currentPageIndex = 1,
+          ),
+        )
+
+      assertThat(questionnaireStatePagination.hasNextPage).isFalse()
     }
   }
 
@@ -3340,7 +3547,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -3387,7 +3594,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -3435,7 +3642,7 @@ class QuestionnaireViewModelTest {
     val viewModel = createQuestionnaireViewModel(questionnaire)
 
     runTest {
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         viewModel.getQuestionnaireResponse(),
         QuestionnaireResponse().apply {
           addItem(
@@ -3489,7 +3696,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertResourceEquals(
+    assertQuestionnaireResponseEqualsIgnoringTimestamps(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
         addItem(
@@ -3534,7 +3741,7 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertResourceEquals(
+    assertQuestionnaireResponseEqualsIgnoringTimestamps(
       viewModel.getQuestionnaireResponse(),
       QuestionnaireResponse().apply {
         addItem(
@@ -3621,7 +3828,10 @@ class QuestionnaireViewModelTest {
 
     val viewModel = QuestionnaireViewModel(context, state)
 
-    assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+    assertQuestionnaireResponseEqualsIgnoringTimestamps(
+      viewModel.getQuestionnaireResponse(),
+      questionnaireResponse,
+    )
   }
 
   @Test
@@ -3787,7 +3997,7 @@ class QuestionnaireViewModelTest {
         // Clearing the answer disables question-2 that in turn disables question-3.
         items.first { it.questionnaireItem.linkId == "question-1" }.clearAnswer()
 
-        assertResourceEquals(
+        assertQuestionnaireResponseEqualsIgnoringTimestamps(
           viewModel.getQuestionnaireResponse(),
           QuestionnaireResponse().apply {
             id = "a-questionnaire-response"
@@ -3809,7 +4019,10 @@ class QuestionnaireViewModelTest {
             },
           )
 
-        assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+        assertQuestionnaireResponseEqualsIgnoringTimestamps(
+          viewModel.getQuestionnaireResponse(),
+          questionnaireResponse,
+        )
       }
     }
 
@@ -4180,7 +4393,7 @@ class QuestionnaireViewModelTest {
         printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
           as QuestionnaireResponse
 
-      assertResourceEquals(value, expectedResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(value, expectedResponse)
     }
   }
 
@@ -4278,7 +4491,7 @@ class QuestionnaireViewModelTest {
       val expectedResponse =
         printer.parseResource(QuestionnaireResponse::class.java, expectedResponseString)
           as QuestionnaireResponse
-      assertResourceEquals(value, expectedResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(value, expectedResponse)
     }
   }
 
@@ -4339,7 +4552,10 @@ class QuestionnaireViewModelTest {
           },
         )
 
-      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
     }
   }
 
@@ -4459,7 +4675,7 @@ class QuestionnaireViewModelTest {
         )
         .inOrder()
 
-      assertResourceEquals(
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
         actual = viewModel.getQuestionnaireResponse(),
         expected =
           QuestionnaireResponse().apply {
@@ -4641,7 +4857,10 @@ class QuestionnaireViewModelTest {
           },
         )
 
-      assertResourceEquals(viewModel.getQuestionnaireResponse(), questionnaireResponse)
+      assertQuestionnaireResponseEqualsIgnoringTimestamps(
+        viewModel.getQuestionnaireResponse(),
+        questionnaireResponse,
+      )
     }
   }
 
@@ -7516,6 +7735,28 @@ class QuestionnaireViewModelTest {
     fun <T : IBaseResource> assertResourceEquals(actual: T, expected: T) {
       assertThat(printer.encodeResourceToString(actual))
         .isEqualTo(printer.encodeResourceToString(expected))
+    }
+
+    /**
+     * Asserts that the `expected` and the `actual` Questionnaire Responses are equal ignoring the
+     * stamp values
+     */
+    private fun assertQuestionnaireResponseEqualsIgnoringTimestamps(
+      actual: QuestionnaireResponse,
+      expected: QuestionnaireResponse,
+    ) {
+      val actualResponseWithoutTimestamp =
+        actual.copy().apply {
+          extension.removeIf { ext -> ext.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+          authored = null
+        }
+      val expectedResponseWithoutTimestamp =
+        expected.copy().apply {
+          extension.removeIf { ext -> ext.url == EXTENSION_LAST_LAUNCHED_TIMESTAMP }
+          authored = null
+        }
+      assertThat(printer.encodeResourceToString(actualResponseWithoutTimestamp))
+        .isEqualTo(printer.encodeResourceToString(expectedResponseWithoutTimestamp))
     }
   }
 }

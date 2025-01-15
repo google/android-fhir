@@ -25,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.fhir.datacapture.contrib.views.PhoneNumberViewHolderFactory
 import com.google.android.fhir.datacapture.extensions.inflate
 import com.google.android.fhir.datacapture.extensions.itemControl
+import com.google.android.fhir.datacapture.extensions.shouldUseDialog
 import com.google.android.fhir.datacapture.views.NavigationViewHolder
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.fhir.datacapture.views.factories.AttachmentViewHolderFactory
@@ -46,6 +47,7 @@ import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemView
 import com.google.android.fhir.datacapture.views.factories.RadioGroupViewHolderFactory
 import com.google.android.fhir.datacapture.views.factories.RepeatedGroupHeaderItemViewHolder
 import com.google.android.fhir.datacapture.views.factories.SliderViewHolderFactory
+import com.google.android.fhir.datacapture.views.factories.TimePickerViewHolderFactory
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemType
 
 internal class QuestionnaireEditAdapter(
@@ -102,6 +104,7 @@ internal class QuestionnaireEditAdapter(
         QuestionnaireViewHolderType.GROUP -> GroupViewHolderFactory
         QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER -> BooleanChoiceViewHolderFactory
         QuestionnaireViewHolderType.DATE_PICKER -> DatePickerViewHolderFactory
+        QuestionnaireViewHolderType.TIME_PICKER -> TimePickerViewHolderFactory
         QuestionnaireViewHolderType.DATE_TIME_PICKER -> DateTimePickerViewHolderFactory
         QuestionnaireViewHolderType.EDIT_TEXT_SINGLE_LINE -> EditTextSingleLineViewHolderFactory
         QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE -> EditTextMultiLineViewHolderFactory
@@ -222,6 +225,7 @@ internal class QuestionnaireEditAdapter(
       QuestionnaireItemType.GROUP -> QuestionnaireViewHolderType.GROUP
       QuestionnaireItemType.BOOLEAN -> QuestionnaireViewHolderType.BOOLEAN_TYPE_PICKER
       QuestionnaireItemType.DATE -> QuestionnaireViewHolderType.DATE_PICKER
+      QuestionnaireItemType.TIME -> QuestionnaireViewHolderType.TIME_PICKER
       QuestionnaireItemType.DATETIME -> QuestionnaireViewHolderType.DATE_TIME_PICKER
       QuestionnaireItemType.STRING -> getStringViewHolderType(questionnaireViewItem)
       QuestionnaireItemType.TEXT -> QuestionnaireViewHolderType.EDIT_TEXT_MULTI_LINE
@@ -241,8 +245,11 @@ internal class QuestionnaireEditAdapter(
   ): QuestionnaireViewHolderType {
     val questionnaireItem = questionnaireViewItem.questionnaireItem
 
-    // Use the view type that the client wants if they specified an itemControl
-    return questionnaireItem.itemControl?.viewHolderType
+    // Use the view type that the client wants if they specified an itemControl or dialog extension
+    return when {
+      questionnaireItem.shouldUseDialog -> QuestionnaireViewHolderType.DIALOG_SELECT
+      else -> questionnaireItem.itemControl?.viewHolderType
+    }
     // Otherwise, choose a sensible UI element automatically
     ?: run {
         val numOptions = questionnaireViewItem.enabledAnswerOptions.size
