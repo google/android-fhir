@@ -2980,7 +2980,7 @@ class ResourceMapperTest {
   }
 
   @Test
-  fun `populate() should fail with IllegalStateException when QuestionnaireItem of group or display item has a initial value`():
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem of group item has a initial value`():
     Unit = runBlocking {
     val questionnaire =
       Questionnaire()
@@ -3008,38 +3008,49 @@ class ResourceMapperTest {
                   },
                 ),
               )
-            item =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "patient-gender-display-initial"
-                  type = Questionnaire.QuestionnaireItemType.DISPLAY
-                  initial =
-                    listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-                },
-              )
           },
         )
+
+    val patient = Patient().apply { gender = Enumerations.AdministrativeGender.MALE }
+    val errorMessage =
+      assertFailsWith<IllegalStateException> {
+          ResourceMapper.populate(questionnaire, mapOf("father" to patient))
+        }
+        .localizedMessage
+    assertThat(errorMessage)
+      .isEqualTo(
+        "QuestionnaireItem item is not allowed to have initial value or initial expression for groups or display items. See rule at http://build.fhir.org/ig/HL7/sdc/expressions.html#initialExpression.",
+      )
+  }
+
+  @Test
+  fun `populate() should fail with IllegalStateException when QuestionnaireItem of display item has a initial value`():
+    Unit = runBlocking {
+    val questionnaire =
+      Questionnaire()
+        .apply {
+          addExtension().apply {
+            url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+            extension =
+              listOf(
+                Extension("name", Coding(CODE_SYSTEM_LAUNCH_CONTEXT, "father", "Father")),
+                Extension("type", CodeType("Patient")),
+              )
+          }
+        }
         .addItem(
           Questionnaire.QuestionnaireItemComponent().apply {
-            linkId = "patient-gender-group-initial"
-            type = Questionnaire.QuestionnaireItemType.GROUP
-            initial = listOf(Questionnaire.QuestionnaireItemInitialComponent(StringType("male")))
-            item =
-              mutableListOf(
-                Questionnaire.QuestionnaireItemComponent().apply {
-                  linkId = "patient-gender-display-initial-expression"
-                  type = Questionnaire.QuestionnaireItemType.DISPLAY
-                  extension =
-                    listOf(
-                      Extension(
-                        ITEM_INITIAL_EXPRESSION_URL,
-                        Expression().apply {
-                          language = "text/fhirpath"
-                          expression = "%father.gender"
-                        },
-                      ),
-                    )
-                },
+            linkId = "patient-gender-display-initial-expression"
+            type = Questionnaire.QuestionnaireItemType.DISPLAY
+            extension =
+              listOf(
+                Extension(
+                  ITEM_INITIAL_EXPRESSION_URL,
+                  Expression().apply {
+                    language = "text/fhirpath"
+                    expression = "%father.gender"
+                  },
+                ),
               )
           },
         )
@@ -3127,10 +3138,10 @@ class ResourceMapperTest {
       val questionnaireResponse =
         ResourceMapper.populate(questionnaire, mapOf("observation" to observation))
 
-      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
-        .isEqualTo("correct-code-val")
-      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-        .isEqualTo("correct-display-val")
+      with(questionnaireResponse.item[0].answer[0].value as Coding) {
+        assertThat(this.code).isEqualTo("correct-code-val")
+        assertThat(this.display).isEqualTo("correct-display-val")
+      }
     }
 
   @Test
@@ -3210,8 +3221,8 @@ class ResourceMapperTest {
               coding =
                 mutableListOf(
                   Coding().apply {
-                    code = "correct-code-val"
-                    display = "correct-display-val"
+                    code = "wrong-code-val"
+                    display = "wrong-display-val"
                   },
                 )
             }
@@ -3323,14 +3334,14 @@ class ResourceMapperTest {
       val questionnaireResponse =
         ResourceMapper.populate(questionnaire, mapOf("observations" to observationBundle))
 
-      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).code)
-        .isEqualTo("correct-code-val")
-      assertThat((questionnaireResponse.item[0].answer[0].value as Coding).display)
-        .isEqualTo("correct-display-val")
-      assertThat((questionnaireResponse.item[0].answer[1].value as Coding).code)
-        .isEqualTo("correct2-code-val")
-      assertThat((questionnaireResponse.item[0].answer[1].value as Coding).display)
-        .isEqualTo("correct2-display-val")
+      with(questionnaireResponse.item[0].answer[0].value as Coding) {
+        assertThat(this.code).isEqualTo("correct-code-val")
+        assertThat(this.display).isEqualTo("correct-display-val")
+      }
+      with(questionnaireResponse.item[0].answer[1].value as Coding) {
+        assertThat(this.code).isEqualTo("correct2-code-val")
+        assertThat(this.display).isEqualTo("correct2-display-val")
+      }
     }
 
   @Test
@@ -3382,6 +3393,71 @@ class ResourceMapperTest {
 
       val questionnaireResponse =
         ResourceMapper.populate(questionnaire, mapOf("patient" to patient))
+
+      assertThat((questionnaireResponse.item[0].answer[0].valueStringType.valueAsString))
+        .isEqualTo("Parth")
+    }
+
+  @Test
+  fun `populate() should select a first single initial answer for non repeating question without answerOption and initialExpression evalutes to multiple values`() =
+    runBlocking {
+      val questionnaire =
+        Questionnaire()
+          .apply {
+            addExtension().apply {
+              url = EXTENSION_SDC_QUESTIONNAIRE_LAUNCH_CONTEXT
+              extension =
+                listOf(
+                  Extension(
+                    "name",
+                    Coding(
+                      CODE_SYSTEM_LAUNCH_CONTEXT,
+                      "patients",
+                      "list of patients",
+                    ),
+                  ),
+                  Extension("type", CodeType("Patient")),
+                )
+            }
+          }
+          .addItem(
+            Questionnaire.QuestionnaireItemComponent().apply {
+              linkId = "patient-name"
+              type = Questionnaire.QuestionnaireItemType.TEXT
+              repeats = false
+              extension =
+                listOf(
+                  Extension(
+                    ITEM_INITIAL_EXPRESSION_URL,
+                    Expression().apply {
+                      language = "text/fhirpath"
+                      expression = "%patients.entry.resource.name.given"
+                    },
+                  ),
+                )
+            },
+          )
+
+      val patient1 =
+        Patient().apply {
+          addName(
+            HumanName().apply { addGiven("Parth") },
+          )
+        }
+      val patient2 =
+        Patient().apply {
+          addName(
+            HumanName().apply { addGiven("Jose") },
+          )
+        }
+
+      val patientBundle =
+        Bundle().apply {
+          addEntry().resource = patient1
+          addEntry().resource = patient2
+        }
+      val questionnaireResponse =
+        ResourceMapper.populate(questionnaire, mapOf("patients" to patientBundle))
 
       assertThat((questionnaireResponse.item[0].answer[0].valueStringType.valueAsString))
         .isEqualTo("Parth")
