@@ -93,7 +93,7 @@ Let's look at a more complex Questionnaire, focused on the top-level `item` elem
 
 There are [several options](https://www.hl7.org/fhir/valueset-item-type.html) for the `type` member of `item` objects. The Structured Data Capture Library selects the UI component to use when rendering based on the type. This example also uses the `group` type where `text` acts as section headers and child item objects are logically grouped.
 
-Some Questionnaire elements control validation or rendering logic. For example, item `1.1` is required, and item `2.1.1` is only shown if item `2.1` is `true`.
+Some Questionnaire elements control validation or rendering logic. For example, item `1.1` is required, and item `2.2` is only shown if item `2.1` is `true`.
 
 The next example of an item object uses extensions from the SDC implementation guide and also demonstrates the `choice` type:
 
