@@ -52,7 +52,7 @@ class NavigationViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
       is QuestionnaireNavigationViewUIState.Enabled -> {
         visibility = View.VISIBLE
         isEnabled = true
-        text = navigationViewState.labelText
+        text = navigationViewState.labelText ?: navigationViewState.labelStringRes?.let { context.getString(it) }
         setOnClickListener { navigationViewState.onClickAction() }
       }
       QuestionnaireNavigationViewUIState.Hidden -> {

@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture
 
 import android.app.Application
-import android.content.Context
 import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.AndroidViewModel
@@ -779,7 +778,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           navCancel =
             if (!isReadOnly && shouldShowCancelButton) {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText = (getApplication() as Context).getString(R.string.cancel_questionnaire),
+                labelStringRes = R.string.cancel_questionnaire,
                 onClickAction = onCancelButtonClickListener,
               )
             } else {
@@ -838,8 +837,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
           when {
             questionnairePagination.isPaginated && questionnairePagination.hasPreviousPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText =
-                  (getApplication() as Context).getString(R.string.button_pagination_previous),
+                labelStringRes = R.string.button_pagination_previous,
                 onClickAction = { goToPreviousPage() },
               )
             }
@@ -852,14 +850,11 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
             questionnairePagination.isPaginated &&
               questionnairePagination.hasNextPage &&
               isLoadingNextPage.value -> {
-              QuestionnaireNavigationViewUIState.Enabled(
-                labelText = null,
-              )
+              QuestionnaireNavigationViewUIState.Enabled()
             }
             questionnairePagination.isPaginated && questionnairePagination.hasNextPage -> {
               QuestionnaireNavigationViewUIState.Enabled(
-                labelText =
-                  (getApplication() as Context).getString(R.string.button_pagination_next),
+                labelStringRes = R.string.button_pagination_next,
                 onClickAction = { goToNextPage() },
               )
             }
@@ -879,7 +874,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         navReview =
           if (showReviewButton) {
             QuestionnaireNavigationViewUIState.Enabled(
-              labelText = (getApplication() as Context).getString(R.string.button_review),
+              labelStringRes = R.string.button_review,
               onClickAction = { setReviewMode(true) },
             )
           } else {
@@ -888,7 +883,7 @@ internal class QuestionnaireViewModel(application: Application, state: SavedStat
         navCancel =
           if (showCancelButton) {
             QuestionnaireNavigationViewUIState.Enabled(
-              labelText = (getApplication() as Context).getString(R.string.cancel_questionnaire),
+              labelStringRes = R.string.cancel_questionnaire,
               onClickAction = onCancelButtonClickListener,
             )
           } else {

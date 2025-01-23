@@ -16,10 +16,12 @@
 
 package com.google.android.fhir.datacapture
 
+import androidx.annotation.StringRes
+
 sealed interface QuestionnaireNavigationViewUIState {
   data object Hidden : QuestionnaireNavigationViewUIState
 
-  data class Enabled(val labelText: String? = null, val onClickAction: () -> Unit = {}) :
+  data class Enabled(val labelText: String? = null, @StringRes val labelStringRes: Int? = null, val onClickAction: () -> Unit = {}) :
     QuestionnaireNavigationViewUIState
 }
 
