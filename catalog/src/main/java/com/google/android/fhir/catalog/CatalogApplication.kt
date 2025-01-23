@@ -21,15 +21,15 @@ import ca.uhn.fhir.context.FhirContext
 import com.google.android.fhir.FhirEngine
 import com.google.android.fhir.FhirEngineConfiguration
 import com.google.android.fhir.FhirEngineProvider
-import com.google.android.fhir.datacapture.CustomCallback.AutoCompleteCallback
-import com.google.android.fhir.datacapture.CustomCallbackType
 import com.google.android.fhir.datacapture.DataCaptureConfig
-import com.google.android.fhir.datacapture.views.factories.AutoCompleteViewAnswerOption
+import com.google.android.fhir.datacapture.ExternalAnswerValueSetResolver
 import com.google.android.fhir.search.search
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.Coding
 
 class CatalogApplication : Application(), DataCaptureConfig.Provider {
   // Only initiate the FhirEngine when used for the first time, not when the app is created.
@@ -47,15 +47,26 @@ class CatalogApplication : Application(), DataCaptureConfig.Provider {
         xFhirQueryResolver = { fhirEngine.search(it).map { it.resource } },
         questionnaireItemViewHolderFactoryMatchersProviderFactory =
           ContribQuestionnaireItemViewHolderFactoryMatchersProviderFactory,
-        callbacks = mapOf(Pair(CustomCallbackType.AUTO_COMPLETE, AutoCompleteCallback(
-          callback = { query ->
-            run {
-              listOf(AutoCompleteViewAnswerOption("a", "Type 2 Diabetes Mellitus"),
-                AutoCompleteViewAnswerOption("b", "Test")
+        valueSetResolverExternal =
+          object : ExternalAnswerValueSetResolver {
+            override suspend fun resolve(uri: String, query: String?): List<Coding> {
+              delay(1000)
+              // Here we can call out to our FHIR terminology server with the provided uri and query
+              if (uri == "https://my.url/fhir/ValueSet/my-valueset" && !query.isNullOrBlank()) {
+                return listOf(
+                  Coding().apply {
+                    code = "a"
+                    display = "Custom response A"
+                  },
+                  Coding().apply {
+                    code = "b"
+                    display = "Custom response B"
+                  },
                 )
+              }
+              return emptyList()
             }
-          }
-        )))
+          },
       )
 
     CoroutineScope(Dispatchers.IO).launch {

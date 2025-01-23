@@ -56,12 +56,6 @@ data class DataCaptureConfig(
   var questionnaireItemViewHolderFactoryMatchersProviderFactory:
     QuestionnaireItemViewHolderFactoryMatchersProviderFactory? =
     null,
-
-  /**
-   * A [CustomCallback] may be set by the client to override the behaviour of an existing component
-   * in the sdc.
-   */
-  var callback: CustomCallback<*>? = null,
 ) {
 
   /**
@@ -80,12 +74,18 @@ data class DataCaptureConfig(
  * allows the library to render answer options to `choice` and `open-choice` type questions more
  * dynamically.
  *
+ * Optional query parameter can be used to accept the search string from user input for server-side
+ * filtering.
+ *
  * NOTE: The result of the resolution may be cached to improve performance. In other words, the
  * resolver may be called only once after which the same answer value set may be used multiple times
  * in the UI to populate answer options.
+ *
+ * @param uri The uri used to identify the questionnaire item
+ * @param query The text input from the user
  */
 interface ExternalAnswerValueSetResolver {
-  suspend fun resolve(uri: String): List<Coding>
+  suspend fun resolve(uri: String, query: String?): List<Coding>
 }
 
 /**

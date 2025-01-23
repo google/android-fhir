@@ -17,7 +17,6 @@
 package com.google.android.fhir.datacapture.views.factories
 
 import android.view.View
-import android.widget.AutoCompleteTextView
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -34,8 +33,6 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.textfield.TextInputLayout
 import com.google.common.truth.Truth.assertThat
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -467,44 +464,5 @@ class AutoCompleteViewHolderFactoryTest {
       .isEmpty()
     assertThat(viewHolder.itemView.findViewById<TextView>(R.id.required_optional_text).visibility)
       .isEqualTo(View.GONE)
-  }
-
-  @Test
-  fun givenCustomCallback_thenDisplayCallbackResponse() {
-    val testAnswerVS = "testAnswerValueSet"
-    val testQuery = "t2"
-
-    viewHolder.bind(
-      QuestionnaireViewItem(
-        Questionnaire.QuestionnaireItemComponent().apply {
-          text = "Question"
-          answerValueSet = testAnswerVS
-        },
-        QuestionnaireResponse.QuestionnaireResponseItemComponent(),
-        validationResult = NotValidated,
-        answersChangedCallback = { _, _, _, _ -> },
-        questionViewTextConfiguration = QuestionTextConfiguration(showOptionalText = false),
-        callback = { query, uri ->
-          assertNotNull(query)
-          assertNotNull(uri)
-          assertEquals(query, testQuery)
-          assertEquals(uri, testAnswerVS)
-          run {
-            listOf(
-              AutoCompleteViewAnswerOption("a", "Answer A"),
-              AutoCompleteViewAnswerOption("b", "Answer B"),
-            )
-          }
-        },
-      ),
-    )
-
-    val autoCompleteTextView =
-      viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.autoCompleteTextView)
-
-    autoCompleteTextView.setText(testQuery)
-    val adapter = autoCompleteTextView.adapter
-    assertNotNull(adapter)
-    assertThat(adapter.count).isEqualTo(2)
   }
 }

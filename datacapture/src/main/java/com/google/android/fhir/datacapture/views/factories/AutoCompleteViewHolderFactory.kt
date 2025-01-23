@@ -28,8 +28,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.children
 import androidx.core.view.get
 import androidx.core.view.isEmpty
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
-import com.google.android.fhir.datacapture.CustomCallback
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.identifierString
@@ -58,13 +58,10 @@ internal object AutoCompleteViewHolderFactory :
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
       private lateinit var chipContainer: ChipGroup
       private lateinit var textInputLayout: TextInputLayout
-      private lateinit var adapter: ArrayAdapter<AutoCompleteViewAnswerOption>
+      private lateinit var adapter: AutoCompleteArrayAdapter
 
       private val canHaveMultipleAnswers
         get() = questionnaireViewItem.questionnaireItem.repeats
-
-      private val callback: CustomCallback<*>?
-        get() = questionnaireViewItem.callback
 
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var errorTextView: TextView
@@ -82,7 +79,6 @@ internal object AutoCompleteViewHolderFactory :
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
         header.bind(questionnaireViewItem)
         header.showRequiredOrOptionalTextInHeaderView(questionnaireViewItem)
-        val suggestions = mutableListOf<AutoCompleteViewAnswerOption>()
         val answerOptionValues =
           questionnaireViewItem.enabledAnswerOptions.map {
             AutoCompleteViewAnswerOption(
@@ -90,15 +86,12 @@ internal object AutoCompleteViewHolderFactory :
               answerDisplay = it.value.displayString(header.context),
             )
           }
-        suggestions.addAll(answerOptionValues)
         adapter =
           AutoCompleteArrayAdapter(
             context = header.context,
             resource = R.layout.drop_down_list_item,
             textViewResourceId = R.id.answer_option_textview,
             objects = answerOptionValues,
-            callback = callback,
-            answerValueSet = questionnaireViewItem.questionnaireItem.answerValueSet,
           )
         autoCompleteTextView.setAdapter(adapter)
         // Remove chips if any from the last bindView call on this VH.
@@ -106,6 +99,30 @@ internal object AutoCompleteViewHolderFactory :
         presetValuesIfAny()
 
         displayValidationResult(questionnaireViewItem.validationResult)
+
+        val serverSideFiltering =
+          questionnaireViewItem.questionnaireItem.answerValueSet != null &&
+            answerOptionValues.isEmpty()
+
+        autoCompleteTextView.addTextChangedListener { text ->
+          if (serverSideFiltering) {
+            questionnaireViewItem.autoCompleteAnswerOptionResolver(
+              text.toString(),
+              questionnaireViewItem.questionnaireItem.answerValueSet,
+            ) { response ->
+              val items =
+                response.map {
+                  AutoCompleteViewAnswerOption(
+                    answerId = it.code,
+                    answerDisplay = it.display,
+                  )
+                }
+              adapter.updateData(items)
+            }
+          } else {
+            adapter.clientSideFilter(text.toString())
+          }
+        }
       }
 
       override fun setReadOnly(isReadOnly: Boolean) {
@@ -272,7 +289,7 @@ internal object AutoCompleteViewHolderFactory :
  * An answer option that would show up as a dropdown item in an [AutoCompleteViewHolderFactory]
  * textview
  */
-data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
+internal data class AutoCompleteViewAnswerOption(val answerId: String, val answerDisplay: String) {
   override fun toString(): String {
     return this.answerDisplay
   }
@@ -283,8 +300,6 @@ internal class AutoCompleteArrayAdapter(
   val resource: Int,
   val textViewResourceId: Int,
   private val objects: List<AutoCompleteViewAnswerOption>,
-  private val callback: CustomCallback<*>? = null,
-  private val answerValueSet: String? = null,
 ) : ArrayAdapter<AutoCompleteViewAnswerOption>(context, resource, textViewResourceId, objects) {
 
   private var items = listOf<AutoCompleteViewAnswerOption>()
@@ -303,6 +318,11 @@ internal class AutoCompleteArrayAdapter(
     notifyDataSetChanged()
   }
 
+  fun clientSideFilter(query: String) {
+    items = objects.filter { it.answerDisplay.contains(query, ignoreCase = true) }
+    notifyDataSetChanged()
+  }
+
   override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
     return getView(position, convertView, parent)
   }
@@ -312,21 +332,12 @@ internal class AutoCompleteArrayAdapter(
   @Suppress("UNCHECKED_CAST")
   override fun getFilter(): Filter {
     return object : Filter() {
+
       override fun performFiltering(constraint: CharSequence?): FilterResults {
-        val query = (constraint?.toString() ?: "").trim()
-        val filteredResults: List<AutoCompleteViewAnswerOption> =
-          if (callback != null && answerValueSet != null && objects.isEmpty()) {
-            (callback as? CustomCallback<AutoCompleteViewAnswerOption>)?.invoke(
-              query,
-              answerValueSet,
-            )
-              ?: emptyList()
-          } else {
-            objects.filter { it.answerDisplay.contains(query, ignoreCase = true) }
-          }
+        // Prevent default filtering behaviour
         return FilterResults().apply {
-          values = filteredResults
-          count = filteredResults.size
+          values = items
+          count = items.size
         }
       }
 

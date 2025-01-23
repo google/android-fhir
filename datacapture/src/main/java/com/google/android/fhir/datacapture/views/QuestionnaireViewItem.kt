@@ -19,7 +19,6 @@ package com.google.android.fhir.datacapture.views
 import android.content.Context
 import android.text.Spanned
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.fhir.datacapture.CustomCallback
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
 import com.google.android.fhir.datacapture.extensions.isHelpCode
@@ -31,6 +30,7 @@ import com.google.android.fhir.datacapture.validation.NotValidated
 import com.google.android.fhir.datacapture.validation.Valid
 import com.google.android.fhir.datacapture.validation.ValidationResult
 import com.google.android.fhir.datacapture.views.factories.QuestionnaireItemViewHolder
+import org.hl7.fhir.r4.model.Coding
 import org.hl7.fhir.r4.model.Questionnaire
 import org.hl7.fhir.r4.model.Questionnaire.QuestionnaireItemComponent
 import org.hl7.fhir.r4.model.QuestionnaireResponse
@@ -94,7 +94,9 @@ data class QuestionnaireViewItem(
   val helpCardStateChangedCallback: (Boolean, QuestionnaireResponseItemComponent) -> Unit =
     { _, _ ->
     },
-  val callback: CustomCallback<*>? = null,
+  internal val autoCompleteAnswerOptionResolver: (String, String?, (List<Coding>) -> Unit) -> Unit =
+    { _, _, _ ->
+    },
 ) {
 
   fun getQuestionnaireResponseItem(): QuestionnaireResponseItemComponent = questionnaireResponseItem

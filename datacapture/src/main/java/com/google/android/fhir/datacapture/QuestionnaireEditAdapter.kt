@@ -391,5 +391,3 @@ internal object DiffCallbacks {
       }
     }
 }
-
-typealias CustomCallback<T> = (String, String) -> List<T>
