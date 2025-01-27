@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
@@ -53,6 +54,35 @@ class PatientListFragment : Fragment() {
     savedInstanceState: Bundle?,
   ): View {
     _binding = FragmentPatientListBinding.inflate(inflater, container, false)
+
+    val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+    binding.givenNameEditText.apply {
+      addTextChangedListener(
+        onTextChanged = { text, _, _, _ ->
+          patientListViewModel.setPatientGivenName(text.toString())
+        },
+      )
+      setOnFocusChangeListener { view, hasFocus ->
+        if (!hasFocus) {
+          imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+      }
+    }
+
+    binding.familyNameEditText.apply {
+      addTextChangedListener(
+        onTextChanged = { text, _, _, _ ->
+          patientListViewModel.setPatientFamilyName(text.toString())
+        },
+      )
+      setOnFocusChangeListener { view, hasFocus ->
+        if (!hasFocus) {
+          imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+      }
+    }
+
     return binding.root
   }
 
@@ -87,27 +117,6 @@ class PatientListFragment : Fragment() {
       binding.patientListContainer.patientCount.text = "$it Patient(s)"
     }
 
-    searchView = binding.search
-    searchView.setOnQueryTextListener(
-      object : SearchView.OnQueryTextListener {
-        override fun onQueryTextChange(newText: String): Boolean {
-          patientListViewModel.searchPatientsByName(newText)
-          return true
-        }
-
-        override fun onQueryTextSubmit(query: String): Boolean {
-          patientListViewModel.searchPatientsByName(query)
-          return true
-        }
-      },
-    )
-    searchView.setOnQueryTextFocusChangeListener { view, focused ->
-      if (!focused) {
-        // hide soft keyboard
-        (requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager)
-          .hideSoftInputFromWindow(view.windowToken, 0)
-      }
-    }
     requireActivity()
       .onBackPressedDispatcher
       .addCallback(
@@ -123,7 +132,6 @@ class PatientListFragment : Fragment() {
           }
         },
       )
-
     setHasOptionsMenu(true)
   }
 

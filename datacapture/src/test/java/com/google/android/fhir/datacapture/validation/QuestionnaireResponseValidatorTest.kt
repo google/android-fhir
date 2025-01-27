@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2024 Google LLC
+ * Copyright 2022-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import android.content.Context
 import android.os.Build
 import androidx.test.core.app.ApplicationProvider
 import com.google.android.fhir.datacapture.extensions.EXTENSION_HIDDEN_URL
+import com.google.android.fhir.datacapture.extensions.packRepeatedGroups
 import com.google.common.truth.Truth.assertThat
 import java.math.BigDecimal
 import kotlinx.coroutines.test.runTest
@@ -594,6 +595,79 @@ class QuestionnaireResponseValidatorTest {
       "Multiple answers for non-repeat questionnaire item question-1",
       context,
     )
+  }
+
+  @Test
+  fun `validation fails for required item in a questionnaire repeating group item with answer value`() {
+    val questionnaire1 =
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("group-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.GROUP,
+              ),
+            )
+            .apply {
+              repeats = true
+              addItem(
+                Questionnaire.QuestionnaireItemComponent(
+                    StringType("question-0"),
+                    Enumeration(
+                      Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                      Questionnaire.QuestionnaireItemType.INTEGER,
+                    ),
+                  )
+                  .apply { required = true },
+              )
+            },
+        )
+      }
+
+    val questionnaireResponse1 =
+      QuestionnaireResponse()
+        .apply {
+          questionnaire = "questionnaire-1"
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-0"))
+                  .apply {
+                    addAnswer(
+                      QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                        value = IntegerType(1)
+                      },
+                    )
+                  },
+              )
+            },
+          )
+
+          addItem(
+            QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
+              addItem(
+                QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-0")),
+              )
+            },
+          )
+        }
+        .apply { packRepeatedGroups(questionnaire1) }
+
+    runTest {
+      val result =
+        QuestionnaireResponseValidator.validateQuestionnaireResponse(
+          questionnaire1,
+          questionnaireResponse1,
+          context,
+        )
+
+      assertThat(result.keys).containsExactly("question-0", "group-1")
+      assertThat(result["question-0"]!!.first()).isInstanceOf(Invalid::class.java)
+      assertThat((result["question-0"]!!.first() as Invalid).getSingleStringValidationMessage())
+        .isEqualTo("Missing answer for required field.")
+    }
   }
 
   @Test
@@ -1650,6 +1724,69 @@ class QuestionnaireResponseValidatorTest {
         )
       },
       "Mismatching question type QUANTITY and answer type decimal for question-1",
+    )
+  }
+
+  @Test
+  fun `check fails for wrong answer type to a nested question in repeating group`() {
+    assertException_checkQuestionnaireResponse_throwsIllegalArgumentException(
+      Questionnaire().apply {
+        url = "questionnaire-1"
+        addItem(
+          Questionnaire.QuestionnaireItemComponent(
+              StringType("group-1"),
+              Enumeration(
+                Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                Questionnaire.QuestionnaireItemType.GROUP,
+              ),
+            )
+            .apply {
+              repeats = true
+              addItem(
+                Questionnaire.QuestionnaireItemComponent(
+                  StringType("question-0"),
+                  Enumeration(
+                    Questionnaire.QuestionnaireItemTypeEnumFactory(),
+                    Questionnaire.QuestionnaireItemType.INTEGER,
+                  ),
+                ),
+              )
+            },
+        )
+      },
+      QuestionnaireResponse().apply {
+        questionnaire = "questionnaire-1"
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-0"))
+                .apply {
+                  addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = IntegerType(1)
+                    },
+                  )
+                },
+            )
+          },
+        )
+
+        addItem(
+          QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("group-1")).apply {
+            addItem(
+              QuestionnaireResponse.QuestionnaireResponseItemComponent(StringType("question-0"))
+                .apply {
+                  addAnswer(
+                    QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent().apply {
+                      value = DecimalType(2.0)
+                    },
+                  )
+                },
+            )
+          },
+        )
+      },
+      "Mismatching question type INTEGER and answer type decimal for question-0",
     )
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ object Sync {
   suspend inline fun <reified W : FhirSyncWorker> oneTimeSync(
     context: Context,
     retryConfiguration: RetryConfiguration? = defaultRetryConfiguration,
+    existingWorkPolicy: ExistingWorkPolicy = ExistingWorkPolicy.KEEP,
   ): Flow<CurrentSyncJobStatus> {
     val uniqueWorkName = createSyncUniqueName<W>("oneTimeSync")
     val flow = getWorkerInfo(context, uniqueWorkName)
@@ -77,7 +78,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniqueWork(
         uniqueWorkName,
-        ExistingWorkPolicy.KEEP,
+        existingWorkPolicy,
         oneTimeWorkRequest,
       )
     val workId = oneTimeWorkRequest.id
@@ -99,6 +100,7 @@ object Sync {
   suspend inline fun <reified W : FhirSyncWorker> periodicSync(
     context: Context,
     periodicSyncConfiguration: PeriodicSyncConfiguration,
+    existingPeriodicWorkPolicy: ExistingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.KEEP,
   ): Flow<PeriodicSyncJobStatus> {
     val uniqueWorkName = createSyncUniqueName<W>("periodicSync")
     val flow = getWorkerInfo(context, uniqueWorkName)
@@ -107,7 +109,7 @@ object Sync {
     WorkManager.getInstance(context)
       .enqueueUniquePeriodicWork(
         uniqueWorkName,
-        ExistingPeriodicWorkPolicy.KEEP,
+        existingPeriodicWorkPolicy,
         periodicWorkRequest,
       )
     val workId = periodicWorkRequest.id
