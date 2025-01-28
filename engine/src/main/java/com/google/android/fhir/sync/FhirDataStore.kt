@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2024 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import java.time.OffsetDateTime
-import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
 @PublishedApi
@@ -101,19 +102,23 @@ internal class FhirDataStore(context: Context) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
   }
 
-  /** Stores the given UUID in DataStore. */
+  private val mutex = Mutex()
+
+  /** Stores the given unique-work-name in DataStore. */
   @PublishedApi
-  internal suspend fun storeWorkId(uuid: UUID, workIdKey: String) {
-    dataStore.edit { preferences ->
-      preferences[stringPreferencesKey("$workIdKey-key")] = uuid.toString()
+  internal suspend fun storeUniqueWorkName(key: String, value: String) {
+    mutex.withLock {
+      dataStore.edit { preferences -> preferences[stringPreferencesKey("$key-key")] = value }
     }
   }
 
-  /** Fetches the stored UUID from DataStore. */
+  /** Fetches the stored unique-work-name from DataStore. */
   @PublishedApi
-  internal suspend fun fetchWorkId(workIdKey: String): UUID? {
-    val preferences = dataStore.data.first()
-    return preferences[stringPreferencesKey("$workIdKey-key")]?.let { UUID.fromString(it) }
+  internal suspend fun fetchUniqueWorkName(key: String): String? {
+    mutex.withLock {
+      val preferences = dataStore.data.first()
+      return preferences[stringPreferencesKey("$key-key")]
+    }
   }
 
   companion object {

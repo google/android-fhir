@@ -24,15 +24,10 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
-import androidx.work.WorkInfo.State.BLOCKED
-import androidx.work.WorkInfo.State.CANCELLED
-import androidx.work.WorkInfo.State.ENQUEUED
-import androidx.work.WorkInfo.State.FAILED
-import androidx.work.WorkInfo.State.RUNNING
-import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
 import com.google.android.fhir.FhirEngineProvider
+import com.google.android.fhir.FhirEngineProvider.getFhirDataStore
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Cancelled
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Enqueued
@@ -42,7 +37,6 @@ import com.google.android.fhir.sync.CurrentSyncJobStatus.Succeeded
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import java.time.OffsetDateTime
-import java.util.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -81,8 +75,7 @@ object Sync {
         existingWorkPolicy,
         oneTimeWorkRequest,
       )
-    val workId = oneTimeWorkRequest.id
-    FhirEngineProvider.getFhirDataStore(context).storeWorkId(workId, uniqueWorkName)
+    storeUniqueWorkNameInDataStore(context, uniqueWorkName)
     return combineSyncStateForOneTimeSync(context, uniqueWorkName, flow)
   }
 
@@ -112,8 +105,7 @@ object Sync {
         existingPeriodicWorkPolicy,
         periodicWorkRequest,
       )
-    val workId = periodicWorkRequest.id
-    FhirEngineProvider.getFhirDataStore(context).storeWorkId(workId, uniqueWorkName)
+    storeUniqueWorkNameInDataStore(context, uniqueWorkName)
     return combineSyncStateForPeriodicSync(context, uniqueWorkName, flow)
   }
 
@@ -130,12 +122,13 @@ object Sync {
     context: Context,
     syncType: String,
   ) {
-    val uniqueWorkName = createSyncUniqueName<W>(syncType)
-    val workId = FhirEngineProvider.getFhirDataStore(context).fetchWorkId(uniqueWorkName)
-    if (workId != null) {
-      WorkManager.getInstance(context).cancelWorkById(workId)
+    val uniqueWorkNameAsKey = createSyncUniqueName<W>(syncType)
+    val uniqueWorkNameValueFromDataStore =
+      getFhirDataStore(context).fetchUniqueWorkName(uniqueWorkNameAsKey)
+    if (uniqueWorkNameValueFromDataStore != null) {
+      WorkManager.getInstance(context).cancelUniqueWork(uniqueWorkNameValueFromDataStore)
     } else {
-      Timber.w("No Work ID found for uniqueWorkName: $uniqueWorkName")
+      Timber.w("No value found for uniqueWorkName: $uniqueWorkNameValueFromDataStore")
     }
   }
 
@@ -373,5 +366,16 @@ object Sync {
   @PublishedApi
   internal inline fun <reified W : FhirSyncWorker> createSyncUniqueName(syncType: String): String {
     return "${W::class.java.name}-$syncType"
+  }
+
+  @PublishedApi
+  internal suspend inline fun storeUniqueWorkNameInDataStore(
+    context: Context,
+    uniqueWorkName: String,
+  ) {
+    val dataStore = getFhirDataStore(context)
+    if (dataStore.fetchUniqueWorkName(uniqueWorkName) == null) {
+      dataStore.storeUniqueWorkName(key = uniqueWorkName, value = uniqueWorkName)
+    }
   }
 }
