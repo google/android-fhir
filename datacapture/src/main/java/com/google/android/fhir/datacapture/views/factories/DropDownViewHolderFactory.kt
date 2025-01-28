@@ -19,11 +19,14 @@ package com.google.android.fhir.datacapture.views.factories
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.text.Spanned
+import android.text.method.TextKeyListener
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -41,6 +44,7 @@ import com.google.android.fhir.datacapture.views.HeaderView
 import com.google.android.fhir.datacapture.views.QuestionnaireViewItem
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.hl7.fhir.r4.model.QuestionnaireResponse
 import timber.log.Timber
@@ -52,6 +56,7 @@ internal object DropDownViewHolderFactory :
       private lateinit var header: HeaderView
       private lateinit var textInputLayout: TextInputLayout
       private lateinit var autoCompleteTextView: MaterialAutoCompleteTextView
+      private lateinit var clearInputIcon: FrameLayout
       override lateinit var questionnaireViewItem: QuestionnaireViewItem
       private lateinit var context: AppCompatActivity
 
@@ -59,7 +64,13 @@ internal object DropDownViewHolderFactory :
         header = itemView.findViewById(R.id.header)
         textInputLayout = itemView.findViewById(R.id.text_input_layout)
         autoCompleteTextView = itemView.findViewById(R.id.auto_complete)
+        clearInputIcon = itemView.findViewById(R.id.clear_input_icon)
         context = itemView.context.tryUnwrapContext()!!
+        autoCompleteTextView.setOnFocusChangeListener { view, hasFocus ->
+          if (!hasFocus) {
+            (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
+          }
+        }
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -130,6 +141,16 @@ internal object DropDownViewHolderFactory :
               }
             }
           }
+        val isEditable = questionnaireViewItem.answers.isEmpty()
+        if (!isEditable) autoCompleteTextView.clearFocus()
+        autoCompleteTextView.keyListener = if (isEditable) TextKeyListener.getInstance() else null
+        clearInputIcon.visibility = if (isEditable) View.GONE else View.VISIBLE
+        clearInputIcon.setOnClickListener {
+          context.lifecycleScope.launch {
+            delay(200) // to show ripple effect on the icon before clearing the answer
+            questionnaireViewItem.clearAnswer()
+          }
+        }
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }

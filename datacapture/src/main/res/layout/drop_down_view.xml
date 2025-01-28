@@ -13,7 +13,7 @@
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/item_margin_horizontal"
@@ -35,37 +35,42 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-    >
+        android:layout_height="wrap_content">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout"
             style="?attr/questionnaireDropdownLayoutStyle"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-        >
+            android:layout_height="wrap_content">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:id="@+id/auto_complete"
                 style="?attr/questionnaireDropDownSelectedTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawablePadding="@dimen/icon_drawable_padding"
-            />
+                android:drawablePadding="@dimen/icon_drawable_padding" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <ImageView
-            android:id="@+id/clearIcon"
+        <FrameLayout
+            android:id="@+id/clear_input_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:layout_gravity="end|center_vertical"
-            android:layout_marginTop="@dimen/help_container_margin_top"
-            android:layout_marginEnd="@dimen/drop_down_clear_icon_margin"
-            android:padding="@dimen/icon_drawable_padding"
-            android:src="@drawable/ic_clear"
-            android:visibility="gone"
-        />
+            android:padding="@dimen/drop_down_clear_input_icon_ripple_padding"
+            android:layout_marginTop="@dimen/drop_down_clear_icon_margin_top"
+            android:layout_marginEnd="@dimen/drop_down_clear_icon_margin_end">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_clear"
+                android:scaleType="fitCenter"
+                app:tint="#999999"/>
+
+        </FrameLayout>
 
     </FrameLayout>
 
