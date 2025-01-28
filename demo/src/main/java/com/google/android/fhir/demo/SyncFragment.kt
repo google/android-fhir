@@ -55,7 +55,7 @@ class SyncFragment : Fragment() {
     }
     observeLastSyncTime()
     launchAndRepeatStarted(
-      { syncFragmentViewModel.pollState.collect(::collectSyncJobStatus) },
+      { syncFragmentViewModel.pollState.collect(::currentSyncJobStatus) },
     )
   }
 
@@ -76,7 +76,7 @@ class SyncFragment : Fragment() {
     }
   }
 
-  private fun collectSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
+  private fun currentSyncJobStatus(currentSyncJobStatus: CurrentSyncJobStatus) {
     Timber.d("currentSyncJobStatus: $currentSyncJobStatus")
     // Update status text
     val statusTextView = requireView().findViewById<TextView>(R.id.current_status)

@@ -23,6 +23,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import java.io.IOException
 import java.time.OffsetDateTime
+import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
@@ -102,36 +103,35 @@ internal class FhirDataStore(context: Context) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
   }
 
-  private val mutexMap = mutableMapOf<String, Mutex>()
+  private val mutexMap = ConcurrentHashMap<String, Mutex>()
 
-  private fun getMutexForKey(key: String): Mutex {
-    return mutexMap.getOrPut(key) { Mutex() }
+  private fun getOrCreateMutex(key: String): Mutex {
+    // computeIfAbsent is thread-safe and only creates a Mutex if one doesn't exist.
+    return mutexMap.computeIfAbsent(key) { Mutex() }
   }
 
   /** Stores the given unique-work-name in DataStore. */
   @PublishedApi
   internal suspend fun storeUniqueWorkName(key: String, value: String) {
-    getMutexForKey(key).withLock {
+    getOrCreateMutex(key).withLock {
       dataStore.edit { preferences -> preferences[stringPreferencesKey("$key-key")] = value }
     }
   }
 
   @PublishedApi
   internal suspend fun removeUniqueWorkName(key: String) {
-    getMutexForKey(key).withLock {
+    getOrCreateMutex(key).withLock {
       dataStore.edit { preferences ->
         val value = preferences.remove(stringPreferencesKey("$key-key"))
         Timber.d("Removed value: $value")
       }
     }
-
-    synchronized(mutexMap) { mutexMap.remove(key) }
   }
 
   /** Fetches the stored unique-work-name from DataStore. */
   @PublishedApi
   internal suspend fun fetchUniqueWorkName(key: String): String? {
-    return getMutexForKey(key).withLock {
+    return getOrCreateMutex(key).withLock {
       val preferences = dataStore.data.first()
       preferences[stringPreferencesKey("$key-key")]
     }
