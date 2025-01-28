@@ -102,12 +102,16 @@ internal class FhirDataStore(context: Context) {
     runBlocking { dataStore.edit { pref -> pref[lastSyncTimestampKey] = datetime.toString() } }
   }
 
-  private val mutex = Mutex()
+  private val mutexMap = mutableMapOf<String, Mutex>()
+
+  private fun getMutexForKey(key: String): Mutex {
+    return mutexMap.getOrPut(key) { Mutex() }
+  }
 
   /** Stores the given unique-work-name in DataStore. */
   @PublishedApi
   internal suspend fun storeUniqueWorkName(key: String, value: String) {
-    mutex.withLock {
+    getMutexForKey(key).withLock {
       dataStore.edit { preferences -> preferences[stringPreferencesKey("$key-key")] = value }
     }
   }
@@ -115,9 +119,9 @@ internal class FhirDataStore(context: Context) {
   /** Fetches the stored unique-work-name from DataStore. */
   @PublishedApi
   internal suspend fun fetchUniqueWorkName(key: String): String? {
-    mutex.withLock {
+    return getMutexForKey(key).withLock {
       val preferences = dataStore.data.first()
-      return preferences[stringPreferencesKey("$key-key")]
+      preferences[stringPreferencesKey("$key-key")]
     }
   }
 
