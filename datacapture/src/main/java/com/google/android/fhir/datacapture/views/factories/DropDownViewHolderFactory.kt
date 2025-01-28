@@ -71,6 +71,12 @@ internal object DropDownViewHolderFactory :
             (view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager).hideSoftInputFromWindow(view.windowToken, 0)
           }
         }
+        clearInputIcon.setOnClickListener {
+          context.lifecycleScope.launch {
+            delay(200) // to show ripple effect on the icon before clearing the answer
+            questionnaireViewItem.clearAnswer()
+          }
+        }
       }
 
       override fun bind(questionnaireViewItem: QuestionnaireViewItem) {
@@ -145,12 +151,6 @@ internal object DropDownViewHolderFactory :
         if (!isEditable) autoCompleteTextView.clearFocus()
         autoCompleteTextView.keyListener = if (isEditable) TextKeyListener.getInstance() else null
         clearInputIcon.visibility = if (isEditable) View.GONE else View.VISIBLE
-        clearInputIcon.setOnClickListener {
-          context.lifecycleScope.launch {
-            delay(200) // to show ripple effect on the icon before clearing the answer
-            questionnaireViewItem.clearAnswer()
-          }
-        }
 
         displayValidationResult(questionnaireViewItem.validationResult)
       }
