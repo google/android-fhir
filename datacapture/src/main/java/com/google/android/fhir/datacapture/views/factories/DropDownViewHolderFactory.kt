@@ -29,6 +29,7 @@ import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.doOnNextLayout
 import androidx.lifecycle.lifecycleScope
 import com.google.android.fhir.datacapture.R
 import com.google.android.fhir.datacapture.extensions.displayString
@@ -75,6 +76,7 @@ internal object DropDownViewHolderFactory :
           context.lifecycleScope.launch {
             delay(200) // to show ripple effect on the icon before clearing the answer
             questionnaireViewItem.clearAnswer()
+            autoCompleteTextView.doOnNextLayout { autoCompleteTextView.showDropDown() }
           }
         }
       }
