@@ -76,8 +76,8 @@ of the `app/build.gradle.kts` file of your project:
 dependencies {
     // ...
 
-    implementation("com.google.android.fhir:data-capture:1.0.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.5")
+    implementation("com.google.android.fhir:data-capture:1.2.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.0")
 }
 ```
 
@@ -150,11 +150,11 @@ Open `MainActivity.kt` and add the following code to the `MainActivity` class:
 
 ```kotlin
 // Step 2: Configure a QuestionnaireFragment
-val questionnaireJsonString = getStringFromAssets("questionnaire.json")
+questionnaireJsonString = getStringFromAssets("questionnaire.json")
 
-val questionnaireParams = bundleOf(
-QuestionnaireFragment.EXTRA_QUESTIONNAIRE_JSON_STRING to questionnaireJsonString
-)
+val questionnaireFragment =
+  QuestionnaireFragment.builder().setQuestionnaire(questionnaireJsonString!!).build()
+
 ```
 
 ### Step 3: Add the QuestionnaireFragment to the FragmentContainerView
@@ -168,10 +168,10 @@ Add the following code to the `MainActivity` class:
 ```kotlin
 // Step 3: Add the QuestionnaireFragment to the FragmentContainerView
 if (savedInstanceState == null) {
-    supportFragmentManager.commit {
-        setReorderingAllowed(true)
-        add<QuestionnaireFragment>(R.id.fragment_container_view, args = questionnaireParams)
-    }
+  supportFragmentManager.commit {
+    setReorderingAllowed(true)
+    add(R.id.fragment_container_view, questionnaireFragment)
+  }
 }
 // Submit button callback
 supportFragmentManager.setFragmentResultListener(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 Google LLC
+ * Copyright 2023-2025 Google LLC
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -367,6 +367,121 @@ class ResourceDatabaseMigrationTest {
     assertThat(localChangeReferences[localChange1Id]!!)
       .containsExactly("Practitioner/123", "Organization/123")
     assertThat(localChangeReferences[localChange2Id]!!).containsExactly("Practitioner/345")
+  }
+
+  @Test
+  fun migrate8To9_should_execute_with_no_exception(): Unit = runBlocking {
+    val taskId = "bed-net-001"
+    val taskResourceUuid = "8593abf6-b8dd-44d7-a35f-1c8843bc2c45"
+    val date = Date()
+    val bedNetTask =
+      Task()
+        .apply {
+          id = taskId
+          status = Task.TaskStatus.READY
+          meta.lastUpdated = date
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 8).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource, lastUpdatedLocal) VALUES ('$taskResourceUuid', 'Task', '$taskId', '$bedNetTask', '${DbTypeConverters.instantToLong(date.toInstant())}' );",
+      )
+      execSQL(
+        "INSERT INTO TokenIndexEntity (resourceUuid, resourceType, index_name, index_path, index_system, index_value) VALUES ('$taskResourceUuid', 'Task', 'status', 'Task.status', 'http://hl7.org/fhir/task-status', 'ready');",
+      )
+      close()
+    }
+
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 9, true, Migration_8_9)
+
+    val retrievedTask: String?
+    migratedDatabase.let { database ->
+      database
+        .query(
+          """
+        SELECT a.serializedResource FROM ResourceEntity a
+        WHERE a.resourceType = 'Task'
+          AND a.resourceUuid IN (SELECT resourceUuid FROM TokenIndexEntity
+            WHERE resourceType = 'Task' AND index_name = 'status' AND index_value = 'ready'
+              AND IFNULL(index_system, '') = 'http://hl7.org/fhir/task-status')
+                """
+            .trimIndent(),
+        )
+        .let {
+          it.moveToFirst()
+          retrievedTask = it.getString(0)
+        }
+    }
+    migratedDatabase.close()
+
+    assertThat(retrievedTask).isEqualTo(bedNetTask)
+  }
+
+  @Test
+  fun migrate9To10_should_execute_with_no_exception(): Unit = runBlocking {
+    val patient1Id = "patient-001"
+    val patient1ResourceUuid = "e2c79e28-ed4d-4029-a12c-108d1eb5bedb"
+    val patient1: String =
+      Patient()
+        .apply {
+          id = patient1Id
+          addName(HumanName().apply { addGiven("Brad") })
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    val patient2Id = "patient-002"
+    val patient2ResourceUuid = "541782b3-48f5-4c36-bd20-cae265e974e7"
+    val patient2: String =
+      Patient()
+        .apply {
+          id = patient2Id
+          addName(HumanName().apply { addGiven("Alex") })
+        }
+        .let { iParser.encodeResourceToString(it) }
+
+    helper.createDatabase(DB_NAME, 9).apply {
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient1ResourceUuid', 'Patient', '$patient1', '$patient1');",
+      )
+      execSQL(
+        "INSERT INTO ResourceEntity (resourceUuid, resourceType, resourceId, serializedResource) VALUES ('$patient2ResourceUuid', 'Patient', '$patient2', '$patient2');",
+      )
+
+      close()
+    }
+
+    val migratedDatabase = helper.runMigrationsAndValidate(DB_NAME, 10, true, Migration_9_10)
+
+    val patientResult1: String?
+    val patientResult2: String?
+
+    migratedDatabase.let { database ->
+      database
+        .query(
+          """
+        SELECT a.serializedResource
+        FROM ResourceEntity a
+        LEFT JOIN StringIndexEntity b
+        ON a.resourceUuid = b.resourceUuid AND b.index_name = 'name'
+        WHERE a.resourceType = 'Patient'
+        GROUP BY a.resourceUuid
+        HAVING MAX(IFNULL(b.index_value,0)) >= -9223372036854775808
+        ORDER BY IFNULL(b.index_value, -9223372036854775808) ASC
+                """
+            .trimIndent(),
+        )
+        .let {
+          it.moveToFirst()
+          patientResult1 = it.getString(0)
+          it.moveToNext()
+          patientResult2 = it.getString(0)
+        }
+    }
+    migratedDatabase.close()
+
+    assertThat(patientResult1).isEqualTo(patient2)
+    assertThat(patientResult2).isEqualTo(patient1)
   }
 
   companion object {

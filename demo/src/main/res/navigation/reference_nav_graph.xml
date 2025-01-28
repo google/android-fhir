@@ -14,16 +14,20 @@
         tools:layout="@layout/fragment_home"
     >
     <action
-            android:id="@+id/action_home_fragment_to_addPatientFragment"
-            app:destination="@id/addPatientFragment"
-        />
-    <action
             android:id="@+id/action_home_fragment_to_patient_list"
             app:destination="@id/patient_list"
         />
     <action
             android:id="@+id/action_home_fragment_to_sync_fragment"
-            app:destination="@id/manualSyncFragment"
+            app:destination="@id/syncFragment"
+        />
+    <action
+            android:id="@+id/action_home_fragment_to_periodic_sync_fragment"
+            app:destination="@id/periodicSyncFragment"
+        />
+    <action
+            android:id="@+id/action_home_fragment_to_crud_operation_fragment"
+            app:destination="@id/crudOperationFragment"
         />
   </fragment>
 
@@ -85,10 +89,22 @@
     </fragment>
 
   <fragment
-        android:id="@+id/manualSyncFragment"
+        android:id="@+id/syncFragment"
         android:name="com.google.android.fhir.demo.SyncFragment"
         android:label="fragment_manual_sync"
         tools:layout="@layout/sync"
     />
+  <fragment
+        android:id="@+id/crudOperationFragment"
+        android:name="com.google.android.fhir.demo.CrudOperationFragment"
+        android:label="fragment_layout"
+        tools:layout="@layout/fragment_crud_layout"
+    />
 
+  <fragment
+        android:id="@+id/periodicSyncFragment"
+        android:name="com.google.android.fhir.demo.PeriodicSyncFragment"
+        android:label="fragment_periodic_sync"
+        tools:layout="@layout/periodic_sync"
+    />
 </navigation>

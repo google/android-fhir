@@ -206,6 +206,12 @@ interface FhirEngine {
    *   back and no record is purged.
    */
   suspend fun purge(type: ResourceType, ids: Set<String>, forcePurge: Boolean = false)
+
+  /**
+   * Adds support for performing actions on `FhirEngine` as a single atomic transaction where the
+   * entire set of changes succeed or fail as a single entity
+   */
+  suspend fun withTransaction(block: suspend FhirEngine.() -> Unit)
 }
 
 /**
