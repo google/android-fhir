@@ -26,7 +26,6 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.hasKeyWithValueOfType
-import com.google.android.fhir.FhirEngineProvider
 import com.google.android.fhir.FhirEngineProvider.getFhirDataStore
 import com.google.android.fhir.OffsetDateTimeTypeAdapter
 import com.google.android.fhir.sync.CurrentSyncJobStatus.Cancelled
@@ -175,7 +174,7 @@ object Sync {
     workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
   ): Flow<PeriodicSyncJobStatus> {
     val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
-      FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
+      getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
     return combine(workerInfoSyncJobStatusPairFromWorkManagerFlow, syncJobStatusInDataStoreFlow) {
       workerInfoSyncJobStatusPairFromWorkManager,
       syncJobStatusFromDataStore,
@@ -184,6 +183,8 @@ object Sync {
         lastSyncJobStatus = mapSyncJobStatusToResult(syncJobStatusFromDataStore),
         currentSyncJobStatus =
           createSyncStateForPeriodicSync(
+            context,
+            workName,
             workerInfoSyncJobStatusPairFromWorkManager.first,
             workerInfoSyncJobStatusPairFromWorkManager.second,
           ),
@@ -207,13 +208,15 @@ object Sync {
     workerInfoSyncJobStatusPairFromWorkManagerFlow: Flow<Pair<WorkInfo.State, SyncJobStatus?>>,
   ): Flow<CurrentSyncJobStatus> {
     val syncJobStatusInDataStoreFlow: Flow<SyncJobStatus?> =
-      FhirEngineProvider.getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
+      getFhirDataStore(context).observeTerminalSyncJobStatus(workName)
 
     return combine(workerInfoSyncJobStatusPairFromWorkManagerFlow, syncJobStatusInDataStoreFlow) {
       workerInfoSyncJobStatusPairFromWorkManager,
       syncJobStatusFromDataStore,
       ->
       createSyncStateForOneTimeSync(
+        context,
+        workName,
         workerInfoSyncJobStatusPairFromWorkManager.first,
         workerInfoSyncJobStatusPairFromWorkManager.second,
         syncJobStatusFromDataStore,
@@ -276,10 +279,12 @@ object Sync {
 
   /** Gets the timestamp of the last sync job. */
   fun getLastSyncTimestamp(context: Context): OffsetDateTime? {
-    return FhirEngineProvider.getFhirDataStore(context).readLastSyncTimestamp()
+    return getFhirDataStore(context).readLastSyncTimestamp()
   }
 
-  private fun createSyncStateForOneTimeSync(
+  private suspend fun createSyncStateForOneTimeSync(
+    context: Context,
+    uniqueWorkName: String,
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
     syncJobStatusFromDataStore: SyncJobStatus?,
@@ -298,6 +303,7 @@ object Sync {
         }
       }
       WorkInfo.State.SUCCEEDED -> {
+        removeUniqueWorkNameInDataStore(context, uniqueWorkName)
         syncJobStatusFromDataStore?.let {
           when (it) {
             is SyncJobStatus.Succeeded -> Succeeded(it.timestamp)
@@ -307,6 +313,7 @@ object Sync {
           ?: error("Inconsistent terminal syncJobStatus.")
       }
       WorkInfo.State.FAILED -> {
+        removeUniqueWorkNameInDataStore(context, uniqueWorkName)
         syncJobStatusFromDataStore?.let {
           when (it) {
             is SyncJobStatus.Failed -> Failed(it.timestamp)
@@ -315,12 +322,17 @@ object Sync {
         }
           ?: error("Inconsistent terminal syncJobStatus.")
       }
-      WorkInfo.State.CANCELLED -> Cancelled
+      WorkInfo.State.CANCELLED -> {
+        removeUniqueWorkNameInDataStore(context, uniqueWorkName)
+        Cancelled
+      }
       WorkInfo.State.BLOCKED -> CurrentSyncJobStatus.Blocked
     }
   }
 
-  private fun createSyncStateForPeriodicSync(
+  private suspend fun createSyncStateForPeriodicSync(
+    context: Context,
+    uniqueWorkName: String,
     workInfoState: WorkInfo.State,
     syncJobStatusFromWorkManager: SyncJobStatus?,
   ): CurrentSyncJobStatus {
@@ -335,7 +347,10 @@ object Sync {
           null -> Running(SyncJobStatus.Started())
         }
       }
-      WorkInfo.State.CANCELLED -> Cancelled
+      WorkInfo.State.CANCELLED -> {
+        removeUniqueWorkNameInDataStore(context, uniqueWorkName)
+        Cancelled
+      }
       WorkInfo.State.BLOCKED -> CurrentSyncJobStatus.Blocked
       else -> error("Inconsistent WorkInfo.State in periodic sync : $workInfoState.")
     }
@@ -376,6 +391,17 @@ object Sync {
     val dataStore = getFhirDataStore(context)
     if (dataStore.fetchUniqueWorkName(uniqueWorkName) == null) {
       dataStore.storeUniqueWorkName(key = uniqueWorkName, value = uniqueWorkName)
+    }
+  }
+
+  @PublishedApi
+  internal suspend inline fun removeUniqueWorkNameInDataStore(
+    context: Context,
+    uniqueWorkName: String,
+  ) {
+    val dataStore = getFhirDataStore(context)
+    if (dataStore.fetchUniqueWorkName(uniqueWorkName) != null) {
+      dataStore.removeUniqueWorkName(key = uniqueWorkName)
     }
   }
 }

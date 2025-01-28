@@ -116,6 +116,18 @@ internal class FhirDataStore(context: Context) {
     }
   }
 
+  @PublishedApi
+  internal suspend fun removeUniqueWorkName(key: String) {
+    getMutexForKey(key).withLock {
+      dataStore.edit { preferences ->
+        val value = preferences.remove(stringPreferencesKey("$key-key"))
+        Timber.d("Removed value: $value")
+      }
+    }
+
+    synchronized(mutexMap) { mutexMap.remove(key) }
+  }
+
   /** Fetches the stored unique-work-name from DataStore. */
   @PublishedApi
   internal suspend fun fetchUniqueWorkName(key: String): String? {
